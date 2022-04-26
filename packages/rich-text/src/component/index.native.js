@@ -1039,6 +1039,8 @@ export class RichText extends Component {
 			accessibilityLabel,
 			disableEditingMenu = false,
 			baseGlobalStyles,
+			selectionStart,
+			selectionEnd,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1065,12 +1067,14 @@ export class RichText extends Component {
 			defaultTextDecorationColor
 		);
 
+		const currentSelectionStart = selectionStart ?? 0;
+		const currentSelectionEnd = selectionEnd ?? 0;
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
 			selection = {
-				start: this.props.selectionStart,
-				end: this.props.selectionEnd,
+				start: currentSelectionStart,
+				end: currentSelectionEnd,
 			};
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
@@ -1086,12 +1090,11 @@ export class RichText extends Component {
 						brBeforeParaMatches[ 0 ].match( /br/g ) || []
 					).length;
 					if ( count > 0 ) {
-						let newSelectionStart =
-							this.props.selectionStart - count;
+						let newSelectionStart = currentSelectionStart - count;
 						if ( newSelectionStart < 0 ) {
 							newSelectionStart = 0;
 						}
-						let newSelectionEnd = this.props.selectionEnd - count;
+						let newSelectionEnd = currentSelectionEnd - count;
 						if ( newSelectionEnd < 0 ) {
 							newSelectionEnd = 0;
 						}
