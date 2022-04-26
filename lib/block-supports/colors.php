@@ -101,8 +101,8 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		$color_block_styles['gradient'] = $preset_gradient_color ? $preset_gradient_color : $custom_gradient_color;
 	}
 
-	$attributes   = array();
-	$styles       = gutenberg_style_engine_generate( array( 'color' => $color_block_styles ) );
+	$attributes = array();
+	$styles     = gutenberg_style_engine_generate( array( 'color' => $color_block_styles ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
