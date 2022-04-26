@@ -204,8 +204,9 @@ export function useInputControlStateReducer(
 		currentValueProp.current = initialState.value;
 	} );
 	useLayoutEffect( () => {
+		if ( ! refEvent.current ) return;
+
 		if (
-			refEvent.current &&
 			state.value !== currentValueProp.current &&
 			! currentState.current.isDirty
 		) {
@@ -214,9 +215,9 @@ export function useInputControlStateReducer(
 					| ChangeEvent< HTMLInputElement >
 					| PointerEvent< HTMLInputElement >,
 			} );
-			refEvent.current = null;
 		}
-	}, [ state.value ] );
+		refEvent.current = null;
+	}, [ state.value, state.isDragging ] );
 	useLayoutEffect( () => {
 		if (
 			! refEvent.current &&
