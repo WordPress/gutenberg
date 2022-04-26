@@ -140,9 +140,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['letterSpacing'], 'letter-spacing' );
 	}
 
-	$attributes   = array();
-	$style_engine = gutenberg_get_style_engine();
-	$styles       = $style_engine->generate( array( 'typography' => $typography_block_styles ) );
+	$attributes = array();
+	$styles     = gutenberg_style_engine_generate( array( 'typography' => $typography_block_styles ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];

@@ -18,8 +18,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * @dataProvider data_generate_styles_fixtures
 	 */
 	function test_generate_styles( $block_styles, $expected_output ) {
-		$style_engine     = wp_get_style_engine();
-		$generated_styles = $style_engine->generate( $block_styles );
+		$generated_styles = wp_style_engine_generate( $block_styles );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 

@@ -16,6 +16,11 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  *
  * Consolidates rendering block styles to reduce duplication and streamline
  * CSS styles generation.
+ *
+ * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
+ * This is a low-level API that may need to do breaking changes. Please, use gutenberg_style_engine_get_styles instead.
+ *
+ * @access private
  */
 class WP_Style_Engine {
 	/**
@@ -169,10 +174,9 @@ class WP_Style_Engine {
 	 * @return array        An array of CSS rules.
 	 */
 	protected static function get_css( $style_value, $style_definition ) {
-		$css = array();
 		// Low-specificity check to see if the value is a CSS preset.
 		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
-			return $css;
+			return array();
 		}
 
 		// If required in the future, style definitions could define a callable `value_func` to generate custom CSS rules.
@@ -269,12 +273,22 @@ class WP_Style_Engine {
 }
 
 /**
- * This function returns the Style Engine instance.
+ * Global public interface method to WP_Style_Engine->generate.
  *
- * @return WP_Style_Engine
+ * Returns an CSS ruleset.
+ * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ *
+ * @param array $block_styles An array of styles from a block's attributes.
+ *
+ * @return array|null array(
+ *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
+ *     'classnames' => (string) Classnames separated by a space.
+ * );
  */
-function wp_get_style_engine() {
+function wp_style_engine_generate( $block_styles ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
-		return WP_Style_Engine::get_instance();
+		$style_engine = WP_Style_Engine::get_instance();
+		return $style_engine->generate( $block_styles );
 	}
+	return null;
 }
