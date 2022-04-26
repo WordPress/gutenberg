@@ -299,6 +299,11 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Sometimes the caret has not moved to the correct position before pressing Enter.
+		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -321,6 +326,11 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Sometimes the caret has not moved to the correct position before pressing Enter.
+		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -342,6 +352,11 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Sometimes the caret has not moved to the correct position before pressing Enter.
+		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
