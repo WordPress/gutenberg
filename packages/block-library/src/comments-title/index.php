@@ -53,9 +53,9 @@ function render_block_core_comments_title( $attributes ) {
 	);
 }
 
-	/**
-	 * Registers the `core/comments-title` block on the server.
-	 */
+/**
+ * Registers the `core/comments-title` block on the server.
+ */
 function register_block_core_comments_title() {
 	register_block_type_from_metadata(
 		__DIR__ . '/comments-title',
@@ -65,4 +65,4 @@ function register_block_core_comments_title() {
 	);
 }
 
-	add_action( 'init', 'register_block_core_comments_title' );
+add_action( 'init', 'register_block_core_comments_title' );
