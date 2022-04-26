@@ -45,3 +45,47 @@ export const all = () => {
 
 	return <CheckboxControlWithState label={ label } help={ help } checked />;
 };
+
+export const Indeterminate = () => {
+	const [ fruits, setFruits ] = useState( { apple: false, orange: false } );
+
+	const isAllChecked = Object.values( fruits ).every( Boolean );
+	const isIndeterminate =
+		Object.values( fruits ).some( Boolean ) && ! isAllChecked;
+
+	return (
+		<>
+			<CheckboxControl
+				label="Select All"
+				checked={ isAllChecked }
+				indeterminate={ isIndeterminate }
+				onChange={ ( newValue ) =>
+					setFruits( {
+						apple: newValue,
+						orange: newValue,
+					} )
+				}
+			/>
+			<CheckboxControl
+				label="Apple"
+				checked={ fruits.apple }
+				onChange={ ( apple ) =>
+					setFruits( ( prevState ) => ( {
+						...prevState,
+						apple,
+					} ) )
+				}
+			/>
+			<CheckboxControl
+				label="Orange"
+				checked={ fruits.orange }
+				onChange={ ( orange ) =>
+					setFruits( ( prevState ) => ( {
+						...prevState,
+						orange,
+					} ) )
+				}
+			/>
+		</>
+	);
+};

@@ -92,7 +92,7 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => 'a7a065576c848d981b22daffdf0d336a');"`;
+exports[`DependencyExtractionWebpackPlugin Webpack \`no-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => 'e666cc803ddb8b960a12755e87d0321c');"`;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 

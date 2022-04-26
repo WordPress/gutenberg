@@ -1,384 +1,262 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
-<ForwardRef(Modal)
-  className="edit-post-preferences-modal"
-  closeLabel="Close"
-  onRequestClose={[Function]}
-  title="Preferences"
+exports[`EditPostPreferencesModal should match snapshot when the modal is active large viewports 1`] = `
+<PreferencesModal
+  closeModal={[Function]}
 >
-  <TabPanel
-    className="edit-post-preferences__tabs"
-    onSelect={[Function]}
-    orientation="vertical"
-    tabs={
+  <PreferencesModalTabs
+    sections={
       Array [
         Object {
+          "content": <React.Fragment>
+            <Section
+              description="Change options related to publishing."
+              title="Publishing"
+            >
+              <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
+                help="Review settings, such as visibility and tags."
+                label="Include pre-publish checklist"
+              />
+            </Section>
+            <Section
+              description="Customize options related to the block editor interface and editing flow."
+              title="Appearance"
+            >
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="reducedUI"
+                help="Compacts options and outlines in the toolbar."
+                label="Reduce the interface"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="focusMode"
+                help="Highlights the current block and fades other content."
+                label="Spotlight mode"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showIconLabels"
+                help="Shows text instead of icons."
+                label="Display button labels"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="themeStyles"
+                help="Make the editor look like your theme."
+                label="Use theme styles"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showBlockBreadcrumbs"
+                help="Shows block breadcrumbs at the bottom of the editor."
+                label="Display block breadcrumbs"
+              />
+            </Section>
+          </React.Fragment>,
           "name": "general",
-          "title": "General",
+          "tabLabel": "General",
         },
         Object {
+          "content": <React.Fragment>
+            <Section
+              description="Customize how you interact with blocks in the block library and editing canvas."
+              title="Block interactions"
+            >
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="mostUsedBlocks"
+                help="Places the most frequent blocks in the block library."
+                label="Show most used blocks"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="keepCaretInsideBlock"
+                help="Aids screen readers by stopping text caret from leaving blocks."
+                label="Contain text cursor inside block"
+              />
+            </Section>
+            <Section
+              description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+              title="Visible blocks"
+            >
+              <WithSelect(BlockManager) />
+            </Section>
+          </React.Fragment>,
           "name": "blocks",
-          "title": "Blocks",
+          "tabLabel": "Blocks",
         },
         Object {
+          "content": <React.Fragment>
+            <Section
+              description="Choose what displays in the panel."
+              title="Document settings"
+            >
+              <EnablePluginDocumentSettingPanelOptionSlot />
+              <WithSelect(PostTaxonomies)
+                taxonomyWrapper={[Function]}
+              />
+              <PostFeaturedImageCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Featured image"
+                  panelName="featured-image"
+                />
+              </PostFeaturedImageCheck>
+              <PostExcerptCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Excerpt"
+                  panelName="post-excerpt"
+                />
+              </PostExcerptCheck>
+              <WithSelect(PostTypeSupportCheck)
+                supportKeys={
+                  Array [
+                    "comments",
+                    "trackbacks",
+                  ]
+                }
+              >
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Discussion"
+                  panelName="discussion-panel"
+                />
+              </WithSelect(PostTypeSupportCheck)>
+              <PageAttributesCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Page attributes"
+                  panelName="page-attributes"
+                />
+              </PageAttributesCheck>
+            </Section>
+            <WithSelect(MetaBoxesSection)
+              description="Add extra areas to the editor."
+              title="Additional"
+            />
+          </React.Fragment>,
           "name": "panels",
-          "title": "Panels",
+          "tabLabel": "Panels",
         },
       ]
     }
-  >
-    <Component />
-  </TabPanel>
-</ForwardRef(Modal)>
+  />
+</PreferencesModal>
 `;
 
-exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
-<ForwardRef(Modal)
-  className="edit-post-preferences-modal"
-  closeLabel="Close"
-  onRequestClose={[Function]}
-  title="Preferences"
+exports[`EditPostPreferencesModal should match snapshot when the modal is active small viewports 1`] = `
+<PreferencesModal
+  closeModal={[Function]}
 >
-  <NavigatorProvider
-    initialPath="/"
-  >
-    <NavigatorScreen
-      path="/"
-    >
-      <Card
-        isBorderless={true}
-        size="small"
-      >
-        <CardBody>
-          <ItemGroup>
-            <NavigationButton
-              as={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "__contextSystemKey__": Array [
-                    "Item",
-                  ],
-                  "render": [Function],
-                  "selector": ".components-item",
-                }
-              }
-              isAction={true}
-              key="general"
-              path="general"
+  <PreferencesModalTabs
+    sections={
+      Array [
+        Object {
+          "content": <React.Fragment>
+            <Section
+              description="Customize options related to the block editor interface and editing flow."
+              title="Appearance"
             >
-              <HStack
-                justify="space-between"
-              >
-                <FlexItem>
-                  <Truncate>
-                    General
-                  </Truncate>
-                </FlexItem>
-                <FlexItem>
-                  <Icon
-                    icon={
-                      <SVG
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <Path
-                          d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                        />
-                      </SVG>
-                    }
-                  />
-                </FlexItem>
-              </HStack>
-            </NavigationButton>
-            <NavigationButton
-              as={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "__contextSystemKey__": Array [
-                    "Item",
-                  ],
-                  "render": [Function],
-                  "selector": ".components-item",
-                }
-              }
-              isAction={true}
-              key="blocks"
-              path="blocks"
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="reducedUI"
+                help="Compacts options and outlines in the toolbar."
+                label="Reduce the interface"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="focusMode"
+                help="Highlights the current block and fades other content."
+                label="Spotlight mode"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showIconLabels"
+                help="Shows text instead of icons."
+                label="Display button labels"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="themeStyles"
+                help="Make the editor look like your theme."
+                label="Use theme styles"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showBlockBreadcrumbs"
+                help="Shows block breadcrumbs at the bottom of the editor."
+                label="Display block breadcrumbs"
+              />
+            </Section>
+          </React.Fragment>,
+          "name": "general",
+          "tabLabel": "General",
+        },
+        Object {
+          "content": <React.Fragment>
+            <Section
+              description="Customize how you interact with blocks in the block library and editing canvas."
+              title="Block interactions"
             >
-              <HStack
-                justify="space-between"
-              >
-                <FlexItem>
-                  <Truncate>
-                    Blocks
-                  </Truncate>
-                </FlexItem>
-                <FlexItem>
-                  <Icon
-                    icon={
-                      <SVG
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <Path
-                          d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                        />
-                      </SVG>
-                    }
-                  />
-                </FlexItem>
-              </HStack>
-            </NavigationButton>
-            <NavigationButton
-              as={
-                Object {
-                  "$$typeof": Symbol(react.forward_ref),
-                  "__contextSystemKey__": Array [
-                    "Item",
-                  ],
-                  "render": [Function],
-                  "selector": ".components-item",
-                }
-              }
-              isAction={true}
-              key="panels"
-              path="panels"
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="mostUsedBlocks"
+                help="Places the most frequent blocks in the block library."
+                label="Show most used blocks"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="keepCaretInsideBlock"
+                help="Aids screen readers by stopping text caret from leaving blocks."
+                label="Contain text cursor inside block"
+              />
+            </Section>
+            <Section
+              description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+              title="Visible blocks"
             >
-              <HStack
-                justify="space-between"
-              >
-                <FlexItem>
-                  <Truncate>
-                    Panels
-                  </Truncate>
-                </FlexItem>
-                <FlexItem>
-                  <Icon
-                    icon={
-                      <SVG
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <Path
-                          d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
-                        />
-                      </SVG>
-                    }
-                  />
-                </FlexItem>
-              </HStack>
-            </NavigationButton>
-          </ItemGroup>
-        </CardBody>
-      </Card>
-    </NavigatorScreen>
-    <NavigatorScreen
-      key="general-menu"
-      path="general"
-    >
-      <Card
-        isBorderless={true}
-        size="large"
-      >
-        <CardHeader
-          gap="6"
-          isBorderless={false}
-          justify="left"
-          size="small"
-        >
-          <NavigationBackButton
-            aria-label="Navigate to the previous view"
-            icon={
-              <SVG
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
+              <WithSelect(BlockManager) />
+            </Section>
+          </React.Fragment>,
+          "name": "blocks",
+          "tabLabel": "Blocks",
+        },
+        Object {
+          "content": <React.Fragment>
+            <Section
+              description="Choose what displays in the panel."
+              title="Document settings"
+            >
+              <EnablePluginDocumentSettingPanelOptionSlot />
+              <WithSelect(PostTaxonomies)
+                taxonomyWrapper={[Function]}
+              />
+              <PostFeaturedImageCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Featured image"
+                  panelName="featured-image"
                 />
-              </SVG>
-            }
-          />
-          <Text
-            size="16"
-          >
-            General
-          </Text>
-        </CardHeader>
-        <CardBody>
-          <Section
-            description="Customize options related to the block editor interface and editing flow."
-            title="Appearance"
-          >
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="reducedUI"
-              help="Compacts options and outlines in the toolbar."
-              label="Reduce the interface"
-            />
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="focusMode"
-              help="Highlights the current block and fades other content."
-              label="Spotlight mode"
-            />
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="showIconLabels"
-              help="Shows text instead of icons."
-              label="Display button labels"
-            />
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="themeStyles"
-              help="Make the editor look like your theme."
-              label="Use theme styles"
-            />
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="showBlockBreadcrumbs"
-              help="Shows block breadcrumbs at the bottom of the editor."
-              label="Display block breadcrumbs"
-            />
-          </Section>
-        </CardBody>
-      </Card>
-    </NavigatorScreen>
-    <NavigatorScreen
-      key="blocks-menu"
-      path="blocks"
-    >
-      <Card
-        isBorderless={true}
-        size="large"
-      >
-        <CardHeader
-          gap="6"
-          isBorderless={false}
-          justify="left"
-          size="small"
-        >
-          <NavigationBackButton
-            aria-label="Navigate to the previous view"
-            icon={
-              <SVG
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <Path
-                  d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
+              </PostFeaturedImageCheck>
+              <PostExcerptCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Excerpt"
+                  panelName="post-excerpt"
                 />
-              </SVG>
-            }
-          />
-          <Text
-            size="16"
-          >
-            Blocks
-          </Text>
-        </CardHeader>
-        <CardBody>
-          <Section
-            description="Customize how you interact with blocks in the block library and editing canvas."
-            title="Block interactions"
-          >
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="mostUsedBlocks"
-              help="Places the most frequent blocks in the block library."
-              label="Show most used blocks"
-            />
-            <WithSelect(WithDispatch(BaseOption))
-              featureName="keepCaretInsideBlock"
-              help="Aids screen readers by stopping text caret from leaving blocks."
-              label="Contain text cursor inside block"
-            />
-          </Section>
-          <Section
-            description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-            title="Visible blocks"
-          >
-            <WithSelect(BlockManager) />
-          </Section>
-        </CardBody>
-      </Card>
-    </NavigatorScreen>
-    <NavigatorScreen
-      key="panels-menu"
-      path="panels"
-    >
-      <Card
-        isBorderless={true}
-        size="large"
-      >
-        <CardHeader
-          gap="6"
-          isBorderless={false}
-          justify="left"
-          size="small"
-        >
-          <NavigationBackButton
-            aria-label="Navigate to the previous view"
-            icon={
-              <SVG
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+              </PostExcerptCheck>
+              <WithSelect(PostTypeSupportCheck)
+                supportKeys={
+                  Array [
+                    "comments",
+                    "trackbacks",
+                  ]
+                }
               >
-                <Path
-                  d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Discussion"
+                  panelName="discussion-panel"
                 />
-              </SVG>
-            }
-          />
-          <Text
-            size="16"
-          >
-            Panels
-          </Text>
-        </CardHeader>
-        <CardBody>
-          <Section
-            description="Choose what displays in the panel."
-            title="Document settings"
-          >
-            <EnablePluginDocumentSettingPanelOptionSlot />
-            <WithSelect(PostTaxonomies)
-              taxonomyWrapper={[Function]}
+              </WithSelect(PostTypeSupportCheck)>
+              <PageAttributesCheck>
+                <WithSelect(IfCondition(WithDispatch(BaseOption)))
+                  label="Page attributes"
+                  panelName="page-attributes"
+                />
+              </PageAttributesCheck>
+            </Section>
+            <WithSelect(MetaBoxesSection)
+              description="Add extra areas to the editor."
+              title="Additional"
             />
-            <PostFeaturedImageCheck>
-              <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                label="Featured image"
-                panelName="featured-image"
-              />
-            </PostFeaturedImageCheck>
-            <PostExcerptCheck>
-              <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                label="Excerpt"
-                panelName="post-excerpt"
-              />
-            </PostExcerptCheck>
-            <WithSelect(PostTypeSupportCheck)
-              supportKeys={
-                Array [
-                  "comments",
-                  "trackbacks",
-                ]
-              }
-            >
-              <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                label="Discussion"
-                panelName="discussion-panel"
-              />
-            </WithSelect(PostTypeSupportCheck)>
-            <PageAttributesCheck>
-              <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                label="Page attributes"
-                panelName="page-attributes"
-              />
-            </PageAttributesCheck>
-          </Section>
-          <WithSelect(MetaBoxesSection)
-            description="Add extra areas to the editor."
-            title="Additional"
-          />
-        </CardBody>
-      </Card>
-    </NavigatorScreen>
-  </NavigatorProvider>
-</ForwardRef(Modal)>
+          </React.Fragment>,
+          "name": "panels",
+          "tabLabel": "Panels",
+        },
+      ]
+    }
+  />
+</PreferencesModal>
 `;

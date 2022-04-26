@@ -17,7 +17,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
  * @param {Object} blockEditorSettings Block editor settings.
  */
 export function initialize( editorName, blockEditorSettings ) {
-	dispatch( interfaceStore ).setFeatureDefaults( 'core/customize-widgets', {
+	dispatch( preferencesStore ).setDefaults( 'core/customize-widgets', {
 		fixedToolbar: false,
 		welcomeGuide: true,
 	} );

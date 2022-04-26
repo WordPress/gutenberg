@@ -87,7 +87,7 @@ function BottomSheetNavigationContainer( {
 
 	const setHeight = useCallback(
 		( height ) => {
-			// The screen is fullHeight
+			// The screen is fullHeight.
 			if (
 				typeof height === 'string' &&
 				typeof height !== typeof currentHeight

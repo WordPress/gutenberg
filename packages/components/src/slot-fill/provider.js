@@ -48,7 +48,7 @@ export default class SlotFillProvider extends Component {
 		this.triggerListeners();
 
 		// Sometimes the fills are registered after the initial render of slot
-		// But before the registerSlot call, we need to rerender the slot
+		// But before the registerSlot call, we need to rerender the slot.
 		this.forceUpdateSlot( name );
 
 		// If a new instance of a slot is being mounted while another with the

@@ -1,21 +1,71 @@
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import CommentsInspectorControls from './edit/comments-inspector-controls';
-import { useSelect } from '@wordpress/data';
 
 const TEMPLATE = [
-	[ 'core/comment-template' ],
+	[ 'core/comments-title' ],
+	[
+		'core/comment-template',
+		{},
+		[
+			[
+				'core/columns',
+				{},
+				[
+					[
+						'core/column',
+						{ width: '40px' },
+						[
+							[
+								'core/avatar',
+								{
+									size: 40,
+									style: {
+										border: { radius: '20px' },
+									},
+								},
+							],
+						],
+					],
+					[
+						'core/column',
+						{},
+						[
+							[ 'core/comment-author-name' ],
+							[
+								'core/group',
+								{
+									layout: { type: 'flex' },
+									style: {
+										spacing: {
+											margin: {
+												top: '0px',
+												bottom: '0px',
+											},
+										},
+									},
+								},
+								[
+									[ 'core/comment-date' ],
+									[ 'core/comment-edit-link' ],
+								],
+							],
+							[ 'core/comment-content' ],
+							[ 'core/comment-reply-link' ],
+						],
+					],
+				],
+			],
+		],
+	],
 	[ 'core/comments-pagination' ],
+	[ 'core/post-comments-form' ],
 ];
 
 export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
@@ -26,21 +76,11 @@ export default function CommentsQueryLoopEdit( { attributes, setAttributes } ) {
 		template: TEMPLATE,
 	} );
 
-	const { commentOrder, commentsPerPage } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
-
 	return (
 		<>
 			<CommentsInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				defaultSettings={ {
-					defaultOrder: commentOrder,
-					defaultPerPage: commentsPerPage,
-				} }
 			/>
 			<TagName { ...innerBlocksProps } />
 		</>

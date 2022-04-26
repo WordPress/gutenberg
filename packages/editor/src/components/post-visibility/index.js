@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -24,6 +27,7 @@ export class PostVisibility extends Component {
 
 		this.state = {
 			hasPassword: !! props.password,
+			showPrivateConfirmDialog: false,
 		};
 	}
 
@@ -35,21 +39,23 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		if (
-			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
-			)
-		) {
-			return;
-		}
+		this.setState( { showPrivateConfirmDialog: true } );
+	}
 
+	confirmPrivate = () => {
 		const { onUpdateVisibility, onSave } = this.props;
 
 		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
+		this.setState( {
+			hasPassword: false,
+			showPrivateConfirmDialog: false,
+		} );
 		onSave();
-	}
+	};
+
+	handleDialogCancel = () => {
+		this.setState( { showPrivateConfirmDialog: false } );
+	};
 
 	setPasswordProtected() {
 		const { visibility, onUpdateVisibility, status, password } = this.props;
@@ -145,6 +151,14 @@ export class PostVisibility extends Component {
 					/>
 				</div>
 			),
+			<ConfirmDialog
+				key="private-publish-confirmation"
+				isOpen={ this.state.showPrivateConfirmDialog }
+				onConfirm={ this.confirmPrivate }
+				onCancel={ this.handleDialogCancel }
+			>
+				{ __( 'Would you like to privately publish this post now?' ) }
+			</ConfirmDialog>,
 		];
 	}
 }

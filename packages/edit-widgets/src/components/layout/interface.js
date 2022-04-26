@@ -12,6 +12,7 @@ import {
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -54,9 +55,10 @@ function Interface( { blockEditorSettings } ) {
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
 			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
-			hasBlockBreadCrumbsEnabled: select(
-				interfaceStore
-			).isFeatureActive( 'core/edit-widgets', 'showBlockBreadcrumbs' ),
+			hasBlockBreadCrumbsEnabled: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'showBlockBreadcrumbs'
+			),
 			previousShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations(
@@ -83,11 +85,18 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
+			labels={ {
+				...interfaceLabels,
+				secondarySidebar: secondarySidebarLabel,
+			} }
 			header={ <Header /> }
 			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={

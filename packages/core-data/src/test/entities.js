@@ -9,8 +9,8 @@ jest.mock( '@wordpress/api-fetch' );
  */
 import {
 	getMethodName,
-	defaultEntities,
-	getKindEntities,
+	rootEntitiesConfig,
+	getOrLoadEntitiesConfig,
 	prePersistPostType,
 } from '../entities';
 
@@ -40,10 +40,10 @@ describe( 'getMethodName', () => {
 	} );
 
 	it( 'should include the kind in the method name', () => {
-		const id = defaultEntities.length;
-		defaultEntities[ id ] = { name: 'book', kind: 'postType' };
+		const id = rootEntitiesConfig.length;
+		rootEntitiesConfig[ id ] = { name: 'book', kind: 'postType' };
 		const methodName = getMethodName( 'postType', 'book' );
-		delete defaultEntities[ id ];
+		delete rootEntitiesConfig[ id ];
 
 		expect( methodName ).toEqual( 'getPostTypeBook' );
 	} );
@@ -58,19 +58,19 @@ describe( 'getKindEntities', () => {
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => entities ),
+			getEntitiesConfig: jest.fn( () => entities ),
 		};
 		const entities = [ { kind: 'postType' } ];
-		await getKindEntities( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
 	it( 'shouldn’t do anything if there no defined kind config', async () => {
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => [] ),
+			getEntitiesConfig: jest.fn( () => [] ),
 		};
-		await getKindEntities( 'unknownKind' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig( 'unknownKind' )( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
@@ -85,11 +85,11 @@ describe( 'getKindEntities', () => {
 		];
 		const dispatch = jest.fn();
 		const select = {
-			getEntitiesByKind: jest.fn( () => [] ),
+			getEntitiesConfig: jest.fn( () => [] ),
 		};
 		triggerFetch.mockImplementation( () => fetchedEntities );
 
-		await getKindEntities( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
 		expect( dispatch ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'ADD_ENTITIES' );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].entities.length ).toBe( 1 );

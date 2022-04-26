@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +12,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -24,6 +26,7 @@ import usePostTerms from './use-post-terms';
 
 export default function PostTermsEdit( {
 	attributes,
+	clientId,
 	context,
 	setAttributes,
 } ) {
@@ -45,6 +48,7 @@ export default function PostTermsEdit( {
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -53,7 +57,7 @@ export default function PostTermsEdit( {
 	} );
 
 	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ __( 'Post Terms' ) }</div>;
+		return <div { ...blockProps }>{ blockInformation.title }</div>;
 	}
 
 	return (
@@ -88,7 +92,7 @@ export default function PostTermsEdit( {
 								href={ postTerm.link }
 								onClick={ ( event ) => event.preventDefault() }
 							>
-								{ postTerm.name }
+								{ unescape( postTerm.name ) }
 							</a>
 						) )
 						.reduce( ( prev, curr ) => (

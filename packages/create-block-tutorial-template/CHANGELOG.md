@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 2.1.0 (2022-04-21)
+
+### Bug Fix
+
+-   Fix some CSS Coding Standards violations in file templates ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
+## 2.0.0 (2022-03-03)
+
+### Breaking Change
+
+-   Bring project's template compatibility with `@wordpress/create-block` v3 ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
+### Enhancement
+
+-   Update project template configuration and templates to synchronize with the updated [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/) ([#39049](https://github.com/WordPress/gutenberg/pull/39049)).
+
 ## 1.4.0 (2022-01-27)
 
 ### Enhancement

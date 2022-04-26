@@ -98,7 +98,7 @@ export default function BlockActions( {
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion
+			// Activate the `transform` on `core/group` which does the conversion.
 			const newBlocks = switchToBlockType( blocks, groupingBlockName );
 
 			if ( ! newBlocks ) {

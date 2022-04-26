@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, isEmpty, each, map } from 'lodash';
+import { find, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,38 +80,25 @@ const ImageURLInputUI = ( {
 		setIsOpen( false );
 	} );
 
-	const removeNewTabRel = ( currentRel ) => {
-		let newRel = currentRel;
-
-		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, ( relVal ) => {
-					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-					newRel = newRel.replace( regExp, '' );
-				} );
-
-				// Only trim if NEW_TAB_REL values was replaced.
-				if ( newRel !== currentRel ) {
-					newRel = newRel.trim();
-				}
-
-				if ( isEmpty( newRel ) ) {
-					newRel = undefined;
-				}
-			}
-		}
-
-		return newRel;
-	};
-
 	const getUpdatedLinkTargetSettings = ( value ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
-		if ( ! newLinkTarget && ! rel ) {
-			updatedRel = undefined;
+		if ( newLinkTarget ) {
+			const rels = ( rel ?? '' ).split( ' ' );
+			NEW_TAB_REL.forEach( ( relVal ) => {
+				if ( ! rels.includes( relVal ) ) {
+					rels.push( relVal );
+				}
+			} );
+			updatedRel = rels.join( ' ' );
 		} else {
-			updatedRel = removeNewTabRel( rel );
+			const rels = ( rel ?? '' )
+				.split( ' ' )
+				.filter(
+					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
+				);
+			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
 		}
 
 		return {
@@ -232,7 +219,7 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				label={ __( 'Link Rel' ) }
-				value={ removeNewTabRel( rel ) || '' }
+				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>
 			<TextControl

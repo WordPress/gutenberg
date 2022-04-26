@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
@@ -24,6 +25,7 @@ import { useUpdateEffect, useCx } from '../../utils/hooks';
 import { View } from '../../view';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
+import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import * as styles from './styles';
 
@@ -31,7 +33,7 @@ const noop = () => {};
 
 function ToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		className,
@@ -47,6 +49,7 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
+	const [ resizeListener, sizes ] = useResizeAware();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
@@ -57,7 +60,7 @@ function ToggleGroupControl(
 	} );
 	const previousValue = usePrevious( value );
 
-	// Propagate radio.state change
+	// Propagate radio.state change.
 	useUpdateEffect( () => {
 		// Avoid calling onChange if radio state changed
 		// from incoming value.
@@ -66,7 +69,7 @@ function ToggleGroupControl(
 		}
 	}, [ radio.state ] );
 
-	// Sync incoming value with radio.state
+	// Sync incoming value with radio.state.
 	useUpdateEffect( () => {
 		if ( value !== radio.state ) {
 			radio.setState( value );
@@ -81,7 +84,7 @@ function ToggleGroupControl(
 				'medium',
 				className
 			),
-		[ className, isBlock ]
+		[ className, cx, isBlock ]
 	);
 	return (
 		<BaseControl help={ help }>
@@ -103,6 +106,13 @@ function ToggleGroupControl(
 					{ ...otherProps }
 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 				>
+					{ resizeListener }
+					<ToggleGroupControlBackdrop
+						{ ...radio }
+						containerRef={ containerRef }
+						containerWidth={ sizes.width }
+						isAdaptiveWidth={ isAdaptiveWidth }
+					/>
 					{ children }
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>

@@ -188,7 +188,7 @@ function InserterMenu(
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
-				{ /* the following div is necessary to fix the sticky position of the search form */ }
+				{ /* The following div is necessary to fix the sticky position of the search form. */ }
 				<div className="block-editor-inserter__content">
 					<SearchControl
 						className="block-editor-inserter__search"

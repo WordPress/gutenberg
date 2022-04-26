@@ -39,9 +39,37 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			array(
 				'comment_author'       => 'Test',
 				'comment_author_email' => 'test@example.org',
+				'comment_author_url'   => 'http://example.com/author-url/',
 				'comment_content'      => 'Hello world',
 			)
 		);
+	}
+
+	function test_build_comment_query_vars_from_block_with_context_no_pagination() {
+		update_option( 'page_comments', false );
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+
+		$this->assertEquals(
+			build_comment_query_vars_from_block( $block ),
+			array(
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
+			)
+		);
+		update_option( 'page_comments', true );
 	}
 
 	function test_build_comment_query_vars_from_block_with_context() {
@@ -52,22 +80,21 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 77,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'post_id'                   => self::$custom_post->ID,
-				'hierarchical'              => 'threaded',
-				'number'                    => 77,
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
+				'number'        => 5,
+				'paged'         => 1,
 			)
 		);
 	}
@@ -82,13 +109,13 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'                   => 'comment_date_gmt',
-				'order'                     => 'ASC',
-				'status'                    => 'approve',
-				'no_found_rows'             => false,
-				'update_comment_meta_cache' => false,
-				'hierarchical'              => 'threaded',
-				'number'                    => self::$per_page,
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'hierarchical'  => 'threaded',
+				'number'        => 5,
+				'paged'         => 1,
 			)
 		);
 	}
@@ -104,45 +131,47 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 10,
+				'postId' => self::$custom_post->ID,
 			)
 		);
 
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
 		$this->assertEquals(
-			gutenberg_render_block_core_comment_template( null, null, $block ),
-			'<ol ><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div></li></ol>'
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
+			gutenberg_render_block_core_comment_template( null, null, $block )
 		);
 	}
 
 	/**
-	 * Test rendering 3 nested comments:
+	 * Test rendering nested comments:
 	 *
 	 * └─ comment 1
 	 *    └─ comment 2
-	 *       └─ comment 3
+	 *       └─ comment 4
+	 *    └─ comment 3
 	 */
 	function test_rendering_comment_template_nested() {
-		$nested_comment_ids = self::factory()->comment->create_post_comments(
+		$first_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			1,
+			2,
 			array(
 				'comment_parent'       => self::$comment_ids[0],
 				'comment_author'       => 'Test',
 				'comment_author_email' => 'test@example.org',
+				'comment_author_url'   => 'http://example.com/author-url/',
 				'comment_content'      => 'Hello world',
 			)
 		);
 
-		self::factory()->comment->create_post_comments(
+		$second_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
 			1,
 			array(
-				'comment_parent'       => $nested_comment_ids[0],
+				'comment_parent'       => $first_level_ids[0],
 				'comment_author'       => 'Test',
 				'comment_author_email' => 'test@example.org',
+				'comment_author_url'   => 'http://example.com/author-url/',
 				'comment_content'      => 'Hello world',
 			)
 		);
@@ -154,14 +183,103 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/perPage' => 10,
+				'postId' => self::$custom_post->ID,
 			)
+		);
+
+		$top_level_ids = self::$comment_ids;
+		$expected      = str_replace(
+			array( "\n", "\t" ),
+			'',
+			<<<END
+				<ol >
+					<li id="comment-{$top_level_ids[0]}" class="comment odd alt thread-odd thread-alt depth-1">
+						<div class="wp-block-comment-author-name">
+							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+								Test
+							</a>
+						</div>
+						<div class="wp-block-comment-content">
+							Hello world
+						</div>
+						<ol>
+							<li id="comment-{$first_level_ids[0]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									Hello world
+								</div>
+								<ol>
+									<li id="comment-{$second_level_ids[0]}" class="comment odd alt depth-3">
+										<div class="wp-block-comment-author-name">
+											<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+												Test
+											</a>
+										</div>
+										<div class="wp-block-comment-content">
+											Hello world
+										</div>
+									</li>
+								</ol>
+							</li>
+							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									Hello world
+								</div>
+							</li>
+						</ol>
+					</li>
+				</ol>
+END
 		);
 
 		$this->assertEquals(
 			gutenberg_render_block_core_comment_template( null, null, $block ),
-			'<ol ><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div><ol><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div><ol><li><div class="wp-block-comment-author-name">Test</div><div class="wp-block-comment-content">Hello world</div></li></ol></li></ol></li></ol>'
+			$expected
 		);
+	}
+	/**
+	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
+	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
+	 * In order to do that, it should exist a query var 'cpage' set with the $comment_args['paged'] value.
+	 */
+	function test_build_comment_query_vars_from_block_sets_cpage_var() {
+
+		// This could be any number, we set a fixed one instead of a random for better performance.
+		$comment_query_max_num_pages = 5;
+		// We substract 1 because we created 1 comment at the beggining.
+		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
+		self::factory()->comment->create_post_comments(
+			self::$custom_post->ID,
+			$post_comments_numbers,
+			array(
+				'comment_author'       => 'Test',
+				'comment_author_email' => 'test@example.org',
+				'comment_author_url'   => 'http://example.com/author-url/',
+				'comment_content'      => 'Hello world',
+			)
+		);
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block  = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'           => self::$custom_post->ID,
+				'comments/inherit' => true,
+			)
+		);
+		$actual = build_comment_query_vars_from_block( $block );
+		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
+		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
 	}
 }

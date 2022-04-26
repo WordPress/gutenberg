@@ -14,9 +14,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { MIN_SPACER_SIZE } from './constants';
 import styles from './style.scss';
 
-const DEFAULT_VALUES = { px: '100', em: '10', rem: '10', vw: '10', vh: '25' };
+const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
 function Controls( { attributes, context, setAttributes } ) {
 	const { orientation } = context;
@@ -66,7 +67,7 @@ function Controls( { attributes, context, setAttributes } ) {
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
 					label={ label }
-					min={ 1 }
+					min={ MIN_SPACER_SIZE }
 					value={ value }
 					onChange={ handleChange }
 					onUnitChange={ handleUnitChange }

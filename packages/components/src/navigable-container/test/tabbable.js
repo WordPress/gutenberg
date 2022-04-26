@@ -75,7 +75,7 @@ describe( 'TabbableContainer', () => {
 
 		container.querySelector( '#section1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown(
 			keyCode,
 			shiftKey,
@@ -132,7 +132,7 @@ describe( 'TabbableContainer', () => {
 
 		container.querySelector( '#section1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown(
 			keyCode,
 			shiftKey,

@@ -90,7 +90,7 @@ export function BlockTypesTab( {
 	const didRenderAllCategories =
 		categories.length === currentlyRenderedCategories.length;
 
-	// Async List requires an array
+	// Async List requires an array.
 	const collectionEntries = useMemo( () => {
 		return Object.entries( collections );
 	}, [ collections ] );

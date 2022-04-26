@@ -55,7 +55,7 @@ import { createEmitter } from './utils/emitter';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const emitter = createEmitter();
-	const __experimentalListeningStores = new Set();
+	const listeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -87,7 +87,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
@@ -96,10 +96,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return parent && parent.select( storeName );
 	}
 
-	function __experimentalMarkListeningStores( callback, ref ) {
-		__experimentalListeningStores.clear();
+	function __unstableMarkListeningStores( callback, ref ) {
+		listeningStores.clear();
 		const result = callback.call( this );
-		ref.current = Array.from( __experimentalListeningStores );
+		ref.current = Array.from( listeningStores );
 		return result;
 	}
 
@@ -118,7 +118,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getResolveSelectors();
@@ -150,7 +150,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	//
 	// Deprecated
 	// TODO: Remove this after `use()` is removed.
-	//
 	function withPlugins( attributes ) {
 		return mapValues( attributes, ( attribute, key ) => {
 			if ( typeof attribute !== 'function' ) {
@@ -246,7 +245,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Function} handler   The function subscribed to the store.
 	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStore( storeName, handler ) {
+	function __unstableSubscribeStore( storeName, handler ) {
 		if ( storeName in stores ) {
 			return stores[ storeName ].subscribe( handler );
 		}
@@ -259,7 +258,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return subscribe( handler );
 		}
 
-		return parent.__experimentalSubscribeStore( storeName, handler );
+		return parent.__unstableSubscribeStore( storeName, handler );
 	}
 
 	function batch( callback ) {
@@ -282,15 +281,18 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		register,
 		registerGenericStore,
 		registerStore,
-		__experimentalMarkListeningStores,
-		__experimentalSubscribeStore,
+		__unstableMarkListeningStores,
+		__unstableSubscribeStore,
 	};
 
 	//
 	// TODO:
 	// This function will be deprecated as soon as it is no longer internally referenced.
-	//
 	function use( plugin, options ) {
+		if ( ! plugin ) {
+			return;
+		}
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),

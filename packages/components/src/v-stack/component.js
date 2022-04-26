@@ -7,7 +7,7 @@ import { useVStack } from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                        forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
  */
 function VStack( props, forwardedRef ) {
 	const vStackProps = useVStack( props );

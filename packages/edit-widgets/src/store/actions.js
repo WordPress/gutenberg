@@ -95,7 +95,7 @@ export const saveWidgetAreas = ( widgetAreas ) => async ( {
 			await dispatch.saveWidgetArea( widgetArea.id );
 		}
 	} finally {
-		// saveEditedEntityRecord resets the resolution status, let's fix it manually
+		// saveEditedEntityRecord resets the resolution status, let's fix it manually.
 		await registry
 			.dispatch( coreStore )
 			.finishResolution(
@@ -282,18 +282,11 @@ export const saveWidgetArea = ( widgetAreaId ) => async ( {
 };
 
 const trySaveWidgetArea = ( widgetAreaId ) => ( { registry } ) => {
-	const saveErrorBefore = registry
-		.select( coreStore )
-		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
 	registry
 		.dispatch( coreStore )
-		.saveEditedEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
-	const saveErrorAfter = registry
-		.select( coreStore )
-		.getLastEntitySaveError( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId );
-	if ( saveErrorAfter && saveErrorBefore !== saveErrorAfter ) {
-		throw new Error( saveErrorAfter );
-	}
+		.saveEditedEntityRecord( KIND, WIDGET_AREA_ENTITY_TYPE, widgetAreaId, {
+			throwOnError: true,
+		} );
 };
 
 /**

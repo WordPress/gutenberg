@@ -3,7 +3,13 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
+		"types": [
+			"gutenberg-env",
+			"gutenberg-test-env",
+			"jest",
+			"@testing-library/jest-dom",
+			"snapshot-diff",
+		],
 		// Some errors in Reakit types with TypeScript 4.3
 		// Remove the following line when they've been addressed.
 		"skipLibCheck": true,
@@ -26,8 +32,14 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
+		"src/border-box-control/**/*",
+		"src/border-control/**/*",
 		"src/button/**/*",
 		"src/card/**/*",
+		"src/circular-option-picker/**/*",
+		"src/color-indicator/**/*",
+		"src/color-palette/**/*",
+		"src/color-picker/**/*",
 		"src/confirm-dialog/**/*",
 		"src/dashicon/**/*",
 		"src/disabled/**/*",
@@ -83,8 +95,8 @@
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories",
-		"src/**/test",
+		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
+		"src/**/test/**.js", // only exclude js files, ts{x} files should be checked
 		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
 	]

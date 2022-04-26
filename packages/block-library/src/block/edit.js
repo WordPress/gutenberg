@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
-	store as coreStore,
+	__experimentalUseEntityRecord as useEntityRecord,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
@@ -25,6 +25,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -33,26 +34,16 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
-	const { isMissing, hasResolved } = useSelect(
-		( select ) => {
-			const persistedBlock = select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_block',
-				ref
-			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
-			return {
-				hasResolved: hasResolvedBlock,
-				isMissing: hasResolvedBlock && ! persistedBlock,
-			};
-		},
-		[ ref, clientId ]
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
+		ref
+	);
+	const isMissing = hasResolved && ! record;
+
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
 	);
 
 	const {
@@ -118,16 +109,20 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	return (
 		<RecursionProvider>
 			<div { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+				{ canRemove && (
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								onClick={ () =>
+									convertBlockToStatic( clientId )
+								}
+								label={ __( 'Convert to regular blocks' ) }
+								icon={ ungroup }
+								showTooltip
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 				<InspectorControls>
 					<PanelBody>
 						<TextControl

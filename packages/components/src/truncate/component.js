@@ -7,7 +7,7 @@ import useTruncate from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').Ref<any>}                                                         forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                forwardedRef
  */
 function Truncate( props, forwardedRef ) {
 	const truncateProps = useTruncate( props );

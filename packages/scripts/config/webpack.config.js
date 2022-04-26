@@ -36,6 +36,10 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
+const copyWebpackPatterns = process.env.WP_COPY_PHP_FILES_TO_DIST
+	? '**/{block.json,*.php}'
+	: '**/block.json';
+
 const cssLoaders = [
 	{
 		loader: MiniCSSExtractPlugin.loader,
@@ -86,7 +90,7 @@ const cssLoaders = [
 const config = {
 	mode,
 	target,
-	entry: getWebpackEntryPoints(),
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
 		path: resolve( process.cwd(), 'build' ),
@@ -95,7 +99,7 @@ const config = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -228,8 +232,8 @@ const config = {
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
-					from: '**/block.json',
-					context: 'src',
+					from: copyWebpackPatterns,
+					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
 				},
 			],

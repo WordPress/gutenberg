@@ -56,7 +56,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	return (
 		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<FullscreenModeClose showTooltip />
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />

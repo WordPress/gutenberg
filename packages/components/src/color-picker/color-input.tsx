@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
 
 /**
  * Internal dependencies

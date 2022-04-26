@@ -30,7 +30,7 @@ const Box = ( props ) => {
 const DraggalbeExample = () => {
 	const [ isDragging, setDragging ] = useState( false );
 
-	// Allow for the use of ID in the example
+	// Allow for the use of ID in the example.
 	/* eslint-disable no-restricted-syntax */
 	return (
 		<div>

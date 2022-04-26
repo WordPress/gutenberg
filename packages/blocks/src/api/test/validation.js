@@ -16,7 +16,7 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
-	isValidBlockContent,
+	validateBlock,
 	isClosedByToken,
 } from '../validation';
 import { createLogger } from '../validation/logger';
@@ -24,7 +24,6 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	getBlockType,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -34,7 +33,7 @@ describe( 'validation', () => {
 		title: 'block title',
 	};
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 
@@ -717,15 +716,17 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isValidBlockContent()', () => {
+	describe( 'validateBlock()', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Apples'
-			);
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attrs: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Apples',
+			} );
 
 			expect( isValid ).toBe( false );
 		} );
@@ -738,11 +739,13 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attrs: {
+					fruit: 'Bananas',
+				},
+				originalContent: 'Bananas',
+			} );
 
 			expect( isValid ).toBe( false );
 		} );
@@ -750,23 +753,11 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlockContent(
-				'core/test-block',
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
-
-			expect( isValid ).toBe( true );
-		} );
-
-		it( 'works also when block type object is passed as object', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
-
-			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' },
-				'Bananas'
-			);
+			const [ isValid ] = validateBlock( {
+				name: 'core/test-block',
+				attributes: { fruit: 'Bananas' },
+				originalContent: 'Bananas',
+			} );
 
 			expect( isValid ).toBe( true );
 		} );

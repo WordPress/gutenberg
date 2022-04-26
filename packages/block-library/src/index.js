@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import * as archives from './archives';
+import * as avatar from './avatar';
 import * as audio from './audio';
 import * as button from './button';
 import * as buttons from './buttons';
@@ -34,6 +35,7 @@ import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
+import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -46,6 +48,7 @@ import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
 import * as missing from './missing';
@@ -77,6 +80,7 @@ import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as query from './query';
+import * as queryNoResults from './query-no-results';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -84,6 +88,7 @@ import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as quote from './quote';
 import * as reusableBlock from './block';
+import * as readMore from './read-more';
 import * as rss from './rss';
 import * as search from './search';
 import * as separator from './separator';
@@ -95,7 +100,6 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as table from './table';
-// import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
@@ -144,7 +148,7 @@ export const __experimentalGetCoreBlocks = () => [
 	buttons,
 	calendar,
 	categories,
-	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context.
 	code,
 	column,
 	columns,
@@ -187,6 +191,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTagline,
 	query,
 	templatePart,
+	avatar,
 	postTitle,
 	postExcerpt,
 	postFeaturedImage,
@@ -200,11 +205,27 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNext,
 	queryPaginationNumbers,
 	queryPaginationPrevious,
+	queryNoResults,
+	readMore,
+	commentAuthorName,
+	commentContent,
+	commentDate,
+	commentEditLink,
+	commentReplyLink,
+	commentTemplate,
+	commentsTitle,
+	commentsQueryLoop,
+	commentsPagination,
+	commentsPaginationNext,
+	commentsPaginationNumbers,
+	commentsPaginationPrevious,
+
 	postComments,
+	postCommentsForm,
+	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
-	postAuthorName,
 	postAuthorBiography,
 ];
 
@@ -249,27 +270,18 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				homeLink,
+				postAuthorName,
+				...( window.__experimentalEnableListBlockV2
+					? [ listItem ]
+					: [] ),
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
 							commentAuthorAvatar,
-							commentAuthorName,
-							commentContent,
-							commentDate,
-							commentEditLink,
-							commentReplyLink,
-							commentTemplate,
-							commentsQueryLoop,
-							commentsPagination,
-							commentsPaginationNext,
-							commentsPaginationNumbers,
-							commentsPaginationPrevious,
 							navigationArea,
 							postComment,
 							postCommentsCount,
-							postCommentsForm,
 							postCommentsLink,
 					  ]
 					: [] ),

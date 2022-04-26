@@ -24,6 +24,6 @@ export default function getScrollContainer( node ) {
 		}
 	}
 
-	// Continue traversing
+	// Continue traversing.
 	return getScrollContainer( /** @type {Element} */ ( node.parentNode ) );
 }

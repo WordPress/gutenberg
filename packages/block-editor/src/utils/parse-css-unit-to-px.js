@@ -86,7 +86,7 @@ function parseUnitFunction( cssUnit ) {
 			cssUnit = cssUnit.replace( matches[ 0 ], functionUnitValue );
 		}
 
-		// if the unit hasn't been modified or we have a single value break free.
+		// If the unit hasn't been modified or we have a single value break free.
 		if ( cssUnit === currentCssUnit || parseFloat( cssUnit ) ) {
 			break;
 		}
@@ -123,7 +123,7 @@ function evalMathExpression( cssUnit ) {
 		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
 		if ( ! parseFloat( parsedUnit.value ) ) {
 			errorFound = true;
-			// end early since we are dealing with a null value.
+			// End early since we are dealing with a null value.
 			break;
 		}
 		cssUnit = cssUnit.replace( unit, parsedUnit.value );
@@ -171,7 +171,7 @@ function convertParsedUnitToPx( parsedUnit, options ) {
 				? setOptions.fontSize
 				: setOptions.width ) * ONE_PERCENT,
 		ch: 8, // The advance measure (width) of the glyph "0" of the element's font. Approximate
-		ex: 7.15625, // x-height of the element's font. Approximate
+		ex: 7.15625, // X-height of the element's font. Approximate.
 		lh: setOptions.lineHeight,
 	};
 

@@ -7,7 +7,7 @@ import { useControlLabel } from './hook';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
- * @param {import('react').Ref<any>}                                                              forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
  */
 function ControlLabel( props, forwardedRef ) {
 	const controlLabelProps = useControlLabel( props );

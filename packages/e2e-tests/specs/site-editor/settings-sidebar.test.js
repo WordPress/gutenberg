@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
 	insertBlock,
+	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function toggleSidebar() {
 	await page.click(
@@ -43,17 +39,16 @@ async function getTemplateCard() {
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
 	} );
 
 	describe( 'Template tab', () => {
@@ -69,7 +64,7 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			const templateCardBeforeNavigation = await getTemplateCard();
-			await siteEditor.visit( {
+			await visitSiteEditor( {
 				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );

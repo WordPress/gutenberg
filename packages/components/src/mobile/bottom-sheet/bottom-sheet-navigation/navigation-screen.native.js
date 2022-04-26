@@ -128,7 +128,16 @@ const BottomSheetNavigationScreen = ( {
 				</TouchableHighlight>
 			</ScrollView>
 		);
-	}, [ children, isFocused, safeAreaBottomInset, listProps ] );
+	}, [
+		children,
+		isFocused,
+		safeAreaBottomInset,
+		listProps,
+		name,
+		isScrollable,
+		isNested,
+		onLayout,
+	] );
 };
 
 export default BottomSheetNavigationScreen;

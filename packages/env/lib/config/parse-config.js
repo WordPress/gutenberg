@@ -136,6 +136,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		`Invalid or unrecognized source: "${ sourceString }".`
 	);
 }
+module.exports.parseSourceString = parseSourceString;
 
 /**
  * Given a source object, returns a new source object with the testsPath
@@ -160,3 +161,4 @@ function includeTestsPath( source, { workDirectoryPath } ) {
 		),
 	};
 }
+module.exports.includeTestsPath = includeTestsPath;

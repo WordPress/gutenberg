@@ -18,6 +18,7 @@ import {
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
+	KeyboardShortcuts,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -47,8 +48,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { name } from './block.json';
-
-const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -265,6 +264,64 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+const useIsInvalidLink = ( kind, type, id ) => {
+	const isPostType =
+		kind === 'post-type' || type === 'post' || type === 'page';
+	const hasId = Number.isInteger( id );
+	const postStatus = useSelect(
+		( select ) => {
+			if ( ! isPostType ) {
+				return null;
+			}
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'postType', type, id )?.status;
+		},
+		[ isPostType, type, id ]
+	);
+
+	// Check Navigation Link validity if:
+	// 1. Link is 'post-type'.
+	// 2. It has an id.
+	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
+	// If those conditions are met, check if
+	// 1. The post status is published.
+	// 2. The Navigation Link item has no label.
+	// If either of those is true, invalidate.
+	const isInvalid =
+		isPostType && hasId && postStatus && 'trash' === postStatus;
+	const isDraft = 'draft' === postStatus;
+
+	return [ isInvalid, isDraft ];
+};
+
+const useMissingText = ( type ) => {
+	let missingText = '';
+
+	switch ( type ) {
+		case 'post':
+			/* translators: label for missing post in navigation link block */
+			missingText = __( 'Select post' );
+			break;
+		case 'page':
+			/* translators: label for missing page in navigation link block */
+			missingText = __( 'Select page' );
+			break;
+		case 'category':
+			/* translators: label for missing category in navigation link block */
+			missingText = __( 'Select category' );
+			break;
+		case 'tag':
+			/* translators: label for missing tag in navigation link block */
+			missingText = __( 'Select tag' );
+			break;
+		default:
+			/* translators: label for missing values in navigation link block */
+			missingText = __( 'Add link' );
+	}
+
+	return missingText;
+};
+
 /**
  * Removes HTML from a given string.
  * Note the does not provide XSS protection or otherwise attempt
@@ -329,6 +386,7 @@ export default function NavigationLinkEdit( {
 	clientId,
 } ) {
 	const {
+		id,
 		label,
 		type,
 		opensInNewTab,
@@ -338,6 +396,9 @@ export default function NavigationLinkEdit( {
 		title,
 		kind,
 	} = attributes;
+
+	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
+	const { maxNestingLevel } = context;
 
 	const link = {
 		url,
@@ -390,7 +451,7 @@ export default function NavigationLinkEdit( {
 					getBlockParentsByBlockName( clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length >= MAX_NESTING,
+					] ).length >= maxNestingLevel,
 				isTopLevelLink:
 					getBlockName( getBlockRootClientId( clientId ) ) ===
 					'core/navigation',
@@ -589,36 +650,23 @@ export default function NavigationLinkEdit( {
 		onKeyDown,
 	} );
 
-	if ( ! url ) {
+	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
 	const classes = classnames( 'wp-block-navigation-item__content', {
-		'wp-block-navigation-link__placeholder': ! url,
+		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
-	let missingText = '';
-	switch ( type ) {
-		case 'post':
-			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select post' );
-			break;
-		case 'page':
-			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select page' );
-			break;
-		case 'category':
-			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select category' );
-			break;
-		case 'tag':
-			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select tag' );
-			break;
-		default:
-			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add link' );
-	}
+	const missingText = useMissingText( type, isInvalid, isDraft );
+	/* translators: Whether the navigation link is Invalid or a Draft. */
+	const placeholderText = `(${
+		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
+	})`;
+	const tooltipText =
+		isInvalid || isDraft
+			? __( 'This item has been deleted, or is a draft' )
+			: __( 'This item is missing a link' );
 
 	return (
 		<Fragment>
@@ -677,46 +725,90 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip
-								position="top center"
-								text={ __( 'This item is missing a link' ) }
-							>
-								<span>{ missingText }</span>
+							<Tooltip position="top center" text={ tooltipText }>
+								<>
+									<span>{ missingText }</span>
+									<span className="wp-block-navigation-link__missing_text-tooltip">
+										{ tooltipText }
+									</span>
+								</>
 							</Tooltip>
 						</div>
 					) : (
-						<RichText
-							ref={ ref }
-							identifier="label"
-							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( {
-									label: labelValue,
-								} )
-							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( 'core/navigation-link' )
-								)
-							}
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
-							withoutInteractiveFormatting
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/image',
-								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! url ) {
-									setIsLinkOpen( true );
-								}
-							} }
-						/>
+						<>
+							{ ! isInvalid && ! isDraft && (
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
+										}
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
+												)
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
+										) }
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+										allowedFormats={ [
+											'core/bold',
+											'core/italic',
+											'core/image',
+											'core/strikethrough',
+										] }
+										onClick={ () => {
+											if ( ! url ) {
+												setIsLinkOpen( true );
+											}
+										} }
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
+							) }
+							{ ( isInvalid || isDraft ) && (
+								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
+									<KeyboardShortcuts
+										shortcuts={ {
+											enter: () =>
+												isSelected &&
+												setIsLinkOpen( true ),
+										} }
+									/>
+									<Tooltip
+										position="top center"
+										text={ tooltipText }
+									>
+										<>
+											<span>
+												{
+													/* Trim to avoid trailing white space when the placeholder text is not present */
+													`${ label } ${ placeholderText }`.trim()
+												}
+											</span>
+											<span className="wp-block-navigation-link__missing_text-tooltip">
+												{ tooltipText }
+											</span>
+										</>
+									</Tooltip>
+								</div>
+							) }
+						</>
 					) }
 					{ isLinkOpen && (
 						<Popover

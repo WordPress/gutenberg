@@ -232,11 +232,8 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 		createResolversCacheMiddleware( registry, key ),
 		promise,
 		createReduxRoutineMiddleware( normalizedControls ),
+		createThunkMiddleware( thunkArgs ),
 	];
-
-	if ( options.__experimentalUseThunks ) {
-		middlewares.push( createThunkMiddleware( thunkArgs ) );
-	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (
@@ -324,33 +321,59 @@ function mapActions( actions, store ) {
  * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
-	return mapValues(
-		omit( selectors, [
-			'getIsResolving',
-			'hasStartedResolution',
-			'hasFinishedResolution',
-			'isResolving',
-			'getCachedResolvers',
-		] ),
-		( selector, selectorName ) => ( ...args ) =>
-			new Promise( ( resolve ) => {
+	const storeSelectors = omit( selectors, [
+		'getIsResolving',
+		'hasStartedResolution',
+		'hasFinishedResolution',
+		'hasResolutionFailed',
+		'isResolving',
+		'getCachedResolvers',
+		'getResolutionState',
+		'getResolutionError',
+	] );
+
+	return mapValues( storeSelectors, ( selector, selectorName ) => {
+		// If the selector doesn't have a resolver, just convert the return value
+		// (including exceptions) to a Promise, no additional extra behavior is needed.
+		if ( ! selector.hasResolver ) {
+			return async ( ...args ) => selector.apply( null, args );
+		}
+
+		return ( ...args ) => {
+			return new Promise( ( resolve, reject ) => {
 				const hasFinished = () =>
 					selectors.hasFinishedResolution( selectorName, args );
+				const finalize = ( result ) => {
+					const hasFailed = selectors.hasResolutionFailed(
+						selectorName,
+						args
+					);
+					if ( hasFailed ) {
+						const error = selectors.getResolutionError(
+							selectorName,
+							args
+						);
+						reject( error );
+					} else {
+						resolve( result );
+					}
+				};
 				const getResult = () => selector.apply( null, args );
-				// trigger the selector (to trigger the resolver)
+				// Trigger the selector (to trigger the resolver)
 				const result = getResult();
 				if ( hasFinished() ) {
-					return resolve( result );
+					return finalize( result );
 				}
 
 				const unsubscribe = store.subscribe( () => {
 					if ( hasFinished() ) {
 						unsubscribe();
-						resolve( getResult() );
+						finalize( getResult() );
 					}
 				} );
-			} )
-	);
+			} );
+		};
+	} );
 }
 
 /**
@@ -373,8 +396,8 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 		}
 
 		return {
-			...resolver, // copy the enumerable properties of the resolver function
-			fulfill: resolver, // add the fulfill method
+			...resolver, // Copy the enumerable properties of the resolver function.
+			fulfill: resolver, // Add the fulfill method.
 		};
 	} );
 
@@ -416,15 +439,28 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
 					store.dispatch(
 						metadataActions.startResolution( selectorName, args )
 					);
-					await fulfillResolver(
-						store,
-						mappedResolvers,
-						selectorName,
-						...args
-					);
-					store.dispatch(
-						metadataActions.finishResolution( selectorName, args )
-					);
+					try {
+						await fulfillResolver(
+							store,
+							mappedResolvers,
+							selectorName,
+							...args
+						);
+						store.dispatch(
+							metadataActions.finishResolution(
+								selectorName,
+								args
+							)
+						);
+					} catch ( error ) {
+						store.dispatch(
+							metadataActions.failResolution(
+								selectorName,
+								args,
+								error
+							)
+						);
+					}
 				} );
 			}
 

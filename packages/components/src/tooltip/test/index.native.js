@@ -15,7 +15,7 @@ import { SlotFillProvider } from '@wordpress/components';
  */
 import Tooltip from '../index';
 
-// Minimal tree to render tooltip
+// Minimal tree to render tooltip.
 const TooltipSlot = ( { children } ) => (
 	<SlotFillProvider>
 		<Tooltip.Slot>{ children }</Tooltip.Slot>
@@ -81,7 +81,7 @@ it( 'dismisses when the keyboard closes', () => {
 		</TooltipSlot>
 	);
 
-	// Show keyboard
+	// Show keyboard.
 	act( () => {
 		keyboardHandlers.forEach( ( [ event, handler ] ) => {
 			if ( event === 'keyboardDidShow' ) {

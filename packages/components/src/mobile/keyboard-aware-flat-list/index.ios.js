@@ -44,7 +44,7 @@ export const KeyboardAwareFlatList = ( {
 					this.latestContentOffsetY !== undefined &&
 					! shouldPreventAutomaticScroll()
 				) {
-					// Reset the content position if keyboard is still closed
+					// Reset the content position if keyboard is still closed.
 					if ( this.scrollViewRef ) {
 						this.scrollViewRef.scrollToPosition(
 							0,
@@ -74,7 +74,7 @@ KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
 	previousCaretY
 ) => {
 	if ( previousCaretY ) {
-		//if this is not the first tap
+		// If this is not the first tap.
 		scrollView.refreshScrollForField( targetId );
 	}
 };

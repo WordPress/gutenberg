@@ -23,19 +23,16 @@ const BlockDraggable = ( {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
 			const {
+				canMoveBlocks,
 				getBlockRootClientId,
-				getTemplateLock,
 				getBlockName,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-			const templateLock = rootClientId
-				? getTemplateLock( rootClientId )
-				: null;
 			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: 'all' !== templateLock,
+				isDraggable: canMoveBlocks( clientIds, rootClientId ),
 				icon: getBlockType( blockName )?.icon,
 			};
 		},
@@ -52,7 +49,7 @@ const BlockDraggable = ( {
 		blockEditorStore
 	);
 
-	// Stop dragging blocks if the block draggable is unmounted
+	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
 		return () => {
 			if ( isDragging.current ) {

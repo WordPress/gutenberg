@@ -7,7 +7,7 @@ import { useFlexBlock } from './hook';
 
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                                     forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                            forwardedRef
  */
 function FlexBlock( props, forwardedRef ) {
 	const flexBlockProps = useFlexBlock( props );

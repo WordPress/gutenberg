@@ -21,6 +21,10 @@ export const textFormattingShortcuts = [
 		description: __( 'Remove a link.' ),
 	},
 	{
+		keyCombination: { character: '[[' },
+		description: __( 'Insert a link to a post or page' ),
+	},
+	{
 		keyCombination: { modifier: 'primary', character: 'u' },
 		description: __( 'Underline the selected text.' ),
 	},

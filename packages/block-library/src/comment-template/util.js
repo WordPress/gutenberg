@@ -29,6 +29,7 @@
  */
 export const convertToTree = ( data ) => {
 	const table = {};
+
 	if ( ! data ) return [];
 
 	// First create a hash table of { [id]: { ...comment, children: [] }}

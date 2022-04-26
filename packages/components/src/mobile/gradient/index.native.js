@@ -60,7 +60,7 @@ export function getGradientColorGroup( gradientValue ) {
 	const excludeSideOrCorner = /linear-gradient\(to\s+([a-z\s]+,)/;
 
 	// Parser has some difficulties with angle defined as a side or corner (e.g. `to left`)
-	// so it's going to be excluded in order to matching color groups
+	// so it's going to be excluded in order to matching color groups.
 	const modifiedGradientValue = gradientValue.replace(
 		excludeSideOrCorner,
 		'linear-gradient('
@@ -151,7 +151,7 @@ function Gradient( {
 			<SVG>
 				<Defs>
 					<RadialGradient
-						//eslint-disable-next-line no-restricted-syntax
+						// eslint-disable-next-line no-restricted-syntax
 						id="radialGradient"
 						gradientUnits="userSpaceOnUse"
 						rx="70%"

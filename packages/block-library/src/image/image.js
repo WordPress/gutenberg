@@ -95,7 +95,10 @@ export default function Image( {
 			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && isSelected
+						? getMedia( id, { context: 'view' } )
+						: null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -367,7 +370,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
 							label={ __( 'Alt text (alternative text)' ) }

@@ -11,13 +11,10 @@ import {
 	subscribeParentGetHtml,
 	provideToNative_Html as provideToNativeHtml,
 } from '@wordpress/react-native-bridge';
-// Editor component is not exposed in the pacakge because is meant to be consumed
-// internally, however we require it for rendering the editor in integration tests,
-// for this reason it's imported with path access.
-// eslint-disable-next-line no-restricted-syntax
-import Editor from '@wordpress/edit-post/src/editor';
+import { initializeEditor as internalInitializeEditor } from '@wordpress/edit-post';
+import { createElement, cloneElement } from '@wordpress/element';
 
-// Set up the mocks for getting the HTML output of the editor
+// Set up the mocks for getting the HTML output of the editor.
 let triggerHtmlSerialization;
 let serializedHtml;
 subscribeParentGetHtml.mockImplementation( ( callback ) => {
@@ -35,48 +32,26 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 } );
 
 /**
- * Initialize an editor for test assertions.
+ * Executes a function that triggers store resolvers and waits for them to be finished.
  *
- * @param {Object}                    props               Properties passed to the editor component.
- * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
- * @param {Object}                    [options]           Configuration options for the editor.
- * @param {import('react').ReactNode} [options.component] A specific editor component to render.
- * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ * Asynchronous store resolvers leverage `setTimeout` to run at the end of
+ * the current JavaScript block execution. In order to prevent "act" warnings
+ * triggered by updates to the React tree, we manually tick fake timers and
+ * await the resolution of the current block execution before proceeding.
+ *
+ * @param {Function} fn Function that triggers store resolvers.
+ * @return {*} The result of the function call.
  */
-export async function initializeEditor( props, { component = Editor } = {} ) {
+export async function waitForStoreResolvers( fn ) {
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
 	// API. We preserve the original implementations to restore them later.
 	const originalRAF = global.requestAnimationFrame;
 	const originalCAF = global.cancelAnimationFrame;
 
-	// During editor initialization, asynchronous store resolvers leverage
-	// `setTimeout` to run at the end of the current JavaScript block execution.
-	// In order to prevent "act" warnings triggered by updates to the React tree,
-	// we manually tick fake timers and await the resolution of the current block
-	// execution before proceeding.
 	jest.useFakeTimers( 'legacy' );
 
-	// Arrange
-	const EditorComponent = component;
-	const screen = render(
-		<EditorComponent
-			postId={ `post-id-${ uuid() }` }
-			postType="post"
-			initialTitle="test"
-			{ ...props }
-		/>
-	);
-
-	// A layout event must be explicitly dispatched in BlockList component,
-	// otherwise the inner blocks are not rendered.
-	fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
-		nativeEvent: {
-			layout: {
-				width: 100,
-			},
-		},
-	} );
+	const result = fn();
 
 	// Advance all timers allowing store resolvers to resolve.
 	act( () => jest.runAllTimers() );
@@ -85,7 +60,7 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	// initialization. The most straightforward approach to ensure all of them
 	// resolve before we consider the editor initialized is to flush micro tasks,
 	// similar to the approach found in `@testing-library/react-native`.
-	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23
+	// https://github.com/callstack/react-native-testing-library/blob/a010ffdbca906615279ecc3abee423525e528101/src/flushMicroTasks.js#L15-L23.
 	await act( async () => {} );
 
 	// Restore the default timer APIs for remainder of test arrangement, act, and
@@ -97,12 +72,49 @@ export async function initializeEditor( props, { component = Editor } = {} ) {
 	global.requestAnimationFrame = originalRAF;
 	global.cancelAnimationFrame = originalCAF;
 
-	return screen;
+	return result;
+}
+
+/**
+ * Initialize an editor for test assertions.
+ *
+ * @param {Object}                    props               Properties passed to the editor component.
+ * @param {string}                    props.initialHtml   String of block editor HTML to parse and render.
+ * @param {Object}                    [options]           Configuration options for the editor.
+ * @param {import('react').ReactNode} [options.component] A specific editor component to render.
+ * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+ */
+export async function initializeEditor( props, { component } = {} ) {
+	const uniqueId = uuid();
+	const postId = `post-id-${ uniqueId }`;
+	const postType = 'post';
+
+	return waitForStoreResolvers( () => {
+		const editorElement = component
+			? createElement( component, { postType, postId } )
+			: internalInitializeEditor( uniqueId, postType, postId );
+
+		const screen = render(
+			cloneElement( editorElement, { initialTitle: 'test', ...props } )
+		);
+
+		// A layout event must be explicitly dispatched in BlockList component,
+		// otherwise the inner blocks are not rendered.
+		fireEvent( screen.getByTestId( 'block-list-wrapper' ), 'layout', {
+			nativeEvent: {
+				layout: {
+					width: 100,
+				},
+			},
+		} );
+
+		return screen;
+	} );
 }
 
 export * from '@testing-library/react-native';
 
-// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE
+// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE.
 export function waitFor(
 	cb,
 	{ timeout, interval } = { timeout: 1000, interval: 50 }
@@ -139,7 +151,7 @@ export function waitFor(
 	);
 }
 
-// Helper for getting the current HTML output of the editor
+// Helper for getting the current HTML output of the editor.
 export function getEditorHtml() {
 	if ( ! triggerHtmlSerialization ) {
 		throw new Error( 'HTML serialization trigger is not defined.' );

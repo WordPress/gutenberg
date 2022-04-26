@@ -193,7 +193,7 @@ function proceed( conversionMap ) {
 				return true;
 			}
 
-			// otherwise we found an inner element
+			// Otherwise we found an inner element.
 			addChild(
 				createFrame( conversionMap[ name ], startOffset, tokenLength )
 			);
@@ -214,15 +214,15 @@ function proceed( conversionMap ) {
 			return true;
 
 		case 'closer':
-			// if we're not nesting then this is easy - close the block
+			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
-			// otherwise we're nested and we have to close out the current
-			// block and add it as a innerBlock to the parent
+			// Otherwise we're nested and we have to close out the current
+			// block and add it as a innerBlock to the parent.
 			const stackTop = stack.pop();
 			const text = indoc.substr(
 				stackTop.prevOffset,
@@ -256,7 +256,7 @@ function proceed( conversionMap ) {
  */
 function nextToken() {
 	const matches = tokenizer.exec( indoc );
-	// we have no more tokens
+	// We have no more tokens.
 	if ( null === matches ) {
 		return [ 'no-more-tokens' ];
 	}

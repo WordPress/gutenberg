@@ -5,17 +5,17 @@ import { DropdownMenu, FlexItem, FlexBlock, Flex } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, moreVertical } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
-import { store as editSiteStore } from '../../store';
 
 export default function GlobalStylesSidebar() {
 	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	return (
 		<DefaultSidebar
@@ -46,7 +46,10 @@ export default function GlobalStylesSidebar() {
 								{
 									title: __( 'Welcome Guide' ),
 									onClick: () =>
-										toggleFeature( 'welcomeGuideStyles' ),
+										toggle(
+											'core/edit-site',
+											'welcomeGuideStyles'
+										),
 								},
 							] }
 						/>

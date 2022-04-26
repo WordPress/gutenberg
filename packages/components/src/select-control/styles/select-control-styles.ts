@@ -96,8 +96,9 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${ COLORS.gray[ 900 ] };
 		display: block;
+		font-family: inherit;
 		margin: 0;
 		width: 100%;
 

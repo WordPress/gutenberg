@@ -9,7 +9,14 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import {
+	Fragment,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -22,12 +29,13 @@ import {
 	Spinner,
 	TextareaControl,
 	ToggleControl,
-	withNotices,
+	ToolbarButton,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
+import { compose, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -41,15 +49,15 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch, useSelect } from '@wordpress/data';
-import { cover as icon } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { postFeaturedImage, cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -67,8 +75,6 @@ import {
 } from './shared';
 
 extend( [ namesPlugin ] );
-
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -96,8 +102,6 @@ function CoverHeightInput( {
 	unit = 'px',
 	value = '',
 } ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -110,7 +114,7 @@ function CoverHeightInput( {
 			'vw',
 			'vh',
 		],
-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
 	const handleOnChange = ( unprocessedValue ) => {
@@ -120,23 +124,16 @@ function CoverHeightInput( {
 				: undefined;
 
 		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
 			return;
 		}
-		setTemporaryInput( null );
 		onChange( inputValue );
-		if ( inputValue === undefined ) {
-			onUnitChange();
-		}
 	};
 
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
+	const computedValue = useMemo( () => {
+		const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue( value );
+		return [ parsedQuantity, unit ].join( '' );
+	}, [ unit, value ] );
 
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
@@ -145,13 +142,11 @@ function CoverHeightInput( {
 				id={ inputId }
 				isResetValueOnUnitChange
 				min={ min }
-				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
 				onUnitChange={ onUnitChange }
 				style={ { maxWidth: 80 } }
-				unit={ unit }
 				units={ units }
-				value={ inputValue }
+				value={ computedValue }
 			/>
 		</BaseControl>
 	);
@@ -244,7 +239,7 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
 	useEffect( () => {
 		if ( ! url && ! overlayColor ) {
-			// Reset isDark
+			// Reset isDark.
 			setIsDark( false );
 		}
 	}, [ ! url && ! overlayColor, setIsDark ] );
@@ -269,12 +264,10 @@ const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
-	noticeUI,
-	noticeOperations,
 	onSelectMedia,
+	onError,
 	style,
 } ) {
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -287,12 +280,8 @@ function CoverPlaceholder( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			disableMediaButtons={ disableMediaButtons }
-			onError={ ( message ) => {
-				removeAllNotices();
-				createErrorNotice( message );
-			} }
+			onError={ onError }
 			style={ style }
 		>
 			{ children }
@@ -304,18 +293,16 @@ function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
-	noticeUI,
-	noticeOperations,
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	markNextChangeAsNotPersistent,
+	context: { postId, postType },
 } ) {
 	const {
 		contentPosition,
 		id,
-		backgroundType,
+		useFeaturedImage,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -323,12 +310,39 @@ function CoverEdit( {
 		isRepeated,
 		minHeight,
 		minHeightUnit,
-		style: styleAttribute,
-		url,
 		alt,
 		allowedBlocks,
 		templateLock,
 	} = attributes;
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const media = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+	const mediaUrl = media?.source_url;
+
+	// instead of destructuring the attributes
+	// we define the url and background type
+	// depending on the value of the useFeaturedImage flag
+	// to preview in edit the dynamic featured image
+	const url = useFeaturedImage ? mediaUrl : attributes.url;
+	const backgroundType = useFeaturedImage
+		? IMAGE_BACKGROUND_TYPE
+		: attributes.backgroundType;
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		gradientClass,
 		gradientValue,
@@ -383,6 +397,19 @@ function CoverEdit( {
 		} );
 	};
 
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+		} );
+	};
+
+	const onUploadError = ( message ) => {
+		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
+			type: 'snackbar',
+		} );
+	};
+
 	const isDarkElement = useRef();
 	const isCoverDark = useCoverIsDark(
 		url,
@@ -393,18 +420,17 @@ function CoverEdit( {
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
-		markNextChangeAsNotPersistent();
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { isDark: isCoverDark } );
 	}, [ isCoverDark ] );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-
-	const minHeightWithUnit = minHeightUnit
-		? `${ minHeight }${ minHeightUnit }`
-		: minHeight;
+	const minHeightWithUnit =
+		minHeight && minHeightUnit
+			? `${ minHeight }${ minHeightUnit }`
+			: minHeight;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
 
@@ -412,7 +438,7 @@ function CoverEdit( {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: undefined ),
-		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		minHeight: minHeightWithUnit || undefined,
 	};
 
 	const bgStyle = { backgroundColor: overlayColor.color };
@@ -462,14 +488,22 @@ function CoverEdit( {
 				/>
 			</BlockControls>
 			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*,video/*"
-					onSelect={ onSelectMedia }
-					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				<ToolbarButton
+					icon={ postFeaturedImage }
+					label={ __( 'Use featured image' ) }
+					isPressed={ useFeaturedImage }
+					onClick={ toggleUseFeaturedImage }
 				/>
+				{ ! useFeaturedImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+						name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+					/>
+				) }
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
@@ -503,27 +537,32 @@ function CoverEdit( {
 								}
 							/>
 						) }
-						{ url && isImageBackground && isImgElement && (
-							<TextareaControl
-								label={ __( 'Alt text (alternative text)' ) }
-								value={ alt }
-								onChange={ ( newAlt ) =>
-									setAttributes( { alt: newAlt } )
-								}
-								help={
-									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+						{ ! useFeaturedImage &&
+							url &&
+							isImageBackground &&
+							isImgElement && (
+								<TextareaControl
+									label={ __(
+										'Alt text (alternative text)'
+									) }
+									value={ alt }
+									onChange={ ( newAlt ) =>
+										setAttributes( { alt: newAlt } )
+									}
+									help={
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image'
+												) }
+											</ExternalLink>
 											{ __(
-												'Describe the purpose of the image'
+												'Leave empty if the image is purely decorative.'
 											) }
-										</ExternalLink>
-										{ __(
-											'Leave empty if the image is purely decorative.'
-										) }
-									</>
-								}
-							/>
-						) }
+										</>
+									}
+								/>
+							) }
 						<PanelRow>
 							<Button
 								variant="secondary"
@@ -537,6 +576,7 @@ function CoverEdit( {
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
+										useFeaturedImage: false,
 									} )
 								}
 							>
@@ -593,7 +633,7 @@ function CoverEdit( {
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
+						value={ minHeight }
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
 							setAttributes( { minHeight: newMinHeight } )
@@ -642,14 +682,10 @@ function CoverEdit( {
 					) }
 				>
 					<CoverPlaceholder
-						noticeUI={ noticeUI }
 						onSelectMedia={ onSelectMedia }
-						noticeOperations={ noticeOperations }
+						onError={ onUploadError }
 						style={ {
-							minHeight:
-								temporaryMinHeight ||
-								minHeightWithUnit ||
-								undefined,
+							minHeight: minHeightWithUnit || undefined,
 						} }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
@@ -667,11 +703,12 @@ function CoverEdit( {
 							setAttributes( { minHeightUnit: 'px' } );
 							toggleSelection( false );
 						} }
-						onResize={ setTemporaryMinHeight }
+						onResize={ ( value ) => {
+							setAttributes( { minHeight: value } );
+						} }
 						onResizeStop={ ( newMinHeight ) => {
 							toggleSelection( true );
 							setAttributes( { minHeight: newMinHeight } );
-							setTemporaryMinHeight( null );
 						} }
 						showHandle={ isSelected }
 					/>
@@ -703,22 +740,18 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
-				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
-					className="block-library-cover__padding-visualizer"
-				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {
 						setAttributes( { minHeightUnit: 'px' } );
 						toggleSelection( false );
 					} }
-					onResize={ setTemporaryMinHeight }
+					onResize={ ( value ) => {
+						setAttributes( { minHeight: value } );
+					} }
 					onResizeStop={ ( newMinHeight ) => {
 						toggleSelection( true );
 						setAttributes( { minHeight: newMinHeight } );
-						setTemporaryMinHeight( null );
 					} }
 					showHandle={ isSelected }
 				/>
@@ -726,14 +759,18 @@ function CoverEdit( {
 				<span
 					aria-hidden="true"
 					className={ classnames(
+						'wp-block-cover__background',
 						dimRatioToClass( dimRatio ),
-						{ [ overlayColor.class ]: overlayColor.class },
-						'wp-block-cover__gradient-background',
-						gradientClass,
 						{
+							[ overlayColor.class ]: overlayColor.class,
 							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
 							'has-background-gradient': gradientValue,
-							[ gradientClass ]: ! url && gradientClass,
+							[ gradientClass ]: gradientClass,
 						}
 					) }
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
@@ -762,9 +799,8 @@ function CoverEdit( {
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
 					disableMediaButtons
-					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
+					onError={ onUploadError }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>
@@ -773,18 +809,5 @@ function CoverEdit( {
 }
 
 export default compose( [
-	withDispatch( ( dispatch ) => {
-		const {
-			toggleSelection,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = dispatch( blockEditorStore );
-
-		return {
-			toggleSelection,
-			markNextChangeAsNotPersistent: __unstableMarkNextChangeAsNotPersistent,
-		};
-	} ),
 	withColors( { overlayColor: 'background-color' } ),
-	withNotices,
-	withInstanceId,
 ] )( CoverEdit );

@@ -9,7 +9,7 @@ import { forwardRef } from '@wordpress/element';
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode, ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -104,7 +104,7 @@ function ResizableBox(
 		__experimentalTooltipProps: tooltipProps = {},
 		...props
 	}: ResizableBoxProps,
-	ref: Ref< Resizable >
+	ref: ForwardedRef< Resizable >
 ): JSX.Element {
 	return (
 		<Resizable

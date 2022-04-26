@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, pull } from 'lodash';
+import { escape, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,9 +38,10 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -53,8 +54,6 @@ const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
 };
-
-const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -292,11 +291,13 @@ export default function NavigationSubmenuEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { showSubmenuIcon, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -312,6 +313,7 @@ export default function NavigationSubmenuEdit( {
 		selectedBlockHasDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		onlyDescendantIsEmptyLink,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -319,17 +321,35 @@ export default function NavigationSubmenuEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
+				getBlock,
 			} = select( blockEditorStore );
+
+			let _onlyDescendantIsEmptyLink;
 
 			const selectedBlockId = getSelectedBlockClientId();
 
 			const descendants = getClientIdsOfDescendants( [ clientId ] )
 				.length;
 
+			const selectedBlockDescendants = getClientIdsOfDescendants( [
+				selectedBlockId,
+			] );
+
+			// Check for a single descendant in the submenu. If that block
+			// is a link block in a "placeholder" state with no label then
+			// we can consider as an "empty" link.
+			if ( selectedBlockDescendants?.length === 1 ) {
+				const singleBlock = getBlock( selectedBlockDescendants[ 0 ] );
+
+				_onlyDescendantIsEmptyLink =
+					singleBlock?.name === 'core/navigation-link' &&
+					! singleBlock?.attributes?.label;
+			}
+
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
-					MAX_NESTING,
+					maxNestingLevel,
 				isTopLevelItem:
 					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
@@ -341,9 +361,7 @@ export default function NavigationSubmenuEdit( {
 					false
 				),
 				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				selectedBlockHasDescendants: !! selectedBlockDescendants?.length,
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -352,6 +370,7 @@ export default function NavigationSubmenuEdit( {
 					'create',
 					'posts'
 				),
+				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
 			};
 		},
 		[ clientId ]
@@ -367,7 +386,7 @@ export default function NavigationSubmenuEdit( {
 		}
 	}, [] );
 
-	// Store the colors from context as attributes for rendering
+	// Store the colors from context as attributes for rendering.
 	useEffect( () => {
 		// This side-effect should not create an undo level as those should
 		// only be created via user interactions. Mark this change as
@@ -479,12 +498,12 @@ export default function NavigationSubmenuEdit( {
 		onKeyDown,
 	} );
 
-	// Always use overlay colors for submenus
+	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	if ( isAtMaxNesting ) {
-		pull( ALLOWED_BLOCKS, 'core/navigation-submenu' );
-	}
+	const allowedBlocks = isAtMaxNesting
+		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -507,7 +526,7 @@ export default function NavigationSubmenuEdit( {
 			},
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks,
 			__experimentalDefaultBlock: DEFAULT_BLOCK,
 			__experimentalDirectInsert: true,
 
@@ -529,6 +548,14 @@ export default function NavigationSubmenuEdit( {
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
+	function transformToLink() {
+		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
+		replaceBlock( clientId, newLinkBlock );
+	}
+
+	const canConvertToLink =
+		! selectedBlockHasDescendants || onlyDescendantIsEmptyLink;
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -542,6 +569,15 @@ export default function NavigationSubmenuEdit( {
 							onClick={ () => setIsLinkOpen( true ) }
 						/>
 					) }
+
+					<ToolbarButton
+						name="revert"
+						icon={ removeSubmenu }
+						title={ __( 'Convert to Link' ) }
+						onClick={ transformToLink }
+						className="wp-block-navigation__submenu__revert"
+						isDisabled={ ! canConvertToLink }
+					/>
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
@@ -657,12 +693,12 @@ export default function NavigationSubmenuEdit( {
 							/>
 						</Popover>
 					) }
-					{ ( showSubmenuIcon || openSubmenusOnClick ) && (
-						<span className="wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 				</ParentElement>
+				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+					<span className="wp-block-navigation__submenu-icon">
+						<ItemSubmenuIcon />
+					</span>
+				) }
 				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>

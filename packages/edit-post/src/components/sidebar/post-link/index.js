@@ -10,8 +10,8 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { cleanForSlug, store as editorStore } from '@wordpress/editor';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { store as editorStore } from '@wordpress/editor';
+import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 
@@ -97,7 +97,7 @@ function PostLink( {
 						{ __( 'The last part of the URL.' ) }{ ' ' }
 						<ExternalLink
 							href={ __(
-								'https://wordpress.org/support/article/writing-posts/#post-field-descriptions'
+								'https://wordpress.org/support/article/settings-sidebar/#permalink'
 							) }
 						>
 							{ __( 'Read about permalinks' ) }

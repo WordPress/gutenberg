@@ -25,6 +25,8 @@ export default {
 
 const daText = () =>
 	text( 'message', 'Would you like to privately publish the post now?' );
+const daCancelText = () => text( 'cancel button', 'No thanks' );
+const daConfirmText = () => text( 'confirm button', 'Yes please!' );
 
 // Simplest usage: just declare the component with the required `onConfirm` prop.
 export const _default = () => {
@@ -33,6 +35,23 @@ export const _default = () => {
 	return (
 		<>
 			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
+				{ daText() }
+			</ConfirmDialog>
+			<Heading level={ 1 }>{ confirmVal }</Heading>
+		</>
+	);
+};
+
+export const WithCustomButtonLabels = () => {
+	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+
+	return (
+		<>
+			<ConfirmDialog
+				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
+				cancelButtonText={ daCancelText() }
+				confirmButtonText={ daConfirmText() }
+			>
 				{ daText() }
 			</ConfirmDialog>
 			<Heading level={ 1 }>{ confirmVal }</Heading>

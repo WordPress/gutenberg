@@ -38,11 +38,11 @@ const BlockSelectionButton = ( {
 			<TouchableOpacity
 				style={ styles.button }
 				onPress={ () => {
-					/* Open BottomSheet with markup */
+					/* Open BottomSheet with markup. */
 				} }
 				disabled={
 					true
-				} /* Disable temporarily since onPress function is empty */
+				} /* Disable temporarily since onPress function is empty. */
 			>
 				{ rootClientId &&
 					rootBlockIcon && [
@@ -72,7 +72,7 @@ const BlockSelectionButton = ( {
 					numberOfLines={ 1 }
 					style={ styles.selectionButtonTitle }
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</Text>
 			</TouchableOpacity>
 		</View>

@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -13,7 +12,6 @@
 				"orientation": "vertical"
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -33,7 +33,7 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		$comment_html = sprintf(
 			/* translators: %s post title */
 			__( 'No comments<span class="screen-reader-text"> on %s</span>' ),
-			esc_html( $post_title )
+			$post_title
 		);
 	} else {
 		$comment_html = sprintf(
@@ -44,7 +44,7 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 				$comments_number
 			),
 			esc_html( number_format_i18n( $comments_number ) ),
-			esc_html( $post_title )
+			$post_title
 		);
 	}
 

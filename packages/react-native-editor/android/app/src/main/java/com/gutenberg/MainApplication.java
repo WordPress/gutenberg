@@ -12,6 +12,7 @@ import androidx.core.util.Consumer;
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
@@ -37,6 +38,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
@@ -307,6 +309,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             protected String getJSMainModuleName() {
                 return "index";
+            }
+
+            @Override
+            protected JSIModulePackage getJSIModulePackage() {
+                return new ReanimatedJSIModulePackage();
             }
         };
     }

@@ -66,12 +66,12 @@ function PostFeaturedImage( {
 			currentPostId
 		);
 		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
-			// use mediaSize when available
+			// Use mediaSize when available.
 			mediaWidth = media.media_details.sizes[ mediaSize ].width;
 			mediaHeight = media.media_details.sizes[ mediaSize ].height;
 			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
 		} else {
-			// get fallbackMediaSize if mediaSize is not available
+			// Get fallbackMediaSize if mediaSize is not available.
 			const fallbackMediaSize = applyFilters(
 				'editor.PostFeaturedImage.imageSize',
 				'thumbnail',
@@ -81,7 +81,7 @@ function PostFeaturedImage( {
 			if (
 				has( media, [ 'media_details', 'sizes', fallbackMediaSize ] )
 			) {
-				// use fallbackMediaSize when mediaSize is not available
+				// Use fallbackMediaSize when mediaSize is not available.
 				mediaWidth =
 					media.media_details.sizes[ fallbackMediaSize ].width;
 				mediaHeight =
@@ -89,7 +89,7 @@ function PostFeaturedImage( {
 				mediaSourceUrl =
 					media.media_details.sizes[ fallbackMediaSize ].source_url;
 			} else {
-				// use full image size when mediaFallbackSize and mediaSize are not available
+				// Use full image size when mediaFallbackSize and mediaSize are not available.
 				mediaWidth = media.media_details.width;
 				mediaHeight = media.media_details.height;
 				mediaSourceUrl = media.source_url;

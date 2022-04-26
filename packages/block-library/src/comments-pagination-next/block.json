@@ -5,20 +5,23 @@
 	"title": "Next Page",
 	"category": "theme",
 	"parent": [ "core/comments-pagination" ],
-	"description": "Displays the next comments page link.",
+	"description": "Displays the next comment's page link.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postId", "comments/perPage", "comments/paginationArrow" ],
+	"usesContext": [ "postId", "comments/paginationArrow" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

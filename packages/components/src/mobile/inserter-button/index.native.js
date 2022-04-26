@@ -10,14 +10,13 @@ import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { sparkles } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-
+import sparkles from './sparkles';
 class MenuItem extends Component {
 	constructor() {
 		super( ...arguments );
