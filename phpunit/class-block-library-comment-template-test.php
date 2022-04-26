@@ -138,7 +138,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
 		$this->assertEquals(
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
 			gutenberg_render_block_core_comment_template( null, null, $block )
 		);
 	}
@@ -186,11 +186,66 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
+		$top_level_ids = self::$comment_ids;
+		$expected      = str_replace(
+			array( "\n", "\t" ),
+			'',
+			<<<END
+				<ol >
+					<li id="comment-{$top_level_ids[0]}" class="comment odd alt thread-odd thread-alt depth-1">
+						<div class="wp-block-comment-author-name">
+							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+								Test
+							</a>
+						</div>
+						<div class="wp-block-comment-content">
+							Hello world
+						</div>
+						<ol>
+							<li id="comment-{$first_level_ids[0]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									Hello world
+								</div>
+								<ol>
+									<li id="comment-{$second_level_ids[0]}" class="comment odd alt depth-3">
+										<div class="wp-block-comment-author-name">
+											<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+												Test
+											</a>
+										</div>
+										<div class="wp-block-comment-content">
+											Hello world
+										</div>
+									</li>
+								</ol>
+							</li>
+							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									Hello world
+								</div>
+							</li>
+						</ol>
+					</li>
+				</ol>
+END
+		);
+
 		$this->assertEquals(
 			gutenberg_render_block_core_comment_template( null, null, $block ),
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-odd thread-alt depth-1"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div><ol><li id="comment-' . $first_level_ids[0] . '" class="comment even depth-2"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div><ol><li id="comment-' . $second_level_ids[0] . '" class="comment odd alt depth-3"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol></li></ol></li></ol>'
+			$expected
 		);
 	}
+
 	/**
 	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
 	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
