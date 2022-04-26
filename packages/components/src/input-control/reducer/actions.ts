@@ -20,7 +20,7 @@ export const PRESS_UP = 'PRESS_UP';
 export const RESET = 'RESET';
 
 interface EventPayload {
-	event?: SyntheticEvent;
+	event: SyntheticEvent;
 }
 
 interface Action< Type, ExtraPayload = {} > {
