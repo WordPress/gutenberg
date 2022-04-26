@@ -12,7 +12,8 @@ const EMPTY_OBJECT = {};
 const localStorage = window.localStorage;
 
 /**
- * Creates a database persistence layer, storing data in WordPress user meta.
+ * Creates a persistence layer that stores data in WordPress user meta via the
+ * REST API.
  *
  * @param {Object}  options
  * @param {?Object} options.preloadedData          Any persisted preferences data that should be preloaded.
@@ -25,7 +26,7 @@ const localStorage = window.localStorage;
  *                                                 minimum every `requestDebounceMS` milliseconds, and don't
  *                                                 swamp the server. Defaults to 2500ms.
  *
- * @return {Object} A database persistence layer.
+ * @return {Object} A persistence layer for WordPress user meta.
  */
 export default function create( {
 	preloadedData,

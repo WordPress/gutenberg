@@ -1482,12 +1482,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/database-persistence-layer",
-		"slug": "packages-database-persistence-layer",
-		"markdown_source": "../packages/database-persistence-layer/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/date",
 		"slug": "packages-date",
 		"markdown_source": "../packages/date/README.md",
@@ -1713,6 +1707,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
 		"parent": "packages"
 	},
 	{

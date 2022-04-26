@@ -64,7 +64,7 @@ function gutenberg_configure_persisted_preferences() {
 			'( function() {
 				var serverData = %s;
 				var userId = "%s";
-				var persistenceLayer = wp.databasePersistenceLayer.__unstableCreatePersistenceLayer( serverData, userId );
+				var persistenceLayer = wp.preferencesPersistence.__unstableCreatePersistenceLayer( serverData, userId );
 				var preferencesStore = wp.preferences.store;
 				wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer );
 			} ) ();',
@@ -90,17 +90,17 @@ add_action( 'admin_init', 'gutenberg_configure_persisted_preferences' );
  * The update should be adding a new case like this like this:
  * ```
  * case 'wp-preferences':
- *     array_push( $dependencies, 'wp-database-persistence-layer' );
+ *     array_push( $dependencies, 'wp-preferences-persistence' );
  *     break;
  * ```
  *
  * @param WP_Scripts $scripts An instance of WP_Scripts.
  */
-function gutenberg_update_database_persistence_layer_deps( $scripts ) {
+function gutenberg_update_preferences_persistence_deps( $scripts ) {
 	$persistence_script = $scripts->query( 'wp-preferences', 'registered' );
 	if ( isset( $persistence_script->deps ) ) {
-		array_push( $persistence_script->deps, 'wp-database-persistence-layer' );
+		array_push( $persistence_script->deps, 'wp-preferences-persistence' );
 	}
 }
 
-add_action( 'wp_default_scripts', 'gutenberg_update_database_persistence_layer_deps', 11 );
+add_action( 'wp_default_scripts', 'gutenberg_update_preferences_persistence_deps', 11 );

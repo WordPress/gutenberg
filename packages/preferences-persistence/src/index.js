@@ -4,6 +4,8 @@
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
 
+export { create };
+
 /**
  * Creates the persistence layer with preloaded data.
  *
