@@ -34,7 +34,7 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
-import type { StateReducer } from '../input-control/reducer/state';
+import type { SecondaryReducer } from '../input-control/reducer/state';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -206,7 +206,7 @@ function UnforwardedUnitControl(
 	 * @param  action Action triggering state change
 	 * @return The updated state to apply to InputControl
 	 */
-	const unitControlStateReducer: StateReducer = ( state, action ) => {
+	const unitControlStateReducer: SecondaryReducer = ( state, action ) => {
 		const nextState = { ...state };
 
 		/*
@@ -226,7 +226,7 @@ function UnforwardedUnitControl(
 		return nextState;
 	};
 
-	let stateReducer: StateReducer = unitControlStateReducer;
+	let stateReducer: SecondaryReducer = unitControlStateReducer;
 	if ( stateReducerProp ) {
 		stateReducer = ( state, action ) => {
 			const baseState = unitControlStateReducer( state, action );

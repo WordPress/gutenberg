@@ -22,6 +22,7 @@ export type StateReducer = Reducer<
 	InputState,
 	InputAction | Partial< InputState >
 >;
+export type SecondaryReducer = Reducer< InputState, InputAction >;
 
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;
 
