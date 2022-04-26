@@ -43,7 +43,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 
 	$suffix = '</div>';
 	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
-		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . $suffix;
+		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
 	return get_the_term_list(
