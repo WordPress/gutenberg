@@ -143,7 +143,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDescriptor )
 			? storeNameOrDescriptor.name
 			: storeNameOrDescriptor;
-		__experimentalListeningStores.add( storeName );
+		listeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSuspendSelectors();
