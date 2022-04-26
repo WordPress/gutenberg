@@ -122,12 +122,12 @@ require __DIR__ . '/compat/wordpress-6.0/block-template.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
-remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 
 // Experimental features.
+remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
