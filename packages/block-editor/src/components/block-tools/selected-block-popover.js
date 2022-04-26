@@ -129,6 +129,7 @@ function SelectedBlockPopover( {
 
 	return (
 		<BlockPopover
+			rootClientId={ rootClientId }
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
 			className={ classnames( 'block-editor-block-list__block-popover', {
