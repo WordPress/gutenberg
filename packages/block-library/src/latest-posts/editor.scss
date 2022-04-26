@@ -3,6 +3,10 @@
 	&.is-grid {
 		padding-left: 0;
 	}
+	// Make links unclickable in the editor.
+	a {
+		pointer-events: none;
+	}
 }
 
 .wp-block-latest-posts li a > div {
