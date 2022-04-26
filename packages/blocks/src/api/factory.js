@@ -12,7 +12,6 @@ import {
 	flatMap,
 	has,
 	uniq,
-	isFunction,
 	isEmpty,
 	map,
 } from 'lodash';
@@ -220,10 +219,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// If the transform has a `isMatch` function specified, check that it returns true.
-	if (
-		isFunction( transform.isMatch ) &&
-		! checkTransformIsMatch( transform, blocks )
-	) {
+	if ( ! maybeCheckTransformIsMatch( transform, blocks ) ) {
 		return false;
 	}
 
@@ -462,7 +458,10 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  *
  * @return {boolean} True if given blocks are a match for the transform.
  */
-function checkTransformIsMatch( transform, blocks ) {
+function maybeCheckTransformIsMatch( transform, blocks ) {
+	if ( typeof transform.isMatch !== 'function' ) {
+		return true;
+	}
 	const sourceBlock = first( blocks );
 	const attributes = transform.isMultiBlock
 		? blocks.map( ( block ) => block.attributes )
@@ -499,8 +498,7 @@ export function switchToBlockType( blocks, name ) {
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( name ) !== -1 ) &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
-				( ! isFunction( t.isMatch ) ||
-					checkTransformIsMatch( t, blocksArray ) )
+				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
 		findTransform(
 			transformationsFrom,
@@ -509,8 +507,7 @@ export function switchToBlockType( blocks, name ) {
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( sourceName ) !== -1 ) &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
-				( ! isFunction( t.isMatch ) ||
-					checkTransformIsMatch( t, blocksArray ) )
+				maybeCheckTransformIsMatch( t, blocksArray )
 		);
 
 	// Stop if there is no valid transformation.
