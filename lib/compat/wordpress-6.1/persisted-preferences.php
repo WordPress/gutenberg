@@ -64,34 +64,9 @@ function gutenberg_configure_persisted_preferences() {
 			'( function() {
 				var serverData = %s;
 				var userId = "%s";
-				var localStorageRestoreKey = "WP_PREFERENCES_USER_" + userId;
-				var localData = JSON.parse(
-					localStorage.getItem( localStorageRestoreKey )
-				);
-
-				// Date parse returns NaN for invalid input. Coerce anything invalid
-				// into a conveniently comparable zero.
-				var serverModified =
-				    Date.parse( serverData && serverData._modified ) || 0;
-				var localModified =
-				    Date.parse( localData && localData._modified ) || 0;
-
-				var preloadedData;
-				if ( serverData && serverModified >= localModified ) {
-					preloadedData = serverData;
-				} else if ( localData ) {
-					preloadedData = localData;
-				} else {
-					// Check if there is data in the legacy format from the old persistence system.
-					const convertLegacyLocalStorageData =
-					    wp.databasePersistenceLayer.__unstableConvertLegacyLocalStorageData;
-					preloadedData = convertLegacyLocalStorageData( userId );
-				}
-
-				var create = wp.databasePersistenceLayer.create;
-				var persistenceLayer = create( { preloadedData, localStorageRestoreKey } );
+				var persistenceLayer = wp.databasePersistenceLayer.__unstableCreatePersistenceLayer( serverData, userId );
 				var preferencesStore = wp.preferences.store;
-				wp.data.dispatch( "core/preferences" ).setPersistenceLayer( persistenceLayer );
+				wp.data.dispatch( preferencesStore ).setPersistenceLayer( persistenceLayer );
 			} ) ();',
 			wp_json_encode( $preload_data ),
 			$user_id
