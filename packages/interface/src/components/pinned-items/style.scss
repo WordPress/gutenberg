@@ -11,8 +11,14 @@
 		}
 	}
 
+	// Gap between pinned items.
+	gap: $grid-unit-05;
+
+	// Account for larger grid from parent container gap.
+	margin-right: -$grid-unit-05;
+
 	.components-button {
-		margin-left: $grid-unit-05;
+		margin: 0;
 
 		svg {
 			max-width: $icon-size;

@@ -390,7 +390,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Metadata",
+		"title": "Metadata in block.json",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
 		"parent": "block-api"

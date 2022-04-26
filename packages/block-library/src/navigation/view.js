@@ -1,32 +1,3 @@
-/**
- * External dependencies
- */
-import MicroModal from 'micromodal';
-
-// Responsive navigation toggle.
-function navigationToggleModal( modal ) {
-	const dialogContainer = modal.querySelector(
-		`.wp-block-navigation__responsive-dialog`
-	);
-
-	const isHidden = 'true' === modal.getAttribute( 'aria-hidden' );
-
-	modal.classList.toggle( 'has-modal-open', ! isHidden );
-	dialogContainer.toggleAttribute( 'aria-modal', ! isHidden );
-
-	if ( isHidden ) {
-		dialogContainer.removeAttribute( 'role' );
-		dialogContainer.removeAttribute( 'aria-modal' );
-	} else {
-		dialogContainer.setAttribute( 'role', 'dialog' );
-		dialogContainer.setAttribute( 'aria-modal', 'true' );
-	}
-
-	// Add a class to indicate the modal is open.
-	const htmlElement = document.documentElement;
-	htmlElement.classList.toggle( 'has-modal-open' );
-}
-
 // Open on click functionality.
 function closeSubmenus( element ) {
 	element
@@ -65,12 +36,6 @@ function toggleSubmenuOnClick( event ) {
 // Necessary for some themes such as TT1 Blocks, where
 // scripts could be loaded before the body.
 window.addEventListener( 'load', () => {
-	MicroModal.init( {
-		onShow: navigationToggleModal,
-		onClose: navigationToggleModal,
-		openClass: 'is-menu-open',
-	} );
-
 	const submenuButtons = document.querySelectorAll(
 		'.wp-block-navigation-submenu__toggle'
 	);

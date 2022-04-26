@@ -118,11 +118,17 @@ class Layout extends Component {
 				? headerToolbarStyles[ 'header-toolbar__container' ].height
 				: 0;
 
+		const containerStyles = getStylesFromColorScheme(
+			styles.container,
+			styles.containerDark
+		);
+
 		const toolbarKeyboardAvoidingViewStyle = {
 			...styles.toolbarKeyboardAvoidingView,
 			left: this.state.safeAreaInsets.left,
 			right: this.state.safeAreaInsets.right,
 			bottom: this.state.safeAreaInsets.bottom,
+			backgroundColor: containerStyles.backgroundColor,
 		};
 
 		const editorStyles = [
@@ -138,10 +144,7 @@ class Layout extends Component {
 		return (
 			<Tooltip.Slot>
 				<SafeAreaView
-					style={ getStylesFromColorScheme(
-						styles.container,
-						styles.containerDark
-					) }
+					style={ containerStyles }
 					onLayout={ this.onRootViewLayout }
 				>
 					<AutosaveMonitor disableIntervalChecks />

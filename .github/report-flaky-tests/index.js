@@ -336,6 +336,7 @@ function stripAnsi( string ) {
 				'(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))',
 			].join( '|' ),
 			'g'
-		)
+		),
+		''
 	);
 }
