@@ -21,19 +21,17 @@ function createDescriptionNode( name, description ) {
 			'=',
 			babel.types.memberExpression(
 				babel.types.identifier( name ),
-				babel.types.identifier( 'story' )
+				babel.types.identifier( 'parameters' )
 			),
 			babel.types.objectExpression( [
 				babel.types.objectProperty(
-					babel.types.identifier( 'parameters' ),
+					babel.types.identifier( 'docs' ),
 					babel.types.objectExpression( [
 						babel.types.objectProperty(
-							babel.types.identifier( 'docs' ),
+							babel.types.identifier( 'description' ),
 							babel.types.objectExpression( [
 								babel.types.objectProperty(
-									babel.types.identifier(
-										'storyDescription'
-									),
+									babel.types.identifier( 'story' ),
 									babel.types.stringLiteral( description )
 								),
 							] )
