@@ -58,7 +58,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$query        = new WP_Query;
 	$recent_posts = $query->query( $args );
 
-	if ( $attributes['displayFeaturedImage'] ) {
+	if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {
 		update_post_thumbnail_cache( $query );
 	}
 
