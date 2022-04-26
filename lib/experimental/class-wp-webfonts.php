@@ -148,9 +148,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @param $variation_handle
 	 */
 	public function add_dependency( $font_family_handle, $variation_handle ) {
-		$dependencies = $this->registered[ $font_family_handle ]->deps;
-		$dependencies[] = $variation_handle;
-		$this->registered[ $font_family_handle ]->deps = $dependencies;
+		$this->registered[ $font_family_handle ]->deps[] = $variation_handle;
 	}
 
 	/**
