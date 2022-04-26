@@ -385,12 +385,6 @@ END
 			)
 		);
 
-		$commenter_filter = function () {
-			return array(
-				'comment_author_email' => 'unapproved@example.org',
-			);
-		};
-
 		add_filter( 'wp_get_current_commenter', $commenter_filter );
 
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
