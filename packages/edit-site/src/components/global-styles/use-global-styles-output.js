@@ -436,7 +436,7 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 	let ruleset = 'body {margin: 0;}';
 	if ( useRootVars ) {
 		ruleset =
-			'body { padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { margin-top: 0; margin-bottom: 0; padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > * + * { margin-top: var( --wp--style--block-gap ); }';
+			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } }';
 	}
 
 	nodesWithStyles.forEach( ( { selector, duotoneSelector, styles } ) => {
