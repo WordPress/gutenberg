@@ -45,7 +45,7 @@ import {
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { getProtocol, hasQueryArg } from '@wordpress/url';
+import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -207,6 +207,7 @@ export class ImageEdit extends Component {
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
@@ -459,6 +460,19 @@ export class ImageEdit extends Component {
 			...mediaAttributes,
 			...additionalAttributes,
 		} );
+	}
+
+	onSelectURL( newUrl ) {
+		const { attributes: url, setAttributes } = this.props;
+
+		if ( newUrl !== url ) {
+			if ( isURL( newUrl ) ) {
+				setAttributes( { url: newUrl, id: undefined } );
+			} else {
+				// TODO: throw createErrorNotice equivalent error from class component
+				// console.log( 'Invalid URL. Image file not found.' );
+			}
+		}
 	}
 
 	onFocusCaption() {
@@ -716,6 +730,7 @@ export class ImageEdit extends Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
+						onSelectURL={ this.onSelectURL }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
@@ -837,6 +852,7 @@ export class ImageEdit extends Component {
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
+				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
 				} }
