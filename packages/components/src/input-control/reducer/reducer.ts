@@ -57,10 +57,10 @@ function inputControlStateReducer(
 		// Updates state and returns early when there's no action type. These
 		// are controlled updates and need no exposure to additional reducers.
 		if ( ! ( 'type' in action ) ) {
-			let { value = state.value } = action;
-			value ??= '';
-			if ( value !== '' ) value = `${ value }`;
-			return { ...state, value };
+			return {
+				...state,
+				value: `${ action.value ?? '' }`,
+			};
 		}
 
 		switch ( action.type ) {
