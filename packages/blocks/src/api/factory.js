@@ -460,7 +460,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  * @param {Object} transform A transform object.
  * @param {Array}  blocks    Blocks array.
  *
- * @return {boolean} True if given blocks are a match for given tranform.
+ * @return {boolean} True if given blocks are a match for the transform.
  */
 function checkTransformIsMatch( transform, blocks ) {
 	const sourceBlock = first( blocks );
