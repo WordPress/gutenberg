@@ -14,14 +14,14 @@ import { chevronRight, chevronLeft } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { NavigationBackButton } from './navigation-button';
+import { NavigationBackButtonAsItem } from './navigation-button';
 
 function ScreenHeader( { title, description } ) {
 	return (
 		<VStack spacing={ 2 }>
 			<HStack spacing={ 2 }>
-				<View>
-					<NavigationBackButton
+				<View role="list">
+					<NavigationBackButtonAsItem
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						size="small"
 						aria-label={ __( 'Navigate to the previous view' ) }
