@@ -8,11 +8,19 @@
 /**
  * Function that recursively renders a list of nested comments.
  *
- * @param WP_Comment[] $comments    The array of comments.
+ * @global int $comment_depth
+ *
+ * @param WP_Comment[] $comments        The array of comments.
  * @param WP_Block     $block           Block instance.
  * @return string
  */
 function block_core_comment_template_render_comments( $comments, $block ) {
+	global $comment_depth;
+
+	if ( empty( $comment_depth ) ) {
+		$comment_depth = 1;
+	}
+
 	$content = '';
 	foreach ( $comments as $comment ) {
 
@@ -25,17 +33,30 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 
 		$children = $comment->get_children();
 
+		/*
+		 * We need to create the CSS classes BEFORE recursing into the children.
+		 * This is because comment_class() uses globals like `$comment_alt`
+		 * and `$comment_thread_alt` which are order-sensitive.
+		 *
+		 * The `false` parameter at the end means that we do NOT want the function
+		 * to `echo` the output but to return a string.
+		 * See https://developer.wordpress.org/reference/functions/comment_class/#parameters.
+		 */
+		$comment_classes = comment_class( '', $comment->comment_ID, $comment->comment_post_ID, false );
+
 		// If the comment has children, recurse to create the HTML for the nested
 		// comments.
 		if ( ! empty( $children ) ) {
+			$comment_depth += 1;
 			$inner_content  = block_core_comment_template_render_comments(
 				$children,
 				$block
 			);
 			$block_content .= sprintf( '<ol>%1$s</ol>', $inner_content );
+			$comment_depth -= 1;
 		}
 
-		$content .= '<li>' . $block_content . '</li>';
+		$content .= sprintf( '<li id="comment-%1$s" %2$s>%3$s</li>', $comment->comment_ID, $comment_classes, $block_content );
 	}
 
 	return $content;

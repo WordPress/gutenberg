@@ -78,7 +78,7 @@ Display a list of all categories. ([Source](https://github.com/WordPress/gutenbe
 -	**Name:** core/categories
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showHierarchy, showOnlyTopLevel, showPostCounts
+-	**Attributes:** displayAsDropdown, showEmpty, showHierarchy, showOnlyTopLevel, showPostCounts
 
 ## Code
 
@@ -214,6 +214,15 @@ An advanced block that allows displaying post comments using different visual co
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** tagName
+
+## Comments Title
+
+Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
+
+-	**Name:** core/comments-title
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
+-	**Attributes:** level, multipleCommentsLabel, showCommentsCount, showPostTitle, singleCommentLabel, textAlign
 
 ## Cover
 

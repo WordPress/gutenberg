@@ -54,7 +54,6 @@ const {
 	getDraggedBlockClientIds,
 	isBlockBeingDragged,
 	isAncestorBeingDragged,
-	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
@@ -2053,24 +2052,6 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isCaretWithinFormattedText', () => {
-		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
-			const state = {
-				isCaretWithinFormattedText: true,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( true );
-		} );
-
-		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
-			const state = {
-				isCaretWithinFormattedText: false,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( false );
 		} );
 	} );
 

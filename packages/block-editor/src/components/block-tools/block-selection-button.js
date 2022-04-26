@@ -38,6 +38,7 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -49,7 +50,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
@@ -90,6 +91,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 		speak( label );
 	}, [ label ] );
+	const blockElement = useBlockElement( clientId );
 
 	const {
 		hasBlockMovingClientId,

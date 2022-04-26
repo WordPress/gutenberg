@@ -1261,22 +1261,34 @@ export function stopDraggingBlocks() {
 /**
  * Returns an action object used in signalling that the caret has entered formatted text.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function enterFormattedText() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).enterFormattedText', {
+		since: '6.1',
+		version: '6.3',
+	} );
 	return {
-		type: 'ENTER_FORMATTED_TEXT',
+		type: 'DO_NOTHING',
 	};
 }
 
 /**
  * Returns an action object used in signalling that the user caret has exited formatted text.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function exitFormattedText() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).exitFormattedText', {
+		since: '6.1',
+		version: '6.3',
+	} );
 	return {
-		type: 'EXIT_FORMATTED_TEXT',
+		type: 'DO_NOTHING',
 	};
 }
 

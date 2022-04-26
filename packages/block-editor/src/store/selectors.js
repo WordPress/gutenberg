@@ -34,6 +34,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -933,6 +934,25 @@ export function __unstableIsFullySelected( state ) {
 }
 
 /**
+ * Returns true if the selection is collapsed.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether the selection is collapsed.
+ */
+export function __unstableIsSelectionCollapsed( state ) {
+	const selectionAnchor = getSelectionStart( state );
+	const selectionFocus = getSelectionEnd( state );
+	return (
+		!! selectionAnchor &&
+		!! selectionFocus &&
+		selectionAnchor.clientId === selectionFocus.clientId &&
+		selectionAnchor.attributeKey === selectionFocus.attributeKey &&
+		selectionAnchor.offset === selectionFocus.offset
+	);
+}
+
+/**
  * Check whether the selection is mergeable.
  *
  * @param {Object}  state     Editor state.
@@ -1325,12 +1345,20 @@ export function isAncestorBeingDragged( state, clientId ) {
 /**
  * Returns true if the caret is within formatted text, or false otherwise.
  *
- * @param {Object} state Global application state.
+ * @deprecated
  *
  * @return {boolean} Whether the caret is within formatted text.
  */
-export function isCaretWithinFormattedText( state ) {
-	return state.isCaretWithinFormattedText;
+export function isCaretWithinFormattedText() {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).isCaretWithinFormattedText',
+		{
+			since: '6.1',
+			version: '6.3',
+		}
+	);
+
+	return false;
 }
 
 /**

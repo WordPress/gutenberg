@@ -184,10 +184,10 @@ function Editor( { onError } ) {
 		: __( 'Block Library' );
 
 	const secondarySidebar = () => {
-		if ( isInserterOpen ) {
+		if ( editorMode === 'visual' && isInserterOpen ) {
 			return <InserterSidebar />;
 		}
-		if ( isListViewOpen ) {
+		if ( editorMode === 'visual' && isListViewOpen ) {
 			return <ListViewSidebar />;
 		}
 		return null;

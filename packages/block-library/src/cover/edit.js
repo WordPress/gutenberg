@@ -31,7 +31,6 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalBoxControl as BoxControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -76,8 +75,6 @@ import {
 } from './shared';
 
 extend( [ namesPlugin ] );
-
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -313,7 +310,6 @@ function CoverEdit( {
 		isRepeated,
 		minHeight,
 		minHeightUnit,
-		style: styleAttribute,
 		alt,
 		allowedBlocks,
 		templateLock,
@@ -744,11 +740,6 @@ function CoverEdit( {
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
-				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
-					className="block-library-cover__padding-visualizer"
-				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {
