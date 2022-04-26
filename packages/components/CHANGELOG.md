@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
+
 ## 19.9.0 (2022-04-21)
 
 ### Bug Fix
