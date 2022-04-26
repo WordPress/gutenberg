@@ -7,7 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useEffect,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -27,7 +33,7 @@ import { store as editorStore } from '../../store';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
-export default function PostTitle() {
+function PostTitle( _, forwardedRef ) {
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
@@ -62,6 +68,12 @@ export default function PostTitle() {
 			hasFixedToolbar: _hasFixedToolbar,
 		};
 	}, [] );
+
+	useImperativeHandle( forwardedRef, () => ( {
+		focus: () => {
+			ref?.current?.focus();
+		},
+	} ) );
 
 	useEffect( () => {
 		if ( ! ref.current ) {
@@ -219,3 +231,5 @@ export default function PostTitle() {
 	);
 	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 }
+
+export default forwardRef( PostTitle );

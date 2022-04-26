@@ -1,6 +1,5 @@
 .block-editor-block-switcher {
 	position: relative;
-	padding: 0 ($grid-unit-15 * 0.5);
 
 	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
@@ -47,9 +46,6 @@
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	display: flex;
-	// The `!important` is used to vastly simplify the overriding of an inherited selector.
-	// Can be removed if we refactor .block-editor-block-toolbar .components-toolbar-group .components-button.has-icon.has-icon
-	padding: ($grid-unit-15 * 0.5) $grid-unit-15 !important;
 
 	.block-editor-block-icon {
 		margin-right: auto;

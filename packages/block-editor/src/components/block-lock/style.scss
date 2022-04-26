@@ -63,8 +63,7 @@
 		padding-left: 0 !important;
 
 		&:focus::before {
-			left: 0 !important;
-			right: $grid-unit-15 !important;
+			right: $grid-unit-10 !important;
 		}
 	}
 }

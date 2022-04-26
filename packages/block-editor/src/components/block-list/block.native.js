@@ -47,6 +47,7 @@ function BlockForType( {
 	onDeleteBlock,
 	onReplace,
 	parentWidth,
+	parentBlockAlignment,
 	wrapperProps,
 	blockWidth,
 	baseGlobalStyles,
@@ -95,6 +96,7 @@ function BlockForType( {
 				contentStyle={ contentStyle }
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
+				parentBlockAlignment={ parentBlockAlignment }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>

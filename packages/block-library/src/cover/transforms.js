@@ -64,37 +64,60 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			isMatch: ( { backgroundColor, gradient, style } ) => {
-				/*
-				 * Make this transformation available only if the Group has background
-				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
-				 *
-				 * This helps avoid arbitrary decisions about the Cover block's background
-				 * and user confusion about the existence of previous content.
-				 */
-				return (
+			transform: ( attributes, innerBlocks ) => {
+				const {
+					align,
+					anchor,
+					backgroundColor,
+					gradient,
+					style,
+				} = attributes;
+
+				// If no background or gradient color is provided, default to 50% opacity.
+				// This matches the styling of a Cover block with a background image,
+				// in the state where a background image has been removed.
+				const dimRatio =
 					backgroundColor ||
+					gradient ||
 					style?.color?.background ||
-					style?.color?.gradient ||
-					gradient
-				);
-			},
-			transform: (
-				{ align, anchor, backgroundColor, gradient, style },
-				innerBlocks
-			) => {
-				return createBlock(
-					'core/cover',
-					{
-						align,
-						anchor,
-						overlayColor: backgroundColor,
-						customOverlayColor: style?.color?.background,
-						gradient,
-						customGradient: style?.color?.gradient,
+					style?.color?.gradient
+						? undefined
+						: 50;
+
+				// Move the background or gradient color to the parent Cover block.
+				const parentAttributes = {
+					align,
+					anchor,
+					dimRatio,
+					overlayColor: backgroundColor,
+					customOverlayColor: style?.color?.background,
+					gradient,
+					customGradient: style?.color?.gradient,
+				};
+
+				const attributesWithoutBackgroundColors = {
+					...attributes,
+					backgroundColor: undefined,
+					gradient: undefined,
+					style: {
+						...attributes?.style,
+						color: {
+							...attributes?.style?.color,
+							background: undefined,
+							gradient: undefined,
+						},
 					},
-					innerBlocks
-				);
+				};
+
+				// Preserve the block by nesting it within the Cover block,
+				// instead of converting the Group block directly to the Cover block.
+				return createBlock( 'core/cover', parentAttributes, [
+					createBlock(
+						'core/group',
+						attributesWithoutBackgroundColors,
+						innerBlocks
+					),
+				] );
 			},
 		},
 	],

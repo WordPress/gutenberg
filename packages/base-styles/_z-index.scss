@@ -83,10 +83,6 @@ $z-layers: (
 	// Ensures content overlay appears higher than resize containers used for image/video/etc.
 	".block-editor-block-content-overlay__overlay": 10,
 
-	// The block mover, particularly in nested contexts,
-	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
-
 	// Query block setup state.
 	".block-editor-block-pattern-setup .pattern-slide": 100,
 	".block-editor-block-pattern-setup .{next,previous}-slide": 101,
@@ -127,10 +123,7 @@ $z-layers: (
 	".edit-site-navigation-panel__preview": 32,
 
 	// Above the block list and the header.
-	".block-editor-block-list__block-popover": 31,
-
-	// Under the block popover (block toolbar).
-	".block-editor-block-list__insertion-point-popover": 28,
+	".block-editor-block-popover": 31,
 
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,

@@ -31,13 +31,6 @@ export const DEFAULT_VALUES = {
 	left: undefined,
 };
 
-export const DEFAULT_VISUALIZER_VALUES = {
-	top: false,
-	right: false,
-	bottom: false,
-	left: false,
-};
-
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 
 /**

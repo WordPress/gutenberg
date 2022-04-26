@@ -25,7 +25,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canEdit, canMove, canRemove } = useBlockLock( clientId, true );
+	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
 	const { isReusable } = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
