@@ -3,8 +3,8 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
 	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
 	__experimentalVStack as VStack,
 	FlexItem,
 	CardBody,
@@ -37,7 +37,7 @@ function ScreenRoot() {
 	return (
 		<Card size="small">
 			<CardBody>
-				<VStack spacing={ 2 }>
+				<VStack spacing={ 4 }>
 					<Card>
 						<CardMedia>
 							<StylesPreview />
@@ -55,22 +55,28 @@ function ScreenRoot() {
 							</HStack>
 						</NavigationButton>
 					) }
+					<ContextMenu />
 				</VStack>
-			</CardBody>
-
-			<CardBody>
-				<ContextMenu />
 			</CardBody>
 
 			<CardDivider />
 
 			<CardBody>
+				<Spacer
+					as="p"
+					paddingTop={ 2 }
+					/*
+					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
+					 * This is an ad hoc override for this particular instance only and should be reconsidered before making into a pattern.
+					 */
+					paddingX="13px"
+					marginBottom={ 4 }
+				>
+					{ __(
+						'Customize the appearance of specific blocks for the whole site.'
+					) }
+				</Spacer>
 				<ItemGroup>
-					<Item>
-						{ __(
-							'Customize the appearance of specific blocks for the whole site.'
-						) }
-					</Item>
 					<NavigationButton path="/blocks">
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
