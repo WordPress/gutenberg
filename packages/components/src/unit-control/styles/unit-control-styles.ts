@@ -26,21 +26,11 @@ export const Root = styled.div`
 	position: relative;
 `;
 
-const paddingStyles = ( { disableUnits, size }: InputProps ) => {
-	const paddings = {
-		default: {
-			paddingRight: 8,
-		},
-		small: {
-			paddingRight: 8,
-		},
-		'__unstable-large': {
-			paddingRight: disableUnits ? 16 : 8,
-		},
-	};
+const paddingStyles = ( { disableUnits }: InputProps ) => {
+	if ( disableUnits ) return '';
 
 	return css`
-		${ rtl( paddings[ size ] )() };
+		${ rtl( { paddingRight: 8 } )() };
 	`;
 };
 
