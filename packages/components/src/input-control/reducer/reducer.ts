@@ -52,8 +52,6 @@ function inputControlStateReducer(
 	composedStateReducers: StateReducer
 ): StateReducer {
 	return ( state, action ) => {
-		const nextState = { ...state };
-
 		// Updates state and returns early when there's no action type. These
 		// are controlled updates and need no exposure to additional reducers.
 		if ( ! ( 'type' in action ) ) {
@@ -62,6 +60,7 @@ function inputControlStateReducer(
 				value: `${ action.value ?? '' }`,
 			};
 		}
+		const nextState = { ...state };
 
 		switch ( action.type ) {
 			/**
