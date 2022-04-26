@@ -35,6 +35,12 @@ export const removeFocusChangeListener = ( listener ) => {
 	}
 };
 
+/**
+ *	Notifies listeners about changes in focus.
+ *
+ * @param {Object}  event           Event data to be notified to listeners.
+ * @param {boolean} event.isFocused True if any Aztec view is currently focused.
+ */
 const notifyListeners = ( { isFocused } ) => {
 	focusChangeListeners.forEach( ( listener ) => {
 		listener( { isFocused } );
