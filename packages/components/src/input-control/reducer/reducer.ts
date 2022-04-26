@@ -98,10 +98,7 @@ function inputControlStateReducer(
 			case actions.RESET:
 				nextState.error = null;
 				nextState.isDirty = false;
-				nextState.value =
-					action.payload.value === undefined
-						? state.initialValue
-						: action.payload.value ?? '';
+				nextState.value = action.payload.value ?? state.initialValue;
 				break;
 
 			/**
