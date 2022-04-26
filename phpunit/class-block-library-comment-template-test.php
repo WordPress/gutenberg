@@ -361,7 +361,7 @@ END
 	/**
 	 * Test rendering an unapproved comment preview.
 	 */
-	function test_rendering_comment_template_preview() {
+	function test_rendering_comment_template_unmoderated_preview() {
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
@@ -401,5 +401,11 @@ END
 		);
 
 		remove_filter( 'wp_get_current_commenter', $commenter_filter );
+
+		// Test it again and ensure the unmoderated comment doesn't leak out.
+		$this->assertEquals(
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
+			gutenberg_render_block_core_comment_template( null, null, $block )
+		);
 	}
 }
