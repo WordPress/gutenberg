@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { set } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -51,20 +46,24 @@ const transforms = {
 				},
 				innerBlocks
 			) => {
-				const additionalAttributes = {};
+				let additionalAttributes = {};
 
 				if ( customGradient ) {
-					set(
-						additionalAttributes,
-						'style.color.gradient',
-						customGradient
-					);
+					additionalAttributes = {
+						style: {
+							color: {
+								gradient: customGradient,
+							},
+						},
+					};
 				} else if ( customOverlayColor ) {
-					set(
-						additionalAttributes,
-						'style.color.background',
-						customOverlayColor
-					);
+					additionalAttributes = {
+						style: {
+							color: {
+								background: customOverlayColor,
+							},
+						},
+					};
 				}
 
 				return createBlock(
