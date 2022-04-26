@@ -45,7 +45,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		);
 	} else {
 		$wrapper_attributes .= 'style="visibility:hidden;"';
-		$content = sprintf(
+		$content             = sprintf(
 			'<span %1$s>%2$s</span>',
 			$wrapper_attributes,
 			$label
