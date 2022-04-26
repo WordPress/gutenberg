@@ -51,6 +51,15 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
+// The flattened color palettes array is memoized to ensure that the same array instance is
+// returned for the colors palettes. This value might be used as a prop, so having the same
+// instance will prevent unnecessary re-renders of the RichText component.
+const flatColorPalettes = memize( ( colorsPalettes ) => [
+	...( colorsPalettes?.theme || [] ),
+	...( colorsPalettes?.custom || [] ),
+	...( colorsPalettes?.default || [] ),
+] );
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -1263,14 +1272,10 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
-		const allColorsPalette = [
-			...( colorsPalettes?.theme || [] ),
-			...( colorsPalettes?.custom || [] ),
-			...( colorsPalettes?.default || [] ),
-		];
-		const colorPalette = colorsPalettes
-			? allColorsPalette
+
+		const colorPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette = colorPalettes
+			? flatColorPalettes( colorPalettes )
 			: settings?.colors;
 
 		return {
