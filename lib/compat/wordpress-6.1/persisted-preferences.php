@@ -8,11 +8,12 @@
 /**
  * Register the user meta for persisted preferences.
  */
-function gutenberg_configure_persisted_preferences() {
+function gutenberg_register_persisted_preferences_meta() {
 	// Create a meta key that incorporates the blog prefix so that each site
 	// on a multisite can have distinct user preferences.
 	global $wpdb;
 	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
+
 	register_meta(
 		'user',
 		$meta_key,
@@ -39,11 +40,21 @@ function gutenberg_configure_persisted_preferences() {
 			),
 		)
 	);
+}
 
+add_action( 'init', 'gutenberg_register_persisted_preferences_meta' );
+
+/**
+ * Configures the preferences package to use user meta persistence.
+ */
+function gutenberg_configure_persisted_preferences() {
 	$user_id = get_current_user_id();
 	if ( empty( $user_id ) ) {
 		return;
 	}
+
+	global $wpdb;
+	$meta_key = $wpdb->get_blog_prefix() . 'persisted_preferences';
 
 	$preload_data = get_user_meta( $user_id, $meta_key, true );
 
@@ -90,7 +101,7 @@ function gutenberg_configure_persisted_preferences() {
 
 }
 
-add_action( 'init', 'gutenberg_configure_persisted_preferences' );
+add_action( 'admin_init', 'gutenberg_configure_persisted_preferences' );
 
 /**
  * Register dependencies for the inline script that configures the persistence layer.
