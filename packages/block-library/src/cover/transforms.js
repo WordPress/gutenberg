@@ -73,6 +73,19 @@ const transforms = {
 					style,
 				} = attributes;
 
+				// If the Group block being transformed has a Cover block as its
+				// only child return that Cover block.
+				if (
+					innerBlocks?.length === 1 &&
+					innerBlocks[ 0 ]?.name === 'core/cover'
+				) {
+					return createBlock(
+						'core/cover',
+						innerBlocks[ 0 ].attributes,
+						innerBlocks[ 0 ].innerBlocks
+					);
+				}
+
 				// If no background or gradient color is provided, default to 50% opacity.
 				// This matches the styling of a Cover block with a background image,
 				// in the state where a background image has been removed.
