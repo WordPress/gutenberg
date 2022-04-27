@@ -42,6 +42,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	const isPanActive = useSharedValue( false );
 	const draggingId = useSharedValue( '' );
 	const panGestureRef = useRef();
+	const currentFirstTouchId = useSharedValue( null );
 
 	const initialPosition = {
 		x: useSharedValue( 0 ),
@@ -80,20 +81,23 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 	function getFirstTouchEvent( event ) {
 		'worklet';
 
-		const sortedEventsById = event.allTouches.sort(
-			( a, b ) => b.id + a.id
+		return event.allTouches.find(
+			( touch ) => touch.id === currentFirstTouchId.value
 		);
-		return sortedEventsById[ 0 ];
 	}
 
 	const panGesture = Gesture.Pan()
 		.manualActivation( true )
 		.onTouchesDown( ( event ) => {
-			const firstEvent = getFirstTouchEvent( event );
+			if ( ! currentFirstTouchId.value ) {
+				const firstEvent = event.allTouches[ 0 ];
+				const { x = 0, y = 0 } = firstEvent;
 
-			const { x = 0, y = 0 } = firstEvent;
-			initialPosition.x.value = x;
-			initialPosition.y.value = y;
+				currentFirstTouchId.value = firstEvent.id;
+
+				initialPosition.x.value = x;
+				initialPosition.y.value = y;
+			}
 		} )
 		.onTouchesMove( ( event, state ) => {
 			if ( ! isPanActive.value && isDragging.value ) {
@@ -104,6 +108,11 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			if ( isPanActive.value && isDragging.value ) {
 				const firstEvent = getFirstTouchEvent( event );
 
+				if ( ! firstEvent ) {
+					state.end();
+					return;
+				}
+
 				lastPosition.x.value = firstEvent.x;
 				lastPosition.y.value = firstEvent.y;
 
@@ -113,6 +122,7 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 			}
 		} )
 		.onEnd( () => {
+			currentFirstTouchId.value = null;
 			isPanActive.value = false;
 			isDragging.value = false;
 		} )
