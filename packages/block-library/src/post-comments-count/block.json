@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"group": "fse-blocks",
+	"__experiment": "fse-blocks",
 	"name": "core/post-comments-count",
 	"title": "Post Comments Count",
 	"category": "theme",

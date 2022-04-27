@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"group": "stable",
 	"name": "core/comment-author-name",
 	"title": "Comment Author Name",
 	"category": "theme",

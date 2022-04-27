@@ -122,10 +122,16 @@ const registerBlock = ( block ) => {
 };
 
 /**
- * Function to get all available blocks in an array, even those
- * that are experimental or registered conditionally.
+ * Function to get all the core blocks in an array.
+ *
+ * @example
+ * ```js
+ * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
+ *
+ * const coreBlocks = __experimentalGetCoreBlocks();
+ * ```
  */
-const getAllBlocks = () => [
+export const __experimentalGetCoreBlocks = () => [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
 	paragraph,
@@ -142,7 +148,7 @@ const getAllBlocks = () => [
 	buttons,
 	calendar,
 	categories,
-	classic,
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context.
 	code,
 	column,
 	columns,
@@ -151,13 +157,11 @@ const getAllBlocks = () => [
 	file,
 	group,
 	html,
-	listItem,
 	latestComments,
 	latestPosts,
 	mediaText,
 	missing,
 	more,
-	navigationArea,
 	nextpage,
 	pageList,
 	pattern,
@@ -188,7 +192,6 @@ const getAllBlocks = () => [
 	query,
 	templatePart,
 	avatar,
-	postAuthorName,
 	postTitle,
 	postExcerpt,
 	postFeaturedImage,
@@ -205,7 +208,6 @@ const getAllBlocks = () => [
 	queryNoResults,
 	readMore,
 	commentAuthorName,
-	commentAuthorAvatar,
 	commentContent,
 	commentDate,
 	commentEditLink,
@@ -217,39 +219,15 @@ const getAllBlocks = () => [
 	commentsPaginationNext,
 	commentsPaginationNumbers,
 	commentsPaginationPrevious,
-	postComment,
-	postComments,
-	postCommentsCount,
-	postCommentsForm,
-	postCommentsLink,
 
+	postComments,
+	postCommentsForm,
 	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
 	postAuthorBiography,
 ];
-
-const getBlocksFromGroups = ( allowedGroups ) =>
-	getAllBlocks().filter( ( { metadata: { group } } ) =>
-		allowedGroups.includes( group )
-	);
-
-/**
- * Function to get all the core blocks in an array.
- *
- * @example
- * ```js
- * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
- *
- * const coreBlocks = __experimentalGetCoreBlocks();
- * ```
- */
-export const __experimentalGetCoreBlocks = () =>
-	getBlocksFromGroups( [
-		'stable',
-		window.wp && window.wp.oldEditor ? 'stable+wordpress' : null,
-	] );
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -290,16 +268,21 @@ export const registerCoreBlocks = (
 export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	.IS_GUTENBERG_PLUGIN
 	? ( { enableFSEBlocks } = {} ) => {
-			const blocks = getBlocksFromGroups( [
-				// Experimental blocks.
+			const experimentalBlocks = [
+				listItem,
+				postAuthorName,
+				commentAuthorAvatar,
+				navigationArea,
+				postComment,
+				postCommentsCount,
+				postCommentsLink,
+			];
+			const allowedExperiments = [
 				window.__experimentalEnableListBlockV2 ? 'list-block-v2' : null,
-
-				// Full Site Editing blocks.
 				enableFSEBlocks ? 'fse-blocks' : null,
-			] );
-
-			for ( const block of blocks ) {
-				registerBlock( block );
-			}
+			];
+			experimentalBlocks.filter( ( { metadata: { __experiment } } ) =>
+				allowedExperiments.includes( __experiment )
+			);
 	  }
 	: undefined;

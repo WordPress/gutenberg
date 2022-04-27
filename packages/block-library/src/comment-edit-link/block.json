@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"group": "stable",
 	"name": "core/comment-edit-link",
 	"title": "Comment Edit Link",
 	"category": "theme",

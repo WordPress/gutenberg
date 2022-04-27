@@ -1,9 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"group": "stable",
 	"name": "core/group",
-	"title": "Group",
+	"title": "__experiment",
 	"category": "design",
 	"description": "Gather blocks in a layout container.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
