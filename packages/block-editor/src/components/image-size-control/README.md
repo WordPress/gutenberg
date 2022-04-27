@@ -18,7 +18,7 @@ const MyImageSizeControl = () => {
 
 	return (
 		<ImageSizeControl
-			label={ __( 'Image Size' ) }
+			label={ __( 'Image size' ) }
 			onChange={ ( value ) => setSize( value ) }
 			width={ size.width }
 			height={ size.height }
@@ -39,7 +39,7 @@ The label for the control.
 
 -   Type: `string`
 -   Required: No
--   Default: `Image Size`
+-   Default: `Image size`
 
 ### help
 

@@ -45,7 +45,7 @@ export default function ImageSizeControl( {
 		<>
 			{ ! isEmpty( imageSizeOptions ) && (
 				<SelectControl
-					label={ label === undefined ? __( 'Image Size' ) : label }
+					label={ label === undefined ? __( 'Image size' ) : label }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
