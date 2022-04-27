@@ -45,8 +45,8 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	// For text blocks, e.g Paragraph, Heading
-	async getTextBlockLocatorAtPosition( blockName, position = 1 ) {
+	// For text blocks, e.g. Paragraph, Heading
+	async getTextBlockAtPosition( blockName, position = 1 ) {
 		// iOS needs a click before
 		if ( ! isAndroid() ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
@@ -513,7 +513,7 @@ class EditorPage {
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
-			const block = await this.getTextBlockLocatorAtPosition(
+			const block = await this.getTextBlockAtPosition(
 				blockNames.paragraph,
 				position + i
 			);
@@ -534,7 +534,7 @@ class EditorPage {
 	}
 
 	async getTextForParagraphBlockAtPosition( position ) {
-		const blockLocator = await this.getTextBlockLocatorAtPosition(
+		const blockLocator = await this.getTextBlockAtPosition(
 			blockNames.paragraph,
 			position
 		);

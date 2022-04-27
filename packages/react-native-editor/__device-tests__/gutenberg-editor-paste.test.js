@@ -26,7 +26,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -55,7 +55,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
 			await editorPage.dismissAndroidClipboardSmartSuggestion();
 		}
-		const paragraphBlockElement2 = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement2 = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
@@ -80,7 +80,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	it( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// Create paragraph block with styled text by editing html.
 		await editorPage.setHtmlContent( testData.pasteHtmlText );
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -104,7 +104,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
 			await editorPage.dismissAndroidClipboardSmartSuggestion();
 		}
-		const paragraphBlockElement2 = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement2 = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);

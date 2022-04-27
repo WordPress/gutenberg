@@ -13,7 +13,7 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		await editorPage.typeTextToParagraphBlock(
@@ -41,7 +41,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -61,7 +61,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
-		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
@@ -100,13 +100,13 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		const blockText = await editorPage.getTextForParagraphBlockAtPosition(
-			2
-		);
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
+
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 
 		await clickBeginningOfElement(
 			editorPage.driver,
@@ -121,7 +121,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const mergedBlockText = await editorPage.getTextForParagraphBlockAtPosition(
 			1
 		);
-		expect( mergedBlockText.length ).not.toEqual( blockText.length );
+		expect( text0 + text1 ).toMatch( mergedBlockText );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
@@ -136,7 +136,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Merge paragraphs.
-		const paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);

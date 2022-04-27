@@ -25,7 +25,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
@@ -35,7 +35,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			3
 		);
@@ -45,7 +45,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.heading );
-		headingBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		headingBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.heading,
 			4
 		);
@@ -55,7 +55,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getTextBlockLocatorAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			5
 		);
