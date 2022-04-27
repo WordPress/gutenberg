@@ -230,9 +230,9 @@ const getAllBlocks = () => [
 	postAuthorBiography,
 ];
 
-const getBlocksWithMaturity = ( allowedMaturity ) =>
-	getAllBlocks().filter( ( { metadata: { maturity } } ) =>
-		allowedMaturity.includes( maturity )
+const getBlocksFromGroups = ( allowedGroups ) =>
+	getAllBlocks().filter( ( { metadata: { group } } ) =>
+		allowedGroups.includes( group )
 	);
 
 /**
@@ -246,7 +246,7 @@ const getBlocksWithMaturity = ( allowedMaturity ) =>
  * ```
  */
 export const __experimentalGetCoreBlocks = () =>
-	getBlocksWithMaturity( [
+	getBlocksFromGroups( [
 		'stable',
 		window.wp && window.wp.oldEditor ? 'stable+wordpress' : null,
 	] );
@@ -290,7 +290,7 @@ export const registerCoreBlocks = (
 export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	.IS_GUTENBERG_PLUGIN
 	? ( { enableFSEBlocks } = {} ) => {
-			const blocks = getBlocksWithMaturity( [
+			const blocks = getBlocksFromGroups( [
 				// Experimental blocks.
 				window.__experimentalEnableListBlockV2 ? 'list-block-v2' : null,
 
