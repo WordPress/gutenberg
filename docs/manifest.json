@@ -390,7 +390,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Metadata",
+		"title": "Metadata in block.json",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
 		"parent": "block-api"
@@ -1707,6 +1707,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
 		"parent": "packages"
 	},
 	{

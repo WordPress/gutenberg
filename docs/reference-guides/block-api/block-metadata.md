@@ -1,4 +1,4 @@
-# Metadata
+# Metadata in block.json
 
 Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 

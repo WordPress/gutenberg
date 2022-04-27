@@ -13,6 +13,10 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] Add featured image settings to Latest Posts block [#39257]
 
+## 1.74.1
+
+-   [**] RichText - Set a default value for selection values [#40581]
+
 ## 1.74.0
 
 -   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
