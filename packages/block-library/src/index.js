@@ -278,6 +278,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 				postCommentsLink,
 			];
 			const enabledExperiments = [
+				'experimental',
 				window.__experimentalEnableListBlockV2 ? 'list-block-v2' : null,
 				enableFSEBlocks ? 'fse-blocks' : null,
 			];
