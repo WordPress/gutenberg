@@ -20,6 +20,7 @@ import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
  * @return {Object} Filtered props applied to save element.
  */
 export function addGeneratedClassName( extraProps, blockType ) {
+	if ( blockType.name === 'core/comments' ) return extraProps;
 	// Adding the generated className.
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
 		if ( typeof extraProps.className === 'string' ) {

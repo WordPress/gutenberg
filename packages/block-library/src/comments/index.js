@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { postComments as icon } from '@wordpress/icons';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,4 +18,34 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	deprecated: [
+		{
+			attributes: {
+				tagName: {
+					type: 'string',
+					default: 'div',
+				},
+			},
+			supports: {
+				align: [ 'wide', 'full' ],
+				html: false,
+				color: {
+					gradients: true,
+					link: true,
+					__experimentalDefaultControls: {
+						background: true,
+						text: true,
+						link: true,
+					},
+				},
+			},
+			save( { attributes: { tagName: Tag } } ) {
+				return (
+					<Tag className="wp-block-comments-query-loop">
+						<InnerBlocks.Content />
+					</Tag>
+				);
+			},
+		},
+	],
 };
