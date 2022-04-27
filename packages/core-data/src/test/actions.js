@@ -11,7 +11,6 @@ jest.mock( '@wordpress/api-fetch' );
 import {
 	editEntityRecord,
 	saveEntityRecord,
-	saveEditedEntityRecord,
 	deleteEntityRecord,
 	receiveUserPermission,
 	receiveAutosaves,
@@ -178,87 +177,6 @@ describe( 'saveEditedEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
-	} );
-
-	it( 'Uses "id" as a key when no entity key is provided', async () => {
-		const area = { id: 1, menu: 0 };
-		const configs = [
-			{
-				kind: 'root',
-				name: 'navigationArea',
-				baseURL: '/wp/v2/block-navigation-areas',
-			},
-		];
-		const select = {
-			getEntityRecordNonTransientEdits: () => [],
-			hasEditsForEntityRecord: () => true,
-		};
-
-		const dispatch = Object.assign( jest.fn(), {
-			saveEntityRecord: jest.fn(),
-		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
-
-		// Provide response
-		const updatedRecord = { ...area, menu: 10 };
-		apiFetch.mockImplementation( () => {
-			return updatedRecord;
-		} );
-
-		await saveEditedEntityRecord(
-			'root',
-			'navigationArea',
-			1
-		)( { dispatch, select } );
-
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'root',
-			'navigationArea',
-			{ id: 1 },
-			undefined
-		);
-	} );
-
-	it( 'Uses the entity key when provided', async () => {
-		const area = { area: 'primary', menu: 0 };
-		const configs = [
-			{
-				kind: 'root',
-				name: 'navigationArea',
-				baseURL: '/wp/v2/block-navigation-areas',
-				key: 'area',
-			},
-		];
-		const select = {
-			getEntityRecordNonTransientEdits: () => [],
-			hasEditsForEntityRecord: () => true,
-		};
-
-		const dispatch = Object.assign( jest.fn(), {
-			saveEntityRecord: jest.fn(),
-		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( configs );
-
-		// Provide response
-		const updatedRecord = { ...area, menu: 10 };
-		apiFetch.mockImplementation( () => {
-			return updatedRecord;
-		} );
-
-		await saveEditedEntityRecord(
-			'root',
-			'navigationArea',
-			'primary'
-		)( { dispatch, select } );
-
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'root',
-			'navigationArea',
-			{ area: 'primary' },
-			undefined
-		);
 	} );
 } );
 
