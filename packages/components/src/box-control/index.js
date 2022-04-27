@@ -46,7 +46,7 @@ function useUniqueId( idProp ) {
 }
 export default function BoxControl( {
 	id: idProp,
-	inputProps = defaultInputProps,
+	inputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
@@ -55,7 +55,10 @@ export default function BoxControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
+	allowNegativeValues = false,
 } ) {
+	inputProps = allowNegativeValues ? { min: -Infinity } : defaultInputProps;
+
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
 	} );
