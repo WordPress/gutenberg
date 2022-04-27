@@ -12,7 +12,10 @@ import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseDisabled as useIsDisabled,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
@@ -54,10 +57,14 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  *                                           the ref if one is defined.
  * @param {Object}  options                  Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
+ * @param {boolean} options.isDisabled       Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps(
+	props = {},
+	{ __unstableIsHtml, isDisabled = false } = {}
+) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
@@ -125,6 +132,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		useIsDisabled( { isDisabled: ! isDisabled } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();

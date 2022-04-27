@@ -13,6 +13,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -95,7 +96,15 @@ export default function TemplatePartEdit( {
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
-	const blockProps = useBlockProps();
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
+		{
+			className: hasBlockOverlay
+				? 'block-editor-block-content-overlay'
+				: undefined,
+		},
+		{ isDisabled: hasBlockOverlay }
+	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
@@ -168,7 +177,6 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
-					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }
