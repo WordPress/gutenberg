@@ -24,6 +24,7 @@ interface Media {
 /**
  * List all media files.
  *
+ * @see https://developer.wordpress.org/rest-api/reference/media/#list-media
  * @param  this
  */
 async function listMedia( this: RequestUtils ) {
@@ -41,6 +42,7 @@ async function listMedia( this: RequestUtils ) {
 /**
  * Upload a media file.
  *
+ * @see https://developer.wordpress.org/rest-api/reference/media/#create-a-media-item
  * @param  this
  * @param  filePathOrData The path or data of the file being uploaded.
  */
@@ -67,6 +69,7 @@ async function uploadMedia(
 /**
  * delete a media file.
  *
+ * @see https://developer.wordpress.org/rest-api/reference/media/#delete-a-media-item
  * @param  this
  * @param  mediaId The ID of the media file.
  */
