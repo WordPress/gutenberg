@@ -15,34 +15,6 @@
  */
 const babel = require( '@babel/core' );
 
-function createDescriptionNode( name, description ) {
-	return babel.types.expressionStatement(
-		babel.types.assignmentExpression(
-			'=',
-			babel.types.memberExpression(
-				babel.types.identifier( name ),
-				babel.types.identifier( 'parameters' )
-			),
-			babel.types.objectExpression( [
-				babel.types.objectProperty(
-					babel.types.identifier( 'docs' ),
-					babel.types.objectExpression( [
-						babel.types.objectProperty(
-							babel.types.identifier( 'description' ),
-							babel.types.objectExpression( [
-								babel.types.objectProperty(
-									babel.types.identifier( 'story' ),
-									babel.types.stringLiteral( description )
-								),
-							] )
-						),
-					] )
-				),
-			] )
-		)
-	);
-}
-
 function annotateDescriptionPlugin() {
 	return {
 		visitor: {
@@ -68,13 +40,18 @@ function annotateDescriptionPlugin() {
 						}
 					);
 					const description = commentValues.join( '\n' );
-					const declaration = path.node.declaration.declarations[ 0 ];
+					const storyId =
+						path.node.declaration.declarations[ 0 ].id.name;
 
-					path.insertAfter(
-						createDescriptionNode(
-							declaration.id.name,
+					path.container.push(
+						...babel.template.ast`
+							${ storyId }.parameters ??= {};
+							${ storyId }.parameters.docs ??= {};
+							${ storyId }.parameters.docs.description ??= {};
+							${ storyId }.parameters.docs.description.story = ${ JSON.stringify(
 							description
-						)
+						) };
+					`
 					);
 				}
 			},
