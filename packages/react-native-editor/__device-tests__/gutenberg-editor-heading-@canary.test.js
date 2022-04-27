@@ -9,7 +9,11 @@ describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.heading );
 		let headingBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.heading
+			blockNames.heading,
+			1,
+			{
+				useWaitForVisible: true,
+			}
 		);
 		if ( isAndroid() ) {
 			await headingBlockElement.click();
@@ -21,7 +25,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getBlockAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
@@ -31,7 +35,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getBlockAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			3
 		);
@@ -41,7 +45,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.heading );
-		headingBlockElement = await editorPage.getBlockAtPosition(
+		headingBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.heading,
 			4
 		);
@@ -51,7 +55,7 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getBlockAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			5
 		);
