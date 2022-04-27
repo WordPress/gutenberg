@@ -11,11 +11,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		await editorPage.closePicker();
 
 		const imageBlock = await editorPage.getBlockAtPosition(
-			blockNames.image,
-			1,
-			{
-				useWaitForVisible: true,
-			}
+			blockNames.image
 		);
 
 		// Can only add image from media library on iOS

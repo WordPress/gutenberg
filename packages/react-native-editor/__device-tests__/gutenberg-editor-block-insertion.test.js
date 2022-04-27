@@ -40,7 +40,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		);
 
 		// wait for the block editor to load and for accessibility ids to update
-		await editorPage.driver.sleep( 3000 );
+		// await editorPage.driver.sleep( 3000 );
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
@@ -56,7 +56,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await editorPage.removeBlockAtPosition( blockNames.paragraph, 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
-				await editorPage.driver.sleep( 1000 );
+				// await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 					blockNames.paragraph,
 					i,
@@ -73,7 +73,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		} else {
 			for ( let i = 4; i > 0; i-- ) {
 				// wait for accessibility ids to update
-				await editorPage.driver.sleep( 1000 );
+				// await editorPage.driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 					blockNames.paragraph
 				);

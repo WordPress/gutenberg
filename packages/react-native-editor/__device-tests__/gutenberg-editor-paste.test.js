@@ -33,7 +33,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.pastePlainText
 		);

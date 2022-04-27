@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import { slashInserter, shortText } from './helpers/test-data';
 
-const ANIMATION_TIME = 200;
+// const ANIMATION_TIME = 200;
 
 // Helper function for asserting slash inserter presence.
 async function assertSlashInserterPresent( checkIsVisible ) {
@@ -38,11 +38,11 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			slashInserter
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
+		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
@@ -58,29 +58,29 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			slashInserter
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
+		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
 		// Remove / character.
 		if ( isAndroid() ) {
-			await editorPage.typeTextToParagraphBlock(
+			await editorPage.typeTextToTextBlock(
 				paragraphBlockElement,
 				`${ shortText }`,
 				true
 			);
 		} else {
-			await editorPage.typeTextToParagraphBlock(
+			await editorPage.typeTextToTextBlock(
 				paragraphBlockElement,
 				`\b ${ shortText }`,
 				false
 			);
 		}
-		await editorPage.driver.sleep( ANIMATION_TIME );
+		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		// Check if the slash inserter UI no longer exists.
 		assertSlashInserterPresent( false );
@@ -97,11 +97,11 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			`${ slashInserter }image`
 		);
-		await editorPage.driver.sleep( ANIMATION_TIME );
+		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
@@ -135,7 +135,7 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			'/img\n',
 			false

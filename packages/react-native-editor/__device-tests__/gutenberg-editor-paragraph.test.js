@@ -16,12 +16,12 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.shortText
 		);
 		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			'\n',
 			false
@@ -48,15 +48,12 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.shortText
 		);
 		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			'\n'
-		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
@@ -71,7 +68,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement
 		);
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			backspace
 		);
@@ -112,7 +109,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			editorPage.driver,
 			paragraphBlockElement
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			backspace
 		);
@@ -140,7 +137,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			blockNames.paragraph,
 			2
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			backspace
 		);

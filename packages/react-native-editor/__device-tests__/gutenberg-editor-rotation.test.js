@@ -15,7 +15,7 @@ describe( 'Gutenberg Editor tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
@@ -43,7 +43,7 @@ describe( 'Gutenberg Editor tests', () => {
 				2
 			);
 		}
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);

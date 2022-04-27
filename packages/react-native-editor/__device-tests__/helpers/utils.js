@@ -422,6 +422,7 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		const showHtmlButton = await driver.elementByXPath(
 			showHtmlButtonXpath
 		);
+		// const showHtmlButton = await this.waitForVisible( driver, showHtmlButtonXpath )
 		await showHtmlButton.click();
 	} else {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
@@ -464,7 +465,12 @@ const waitForMediaLibrary = async ( driver ) => {
 	await waitForVisible( driver, locator );
 };
 
-const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
+const waitForVisible = async (
+	driver,
+	elementLocator,
+	length = 1,
+	iteration = 0
+) => {
 	const maxIteration = 25;
 	const timeout = 1000;
 
@@ -478,9 +484,9 @@ const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	}
 
 	const locator = await driver.elementsByXPath( elementLocator );
-	if ( locator.length !== 1 ) {
+	if ( locator.length !== length ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, iteration + 1 );
+		return waitForVisible( driver, elementLocator, length, iteration + 1 );
 	}
 	return locator[ 0 ];
 };
