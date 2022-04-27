@@ -277,12 +277,12 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 				postCommentsCount,
 				postCommentsLink,
 			];
-			const allowedExperiments = [
+			const enabledExperiments = [
 				window.__experimentalEnableListBlockV2 ? 'list-block-v2' : null,
 				enableFSEBlocks ? 'fse-blocks' : null,
 			];
 			experimentalBlocks.filter( ( { metadata: { __experiment } } ) =>
-				allowedExperiments.includes( __experiment )
+				enabledExperiments.includes( __experiment )
 			);
 	  }
 	: undefined;
