@@ -77,4 +77,47 @@ describe( 'debounceAsync', () => {
 		jest.runAllTimers();
 		expect( fn ).toHaveBeenCalledTimes( 2 );
 	} );
+
+	it( 'is thenable, returning any data from promise resolution of the debounced function', async () => {
+		expect.assertions( 2 );
+		const fn = async () => 'test';
+		const debounced = debounceAsync( fn, 20 );
+
+		// Test the return value via awaiting.
+		const returnValue = await debounced();
+		expect( returnValue ).toBe( 'test' );
+
+		// Test then-ing.
+		await debounced().then( ( thenValue ) =>
+			expect( thenValue ).toBe( 'test' )
+		);
+	} );
+
+	it( 'is catchable', async () => {
+		expect.assertions( 2 );
+		const expectedError = new Error( 'test' );
+		const fn = async () => {
+			throw expectedError;
+		};
+
+		const debounced = debounceAsync( fn, 20 );
+
+		// Test traditional try/catch.
+		try {
+			await debounced();
+		} catch ( error ) {
+			// Disable reason - the test uses `expect.assertions` to ensure
+			// conditional assertions are called.
+			// eslint-disable-next-line jest/no-conditional-expect
+			expect( error ).toBe( expectedError );
+		}
+
+		// Test chained .catch().
+		await debounced().catch( ( error ) => {
+			// Disable reason - the test uses `expect.assertions` to ensure
+			// conditional assertions are called.
+			// eslint-disable-next-line jest/no-conditional-expect
+			expect( error ).toBe( expectedError );
+		} );
+	} );
 } );
