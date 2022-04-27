@@ -49,7 +49,7 @@ function annotateDescriptionPlugin() {
 							${ storyId }.parameters ??= {};
 							${ storyId }.parameters.docs ??= {};
 							${ storyId }.parameters.docs.description ??= {};
-							${ storyId }.parameters.docs.description.story = ${ JSON.stringify(
+							${ storyId }.parameters.docs.description.story ??= ${ JSON.stringify(
 						description
 					) };
 					`
