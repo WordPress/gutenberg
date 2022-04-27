@@ -81,7 +81,9 @@ export default function PostVisibility( { onClose } ) {
 				<legend className="editor-post-visibility__legend">
 					{ __( 'Visibility' ) }
 				</legend>
-				<p>{ __( 'Control how this post is viewed.' ) }</p>
+				<p className="editor-post-visibility__description">
+					{ __( 'Control how this post is viewed.' ) }
+				</p>
 				<PostVisibilityChoice
 					instanceId={ instanceId }
 					value="public"
