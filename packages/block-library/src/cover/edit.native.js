@@ -47,7 +47,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	useEffect,
 	useState,
@@ -71,6 +71,7 @@ import {
 	COVER_DEFAULT_HEIGHT,
 } from './shared';
 import Controls from './controls';
+import useCoverIsDark from './use-cover-is-dark';
 
 /**
  * Constants
@@ -180,18 +181,6 @@ const Cover = ( {
 
 	const openMediaOptionsRef = useRef();
 
-	// Used to set a default color for its InnerBlocks
-	// since there's no system to inherit styles yet
-	// the RichText component will check if there are
-	// parent styles for the current block. If there are,
-	// it will use that color instead.
-	useEffect( () => {
-		// While we don't support theme colors.
-		if ( ! attributes.overlayColor || ( ! attributes.overlay && url ) ) {
-			setAttributes( { childrenStyles: styles.defaultColor } );
-		}
-	}, [ setAttributes ] );
-
 	// Initialize uploading flag to false, awaiting sync.
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
@@ -256,6 +245,33 @@ const Cover = ( {
 		setCustomColorPickerShowing( true );
 		openGeneralSidebar();
 	}
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+	const isDarkElement = useRef();
+	const isCoverDark = useCoverIsDark(
+		url,
+		dimRatio,
+		overlayColorValue?.color,
+		isDarkElement
+	);
+
+	useEffect( () => {
+		// This side-effect should not create an undo level.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { isDark: isCoverDark } );
+		// Used to set a default color for its InnerBlocks
+		// since there's no system to inherit styles yet
+		// the RichText component will check if there are
+		// parent styles for the current block. If there are,
+		// it will use that color instead.
+		setAttributes( {
+			childrenStyles: isCoverDark
+				? styles.defaultColor
+				: styles.defaultColorLightMode,
+		} );
+	}, [ isCoverDark ] );
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
