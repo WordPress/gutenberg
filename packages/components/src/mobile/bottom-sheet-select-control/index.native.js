@@ -82,6 +82,7 @@ const BottomSheetSelectControl = ( {
 							customActionButton
 							separatorType="none"
 							label={ item.label }
+							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
 							leftAlign={ true }
 							key={ index }
