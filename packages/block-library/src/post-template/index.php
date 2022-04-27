@@ -57,6 +57,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			if ( empty( $query_args['post_type'] ) && is_singular() ) {
 				$query_args['post_type'] = get_post_type( get_the_ID() );
 			}
+
+			if ( $block->context['query']['sticky'] === '') {
+				$query['ignore_sticky_posts'] = 0;
+			}
 		}
 	}
 
