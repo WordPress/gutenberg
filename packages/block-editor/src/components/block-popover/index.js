@@ -32,7 +32,7 @@ export default function BlockPopover( {
 	const rootElement = useBlockElement( rootClientId );
 
 	useLayoutEffect( () => {
-		if ( ! rootElement ) {
+		if ( ! rootElement || ! selectedElement ) {
 			return;
 		}
 
@@ -119,14 +119,6 @@ export default function BlockPopover( {
 		return () => {
 			observer.disconnect();
 		};
-
-		// console.log( {
-		// 	selectedElement,
-		// 	rootElement,
-		// 	elChildren,
-		// 	boundary,
-		// 	candidate,
-		// } );
 	}, [ rootElement, selectedElement ] );
 
 	const lastSelectedElement = useBlockElement( bottomClientId ?? clientId );
