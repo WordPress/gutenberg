@@ -64,13 +64,9 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					const range = selection.getRangeAt( 0 );
 					const fragment = range.cloneContents();
 					html = Array.from( fragment.childNodes )
-						.map( ( node ) =>
-							Object.prototype.hasOwnProperty.call(
-								node,
-								'outerHTML'
-							)
-								? ( node as Element ).outerHTML
-								: node.nodeValue
+						.map(
+							( node ) =>
+								( node as Element ).outerHTML ?? node.nodeValue
 						)
 						.join( '' );
 				}
