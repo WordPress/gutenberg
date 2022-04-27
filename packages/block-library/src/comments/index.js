@@ -26,6 +26,7 @@ export const settings = {
 					default: 'div',
 				},
 			},
+			apiVersion: 2,
 			supports: {
 				align: [ 'wide', 'full' ],
 				html: false,
