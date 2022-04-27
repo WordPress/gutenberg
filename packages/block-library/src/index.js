@@ -176,7 +176,6 @@ export const __experimentalGetCoreBlocks = () => [
 	socialLinks,
 	spacer,
 	table,
-	tableOfContents,
 	tagCloud,
 	textColumns,
 	verse,
@@ -270,6 +269,7 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 			[
 				// Experimental blocks.
 				postAuthorName,
+				tableOfContents,
 				...( window.__experimentalEnableListBlockV2
 					? [ listItem ]
 					: [] ),
