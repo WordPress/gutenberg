@@ -12,16 +12,22 @@ import Animated, {
 	ZoomInEasyDown,
 	ZoomOutEasyDown,
 } from 'react-native-reanimated';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
  */
 import { Draggable, DraggableTrigger } from '@wordpress/components';
 import { select, useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useState, Platform } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	Platform,
+} from '@wordpress/element';
 import { getBlockType } from '@wordpress/blocks';
 import { generateHapticFeedback } from '@wordpress/react-native-bridge';
+import RCTAztecView from '@wordpress/react-native-aztec';
 
 /**
  * Internal dependencies
@@ -256,6 +262,9 @@ const BlockDraggableWrapper = ( { children } ) => {
  */
 const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	const wasBeingDragged = useRef( false );
+	const [ isEditingText, setIsEditingText ] = useState(
+		RCTAztecView.InputState.isFocused()
+	);
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),
@@ -275,27 +284,28 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		);
 	};
 
-	const { isDraggable, isBeingDragged, canDragBlock } = useSelect(
+	const { isDraggable, isBeingDragged, isBlockSelected } = useSelect(
 		( _select ) => {
 			const {
 				getBlockRootClientId,
 				getTemplateLock,
 				isBlockBeingDragged,
-				hasSelectedBlock,
+				getSelectedBlockClientId,
+				hasSelectedInnerBlock,
 			} = _select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
-			const isAnyTextInputFocused =
-				TextInputState.currentlyFocusedInput() !== null;
+			const selectedBlockClientId = getSelectedBlockClientId();
 
 			return {
 				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
-				canDragBlock: hasSelectedBlock()
-					? ! isAnyTextInputFocused
-					: true,
+				isBlockSelected:
+					selectedBlockClientId &&
+					( selectedBlockClientId === clientId ||
+						hasSelectedInnerBlock( clientId, true ) ),
 			};
 		},
 		[ clientId ]
@@ -312,6 +322,24 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		wasBeingDragged.current = isBeingDragged;
 	}, [ isBeingDragged ] );
 
+	const onFocusChangeAztec = useCallback( ( { isFocused } ) => {
+		setIsEditingText( isFocused );
+	}, [] );
+
+	useEffect( () => {
+		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
+		return () => {
+			RCTAztecView.InputState.removeFocusChangeListener(
+				onFocusChangeAztec
+			);
+		};
+	}, [] );
+
+	const onLongPressDraggable = useCallback( () => {
+		// Ensure that no text input is focused when starting the dragging gesture in order to prevent conflicts with text editing.
+		RCTAztecView.InputState.blurCurrentFocusedElement();
+	}, [] );
+
 	const animatedWrapperStyles = useAnimatedStyle( () => {
 		return {
 			opacity: draggingAnimation.opacity.value,
@@ -321,6 +349,8 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		animatedWrapperStyles,
 		styles[ 'draggable-wrapper__container' ],
 	];
+
+	const canDragBlock = enabled && ( ! isBlockSelected || ! isEditingText );
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
@@ -340,6 +370,7 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 					: DEFAULT_LONG_PRESS_MIN_DURATION,
 				android: DEFAULT_LONG_PRESS_MIN_DURATION,
 			} ) }
+			onLongPress={ onLongPressDraggable }
 		>
 			<Animated.View style={ wrapperStyles }>
 				{ children( { isDraggable: true } ) }
