@@ -32,7 +32,7 @@ function gutenberg_register_persisted_preferences_meta() {
 							'type'        => 'string',
 							'format'      => 'date-time',
 							'context'     => array( 'edit' ),
-							'readonly'    => true,
+							'readonly'    => false,
 						),
 					),
 					'additionalProperties' => true,
