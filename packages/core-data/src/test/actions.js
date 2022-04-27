@@ -11,6 +11,7 @@ jest.mock( '@wordpress/api-fetch' );
 import {
 	editEntityRecord,
 	saveEntityRecord,
+	saveEditedEntityRecord,
 	deleteEntityRecord,
 	receiveUserPermission,
 	receiveAutosaves,
@@ -177,6 +178,87 @@ describe( 'saveEditedEntityRecord', () => {
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
+	} );
+
+	it( 'Uses "id" as a key when no entity key is provided', async () => {
+		const item = { id: 1, menu: 0 };
+		const configs = [
+			{
+				kind: 'root',
+				name: 'menuItem',
+				baseURL: '/wp/v2/menu-items',
+			},
+		];
+		const select = {
+			getEntityRecordNonTransientEdits: () => [],
+			hasEditsForEntityRecord: () => true,
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			saveEntityRecord: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( configs );
+
+		// Provide response
+		const updatedRecord = { ...item, menu: 10 };
+		apiFetch.mockImplementation( () => {
+			return updatedRecord;
+		} );
+
+		await saveEditedEntityRecord(
+			'root',
+			'menuItem',
+			1
+		)( { dispatch, select } );
+
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'menuItem',
+			{ id: 1 },
+			undefined
+		);
+	} );
+
+	it( 'Uses the entity key when provided', async () => {
+		const item = { name: 'primary', menu: 0 };
+		const configs = [
+			{
+				kind: 'root',
+				name: 'menuLocation',
+				baseURL: '/wp/v2/menu-items',
+				key: 'name',
+			},
+		];
+		const select = {
+			getEntityRecordNonTransientEdits: () => [],
+			hasEditsForEntityRecord: () => true,
+		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			saveEntityRecord: jest.fn(),
+		} );
+		// Provide entities
+		dispatch.mockReturnValueOnce( configs );
+
+		// Provide response
+		const updatedRecord = { ...item, menu: 10 };
+		apiFetch.mockImplementation( () => {
+			return updatedRecord;
+		} );
+
+		await saveEditedEntityRecord(
+			'root',
+			'menuLocation',
+			'primary'
+		)( { dispatch, select } );
+
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'menuLocation',
+			{ name: 'primary' },
+			undefined
+		);
 	} );
 } );
 
