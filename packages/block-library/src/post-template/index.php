@@ -45,6 +45,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	$query_args = build_query_vars_from_query_block( $block, $page );
+
 	// Override the custom query with the global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
@@ -52,14 +53,17 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
 			// Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
 			unset( $query_args['offset'] );
-			$query_args = wp_parse_args( $wp_query->query_vars, $query_args );
+
+			// merge the user settings into the defaults of the query
+			$query_args = wp_parse_args( $query_args, $wp_query->query_vars );
+
+			// Unset the `s` query arg because it is automagically filled by `WP_Query::fill_query_vars` and makes the query believe it is a search query when it is not
+			if ( ! is_search() ) {
+				unset( $query_args['s'] );
+			}
 
 			if ( empty( $query_args['post_type'] ) && is_singular() ) {
 				$query_args['post_type'] = get_post_type( get_the_ID() );
-			}
-
-			if ( $block->context['query']['sticky'] === '') {
-				$query['ignore_sticky_posts'] = 0;
 			}
 		}
 	}
