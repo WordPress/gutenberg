@@ -18,6 +18,7 @@ const MyImageSizeControl = () => {
 
 	return (
 		<ImageSizeControl
+			label={ __( 'Image Size' ) }
 			onChange={ ( value ) => setSize( value ) }
 			width={ size.width }
 			height={ size.height }
@@ -31,6 +32,21 @@ const MyImageSizeControl = () => {
 ## Props
 
 The component accepts the following props:
+
+### label
+
+The label for the control.
+
+-   Type: `string`
+-   Required: No
+-   Default: `Image Size`
+
+### help
+
+If this property is added, a help text will be generated using help property as the content.
+
+-   Type: `String|WPElement`
+-   Required: No
 
 ### slug
 
