@@ -44,7 +44,7 @@
 		border-radius: $radius-block-ui;
 		flex: 1;
 		pointer-events: none;
-		min-height: $grid-unit-60;
+		min-height: $grid-unit-60 - $border-width - $border-width;
 	}
 
 	// Let the parent be selectable in the placeholder area.
