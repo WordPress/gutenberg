@@ -103,7 +103,6 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	const target = document.getElementById( id );
 
