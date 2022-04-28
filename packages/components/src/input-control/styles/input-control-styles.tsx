@@ -105,6 +105,7 @@ export const Container = styled.div< ContainerProps >`
 `;
 
 type InputProps = {
+	__next36pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -140,14 +141,17 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	`;
 };
 
-const sizeStyles = ( { inputSize: size }: InputProps ) => {
+const sizeStyles = ( {
+	inputSize: size,
+	__next36pxDefaultSize,
+}: InputProps ) => {
 	const sizes = {
 		default: {
-			height: 30,
+			height: 36,
 			lineHeight: 1,
-			minHeight: 30,
-			paddingLeft: 8,
-			paddingRight: 8,
+			minHeight: 36,
+			paddingLeft: 16,
+			paddingRight: 16,
 		},
 		small: {
 			height: 24,
@@ -164,6 +168,16 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
 			paddingRight: 16,
 		},
 	};
+
+	if ( ! __next36pxDefaultSize ) {
+		sizes.default = {
+			height: 30,
+			lineHeight: 1,
+			minHeight: 30,
+			paddingLeft: 8,
+			paddingRight: 8,
+		};
+	}
 
 	const style = sizes[ size as Size ] || sizes.default;
 
@@ -210,7 +224,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${ COLORS.gray[ 900 ] };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -245,7 +259,6 @@ const labelMargin = ( {
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		box-sizing: border-box;
-		color: currentColor;
 		display: block;
 		padding-top: 0;
 		padding-bottom: 0;

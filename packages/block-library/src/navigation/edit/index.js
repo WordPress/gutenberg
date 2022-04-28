@@ -523,6 +523,11 @@ function Navigation( {
 		ref,
 	] );
 
+	const navigationSelectorRef = useRef();
+	const [
+		shouldFocusNavigationSelector,
+		setShouldFocusNavigationSelector,
+	] = useState( false );
 	const handleSelectNavigation = useCallback(
 		( navPostOrClassicMenu ) => {
 			if ( ! navPostOrClassicMenu ) {
@@ -538,9 +543,27 @@ function Navigation( {
 			} else {
 				handleUpdateMenu( navPostOrClassicMenu.id );
 			}
+			setShouldFocusNavigationSelector( true );
 		},
 		[ convert, handleUpdateMenu ]
 	);
+
+	// Focus support after menu selection.
+	useEffect( () => {
+		if (
+			isDraftNavigationMenu ||
+			! isEntityAvailable ||
+			! shouldFocusNavigationSelector
+		) {
+			return;
+		}
+		navigationSelectorRef?.current?.focus();
+		setShouldFocusNavigationSelector( false );
+	}, [
+		isDraftNavigationMenu,
+		isEntityAvailable,
+		shouldFocusNavigationSelector,
+	] );
 
 	const resetToEmptyBlock = useCallback( () => {
 		registry.batch( () => {
@@ -663,6 +686,7 @@ function Navigation( {
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
 							<NavigationMenuSelector
+								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
 								clientId={ clientId }
 								onSelect={ handleSelectNavigation }

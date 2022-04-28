@@ -98,6 +98,13 @@ export default function useSelectionObserver() {
 				const endClientId = getBlockClientId(
 					extractSelectionEndNode( selection )
 				);
+
+				// If the selection did not involve a block, return early.
+				if ( clientId === undefined && endClientId === undefined ) {
+					setContentEditableWrapper( node, false );
+					return;
+				}
+
 				const isSingularSelection = clientId === endClientId;
 
 				if ( isSingularSelection ) {

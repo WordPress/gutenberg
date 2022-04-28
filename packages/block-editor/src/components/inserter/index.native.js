@@ -52,7 +52,7 @@ const defaultRenderToggle = ( {
 	};
 	const expandedModeViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-			{ __( 'Add Blocks' ) }
+			{ __( 'Add blocks' ) }
 		</Text>
 	);
 

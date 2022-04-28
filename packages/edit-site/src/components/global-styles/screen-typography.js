@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
@@ -44,7 +44,7 @@ function Item( { name, parentMenu, element, label } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/typography/' + element }>
+		<NavigationButtonAsItem path={ parentMenu + '/typography/' + element }>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -62,7 +62,7 @@ function Item( { name, parentMenu, element, label } ) {
 				</FlexItem>
 				<FlexItem>{ label }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 

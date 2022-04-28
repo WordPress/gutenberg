@@ -5,8 +5,8 @@ import {
 	createUpgradedEmbedBlock,
 	getClassNames,
 	fallback,
-	getAttributesFromPreview,
 	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
@@ -130,19 +130,14 @@ const EmbedEdit = ( props ) => {
 	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
 	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = ( ignorePreviousClassName = false ) => {
-		const { allowResponsive, className } = attributes;
-		return {
-			...attributes,
-			...getAttributesFromPreview(
-				preview,
-				title,
-				ignorePreviousClassName ? undefined : className,
-				responsive,
-				allowResponsive
-			),
-		};
-	};
+	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+		getMergedAttributesWithPreview(
+			attributes,
+			preview,
+			title,
+			responsive,
+			ignorePreviousClassName
+		);
 
 	const toggleResponsive = () => {
 		const { allowResponsive, className } = attributes;

@@ -40,7 +40,7 @@ const config: PlaywrightTestConfig = {
 		},
 		storageState: STORAGE_STATE_PATH,
 		actionTimeout: 10_000, // 10 seconds.
-		trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
+		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
 		video: 'on-first-retry',
 	},

@@ -137,23 +137,24 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
-		$this->assertEquals(
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
-			gutenberg_render_block_core_comment_template( null, null, $block )
+		$this->assertSame(
+			str_replace( array( "\n", "\t" ), '', '<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
+			str_replace( array( "\n", "\t" ), '', gutenberg_render_block_core_comment_template( null, null, $block ) )
 		);
 	}
 
 	/**
-	 * Test rendering 3 nested comments:
+	 * Test rendering nested comments:
 	 *
 	 * └─ comment 1
 	 *    └─ comment 2
-	 *       └─ comment 3
+	 *       └─ comment 4
+	 *    └─ comment 3
 	 */
 	function test_rendering_comment_template_nested() {
 		$first_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			1,
+			2,
 			array(
 				'comment_parent'       => self::$comment_ids[0],
 				'comment_author'       => 'Test',
@@ -186,11 +187,66 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals(
-			gutenberg_render_block_core_comment_template( null, null, $block ),
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-odd thread-alt depth-1"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div><ol><li id="comment-' . $first_level_ids[0] . '" class="comment even depth-2"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div><ol><li id="comment-' . $second_level_ids[0] . '" class="comment odd alt depth-3"><div class="has-small-font-size wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol></li></ol></li></ol>'
+		$top_level_ids = self::$comment_ids;
+		$expected      = str_replace(
+			array( "\n", "\t" ),
+			'',
+			<<<END
+				<ol >
+					<li id="comment-{$top_level_ids[0]}" class="comment odd alt thread-odd thread-alt depth-1">
+						<div class="wp-block-comment-author-name">
+							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+								Test
+							</a>
+						</div>
+						<div class="wp-block-comment-content">
+							<p>Hello world</p>
+						</div>
+						<ol>
+							<li id="comment-{$first_level_ids[0]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									<p>Hello world</p>
+								</div>
+								<ol>
+									<li id="comment-{$second_level_ids[0]}" class="comment odd alt depth-3">
+										<div class="wp-block-comment-author-name">
+											<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+												Test
+											</a>
+										</div>
+										<div class="wp-block-comment-content">
+											<p>Hello world</p>
+										</div>
+									</li>
+								</ol>
+							</li>
+							<li id="comment-{$first_level_ids[1]}" class="comment even depth-2">
+								<div class="wp-block-comment-author-name">
+									<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
+										Test
+									</a>
+								</div>
+								<div class="wp-block-comment-content">
+									<p>Hello world</p>
+								</div>
+							</li>
+						</ol>
+					</li>
+				</ol>
+END
+		);
+
+		$this->assertSame(
+			str_replace( array( "\n", "\t" ), '', gutenberg_render_block_core_comment_template( null, null, $block ) ),
+			$expected
 		);
 	}
+
 	/**
 	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
 	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
@@ -226,5 +282,38 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$actual = build_comment_query_vars_from_block( $block );
 		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
 		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
+	}
+
+	/**
+	 * Test that line and paragraph breaks are converted to HTML tags in a comment.
+	 */
+	function test_render_block_core_comment_content_converts_to_html() {
+		$comment_id  = self::$comment_ids[0];
+		$new_content = "Paragraph One\n\nP2L1\nP2L2\n\nhttps://example.com/";
+		self::factory()->comment->update_object(
+			$comment_id,
+			array( 'comment_content' => $new_content )
+		);
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'           => self::$custom_post->ID,
+				'comments/inherit' => true,
+			)
+		);
+
+		$expected_content = "<p>Paragraph One</p>\n<p>P2L1<br />\nP2L2</p>\n<p><a href=\"https://example.com/\" rel=\"nofollow ugc\">https://example.com/</a></p>\n";
+
+		// Here we use the function prefixed with 'gutenberg_*' because it's added
+		// in the build step.
+		$this->assertSame(
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
+			gutenberg_render_block_core_comment_template( null, null, $block )
+		);
 	}
 }

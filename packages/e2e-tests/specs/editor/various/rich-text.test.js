@@ -485,28 +485,6 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should show/hide toolbar when entering/exiting format', async () => {
-		const blockToolbarSelector = '.block-editor-block-toolbar';
-		await clickBlockAppender();
-		await page.keyboard.type( '1' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.type( '2' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await page.keyboard.type( '3' );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
-		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
-	} );
-
 	it( 'should run input rules after composition end', async () => {
 		await clickBlockAppender();
 		// Puppeteer doesn't support composition, so emulate it by inserting

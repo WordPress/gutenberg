@@ -63,10 +63,14 @@
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 1em;
+		/*rtl:ignore*/
+		float: left;
 	}
 	&.alignright {
 		/*rtl:ignore*/
 		margin-left: 1em;
+		/*rtl:ignore*/
+		float: right;
 	}
 	&.aligncenter {
 		margin-bottom: 1em;

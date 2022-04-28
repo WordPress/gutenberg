@@ -18,6 +18,7 @@ import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
+import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -120,6 +121,7 @@ class RequestUtils {
 	deleteAllWidgets = deleteAllWidgets;
 	addWidgetBlock = addWidgetBlock;
 	deleteAllTemplates = deleteAllTemplates;
+	resetPreferences = resetPreferences;
 }
 
 export type { StorageState };

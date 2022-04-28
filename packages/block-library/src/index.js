@@ -35,6 +35,7 @@ import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
+import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -212,12 +213,15 @@ export const __experimentalGetCoreBlocks = () => [
 	commentEditLink,
 	commentReplyLink,
 	commentTemplate,
+	commentsTitle,
 	commentsQueryLoop,
 	commentsPagination,
 	commentsPaginationNext,
 	commentsPaginationNumbers,
 	commentsPaginationPrevious,
+
 	postComments,
+	postCommentsForm,
 	homeLink,
 	logInOut,
 	termDescription,
@@ -278,7 +282,6 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 							navigationArea,
 							postComment,
 							postCommentsCount,
-							postCommentsForm,
 							postCommentsLink,
 					  ]
 					: [] ),
