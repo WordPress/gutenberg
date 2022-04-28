@@ -7,7 +7,7 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, Platform } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -49,13 +49,6 @@ export default function useCoverIsDark(
 			);
 		}
 	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
-	useEffect( () => {
-		// In native, we can't get the average color of an element, so
-		// we revert dark mode to the default value.
-		if ( url && dimRatio <= 50 && Platform.isNative ) {
-			setIsDark( true );
-		}
-	}, [ url, url && dimRatio <= 50 && Platform.isNative, setIsDark ] );
 	useEffect( () => {
 		// If opacity is greater than 50 the dominant color is the overlay color,
 		// so use that color for the dark mode computation.

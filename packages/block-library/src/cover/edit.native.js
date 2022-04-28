@@ -114,6 +114,7 @@ const Cover = ( {
 		customGradient,
 		gradient,
 		overlayColor,
+		isDark,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
@@ -249,12 +250,11 @@ const Cover = ( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
-	const isDarkElement = useRef();
 	const isCoverDark = useCoverIsDark(
+		isDark,
 		url,
 		dimRatio,
-		overlayColorValue?.color,
-		isDarkElement
+		overlayColorValue?.color
 	);
 
 	useEffect( () => {
