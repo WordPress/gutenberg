@@ -19,7 +19,6 @@ const meta: ComponentMeta< typeof TextControl > = {
 	argTypes: {
 		onChange: {
 			action: 'onChange',
-			control: { type: null },
 		},
 		value: {
 			control: { type: null },
@@ -35,6 +34,7 @@ const meta: ComponentMeta< typeof TextControl > = {
 export default meta;
 
 const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
+	onChange,
 	...args
 } ) => {
 	const [ value, setValue ] = useState( '' );
@@ -45,6 +45,7 @@ const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
 			value={ value }
 			onChange={ ( v ) => {
 				setValue( v );
+				onChange( v );
 			} }
 		/>
 	);
