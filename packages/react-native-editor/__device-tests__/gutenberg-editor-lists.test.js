@@ -20,6 +20,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		if ( isAndroid() ) {
 			await listBlockElement.click();
 		}
+
 		// Send a backspace.
 		await editorPage.typeTextToTextBlock(
 			listBlockElement,
@@ -37,9 +38,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		);
 
 		// Remove list block to reset editor to clean state.
-		listBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.list
-		);
+		listBlockElement = await editorPage.getListBlock();
 		await listBlockElement.click();
 		await editorPage.removeBlockAtPosition( blockNames.list );
 	} );

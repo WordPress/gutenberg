@@ -591,6 +591,11 @@ class EditorPage {
 	}
 
 	async clickOrderedListToolBarButton() {
+		const toolBarLocator = isAndroid()
+			? `//android.widget.Button[@content-desc="${ this.orderedListButtonName }"]`
+			: `//XCUIElementTypeButton[@name="${ this.orderedListButtonName }"]`;
+
+		await waitForVisible( this.driver, toolBarLocator);
 		await this.clickToolBarButton( this.orderedListButtonName );
 	}
 
