@@ -176,6 +176,12 @@ function DatePicker( {
 						events={ getEventsPerDay( day ) }
 					/>
 				) }
+				renderMonthElement={ ( { month } ) => (
+					<>
+						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
+						{ month.format( 'YYYY' ) }
+					</>
+				) }
 			/>
 		</div>
 	);
