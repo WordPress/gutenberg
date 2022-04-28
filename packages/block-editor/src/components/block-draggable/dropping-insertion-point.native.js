@@ -127,7 +127,7 @@ export default function DroppingInsertionPoint( {
 			bottom: Math.floor(
 				nextElement
 					? nextElement.y
-					: previousElement.y + previousElement.height
+					: previousElement?.y + previousElement?.height
 			),
 		};
 
