@@ -1,9 +1,8 @@
 # Documentation
-/docs                                           @ajitbohra @mkaz @ryanwelcher @juanmaguitar
+/docs                                           @ajitbohra @ryanwelcher @juanmaguitar
 
 # Schemas
-/schemas                                        @mkaz
-/schemas/json                                   @ajlende @mkaz
+/schemas/json                                   @ajlende
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
@@ -15,8 +14,6 @@
 # Blocks
 /packages/block-library                         @ajitbohra
 /packages/block-library/src/gallery             @geriux
-/packages/block-library/src/social-links        @mkaz
-/packages/block-library/src/social-link         @mkaz
 /packages/block-library/src/navigation          @tellthemachines
 /packages/block-library/src/navigation-link     @tellthemachines
 /packages/block-library/src/navigation-submenu  @tellthemachines
@@ -66,8 +63,8 @@
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
 /packages/browserslist-config                   @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @mkaz @ryanwelcher
-/packages/create-block-tutorial-template        @gziolo @mkaz @ryanwelcher
+/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block-tutorial-template        @gziolo @ryanwelcher
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen
