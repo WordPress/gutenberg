@@ -2,17 +2,17 @@
  * Internal dependencies
  */
 const {
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	longPressMiddleOfElement,
 	setupDriver,
 	stopDriver,
-	isAndroid,
-	swipeUp,
 	swipeDown,
-	typeString,
-	toggleHtmlMode,
 	swipeFromTo,
-	longPressMiddleOfElement,
-	doubleTap,
-	isEditorVisible,
+	swipeUp,
+	toggleHtmlMode,
+	typeString,
 	waitForVisible,
 } = require( '../helpers/utils' );
 
@@ -45,11 +45,15 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	// For text blocks, e.g. Paragraph, Heading
+	// ===============================
+	// Text blocks functions
+	// E.g. Paragraph, Heading blocks
+	// ===============================
 	async getTextBlockAtPosition( blockName, position = 1 ) {
-		// iOS needs a click before
+		// iOS needs a click to get the text element
 		if ( ! isAndroid() ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
+
 			const textBlock = await waitForVisible(
 				this.driver,
 				textBlockLocator
@@ -62,6 +66,10 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }.")]//XCUIElementTypeTextView`;
 
 		return await waitForVisible( this.driver, blockLocator );
+	}
+
+	async typeTextToTextBlock( block, text, clear ) {
+		await typeString( this.driver, block, text, clear );
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
@@ -506,10 +514,6 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async typeTextToParagraphBlock( block, text, clear ) {
-		await typeString( this.driver, block, text, clear );
-	}
-
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -522,13 +526,9 @@ class EditorPage {
 				await block.click();
 			}
 
-			await this.typeTextToParagraphBlock(
-				block,
-				paragraphs[ i ],
-				clear
-			);
+			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToTextBlock( block, '\n', false );
 			}
 		}
 	}
@@ -542,32 +542,44 @@ class EditorPage {
 		return await blockLocator.text();
 	}
 
+	async getNumberOfParagraphBlocks() {
+		const paragraphBlockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
+			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
+		const locator = await this.driver.elementsByXPath(
+			paragraphBlockLocator
+		);
+		return locator.length;
+	}
+
 	// =========================
 	// List Block functions
 	// =========================
 
-	async getTextViewForListBlock( block ) {
-		let textViewElementName = 'XCUIElementTypeTextView';
-		if ( isAndroid() ) {
-			textViewElementName = 'android.widget.EditText';
+	async getListBlock( options = { isEmptyBlock: false } ) {
+		// iOS needs a click to get the text element
+		if ( ! isAndroid() ) {
+			const listBlockLocator = options.isEmptyBlock
+				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
+				: `//XCUIElementTypeButton[contains(@name, "List")]`;
+
+			const textBlock = await waitForVisible(
+				this.driver,
+				listBlockLocator
+			);
+			await textBlock.click();
 		}
 
-		const accessibilityId = await block.getAttribute(
-			this.accessibilityIdKey
-		);
-		const blockLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
+		let listBlockTextLocator =
+			! isAndroid() && options.isEmptyBlock
+				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
+				: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
-	async sendTextToListBlock( block, text ) {
-		const textViewElement = await this.getTextViewForListBlock( block );
+		if ( isAndroid() ) {
+			listBlockTextLocator = `//android.view.ViewGroup[contains(@content-desc, "List Block.")]/android.widget.EditText`;
+		}
 
-		// Cannot clear list blocks because it messes up the list bullet.
-		const clear = false;
-
-		return await typeString( this.driver, textViewElement, text, clear );
+		return await waitForVisible( this.driver, listBlockTextLocator );
 	}
 
 	async clickOrderedListToolBarButton() {
@@ -607,34 +619,6 @@ class EditorPage {
 		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
-	}
-
-	// =========================
-	// Heading Block functions
-	// =========================
-
-	// Inner element changes on iOS if Heading Block is empty
-	async getTextViewForHeadingBlock( block, empty ) {
-		let textViewElementName = empty
-			? 'XCUIElementTypeStaticText'
-			: 'XCUIElementTypeTextView';
-		if ( isAndroid() ) {
-			textViewElementName = 'android.widget.EditText';
-		}
-
-		const accessibilityId = await block.getAttribute(
-			this.accessibilityIdKey
-		);
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
-
-	async sendTextToHeadingBlock( block, text, clear = true ) {
-		const textViewElement = await this.getTextViewForHeadingBlock(
-			block,
-			true
-		);
-		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
 	async closePicker() {
@@ -760,34 +744,25 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
-
-	async getNumberOfParagraphBlocks() {
-		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
-			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
-		const locator = await this.driver.elementsByXPath(
-			paragraphBlockLocator
-		);
-		return locator.length;
-	}
 }
 
 const blockNames = {
-	paragraph: 'Paragraph',
-	gallery: 'Gallery',
+	audio: 'Audio',
 	columns: 'Columns',
 	cover: 'Cover',
+	embed: 'Embed',
+	file: 'File',
+	gallery: 'Gallery',
 	heading: 'Heading',
 	image: 'Image',
 	latestPosts: 'Latest Posts',
 	list: 'List',
 	more: 'More',
+	paragraph: 'Paragraph',
+	search: 'Search',
 	separator: 'Separator',
 	spacer: 'Spacer',
 	verse: 'Verse',
-	file: 'File',
-	audio: 'Audio',
-	search: 'Search',
 };
 
 module.exports = { initializeEditorPage, blockNames };

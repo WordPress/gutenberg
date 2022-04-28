@@ -8,22 +8,24 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
 	it( 'should handle spaces in a list', async () => {
 		await editorPage.addNewBlock( blockNames.list );
-		let listBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.list
-		);
+		let listBlockElement = await editorPage.getListBlock();
+
+		// Send the list item text.
+		await editorPage.typeTextToTextBlock( listBlockElement, '  a', false );
+
+		// Send an Enter.
+		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
+
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {
 			await listBlockElement.click();
 		}
-
-		// Send the list item text.
-		await editorPage.sendTextToListBlock( listBlockElement, '  a' );
-
-		// Send an Enter.
-		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
-
 		// Send a backspace.
-		await editorPage.sendTextToListBlock( listBlockElement, backspace );
+		await editorPage.typeTextToTextBlock(
+			listBlockElement,
+			backspace,
+			false
+		);
 
 		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();

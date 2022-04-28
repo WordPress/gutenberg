@@ -11,11 +11,8 @@ describe( 'Gutenberg Editor tests', () => {
 		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
@@ -23,27 +20,21 @@ describe( 'Gutenberg Editor tests', () => {
 		await toggleOrientation( editorPage.driver );
 		// On Android the keyboard hides the add block button, let's hide it after rotation
 		if ( isAndroid() ) {
-			await editorPage.driver.hideDeviceKeyboard();
+			await editorPage.dismissKeyboard();
 		}
 
 		await editorPage.addNewBlock( blockNames.paragraph );
 
 		if ( isAndroid() ) {
-			await editorPage.driver.hideDeviceKeyboard();
+			await editorPage.dismissKeyboard();
 		}
 
 		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
-		while ( ! paragraphBlockElement ) {
-			await editorPage.driver.hideDeviceKeyboard();
-			paragraphBlockElement = await editorPage.getBlockAtPosition(
-				blockNames.paragraph,
-				2
-			);
-		}
-		await editorPage.typeTextToParagraphBlock(
+
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
