@@ -9,6 +9,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -260,17 +261,27 @@ const Cover = ( {
 	useEffect( () => {
 		// This side-effect should not create an undo level.
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { isDark: isCoverDark } );
 		// Used to set a default color for its InnerBlocks
 		// since there's no system to inherit styles yet
 		// the RichText component will check if there are
 		// parent styles for the current block. If there are,
 		// it will use that color instead.
 		setAttributes( {
+			isDark: isCoverDark,
 			childrenStyles: isCoverDark
 				? styles.defaultColor
 				: styles.defaultColorLightMode,
 		} );
+
+		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
+		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
+			const className = classnames( attributes.className, {
+				'is-light': false,
+			} );
+			setAttributes( {
+				className: className !== '' ? className : undefined,
+			} );
+		}
 	}, [ isCoverDark ] );
 
 	const backgroundColor = getStylesFromColorScheme(
