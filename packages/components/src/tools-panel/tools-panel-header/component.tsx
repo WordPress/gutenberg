@@ -132,12 +132,11 @@ const ToolsPanelHeader = (
 	const defaultItems = Object.entries( menuItems?.default || {} );
 	const optionalItems = Object.entries( menuItems?.optional || {} );
 	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
-	const dropDownMenuLabelText = areAllOptionalControlsHidden
-		? _x(
-				'View and add options',
-				'Button label to reveal tool panel options'
-		  )
-		: _x( 'View options', 'Button label to reveal tool panel options' );
+	const dropDownMenuLabelText = sprintf(
+		// translators: %s: The name of the tool e.g. "Color" or "Typography".
+		_x( '%s options', 'Button label to reveal tool panel options' ),
+		labelText
+	);
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
