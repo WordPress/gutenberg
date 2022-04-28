@@ -6,8 +6,12 @@ import { includes, debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useCallback, useLayoutEffect, useRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+
+/**
+ * Internal dependencies
+ */
+import useRefEffect from '../use-ref-effect';
 
 /**
  * Names of control nodes which qualify for disabled behavior.
@@ -33,7 +37,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
  * (input fields, links, buttons, etc.) need to be disabled. This hook adds the
  * behavior to disable nested DOM elements to the returned ref.
  *
- * @return {import('react').RefObject<HTMLElement>} Element Ref.
+ * @return {import('react').RefCallback<HTMLElement>} Element Ref.
  *
  * @example
  * ```js
@@ -50,56 +54,54 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
  * ```
  */
 export default function useDisabled() {
-	/** @type {import('react').RefObject<HTMLElement>} */
-	const node = useRef( null );
+	return useRefEffect( ( node ) => {
+		const disable = () => {
+			node.style.setProperty( 'user-select', 'none' );
+			node.style.setProperty( '-webkit-user-select', 'none' );
+			focus.focusable.find( node ).forEach( ( focusable ) => {
+				if (
+					includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
+				) {
+					focusable.setAttribute( 'disabled', '' );
+				}
 
-	const disable = () => {
-		if ( ! node.current ) {
-			return;
-		}
+				if ( focusable.nodeName === 'A' ) {
+					focusable.setAttribute( 'tabindex', '-1' );
+				}
 
-		focus.focusable.find( node.current ).forEach( ( focusable ) => {
-			if (
-				includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
-			) {
-				focusable.setAttribute( 'disabled', '' );
-			}
+				const tabIndex = focusable.getAttribute( 'tabindex' );
+				if ( tabIndex !== null && tabIndex !== '-1' ) {
+					focusable.removeAttribute( 'tabindex' );
+				}
 
-			if ( focusable.nodeName === 'A' ) {
-				focusable.setAttribute( 'tabindex', '-1' );
-			}
+				if ( focusable.hasAttribute( 'contenteditable' ) ) {
+					focusable.setAttribute( 'contenteditable', 'false' );
+				}
 
-			const tabIndex = focusable.getAttribute( 'tabindex' );
-			if ( tabIndex !== null && tabIndex !== '-1' ) {
-				focusable.removeAttribute( 'tabindex' );
-			}
+				if (
+					node.ownerDocument.defaultView?.HTMLElement &&
+					focusable instanceof
+						node.ownerDocument.defaultView.HTMLElement
+				) {
+					focusable.style.setProperty( 'pointer-events', 'none' );
+				}
+			} );
+		};
 
-			if ( focusable.hasAttribute( 'contenteditable' ) ) {
-				focusable.setAttribute( 'contenteditable', 'false' );
-			}
+		// Debounce re-disable since disabling process itself will incur
+		// additional mutations which should be ignored.
+		const debouncedDisable = debounce( disable, undefined, {
+			leading: true,
 		} );
-	};
-
-	// Debounce re-disable since disabling process itself will incur
-	// additional mutations which should be ignored.
-	const debouncedDisable = useCallback(
-		debounce( disable, undefined, { leading: true } ),
-		[]
-	);
-
-	useLayoutEffect( () => {
 		disable();
 
 		/** @type {MutationObserver | undefined} */
-		let observer;
-		if ( node.current ) {
-			observer = new window.MutationObserver( debouncedDisable );
-			observer.observe( node.current, {
-				childList: true,
-				attributes: true,
-				subtree: true,
-			} );
-		}
+		const observer = new window.MutationObserver( debouncedDisable );
+		observer.observe( node, {
+			childList: true,
+			attributes: true,
+			subtree: true,
+		} );
 
 		return () => {
 			if ( observer ) {
@@ -108,6 +110,4 @@ export default function useDisabled() {
 			debouncedDisable.cancel();
 		};
 	}, [] );
-
-	return node;
 }

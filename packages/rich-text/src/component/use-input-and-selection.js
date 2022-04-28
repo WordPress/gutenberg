@@ -132,6 +132,13 @@ export function useInputAndSelection( props ) {
 				onSelectionChange,
 			} = propsRef.current;
 
+			// Check if the implementor disabled editing. `contentEditable`
+			// does disable input, but not text selection, so we must ignore
+			// selection changes.
+			if ( element.contentEditable !== 'true' ) {
+				return;
+			}
+
 			// If the selection changes where the active element is a parent of
 			// the rich text instance (writing flow), call `onSelectionChange`
 			// for the rich text instance that contains the start or end of the

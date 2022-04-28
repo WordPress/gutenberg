@@ -59,7 +59,7 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 		);
 
 		$actual   = gutenberg_apply_colors_support( $block_type, $block_atts );
-		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-background has-gr-3-gradient-background' );
+		$expected = array( 'class' => 'has-text-color has-fg-1-color has-background has-bg-2-background-color has-gr-3-gradient-background' );
 
 		$this->assertSame( $expected, $actual );
 	}

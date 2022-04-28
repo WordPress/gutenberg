@@ -8,7 +8,7 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getBlockAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -32,7 +32,7 @@ describe( 'Gutenberg Editor tests', () => {
 			await editorPage.driver.hideDeviceKeyboard();
 		}
 
-		paragraphBlockElement = await editorPage.getBlockAtPosition(
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
