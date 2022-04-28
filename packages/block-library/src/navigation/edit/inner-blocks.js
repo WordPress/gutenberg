@@ -49,7 +49,7 @@ export default function NavigationInnerBlocks( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getClientIdsOfDescendants,
+				getBlockCount,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
@@ -60,9 +60,9 @@ export default function NavigationInnerBlocks( {
 					clientId,
 					false
 				),
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				selectedBlockHasDescendants: !! getBlockCount(
+					selectedBlockId
+				),
 
 				// This prop is already available but computing it here ensures it's
 				// fresh compared to isImmediateParentOfSelectedBlock.

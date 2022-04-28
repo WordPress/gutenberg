@@ -459,18 +459,15 @@ export default function NavigationLinkEdit( {
 		( select ) => {
 			const {
 				getBlocks,
+				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
-				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
-
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
@@ -490,10 +487,10 @@ export default function NavigationLinkEdit( {
 					clientId,
 					false
 				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				hasDescendants: !! getBlockCount( clientId ),
+				selectedBlockHasDescendants: !! getBlockCount(
+					selectedBlockId
+				),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'

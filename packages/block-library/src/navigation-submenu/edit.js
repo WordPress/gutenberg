@@ -317,23 +317,19 @@ export default function NavigationSubmenuEdit( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 				getBlock,
+				getBlockCount,
+				getBlockOrder,
 			} = select( blockEditorStore );
 
 			let _onlyDescendantIsEmptyLink;
 
 			const selectedBlockId = getSelectedBlockClientId();
 
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
-
-			const selectedBlockDescendants = getClientIdsOfDescendants( [
-				selectedBlockId,
-			] );
+			const selectedBlockDescendants = getBlockOrder( selectedBlockId );
 
 			// Check for a single descendant in the submenu. If that block
 			// is a link block in a "placeholder" state with no label then
@@ -360,7 +356,7 @@ export default function NavigationSubmenuEdit( {
 					clientId,
 					false
 				),
-				hasDescendants: !! descendants,
+				hasDescendants: !! getBlockCount( clientId ),
 				selectedBlockHasDescendants: !! selectedBlockDescendants?.length,
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
