@@ -44,12 +44,17 @@ window.addEventListener( 'load', () => {
 		button.addEventListener( 'click', toggleSubmenuOnClick );
 	} );
 
-	// Close modal on clicking internal and external links inside modal.
+	// Close modal automatically on clicking anchor links inside modal.
 	const navigationLinks = document.querySelectorAll(
 		'.wp-block-navigation-item__content'
 	);
 
 	navigationLinks.forEach( function ( link ) {
+		// Ignore non-anchor links.
+		if ( ! link.getAttribute( 'href' )?.startsWith( '#' ) ) {
+			return;
+		}
+
 		// we need to find the specific parent modal for this link
 		// since .close() won't work without an ID in case we have
 		// mutiple navigation menus in a post/page.
