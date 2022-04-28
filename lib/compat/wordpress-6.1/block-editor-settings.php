@@ -1,6 +1,7 @@
 <?php
 /**
- * Adds styles and __experimentalFeatures to the block editor settings.
+ * Adds:
+ * - theme saving flag to the block editor settings.
  *
  * @param array $settings Existing block editor settings.
  *
