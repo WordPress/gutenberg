@@ -135,6 +135,7 @@ describe( 'UnitControl', () => {
 			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
 
 			const select = screen.queryByRole( 'combobox' );
+			// The unit is not being displayed!
 			const label = screen.getByText( '%' );
 
 			expect( select ).not.toBeInTheDocument();
