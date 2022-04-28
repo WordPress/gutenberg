@@ -31,7 +31,6 @@ function gutenberg_register_persisted_preferences_meta() {
 							'description' => __( 'The date and time the preferences were updated.', 'default' ),
 							'type'        => 'string',
 							'format'      => 'date-time',
-							'context'     => array( 'edit' ),
 							'readonly'    => false,
 						),
 					),
