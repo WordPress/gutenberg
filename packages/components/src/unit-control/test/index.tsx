@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
+import type { UnitControlOnChangeCallback } from '../types';
 
 function render( jsx ) {
 	return {
@@ -25,14 +26,17 @@ function render( jsx ) {
 	};
 }
 
-const getComponent = () =>
-	document.body.querySelector( '.components-unit-control' );
-const getInput = () =>
-	document.body.querySelector( '.components-unit-control input' );
-const getSelect = () =>
-	document.body.querySelector( '.components-unit-control select' );
-const getUnitLabel = () =>
-	document.body.querySelector( '.components-unit-control__unit-label' );
+const getInput = ( {
+	isInputTypeText = false,
+}: {
+	isInputTypeText?: boolean;
+} = {} ) =>
+	screen.getByRole(
+		isInputTypeText ? 'textbox' : 'spinbutton'
+	) as HTMLInputElement;
+const getSelect = () => screen.getByRole( 'combobox' ) as HTMLSelectElement;
+const getSelectOptions = () =>
+	screen.getAllByRole( 'option' ) as HTMLOptionElement[];
 
 const ControlledSyncUnits = () => {
 	const [ state, setState ] = useState( {
@@ -119,7 +123,9 @@ describe( 'UnitControl', () => {
 		it( 'should not render select, if units are disabled', () => {
 			render( <UnitControl value="3em" units={ [] } /> );
 			const input = getInput();
-			const select = getSelect();
+			// Using `queryByRole` instead of `getSelect` because we need to test
+			// for this element NOT to be in the document.
+			const select = screen.queryByRole( 'combobox' );
 
 			expect( input ).toBeInTheDocument();
 			expect( select ).not.toBeInTheDocument();
@@ -128,8 +134,8 @@ describe( 'UnitControl', () => {
 		it( 'should render label if single units', () => {
 			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
 
-			const select = getSelect();
-			const label = getUnitLabel();
+			const select = screen.queryByRole( 'combobox' );
+			const label = screen.getByText( '%' );
 
 			expect( select ).not.toBeInTheDocument();
 			expect( label ).toBeInTheDocument();
@@ -230,7 +236,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '300px' );
 
@@ -304,7 +311,8 @@ describe( 'UnitControl', () => {
 				</>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '41vh' );
 
@@ -360,8 +368,7 @@ describe( 'UnitControl', () => {
 
 			render( <UnitControl units={ units } /> );
 
-			const select = getSelect();
-			const options = select.querySelectorAll( 'option' );
+			const options = getSelectOptions();
 
 			expect( options.length ).toBe( 2 );
 
@@ -545,7 +552,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
 			user.keyboard( '{Enter}' );
@@ -562,7 +570,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '61   PX' );
 			user.keyboard( '{Enter}' );
@@ -579,7 +588,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
 			user.keyboard( '{Enter}' );
@@ -596,7 +606,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '-10  %' );
 			user.keyboard( '{Enter}' );
@@ -613,7 +624,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '123       rEm  ' );
 			user.keyboard( '{Enter}' );
