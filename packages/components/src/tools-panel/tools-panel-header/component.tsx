@@ -52,9 +52,12 @@ const DefaultControlsGroup = ( {
 						key={ label }
 						icon={ icon }
 						isSelected={ true }
-						disabled={ ! hasValue }
+						aria-disabled={ ! hasValue }
 						label={ itemLabel }
 						onClick={ () => {
+							if ( ! hasValue ) {
+								return;
+							}
 							toggleItem( label );
 							onClose();
 						} }
