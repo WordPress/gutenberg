@@ -40,13 +40,17 @@ describe( 'generate', () => {
 							left: '14px',
 						},
 					},
+					typography: {
+						fontSize: '2.2rem',
+						lineHeight: '3.3',
+					},
 				},
 				{
 					selector: '.some-selector',
 				}
 			)
 		).toEqual(
-			'.some-selector { margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; }'
+			'.some-selector { margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; line-height: 3.3; }'
 		);
 	} );
 } );

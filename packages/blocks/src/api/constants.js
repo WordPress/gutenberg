@@ -119,6 +119,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
 		support: [ 'typography', 'fontSize' ],
+		useEngine: true,
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
@@ -131,6 +132,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'typography', 'lineHeight' ],
+		useEngine: true,
 	},
 	margin: {
 		value: [ 'spacing', 'margin' ],
