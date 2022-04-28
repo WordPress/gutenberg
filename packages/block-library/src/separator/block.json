@@ -24,6 +24,9 @@
 			"__experimentalDefaultControls": {
 				"background": true
 			}
+		},
+		"spacing": {
+			"margin": [ "top", "bottom" ]
 		}
 	},
 	"styles": [
