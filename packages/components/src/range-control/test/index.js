@@ -29,14 +29,17 @@ function ControlledRangeControl( props ) {
 	return <RangeControl { ...props } onChange={ onChange } value={ value } />;
 }
 
-describe( 'RangeControl', () => {
+describe.each( [
+	[ 'uncontrolled', RangeControl ],
+	[ 'controlled', ControlledRangeControl ],
+] )( 'RangeControl %s', ( ...modeAndComponent ) => {
+	const [ , Component ] = modeAndComponent;
+
 	describe( '#render()', () => {
 		it( 'should trigger change callback with numeric value', () => {
 			const onChange = jest.fn();
 
-			const { container } = render(
-				<RangeControl onChange={ onChange } />
-			);
+			const { container } = render( <Component onChange={ onChange } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -53,10 +56,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should render with icons', () => {
 			const { container } = render(
-				<RangeControl
-					beforeIcon="format-image"
-					afterIcon="format-video"
-				/>
+				<Component beforeIcon="format-image" afterIcon="format-video" />
 			);
 
 			const beforeIcon = container.querySelector(
@@ -73,7 +73,7 @@ describe( 'RangeControl', () => {
 
 	describe( 'validation', () => {
 		it( 'should not apply if new value is lower than minimum', () => {
-			const { container } = render( <RangeControl min={ 11 } /> );
+			const { container } = render( <Component min={ 11 } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -85,7 +85,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should not apply if new value is greater than maximum', () => {
-			const { container } = render( <RangeControl max={ 20 } /> );
+			const { container } = render( <Component max={ 20 } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -99,7 +99,7 @@ describe( 'RangeControl', () => {
 		it( 'should not call onChange if new value is invalid', () => {
 			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
+				<Component onChange={ onChange } min={ 10 } max={ 20 } />
 			);
 
 			const numberInput = getNumberInput( container );
@@ -113,7 +113,7 @@ describe( 'RangeControl', () => {
 		it( 'should keep invalid values in number input until loss of focus', () => {
 			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
+				<Component onChange={ onChange } min={ -1 } max={ 1 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -132,7 +132,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should validate when provided a max or min of zero', () => {
 			const { container } = render(
-				<RangeControl min={ -100 } max={ 0 } />
+				<Component min={ -100 } max={ 0 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -147,7 +147,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should validate when min and max are negative', () => {
 			const { container } = render(
-				<RangeControl min={ -100 } max={ -50 } />
+				<Component min={ -100 } max={ -50 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -168,11 +168,7 @@ describe( 'RangeControl', () => {
 		it( 'should take into account the step starting from min', () => {
 			const onChange = jest.fn();
 			const { container } = render(
-				<RangeControl
-					onChange={ onChange }
-					min={ 0.1 }
-					step={ 0.125 }
-				/>
+				<Component onChange={ onChange } min={ 0.1 } step={ 0.125 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -193,9 +189,7 @@ describe( 'RangeControl', () => {
 
 	describe( 'initialPosition / value', () => {
 		it( 'should render initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
-			const { container } = render(
-				<RangeControl min={ 0 } max={ 10 } />
-			);
+			const { container } = render( <Component min={ 0 } max={ 10 } /> );
 
 			const rangeInput = getRangeInput( container );
 
@@ -204,7 +198,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should render initialPosition if no value is provided', () => {
 			const { container } = render(
-				<RangeControl initialPosition={ 50 } />
+				<Component initialPosition={ 50 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -214,7 +208,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should render value instead of initialPosition is provided', () => {
 			const { container } = render(
-				<RangeControl initialPosition={ 50 } value={ 10 } />
+				<Component initialPosition={ 50 } value={ 10 } />
 			);
 
 			const rangeInput = getRangeInput( container );
@@ -225,7 +219,7 @@ describe( 'RangeControl', () => {
 
 	describe( 'input field', () => {
 		it( 'should render an input field by default', () => {
-			const { container } = render( <RangeControl /> );
+			const { container } = render( <Component /> );
 
 			const numberInput = getNumberInput( container );
 
@@ -234,7 +228,7 @@ describe( 'RangeControl', () => {
 
 		it( 'should not render an input field, if disabled', () => {
 			const { container } = render(
-				<RangeControl withInputField={ false } />
+				<Component withInputField={ false } />
 			);
 
 			const numberInput = getNumberInput( container );
@@ -243,7 +237,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should render a zero value into input range and field', () => {
-			const { container } = render( <RangeControl value={ 0 } /> );
+			const { container } = render( <Component value={ 0 } /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -253,7 +247,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should update both field and range on change', () => {
-			const { container } = render( <RangeControl /> );
+			const { container } = render( <Component /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -272,7 +266,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should reset input values if next value is removed', () => {
-			const { container } = render( <RangeControl /> );
+			const { container } = render( <Component /> );
 
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
@@ -308,8 +302,7 @@ describe( 'RangeControl', () => {
 			const [ , propsForReset, [ expectedValue, expectedChange ] ] = all;
 			const spy = jest.fn();
 			const { container } = render(
-				<RangeControl
-					initialPosition={ 10 }
+				<Component
 					allowReset={ true }
 					onChange={ spy }
 					{ ...propsForReset }
@@ -327,31 +320,25 @@ describe( 'RangeControl', () => {
 			expect( spy ).toHaveBeenCalledWith( expectedChange );
 		} );
 
-		it.concurrent.each( [ RangeControl, ControlledRangeControl ] )(
-			'should reset to a 50% of min/max value, if no initialPosition or resetFallbackValue is defined',
-			( Component ) => {
-				const value =
-					Component === ControlledRangeControl ? 89 : undefined;
-				const { container } = render(
-					<Component
-						initialPosition={ undefined }
-						min={ 0 }
-						max={ 100 }
-						allowReset={ true }
-						resetFallbackValue={ undefined }
-						value={ value }
-					/>
-				);
+		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
+			const { container } = render(
+				<Component
+					initialPosition={ undefined }
+					min={ 0 }
+					max={ 100 }
+					allowReset={ true }
+					resetFallbackValue={ undefined }
+				/>
+			);
 
-				const resetButton = getResetButton( container );
-				const rangeInput = getRangeInput( container );
-				const numberInput = getNumberInput( container );
+			const resetButton = getResetButton( container );
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
 
-				fireEvent.click( resetButton );
+			fireEvent.click( resetButton );
 
-				expect( rangeInput.value ).toBe( '50' );
-				expect( numberInput.value ).toBe( '' );
-			}
-		);
+			expect( rangeInput.value ).toBe( '50' );
+			expect( numberInput.value ).toBe( '' );
+		} );
 	} );
 } );
