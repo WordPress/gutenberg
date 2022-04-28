@@ -303,7 +303,7 @@ class MediaContainer extends Component {
 				mediaElement = this.renderImage( params, openMediaOptions );
 				break;
 			case MEDIA_TYPE_VIDEO:
-				mediaElement = this.renderVideo( params, openMediaOptions );
+				mediaElement = this.renderVideo( params );
 				break;
 		}
 		return mediaElement;
