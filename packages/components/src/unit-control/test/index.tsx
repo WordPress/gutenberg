@@ -105,11 +105,15 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should render custom className', () => {
-			render( <UnitControl className="hello" /> );
+			const { container: withoutClassName } = render( <UnitControl /> );
 
-			const el = getComponent();
+			const { container: withClassName } = render(
+				<UnitControl className="hello" />
+			);
 
-			expect( el.classList.contains( 'hello' ) ).toBe( true );
+			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
+				withClassName.firstChild
+			);
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
