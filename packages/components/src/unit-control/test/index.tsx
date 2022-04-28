@@ -16,7 +16,7 @@ import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
 import type { UnitControlOnChangeCallback } from '../types';
 
-function render( jsx ) {
+function render( jsx: React.ReactElement ) {
 	return {
 		user: userEvent.setup( {
 			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
