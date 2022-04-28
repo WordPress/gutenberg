@@ -191,6 +191,8 @@ export default function useSelect( mapSelect, deps ) {
 		}
 	} );
 
+	const isMounted = useRef( false );
+
 	useIsomorphicLayoutEffect( () => {
 		if ( ! hasMappingFunction ) {
 			return;
@@ -211,6 +213,10 @@ export default function useSelect( mapSelect, deps ) {
 		};
 
 		const onChange = () => {
+			if ( ! isMounted.current ) {
+				return;
+			}
+
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
 			} else {
@@ -226,10 +232,13 @@ export default function useSelect( mapSelect, deps ) {
 			registry.__unstableSubscribeStore( storeName, onChange )
 		);
 
+		isMounted.current = true;
+
 		return () => {
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.cancel( queueContext );
+			isMounted.current = false;
 		};
 		// If you're tempted to eliminate the spread dependencies below don't do it!
 		// We're passing these in from the calling function and want to make sure we're
