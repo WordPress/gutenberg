@@ -158,8 +158,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP press', async () => {
-			let state = '50px';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '50px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -172,8 +173,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', async () => {
-			let state = '50px';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '50px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -186,8 +188,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN press', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -200,8 +203,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -214,8 +218,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should cancel change when ESCAPE key is pressed', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl
@@ -239,10 +244,11 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should run onBlur callback when quantity input is blurred', async () => {
-			let state = '33%';
 			const onChangeSpy = jest.fn();
 			const onBlurSpy = jest.fn();
-			const setState = ( nextState ) => {
+
+			let state: string | undefined = '33%';
+			const setState: UnitControlOnChangeCallback = ( nextState ) => {
 				onChangeSpy( nextState );
 				state = nextState;
 			};
@@ -277,12 +283,11 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
-			let state = '15px';
-
 			const onUnitChangeSpy = jest.fn();
 			const onChangeSpy = jest.fn();
 
-			const setState = ( nextState ) => {
+			let state: string | undefined = '15px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) => {
 				onChangeSpy( nextState );
 				state = nextState;
 			};
@@ -326,8 +331,9 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
-			let state = '14rem';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '14rem';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const spy = jest.fn();
 
@@ -366,8 +372,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should reset value on unit change, if unit has default value', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -394,8 +401,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not reset value on unit change, if disabled', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -422,8 +430,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should set correct unit if single units', async () => {
-			let state = '50%';
-			const setState = ( value ) => ( state = value );
+			let state: string | undefined = '50%';
+			const setState: UnitControlOnChangeCallback = ( value ) =>
+				( state = value );
 
 			const { user } = render(
 				<UnitControl
