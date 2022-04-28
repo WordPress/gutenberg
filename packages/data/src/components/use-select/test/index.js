@@ -175,12 +175,8 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'toggler' ).toggle();
 		} );
 
-		// Check that child was unmounted without any extra state update being performed on it.
-		// I.e., `mapSelectChild` was never called again, and no "state update on an unmounted
-		// component" warning was triggered.
 		expect( rendered.getByText( 'none' ) ).toBeInTheDocument();
 		expect( mapSelectParent ).toHaveBeenCalledTimes( 4 );
-		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
