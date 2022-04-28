@@ -27,20 +27,23 @@ export function generate( style: Style, options: StyleOptions ): string {
 	const groupedRules = groupBy( rules, 'selector' );
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
+			const hasSelector = subSelector !== 'undefined';
+			const prefix = hasSelector ? `${ subSelector } { ` : '';
+			const suffix = subSelector !== 'undefined' ? ' }' : '';
 			acc.push(
-				`${ subSelector } { ${ groupedRules[ subSelector ]
+				`${ prefix }${ groupedRules[ subSelector ]
 					.map(
 						( rule: GeneratedCSSRule ) =>
 							`${ kebabCase( rule.key ) }: ${ rule.value };`
 					)
-					.join( ' ' ) } }`
+					.join( ' ' ) }${ suffix }`
 			);
 			return acc;
 		},
 		[]
 	);
 
-	return selectorRules.join( '\n' );
+	return selectorRules.join( '' );
 }
 
 /**

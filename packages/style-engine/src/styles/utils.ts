@@ -22,7 +22,7 @@ export function generateBoxRules(
 	const rules: GeneratedCSSRule[] = [];
 	if ( typeof boxStyle === 'string' ) {
 		rules.push( {
-			selector: options.selector,
+			selector: options?.selector,
 			key: ruleKey,
 			value: boxStyle,
 		} );
@@ -32,7 +32,7 @@ export function generateBoxRules(
 				const value: string | undefined = get( boxStyle, [ side ] );
 				if ( value ) {
 					acc.push( {
-						selector: options.selector,
+						selector: options?.selector,
 						key: `${ ruleKey }${ upperFirst( side ) }`,
 						value,
 					} );

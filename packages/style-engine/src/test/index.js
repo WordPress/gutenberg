@@ -8,7 +8,15 @@ describe( 'generate', () => {
 		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
-	it( 'should generate spacing styles', () => {
+	it( 'should generate inline styles where there is no selector', () => {
+		expect(
+			generate( {
+				spacing: { padding: '10px', margin: '12px' },
+			} )
+		).toEqual( 'margin: 12px; padding: 10px;' );
+	} );
+
+	it( 'should generate styles with an optional selector', () => {
 		expect(
 			generate(
 				{
