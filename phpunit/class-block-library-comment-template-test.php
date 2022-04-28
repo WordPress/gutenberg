@@ -210,7 +210,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 									</a>
 								</div>
 								<div class="wp-block-comment-content">
-									Hello world
+									<p>Hello world</p>
 								</div>
 								<ol>
 									<li id="comment-{$second_level_ids[0]}" class="comment odd alt depth-3">
@@ -220,7 +220,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 											</a>
 										</div>
 										<div class="wp-block-comment-content">
-											Hello world
+											<p>Hello world</p>
 										</div>
 									</li>
 								</ol>
@@ -307,7 +307,7 @@ END
 			)
 		);
 
-		$expected_content = "<p>Paragraph One</p>\n\n<p>P2L1<br />\nP2L2</p>\n\n<p><a href=\"https://example.com/\" rel=\"nofollow ugc\">https://example.com/</a></p>\n";
+		$expected_content = "<p>Paragraph One</p>\n<p>P2L1<br />\nP2L2</p>\n<p><a href=\"https://example.com/\" rel=\"nofollow ugc\">https://example.com/</a></p>\n";
 
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
