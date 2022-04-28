@@ -9,18 +9,20 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 export default function useBlockOverlayActive( clientId ) {
-	const { isParentSelected, hasChildSelected } = useSelect(
+	return useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } = select(
-				blockEditorStore
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				canEditBlock,
+			} = select( blockEditorStore );
+
+			return (
+				! canEditBlock( clientId ) ||
+				( ! isBlockSelected( clientId ) &&
+					! hasSelectedInnerBlock( clientId, true ) )
 			);
-			return {
-				isParentSelected: isBlockSelected( clientId ),
-				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
-			};
 		},
 		[ clientId ]
 	);
-
-	return ! isParentSelected && ! hasChildSelected;
 }

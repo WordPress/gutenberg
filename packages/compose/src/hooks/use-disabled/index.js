@@ -66,12 +66,9 @@ export default function useDisabled( {
 
 			/** A variable keeping track of the previous updates in order to restore them. */
 			/** @type {Function[]} */
-			let updates = [];
+			const updates = [];
 
 			const disable = () => {
-				// Restore previous updates.
-				updates = [];
-
 				if ( node.style.getPropertyValue( 'user-select' ) !== 'none' ) {
 					const previousValue = node.style.getPropertyValue(
 						'user-select'
