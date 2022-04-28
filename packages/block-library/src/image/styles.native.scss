@@ -57,3 +57,20 @@
 .removeFeaturedButton {
 	color: $alert-red;
 }
+
+.errorContainer {
+	flex-direction: row;
+	align-items: center;
+	padding-top: 4px;
+	padding-bottom: 8px;
+}
+
+.errorIcon {
+	margin-left: -4px;
+	color: $alert-red;
+}
+
+.errorText {
+	padding: 0;
+	color: $alert-red;
+}

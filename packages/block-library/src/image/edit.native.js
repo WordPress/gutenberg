@@ -41,6 +41,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
+	PlainText,
 	store as blockEditorStore,
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
@@ -54,6 +55,7 @@ import {
 	replace,
 	fullscreen,
 	textColor,
+	warning,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -185,6 +187,7 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			isCaptionSelected: false,
+			isInvalidURL: false,
 			uploadStatus: UPLOAD_STATE_IDLE,
 		};
 
@@ -345,6 +348,7 @@ export class ImageEdit extends Component {
 
 		this.setState( {
 			isCaptionSelected: false,
+			isInvalidURL: false,
 		} );
 	}
 
@@ -462,15 +466,22 @@ export class ImageEdit extends Component {
 		} );
 	}
 
-	onSelectURL( newUrl ) {
-		const { attributes: url, setAttributes } = this.props;
+	onSelectURL( newURL ) {
+		const { attributes: url, imageDefaultSize, setAttributes } = this.props;
 
-		if ( newUrl !== url ) {
-			if ( isURL( newUrl ) ) {
-				setAttributes( { url: newUrl, id: undefined } );
+		if ( newURL !== url ) {
+			if ( isURL( newURL ) ) {
+				setAttributes( {
+					url: newURL,
+					id: undefined,
+					width: undefined,
+					height: undefined,
+					sizeSlug: imageDefaultSize,
+				} );
 			} else {
-				// TODO: throw createErrorNotice equivalent error from class component
-				// console.log( 'Invalid URL. Image file not found.' );
+				this.setState( {
+					isInvalidURL: true,
+				} );
 			}
 		}
 	}
@@ -625,7 +636,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, isInvalidURL } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -776,6 +787,21 @@ export class ImageEdit extends Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
+						{ isInvalidURL && (
+							<View style={ styles.errorContainer }>
+								<Icon
+									icon={ warning }
+									style={ styles.errorIcon }
+								/>
+								<PlainText
+									editable={ false }
+									value={ __(
+										'Invalid URL. Image file not found.'
+									) }
+									style={ styles.errorText }
+								/>
+							</View>
+						) }
 						{ isSelected && getInspectorControls() }
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
