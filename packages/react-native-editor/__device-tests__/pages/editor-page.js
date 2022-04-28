@@ -595,7 +595,7 @@ class EditorPage {
 			? `//android.widget.Button[@content-desc="${ this.orderedListButtonName }"]`
 			: `//XCUIElementTypeButton[@name="${ this.orderedListButtonName }"]`;
 
-		await waitForVisible( this.driver, toolBarLocator);
+		await waitForVisible( this.driver, toolBarLocator );
 		await this.clickToolBarButton( this.orderedListButtonName );
 	}
 
