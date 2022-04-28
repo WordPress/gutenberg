@@ -21,7 +21,6 @@ import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
 import { Text } from '../text';
 import LinkedButton from './linked-button';
-import Visualizer from './visualizer';
 import {
 	Root,
 	Header,
@@ -30,7 +29,6 @@ import {
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	DEFAULT_VISUALIZER_VALUES,
 	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
@@ -50,7 +48,6 @@ export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
-	onChangeShowVisualizer = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
@@ -103,14 +100,6 @@ export default function BoxControl( {
 		setIsDirty( true );
 	};
 
-	const handleOnHoverOn = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
-	const handleOnHoverOff = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
@@ -122,8 +111,6 @@ export default function BoxControl( {
 		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
-		onHoverOn: handleOnHoverOn,
-		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
 		selectedUnits,
@@ -189,5 +176,3 @@ export default function BoxControl( {
 		</Root>
 	);
 }
-
-BoxControl.__Visualizer = Visualizer;

@@ -16,7 +16,7 @@ export default function NavigationMenuSidebar() {
 		<DefaultSidebar
 			className="edit-site-navigation-menu-sidebar"
 			identifier="edit-site/navigation-menu"
-			title={ __( 'Navigation Menus' ) }
+			title={ __( 'Navigation' ) }
 			icon={ navigation }
 			closeLabel={ __( 'Close navigation menu sidebar' ) }
 			panelClassName="edit-site-navigation-menu-sidebar__panel"
@@ -24,6 +24,9 @@ export default function NavigationMenuSidebar() {
 				<Flex>
 					<FlexBlock>
 						<strong>{ __( 'Navigation Menus' ) }</strong>
+						<span className="edit-site-navigation-sidebar__beta">
+							{ __( 'Beta' ) }
+						</span>
 					</FlexBlock>
 				</Flex>
 			}

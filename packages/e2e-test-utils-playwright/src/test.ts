@@ -99,7 +99,7 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 const test = base.extend<
 	{
 		pageUtils: PageUtils;
-		snapshotSuffix: void;
+		snapshotConfig: void;
 	},
 	{
 		requestUtils: RequestUtils;
@@ -131,17 +131,26 @@ const test = base.extend<
 				requestUtils.activateTheme( 'twentytwentyone' ),
 				requestUtils.deleteAllPosts(),
 				requestUtils.deleteAllBlocks(),
+				requestUtils.resetPreferences(),
 			] );
 
 			await use( requestUtils );
 		},
 		{ scope: 'worker' },
 	],
-	// A work-around automatic fixture to remove the default snapshot suffix.
-	// See https://github.com/microsoft/playwright/issues/11134
-	snapshotSuffix: [
+	// An automatic fixture to configure snapshot settings globally.
+	snapshotConfig: [
 		async ( {}, use, testInfo ) => {
+			// A work-around to remove the default snapshot suffix.
+			// See https://github.com/microsoft/playwright/issues/11134
 			testInfo.snapshotSuffix = '';
+			// Normalize snapshots into the same `__snapshots__` folder to minimize
+			// the file name length on Windows.
+			// See https://github.com/WordPress/gutenberg/issues/40291
+			testInfo.snapshotDir = path.join(
+				path.dirname( testInfo.file ),
+				'__snapshots__'
+			);
 
 			await use();
 		},

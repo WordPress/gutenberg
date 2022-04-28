@@ -28,9 +28,10 @@ function gutenberg_register_webfonts_from_theme_json() {
 			}
 
 			// Merge the variation settings with the global settings.
-			$settings['typography']                 = empty( $settings['typography'] ) ? array() : $settings['typography'];
-			$settings['typography']['fontFamilies'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
-			$settings['typography']['fontFamilies'] = array_merge( $settings['typography']['fontFamilies'], $variation['settings']['typography']['fontFamilies'] );
+			$settings['typography']                          = empty( $settings['typography'] ) ? array() : $settings['typography'];
+			$settings['typography']['fontFamilies']          = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies'];
+			$settings['typography']['fontFamilies']['theme'] = empty( $settings['typography']['fontFamilies'] ) ? array() : $settings['typography']['fontFamilies']['theme'];
+			$settings['typography']['fontFamilies']['theme'] = array_merge( $settings['typography']['fontFamilies']['theme'], $variation['settings']['typography']['fontFamilies']['theme'] );
 
 			// Make sure there are no duplicates.
 			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
@@ -89,6 +90,8 @@ function gutenberg_register_webfonts_from_theme_json() {
 	}
 	foreach ( $webfonts as $webfont ) {
 		wp_webfonts()->register_webfont( $webfont );
+	}
+	foreach ( $webfonts as $webfont ) {
 		wp_webfonts()->enqueue_webfont( $webfont['font-family'] );
 	}
 }

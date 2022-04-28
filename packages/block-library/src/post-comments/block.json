@@ -40,5 +40,6 @@
 		"wp-block-post-comments",
 		"wp-block-buttons",
 		"wp-block-button"
-	]
+	],
+	"editorStyle": "wp-block-post-comments-editor"
 }

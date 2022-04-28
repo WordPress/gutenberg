@@ -108,7 +108,6 @@ const PluginDocumentSettingPanel = compose(
 			warning( 'PluginDocumentSettingPanel requires a name property.' );
 		}
 		return {
-			icon: ownProps.icon || context.icon,
 			panelName: `${ context.name }/${ ownProps.name }`,
 		};
 	} ),

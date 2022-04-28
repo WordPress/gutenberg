@@ -74,6 +74,7 @@
 	padding: $grid-unit-20;
 }
 
+.edit-site-navigation-sidebar__beta,
 .edit-site-global-styles-sidebar__beta {
 	display: inline-flex;
 	margin-left: $grid-unit-10;
@@ -134,4 +135,10 @@ $split-border-control-offset: 55px;
 			margin-bottom: #{ -($grid-unit-50 + $grid-unit-15) } !important;
 		}
 	}
+}
+
+// Override the `hr` styles defined in the `ComplementaryArea` component
+// from the `@wordpress/interface` package.
+.edit-site-global-styles-sidebar hr {
+	margin: 0;
 }
