@@ -138,7 +138,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
 		$this->assertEquals(
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content">Hello world</div></li></ol>',
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>',
 			gutenberg_render_block_core_comment_template( null, null, $block )
 		);
 	}
@@ -200,7 +200,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 							</a>
 						</div>
 						<div class="wp-block-comment-content">
-							Hello world
+							<p>Hello world</p>
 						</div>
 						<ol>
 							<li id="comment-{$first_level_ids[0]}" class="comment even depth-2">
@@ -232,7 +232,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 									</a>
 								</div>
 								<div class="wp-block-comment-content">
-									Hello world
+									<p>Hello world</p>
 								</div>
 							</li>
 						</ol>
@@ -307,12 +307,12 @@ END
 			)
 		);
 
-		$expected_content = "<p>Paragraph One</p>\n\n<p>P2L1<br/>\nP2L2</p>\n\n<p>https://example.com/</p>";
+		$expected_content = "<p>Paragraph One</p>\n\n<p>P2L1<br />\nP2L2</p>\n\n<p><a href=\"https://example.com/\" rel=\"nofollow ugc\">https://example.com/</a></p>";
 
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
-		$this->assertEquals(
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
+		$this->assertSame(
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
 			gutenberg_render_block_core_comment_template( null, null, $block )
 		);
 	}
