@@ -13,10 +13,11 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import type { WordPressComponentProps } from '../ui/context';
 import type { TextControlProps } from './types';
 
 function UnforwardedTextControl(
-	props: TextControlProps,
+	props: WordPressComponentProps< TextControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
