@@ -218,7 +218,7 @@ export function parseQuantityAndUnitFromRawValue(
  */
 export function getValidParsedQuantityAndUnit(
 	rawValue: string | number,
-	allowedUnits: WPUnitControlUnit[],
+	allowedUnits?: WPUnitControlUnit[],
 	fallbackQuantity?: number,
 	fallbackUnit?: string
 ): [ number | undefined, string | undefined ] {
@@ -295,7 +295,7 @@ export const useCustomUnits = ( {
 }: {
 	units?: WPUnitControlUnit[];
 	availableUnits?: string[];
-	defaultValues: Record< string, number >;
+	defaultValues?: Record< string, number >;
 } ): WPUnitControlUnit[] => {
 	const customUnitsToReturn = filterUnitsWithSettings(
 		availableUnits,
