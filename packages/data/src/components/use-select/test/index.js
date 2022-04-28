@@ -884,10 +884,10 @@ describe( 'useSelect', () => {
 			// Ensure the async update was flushed during the rerender.
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
-			// initial render + subscription check + flushed store update
+			// initial render + subscription check + rerender with isAsync=false
 			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
-			// initial render + rerender with isAsync=false + store state update
-			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
+			// initial render + rerender with isAsync=false
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'cancels scheduled updates when mapSelect function changes', async () => {
