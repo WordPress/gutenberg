@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UnitControl from '../';
+import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
 
 function render( jsx ) {
