@@ -25,7 +25,7 @@ export type TextControlProps = WordPressComponentProps<
 		/**
 		 * Type of the input element to render. Defaults to "text".
 		 *
-		 * @default text
+		 * @default 'text'
 		 */
 		type?: HTMLInputTypeAttribute;
 	},

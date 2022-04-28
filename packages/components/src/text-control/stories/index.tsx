@@ -53,9 +53,13 @@ const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
 export const Default: ComponentStory<
 	typeof TextControl
 > = DefaultTemplate.bind( {} );
-Default.args = {
+Default.args = {};
+
+export const WithLabelAndHelpText: ComponentStory<
+	typeof TextControl
+> = DefaultTemplate.bind( {} );
+WithLabelAndHelpText.args = {
+	...Default.args,
 	label: 'Label Text',
-	hideLabelFromVision: false,
 	help: 'Help text to explain the input.',
-	type: 'text',
 };
