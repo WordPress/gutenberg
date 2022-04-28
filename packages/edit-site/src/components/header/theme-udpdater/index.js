@@ -23,9 +23,10 @@ import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
 
 export default function ThemeUpdater() {
-	const { themeDevMode } = useSelect(
+	const { enableThemeSaving } = useSelect(
 		( select ) => ( {
-			themeDevMode: select( editSiteStore ).getSettings().themeDevMode,
+			enableThemeSaving: select( editSiteStore ).getSettings()
+				.enableThemeSaving,
 		} ),
 		[]
 	);
@@ -75,7 +76,7 @@ export default function ThemeUpdater() {
 		! filter( templates, customSourceFilter ).length &&
 		! filter( templateParts, customSourceFilter ).length;
 
-	if ( ! themeDevMode ) {
+	if ( ! enableThemeSaving ) {
 		return null;
 	}
 

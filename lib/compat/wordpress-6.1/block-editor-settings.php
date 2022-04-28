@@ -7,7 +7,7 @@
  * @return array New block editor settings.
  */
 function gutenberg_add_theme_dev_mode( $settings ) {
-	$settings['themeDevMode'] = defined('THEME_DEV_MODE') && THEME_DEV_MODE;
+	$settings['enableThemeSaving'] = defined('ENABLE_THEME_SAVING') && ENABLE_THEME_SAVING;
 
 	return $settings;
 }
