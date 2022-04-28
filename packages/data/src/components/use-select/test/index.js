@@ -162,7 +162,7 @@ describe( 'useSelect', () => {
 		// dispatch in a different event loop tick, where the batched updates are no longer active.
 		await act( async () => {
 			await Promise.resolve();
-			registry.dispatch( 'testStore' ).toggle();
+			registry.dispatch( 'toggler' ).toggle();
 		} );
 
 		// Child was rendered and subscribed to the store, as the _second_ subscription.
@@ -172,7 +172,7 @@ describe( 'useSelect', () => {
 
 		await act( async () => {
 			await Promise.resolve();
-			registry.dispatch( 'testStore' ).toggle();
+			registry.dispatch( 'toggler' ).toggle();
 		} );
 
 		// Check that child was unmounted without any extra state update being performed on it.
