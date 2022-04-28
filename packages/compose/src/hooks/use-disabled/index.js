@@ -70,7 +70,6 @@ export default function useDisabled( {
 
 			const disable = () => {
 				// Restore previous updates.
-				updates.forEach( ( update ) => update() );
 				updates = [];
 
 				if ( node.style.getPropertyValue( 'user-select' ) !== 'none' ) {
@@ -80,6 +79,9 @@ export default function useDisabled( {
 					node.style.setProperty( 'user-select', 'none' );
 					node.style.setProperty( '-webkit-user-select', 'none' );
 					updates.push( () => {
+						if ( ! node.isConnected ) {
+							return;
+						}
 						node.style.setProperty( 'user-select', previousValue );
 						node.style.setProperty(
 							'-webkit-user-select',
@@ -99,6 +101,9 @@ export default function useDisabled( {
 					) {
 						focusable.setAttribute( 'disabled', '' );
 						updates.push( () => {
+							if ( ! focusable.isConnected ) {
+								return;
+							}
 							// @ts-ignore
 							focusable.disabled = false;
 						} );
@@ -113,6 +118,9 @@ export default function useDisabled( {
 						);
 						focusable.setAttribute( 'tabindex', '-1' );
 						updates.push( () => {
+							if ( ! focusable.isConnected ) {
+								return;
+							}
 							if ( ! previousValue ) {
 								focusable.removeAttribute( 'tabindex' );
 							} else {
@@ -128,6 +136,9 @@ export default function useDisabled( {
 					if ( tabIndex !== null && tabIndex !== '-1' ) {
 						focusable.removeAttribute( 'tabindex' );
 						updates.push( () => {
+							if ( ! focusable.isConnected ) {
+								return;
+							}
 							focusable.setAttribute( 'tabindex', tabIndex );
 						} );
 					}
@@ -138,6 +149,9 @@ export default function useDisabled( {
 					) {
 						focusable.setAttribute( 'contenteditable', 'false' );
 						updates.push( () => {
+							if ( ! focusable.isConnected ) {
+								return;
+							}
 							focusable.setAttribute( 'contenteditable', 'true' );
 						} );
 					}
@@ -152,6 +166,9 @@ export default function useDisabled( {
 						);
 						focusable.style.setProperty( 'pointer-events', 'none' );
 						updates.push( () => {
+							if ( ! focusable.isConnected ) {
+								return;
+							}
 							focusable.style.setProperty(
 								'pointer-events',
 								previousValue
