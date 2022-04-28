@@ -354,8 +354,6 @@ END
 				'paged'         => 1,
 			)
 		);
-
-		remove_filter( 'wp_get_current_commenter', $commenter_filter );
 	}
 
 	/**
