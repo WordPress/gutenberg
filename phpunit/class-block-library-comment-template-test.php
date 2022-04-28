@@ -299,7 +299,7 @@ END
 			'<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
 		);
 
-		$block  = new WP_Block(
+		$block = new WP_Block(
 			$parsed_blocks[0],
 			array(
 				'postId'           => self::$custom_post->ID,
