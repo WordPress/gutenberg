@@ -63,11 +63,10 @@ const Template = ( args ) => {
 			</Button>
 
 			<ConfirmDialog
+				{ ...args }
 				isOpen={ isOpen }
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
-				cancelButtonText={ args.cancelButtonText }
-				confirmButtonText={ args.confirmButtonText }
 			>
 				{ args.children }
 			</ConfirmDialog>
