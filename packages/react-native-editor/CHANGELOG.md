@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Add featured image settings to Latest Posts block [#39257]
+-   [**] [Cover block] Improve color contrast between background and text [#40691]
 
 ## 1.74.1
 
