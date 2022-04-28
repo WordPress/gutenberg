@@ -24,11 +24,8 @@ import type {
 	ToolsPanelHeaderProps,
 } from '../types';
 
-const noop = () => {};
-
 const DefaultControlsGroup = ( {
 	items,
-	onClose,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
@@ -59,7 +56,6 @@ const DefaultControlsGroup = ( {
 								return;
 							}
 							toggleItem( label );
-							onClose();
 						} }
 						role={ hasValue ? 'menuitem' : 'menuitemcheckbox' }
 					>
@@ -73,7 +69,6 @@ const DefaultControlsGroup = ( {
 
 const OptionalControlsGroup = ( {
 	items,
-	onClose,
 	toggleItem,
 }: ToolsPanelControlsGroupProps ) => {
 	if ( ! items.length ) {
@@ -103,7 +98,6 @@ const OptionalControlsGroup = ( {
 						label={ itemLabel }
 						onClick={ () => {
 							toggleItem( label );
-							onClose();
 						} }
 						role="menuitemcheckbox"
 					>
@@ -157,16 +151,14 @@ const ToolsPanelHeader = (
 					menuProps={ { className: dropdownMenuClassName } }
 					toggleProps={ { isSmall: true } }
 				>
-					{ ( { onClose = noop } ) => (
+					{ () => (
 						<>
 							<DefaultControlsGroup
 								items={ defaultItems }
-								onClose={ onClose }
 								toggleItem={ toggleItem }
 							/>
 							<OptionalControlsGroup
 								items={ optionalItems }
-								onClose={ onClose }
 								toggleItem={ toggleItem }
 							/>
 							<MenuGroup>
@@ -174,7 +166,6 @@ const ToolsPanelHeader = (
 									variant={ 'tertiary' }
 									onClick={ () => {
 										resetAll();
-										onClose();
 									} }
 								>
 									{ __( 'Reset all' ) }
