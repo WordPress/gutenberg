@@ -246,6 +246,7 @@ END
 			$expected
 		);
 	}
+
 	/**
 	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
 	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
@@ -281,5 +282,38 @@ END
 		$actual = build_comment_query_vars_from_block( $block );
 		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
 		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
+	}
+
+	/**
+	 * Test that line and paragraph breaks are converted to HTML tags in a comment.
+	 */
+	function test_render_block_core_comment_content_converts_to_html() {
+		$comment_id  = self::$comment_ids[0];
+		$new_content = "Paragraph One\n\nP2L1\nP2L2\n\nhttps://example.com/";
+		self::factory()->comment->update_object(
+			$comment_id,
+			array( 'comment_content' => $new_content )
+		);
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block  = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'           => self::$custom_post->ID,
+				'comments/inherit' => true,
+			)
+		);
+
+		$expected_content = "<p>Paragraph One</p>\n\n<p>P2L1<br/>\nP2L2</p>\n\n<p>https://example.com/</p>";
+
+		// Here we use the function prefixed with 'gutenberg_*' because it's added
+		// in the build step.
+		$this->assertEquals(
+			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
+			gutenberg_render_block_core_comment_template( null, null, $block )
+		);
 	}
 }
