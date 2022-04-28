@@ -343,15 +343,15 @@ END
 		$this->assertEquals(
 			build_comment_query_vars_from_block( $block ),
 			array(
-				'orderby'       => 'comment_date_gmt',
-				'order'         => 'ASC',
-				'status'        => 'approve',
-				'no_found_rows' => false,
+				'orderby'            => 'comment_date_gmt',
+				'order'              => 'ASC',
+				'status'             => 'approve',
+				'no_found_rows'      => false,
 				'include_unapproved' => array( 'unapproved@example.org' ),
-				'post_id'       => self::$custom_post->ID,
-				'hierarchical'  => 'threaded',
-				'number'        => 5,
-				'paged'         => 1,
+				'post_id'            => self::$custom_post->ID,
+				'hierarchical'       => 'threaded',
+				'number'             => 5,
+				'paged'              => 1,
 			)
 		);
 	}
@@ -395,7 +395,7 @@ END
 		// in the build step.
 		$this->assertEquals(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li><li id="comment-' . $unapproved_comment[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/unapproved/" target="_self" >Visitor</a></div><div class="wp-block-comment-content"><em class="comment-awaiting-moderation">Your comment is awaiting moderation.</em>Hi there! My comment needs moderation.</div></li></ol>',
-			str_replace( array( "\n", "\t" ), '', $block->render() ),
+			str_replace( array( "\n", "\t" ), '', $block->render() )
 		);
 
 		remove_filter( 'wp_get_current_commenter', $commenter_filter );
@@ -403,7 +403,7 @@ END
 		// Test it again and ensure the unmoderated comment doesn't leak out.
 		$this->assertEquals(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>',
-			str_replace( array( "\n", "\t" ), '', $block->render() ),
+			str_replace( array( "\n", "\t" ), '', $block->render() )
 		);
 	}
 }
