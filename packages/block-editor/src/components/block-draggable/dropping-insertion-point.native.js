@@ -57,7 +57,7 @@ export default function DroppingInsertionPoint( {
 	const safeAreaOffset = insets.top + insets.bottom;
 	const maxHeight =
 		height -
-		( safeAreaOffset + styles[ 'dropping-insertion-point' ].height );
+		( safeAreaOffset + styles[ 'dropping-insertion-point' ]?.height );
 
 	const blockYPosition = useSharedValue( 0 );
 	const opacity = useSharedValue( 0 );
