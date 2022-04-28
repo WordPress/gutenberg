@@ -43,7 +43,7 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 		} else {
 			$moderation_note = __( 'Your comment is awaiting moderation. This is a preview; your comment will be visible after it has been approved.' );
 		}
-		$moderation_note = '<em class="comment-awaiting-moderation">' . $moderation_note . '</em>';
+		$moderation_note = '<p><em class="comment-awaiting-moderation">' . $moderation_note . '</em></p>';
 		if ( ! $show_pending_links ) {
 			$comment_text = wp_kses( $comment_text, array() );
 		}
