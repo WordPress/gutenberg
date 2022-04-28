@@ -40,8 +40,11 @@ window.addEventListener( 'load', () => {
 	);
 
 	navigationLinks.forEach( function ( link ) {
-		// Ignore non-anchor links.
-		if ( ! link.getAttribute( 'href' )?.startsWith( '#' ) ) {
+		// Ignore non-anchor links and anchor links which open on a new tab.
+		if (
+			! link.getAttribute( 'href' )?.startsWith( '#' ) ||
+			link.attributes?.target === '_blank'
+		) {
 			return;
 		}
 
