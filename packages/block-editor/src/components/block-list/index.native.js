@@ -324,7 +324,7 @@ export class BlockList extends Component {
 
 		// blockClientIds are only required for Grid blocks in the BlockListItem component.
 		// However passing the blockClientIds as a top level prop results in unneeded re-renders.
-		const gridBlockProps = gridProperties && {
+		const gridItemProps = gridProperties && {
 			props: gridProperties,
 			items: blockClientIds,
 		};
@@ -344,7 +344,7 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				gridBlockProps={ gridBlockProps }
+				gridItemProps={ gridItemProps }
 			/>
 		);
 	}

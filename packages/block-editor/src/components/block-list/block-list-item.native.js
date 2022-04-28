@@ -163,19 +163,14 @@ export class BlockListItem extends Component {
 	}
 
 	render() {
-		const {
-			clientId,
-			parentWidth,
-			blockWidth,
-			gridBlockProps,
-		} = this.props;
+		const { clientId, parentWidth, blockWidth, gridItemProps } = this.props;
 
 		if ( ! blockWidth ) {
 			return null;
 		}
 
-		if ( gridBlockProps ) {
-			const { props, items } = gridBlockProps;
+		if ( gridItemProps ) {
+			const { props, items } = gridItemProps;
 			return (
 				<Grid
 					numOfColumns={ props.numColumns }
