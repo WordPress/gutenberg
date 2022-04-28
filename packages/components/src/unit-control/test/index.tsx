@@ -35,20 +35,31 @@ const getUnitLabel = () =>
 	document.body.querySelector( '.components-unit-control__unit-label' );
 
 const ControlledSyncUnits = () => {
-	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
+	const [ state, setState ] = useState( {
+		valueA: '',
+		valueB: '',
+	} );
 
 	// Keep the unit sync'd between the two `UnitControl` instances.
-	const onUnitControlChange = ( fieldName, newValue ) => {
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
+	const onUnitControlChange = (
+		fieldName: 'valueA' | 'valueB',
+		newValue?: string | number
+	) => {
+		const parsedQuantityAndUnit = parseQuantityAndUnitFromRawValue(
 			newValue
 		);
+		const quantity = parsedQuantityAndUnit[ 0 ];
 
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
 
-		const nextState = { ...state, [ fieldName ]: newValue };
+		const newUnit = parsedQuantityAndUnit[ 1 ];
+
+		const nextState = {
+			...state,
+			[ fieldName ]: newValue,
+		};
 
 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
 			const [
@@ -57,7 +68,9 @@ const ControlledSyncUnits = () => {
 			] = parseQuantityAndUnitFromRawValue( stateValue );
 
 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
-				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
+				nextState[
+					stateProp as 'valueA' | 'valueB'
+				] = `${ stateQuantity }${ newUnit }`;
 			}
 		} );
 
