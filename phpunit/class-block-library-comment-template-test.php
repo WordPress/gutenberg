@@ -138,8 +138,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
 		$this->assertSame(
-			str_replace( array( "\n", "\t" ), '', '<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
-			str_replace( array( "\n", "\t" ), '', gutenberg_render_block_core_comment_template( null, null, $block ) )
+			str_replace( array( "\n", "\t" ), '', '<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
+			str_replace( array( "\n", "\t" ), '', $block->render() )
 		);
 	}
 
@@ -191,7 +191,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			array( "\n", "\t" ),
 			'',
 			<<<END
-				<ol >
+				<ol class="wp-block-comment-template">
 					<li id="comment-{$top_level_ids[0]}" class="comment odd alt thread-odd thread-alt depth-1">
 						<div class="wp-block-comment-author-name">
 							<a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >
@@ -241,7 +241,7 @@ END
 		);
 
 		$this->assertSame(
-			str_replace( array( "\n", "\t" ), '', gutenberg_render_block_core_comment_template( null, null, $block ) ),
+			str_replace( array( "\n", "\t" ), '', $block->render() ),
 			$expected
 		);
 	}
@@ -311,8 +311,98 @@ END
 		// Here we use the function prefixed with 'gutenberg_*' because it's added
 		// in the build step.
 		$this->assertSame(
-			'<ol ><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
-			gutenberg_render_block_core_comment_template( null, null, $block )
+			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
+			$block->render()
+		);
+	}
+
+	/**
+	 * Test that unapproved comments are included if it is a preview.
+	 */
+	function test_build_comment_query_vars_from_block_with_comment_preview() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+
+		$commenter_filter = function () {
+			return array(
+				'comment_author_email' => 'unapproved@example.org',
+			);
+		};
+
+		add_filter( 'wp_get_current_commenter', $commenter_filter );
+
+		$this->assertEquals(
+			build_comment_query_vars_from_block( $block ),
+			array(
+				'orderby'            => 'comment_date_gmt',
+				'order'              => 'ASC',
+				'status'             => 'approve',
+				'no_found_rows'      => false,
+				'include_unapproved' => array( 'unapproved@example.org' ),
+				'post_id'            => self::$custom_post->ID,
+				'hierarchical'       => 'threaded',
+				'number'             => 5,
+				'paged'              => 1,
+			)
+		);
+	}
+
+	/**
+	 * Test rendering an unapproved comment preview.
+	 */
+	function test_rendering_comment_template_unmoderated_preview() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$unapproved_comment = self::factory()->comment->create_post_comments(
+			self::$custom_post->ID,
+			1,
+			array(
+				'comment_author'       => 'Visitor',
+				'comment_author_email' => 'unapproved@example.org',
+				'comment_author_url'   => 'http://example.com/unapproved/',
+				'comment_content'      => 'Hi there! My comment needs moderation.',
+				'comment_approved'     => 0,
+			)
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+
+		$commenter_filter = function () {
+			return array(
+				'comment_author_email' => 'unapproved@example.org',
+			);
+		};
+
+		add_filter( 'wp_get_current_commenter', $commenter_filter );
+
+		// Here we use the function prefixed with 'gutenberg_*' because it's added
+		// in the build step.
+		$this->assertEquals(
+			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li><li id="comment-' . $unapproved_comment[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/unapproved/" target="_self" >Visitor</a></div><div class="wp-block-comment-content"><p><em class="comment-awaiting-moderation">Your comment is awaiting moderation.</em></p>Hi there! My comment needs moderation.</div></li></ol>',
+			str_replace( array( "\n", "\t" ), '', $block->render() )
+		);
+
+		remove_filter( 'wp_get_current_commenter', $commenter_filter );
+
+		// Test it again and ensure the unmoderated comment doesn't leak out.
+		$this->assertEquals(
+			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>',
+			str_replace( array( "\n", "\t" ), '', $block->render() )
 		);
 	}
 
