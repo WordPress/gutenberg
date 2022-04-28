@@ -23,10 +23,14 @@ function render_block_core_comment_content( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment_text = get_comment_text( $comment );
+	$args         = array();
+	$comment_text = get_comment_text( $comment, $args );
 	if ( ! $comment_text ) {
 		return '';
 	}
+
+	/** This filter is documented in wp-includes/comment-template.php */
+	$comment_text = apply_filters( 'comment_text', $comment_text, $comment, $args );
 
 	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
