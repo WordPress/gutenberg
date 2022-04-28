@@ -288,14 +288,31 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'reset', () => {
-		it( 'should reset to a custom fallback value, defined by a parent component', () => {
+		it.concurrent.each( [
+			[
+				'initialPosition if it is defined',
+				{ initialPosition: 21 },
+				[ '21', undefined ],
+			],
+			[
+				'resetFallbackValue if it is defined',
+				{ resetFallbackValue: 34 },
+				[ '34', 34 ],
+			],
+			[
+				'resetFallbackValue if both it and initialPosition are defined',
+				{ initialPosition: 21, resetFallbackValue: 34 },
+				[ '34', 34 ],
+			],
+		] )( 'should reset to %s', ( ...all ) => {
+			const [ , propsForReset, [ expectedValue, expectedChange ] ] = all;
 			const spy = jest.fn();
 			const { container } = render(
 				<RangeControl
 					initialPosition={ 10 }
 					allowReset={ true }
 					onChange={ spy }
-					resetFallbackValue={ 33 }
+					{ ...propsForReset }
 				/>
 			);
 
@@ -305,9 +322,9 @@ describe( 'RangeControl', () => {
 
 			fireEvent.click( resetButton );
 
-			expect( rangeInput.value ).toBe( '33' );
-			expect( numberInput.value ).toBe( '33' );
-			expect( spy ).toHaveBeenCalledWith( 33 );
+			expect( rangeInput.value ).toBe( expectedValue );
+			expect( numberInput.value ).toBe( expectedValue );
+			expect( spy ).toHaveBeenCalledWith( expectedChange );
 		} );
 
 		it.concurrent.each( [ RangeControl, ControlledRangeControl ] )(
