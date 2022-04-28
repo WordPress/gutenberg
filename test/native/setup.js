@@ -132,8 +132,10 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
+// To be replaced with built in mocks when we upgrade to the latest version
 jest.mock( 'react-native-safe-area-context', () => {
 	const inset = { top: 0, right: 0, bottom: 0, left: 0 };
+	const frame = { x: 0, y: 0, width: 0, height: 0 };
 	return {
 		SafeAreaProvider: jest
 			.fn()
@@ -142,6 +144,7 @@ jest.mock( 'react-native-safe-area-context', () => {
 			.fn()
 			.mockImplementation( ( { children } ) => children( inset ) ),
 		useSafeAreaInsets: jest.fn().mockImplementation( () => inset ),
+		useSafeAreaFrame: jest.fn().mockImplementation( () => frame ),
 	};
 } );
 
