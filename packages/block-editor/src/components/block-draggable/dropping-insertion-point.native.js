@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useWindowDimensions } from 'react-native';
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -9,7 +8,10 @@ import Animated, {
 	useAnimatedReaction,
 	runOnJS,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+	useSafeAreaInsets,
+	useSafeAreaFrame,
+} from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -52,12 +54,12 @@ export default function DroppingInsertionPoint( {
 	} = useSelect( blockEditorStore );
 
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
-	const insets = useSafeAreaInsets();
-	const { height } = useWindowDimensions();
-	const safeAreaOffset = insets.top + insets.bottom;
+	const { top, bottom } = useSafeAreaInsets();
+	const { height } = useSafeAreaFrame();
+	const safeAreaOffset = top + bottom;
 	const maxHeight =
 		height -
-		( safeAreaOffset + styles[ 'dropping-insertion-point' ]?.height );
+		( safeAreaOffset + styles[ 'dropping-insertion-point' ].height );
 
 	const blockYPosition = useSharedValue( 0 );
 	const opacity = useSharedValue( 0 );
