@@ -8,6 +8,10 @@ import Animated, {
 	useAnimatedReaction,
 	runOnJS,
 } from 'react-native-reanimated';
+import {
+	useSafeAreaInsets,
+	useSafeAreaFrame,
+} from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -50,6 +54,12 @@ export default function DroppingInsertionPoint( {
 	} = useSelect( blockEditorStore );
 
 	const { blocksLayouts, findBlockLayoutByClientId } = useBlockListContext();
+	const { top, bottom } = useSafeAreaInsets();
+	const { height } = useSafeAreaFrame();
+	const safeAreaOffset = top + bottom;
+	const maxHeight =
+		height -
+		( safeAreaOffset + styles[ 'dropping-insertion-point' ].height );
 
 	const blockYPosition = useSharedValue( 0 );
 	const opacity = useSharedValue( 0 );
@@ -144,11 +154,16 @@ export default function DroppingInsertionPoint( {
 	);
 
 	const animatedStyles = useAnimatedStyle( () => {
+		const translationY = blockYPosition.value - scroll.offsetY.value;
+		// Prevents overflowing behind the header/footer
+		const shouldHideIndicator =
+			translationY < 0 || translationY > maxHeight;
+
 		return {
-			opacity: opacity.value,
+			opacity: shouldHideIndicator ? 0 : opacity.value,
 			transform: [
 				{
-					translateY: blockYPosition.value - scroll.offsetY.value,
+					translateY: translationY,
 				},
 			],
 		};
