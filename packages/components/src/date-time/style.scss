@@ -153,7 +153,7 @@
 
 	fieldset {
 		position: relative;
-		margin-bottom: 0.5em;
+		margin-bottom: $grid-unit-20;
 	}
 
 	fieldset + fieldset {
@@ -169,7 +169,10 @@
 
 		.components-datetime__time-separator {
 			display: inline-block;
-			padding: 0 3px 0 0;
+			padding: 0 3px;
+			line-height: 30px - 1px - 1px; // 30px minus the borders
+			border-top: 1px solid $gray-700;
+			border-bottom: 1px solid $gray-700;
 		}
 
 		.components-datetime__time-field {
@@ -179,8 +182,12 @@
 				direction: ltr;
 			}
 
-			select {
+			&:not(:last-child) {
 				margin-right: $grid-unit-05;
+			}
+
+			select {
+				width: 100%;
 
 				&:focus {
 					position: relative;
@@ -190,9 +197,20 @@
 
 			input[type="number"] {
 				padding: 2px;
-				margin-right: $grid-unit-05;
 				text-align: center;
 				-moz-appearance: textfield;
+
+				&.components-datetime__time-field-hours-input {
+					border-right: none;
+					border-top-right-radius: 0;
+					border-bottom-right-radius: 0;
+				}
+
+				&.components-datetime__time-field-minutes-input {
+					border-left: none;
+					border-top-left-radius: 0;
+					border-bottom-left-radius: 0;
+				}
 
 				&:focus {
 					position: relative;
@@ -222,19 +240,13 @@
 
 .components-datetime__timezone {
 	line-height: 30px;
-	margin-left: $grid-unit-05;
+	margin-left: $grid-unit-10;
 	text-decoration: underline dotted;
 }
 
 .components-datetime__time-legend {
-	font-weight: 600;
-	margin-top: 0.5em;
-
-	&.invisible {
-		position: absolute;
-		top: -999em;
-		left: -999em;
-	}
+	margin-bottom: $grid-unit-10;
+	padding: 0;
 }
 
 .components-datetime__time-field-integer-field {
@@ -251,8 +263,8 @@
 	width: 55px;
 }
 
-.components-datetime__time-field-month-select {
-	max-width: 145px;
+.components-datetime__time-field-month {
+	flex-grow: 1;
 }
 
 // Hack to center the datepicker component within the popover.

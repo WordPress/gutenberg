@@ -25,11 +25,13 @@ const DateTimePickerWithState = ( { is12Hour } ) => {
 	const [ date, setDate ] = useState();
 
 	return (
-		<DateTimePicker
-			currentDate={ date }
-			onChange={ setDate }
-			is12Hour={ is12Hour }
-		/>
+		<div style={ { display: 'inline-block' } }>
+			<DateTimePicker
+				currentDate={ date }
+				onChange={ setDate }
+				is12Hour={ is12Hour }
+			/>
+		</div>
 	);
 };
 
@@ -63,10 +65,12 @@ export const WithDaysHighlighted = () => {
 	} );
 
 	return (
-		<DateTimePicker
-			currentDate={ date }
-			onChange={ setDate }
-			events={ highlights }
-		/>
+		<div style={ { display: 'inline-block' } }>
+			<DateTimePicker
+				currentDate={ date }
+				onChange={ setDate }
+				events={ highlights }
+			/>
+		</div>
 	);
 };

@@ -220,30 +220,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 	return (
 		<div className={ classnames( 'components-datetime__time' ) }>
 			<fieldset>
-				<legend className="components-datetime__time-legend invisible">
-					{ __( 'Date' ) }
-				</legend>
-				<div className="components-datetime__time-wrapper">
-					{ dayMonthFormat }
-
-					<div className="components-datetime__time-field components-datetime__time-field-year">
-						<UpdateOnBlurAsIntegerField
-							aria-label={ __( 'Year' ) }
-							className="components-datetime__time-field-year-input"
-							type="number"
-							name="year"
-							step={ 1 }
-							min={ 0 }
-							max={ 9999 }
-							value={ year }
-							onUpdate={ update }
-						/>
-					</div>
-				</div>
-			</fieldset>
-
-			<fieldset>
-				<legend className="components-datetime__time-legend invisible">
+				<legend className="components-datetime__time-legend">
 					{ __( 'Time' ) }
 				</legend>
 				<div className="components-datetime__time-wrapper">
@@ -301,6 +278,29 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 					) }
 
 					<TimeZone />
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend className="components-datetime__time-legend">
+					{ __( 'Date' ) }
+				</legend>
+				<div className="components-datetime__time-wrapper">
+					{ dayMonthFormat }
+
+					<div className="components-datetime__time-field components-datetime__time-field-year">
+						<UpdateOnBlurAsIntegerField
+							aria-label={ __( 'Year' ) }
+							className="components-datetime__time-field-year-input"
+							type="number"
+							name="year"
+							step={ 1 }
+							min={ 0 }
+							max={ 9999 }
+							value={ year }
+							onUpdate={ update }
+						/>
+					</div>
 				</div>
 			</fieldset>
 		</div>
