@@ -58,7 +58,7 @@ const DefaultControlsGroup = ( {
 							toggleItem( label );
 							onClose();
 						} }
-						role="menuitemcheckbox"
+						role={ hasValue ? 'menuitem' : 'menuitemcheckbox' }
 					>
 						{ label }
 					</MenuItem>
