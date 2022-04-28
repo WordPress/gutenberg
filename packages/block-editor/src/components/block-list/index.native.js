@@ -321,6 +321,10 @@ export class BlockList extends Component {
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
+		const gridBlockProps = gridProperties && {
+			props: gridProperties,
+			items: blockClientIds,
+		};
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -337,8 +341,7 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				gridProperties={ gridProperties }
-				items={ blockClientIds }
+				gridBlockProps={ gridBlockProps }
 			/>
 		);
 	}
