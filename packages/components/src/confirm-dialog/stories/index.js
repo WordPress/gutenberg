@@ -129,30 +129,3 @@ withCustomButtonLabels.args = {
 	cancelButtonText: 'No thanks',
 	confirmButtonText: 'Yes please!',
 };
-
-const uncontrolledSnippet = `<>
-  <ConfirmDialog
-    onConfirm={ handleConfirm }
-  >
-    Would you like to privately publish the post now?
-  </ConfirmDialog>
-  
-  <Heading level={ 1 } />
-</>
-`;
-
-export const Uncontrolled = Template.bind( {} );
-Uncontrolled.args = {};
-Uncontrolled.parameters = {
-	docs: {
-		description: {
-			story:
-				'To render in Uncontrolled Mode, omit passing a boolean to the `isOpen` prop. This will allow the component to close itself without the need for an explicit callback. In Uncontrolled mode, `onCancel` is optional.',
-		},
-		source: {
-			code: uncontrolledSnippet,
-			language: 'jsx',
-			type: 'auto',
-		},
-	},
-};
