@@ -100,8 +100,8 @@ describe( 'UnitControl', () => {
 			const input = getInput();
 			const select = getSelect();
 
-			expect( input ).toBeTruthy();
-			expect( select ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
+			expect( select ).toBeInTheDocument();
 		} );
 
 		it( 'should render custom className', () => {
@@ -121,8 +121,8 @@ describe( 'UnitControl', () => {
 			const input = getInput();
 			const select = getSelect();
 
-			expect( input ).toBeTruthy();
-			expect( select ).toBeFalsy();
+			expect( input ).toBeInTheDocument();
+			expect( select ).not.toBeInTheDocument();
 		} );
 
 		it( 'should render label if single units', () => {
@@ -131,8 +131,8 @@ describe( 'UnitControl', () => {
 			const select = getSelect();
 			const label = getUnitLabel();
 
-			expect( select ).toBeFalsy();
-			expect( label ).toBeTruthy();
+			expect( select ).not.toBeInTheDocument();
+			expect( label ).toBeInTheDocument();
 		} );
 	} );
 
