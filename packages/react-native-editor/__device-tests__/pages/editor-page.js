@@ -552,6 +552,14 @@ class EditorPage {
 		return locator.length;
 	}
 
+	async assertSlashInserterPresent() {
+		const slashInserterLocator = isAndroid()
+			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
+			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]'
+
+		return await waitForVisible( this.driver, slashInserterLocator, true )
+	}
+
 	// =========================
 	// List Block functions
 	// =========================

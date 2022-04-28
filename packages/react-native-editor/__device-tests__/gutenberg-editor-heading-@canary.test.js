@@ -55,5 +55,8 @@ describe( 'Gutenberg Editor tests', () => {
 			paragraphBlockElement,
 			testData.mediumText
 		);
+
+		// Assert that even though there are 5 blocks, there should only be 3 paragraph blocks
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 3 );
 	} );
 } );
