@@ -465,18 +465,25 @@ const waitForMediaLibrary = async ( driver ) => {
 };
 
 /**
- * 
- * @param {string} driver 
- * @param {string} elementLocator 
+ *
+ * @param {string} driver
+ * @param {string} elementLocator
  * @param {boolean} returnBool - To return boolean instead of the first element/throw error. Useful for asserts.
  * @param {number} iteration - Default value is 0
  */
-const waitForVisible = async ( driver, elementLocator, returnBool, iteration = 0 ) => {
+const waitForVisible = async (
+	driver,
+	elementLocator,
+	returnBool,
+	iteration = 0
+) => {
 	const maxIteration = returnBool ? 5 : 25;
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		if ( returnBool ) { return false }
+		if ( returnBool ) {
+			return false;
+		}
 
 		throw new Error(
 			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
@@ -489,10 +496,17 @@ const waitForVisible = async ( driver, elementLocator, returnBool, iteration = 0
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, returnBool, iteration + 1 );
+		return waitForVisible(
+			driver,
+			elementLocator,
+			returnBool,
+			iteration + 1
+		);
 	}
 
-	if ( returnBool ) { return true }
+	if ( returnBool ) {
+		return true;
+	}
 	return locator[ 0 ];
 };
 

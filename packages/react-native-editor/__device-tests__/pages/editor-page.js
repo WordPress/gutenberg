@@ -555,9 +555,9 @@ class EditorPage {
 	async assertSlashInserterPresent() {
 		const slashInserterLocator = isAndroid()
 			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
-			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]'
+			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
 
-		return await waitForVisible( this.driver, slashInserterLocator, true )
+		return await waitForVisible( this.driver, slashInserterLocator, true );
 	}
 
 	// =========================
