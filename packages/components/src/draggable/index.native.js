@@ -121,6 +121,9 @@ const Draggable = ( { children, onDragEnd, onDragOver, onDragStart } ) => {
 				}
 			}
 		} )
+		.onTouchesCancelled( ( _event, state ) => {
+			state.end();
+		} )
 		.onEnd( () => {
 			currentFirstTouchId.value = null;
 			isPanActive.value = false;
