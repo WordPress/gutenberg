@@ -1186,13 +1186,12 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 >
                   <ForwardRef(Button)
                     className="components-circular-option-picker__clear"
-                    isSmall={true}
                     onClick={[Function]}
-                    variant="secondary"
+                    variant="tertiary"
                   >
                     <button
                       aria-describedby={null}
-                      className="components-button components-circular-option-picker__clear is-secondary is-small"
+                      className="components-button components-circular-option-picker__clear is-tertiary"
                       onClick={[Function]}
                       type="button"
                     >

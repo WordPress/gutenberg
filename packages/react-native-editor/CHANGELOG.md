@@ -11,6 +11,17 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.75.0
+
+-   [*] [Latest Posts block] Add featured image settings [#39257]
+-   [*] Prevent incorrect notices displaying when switching between HTML-Visual mode quickly [#40415]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35326]
+-   [*] [iOS] Prevent gaps shown around floating toolbar when using external keyboard [#40266]
+
+## 1.74.1
+
+-   [**] RichText - Set a default value for selection values [#40581]
+
 ## 1.74.0
 
 -   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]

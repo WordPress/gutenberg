@@ -8,12 +8,14 @@ import {
 	PostVisibilityLabel,
 	PostVisibilityCheck,
 } from '@wordpress/editor';
+import { useRef } from '@wordpress/element';
 
 export function PostVisibility() {
+	const rowRef = useRef();
 	return (
 		<PostVisibilityCheck
 			render={ ( { canEdit } ) => (
-				<PanelRow className="edit-post-post-visibility">
+				<PanelRow ref={ rowRef } className="edit-post-post-visibility">
 					<span>{ __( 'Visibility' ) }</span>
 					{ ! canEdit && (
 						<span>
@@ -24,6 +26,12 @@ export function PostVisibility() {
 						<Dropdown
 							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
+							popoverProps={ {
+								// Anchor the popover to the middle of the
+								// entire row so that it doesn't move around
+								// when the label changes.
+								anchorRef: rowRef.current,
+							} }
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<Button
 									aria-expanded={ isOpen }
@@ -34,7 +42,9 @@ export function PostVisibility() {
 									<PostVisibilityLabel />
 								</Button>
 							) }
-							renderContent={ () => <PostVisibilityForm /> }
+							renderContent={ ( { onClose } ) => (
+								<PostVisibilityForm onClose={ onClose } />
+							) }
 						/>
 					) }
 				</PanelRow>

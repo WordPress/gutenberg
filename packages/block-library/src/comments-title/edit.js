@@ -140,7 +140,15 @@ export default function Edit( {
 		? __( 'One response to ' )
 		: __( 'One response' );
 
+	const singlePlaceholderNoCount = showPostTitle
+		? __( 'Response to ' )
+		: __( 'Response' );
+
 	const multiplePlaceholder = showPostTitle
+		? __( 'responses to ' )
+		: __( 'responses' );
+
+	const multiplePlaceholderNoCount = showPostTitle
 		? __( 'Responses to ' )
 		: __( 'Responses' );
 
@@ -154,8 +162,16 @@ export default function Edit( {
 						<PlainText
 							__experimentalVersion={ 2 }
 							tagName="span"
-							aria-label={ singlePlaceholder }
-							placeholder={ singlePlaceholder }
+							aria-label={
+								showCommentsCount
+									? singlePlaceholder
+									: singlePlaceholderNoCount
+							}
+							placeholder={
+								showCommentsCount
+									? singlePlaceholder
+									: singlePlaceholderNoCount
+							}
 							value={ singleCommentLabel }
 							onChange={ ( newLabel ) =>
 								setAttributes( {
@@ -174,12 +190,12 @@ export default function Edit( {
 							aria-label={
 								showCommentsCount
 									? ` ${ multiplePlaceholder }`
-									: multiplePlaceholder
+									: multiplePlaceholderNoCount
 							}
 							placeholder={
 								showCommentsCount
 									? ` ${ multiplePlaceholder }`
-									: multiplePlaceholder
+									: multiplePlaceholderNoCount
 							}
 							value={ multipleCommentsLabel }
 							onChange={ ( newLabel ) =>

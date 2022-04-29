@@ -77,6 +77,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 require __DIR__ . '/experimental/editor-settings.php';
 
 // WordPress 5.9 compat.
+require __DIR__ . '/compat/wordpress-5.9/polyfills.php';
 require __DIR__ . '/compat/wordpress-5.9/block-gallery.php';
 require __DIR__ . '/compat/wordpress-5.9/widget-render-api-endpoint/index.php';
 require __DIR__ . '/compat/wordpress-5.9/blocks.php';
@@ -124,8 +125,10 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
+require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 
 // Experimental features.
+remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
