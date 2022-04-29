@@ -97,7 +97,9 @@ export default function useSelectionObserver() {
 				// We have to check about `shift+click` case because elements
 				// that don't support text selection might be involved, and we might
 				// update the clientIds to multi-select blocks.
-				if ( selection.isCollapsed && ! event.shiftKey ) {
+				// For now we check if the event is a `mouse` event.
+				const isClickShift = event.shiftKey && event.type === 'mouseup';
+				if ( selection.isCollapsed && ! isClickShift ) {
 					setContentEditableWrapper( node, false );
 					return;
 				}
@@ -111,7 +113,7 @@ export default function useSelectionObserver() {
 				// If the selection has changed and we had pressed `shift+click`,
 				// we need to check if in an element that doesn't support
 				// text selection has been clicked.
-				if ( event.shiftKey ) {
+				if ( isClickShift ) {
 					const selectedClientId = getBlockSelectionStart();
 					const clickedClientId = getBlockClientId( event.target );
 					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
