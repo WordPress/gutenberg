@@ -118,16 +118,17 @@ export default function DroppingInsertionPoint( {
 			? findBlockLayoutByClientId( blocksLayouts.current, nextClientId )
 			: null;
 
+		const previousElementPosition = previousElement
+			? previousElement.y + previousElement.height
+			: 0;
+		const nextElementPosition = nextElement ? nextElement.y : 0;
+
 		const elementsPositions = {
 			top: Math.floor(
-				previousElement
-					? previousElement.y + previousElement.height
-					: nextElement?.y
+				previousElement ? previousElementPosition : nextElementPosition
 			),
 			bottom: Math.floor(
-				nextElement
-					? nextElement.y
-					: previousElement.y + previousElement.height
+				nextElement ? nextElementPosition : previousElementPosition
 			),
 		};
 
