@@ -3,7 +3,7 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const blockDefault = (
+const blockMeta = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
 			fillRule="evenodd"
@@ -13,4 +13,4 @@ const blockDefault = (
 	</SVG>
 );
 
-export default blockDefault;
+export default blockMeta;
