@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { postComments as icon } from '@wordpress/icons';
@@ -40,9 +45,14 @@ export const settings = {
 					},
 				},
 			},
-			save( { attributes: { tagName: Tag } } ) {
+			save( { attributes: { className, tagName: Tag } } ) {
 				return (
-					<Tag className="wp-block-comments-query-loop">
+					<Tag
+						className={ classnames(
+							'wp-block-comments-query-loop',
+							className
+						) }
+					>
 						<InnerBlocks.Content />
 					</Tag>
 				);
