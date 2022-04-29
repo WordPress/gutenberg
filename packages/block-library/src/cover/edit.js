@@ -786,7 +786,10 @@ function CoverEdit( {
 						<div
 							ref={ isDarkElement }
 							role="img"
-							className="wp-block-cover__image-background"
+							className={ classnames(
+								classes,
+								'wp-block-cover__image-background'
+							) }
 							style={ { backgroundImage, backgroundPosition } }
 						/>
 					) ) }
