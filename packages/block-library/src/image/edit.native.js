@@ -478,6 +478,9 @@ export class ImageEdit extends Component {
 					height: undefined,
 					sizeSlug: imageDefaultSize,
 				} );
+				this.setState( {
+					isInvalidURL: false,
+				} );
 			} else {
 				this.setState( {
 					isInvalidURL: true,
