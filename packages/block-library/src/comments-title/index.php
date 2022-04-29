@@ -29,11 +29,18 @@ function render_block_core_comments_title( $attributes ) {
 		return;
 	}
 
-	$single_default_comment_label = $show_post_title ? __( 'One response to' ) : __( 'One response' );
-	$single_comment_label         = ! empty( $attributes['singleCommentLabel'] ) ? $attributes['singleCommentLabel'] : $single_default_comment_label;
+	$single_default_comment_label = $show_post_title ? __( 'Response to' ) : __( 'Response' );
+	if ( $show_comments_count ) {
+		$single_default_comment_label = $show_post_title ? __( 'One response to' ) : __( 'One response' );
+	}
+	$single_comment_label = ! empty( $attributes['singleCommentLabel'] ) ? $attributes['singleCommentLabel'] : $single_default_comment_label;
 
 	$multiple_default_comment_label = $show_post_title ? __( 'Responses to' ) : __( 'Responses' );
-	$multiple_comment_label         = ! empty( $attributes['multipleCommentsLabel'] ) ? $attributes['multipleCommentsLabel'] : $multiple_default_comment_label;
+	if ( $show_comments_count ) {
+		$multiple_default_comment_label = $show_post_title ? __( 'responses to' ) : __( 'responses' );
+	}
+
+	$multiple_comment_label = ! empty( $attributes['multipleCommentsLabel'] ) ? $attributes['multipleCommentsLabel'] : $multiple_default_comment_label;
 
 	$comments_title = '%1$s %2$s %3$s';
 
