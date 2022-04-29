@@ -57,7 +57,20 @@ export default function PostExcerptEditor( {
 		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
-		return <div { ...blockProps }>{ __( 'Post Excerpt' ) }</div>;
+		return (
+			<div { ...blockProps }>
+				<p>
+					{ __(
+						'This is the Post Excerpt block, it will display the excerpt from single posts.'
+					) }
+				</p>
+				<p>
+					{ __(
+						'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
+					) }
+				</p>
+			</div>
+		);
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
