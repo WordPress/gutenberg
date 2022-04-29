@@ -109,10 +109,40 @@ TweakingTheNumberInput.args = {
 /**
  * When only one unit is available, the unit selection dropdown becomes static text.
  */
-export const WithSingleUnit: ComponentStory<
+export const WithSingleUnitControlled: ComponentStory<
 	typeof UnitControl
-> = DefaultTemplate.bind( {} );
-WithSingleUnit.args = {
+> = ( { onChange, ...args } ) => {
+	// Starting value is `undefined`
+	const [ value, setValue ] = useState< string | undefined >( undefined );
+
+	return (
+		<div style={ { maxWidth: '100px' } }>
+			<UnitControl
+				{ ...args }
+				value={ value }
+				onChange={ ( v, extra ) => {
+					setValue( v );
+					onChange?.( v, extra );
+				} }
+			/>
+		</div>
+	);
+};
+WithSingleUnitControlled.args = {
+	...Default.args,
+	units: CSS_UNITS.slice( 0, 1 ),
+};
+
+export const WithSingleUnitUncontrolled: ComponentStory<
+	typeof UnitControl
+> = ( args ) => {
+	return (
+		<div style={ { maxWidth: '100px' } }>
+			<UnitControl { ...args } />
+		</div>
+	);
+};
+WithSingleUnitUncontrolled.args = {
 	...Default.args,
 	units: CSS_UNITS.slice( 0, 1 ),
 };
