@@ -21,7 +21,7 @@ const fontSize = {
 			? [
 					{
 						selector: options?.selector,
-						key: 'font-size',
+						key: 'fontSize',
 						value: styleValue,
 					},
 			  ]

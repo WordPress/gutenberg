@@ -8,12 +8,12 @@ import { get } from 'lodash';
  */
 import type { Style, StyleOptions } from '../../types';
 
-const lineHeight = {
+const textDecoration = {
 	name: 'lineHeight',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const styleValue: string | undefined = get(
 			style,
-			[ 'typography', 'lineHeight' ],
+			[ 'typography', 'textDecoration' ],
 			null
 		);
 
@@ -21,7 +21,7 @@ const lineHeight = {
 			? [
 					{
 						selector: options?.selector,
-						key: 'lineHeight',
+						key: 'textDecoration',
 						value: styleValue,
 					},
 			  ]
@@ -29,4 +29,4 @@ const lineHeight = {
 	},
 };
 
-export default lineHeight;
+export default textDecoration;

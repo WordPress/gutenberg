@@ -159,6 +159,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
+		useEngine: true,
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
