@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences-persistence",
-	"version": "1.0.0",
+	"version": "1.0.0-prerelease",
 	"description": "Persistence utilities for `wordpress/preferences`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,7 +25,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
