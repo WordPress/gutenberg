@@ -1,3 +1,9 @@
+body.modal-open {
+	#wpwrap {
+		filter: blur($grid-unit);
+	}
+}
+
 // The scrim behind the modal window.
 .components-modal__screen-overlay {
 	position: fixed;
