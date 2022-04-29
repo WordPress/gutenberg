@@ -207,4 +207,81 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
+	 *
+	 * @dataProvider data_generate_font_size_preset_fixtures
+	 */
+	function test_gutenberg_get_typography_font_size_value( $font_size_preset, $expected_output ) {
+		$actual = gutenberg_get_typography_font_size_value( $font_size_preset );
+
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_generate_font_size_preset_fixtures() {
+		return array(
+			'default_return_value'                         => array(
+				'font_size_preset' => array(
+					'size' => '28px',
+				),
+				'expected_output'  => '28px',
+			),
+
+			'default_return_value_with_no_valid_fluid_values' => array(
+				'font_size_preset' => array(
+					'size'      => '28px',
+					'fluidSize' => array(),
+				),
+				'expected_output'  => '28px',
+			),
+
+			'default_return_size_with_invalid_fluid_units' => array(
+				'font_size_preset' => array(
+					'size'      => '10em',
+					'fluidSize' => array(
+						'min' => '20vw',
+						'max' => '50%',
+					),
+				),
+				'expected_output'  => '10em',
+			),
+
+			'default_return_fluid_clamp_value'             => array(
+				'font_size_preset' => array(
+					'size'      => '28px',
+					'fluidSize' => array(
+						'min' => '20px',
+						'max' => '50rem',
+					),
+				),
+				'expected_output'  => 'clamp(20px, calc(1.25rem + ((1vw - 7.68px) * 93.75)), 50rem)',
+			),
+
+			'default_return_fluid_min_value'               => array(
+				'font_size_preset' => array(
+					'size'      => '28px',
+					'fluidSize' => array(
+						'min' => '2.6rem',
+					),
+				),
+				'expected_output'  => 'max(2.6rem, calc(5.417 * 1vw))',
+			),
+
+			'default_return_fluid_max_value'               => array(
+				'font_size_preset' => array(
+					'size'      => '28px',
+					'fluidSize' => array(
+						'max' => '80px',
+					),
+				),
+				'expected_output'  => 'min(5rem, calc(5 * 1vw))',
+			),
+		);
+	}
 }
