@@ -50,6 +50,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 
 	return (
 		<ColorHexInputControl
+			__next36pxDefaultSize={ true }
 			prefix={
 				<Spacer
 					as={ Text }

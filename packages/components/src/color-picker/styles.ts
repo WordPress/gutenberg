@@ -15,7 +15,6 @@ import Button from '../button';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
-	Input,
 } from '../input-control/styles/input-control-styles';
 import InputControl from '../input-control';
 import CONFIG from '../utils/config-values';
@@ -41,14 +40,6 @@ export const RangeControl = styled( InnerRangeControl )`
 		margin-bottom: 0;
 	}
 `;
-
-// All inputs should be the same height so this should be changed at the component level.
-// That involves changing heights of multiple input types probably buttons too etc.
-// So until that is done we are already using the new height on the color picker so it matches the mockups.
-const inputHeightStyle = `
-&&& ${ Input } {
-	height: 40px;
-}`;
 
 // Make the Hue circle picker not go out of the bar.
 const interactiveHueStyles = `
@@ -107,8 +98,6 @@ export const ColorfulWrapper = styled.div`
 	${ StyledField } {
 		margin-bottom: 0;
 	}
-
-	${ inputHeightStyle }
 `;
 
 export const CopyButton = styled( Button )`

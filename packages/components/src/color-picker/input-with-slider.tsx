@@ -28,6 +28,7 @@ export const InputWithSlider = ( {
 	return (
 		<Spacer as={ HStack } spacing={ 4 }>
 			<NumberControlWrapper
+				__next36pxDefaultSize={ true }
 				min={ min }
 				max={ max }
 				label={ label }
