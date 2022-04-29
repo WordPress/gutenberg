@@ -95,7 +95,7 @@ export default function useSelectionObserver() {
 				// If selection is collapsed and we haven't used `shift+click`,
 				// end multi selection and disable the contentEditable wrapper.
 				// We have to check about `shift+click` case because elements
-				// that doesn't support selection might be involved, and we might
+				// that don't support text selection might be involved, and we might
 				// update the clientIds to multi-select blocks.
 				if ( selection.isCollapsed && ! event.shiftKey ) {
 					setContentEditableWrapper( node, false );
@@ -110,7 +110,7 @@ export default function useSelectionObserver() {
 				);
 				// If the selection has changed and we had pressed `shift+click`,
 				// we need to check if in an element that doesn't support
-				// selection has been clicked.
+				// text selection has been clicked.
 				if ( event.shiftKey ) {
 					const selectedClientId = getBlockSelectionStart();
 					const clickedClientId = getBlockClientId( event.target );
@@ -133,8 +133,6 @@ export default function useSelectionObserver() {
 					}
 				}
 
-				const isSingularSelection = startClientId === endClientId;
-
 				// If the selection did not involve a block, return.
 				if (
 					startClientId === undefined &&
@@ -144,6 +142,7 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					selectBlock( startClientId );
 				} else {
