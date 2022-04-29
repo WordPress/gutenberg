@@ -114,7 +114,7 @@ Render a user interface to select multiple users from a list.
 		this.setState( { users } );
 	} }
 	options={ [
-		{ value: null, label: 'Select a User', disabled: true },
+		{ value: '', label: 'Select a User', disabled: true },
 		{ value: 'a', label: 'User A' },
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
