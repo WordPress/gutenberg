@@ -77,7 +77,7 @@ export const withIcon = () => {
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
-			<PanelBody title={ bodyTitle } opened={ opened } icon={ icon } iconOpen={ close } iconClosed={ plus }>
+			<PanelBody title={ bodyTitle } opened={ opened } icon={ icon }>
 				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
 		</Panel>
@@ -91,7 +91,7 @@ export const CustomToggleIcons = () => {
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
-			<PanelBody title={ bodyTitle } opened={ opened } icon={ icon }>
+			<PanelBody title={ bodyTitle } opened={ opened } iconOpen={ iconOpen } iconClosed={ iconClosed }>
 				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
 		</Panel>
