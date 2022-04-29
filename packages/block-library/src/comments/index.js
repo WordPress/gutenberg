@@ -1,18 +1,13 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { postComments as icon } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
+import deprecated from './deprecated';
 import edit from './edit';
 import save from './save';
 
@@ -23,40 +18,5 @@ export const settings = {
 	icon,
 	edit,
 	save,
-	deprecated: [
-		{
-			attributes: {
-				tagName: {
-					type: 'string',
-					default: 'div',
-				},
-			},
-			apiVersion: 2,
-			supports: {
-				align: [ 'wide', 'full' ],
-				html: false,
-				color: {
-					gradients: true,
-					link: true,
-					__experimentalDefaultControls: {
-						background: true,
-						text: true,
-						link: true,
-					},
-				},
-			},
-			save( { attributes: { className, tagName: Tag } } ) {
-				return (
-					<Tag
-						className={ classnames(
-							'wp-block-comments-query-loop',
-							className
-						) }
-					>
-						<InnerBlocks.Content />
-					</Tag>
-				);
-			},
-		},
-	],
+	deprecated,
 };
