@@ -137,6 +137,10 @@ const ToolsPanelHeader = (
 		_x( '%s options', 'Button label to reveal tool panel options' ),
 		labelText
 	);
+	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
+		? // translators: 'control' as in a user interface control.
+		  __( 'All controls are currently hidden' )
+		: undefined;
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
@@ -148,7 +152,10 @@ const ToolsPanelHeader = (
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
-					toggleProps={ { isSmall: true } }
+					toggleProps={ {
+						isSmall: true,
+						describedBy: dropdownMenuDescriptionText,
+					} }
 				>
 					{ () => (
 						<>
