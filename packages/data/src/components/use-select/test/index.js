@@ -1025,4 +1025,73 @@ describe( 'useSelect', () => {
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
+
+	describe( 'usage without dependencies array', () => {
+		function registerStore( name, initial ) {
+			registry.registerStore( name, {
+				reducer: ( s = initial, a ) => ( a.type === 'inc' ? s + 1 : s ),
+				actions: { inc: () => ( { type: 'inc' } ) },
+				selectors: { get: ( s ) => s },
+			} );
+		}
+
+		it( 'does not memoize the callback when there are no deps', () => {
+			registerStore( 'store', 1 );
+
+			const Status = ( { multiple } ) => {
+				const count = useSelect(
+					( select ) => select( 'store' ).get() * multiple
+				);
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { multiple } ) => (
+				<RegistryProvider value={ registry }>
+					<Status multiple={ multiple } />
+				</RegistryProvider>
+			);
+
+			const rendered = render( <App multiple={ 1 } /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
+
+			rendered.rerender( <App multiple={ 2 } /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 2 );
+		} );
+
+		it( 'subscribes only stores used by the initial callback', () => {
+			registerStore( 'counter-1', 1 );
+			registerStore( 'counter-2', 10 );
+
+			const Status = ( { store } ) => {
+				const count = useSelect( ( select ) => select( store ).get() );
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { store } ) => (
+				<RegistryProvider value={ registry }>
+					<Status store={ store } />
+				</RegistryProvider>
+			);
+
+			// initial render with counter-1
+			const rendered = render( <App store="counter-1" /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
+
+			// update from counter-1
+			act( () => {
+				registry.dispatch( 'counter-1' ).inc();
+			} );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 2 );
+
+			// rerender with counter-2
+			rendered.rerender( <App store="counter-2" /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 10 );
+
+			// update from counter-2 is ignored because component is subcribed only to counter-1
+			act( () => {
+				registry.dispatch( 'counter-2' ).inc();
+			} );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 10 );
+		} );
+	} );
 } );
