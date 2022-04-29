@@ -35,4 +35,8 @@ $pagination-margin: 0.5em;
 	&.aligncenter {
 		justify-content: center;
 	}
+
+	.query-pagination-disabled {
+		visibility: hidden;
+	}
 }
