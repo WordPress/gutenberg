@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { backspace, isAndroid, isLocalEnvironment } from './helpers/utils';
+import { backspace, isAndroid } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for List block', () => {
 	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
@@ -17,7 +17,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
 
 		// Click List block on Android.
-		if ( isAndroid() && isLocalEnvironment() ) {
+		if ( isAndroid() ) {
 			await listBlockElement.click();
 		}
 
@@ -27,6 +27,9 @@ describe( 'Gutenberg Editor tests for List block', () => {
 			backspace,
 			false
 		);
+
+		// Wait for backspace click to be reflected before checking HTML
+		listBlockElement = await editorPage.getListBlock();
 
 		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
