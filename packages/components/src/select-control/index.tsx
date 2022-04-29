@@ -3,7 +3,7 @@
  */
 import { isEmpty, noop } from 'lodash';
 import classNames from 'classnames';
-import type { ChangeEvent, FocusEvent, ReactNode, ForwardedRef } from 'react';
+import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -17,39 +17,15 @@ import { Icon, chevronDown } from '@wordpress/icons';
  */
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
-import type { InputBaseProps, LabelPosition } from '../input-control/types';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
-import type { Size } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import type { SelectControlProps } from './types';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
 	const id = `inspector-select-control-${ instanceId }`;
 
 	return idProp || id;
-}
-
-export interface SelectControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
-	help?: string;
-	hideLabelFromVision?: boolean;
-	multiple?: boolean;
-	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-	onChange?: (
-		value: string | string[],
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => void;
-	options?: {
-		label: string;
-		value: string;
-		id?: string;
-		disabled?: boolean;
-	}[];
-	size?: Size;
-	value?: string | string[];
-	labelPosition?: LabelPosition;
-	children?: ReactNode;
 }
 
 function SelectControl(
