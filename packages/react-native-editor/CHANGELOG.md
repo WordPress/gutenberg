@@ -11,7 +11,12 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [*] Add featured image settings to Latest Posts block [#39257]
+## 1.75.0
+
+-   [*] [Latest Posts block] Add featured image settings [#39257]
+-   [*] Prevent incorrect notices displaying when switching between HTML-Visual mode quickly [#40415]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35326]
+-   [*] [iOS] Prevent gaps shown around floating toolbar when using external keyboard [#40266]
 
 ## 1.74.1
 
