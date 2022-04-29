@@ -75,13 +75,18 @@
 	margin-left: auto;
 }
 
-.block-library-cover__resize-container {
+.block-library-cover__resize-container,
+.block-library-cover__border-visualizer {
 	position: absolute !important;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	min-height: 50px;
+}
+
+.block-library-cover__border-visualizer {
+	z-index: z-index(".wp-block-cover.has-background-dim::before");
 }
 
 .block-library-cover__resize-container:not(.is-resizing) {
