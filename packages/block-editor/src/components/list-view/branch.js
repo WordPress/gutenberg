@@ -133,7 +133,7 @@ function ListViewBranch( props ) {
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 
-				const isExpanded = hasNestedBlocks
+				const shouldExpand = hasNestedBlocks
 					? expandedState[ clientId ] ?? expandNested
 					: undefined;
 
@@ -164,7 +164,7 @@ function ListViewBranch( props ) {
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
-								isExpanded={ isExpanded }
+								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 							/>
@@ -174,7 +174,7 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && isExpanded && ! isDragged && (
+						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
