@@ -127,6 +127,20 @@ An icon to be shown next to the `PanelBody` title.
 -   Type: `String`
 -   Required: No
 
+###### iconOpen
+
+An icon to be shown as the toggle button within the `PanelBody` title when open.
+
+-   Type: `String`
+-   Required: No
+
+###### iconClosed
+
+An icon to be shown as the toggle button within the `PanelBody` title when closed.
+
+-   Type: `String`
+-   Required: No
+
 ###### onToggle
 
 A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
