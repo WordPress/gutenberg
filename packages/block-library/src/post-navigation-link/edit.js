@@ -30,8 +30,8 @@ export default function PostNavigationLinkEdit( {
 
 	const arrowMap = {
 		none: '',
-		arrow: isNext ? '←' : '→',
-		chevron: isNext ? '«' : '»',
+		arrow: isNext ? '→' : '←',
+		chevron: isNext ? '»' : '«',
 	};
 
 	const displayArrow = arrowMap[ arrow ];
@@ -120,9 +120,9 @@ export default function PostNavigationLinkEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ isNext && displayArrow && (
+				{ ! isNext && displayArrow && (
 					<span
-						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
+						className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }
 					>
 						{ displayArrow }
 					</span>
@@ -145,9 +145,9 @@ export default function PostNavigationLinkEdit( {
 						{ __( 'An example title' ) }
 					</a>
 				) }
-				{ ! isNext && displayArrow && (
+				{ isNext && displayArrow && (
 					<span
-						className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }
+						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
 					>
 						{ displayArrow }
 					</span>

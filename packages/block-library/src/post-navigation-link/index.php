@@ -37,12 +37,12 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	$arrow_map = array(
 		'none'    => '',
 		'arrow'   => array(
-			'next'     => '←',
-			'previous' => '→',
+			'next'     => '→',
+			'previous' => '←',
 		),
 		'chevron' => array(
-			'next'     => '«',
-			'previous' => '»',
+			'next'     => '»',
+			'previous' => '«',
 		),
 	);
 
@@ -88,9 +88,9 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
 		if ( 'next' === $navigation_type ) {
-			$format = '<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '">' . $arrow . '</span> %link';
+			$format = '%link <span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '">' . $arrow . '</span>';
 		} else {
-			$format = '%link <span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '">' . $arrow . '</span>';
+			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '">' . $arrow . '</span> %link';
 		}
 	}
 
