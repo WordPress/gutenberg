@@ -153,7 +153,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	function test_rendering_comment_template_nested() {
 		$first_level_ids = self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
-			1,
+			2,
 			array(
 				'comment_parent'       => self::$comment_ids[0],
 				'comment_author'       => 'Test',
@@ -242,7 +242,7 @@ END
 
 		$this->assertSame(
 			str_replace( array( "\n", "\t" ), '', $block->render() ),
-			$expected
+			$expected,
 		);
 	}
 
