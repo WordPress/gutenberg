@@ -354,7 +354,7 @@ function LinkControlTransforms( { clientId, replace } ) {
 			return {
 				getBlock: _getBlock,
 				blockTransforms: getBlockTransformItems(
-					[ _getBlock( clientId ) ],
+					_getBlock( clientId ),
 					getBlockRootClientId( clientId )
 				),
 			};
