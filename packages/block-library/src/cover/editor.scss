@@ -2,6 +2,7 @@
 	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
 	.editor-styles-wrapper & {
 		box-sizing: border-box;
+		overflow: initial;
 	}
 
 	// Override default cover styles
