@@ -55,7 +55,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 			);
 		} else {
 			$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'query-pagination-disabled' ) );
-			$content             = sprintf(
+			$content            = sprintf(
 				'<span %1$s>%2$s</span>',
 				$wrapper_attributes,
 				$label

@@ -15,8 +15,8 @@
  * @return string Returns the previous posts link for the query.
  */
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$page_key           = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$page               = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Previous Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
@@ -44,7 +44,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 		);
 	} else {
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'query-pagination-disabled' ) );
-		$content             = sprintf(
+		$content            = sprintf(
 			'<span %1$s>%2$s</span>',
 			$wrapper_attributes,
 			$label
