@@ -26,7 +26,7 @@ body.modal-open {
 	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	border-radius: $radius-block-ui;
+	border-radius: $grid-unit;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
@@ -69,8 +69,7 @@ body.modal-open {
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
-	border-bottom: $border-width solid $gray-300;
-	padding: 0 $grid-unit-40;
+	padding: $grid-unit-20 $grid-unit-40 0;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -83,7 +82,7 @@ body.modal-open {
 	left: 0;
 
 	.components-modal__header-heading {
-		font-size: 1rem;
+		font-size: 1.2rem;
 		font-weight: 600;
 	}
 
@@ -119,7 +118,7 @@ body.modal-open {
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height;
+	margin-top: $header-height + $grid-unit-20;
 	padding: 0 $grid-unit-40 $grid-unit-30;
 	overflow: auto;
 

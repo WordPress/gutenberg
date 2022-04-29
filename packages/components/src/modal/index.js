@@ -24,7 +24,7 @@ import {
 } from '@wordpress/compose';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -168,7 +168,7 @@ function Modal( props, forwardedRef ) {
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }
-										icon={ closeSmall }
+										icon={ close }
 										label={
 											closeButtonLabel ||
 											__( 'Close dialog' )
