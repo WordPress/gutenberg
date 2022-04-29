@@ -39,6 +39,7 @@ const DefaultControlsGroup = ( {
 					return (
 						<MenuItem
 							key={ label }
+							role="menuitem"
 							icon={ reset }
 							label={ sprintf(
 								// translators: %s: The name of the control being reset e.g. "Padding".
@@ -48,7 +49,6 @@ const DefaultControlsGroup = ( {
 							onClick={ () => {
 								toggleItem( label );
 							} }
-							role={ 'menuitem' }
 						>
 							{ label }
 						</MenuItem>
@@ -58,10 +58,10 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
+						role="menuitemcheckbox"
 						icon={ check }
 						isSelected
 						aria-disabled
-						role={ 'menuitemcheckbox' }
 					>
 						{ label }
 					</MenuItem>
