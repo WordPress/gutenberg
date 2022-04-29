@@ -51,6 +51,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
+	__experimentalUseBorderProps as useBorderProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -651,6 +652,7 @@ function CoverEdit( {
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
+	const borderProps = useBorderProps( attributes );
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
 	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
@@ -755,12 +757,12 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-
 				<span
 					aria-hidden="true"
 					className={ classnames(
 						'wp-block-cover__background',
 						dimRatioToClass( dimRatio ),
+						borderProps.className,
 						{
 							[ overlayColor.class ]: overlayColor.class,
 							'has-background-dim': dimRatio !== undefined,
@@ -773,7 +775,11 @@ function CoverEdit( {
 							[ gradientClass ]: gradientClass,
 						}
 					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
+					style={ {
+						backgroundImage: gradientValue,
+						...bgStyle,
+						...borderProps.style,
+					} }
 				/>
 
 				{ url && isImageBackground && isImgElement && (
