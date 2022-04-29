@@ -6,6 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { check, reset, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 
@@ -48,6 +49,14 @@ const DefaultControlsGroup = ( {
 							) }
 							onClick={ () => {
 								toggleItem( label );
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s reset to default' ),
+										label
+									),
+									'assertive'
+								);
 							} }
 						>
 							{ label }
@@ -101,6 +110,25 @@ const OptionalControlsGroup = ( {
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
+							if ( isSelected ) {
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s hidden and reset to default' ),
+										label
+									),
+									'assertive'
+								);
+							} else {
+								speak(
+									sprintf(
+										// translators: %s: The name of the control being reset e.g. "Padding".
+										__( '%s is now visible' ),
+										label
+									),
+									'assertive'
+								);
+							}
 							toggleItem( label );
 						} }
 						role="menuitemcheckbox"
