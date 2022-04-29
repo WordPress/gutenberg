@@ -25,7 +25,6 @@ export default function BlockContentOverlay( {
 	const [ isHovered, setIsHovered ] = useState( false );
 
 	const {
-		canEdit,
 		isParentSelected,
 		hasChildSelected,
 		isDraggingBlocks,
@@ -37,10 +36,8 @@ export default function BlockContentOverlay( {
 				hasSelectedInnerBlock,
 				isDraggingBlocks: _isDraggingBlocks,
 				isBlockHighlighted,
-				canEditBlock,
 			} = select( blockEditorStore );
 			return {
-				canEdit: canEditBlock( clientId ),
 				isParentSelected: isBlockSelected( clientId ),
 				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
 				isDraggingBlocks: _isDraggingBlocks(),
@@ -62,12 +59,6 @@ export default function BlockContentOverlay( {
 	);
 
 	useEffect( () => {
-		// The overlay is always active when editing is locked.
-		if ( ! canEdit ) {
-			setIsOverlayActive( true );
-			return;
-		}
-
 		// Reenable when blocks are not in use.
 		if ( ! isParentSelected && ! hasChildSelected && ! isOverlayActive ) {
 			setIsOverlayActive( true );
@@ -84,13 +75,7 @@ export default function BlockContentOverlay( {
 		if ( hasChildSelected && isOverlayActive ) {
 			setIsOverlayActive( false );
 		}
-	}, [
-		isParentSelected,
-		hasChildSelected,
-		isOverlayActive,
-		isHovered,
-		canEdit,
-	] );
+	}, [ isParentSelected, hasChildSelected, isOverlayActive, isHovered ] );
 
 	// Disabled because the overlay div doesn't actually have a role or functionality
 	// as far as the a11y is concerned. We're just catching the first click so that
@@ -103,9 +88,7 @@ export default function BlockContentOverlay( {
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
 			onMouseUp={
-				isOverlayActive && canEdit
-					? () => setIsOverlayActive( false )
-					: undefined
+				isOverlayActive ? () => setIsOverlayActive( false ) : undefined
 			}
 		>
 			{ wrapperProps?.children }
