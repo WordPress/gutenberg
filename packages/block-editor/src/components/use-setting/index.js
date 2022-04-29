@@ -132,7 +132,11 @@ export default function useSetting( path ) {
 					blockEditorStore
 				).getBlockName( candidateClientId );
 				if (
-					hasBlockSupport( candidateBlockName, 'settings', false )
+					hasBlockSupport(
+						candidateBlockName,
+						'__experimentalSettings',
+						false
+					)
 				) {
 					const candidateAtts = select(
 						blockEditorStore

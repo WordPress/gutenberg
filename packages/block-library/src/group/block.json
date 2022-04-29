@@ -18,7 +18,7 @@
 		}
 	},
 	"supports": {
-		"settings": true,
+		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,

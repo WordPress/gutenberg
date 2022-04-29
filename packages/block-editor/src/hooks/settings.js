@@ -5,7 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 
 const hasSettingsSupport = ( blockType ) =>
-	hasBlockSupport( blockType, 'settings', false );
+	hasBlockSupport( blockType, '__experimentalSettings', false );
 
 function addAttribute( settings ) {
 	if ( ! hasSettingsSupport( settings ) ) {

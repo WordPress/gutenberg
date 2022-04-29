@@ -25,7 +25,7 @@ describe( 'with settings', () => {
 			const settings = addAttribute( {
 				...blockSettings,
 				supports: {
-					settings: false,
+					__experimentalSettings: false,
 				},
 			} );
 
@@ -36,7 +36,7 @@ describe( 'with settings', () => {
 			const settings = addAttribute( {
 				...blockSettings,
 				supports: {
-					settings: true,
+					__experimentalSettings: true,
 				},
 			} );
 
