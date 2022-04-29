@@ -31,7 +31,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// There is a delay in Sauce Labs when a key is sent
 		// There isn't an element to check as it's being typed into an element that already exists, workaround is to add this wait until there's a better solution
-		if ( isAndroid() && !isLocalEnvironment() ) {
+		if ( isAndroid() && ! isLocalEnvironment() ) {
 			await editorPage.driver.sleep( 1500 );
 		}
 
