@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { COLORS, rtl } from '../../utils';
-import type { Size } from '../types';
+import type { Size } from '../../input-control/types';
 
 interface SelectProps {
 	disabled?: boolean;

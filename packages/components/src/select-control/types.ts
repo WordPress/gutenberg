@@ -6,20 +6,21 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { InputBaseProps, LabelPosition } from '../input-control/types';
-
-export type Size = 'default' | 'small' | '__unstable-large';
+import type { InputBaseProps } from '../input-control/types';
+import type { BaseControlProps } from '../base-control/types';
 
 export interface SelectControlProps
-	extends Pick< InputBaseProps, 'label' | 'prefix' | 'suffix' > {
-	/**
-	 * If this property is added, a help text will be generated using help property as the content.
-	 */
-	help?: string;
-	/**
-	 * If true, the label will only be visible to screen readers.
-	 */
-	hideLabelFromVision?: boolean;
+	extends Pick<
+			InputBaseProps,
+			| 'disabled'
+			| 'hideLabelFromVision'
+			| 'label'
+			| 'labelPosition'
+			| 'prefix'
+			| 'size'
+			| 'suffix'
+		>,
+		Pick< BaseControlProps, 'help' > {
 	/**
 	 * If this property is added, multiple values can be selected. The value passed should be an array.
 	 *
@@ -56,14 +57,7 @@ export interface SelectControlProps
 		 */
 		disabled?: boolean;
 	}[];
-	size?: Size;
 	value?: string | string[];
-	/**
-	 * The position of the label.
-	 *
-	 * @default 'top'
-	 */
-	labelPosition?: LabelPosition;
 	/**
 	 * As an alternative to the `options` prop, `optgroup`s and `options` can be
 	 * passed in as `children` for more customizability.
