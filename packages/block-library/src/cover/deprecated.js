@@ -24,11 +24,14 @@ import { __ } from '@wordpress/i18n';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	getPositionClassName,
 	isContentPositionCenter,
 	dimRatioToClass,
 } from './shared';
+
+function backgroundImageStyles( url ) {
+	return url ? { backgroundImage: `url(${ url })` } : {};
+}
 
 /**
  * Original function to determine the background opacity classname
