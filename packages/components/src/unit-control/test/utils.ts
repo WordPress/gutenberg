@@ -52,9 +52,9 @@ describe( 'UnitControl utils', () => {
 			const units = useCustomUnits( {
 				availableUnits: [ '%', 'px' ],
 				defaultValues: {
-					// @ts-ignore (passing a string instead of a number is the point of the test)
+					// @ts-expect-error (passing a string instead of a number is the point of the test)
 					'%': '14',
-					// @ts-ignore (passing a string instead of a number is the point of the test)
+					// @ts-expect-error (passing a string instead of a number is the point of the test)
 					px: 'not a valid numeric quantity',
 				},
 				units: cssUnits,
@@ -110,7 +110,7 @@ describe( 'UnitControl utils', () => {
 			const availableUnits = false;
 
 			expect(
-				// @ts-ignore (passing `false` instead of a valid array of units is the point of the test)
+				// @ts-expect-error (passing `false` instead of a valid array of units is the point of the test)
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [] );
 		} );
