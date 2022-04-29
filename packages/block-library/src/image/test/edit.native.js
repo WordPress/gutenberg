@@ -87,7 +87,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -113,7 +113,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -139,7 +139,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -172,7 +172,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -212,7 +212,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -239,7 +239,7 @@ describe( 'Image Block', () => {
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );
@@ -270,7 +270,7 @@ describe( 'Image Block', () => {
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );
