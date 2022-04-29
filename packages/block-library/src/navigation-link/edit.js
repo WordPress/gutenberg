@@ -452,7 +452,7 @@ export default function NavigationLinkEdit( {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
-		hasDescendants,
+		hasChildren,
 		userCanCreatePages,
 		userCanCreatePosts,
 	} = useSelect(
@@ -463,11 +463,8 @@ export default function NavigationLinkEdit( {
 				getBlockName,
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
-				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
-
-			const selectedBlockId = getSelectedBlockClientId();
 
 			return {
 				innerBlocks: getBlocks( clientId ),
@@ -483,14 +480,7 @@ export default function NavigationLinkEdit( {
 					clientId,
 					true
 				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
-				hasDescendants: !! getBlockCount( clientId ),
-				selectedBlockHasDescendants: !! getBlockCount(
-					selectedBlockId
-				),
+				hasChildren: !! getBlockCount( clientId ),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -534,7 +524,7 @@ export default function NavigationLinkEdit( {
 			setIsLinkOpen( true );
 		}
 		// If block has inner blocks, transform to Submenu.
-		if ( hasDescendants ) {
+		if ( hasChildren ) {
 			transformToSubmenu();
 		}
 	}, [] );
@@ -644,7 +634,7 @@ export default function NavigationLinkEdit( {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
-			'has-child': hasDescendants,
+			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,

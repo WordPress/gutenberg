@@ -309,8 +309,8 @@ export default function NavigationSubmenuEdit( {
 		isTopLevelItem,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
-		hasDescendants,
-		selectedBlockHasDescendants,
+		hasChildren,
+		selectedBlockHasChildren,
 		userCanCreatePages,
 		userCanCreatePosts,
 		onlyDescendantIsEmptyLink,
@@ -329,13 +329,13 @@ export default function NavigationSubmenuEdit( {
 
 			const selectedBlockId = getSelectedBlockClientId();
 
-			const selectedBlockDescendants = getBlockOrder( selectedBlockId );
+			const selectedBlockChildren = getBlockOrder( selectedBlockId );
 
 			// Check for a single descendant in the submenu. If that block
 			// is a link block in a "placeholder" state with no label then
 			// we can consider as an "empty" link.
-			if ( selectedBlockDescendants?.length === 1 ) {
-				const singleBlock = getBlock( selectedBlockDescendants[ 0 ] );
+			if ( selectedBlockChildren?.length === 1 ) {
+				const singleBlock = getBlock( selectedBlockChildren[ 0 ] );
 
 				_onlyDescendantIsEmptyLink =
 					singleBlock?.name === 'core/navigation-link' &&
@@ -356,8 +356,8 @@ export default function NavigationSubmenuEdit( {
 					clientId,
 					false
 				),
-				hasDescendants: !! getBlockCount( clientId ),
-				selectedBlockHasDescendants: !! selectedBlockDescendants?.length,
+				hasChildren: !! getBlockCount( clientId ),
+				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -477,7 +477,7 @@ export default function NavigationSubmenuEdit( {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
-			'has-child': hasDescendants,
+			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
@@ -534,9 +534,9 @@ export default function NavigationSubmenuEdit( {
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
+					! selectedBlockHasChildren ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasDescendants
+				hasChildren
 					? InnerBlocks.ButtonBlockAppender
 					: false,
 		}
@@ -550,7 +550,7 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	const canConvertToLink =
-		! selectedBlockHasDescendants || onlyDescendantIsEmptyLink;
+		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
 	return (
 		<Fragment>
