@@ -170,8 +170,7 @@ const ToolsPanelHeader = (
 		labelText
 	);
 	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
-		? // translators: 'control' as in a user interface control.
-		  __( 'All controls are currently hidden' )
+		? __( 'All options are currently hidden' )
 		: undefined;
 
 	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
