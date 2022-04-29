@@ -53,6 +53,7 @@ figure.wp-block-gallery.has-nested-images {
 			text-align: center;
 			width: 100%;
 			box-sizing: border-box;
+			pointer-events: none;
 
 			img {
 				display: inline;
