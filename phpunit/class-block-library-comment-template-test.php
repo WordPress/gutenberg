@@ -45,6 +45,33 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_build_comment_query_vars_from_block_with_context() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+
+		$this->assertEquals(
+			array(
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
+				'number'        => 5,
+				'paged'         => 1,
+			),
+			build_comment_query_vars_from_block( $block )
+		);
+	}
+
 	function test_build_comment_query_vars_from_block_with_context_no_pagination() {
 		update_option( 'page_comments', false );
 		$parsed_blocks = parse_blocks(
@@ -59,7 +86,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -67,36 +93,10 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'no_found_rows' => false,
 				'post_id'       => self::$custom_post->ID,
 				'hierarchical'  => 'threaded',
-			)
+			),
+			build_comment_query_vars_from_block( $block )
 		);
 		update_option( 'page_comments', true );
-	}
-
-	function test_build_comment_query_vars_from_block_with_context() {
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
-		);
-
-		$block = new WP_Block(
-			$parsed_blocks[0],
-			array(
-				'postId' => self::$custom_post->ID,
-			)
-		);
-
-		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
-			array(
-				'orderby'       => 'comment_date_gmt',
-				'order'         => 'ASC',
-				'status'        => 'approve',
-				'no_found_rows' => false,
-				'post_id'       => self::$custom_post->ID,
-				'hierarchical'  => 'threaded',
-				'number'        => 5,
-				'paged'         => 1,
-			)
-		);
 	}
 
 	function test_build_comment_query_vars_from_block_no_context() {
@@ -107,7 +107,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		$block = new WP_Block( $parsed_blocks[0] );
 
 		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -116,8 +115,46 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'hierarchical'  => 'threaded',
 				'number'        => 5,
 				'paged'         => 1,
+			),
+			build_comment_query_vars_from_block( $block )
+		);
+	}
+
+	/**
+	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
+	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
+	 * In order to do that, it should exist a query var 'cpage' set with the $comment_args['paged'] value.
+	 */
+	function test_build_comment_query_vars_from_block_sets_cpage_var() {
+
+		// This could be any number, we set a fixed one instead of a random for better performance.
+		$comment_query_max_num_pages = 5;
+		// We substract 1 because we created 1 comment at the beginning.
+		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
+		self::factory()->comment->create_post_comments(
+			self::$custom_post->ID,
+			$post_comments_numbers,
+			array(
+				'comment_author'       => 'Test',
+				'comment_author_email' => 'test@example.org',
+				'comment_author_url'   => 'http://example.com/author-url/',
+				'comment_content'      => 'Hello world',
 			)
 		);
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block  = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'           => self::$custom_post->ID,
+				'comments/inherit' => true,
+			)
+		);
+		$actual = build_comment_query_vars_from_block( $block );
+		$this->assertSame( $comment_query_max_num_pages, $actual['paged'] );
+		$this->assertSame( $comment_query_max_num_pages, get_query_var( 'cpage' ) );
 	}
 
 	/**
@@ -135,8 +172,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
-		// Here we use the function prefixed with 'gutenberg_*' because it's added
-		// in the build step.
 		$this->assertSame(
 			str_replace( array( "\n", "\t" ), '', '<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-even depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>' ),
 			str_replace( array( "\n", "\t" ), '', $block->render() )
@@ -242,46 +277,9 @@ END
 		);
 
 		$this->assertSame(
-			str_replace( array( "\n", "\t" ), '', $block->render() ),
-			$expected
+			$expected,
+			str_replace( array( "\n", "\t" ), '', $block->render() )
 		);
-	}
-
-	/**
-	 * Test that both "Older Comments" and "Newer Comments" are displayed in the correct order
-	 * inside the Comment Query Loop when we enable pagination on Discussion Settings.
-	 * In order to do that, it should exist a query var 'cpage' set with the $comment_args['paged'] value.
-	 */
-	function test_build_comment_query_vars_from_block_sets_cpage_var() {
-
-		// This could be any number, we set a fixed one instead of a random for better performance.
-		$comment_query_max_num_pages = 5;
-		// We substract 1 because we created 1 comment at the beggining.
-		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
-		self::factory()->comment->create_post_comments(
-			self::$custom_post->ID,
-			$post_comments_numbers,
-			array(
-				'comment_author'       => 'Test',
-				'comment_author_email' => 'test@example.org',
-				'comment_author_url'   => 'http://example.com/author-url/',
-				'comment_content'      => 'Hello world',
-			)
-		);
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
-		);
-
-		$block  = new WP_Block(
-			$parsed_blocks[0],
-			array(
-				'postId'           => self::$custom_post->ID,
-				'comments/inherit' => true,
-			)
-		);
-		$actual = build_comment_query_vars_from_block( $block );
-		$this->assertEquals( $actual['paged'], $comment_query_max_num_pages );
-		$this->assertEquals( get_query_var( 'cpage' ), $comment_query_max_num_pages );
 	}
 
 	/**
@@ -309,8 +307,6 @@ END
 
 		$expected_content = "<p>Paragraph One</p>\n<p>P2L1<br />\nP2L2</p>\n<p><a href=\"https://example.com/\" rel=\"nofollow ugc\">https://example.com/</a></p>\n";
 
-		// Here we use the function prefixed with 'gutenberg_*' because it's added
-		// in the build step.
 		$this->assertSame(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-content">' . $expected_content . '</div></li></ol>',
 			$block->render()
@@ -391,8 +387,6 @@ END
 
 		add_filter( 'wp_get_current_commenter', $commenter_filter );
 
-		// Here we use the function prefixed with 'gutenberg_*' because it's added
-		// in the build step.
 		$this->assertEquals(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li><li id="comment-' . $unapproved_comment[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-author-name">Visitor</div><div class="wp-block-comment-content"><p><em class="comment-awaiting-moderation">Your comment is awaiting moderation.</em></p>Hi there! My comment needs moderation.</div></li></ol>',
 			str_replace( array( "\n", "\t" ), '', $block->render() )
