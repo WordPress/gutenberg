@@ -70,7 +70,8 @@
 	// Keep .wp-block-cover__gradient-background for v8 deprecation.
 	&.has-background-dim:not(.has-background-gradient)::before,
 	.wp-block-cover__background,
-	.wp-block-cover__gradient-background {
+	.wp-block-cover__gradient-background,
+	.wp-block-cover__background-editor-border {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -78,6 +79,10 @@
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
+	}
+
+	.wp-block-cover__background-editor-border {
+		opacity: 1;
 	}
 
 	// The following styles are needed to support legacy blocks added prior to the update

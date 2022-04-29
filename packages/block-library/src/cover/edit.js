@@ -739,7 +739,10 @@ function CoverEdit( {
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
+				style={ {
+					...style,
+					...blockProps.style,
+				} }
 				data-url={ url }
 			>
 				<ResizableCover
@@ -756,6 +759,13 @@ function CoverEdit( {
 						setAttributes( { minHeight: newMinHeight } );
 					} }
 					showHandle={ isSelected }
+				/>
+				<span
+					aria-hidden="true"
+					className={ 'wp-block-cover__background-editor-border' }
+					style={ {
+						...borderProps.style,
+					} }
 				/>
 				<span
 					aria-hidden="true"
@@ -788,7 +798,7 @@ function CoverEdit( {
 						className="wp-block-cover__image-background"
 						alt={ alt }
 						src={ url }
-						style={ mediaStyle }
+						style={ { ...mediaStyle, ...borderProps.style } }
 					/>
 				) }
 				{ url && isVideoBackground && (
@@ -799,7 +809,7 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
-						style={ mediaStyle }
+						style={ { ...mediaStyle, ...borderProps.style } }
 					/>
 				) }
 				{ isUploadingMedia && <Spinner /> }
