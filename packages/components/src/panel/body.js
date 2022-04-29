@@ -24,6 +24,8 @@ export function PanelBody(
 		children,
 		className,
 		icon,
+		iconOpen = chevronUp,
+		iconClosed = chevronDown,
 		initialOpen,
 		onToggle = noop,
 		opened,
@@ -79,6 +81,8 @@ export function PanelBody(
 		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
 			<PanelBodyTitle
 				icon={ icon }
+				iconOpen={ iconOpen }
+				iconClosed={ iconClosed }
 				isOpened={ isOpened }
 				onClick={ handleOnToggle }
 				title={ title }
@@ -92,7 +96,7 @@ export function PanelBody(
 }
 
 const PanelBodyTitle = forwardRef(
-	( { isOpened, icon, title, ...props }, ref ) => {
+	( { isOpened, icon, title, iconOpen, iconClosed, ...props }, ref ) => {
 		if ( ! title ) return null;
 
 		return (
@@ -110,7 +114,7 @@ const PanelBodyTitle = forwardRef(
 					<span aria-hidden="true">
 						<Icon
 							className="components-panel__arrow"
-							icon={ isOpened ? chevronUp : chevronDown }
+							icon={ isOpened ? iconOpen : iconClosed }
 						/>
 					</span>
 					{ title }
