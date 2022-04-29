@@ -110,7 +110,6 @@ export default function ListViewDropIndicator( {
 
 	return (
 		<Popover
-			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }

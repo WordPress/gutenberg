@@ -5,7 +5,6 @@ exports[`DotTip should render correctly 1`] = `
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
-  noArrow={true}
   onClick={[Function]}
   onFocusOutside={[Function]}
   position="middle right"

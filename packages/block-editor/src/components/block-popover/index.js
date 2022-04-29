@@ -59,9 +59,8 @@ export default function BlockPopover( {
 	return (
 		<Popover
 			ref={ popoverScrollRef }
-			noArrow
 			animate={ false }
-			position="top right left"
+			placement="top-start"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			__unstableStickyBoundaryElement={
@@ -70,13 +69,12 @@ export default function BlockPopover( {
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
-			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
 			// Used to safeguard sticky position behavior against cases where it would permanently
 			// obscure specific sections of a block.
 			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
-			__unstableForcePosition={ __unstableCoverTarget }
+			__unstableForcePosition
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',

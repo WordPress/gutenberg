@@ -64,7 +64,6 @@ const addPopoverToGrandchildren = ( {
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
-				noArrow={ true }
 			>
 				{ text }
 				<Shortcut

@@ -155,7 +155,6 @@ function BlockPopoverInbetween( {
 	return (
 		<Popover
 			ref={ popoverScrollRef }
-			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
