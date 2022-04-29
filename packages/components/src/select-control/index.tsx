@@ -28,7 +28,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-function SelectControl(
+function UnforwardedSelectControl(
 	{
 		className,
 		disabled = false,
@@ -141,6 +141,31 @@ function SelectControl(
 	/* eslint-enable jsx-a11y/no-onchange */
 }
 
-const ForwardedComponent = forwardRef( SelectControl );
+/**
+ * `SelectControl` allows users to select from a single or multiple option menu.
+ * It functions as a wrapper around the browser's native `<select>` element.
+ *
+ * @example
+ * import { SelectControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MySelectControl = () => {
+ *   const [ size, setSize ] = useState( '50%' );
+ *
+ *   return (
+ *     <SelectControl
+ *       label="Size"
+ *       value={ size }
+ *       options={ [
+ *         { label: 'Big', value: '100%' },
+ *         { label: 'Medium', value: '50%' },
+ *         { label: 'Small', value: '25%' },
+ *       ] }
+ *       onChange={ setSize }
+ *     />
+ *   );
+ * };
+ */
+export const SelectControl = forwardRef( UnforwardedSelectControl );
 
-export default ForwardedComponent;
+export default SelectControl;
