@@ -257,12 +257,12 @@
 							"description": "Enables fluid typography and allows users to set global fluid typography parameters.",
 							"type": "object",
 							"properties": {
-								"maxViewportWidth": {
-									"description": "Allow users to set custom a max viewport width.",
+								"max": {
+									"description": "Allow users to set custom a max viewport width in px, rem or em.",
 									"type": "string"
 								},
-								"minViewportWidth": {
-									"description": "Allow users to set custom a min viewport width.",
+								"min": {
+									"description": "Allow users to set custom a min viewport width in px, rem or em.",
 									"type": "string"
 								}
 							}
@@ -309,6 +309,20 @@
 									"size": {
 										"description": "CSS font-size value, including units.",
 										"type": "string"
+									},
+									"fluidSize": {
+										"type": "object",
+										"properties": {
+											"min": {
+												"description": "A min font size for fluid font size calculations in px, rem or em.",
+												"type": "string"
+											},
+											"max": {
+												"description": "A max font size for fluid font size calculations in px, rem or em.",
+												"type": "string"
+											}
+										},
+										"additionalProperties": false
 									}
 								},
 								"additionalProperties": false

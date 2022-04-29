@@ -122,7 +122,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	function test_letter_spacing_with_individual_skipped_serialization_block_supports() {
-		$this->test_block_name = 'test/letter-spacing-with-individua-skipped-serialization-block-supports';
+		$this->test_block_name = 'test/letter-spacing-with-individual-skipped-serialization-block-supports';
 		register_block_type(
 			$this->test_block_name,
 			array(
