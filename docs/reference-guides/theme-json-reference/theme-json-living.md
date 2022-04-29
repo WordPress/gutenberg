@@ -101,7 +101,7 @@ Settings related to typography.
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | name, size, slug |
+| fontSizes | array |  | fluidSize, name, size, slug |
 | fontFamilies | array |  | fontFamily, name, slug |
 
 ---

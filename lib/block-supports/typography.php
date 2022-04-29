@@ -220,7 +220,9 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 }
 
 /**
- * Checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ *
+ * @access private
  *
  * @param string $raw_value            Raw size value from theme.json.
  * @param string $coerce_to            Coerce the value to rem or px. Default `'rem'`.
@@ -229,13 +231,17 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  * @return array                       An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = '', $root_font_size_value = 16, $acceptable_units = array( 'rem', 'px', 'em' ) ) {
+	if ( empty( $raw_value ) ) {
+		return null;
+	}
+
 	$acceptable_units_group = implode( '|', $acceptable_units );
 	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
 
 	// We need a number value and a px or rem unit.
-	if ( ! isset( $matches[1] ) && isset( $matches[2] ) ) {
+	if ( ! isset( $matches[1] ) || ! isset( $matches[2] ) ) {
 		return null;
 	}
 
@@ -260,28 +266,36 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = '', $
 }
 
 /**
- * Internal implementation of clamp() based on available min/max viewport width, and min/max font sizes..
+ * Internal implementation of clamp() based on available min/max viewport width, and min/max font sizes.
+ *
+ * @access private
  *
  * @param array  $fluid_settings        Possible values: array( 'minViewportWidth' => string, 'maxViewportWidth' => string ).
  * @param string $minimum_font_size_raw Minimumn font size for any clamp() calculation.
  * @param string $maximum_font_size_raw Maximumn font size for any clamp() calculation.
- * @return string                        A font-size value using clamp().
+ * @return string|null A font-size value using clamp().
  */
 function gutenberg_get_computed_fluid_typography_value( $fluid_settings, $minimum_font_size_raw, $maximum_font_size_raw ) {
 	// Min and max viewport widths.
 	$default_maximum_viewport_width = '1600px';
 	$default_minimum_viewport_width = '768px';
-    $maximum_viewport_width_raw     = isset( $fluid_settings['max'] ) ? $fluid_settings['max'] : $default_maximum_viewport_width;
+	$maximum_viewport_width_raw     = isset( $fluid_settings['max'] ) ? $fluid_settings['max'] : $default_maximum_viewport_width;
 	$minimum_viewport_width_raw     = isset( $fluid_settings['min'] ) ? $fluid_settings['min'] : $default_minimum_viewport_width;
 
-	// If min, max and viewport sizes are there, do `clamp()`
-    if ( $minimum_font_size_raw && $maximum_font_size_raw ) {
+	// If min, max and viewport sizes are there, do `clamp()`.
+	if ( $minimum_font_size_raw && $maximum_font_size_raw ) {
 		$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
 		// We get a 'preferred' unit to keep units across the calc as consistent as possible.
 		$font_size_unit = $minimum_font_size['unit'];
 
 		// Grab the maximum font size and normalize it in order to use the value for calculations.
 		$maximum_font_size = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $font_size_unit );
+
+		// Protect against unsupported units.
+		if ( ! $maximum_font_size || ! $minimum_font_size ) {
+			return null;
+		}
+
 		// Use rem for accessible fluid target font scaling.
 		$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
 
@@ -297,15 +311,22 @@ function gutenberg_get_computed_fluid_typography_value( $fluid_settings, $minimu
 		$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
 
 		return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
-    }
+	}
 
 	if ( $minimum_font_size_raw ) {
 		// Coerce units for ratio calculation.
 		$minimum_font_size      = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
 		$minimum_viewport_width = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, 'rem' );
-		// Ratio of mmin_font_size / min_viewport
-		$min_ratio              = ( $minimum_font_size['value'] / $minimum_viewport_width['value'] ) * 100;
-		$min_size               = implode( '', $minimum_font_size );
+
+		// Protect against unsupported units.
+		if ( ! $minimum_font_size || ! $minimum_viewport_width ) {
+			return null;
+		}
+
+		// Ratio of min_font_size / min_viewport.
+		$min_ratio = round( ( $minimum_font_size['value'] / $minimum_viewport_width['value'] ) * 100, 3 );
+		$min_size  = implode( '', $minimum_font_size );
+
 		// The font-size will be set at $min_size, unless the computed value of calc($min_ratio * 1vw) is greater than that of $min_size,
 		// in which case it will be set to that value instead.
 		return "max($min_size, calc($min_ratio * 1vw))";
@@ -315,17 +336,25 @@ function gutenberg_get_computed_fluid_typography_value( $fluid_settings, $minimu
 		// Coerce units for ratio calculation.
 		$maximum_font_size      = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, 'rem' );
 		$maximum_viewport_width = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, 'rem' );
+
+		// Protect against unsupported units.
+		if ( ! $maximum_viewport_width || ! $maximum_font_size ) {
+			return null;
+		}
+
 		// Ratio of max_font_size / max_viewport.
-		$max_ratio              = ( $maximum_font_size['value'] / $maximum_viewport_width['value'] ) * 100;
-		$max_size               = implode( '', $maximum_font_size );
+		$max_ratio = round( ( $maximum_font_size['value'] / $maximum_viewport_width['value'] ) * 100, 3 );
+		$max_size  = implode( '', $maximum_font_size );
+
 		// The font-size will be set at $max_size, unless the result of calc($max_ratio * 1vw) is less than $max_size,
-		//  in which case it will be set to that value instead.
+		// in which case it will be set to that value instead.
 		return "min($max_size, calc($max_ratio * 1vw))";
 	}
 }
 
 /**
- * Returns a font-size value based on a given font-size preset. If typography.fluid is enabled it will try to return a fluid string.
+ * Returns a font-size value based on a given font-size preset.
+ * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
  * @param array $preset  fontSizes preset value as seen in theme.json.
  * @return string        Font-size value.
@@ -334,7 +363,6 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluidSize'] ) ? $preset['fluidSize'] : null;
 
-	//
 	if ( ! $fluid_font_size_settings ) {
 		return $preset['size'];
 	}
@@ -346,27 +374,12 @@ function gutenberg_get_typography_font_size_value( $preset ) {
 	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
 	$fluid_settings      = isset( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : null;
 
-	// Gutenberg's internal implementation.
-
-	/*
-		"fluid": {
-			"max": "1600px",
-			"min": "768px"
-		},
-		"fontSizes": [
-			{
-				"size": "5.25rem",
-				"fluidSize": {
-					"min": "5.25rem",
-					"max": "9rem"
-				},
-				"slug": "colossal",
-				"name": "Colossal"
-			}
-	*/
-	// Expect all required variables except formula to trigger internal clamp() implementation based on min/max viewport width.
 	if ( $minimum_font_size_raw || $maximum_font_size_raw ) {
-		return gutenberg_get_computed_fluid_typography_value( $fluid_settings, $minimum_font_size_raw, $maximum_font_size_raw );
+		$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value( $fluid_settings, $minimum_font_size_raw, $maximum_font_size_raw );
+
+		if ( ! empty( $fluid_font_size_value ) ) {
+			return $fluid_font_size_value;
+		}
 	}
 
 	return $preset['size'];
