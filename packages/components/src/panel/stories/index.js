@@ -87,7 +87,8 @@ export const withIcon = () => {
 export const CustomToggleIcons = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
-	const icon = boolean( 'Icon', true ) ? wordpress : undefined;
+	const iconOpen = boolean( 'Toggle Open Icon', true ) ? closeSmall : undefined;
+	const iconClosed = boolean( 'Toggle Closed Icon', true ) ? plus : undefined;
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
