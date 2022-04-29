@@ -13,7 +13,7 @@ import PanelBody from '../body';
 /**
  * WordPress dependencies
  */
-import { wordpress, plus, close } from '@wordpress/icons';
+import { wordpress, plus, closeSmall } from '@wordpress/icons';
 
 export default {
 	title: 'Components/Panel',
@@ -87,12 +87,17 @@ export const withIcon = () => {
 export const CustomToggleIcons = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
-	const iconOpen = boolean( 'Toggle Open Icon', true ) ? closeSmall : undefined;
-	const iconClosed = boolean( 'Toggle Closed Icon', true ) ? plus : undefined;
+	const iconOpen = boolean( 'Open Icon', true ) ? closeSmall : undefined;
+	const iconClosed = boolean( 'Closed Icon', true ) ? plus : undefined;
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
-			<PanelBody title={ bodyTitle } opened={ opened } iconOpen={ iconOpen } iconClosed={ iconClosed }>
+			<PanelBody
+				title={ bodyTitle }
+				opened={ opened }
+				iconOpen={ iconOpen }
+				iconClosed={ iconClosed }
+			>
 				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
 		</Panel>
