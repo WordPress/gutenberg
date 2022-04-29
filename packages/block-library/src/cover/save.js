@@ -72,7 +72,7 @@ export default function save( { attributes } ) {
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
-			  ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+			  ? mediaPosition(focalPoint)
 			  : undefined;
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
