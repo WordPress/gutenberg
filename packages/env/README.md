@@ -492,6 +492,22 @@ Additionally, the key `env` is available to override any of the above options on
 }
 ```
 
+The development supports one last field for `admin` which allows the environment to use credentials other than `admin`/`password`:
+
+```json
+{
+  "env": {
+    "development": {
+      "admin": {
+        "user": "foo",
+        "password": "phoFooPh00",
+        "email": "foo@example.com"
+      }
+    }
+  }
+}
+```
+
 On the development instance, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false. Also note that the default port, 8888, will be used as well.
 
 On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionally, while KEY_2 is still set to false, KEY_1 is overridden and set to false. 3000 overrides the default port as well.

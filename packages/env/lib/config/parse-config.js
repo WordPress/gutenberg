@@ -46,6 +46,7 @@ module.exports = function parseConfig( config, options ) {
 		themeSources: config.themes.map( ( sourceString ) =>
 			parseSourceString( sourceString, options )
 		),
+		admin: config.admin,
 		config: config.config,
 		mappings: Object.entries( config.mappings ).reduce(
 			( result, [ wpDir, localDir ] ) => {

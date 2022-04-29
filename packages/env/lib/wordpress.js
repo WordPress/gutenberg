@@ -55,7 +55,12 @@ async function configureWordPress( environment, config, spinner ) {
 		return `${ domain }:${ port }`;
 	} )();
 
-	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	// Allow env to specify default user to avoid browser warnings about insecure password.
+	const adminUser = environment === 'development' && config.env.development?.admin?.user || 'admin';
+	const adminPassword = environment === 'development' && config.env.development?.admin?.password || 'password';
+	const adminEmail = environment === 'development' && config.env.development?.admin?.email || 'wordpress@example.com';
+
+	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=${ adminUser } --admin_password=${ adminPassword } --admin_email=${ adminEmail } --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
