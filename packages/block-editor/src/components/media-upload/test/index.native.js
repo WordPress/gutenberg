@@ -54,9 +54,9 @@ describe( 'MediaUpload component', () => {
 					} }
 				/>
 			);
-			await fireEvent.press( wrapper.getByText( 'Open Picker' ) );
+			fireEvent.press( wrapper.getByText( 'Open Picker' ) );
 
-			await expectedOptions.forEach( ( item ) => {
+			expectedOptions.forEach( ( item ) => {
 				const option = wrapper.getByText( item );
 				expect( option ).toBeVisible();
 			} );
