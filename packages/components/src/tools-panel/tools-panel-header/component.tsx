@@ -48,7 +48,7 @@ const DefaultControlsGroup = ( {
 					<MenuItem
 						key={ label }
 						icon={ icon }
-						isSelected={ true }
+						isSelected={ ! hasValue }
 						aria-disabled={ ! hasValue }
 						label={ itemLabel }
 						onClick={ () => {
