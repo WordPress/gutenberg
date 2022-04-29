@@ -39,7 +39,6 @@ export default function ThemeUpdater() {
 		isResolving: isTemplateListLoading,
 	} = useEntityRecords( 'postType', 'wp_template', {
 		per_page: -1,
-		source: 'custom',
 	} );
 
 	const {
@@ -63,34 +62,29 @@ export default function ThemeUpdater() {
 		};
 	}, [] );
 
-	if ( ! templates || isTemplateListLoading ) {
-		return null;
-	}
-
-	if ( ! templateParts || isTemplatePartListLoading ) {
-		return null;
-	}
-
 	const customSourceFilter = ( tpl ) => tpl.source === 'custom';
-	const unModifiedTheme =
-		! filter( templates, customSourceFilter ).length &&
-		! filter( templateParts, customSourceFilter ).length;
+	const customTemplates = filter( templates, customSourceFilter );
+	const customTemplateParts = filter( templateParts, customSourceFilter );
 
-	if ( ! enableThemeSaving ) {
+	const unModifiedTheme =
+		! customTemplates.length && ! customTemplateParts.length;
+	const isLoading = isTemplateListLoading || isTemplatePartListLoading;
+
+	if (
+		! enableThemeSaving ||
+		isLoading ||
+		unModifiedTheme ||
+		isDirty ||
+		isSaving
+	) {
 		return null;
 	}
 
 	const handleUpdateTheme = async () => {
 		try {
 			await apiFetch( {
-				path: '/wp-block-editor/v1/export/update_theme',
+				path: '/wp-block-editor/v1/export/export_to_theme_files',
 			} );
-
-			const customTemplates = filter( templates, customSourceFilter );
-			const customTemplateParts = filter(
-				templateParts,
-				customSourceFilter
-			);
 
 			const revertTemplateOrPart = ( name ) => {
 				if ( isTemplateRevertable( name ) ) {
@@ -100,7 +94,7 @@ export default function ThemeUpdater() {
 			customTemplates.forEach( revertTemplateOrPart );
 			customTemplateParts.forEach( revertTemplateOrPart );
 
-			createInfoNotice( __( 'Customisations saved to theme' ), {
+			createInfoNotice( __( 'Customisations exported to theme files' ), {
 				speak: true,
 				type: 'snackbar',
 			} );
@@ -116,10 +110,6 @@ export default function ThemeUpdater() {
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
-
-	if ( unModifiedTheme || isDirty || isSaving ) {
-		return null;
-	}
 
 	return (
 		<Button onClick={ handleUpdateTheme } variant="tertiary">

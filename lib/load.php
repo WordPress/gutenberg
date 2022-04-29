@@ -119,7 +119,6 @@ require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-edit-site-export-controller.php';
-require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/rest-api.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';

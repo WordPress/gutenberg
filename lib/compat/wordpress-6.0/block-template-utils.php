@@ -96,6 +96,19 @@ function gutenberg_generate_block_templates_export_file() {
 		);
 	}
 
+	// Add the theme.json file to the zip.
+	$zip->addFromString(
+		'theme.json',
+		gutenberg_export_theme_json()
+	);
+
+	// Save changes to the zip file.
+	$zip->close();
+
+	return $filename;
+}
+
+function gutenberg_export_theme_json() {
 	// Load theme.json into the zip file.
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) );
 	// Merge with user data.
@@ -117,16 +130,5 @@ function gutenberg_generate_block_templates_export_file() {
 	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
 	// Replace 4 spaces with a tab.
-	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
-
-	// Add the theme.json file to the zip.
-	$zip->addFromString(
-		'theme.json',
-		$theme_json_tabbed
-	);
-
-	// Save changes to the zip file.
-	$zip->close();
-
-	return $filename;
+	return preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 }
