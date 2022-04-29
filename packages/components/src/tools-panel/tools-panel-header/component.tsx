@@ -35,29 +35,33 @@ const DefaultControlsGroup = ( {
 	return (
 		<MenuGroup>
 			{ items.map( ( [ label, hasValue ] ) => {
-				const icon = hasValue ? reset : check;
-				const itemLabel = hasValue
-					? sprintf(
-							// translators: %s: The name of the control being reset e.g. "Padding".
-							__( 'Reset %s' ),
-							label
-					  )
-					: undefined;
+				if ( hasValue ) {
+					return (
+						<MenuItem
+							key={ label }
+							icon={ reset }
+							label={ sprintf(
+								// translators: %s: The name of the control being reset e.g. "Padding".
+								__( 'Reset %s' ),
+								label
+							) }
+							onClick={ () => {
+								toggleItem( label );
+							} }
+							role={ 'menuitem' }
+						>
+							{ label }
+						</MenuItem>
+					);
+				}
 
 				return (
 					<MenuItem
 						key={ label }
-						icon={ icon }
-						isSelected={ ! hasValue }
-						aria-disabled={ ! hasValue }
-						label={ itemLabel }
-						onClick={ () => {
-							if ( ! hasValue ) {
-								return;
-							}
-							toggleItem( label );
-						} }
-						role={ hasValue ? 'menuitem' : 'menuitemcheckbox' }
+						icon={ check }
+						isSelected
+						aria-disabled
+						role={ 'menuitemcheckbox' }
 					>
 						{ label }
 					</MenuItem>
