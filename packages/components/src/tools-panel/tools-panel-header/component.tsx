@@ -210,6 +210,10 @@ const ToolsPanelHeader = (
 									onClick={ () => {
 										if ( canResetAll ) {
 											resetAll();
+											speak(
+												__( 'All options reset' ),
+												'assertive'
+											);
 										}
 									} }
 								>
