@@ -342,7 +342,35 @@ function navStripHTML( html ) {
  * Add transforms to Link Control
  */
 
-function LinkControlTransforms( { block, transforms, replace } ) {
+function LinkControlTransforms( { clientId, replace } ) {
+	const { getBlock, blockTransforms } = useSelect(
+		( select ) => {
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+			} = select( blockEditorStore );
+
+			return {
+				getBlock: _getBlock,
+				blockTransforms: getBlockTransformItems(
+					[ _getBlock( clientId ) ],
+					getBlockRootClientId( clientId )
+				),
+			};
+		},
+		[ clientId ]
+	);
+
+	const featuredBlocks = [
+		'core/site-logo',
+		'core/social-links',
+		'core/search',
+	];
+	const transforms = blockTransforms.filter( ( item ) => {
+		return featuredBlocks.includes( item.name );
+	} );
+
 	if ( ! transforms?.length ) {
 		return null;
 	}
@@ -359,8 +387,11 @@ function LinkControlTransforms( { block, transforms, replace } ) {
 							key={ `transform-${ index }` }
 							onClick={ () =>
 								replace(
-									block.clientId,
-									switchToBlockType( block, item.name )
+									clientId,
+									switchToBlockType(
+										getBlock( clientId ),
+										item.name
+									)
 								)
 							}
 							className="link-control-transform__item"
@@ -424,19 +455,15 @@ export default function NavigationLinkEdit( {
 		hasChildren,
 		userCanCreatePages,
 		userCanCreatePosts,
-		thisBlock,
-		blockTransforms,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock,
 				getBlocks,
 				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
-				getBlockTransformItems,
 			} = select( blockEditorStore );
 
 			return {
@@ -461,11 +488,6 @@ export default function NavigationLinkEdit( {
 				userCanCreatePosts: select( coreStore ).canUser(
 					'create',
 					'posts'
-				),
-				thisBlock: getBlock( clientId ),
-				blockTransforms: getBlockTransformItems(
-					[ getBlock( clientId ) ],
-					getBlockRootClientId( clientId )
 				),
 			};
 		},
@@ -492,15 +514,6 @@ export default function NavigationLinkEdit( {
 		);
 		replaceBlock( clientId, newSubmenu );
 	}
-
-	const featuredBlocks = [
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-	const featuredTransforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -847,10 +860,7 @@ export default function NavigationLinkEdit( {
 									! url
 										? () => (
 												<LinkControlTransforms
-													block={ thisBlock }
-													transforms={
-														featuredTransforms
-													}
+													clientId={ clientId }
 													replace={ replaceBlock }
 												/>
 										  )
