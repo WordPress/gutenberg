@@ -174,6 +174,10 @@ const ToolsPanelHeader = (
 		  __( 'All controls are currently hidden' )
 		: undefined;
 
+	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
+		( [ , isSelected ] ) => isSelected
+	);
+
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
 			<Heading level={ 2 } className={ headingClassName }>
@@ -201,9 +205,12 @@ const ToolsPanelHeader = (
 							/>
 							<MenuGroup>
 								<MenuItem
+									aria-disabled={ ! canResetAll }
 									variant={ 'tertiary' }
 									onClick={ () => {
-										resetAll();
+										if ( canResetAll ) {
+											resetAll();
+										}
 									} }
 								>
 									{ __( 'Reset all' ) }
