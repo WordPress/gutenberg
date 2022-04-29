@@ -17,6 +17,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
 
 		// Click List block on Android.
+		// Only needed when testing in local environment
 		if ( isAndroid() && isLocalEnvironment() ) {
 			await listBlockElement.click();
 		}
@@ -28,8 +29,11 @@ describe( 'Gutenberg Editor tests for List block', () => {
 			false
 		);
 
-		// Wait for backspace click to be reflected before checking HTML
-		listBlockElement = await editorPage.getListBlock();
+		// There is a delay in Sauce Labs when a key is sent
+		// There isn't an element to check as it's being typed into an element that already exists, workaround is to add this wait until there's a better solution
+		if ( isAndroid() && !isLocalEnvironment() ) {
+			await editorPage.driver.sleep( 1500 );
+		}
 
 		// Switch to html and verify html.
 		const html = await editorPage.getHtmlContent();
