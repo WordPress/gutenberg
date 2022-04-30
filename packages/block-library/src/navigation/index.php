@@ -351,6 +351,30 @@ function block_core_navigation_get_fallback_blocks() {
 }
 
 /**
+ * @param $inner_block
+ *
+ * @return array
+ */
+function process_navigation_blocks( $inner_block ) {
+	$post_ids = array();
+
+	if ( 'core/navigation-link' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) {
+		if ( $inner_block->attributes && isset( $inner_block->attributes['kind'] ) && $inner_block->attributes['kind'] === 'post-type' ) {
+			$post_ids[] = $inner_block->attributes['id'];
+		}
+	}
+	if ( $inner_block->inner_blocks ) {
+		$inner_blocks = iterator_to_array( $inner_block->inner_blocks );
+		foreach ( $inner_blocks as $inner_inner_block ) {
+			$inner_post_ids = process_navigation_blocks( $inner_inner_block );
+			$post_ids       = array_merge( $inner_post_ids, $post_ids );
+		}
+
+	}
+	return $post_ids;
+}
+
+/**
  * Renders the `core/navigation` block on server.
  *
  * @param array    $attributes The block attributes.
@@ -505,6 +529,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$is_fallback ? array( 'is-fallback' ) : array(),
 		$text_decoration ? array( $text_decoration_class ) : array()
 	);
+
+	$post_list = array_map( 'process_navigation_blocks', iterator_to_array( $inner_blocks ) );
+	$post_ids  = array_merge( ...$post_list );
+	if ( $post_ids ) {
+		_prime_post_caches( $post_ids, false, false );
+	}
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
