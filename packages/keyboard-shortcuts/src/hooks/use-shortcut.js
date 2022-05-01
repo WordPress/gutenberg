@@ -34,9 +34,9 @@ export default function useShortcut( name, callback, { isDisabled } = {} ) {
 			}
 		}
 
-		shortcuts.current.add( _callback );
+		shortcuts?.current?.add( _callback );
 		return () => {
-			shortcuts.current.delete( _callback );
+			shortcuts?.current?.delete( _callback );
 		};
 	}, [ name, isDisabled ] );
 }
