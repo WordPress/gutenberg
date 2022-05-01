@@ -351,26 +351,36 @@ function block_core_navigation_get_fallback_blocks() {
 }
 
 /**
- * @param $inner_block
+ * Iterate through all inner blocks recursively and get navigation link block's post ids..
  *
- * @return array
+ * @param WP_Block_List $inner_blocks Block list class instance.
+ *
+ * @return array Array of post ids.
  */
-function process_navigation_blocks( $inner_block ) {
+function block_core_navigation_get_post_ids( $inner_blocks ){
+	$post_list = array_map( 'get_post_id_from_navigation_blocks', iterator_to_array( $inner_blocks ) );
+	return array_unique( array_merge( ...$post_list ) );
+}
+
+/**
+ * Get post ids from a navigation link block instance.
+ *
+ * @param WP_Block $block Instance of a block.
+ *
+ * @return array Array of post ids.
+ */
+function get_post_id_from_navigation_block( $block ) {
 	$post_ids = array();
 
-	if ( 'core/navigation-link' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) {
-		if ( $inner_block->attributes && isset( $inner_block->attributes['kind'] ) && $inner_block->attributes['kind'] === 'post-type' ) {
-			$post_ids[] = $inner_block->attributes['id'];
+	if ( $block->inner_blocks ) {
+		$post_ids = block_core_navigation_get_post_ids( $block->inner_blocks );
+	}
+	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
+		if ( $block->attributes && isset( $block->attributes['kind'] ) && $block->attributes['kind'] === 'post-type' ) {
+			$post_ids[] = $block->attributes['id'];
 		}
 	}
-	if ( $inner_block->inner_blocks ) {
-		$inner_blocks = iterator_to_array( $inner_block->inner_blocks );
-		foreach ( $inner_blocks as $inner_inner_block ) {
-			$inner_post_ids = process_navigation_blocks( $inner_inner_block );
-			$post_ids       = array_merge( $inner_post_ids, $post_ids );
-		}
 
-	}
 	return $post_ids;
 }
 
@@ -530,8 +540,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$text_decoration ? array( $text_decoration_class ) : array()
 	);
 
-	$post_list = array_map( 'process_navigation_blocks', iterator_to_array( $inner_blocks ) );
-	$post_ids  = array_merge( ...$post_list );
+	$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
 	if ( $post_ids ) {
 		_prime_post_caches( $post_ids, false, false );
 	}
