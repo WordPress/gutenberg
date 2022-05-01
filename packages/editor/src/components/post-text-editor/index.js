@@ -67,12 +67,7 @@ export default function PostTextEditor() {
 	};
 
 	// Ensure changes aren't lost when switching modes using shortcuts.
-	useShortcut( 'core/edit-post/toggle-mode', () => {
-		if ( isDirty ) {
-			const blocks = parse( value );
-			resetEditorBlocks( blocks );
-		}
-	} );
+	useShortcut( 'core/edit-post/toggle-mode', stopEditing );
 
 	return (
 		<>
