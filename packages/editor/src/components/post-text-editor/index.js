@@ -7,11 +7,12 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -65,15 +66,13 @@ export default function PostTextEditor() {
 		}
 	};
 
-	// Ensure changes aren't lost when the component unmounts
-	useEffect( () => {
-		return () => {
-			if ( isDirty ) {
-				const blocks = parse( value );
-				resetEditorBlocks( blocks );
-			}
-		};
-	}, [ isDirty, value ] );
+	// Ensure changes aren't lost when switching modes using shortcuts.
+	useShortcut( 'core/edit-post/toggle-mode', () => {
+		if ( isDirty ) {
+			const blocks = parse( value );
+			resetEditorBlocks( blocks );
+		}
+	} );
 
 	return (
 		<>
