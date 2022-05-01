@@ -106,7 +106,7 @@ class DependencyExtractionWebpackPlugin {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
 				JSON.parse( JSON.stringify( asset ) )
-			) };`;
+			) };\n`;
 		}
 
 		return JSON.stringify( asset );
