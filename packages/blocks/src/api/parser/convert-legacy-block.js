@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Convert legacy blocks to their canonical form. This function is used
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
@@ -67,5 +72,8 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		name = 'core/comment-date';
 	}
 
-	return [ name, newAttributes ];
+	return applyFilters( 'editor.convertLegacyBlockNameAndAttributes', [
+		name,
+		newAttributes,
+	] );
 }
