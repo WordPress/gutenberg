@@ -2,29 +2,12 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
-
-/**
- * A float supported clamp function for a specific value.
- *
- * @param {number|null} value The value to clamp.
- * @param {number}      min   The minimum value.
- * @param {number}      max   The maximum value.
- *
- * @return {number} A (float) number
- */
-export function floatClamp( value, min, max ) {
-	if ( typeof value !== 'number' ) {
-		return null;
-	}
-
-	return parseFloat( clamp( value, min, max ) );
-}
 
 /**
  * Enables entry of out-of-range and invalid values that diverge from state.
