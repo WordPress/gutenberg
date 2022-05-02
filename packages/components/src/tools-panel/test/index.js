@@ -988,7 +988,7 @@ describe( 'ToolsPanel', () => {
 			isShownByDefault: false,
 		};
 
-		it( 'should render appropriate icon for the dropdown menu where there are default controls', async () => {
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are default controls', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...defaultControls }>
@@ -1005,6 +1005,42 @@ describe( 'ToolsPanel', () => {
 			} );
 
 			expect( optionsDisplayedIcon ).toBeInTheDocument();
+
+			// The dropdown toggle doesn't have a description when an option is displayed.
+			// In this case the default control is displayed.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should render appropriate labels and descriptions for the dropdown menu where there are no default controls', async () => {
+			// All options are inactive.
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...optionalControls }>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const optionsHiddenIcon = screen.getByRole( 'button', {
+				name: 'Panel header options',
+			} );
+
+			// The dropdown toggle has a description indicating that all options are hidden.
+			expect( optionsHiddenIcon ).toBeInTheDocument();
+			expect( optionsHiddenIcon ).toHaveAccessibleDescription(
+				'All options are currently hidden'
+			);
+
+			// Activate one of the options.
+			await openDropdownMenu();
+			await selectMenuItem( optionalControls.label );
+
+			const optionsDisplayedIcon = screen.getByRole( 'button', {
+				name: 'Panel header options',
+			} );
+
+			// The dropdown toggle no longer has a description.
+			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
 	} );
 
