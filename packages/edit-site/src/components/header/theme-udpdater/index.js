@@ -6,6 +6,7 @@ import { filter, some } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -23,6 +24,15 @@ import { store as editSiteStore } from '../../../store';
 import isTemplateRevertable from '../../../utils/is-template-revertable';
 
 export default function ThemeUpdater() {
+	const [ canSave, setCanSave ] = useState( false );
+	useEffect( async () => {
+		const userProps = await apiFetch( {
+			path: 'wp/v2/users/me?context=edit',
+		} );
+
+		setCanSave( userProps?.capabilities?.edit_theme_options );
+	}, [] );
+
 	const { enableThemeSaving } = useSelect(
 		( select ) => ( {
 			enableThemeSaving: select( editSiteStore ).getSettings()
@@ -76,7 +86,8 @@ export default function ThemeUpdater() {
 		isLoading ||
 		unModifiedTheme ||
 		isDirty ||
-		isSaving
+		isSaving ||
+		! canSave
 	) {
 		return null;
 	}
