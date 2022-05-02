@@ -19,7 +19,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS, useControlledValue } from '../utils';
-import { floatClamp } from './utils';
+import { useUnimpededRangedNumberEntry } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
@@ -73,29 +73,17 @@ function RangeControl(
 	const isResetPendent = useRef( false );
 	const [ value, setValue ] = useControlledValue( {
 		defaultValue: initialPosition ?? null,
-		value: isResetPendent.current ? undefined : valueProp,
+		value: valueProp,
 		onChange: ( nextValue ) => {
-			/*
-			 * Calls onChange only when nextValue is numeric
-			 * otherwise may queue a reset for the blur event.
-			 */
-			if ( ! isNaN( nextValue ) ) {
-				if ( nextValue < min || nextValue > max ) {
-					nextValue = floatClamp( nextValue, min, max );
-				}
-				onChange( nextValue );
-				isResetPendent.current = false;
-			} else if ( nextValue === null ) {
+			if ( nextValue === null ) {
 				/*
-				 * handleOnReset has led the execution here due to lack of a
-				 * defined resetFallbackValue. In such conditions the onChange
-				 * callback receives undefined as that was the behavior when the
-				 * component was stablized.
+				 * The value is reset without a resetFallbackValue. In such
+				 * conditions the onChange callback receives undefined as that
+				 * was the behavior when the component was stablized.
 				 */
-				onChange( undefined );
-			} else if ( allowReset ) {
-				isResetPendent.current = true;
+				nextValue = undefined;
 			}
+			onChange( nextValue );
 		},
 	} );
 
@@ -149,10 +137,19 @@ function RangeControl(
 		setValue( nextValue );
 	};
 
-	const handleOnChange = ( nextValue ) => {
-		nextValue = parseFloat( nextValue );
-		setValue( nextValue );
-	};
+	const someNumberInputProps = useUnimpededRangedNumberEntry( {
+		max,
+		min,
+		value: inputSliderValue,
+		onChange: ( nextValue ) => {
+			if ( ! isNaN( nextValue ) ) {
+				setValue( nextValue );
+				isResetPendent.current = false;
+			} else if ( allowReset ) {
+				isResetPendent.current = true;
+			}
+		},
+	} );
 
 	const handleOnInputNumberBlur = () => {
 		if ( isResetPendent.current ) {
@@ -275,13 +272,10 @@ function RangeControl(
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
-						max={ max }
-						min={ min }
 						onBlur={ handleOnInputNumberBlur }
-						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
-						value={ inputSliderValue }
+						{ ...someNumberInputProps }
 					/>
 				) }
 				{ allowReset && (
