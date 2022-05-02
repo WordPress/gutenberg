@@ -121,6 +121,59 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that if pagination is set to display the last page by default (i.e. newest comments),
+	 * the query is set to look for page 1 (rather than page 0, which would cause an error).
+	 *
+	 * Regression: https://github.com/WordPress/gutenberg/issues/40758.
+	 */
+	function test_build_comment_query_vars_from_block_pagination_with_no_comments() {
+		$previous_per_page     = get_option( 'comments_per_page' );
+		$previous_default_page = get_option( 'default_comments_page' );
+
+		update_option( 'comments_per_page', 50 );
+		update_option( 'previous_default_page', 'newest' );
+
+		$post_without_comments = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_name'    => 'fluffycat',
+				'post_title'   => 'Fluffy Cat',
+				'post_content' => 'Fluffy Cat content',
+				'post_excerpt' => 'Fluffy Cat',
+			)
+		);
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template --><!-- wp:comment-author-name /--><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+
+		$block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => $post_without_comments->ID,
+			)
+		);
+
+		$this->assertEquals(
+			build_comment_query_vars_from_block( $block ),
+			array(
+				'orderby'       => 'comment_date_gmt',
+				'order'         => 'ASC',
+				'status'        => 'approve',
+				'no_found_rows' => false,
+				'post_id'       => self::$custom_post->ID,
+				'hierarchical'  => 'threaded',
+				'number'        => 1,
+				'paged'         => 1,
+			)
+		);
+
+		update_option( 'comments_per_page', $previous_comments_per_page );
+		update_option( 'default_comments_page', $previous_previous_default_page );
+	}
+
+	/**
 	 * Test rendering a single comment
 	 */
 	function test_rendering_comment_template() {
