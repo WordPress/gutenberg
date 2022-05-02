@@ -127,8 +127,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	 * Regression: https://github.com/WordPress/gutenberg/issues/40758.
 	 */
 	function test_build_comment_query_vars_from_block_pagination_with_no_comments() {
-		$previous_per_page     = get_option( 'comments_per_page' );
-		$previous_default_page = get_option( 'default_comments_page' );
+		$comments_per_page     = get_option( 'comments_per_page' );
+		$default_comments_page = get_option( 'default_comments_page' );
 
 		update_option( 'comments_per_page', 50 );
 		update_option( 'previous_default_page', 'newest' );
@@ -169,8 +169,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
-		update_option( 'comments_per_page', $previous_comments_per_page );
-		update_option( 'default_comments_page', $previous_previous_default_page );
+		update_option( 'comments_per_page', $comments_per_page );
+		update_option( 'default_comments_page', $default_comments_page );
 	}
 
 	/**
