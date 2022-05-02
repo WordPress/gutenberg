@@ -18,7 +18,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { COLORS, useControlledValue } from '../utils';
+import { COLORS, useControlledState } from '../utils';
 import { useUnimpededRangedNumberEntry } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -71,20 +71,8 @@ function RangeControl(
 	ref
 ) {
 	const isResetPendent = useRef( false );
-	const [ value, setValue ] = useControlledValue( {
-		defaultValue: initialPosition ?? null,
-		value: valueProp,
-		onChange: ( nextValue ) => {
-			if ( nextValue === null ) {
-				/*
-				 * The value is reset without a resetFallbackValue. In such
-				 * conditions the onChange callback receives undefined as that
-				 * was the behavior when the component was stablized.
-				 */
-				nextValue = undefined;
-			}
-			onChange( nextValue );
-		},
+	const [ value, setValue ] = useControlledState( valueProp, {
+		fallback: null,
 	} );
 
 	if ( step === 'any' ) {
@@ -135,6 +123,7 @@ function RangeControl(
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
 		setValue( nextValue );
+		onChange( nextValue );
 	};
 
 	const someNumberInputProps = useUnimpededRangedNumberEntry( {
@@ -144,6 +133,7 @@ function RangeControl(
 		onChange: ( nextValue ) => {
 			if ( ! isNaN( nextValue ) ) {
 				setValue( nextValue );
+				onChange( nextValue );
 				isResetPendent.current = false;
 			} else if ( allowReset ) {
 				isResetPendent.current = true;
@@ -159,13 +149,20 @@ function RangeControl(
 	};
 
 	const handleOnReset = () => {
-		let resetValue = parseFloat( resetFallbackValue );
+		const resetValue = parseFloat( resetFallbackValue );
 
 		if ( isNaN( resetValue ) ) {
-			resetValue = null;
+			setValue( null );
+			/*
+			 * If the value is reset without a resetFallbackValue, the onChange
+			 * callback receives undefined as that was the behavior when the
+			 * component was stablized.
+			 */
+			onChange( undefined );
+		} else {
+			setValue( resetValue );
+			onChange( resetValue );
 		}
-
-		setValue( resetValue );
 	};
 
 	const handleShowTooltip = () => setShowTooltip( true );
