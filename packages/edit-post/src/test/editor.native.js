@@ -25,11 +25,11 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
-beforeEach( () => {
+beforeAll( () => {
 	jest.useFakeTimers( 'legacy' );
 } );
 
-afterEach( () => {
+afterAll( () => {
 	jest.runOnlyPendingTimers();
 	jest.useRealTimers();
 } );

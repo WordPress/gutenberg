@@ -9,11 +9,11 @@ import { render, fireEvent, waitFor } from 'test/helpers';
  */
 import LinkSettingsNavigation from '../link-settings-navigation';
 
-beforeEach( () => {
+beforeAll( () => {
 	jest.useFakeTimers( 'legacy' );
 } );
 
-afterEach( () => {
+afterAll( () => {
 	jest.runOnlyPendingTimers();
 	jest.useRealTimers();
 } );
