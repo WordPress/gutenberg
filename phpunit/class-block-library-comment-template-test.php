@@ -162,9 +162,9 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'order'         => 'ASC',
 				'status'        => 'approve',
 				'no_found_rows' => false,
-				'post_id'       => self::$custom_post->ID,
+				'post_id'       => $post_without_comments->ID,
 				'hierarchical'  => 'threaded',
-				'number'        => 1,
+				'number'        => 50,
 				'paged'         => 1,
 			)
 		);
