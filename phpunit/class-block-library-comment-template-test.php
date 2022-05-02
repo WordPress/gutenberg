@@ -125,6 +125,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 	 * the query is set to look for page 1 (rather than page 0, which would cause an error).
 	 *
 	 * Regression: https://github.com/WordPress/gutenberg/issues/40758.
+	 *
+	 * @covers ::build_comment_query_vars_from_block
 	 */
 	function test_build_comment_query_vars_from_block_pagination_with_no_comments() {
 		$comments_per_page     = get_option( 'comments_per_page' );
