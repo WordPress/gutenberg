@@ -22,14 +22,18 @@ test.describe( 'new editor state', () => {
 
 	test.describe( 'dropdown', () => {
 		test( 'toggles via click', async ( { page } ) => {
-			const isMoreMenuOpen = page.locator( 'role=menu[name="Options"i]' );
+			const moreMenu = page.locator( 'role=menu[name="Options"i]' );
+			const moreMenuToggleButton = page.locator(
+				'role=button[name="Options"i]'
+			);
+			await expect( moreMenu ).not.toBeVisible();
 			// Toggle opened.
-			await page.click( 'role=button[name="Options"i]' );
-			await expect( isMoreMenuOpen ).toBeVisible();
+			await moreMenuToggleButton.click();
+			await expect( moreMenu ).toBeVisible();
 
 			//Toggle closed.
-			await page.click( 'role=button[name="Options"i]' );
-			await expect( isMoreMenuOpen ).not.toBeVisible();
+			await moreMenuToggleButton.click();
+			await expect( moreMenu ).not.toBeVisible();
 		} );
 	} );
 } );
