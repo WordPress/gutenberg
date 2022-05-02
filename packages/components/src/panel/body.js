@@ -96,7 +96,10 @@ export function PanelBody(
 }
 
 const PanelBodyTitle = forwardRef(
-	( { isOpened, icon, title, iconExpanded, iconCollapsed, ...props }, ref ) => {
+	(
+		{ isOpened, icon, title, iconExpanded, iconCollapsed, ...props },
+		ref
+	) => {
 		if ( ! title ) return null;
 
 		return (
