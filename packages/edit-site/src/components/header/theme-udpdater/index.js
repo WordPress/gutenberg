@@ -116,14 +116,10 @@ export default function ThemeUpdater() {
 				type: 'snackbar',
 			} );
 		} catch ( errorResponse ) {
-			let error = {};
-			try {
-				error = await errorResponse.json();
-			} catch ( e ) {}
 			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the site' );
+				errorResponse.message && errorResponse.code !== 'unknown_error'
+					? errorResponse.message
+					: __( 'An error occurred while updating the theme' );
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};

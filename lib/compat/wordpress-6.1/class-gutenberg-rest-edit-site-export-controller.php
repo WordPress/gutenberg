@@ -42,10 +42,17 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 	 * @return WP_Error|void
 	 */
 	public function export_to_theme_files() {
-		$this->update_template_and_parts_files();
-		$this->update_theme_json_file();
+		try {
+			$this->update_template_and_parts_files();
+			$this->update_theme_json_file();
+		} catch ( Exception $e ) {
+			return new WP_Error( 'rest_cant_update_theme_files', __( 'Error updating theme files. ', 'gutenberg' ) . $e->getMessage(), array( 'status' => 500 ) );
+		}
+
 		$this->clear_user_customizations();
-		return rest_ensure_response(  array( "update_theme" => true ) );
+		return rest_ensure_response(  array( "theme_files_updated" => true ) );
+
+
 	}
 
 	protected function update_template_and_parts_files() {
@@ -53,23 +60,46 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 		$user_customisations = $this->get_user_customisations();
 
 		foreach ( $user_customisations['templates'] as $template ) {
+			$fileToUpdate = get_template_directory() . '/templates/' .
+				$template->slug . '.html';
+			if ( ! file_exists( $fileToUpdate ) ) {
+				throw new Exception("Theme file does not exist: " . $fileToUpdate);
+			}
+			if ( ! wp_is_writable( $fileToUpdate ) ) {
+				throw new Exception("Theme file is not writeable: " . $fileToUpdate);
+			}
 			file_put_contents(
-				get_template_directory() . '/templates/' . $template->slug . '.html',
+				$fileToUpdate,
 				$template->content
 			);
 		}
 
 		foreach ( $user_customisations['template_parts'] as $template_part ) {
+			$fileToUpdate = get_template_directory() . '/parts/' .
+				$template_part->slug . '.html';
+			if ( ! file_exists( $fileToUpdate ) ) {
+				throw new Exception("Theme file does not exist: " . $fileToUpdate);
+			}
+			if ( ! wp_is_writable( $fileToUpdate ) ) {
+				throw new Exception("Theme file is not writeable: " . $fileToUpdate);
+			}
 			file_put_contents(
-				get_template_directory() . '/parts/' . $template_part->slug . '.html',
+				$fileToUpdate,
 				$template_part->content
 			);
 		}
 	}
 
 	protected function update_theme_json_file() {
+		$fileToUpdate = get_template_directory() . '/theme.json';
+		if ( ! file_exists( $fileToUpdate ) ) {
+			throw new Exception("Theme file does not exist: " . $fileToUpdate);
+		}
+		if ( ! wp_is_writable( $fileToUpdate ) ) {
+			throw new Exception("Theme file is not writeable: " . $fileToUpdate);
+		}
 		file_put_contents(
-			get_template_directory() . '/theme.json',
+			$fileToUpdate,
 			gutenberg_export_theme_json()
 		);
 	}
