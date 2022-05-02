@@ -87,16 +87,16 @@ export const withIcon = () => {
 export const CustomToggleIcons = () => {
 	const bodyTitle = text( 'Body Title', 'My Block Settings' );
 	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
-	const iconOpen = boolean( 'Open Icon', true ) ? closeSmall : undefined;
-	const iconClosed = boolean( 'Closed Icon', true ) ? plus : undefined;
+	const iconExpanded = boolean( 'Expanded Icon', true ) ? closeSmall : undefined;
+	const iconCollapsed = boolean( 'Collapsed Icon', true ) ? plus : undefined;
 	const opened = boolean( 'Opened', true );
 	return (
 		<Panel header="My Panel">
 			<PanelBody
 				title={ bodyTitle }
 				opened={ opened }
-				iconOpen={ iconOpen }
-				iconClosed={ iconClosed }
+				iconExpanded={ iconExpanded }
+				iconCollapsed={ iconCollapsed }
 			>
 				<PanelRow>{ rowText }</PanelRow>
 			</PanelBody>
