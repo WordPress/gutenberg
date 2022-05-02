@@ -992,6 +992,25 @@ describe( 'ToolsPanel', () => {
 		} );
 	} );
 
+	describe( 'reset all button', () => {
+		it( "should disable the reset all button when there's nothing to reset", async () => {
+			await renderPanel();
+			await openDropdownMenu();
+
+			const resetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: false,
+			} );
+			expect( resetAllItem ).toBeInTheDocument();
+
+			await selectMenuItem( 'Reset all' );
+
+			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
+				disabled: true,
+			} );
+			expect( disabledResetAllItem ).toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'first and last panel items', () => {
 		it( 'should apply first/last classes to appropriate items', () => {
 			const { container } = render(
