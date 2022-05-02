@@ -33,6 +33,7 @@ export default function ThemeUpdater() {
 
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 	const { revertTemplate } = useDispatch( editSiteStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
 
 	const {
 		records: templates,
@@ -86,9 +87,14 @@ export default function ThemeUpdater() {
 				path: '/wp-block-editor/v1/export/export_to_theme_files',
 			} );
 
-			const revertTemplateOrPart = ( name ) => {
-				if ( isTemplateRevertable( name ) ) {
-					revertTemplate( name );
+			const revertTemplateOrPart = async ( template ) => {
+				if ( isTemplateRevertable( template ) ) {
+					await revertTemplate( template, { allowUndo: false } );
+					await saveEditedEntityRecord(
+						'postType',
+						template.type,
+						template.id
+					);
 				}
 			};
 			customTemplates.forEach( revertTemplateOrPart );
