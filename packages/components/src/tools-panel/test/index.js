@@ -161,7 +161,7 @@ const renderPanel = () => {
  */
 const getMenuButton = () => {
 	return screen.getByRole( 'button', {
-		name: /view([\w\s]+)options/i,
+		name: /Panel([\w\s]+)header([\w\s]+)options/i,
 	} );
 };
 
@@ -178,7 +178,6 @@ const openDropdownMenu = () => {
 
 // Opens dropdown then selects the menu item by label before simulating a click.
 const selectMenuItem = async ( label ) => {
-	openDropdownMenu();
 	const menuItem = await screen.findByText( label );
 	fireEvent.click( menuItem );
 };
@@ -289,6 +288,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel item when corresponding menu item is selected', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
 
@@ -297,6 +297,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
 
@@ -319,6 +320,7 @@ describe( 'ToolsPanel', () => {
 
 			expect( control ).toBeInTheDocument();
 
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const resetControl = screen.getByText( 'Default control' );
 
@@ -657,6 +659,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 
 			expect( controlProps.onSelect ).not.toHaveBeenCalled();
@@ -665,6 +669,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call onSelect callback when menu item is toggled on', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
@@ -673,6 +679,8 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should call resetAll callback when its menu item is selected', async () => {
 			renderPanel();
+
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' );
 
 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
@@ -688,6 +696,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should call onDeselect after previous reset all', async () => {
 			renderPanel();
 
+			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
 			await selectMenuItem( controlProps.label ); // Re-display control.
 
@@ -715,9 +724,8 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -754,9 +762,8 @@ describe( 'ToolsPanel', () => {
 			openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
+			const defaultMenuItem = screen.getByRole( 'menuitem', {
 				name: 'Reset Nested Control 1',
-				checked: true,
 			} );
 
 			const altItem = screen.getByText( 'Nested Control 2' );
@@ -807,6 +814,7 @@ describe( 'ToolsPanel', () => {
 			expect( secondItem ).toBeInTheDocument();
 
 			// Toggle on the first item.
+			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
 			// The order of items should be as per their original source order.
@@ -977,37 +985,7 @@ describe( 'ToolsPanel', () => {
 			);
 
 			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
-			} );
-
-			expect( optionsDisplayedIcon ).toBeInTheDocument();
-		} );
-
-		it( 'should render appropriate icons for the dropdown menu where there are no default controls', async () => {
-			render(
-				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem { ...optionalControls }>
-						<div>Optional control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-
-			// There are unactivated, optional menu items in the Tools Panel dropdown.
-			const optionsHiddenIcon = screen.getByRole( 'button', {
-				name: 'View and add options',
-			} );
-
-			expect( optionsHiddenIcon ).toBeInTheDocument();
-
-			await selectMenuItem( optionalControls.label );
-
-			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
-			expect(
-				screen.queryByRole( 'button', { name: 'View and add options' } )
-			).not.toBeInTheDocument();
-
-			const optionsDisplayedIcon = screen.getByRole( 'button', {
-				name: 'View options',
+				name: 'Panel header options',
 			} );
 
 			expect( optionsDisplayedIcon ).toBeInTheDocument();
