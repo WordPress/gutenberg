@@ -158,7 +158,6 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -168,7 +167,8 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 				'hierarchical'  => 'threaded',
 				'number'        => 50,
 				'paged'         => 1,
-			)
+			),
+			build_comment_query_vars_from_block( $block )
 		);
 
 		update_option( 'comments_per_page', $comments_per_page );
