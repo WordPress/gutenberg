@@ -70,3 +70,17 @@ export const WithDaysHighlighted = () => {
 		/>
 	);
 };
+
+export const WithInvalidDates = () => {
+	const [ currentDate, setCurrentDate ] = useState( now );
+
+	return (
+		<DateTimePicker
+			currentDate={ currentDate }
+			onChange={ setCurrentDate }
+			isInvalidDate={ ( date ) =>
+				date.getDay() === 0 || date.getDay() === 6
+			}
+		/>
+	);
+};
