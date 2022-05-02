@@ -354,7 +354,7 @@ function LinkControlTransforms( { clientId, replace } ) {
 			return {
 				getBlock: _getBlock,
 				blockTransforms: getBlockTransformItems(
-					[ _getBlock( clientId ) ],
+					_getBlock( clientId ),
 					getBlockRootClientId( clientId )
 				),
 			};
@@ -452,25 +452,19 @@ export default function NavigationLinkEdit( {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
-		hasDescendants,
+		hasChildren,
 		userCanCreatePages,
 		userCanCreatePosts,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
+				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
-				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
-				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
-
-			const selectedBlockId = getSelectedBlockClientId();
-
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
@@ -486,14 +480,7 @@ export default function NavigationLinkEdit( {
 					clientId,
 					true
 				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				hasChildren: !! getBlockCount( clientId ),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -537,7 +524,7 @@ export default function NavigationLinkEdit( {
 			setIsLinkOpen( true );
 		}
 		// If block has inner blocks, transform to Submenu.
-		if ( hasDescendants ) {
+		if ( hasChildren ) {
 			transformToSubmenu();
 		}
 	}, [] );
@@ -647,7 +634,7 @@ export default function NavigationLinkEdit( {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
-			'has-child': hasDescendants,
+			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,

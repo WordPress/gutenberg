@@ -32,7 +32,7 @@ describe( 'SelectControl', () => {
 
 		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
 
-		const selectElement = screen.queryByLabelText( 'Select' );
+		const selectElement = screen.getByLabelText( 'Select' );
 
 		fireEvent.change( selectElement, {
 			target: { value: 'option-group-option-1' },
@@ -68,7 +68,7 @@ describe( 'SelectControl', () => {
 
 		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
 
-		const selectElement = screen.queryByLabelText( 'Select' );
+		const selectElement = screen.getByLabelText( 'Select' );
 
 		fireEvent.change( selectElement, {
 			target: { value: 'option-2' },

@@ -44,10 +44,13 @@
 	.comment-meta {
 		font-size: 0.875em;
 		line-height: 1.5;
-		margin-left: -3.25em;
-
 		b {
 			font-weight: normal;
+		}
+		.comment-awaiting-moderation {
+			margin-top: 1em;
+			margin-bottom: 1em;
+			display: block;
 		}
 	}
 
