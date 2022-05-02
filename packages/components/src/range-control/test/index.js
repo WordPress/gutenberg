@@ -33,7 +33,7 @@ describe.each( [
 	[ 'uncontrolled', RangeControl ],
 	[ 'controlled', ControlledRangeControl ],
 ] )( 'RangeControl %s', ( ...modeAndComponent ) => {
-	const [ , Component ] = modeAndComponent;
+	const [ mode, Component ] = modeAndComponent;
 
 	describe( '#render()', () => {
 		it( 'should trigger change callback with numeric value', () => {
@@ -306,6 +306,7 @@ describe.each( [
 					allowReset={ true }
 					onChange={ spy }
 					{ ...propsForReset }
+					value={ mode === 'controlled' ? 89 : undefined }
 				/>
 			);
 
@@ -328,6 +329,7 @@ describe.each( [
 					max={ 100 }
 					allowReset={ true }
 					resetFallbackValue={ undefined }
+					value={ mode === 'controlled' ? 89 : undefined }
 				/>
 			);
 
