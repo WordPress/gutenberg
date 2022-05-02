@@ -139,12 +139,14 @@ function inputControlStateReducer(
  * @param  stateReducer    An external state reducer.
  * @param  initialState    The initial state for the reducer.
  * @param  onChangeHandler A handler for the onChange event.
+ * @param  isFocused       Focus state.
  * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(
 	stateReducer: StateReducer = initialStateReducer,
 	initialState: Partial< InputState > = initialInputControlState,
-	onChangeHandler: InputChangeCallback
+	onChangeHandler: InputChangeCallback,
+	isFocused: Boolean
 ) {
 	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
@@ -216,7 +218,7 @@ export function useInputControlStateReducer(
 			} );
 		}
 		refEvent.current = null;
-	}, [ state.value, state.isDragging ] );
+	}, [ state.value, state.isDragging, isFocused ] );
 	useLayoutEffect( () => {
 		if (
 			! refEvent.current &&

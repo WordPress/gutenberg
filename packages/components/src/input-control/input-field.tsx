@@ -73,7 +73,8 @@ function InputField(
 			value: valueProp,
 			isPressEnterToChange,
 		},
-		onChange
+		onChange,
+		isFocused
 	);
 
 	const { value, isDragging, isDirty } = state;
