@@ -8,12 +8,12 @@ import { get } from 'lodash';
  */
 import type { Style, StyleOptions } from '../../types';
 
-const textDecoration = {
-	name: 'textDecoration',
+const textTransform = {
+	name: 'textTransform',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const styleValue: string | undefined = get(
 			style,
-			[ 'typography', 'textDecoration' ],
+			[ 'typography', 'textTransform' ],
 			null
 		);
 
@@ -21,7 +21,7 @@ const textDecoration = {
 			? [
 					{
 						selector: options?.selector,
-						key: 'textDecoration',
+						key: 'textTransform',
 						value: styleValue,
 					},
 			  ]
@@ -29,4 +29,4 @@ const textDecoration = {
 	},
 };
 
-export default textDecoration;
+export default textTransform;

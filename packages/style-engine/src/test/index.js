@@ -43,6 +43,9 @@ describe( 'generate', () => {
 					typography: {
 						fontSize: '2.2rem',
 						lineHeight: '3.3',
+						textDecoration: 'line-through',
+						letterSpacing: '12px',
+						textTransform: 'uppercase',
 					},
 				},
 				{
@@ -50,7 +53,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			'.some-selector { margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; line-height: 3.3; }'
+			'.some-selector { margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }'
 		);
 	} );
 } );

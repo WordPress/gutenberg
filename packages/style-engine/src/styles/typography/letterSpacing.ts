@@ -8,12 +8,12 @@ import { get } from 'lodash';
  */
 import type { Style, StyleOptions } from '../../types';
 
-const textDecoration = {
-	name: 'textDecoration',
+const letterSpacing = {
+	name: 'letterSpacing',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const styleValue: string | undefined = get(
 			style,
-			[ 'typography', 'textDecoration' ],
+			[ 'typography', 'letterSpacing' ],
 			null
 		);
 
@@ -21,7 +21,7 @@ const textDecoration = {
 			? [
 					{
 						selector: options?.selector,
-						key: 'textDecoration',
+						key: 'letterSpacing',
 						value: styleValue,
 					},
 			  ]
@@ -29,4 +29,4 @@ const textDecoration = {
 	},
 };
 
-export default textDecoration;
+export default letterSpacing;
