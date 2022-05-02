@@ -58,6 +58,11 @@ describe( 'deleteEntityRecord', () => {
 		jest.useFakeTimers();
 	} );
 
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'triggers a DELETE request for an existing record', async () => {
 		const deletedRecord = { title: 'new post', id: 10 };
 		const configs = [
@@ -180,6 +185,11 @@ describe( 'saveEditedEntityRecord', () => {
 		jest.useFakeTimers();
 	} );
 
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'Uses "id" as a key when no entity key is provided', async () => {
 		const area = { id: 1, menu: 0 };
 		const configs = [
@@ -264,6 +274,7 @@ describe( 'saveEditedEntityRecord', () => {
 
 describe( 'saveEntityRecord', () => {
 	let dispatch;
+
 	beforeEach( async () => {
 		apiFetch.mockReset();
 		jest.useFakeTimers();
@@ -272,6 +283,11 @@ describe( 'saveEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'triggers a POST request for a new record', async () => {

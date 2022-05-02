@@ -55,6 +55,11 @@ describe( 'getKindEntities', () => {
 		jest.useFakeTimers();
 	} );
 
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
 		const dispatch = jest.fn();
 		const select = {
