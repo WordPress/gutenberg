@@ -12,8 +12,9 @@ describe( 'generate', () => {
 		expect(
 			generate( {
 				spacing: { padding: '10px', margin: '12px' },
+				color: { text: '#381515' },
 			} )
-		).toEqual( 'margin: 12px; padding: 10px;' );
+		).toEqual( 'color: #381515; margin: 12px; padding: 10px;' );
 	} );
 
 	it( 'should generate styles with an optional selector', () => {

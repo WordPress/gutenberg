@@ -26,6 +26,9 @@ export interface Style {
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 	};
+	color?: {
+		text?: CSSProperties[ 'color' ];
+	};
 }
 
 export type StyleOptions = {
