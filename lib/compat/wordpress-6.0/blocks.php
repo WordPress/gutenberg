@@ -186,6 +186,7 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 				}
 			}
 		}
+
 		return $comment_args;
 	}
 }
