@@ -293,6 +293,10 @@ describe( 'ToolsPanel', () => {
 			const control = await screen.findByText( 'Alt control' );
 
 			expect( control ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText( 'Alt is now visible' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
@@ -302,6 +306,12 @@ describe( 'ToolsPanel', () => {
 			const control = screen.queryByText( 'Example control' );
 
 			expect( control ).not.toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText(
+				'Example hidden and reset to default'
+			);
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
@@ -325,6 +335,12 @@ describe( 'ToolsPanel', () => {
 			const resetControl = screen.getByText( 'Default control' );
 
 			expect( resetControl ).toBeInTheDocument();
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText(
+				'Example reset to default'
+			);
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
@@ -1003,6 +1019,10 @@ describe( 'ToolsPanel', () => {
 			expect( resetAllItem ).toBeInTheDocument();
 
 			await selectMenuItem( 'Reset all' );
+
+			// Test the aria live announcement.
+			const announcement = await screen.getByText( 'All options reset' );
+			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
 
 			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
 				disabled: true,
