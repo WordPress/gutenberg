@@ -81,6 +81,10 @@
 	right: 0;
 	bottom: 0;
 	min-height: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
 }
 
 .block-library-cover__resize-container:not(.is-resizing) {

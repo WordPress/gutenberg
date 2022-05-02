@@ -11,6 +11,8 @@ import {
 	getColorClassName,
 	__experimentalGetGradientClass,
 	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
 /**
@@ -59,12 +61,15 @@ export default function save( { attributes } ) {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const isImgElement = ! ( hasParallax || isRepeated );
-
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const style = {
 		...( isImageBackground && ! isImgElement && ! useFeaturedImage
 			? backgroundImageStyles( url )
 			: {} ),
 		minHeight: minHeight || undefined,
+		...borderProps.style,
+		...spacingProps.style,
 	};
 
 	const bgStyle = {
@@ -87,7 +92,8 @@ export default function save( { attributes } ) {
 				contentPosition
 			),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName( contentPosition ),
+		borderProps.className
 	);
 
 	const gradientValue = gradient || customGradient;

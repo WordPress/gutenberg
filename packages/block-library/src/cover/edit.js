@@ -52,6 +52,8 @@ import {
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -168,6 +170,7 @@ function ResizableCover( {
 	onResizeStart,
 	onResize,
 	onResizeStop,
+	children,
 	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
@@ -193,7 +196,9 @@ function ResizableCover( {
 				setIsResizing( false );
 			} }
 			{ ...props }
-		/>
+		>
+			{ children }
+		</ResizableBox>
 	);
 }
 
@@ -651,7 +656,8 @@ function CoverEdit( {
 
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
-
+	const borderProps = useBorderProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
 	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
@@ -741,7 +747,10 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				<ResizableCover
-					className="block-library-cover__resize-container"
+					className={ classnames(
+						'block-library-cover__resize-container',
+						borderProps.className
+					) }
 					onResizeStart={ () => {
 						setAttributes( { minHeightUnit: 'px' } );
 						toggleSelection( false );
@@ -754,55 +763,64 @@ function CoverEdit( {
 						setAttributes( { minHeight: newMinHeight } );
 					} }
 					showHandle={ isSelected }
-				/>
+					style={ {
+						minHeight: minHeightWithUnit || '430px',
+						...borderProps.style,
+						...spacingProps.style,
+					} }
+				>
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
 
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__background',
-						dimRatioToClass( dimRatio ),
-						{
-							[ overlayColor.class ]: overlayColor.class,
-							'has-background-dim': dimRatio !== undefined,
-							// For backwards compatibility. Former versions of the Cover Block applied
-							// `.wp-block-cover__gradient-background` in the presence of
-							// media, a gradient and a dim.
-							'wp-block-cover__gradient-background':
-								url && gradientValue && dimRatio !== 0,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ {
+							backgroundImage: gradientValue,
+							...bgStyle,
+						} }
+					/>
+
+					{ url && isImageBackground && isImgElement && (
+						<img
+							ref={ isDarkElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
 					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
-				/>
-
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ isDarkElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
+					{ url && isVideoBackground && (
+						<video
+							ref={ isDarkElement }
+							className="wp-block-cover__video-background"
+							autoPlay
+							muted
+							loop
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) }
+					{ isUploadingMedia && <Spinner /> }
+					<CoverPlaceholder
+						disableMediaButtons
+						onSelectMedia={ onSelectMedia }
+						onError={ onUploadError }
 					/>
-				) }
-				{ url && isVideoBackground && (
-					<video
-						ref={ isDarkElement }
-						className="wp-block-cover__video-background"
-						autoPlay
-						muted
-						loop
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
-				{ isUploadingMedia && <Spinner /> }
-				<CoverPlaceholder
-					disableMediaButtons
-					onSelectMedia={ onSelectMedia }
-					onError={ onUploadError }
-				/>
-				<div { ...innerBlocksProps } />
+					<div { ...innerBlocksProps } />
+				</ResizableCover>
 			</div>
 		</>
 	);
