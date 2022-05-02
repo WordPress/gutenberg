@@ -322,11 +322,13 @@ export class BlockList extends Component {
 		} = this.props;
 		const { blockWidth } = this.state;
 
-		// blockClientIds are only required for Grid blocks in the BlockListItem component.
-		// However passing the blockClientIds as a top level prop results in unneeded re-renders.
+		// Extracting the grid item properties here to avoid
+		// re-renders in the blockListItem component.
+		const isGridItem = !! gridProperties;
 		const gridItemProps = gridProperties && {
-			props: gridProperties,
-			items: blockClientIds,
+			numOfColumns: gridProperties.numColumns,
+			tileCount: blockClientIds.length,
+			index: blockClientIds.indexOf( clientId ),
 		};
 		return (
 			<BlockListItem
@@ -344,6 +346,7 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
+				isGridItem={ isGridItem }
 				gridItemProps={ gridItemProps }
 			/>
 		);
