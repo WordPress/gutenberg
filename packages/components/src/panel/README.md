@@ -129,17 +129,19 @@ An icon to be shown next to the `PanelBody` title.
 
 ###### iconExpanded
 
-An icon to be shown as the toggle button within the `PanelBody` title when open.
+An icon to be shown as the toggle button within the `PanelBody` title, in its expanded state. See [the `@wordpress/icons` package](https://github.com/WordPress/gutenberg/blob/trunk/packages/icons/README.md) for a list of available icons.
 
--   Type: `String`
+-   Type: `React.ReactNode`
 -   Required: No
+-   Default: `chevronUp` icon from `@wordpress/icons`
 
 ###### iconCollapsed
 
-An icon to be shown as the toggle button within the `PanelBody` title when closed.
+An icon to be shown as the toggle button within the `PanelBody` title, in its collapsed state. See [the `@wordpress/icons` package](https://github.com/WordPress/gutenberg/blob/trunk/packages/icons/README.md) for a list of available icons.
 
--   Type: `String`
+-   Type: `React.ReactNode`
 -   Required: No
+-   Default: `chevronDown` icon from `@wordpress/icons`
 
 ###### onToggle
 
