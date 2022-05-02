@@ -16,7 +16,7 @@ export default function RangeRail( {
 	min = 0,
 	max = 100,
 	step = 1,
-	value = 0,
+	value,
 	...restProps
 } ) {
 	return (
@@ -29,7 +29,7 @@ export default function RangeRail( {
 					min={ min }
 					max={ max }
 					step={ step }
-					value={ value }
+					value={ value ?? ( max - min ) / 2 + min }
 				/>
 			) }
 		</>

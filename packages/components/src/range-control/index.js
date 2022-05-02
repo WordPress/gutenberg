@@ -111,15 +111,15 @@ function RangeControl(
 	const isThumbFocused = ! disabled && isFocused;
 
 	const isValueReset = value === null;
-	const currentValue = value !== undefined ? value : currentInput;
+	const usedValue = isValueReset
+		? resetFallbackValue ?? initialPosition
+		: value ?? currentInput;
 
-	const inputSliderValue = isValueReset ? '' : currentValue;
-
-	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
-
-	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
-	const fillValue = isValueReset ? 50 : calculatedFillValue;
-	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+	const fillPercent = `${
+		usedValue === null || usedValue === undefined
+			? 50
+			: ( ( clamp( usedValue, min, max ) - min ) / ( max - min ) ) * 100
+	}%`;
 
 	const classes = classnames( 'components-range-control', className );
 
@@ -140,7 +140,7 @@ function RangeControl(
 	const someNumberInputProps = useUnimpededRangedNumberEntry( {
 		max,
 		min,
-		value: inputSliderValue,
+		value: usedValue ?? '',
 		onChange: ( nextValue ) => {
 			if ( ! isNaN( nextValue ) ) {
 				setValue( nextValue );
@@ -184,7 +184,7 @@ function RangeControl(
 	};
 
 	const offsetStyle = {
-		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+		[ isRTL() ? 'right' : 'left' ]: fillPercent,
 	};
 
 	return (
@@ -222,7 +222,7 @@ function RangeControl(
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
 						step={ step }
-						value={ inputSliderValue }
+						value={ usedValue ?? '' }
 					/>
 					<RangeRail
 						aria-hidden={ true }
@@ -232,13 +232,13 @@ function RangeControl(
 						min={ min }
 						railColor={ railColor }
 						step={ step }
-						value={ rangeFillValue }
+						value={ usedValue }
 					/>
 					<Track
 						aria-hidden={ true }
 						className="components-range-control__track"
 						disabled={ disabled }
-						style={ { width: fillValueOffset } }
+						style={ { width: fillPercent } }
 						trackColor={ trackColor }
 					/>
 					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
