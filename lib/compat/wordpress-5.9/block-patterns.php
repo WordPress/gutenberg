@@ -25,9 +25,6 @@ if ( ! function_exists( '_load_remote_featured_patterns' ) ) {
 			return;
 		}
 
-		if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'featured' ) ) {
-			register_block_pattern_category( 'featured', array( 'label' => __( 'Featured', 'gutenberg' ) ) );
-		}
 		$request             = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request['category'] = 26; // This is the `Featured` category id from pattern directory.
 		$response            = rest_do_request( $request );

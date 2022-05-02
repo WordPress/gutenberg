@@ -11,13 +11,15 @@ import {
 	BlockControls,
 	Warning,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalUseDisabled as useDisabled,
-	useInstanceId,
-} from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import CommentsForm from './form';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -38,11 +40,49 @@ export default function PostCommentsFormEdit( {
 		} ),
 	} );
 
-	const isInSiteEditor = postType === undefined || postId === undefined;
+	const isSiteEditor = postType === undefined || postId === undefined;
 
-	const disabledFormRef = useDisabled();
+	const { defaultCommentStatus } = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalDiscussionSettings
+	);
 
-	const instanceId = useInstanceId( PostCommentsFormEdit );
+	const postTypeSupportsComments = useSelect( ( select ) =>
+		postType
+			? !! select( coreStore ).getPostType( postType )?.supports.comments
+			: false
+	);
+
+	let warning = false;
+	let showPlaceholder = true;
+
+	if ( ! isSiteEditor && 'open' !== commentStatus ) {
+		if ( 'closed' === commentStatus ) {
+			warning = sprintf(
+				/* translators: 1: Post type (i.e. "post", "page") */
+				__(
+					'Post Comments Form block: Comments on this %s are not allowed.'
+				),
+				postType
+			);
+			showPlaceholder = false;
+		} else if ( ! postTypeSupportsComments ) {
+			warning = sprintf(
+				/* translators: 1: Post type (i.e. "post", "page") */
+				__(
+					'Post Comments Form block: Comments for this post type (%s) are not enabled.'
+				),
+				postType
+			);
+			showPlaceholder = false;
+		} else if ( 'open' !== defaultCommentStatus ) {
+			warning = __(
+				'Post Comments Form block: Comments are not enabled.'
+			);
+			showPlaceholder = false;
+		}
+	}
 
 	return (
 		<>
@@ -55,57 +95,9 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentStatus && ! isInSiteEditor && (
-					<Warning>
-						{ __(
-							'Post Comments Form block: comments are not enabled for this post type.'
-						) }
-					</Warning>
-				) }
+				{ warning && <Warning>{ warning }</Warning> }
 
-				{ 'open' !== commentStatus && ! isInSiteEditor && (
-					<Warning>
-						{ sprintf(
-							/* translators: 1: Post type (i.e. "post", "page") */
-							__(
-								'Post Comments Form block: comments to this %s are not allowed.'
-							),
-							postType
-						) }
-					</Warning>
-				) }
-
-				{ ( 'open' === commentStatus || isInSiteEditor ) && (
-					<div>
-						<h3>{ __( 'Leave a Reply' ) }</h3>
-						<form
-							noValidate
-							className="comment-form"
-							ref={ disabledFormRef }
-						>
-							<p>
-								<label htmlFor={ `comment-${ instanceId }` }>
-									{ __( 'Comment' ) }
-								</label>
-								<textarea
-									id={ `comment-${ instanceId }` }
-									name="comment"
-									cols="45"
-									rows="8"
-								/>
-							</p>
-							<p>
-								<input
-									name="submit"
-									className="submit wp-block-button__link"
-									label={ __( 'Post Comment' ) }
-									value={ __( 'Post Comment' ) }
-									readOnly
-								/>
-							</p>
-						</form>
-					</div>
-				) }
+				{ showPlaceholder ? <CommentsForm /> : null }
 			</div>
 		</>
 	);

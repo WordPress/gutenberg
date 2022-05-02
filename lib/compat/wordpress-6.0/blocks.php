@@ -144,6 +144,16 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			'no_found_rows' => false,
 		);
 
+		if ( is_user_logged_in() ) {
+			$comment_args['include_unapproved'] = array( get_current_user_id() );
+		} else {
+			$unapproved_email = wp_get_unapproved_comment_author_email();
+
+			if ( $unapproved_email ) {
+				$comment_args['include_unapproved'] = array( $unapproved_email );
+			}
+		}
+
 		if ( ! empty( $block->context['postId'] ) ) {
 			$comment_args['post_id'] = (int) $block->context['postId'];
 		}
@@ -284,7 +294,7 @@ add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable'
  */
 function gutenberg_register_lock_attribute( $args ) {
 	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) ) {
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
 		$args['attributes'] = array();
 	}
 

@@ -16,10 +16,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalUseDisabled as useDisabled,
-	useInstanceId,
-} from '@wordpress/compose';
+import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import CommentsForm from '../post-comments-form/form';
 
 export default function PostCommentsEdit( {
 	attributes: { textAlign },
@@ -53,7 +55,7 @@ export default function PostCommentsEdit( {
 	let warning = __(
 		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
 	);
-	let showPlacholder = true;
+	let showPlaceholder = true;
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
@@ -64,7 +66,7 @@ export default function PostCommentsEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
 				/* translators: 1: Post type (i.e. "post", "page") */
@@ -73,10 +75,10 @@ export default function PostCommentsEdit( {
 				),
 				postType
 			);
-			showPlacholder = false;
+			showPlaceholder = false;
 		} else if ( 'open' !== defaultCommentStatus ) {
 			warning = __( 'Post Comments block: Comments are not enabled.' );
-			showPlacholder = false;
+			showPlaceholder = false;
 		}
 	}
 
@@ -87,8 +89,6 @@ export default function PostCommentsEdit( {
 	} );
 
 	const disabledRef = useDisabled();
-
-	const textareaId = useInstanceId( PostCommentsEdit );
 
 	return (
 		<>
@@ -104,7 +104,7 @@ export default function PostCommentsEdit( {
 			<div { ...blockProps }>
 				<Warning>{ warning }</Warning>
 
-				{ showPlacholder && (
+				{ showPlaceholder && (
 					<div
 						className="wp-block-post-comments__placeholder"
 						ref={ disabledRef }
@@ -206,37 +206,7 @@ export default function PostCommentsEdit( {
 							</div>
 						</div>
 
-						<div className="comment-respond">
-							<h3 className="comment-reply-title">
-								{ __( 'Leave a Reply' ) }
-							</h3>
-
-							<form className="comment-form" noValidate>
-								<p className="comment-form-comment">
-									<label
-										htmlFor={ `comment-${ textareaId }` }
-									>
-										{ __( 'Comment' ) }{ ' ' }
-										<span className="required">*</span>
-									</label>
-									<textarea
-										id={ `comment-${ textareaId }` }
-										name="comment"
-										cols="45"
-										rows="8"
-										required
-									/>
-								</p>
-								<p className="form-submit wp-block-button">
-									<input
-										name="submit"
-										type="submit"
-										className="submit wp-block-button__link"
-										value={ __( 'Post Comment' ) }
-									/>
-								</p>
-							</form>
-						</div>
+						<CommentsForm />
 					</div>
 				) }
 			</div>

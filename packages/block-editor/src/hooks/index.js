@@ -8,6 +8,7 @@ import './anchor';
 import './custom-class-name';
 import './generated-class-name';
 import './style';
+import './settings';
 import './color';
 import './duotone';
 import './font-size';

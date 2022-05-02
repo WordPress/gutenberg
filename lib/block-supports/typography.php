@@ -79,10 +79,6 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$attributes = array();
-	$classes    = array();
-	$styles     = array();
-
 	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
 	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
 	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
@@ -92,89 +88,107 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
-	if ( $has_font_size_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' ) ) {
-		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
-		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
+	// Whether to skip individual block support features.
+	$should_skip_font_size       = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
+	$should_skip_font_family     = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' );
+	$should_skip_font_style      = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
+	$should_skip_font_weight     = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
+	$should_skip_line_height     = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
+	$should_skip_text_decoration = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
+	$should_skip_text_transform  = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
+	$should_skip_letter_spacing  = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
 
-		if ( $has_named_font_size ) {
-			$classes[] = sprintf( 'has-%s-font-size', _wp_to_kebab_case( $block_attributes['fontSize'] ) );
-		} elseif ( $has_custom_font_size ) {
-			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
-		}
+	$typography_block_styles = array();
+	if ( $has_font_size_support && ! $should_skip_font_size ) {
+		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
+		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
+		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : $custom_font_size;
 	}
 
-	if ( $has_font_family_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontFamily' ) ) {
-		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
-		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-
-		if ( $has_named_font_family ) {
-			$classes[] = sprintf( 'has-%s-font-family', _wp_to_kebab_case( $block_attributes['fontFamily'] ) );
-		} elseif ( $has_custom_font_family ) {
-			// Before using classes, the value was serialized as a CSS Custom Property.
-			// We don't need this code path when it lands in core.
-			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
-			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
-				$index_to_splice    = strrpos( $font_family_custom, '|' ) + 1;
-				$font_family_slug   = _wp_to_kebab_case( substr( $font_family_custom, $index_to_splice ) );
-				$font_family_custom = sprintf( 'var(--wp--preset--font-family--%s)', $font_family_slug );
-			}
-			$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
-		}
+	if ( $has_font_family_support && ! $should_skip_font_family ) {
+		$preset_font_family                    = array_key_exists( 'fontFamily', $block_attributes ) ? "var:preset|font-family|{$block_attributes['fontFamily']}" : null;
+		$custom_font_family                    = isset( $block_attributes['style']['typography']['fontFamily'] ) ? gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontFamily'], 'font-family' ) : null;
+		$typography_block_styles['fontFamily'] = $preset_font_family ? $preset_font_family : $custom_font_family;
 	}
 
-	if ( $has_font_style_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' ) ) {
-		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
-		if ( $font_style ) {
-			$styles[] = $font_style;
-		}
+	if ( $has_font_style_support && ! $should_skip_font_style && isset( $block_attributes['style']['typography']['fontStyle'] ) ) {
+		$typography_block_styles['fontStyle'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontStyle'], 'font-style' );
 	}
 
-	if ( $has_font_weight_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' ) ) {
-		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
-		if ( $font_weight ) {
-			$styles[] = $font_weight;
-		}
+	if ( $has_font_weight_support && ! $should_skip_font_weight && isset( $block_attributes['style']['typography']['fontWeight'] ) ) {
+		$typography_block_styles['fontWeight'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontWeight'], 'font-weight' );
 	}
 
-	if ( $has_line_height_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' ) ) {
-		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
-		if ( $has_line_height ) {
-			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
-		}
+	if ( $has_line_height_support && ! $should_skip_line_height ) {
+			$typography_block_styles['lineHeight'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'lineHeight' ), null );
 	}
 
-	if ( $has_text_decoration_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' ) ) {
-		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
-		if ( $text_decoration_style ) {
-			$styles[] = $text_decoration_style;
-		}
+	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
+		$typography_block_styles['textDecoration'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textDecoration'], 'text-decoration' );
 	}
 
-	if ( $has_text_transform_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' ) ) {
-		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
-		if ( $text_transform_style ) {
-			$styles[] = $text_transform_style;
-		}
+	if ( $has_text_transform_support && ! $should_skip_text_transform && isset( $block_attributes['style']['typography']['textTransform'] ) ) {
+		$typography_block_styles['textTransform'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textTransform'], 'text-transform' );
 	}
 
-	if ( $has_letter_spacing_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' ) ) {
-		$letter_spacing_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'letterSpacing', 'letter-spacing' );
-		if ( $letter_spacing_style ) {
-			$styles[] = $letter_spacing_style;
-		}
+	if ( $has_letter_spacing_support && ! $should_skip_letter_spacing && isset( $block_attributes['style']['typography']['letterSpacing'] ) ) {
+		$typography_block_styles['letterSpacing'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['letterSpacing'], 'letter-spacing' );
 	}
 
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
+	$attributes = array();
+	$styles     = gutenberg_style_engine_generate( array( 'typography' => $typography_block_styles ) );
+
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
 	}
-	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( ' ', $styles );
+
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
 	return $attributes;
 }
 
 /**
+ * Note: this method is for backwards compatibility.
+ * It mostly replaces `gutenberg_typography_get_css_variable_inline_style()`.
+ *
+ * Generates an inline style value for a typography feature e.g. text decoration,
+ * text transform, and font style.
+ *
+ * @param string $style_value    A raw style value for a single typography feature from a block's style attribute.
+ * @param string $css_property   Slug for the CSS property the inline style sets.
+ *
+ * @return string?             A CSS inline style value.
+ */
+function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_property ) {
+	// If the style value is not a preset CSS variable go no further.
+	if ( empty( $style_value ) || strpos( $style_value, "var:preset|{$css_property}|" ) === false ) {
+		return $style_value;
+	}
+
+	// For backwards compatibility.
+	// Presets were removed in https://github.com/WordPress/gutenberg/pull/27555.
+	// We have a preset CSS variable as the style.
+	// Get the style value from the string and return CSS style.
+	$index_to_splice = strrpos( $style_value, '|' ) + 1;
+	$slug            = _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
+
+	// Return the actual CSS inline style value e.g. `var(--wp--preset--text-decoration--underline);`.
+	return sprintf( 'var(--wp--preset--%s--%s);', $css_property, $slug );
+}
+
+/**
+ * Deprecated.
+ * This method is no longer used and will have to be deprecated in Core.
+ *
+ * It can be deleted once migrated to the next WordPress version.
+ *
  * Generates an inline style for a typography feature e.g. text decoration,
  * text transform, and font style.
  *
@@ -213,5 +227,3 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_typography_support',
 	)
 );
-
-
