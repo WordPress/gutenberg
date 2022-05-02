@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -110,7 +110,7 @@ describe.each( [
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should keep invalid values in number input until loss of focus', () => {
+		it( 'should keep invalid values in number input until loss of focus', async () => {
 			const onChange = jest.fn();
 			const { container } = render(
 				<Component onChange={ onChange } min={ -1 } max={ 1 } />
@@ -122,7 +122,7 @@ describe.each( [
 			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
 
-			expect( numberInput.value ).toBe( '-1.1' );
+			await waitFor( () => expect( numberInput.value ).toBe( '-1.1' ) );
 			expect( rangeInput.value ).toBe( '-1' );
 
 			fireEvent.blur( numberInput );
