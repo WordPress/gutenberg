@@ -113,18 +113,16 @@ const transforms = {
 					...attributes,
 					backgroundColor: undefined,
 					gradient: undefined,
-					style:
-						attributes?.customGradient || attributes?.style?.color
+					style: cleanEmptyObject( {
+						...attributes?.style,
+						color: style?.color
 							? {
-									...attributes?.style,
-									color: {
-										background:
-											attributes?.customOverlayColor,
-										gradient: attributes?.customGradient,
-										...attributes?.style?.color,
-									},
+									...style?.color,
+									background: undefined,
+									gradient: undefined,
 							  }
 							: undefined,
+					} ),
 				};
 
 				// Preserve the block by nesting it within the Cover block,
@@ -226,20 +224,20 @@ const transforms = {
 				const transformedColorAttributes = {
 					backgroundColor: attributes?.overlayColor,
 					gradient: attributes?.gradient,
-					style:
-						attributes?.customOverlayColor ||
-						attributes?.customGradient ||
-						attributes?.style?.color
-							? {
-									...attributes?.style,
-									color: {
+					style: cleanEmptyObject( {
+						...attributes?.style,
+						color:
+							attributes?.customOverlayColor ||
+							attributes?.customGradient ||
+							attributes?.style?.color
+								? {
 										background:
 											attributes?.customOverlayColor,
 										gradient: attributes?.customGradient,
 										...attributes?.style?.color,
-									},
-							  }
-							: undefined,
+								  }
+								: undefined,
+					} ),
 				};
 
 				// If the Cover block contains only a single Group block as a direct child,
@@ -257,20 +255,19 @@ const transforms = {
 						{
 							...transformedColorAttributes,
 							...groupAttributes,
-							style:
-								attributes?.customOverlayColor ||
-								attributes?.customGradient ||
-								attributes?.style?.color
-									? {
-											...groupAttributes?.style,
-											color: {
+							style: cleanEmptyObject( {
+								...groupAttributes?.style,
+								color:
+									transformedColorAttributes?.style?.color ||
+									groupAttributes?.style?.color
+										? {
 												...transformedColorAttributes
 													?.style?.color,
 												...groupAttributes?.style
 													?.color,
-											},
-									  }
-									: undefined,
+										  }
+										: undefined,
+							} ),
 						},
 						innerBlocks[ 0 ]?.innerBlocks
 					);
