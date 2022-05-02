@@ -20,6 +20,8 @@ const meta: ComponentMeta< typeof SelectControl > = {
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
+		prefix: { control: { type: 'text' } },
+		suffix: { control: { type: 'text' } },
 		value: { control: { type: null } },
 	},
 	parameters: {
