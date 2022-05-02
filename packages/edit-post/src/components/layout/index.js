@@ -72,6 +72,7 @@ function Layout( { styles } ) {
 		setIsInserterOpened,
 	} = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setIsListViewOpened } = useDispatch( editPostStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -89,6 +90,7 @@ function Layout( { styles } ) {
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
+		isListViewOpenByDefault,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
@@ -129,6 +131,9 @@ function Layout( { styles } ) {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			isListViewOpenByDefault: select( editPostStore ).isFeatureActive(
+				'listView'
+			),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -141,6 +146,12 @@ function Layout( { styles } ) {
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
+
+	useEffect( () => {
+		if ( isListViewOpenByDefault ) {
+			setIsListViewOpened( true );
+		}
+	}, [] );
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -181,6 +192,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
 		}
+
 		return null;
 	};
 
