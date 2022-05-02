@@ -131,12 +131,24 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
+
+	const noChromeOpened =
+		! sidebarIsOpened && ! isListViewOpened && ! isInserterOpened;
+
+	const [ isDistractionFree, setIsDistractionFree ] = useState(
+		hasReducedUI && noChromeOpened
+	);
+
+	useEffect( () => {
+		setIsDistractionFree( hasReducedUI && noChromeOpened );
+	}, [ noChromeOpened ] );
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
-		'is-distraction-free': hasReducedUI,
+		'is-distraction-free': isDistractionFree,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -214,7 +226,7 @@ function Layout( { styles } ) {
 					...interfaceLabels,
 					secondarySidebar: secondarySidebarLabel,
 				} }
-				isDistractionFree={ hasReducedUI }
+				isDistractionFree={ isDistractionFree }
 				header={
 					<Header
 						setEntitiesSavedStatesCallback={

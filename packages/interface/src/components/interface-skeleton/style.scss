@@ -129,36 +129,6 @@ html.interface-interface-skeleton__html-container {
 		border-bottom: 0;
 	}
 
-	.interface-interface-skeleton__secondary-sidebar,
-	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
-		border: 0;
-		margin: $grid-unit-15;
-		border-radius: 2px;
-		box-shadow: $shadow-popover;
-
-		.components-panel__body {
-			border-bottom: 0;
-		}
-	}
-
-	.interface-interface-skeleton__secondary-sidebar {
-		position: absolute !important; // ignore the important for now
-		width: 350px;
-		right: inherit;
-		top: $header-height;
-		left: 0;
-	}
-
-	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
-		position: absolute !important; // ignore the important for now
-		width: $sidebar-width;
-		right: 0;
-		top: $header-height;
-		left: inherit;
-		bottom: auto;
-		max-height: calc(100vh - #{$header-height} - (#{$grid-unit-15} * 2));
-	}
-
 	.interface-interface-skeleton__body {
 		margin-top: -60px;
 	}

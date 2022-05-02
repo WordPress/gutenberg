@@ -79,16 +79,6 @@ function InterfaceSkeleton(
 		},
 	};
 
-	const sidebarVariants = {
-		hidden: { 
-			opacity: 0.25,
-		},
-		hover: {
-			opacity: 1,
-			transition: { type: 'tween', delay: 0 },
-		},
-	};
-
 	return (
 		<div
 			{ ...navigateRegionsProps }
@@ -128,19 +118,14 @@ function InterfaceSkeleton(
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
-						<motion.div
-							animate={ isDistractionFree ? 'hidden' : 'hover' }
-							initial="hover"
-							whileHover="hover"
-							variants={ sidebarVariants }
-							transition={ { type: 'tween', delay: 0.8 } }
+						<div
 							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
 							aria-label={ mergedLabels.secondarySidebar }
 							tabIndex="-1"
 						>
 							{ secondarySidebar }
-						</motion.div>
+						</div>
 					) }
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
@@ -156,19 +141,14 @@ function InterfaceSkeleton(
 						{ content }
 					</div>
 					{ !! sidebar && (
-						<motion.div
-							animate={ isDistractionFree ? 'hidden' : 'hover' }
-							initial="hover"
-							whileHover="hover"
-							variants={ sidebarVariants }
-							transition={ { type: 'tween', delay: 0.8 } }
+						<div
 							className="interface-interface-skeleton__sidebar"
 							role="region"
 							aria-label={ mergedLabels.sidebar }
 							tabIndex="-1"
 						>
 							{ sidebar }
-						</motion.div>
+						</div>
 					) }
 					{ !! actions && (
 						<div
