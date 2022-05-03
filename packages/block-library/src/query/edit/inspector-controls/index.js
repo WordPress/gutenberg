@@ -24,6 +24,7 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import TaxonomyControls from './taxonomy-controls';
+import ExcludePostsControl from './exclude-posts-control';
 import { usePostTypes } from '../../utils';
 
 const stickyOptions = [
@@ -41,6 +42,7 @@ export default function QueryInspectorControls( {
 		order,
 		orderBy,
 		author: authorIds,
+		exclude: postIds,
 		postType,
 		sticky,
 		inherit,
@@ -151,6 +153,11 @@ export default function QueryInspectorControls( {
 				<PanelBody title={ __( 'Filters' ) }>
 					<TaxonomyControls onChange={ setQuery } query={ query } />
 					<AuthorControl value={ authorIds } onChange={ setQuery } />
+					<ExcludePostsControl
+						query={ query }
+						value={ postIds }
+						onChange={ setQuery }
+					/>
 					<TextControl
 						label={ __( 'Keyword' ) }
 						value={ querySearch }
