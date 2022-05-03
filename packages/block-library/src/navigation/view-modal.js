@@ -57,7 +57,7 @@ window.addEventListener( 'load', () => {
 		const modalId = modal?.getAttribute( 'id' );
 
 		link.addEventListener( 'click', () => {
-			// check if modal exists and is open before we try to close it
+			// check if modal exists and is open before trying to close it
 			// otherwise Micromodal will toggle the `has-modal-open` class
 			// on the html tag which prevents scrolling
 			if ( modalId && modal.classList.contains( 'has-modal-open' ) ) {
