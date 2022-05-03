@@ -274,14 +274,11 @@ describe( 'UnitControl', () => {
 			};
 
 			const { user } = render(
-				<>
-					<button>Click me</button>
-					<UnitControl
-						value={ state }
-						onChange={ setState }
-						onBlur={ onBlurSpy }
-					/>
-				</>
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					onBlur={ onBlurSpy }
+				/>
 			);
 
 			const input = getInput();
@@ -291,9 +288,8 @@ describe( 'UnitControl', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41%' );
 
-			// Clicking on the button should cause the `onBlur` callback to fire.
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			// Clicking document.body to trigget a blur event on the input.
+			await user.click( document.body );
 
 			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
 		} );
@@ -309,15 +305,12 @@ describe( 'UnitControl', () => {
 			};
 
 			const { user } = render(
-				<>
-					<button>Click me</button>
-					<UnitControl
-						value={ state }
-						onChange={ setState }
-						onUnitChange={ onUnitChangeSpy }
-						isPressEnterToChange
-					/>
-				</>
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					onUnitChange={ onUnitChangeSpy }
+					isPressEnterToChange
+				/>
 			);
 
 			// Input type is `text` when the `isPressEnterToChange` prop is passed
@@ -327,10 +320,10 @@ describe( 'UnitControl', () => {
 
 			// This is because `isPressEnterToChange` is `true`
 			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( onUnitChangeSpy ).not.toHaveBeenCalled();
 
-			// Clicking on the button should cause the `onBlur` callback to fire.
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			// Clicking document.body to trigget a blur event on the input.
+			await user.click( document.body );
 
 			// TODO: investigate why `onChange` gets called twice instead of once
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
@@ -515,14 +508,11 @@ describe( 'UnitControl', () => {
 			const onBlurSpy = jest.fn();
 
 			const { user } = render(
-				<>
-					<button>Click me</button>
-					<UnitControl
-						value="15px"
-						onUnitChange={ onUnitChangeSpy }
-						onBlur={ onBlurSpy }
-					/>
-				</>
+				<UnitControl
+					value="15px"
+					onUnitChange={ onUnitChangeSpy }
+					onBlur={ onBlurSpy }
+				/>
 			);
 
 			const select = getSelect();
@@ -534,9 +524,8 @@ describe( 'UnitControl', () => {
 				expect.anything()
 			);
 
-			// Clicking on the button should cause the `onBlur` callback to fire.
-			const button = screen.getByRole( 'button' );
-			await user.click( button );
+			// Clicking document.body to trigget a blur event on the input.
+			await user.click( document.body );
 
 			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
 		} );
