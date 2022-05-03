@@ -92,7 +92,7 @@ function ListViewBranch( props ) {
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
-		expandNested,
+		isExpanded,
 	} = props;
 
 	const {
@@ -115,7 +115,7 @@ function ListViewBranch( props ) {
 						filteredBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
-						expandNested
+						isExpanded
 					);
 				}
 
@@ -133,8 +133,8 @@ function ListViewBranch( props ) {
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 
-				const isExpanded = hasNestedBlocks
-					? expandedState[ clientId ] ?? expandNested
+				const shouldExpand = hasNestedBlocks
+					? expandedState[ clientId ] ?? isExpanded
 					: undefined;
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
@@ -164,7 +164,7 @@ function ListViewBranch( props ) {
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
-								isExpanded={ isExpanded }
+								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 							/>
@@ -174,7 +174,7 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && isExpanded && ! isDragged && (
+						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
@@ -186,7 +186,7 @@ function ListViewBranch( props ) {
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }
-								expandNested={ expandNested }
+								isExpanded={ isExpanded }
 							/>
 						) }
 					</AsyncModeProvider>

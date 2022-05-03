@@ -19,7 +19,7 @@
 /packages/block-library/src/navigation-submenu  @tellthemachines
 /packages/block-library/src/page-list           @tellthemachines
 /packages/block-library/src/comment-template    @michalczaplinski
-/packages/block-library/src/comments-query-loop @michalczaplinski
+/packages/block-library/src/comments            @michalczaplinski
 
 # Duotone
 /lib/block-supports/duotone.php                       @ajlende
@@ -117,9 +117,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @cameronvoell
-/packages/rich-text                             @ellatrix @cameronvoell
-/packages/block-editor/src/components/rich-text @ellatrix @cameronvoell
+/packages/format-library                        @ellatrix @fluiddot
+/packages/rich-text                             @ellatrix @fluiddot
+/packages/block-editor/src/components/rich-text @ellatrix @fluiddot
 
 # Project Management
 /.github

@@ -11,7 +11,7 @@ import {
 	trashAllComments,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Comment Query Loop', () => {
+describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
 		previousDefaultCommentsPage;
@@ -27,12 +27,12 @@ describe( 'Comment Query Loop', () => {
 	it( 'We show no results message if there are no comments', async () => {
 		await trashAllComments();
 		await createNewPost();
-		await insertBlock( 'Comments Query Loop' );
+		await insertBlock( 'Comments' );
 		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
 	} );
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();
-		await insertBlock( 'Comments Query Loop' );
+		await insertBlock( 'Comments' );
 		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.
@@ -93,7 +93,7 @@ describe( 'Comment Query Loop', () => {
 	it( 'Pagination links are not appearing if break comments is not enabled', async () => {
 		await setOption( 'page_comments', '0' );
 		await createNewPost();
-		await insertBlock( 'Comments Query Loop' );
+		await insertBlock( 'Comments' );
 		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.

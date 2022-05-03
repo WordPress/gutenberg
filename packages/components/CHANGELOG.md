@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `UnitControl`: migrate unit tests to TypeScript ([#40697](https://github.com/WordPress/gutenberg/pull/40697)).
+
 ### Enhancements
 
 -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
