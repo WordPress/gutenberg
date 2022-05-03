@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
+import { focus, isFormElement } from '@wordpress/dom';
 import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
@@ -11,16 +11,6 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
 
 export default function useTabNav() {
 	const container = useRef();

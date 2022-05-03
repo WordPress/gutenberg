@@ -14,9 +14,12 @@ import type { User } from './login';
 import { login } from './login';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
+import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
+import { resetPreferences } from './preferences';
+import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -115,6 +118,10 @@ class RequestUtils {
 	activateTheme = activateTheme;
 	deleteAllBlocks = deleteAllBlocks;
 	deleteAllPosts = deleteAllPosts;
+	deleteAllWidgets = deleteAllWidgets;
+	addWidgetBlock = addWidgetBlock;
+	deleteAllTemplates = deleteAllTemplates;
+	resetPreferences = resetPreferences;
 }
 
 export type { StorageState };

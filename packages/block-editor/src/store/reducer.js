@@ -1182,26 +1182,6 @@ export function draggedBlocks( state = [], action ) {
 }
 
 /**
- * Reducer returning whether the caret is within formatted text.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function isCaretWithinFormattedText( state = false, action ) {
-	switch ( action.type ) {
-		case 'ENTER_FORMATTED_TEXT':
-			return true;
-
-		case 'EXIT_FORMATTED_TEXT':
-			return false;
-	}
-
-	return state;
-}
-
-/**
  * Internal helper reducer for selectionStart and selectionEnd. Can hold a block
  * selection, represented by an object with property clientId.
  *
@@ -1278,17 +1258,24 @@ function selectionHelper( state = {}, action ) {
 export function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
+			if ( action.clientId ) {
+				return {
+					selectionStart: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.startOffset,
+					},
+					selectionEnd: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.endOffset,
+					},
+				};
+			}
+
 			return {
-				selectionStart: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.startOffset,
-				},
-				selectionEnd: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.endOffset,
-				},
+				selectionStart: action.start || state.selectionStart,
+				selectionEnd: action.end || state.selectionEnd,
 			};
 		case 'RESET_SELECTION':
 			const { selectionStart, selectionEnd } = action;
@@ -1298,6 +1285,14 @@ export function selection( state = {}, action ) {
 			};
 		case 'MULTI_SELECT':
 			const { start, end } = action;
+
+			if (
+				start === state.selectionStart?.clientId &&
+				end === state.selectionEnd?.clientId
+			) {
+				return state;
+			}
+
 			return {
 				selectionStart: { clientId: start },
 				selectionEnd: { clientId: end },
@@ -1750,7 +1745,6 @@ export default combineReducers( {
 	blocks,
 	isTyping,
 	draggedBlocks,
-	isCaretWithinFormattedText,
 	selection,
 	isMultiSelecting,
 	isSelectionEnabled,

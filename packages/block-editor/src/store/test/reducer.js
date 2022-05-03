@@ -22,7 +22,6 @@ import {
 	blocks,
 	isTyping,
 	draggedBlocks,
-	isCaretWithinFormattedText,
 	selection,
 	initialPosition,
 	isMultiSelecting,
@@ -2157,24 +2156,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'isCaretWithinFormattedText()', () => {
-		it( 'should set the flag to true', () => {
-			const state = isCaretWithinFormattedText( false, {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( true );
-		} );
-
-		it( 'should set the flag to false', () => {
-			const state = isCaretWithinFormattedText( true, {
-				type: 'EXIT_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( false );
 		} );
 	} );
 

@@ -21,9 +21,11 @@ describe( 'Template Part', () => {
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
 	} );
-	afterAll( async () => {
+	afterEach( async () => {
 		await deleteAllTemplates( 'wp_template' );
 		await deleteAllTemplates( 'wp_template_part' );
+	} );
+	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 

@@ -25,10 +25,19 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
-jest.useFakeTimers( 'legacy' );
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 describe( 'Editor', () => {
-	beforeAll( registerCoreBlocks );
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
 
 	it( 'detects unsupported block and sends hasUnsupportedBlocks true to native', () => {
 		RNReactNativeGutenbergBridge.editorDidMount = jest.fn();

@@ -4,7 +4,6 @@
 import {
 	createNewPost,
 	pressKeyWithModifier,
-	clickBlockToolbarButton,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -42,9 +41,7 @@ async function testBlockToolbarKeyboardNavigation(
 
 async function wrapCurrentBlockWithGroup( currentBlockTitle ) {
 	await page.click( `[aria-label="${ currentBlockTitle }"]` );
-	await page.evaluate( () => {
-		document.querySelector( '.editor-block-list-item-group' ).click();
-	} );
+	await page.click( '.editor-block-list-item-group' );
 }
 
 async function testGroupKeyboardNavigation(
@@ -128,10 +125,11 @@ describe( 'Toolbar roving tabindex', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph' );
 		await focusBlockToolbar();
-		await clickBlockToolbarButton( 'Bold' );
-		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+		await expectLabelToHaveFocus( 'Move up' );
+		await page.keyboard.press( 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expectLabelToHaveFocus( 'Bold' );
+		await expectLabelToHaveFocus( 'Move up' );
 	} );
 
 	it( 'can reach toolbar items with arrow keys after pressing alt+F10', async () => {

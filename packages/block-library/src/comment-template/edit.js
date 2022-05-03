@@ -20,7 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCommentQueryArgs, useCommentTree } from './hooks';
 
 const TEMPLATE = [
-	[ 'core/comment-author-avatar' ],
+	[ 'core/avatar' ],
 	[ 'core/comment-author-name' ],
 	[ 'core/comment-date' ],
 	[ 'core/comment-content' ],
@@ -229,36 +229,29 @@ const CommentsList = ( {
 
 export default function CommentTemplateEdit( {
 	clientId,
-	context: {
-		postId,
-		'comments/perPage': perPage,
-		'comments/order': order,
-		'comments/defaultPage': defaultPage,
-		'comments/inherit': inherit,
-	},
+	context: { postId },
 } ) {
 	const blockProps = useBlockProps();
 
 	const [ activeCommentId, setActiveCommentId ] = useState();
-	const { commentOrder, threadCommentsDepth, threadComments } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return getSettings().__experimentalDiscussionSettings;
-		}
-	);
+	const {
+		commentOrder,
+		threadCommentsDepth,
+		threadComments,
+		commentsPerPage,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalDiscussionSettings;
+	} );
 
 	const commentQuery = useCommentQueryArgs( {
 		postId,
-		perPage,
-		defaultPage,
-		inherit,
 	} );
 
 	const { topLevelComments, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-
 			return {
 				// Request only top-level comments. Replies are embedded.
 				topLevelComments: commentQuery
@@ -270,12 +263,10 @@ export default function CommentTemplateEdit( {
 		[ clientId, commentQuery ]
 	);
 
-	order = inherit || ! order ? commentOrder : order;
-
 	// Generate a tree structure of comment IDs.
 	let commentTree = useCommentTree(
 		// Reverse the order of top comments if needed.
-		order === 'desc' && topLevelComments
+		commentOrder === 'desc' && topLevelComments
 			? [ ...topLevelComments ].reverse()
 			: topLevelComments
 	);
@@ -290,14 +281,14 @@ export default function CommentTemplateEdit( {
 
 	if ( ! postId ) {
 		commentTree = getCommentsPlaceholder( {
-			perPage,
+			perPage: commentsPerPage,
 			threadComments,
 			threadCommentsDepth,
 		} );
 	}
 
 	if ( ! commentTree.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+		return <p { ...blockProps }>{ __( 'No results found.' ) }</p>;
 	}
 
 	return (

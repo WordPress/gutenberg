@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, compact, uniq } from 'lodash';
+import { find, includes, get, compact, uniq, map, mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -452,4 +452,30 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async (
 		currentTheme.stylesheet,
 		variations
 	);
+};
+
+export const getBlockPatterns = () => async ( { dispatch } ) => {
+	const restPatterns = await apiFetch( {
+		path: '/wp/v2/block-patterns/patterns',
+	} );
+	const patterns = map( restPatterns, ( pattern ) =>
+		mapKeys( pattern, ( value, key ) => {
+			switch ( key ) {
+				case 'block_types':
+					return 'blockTypes';
+				case 'viewport_width':
+					return 'viewportWidth';
+				default:
+					return key;
+			}
+		} )
+	);
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
+};
+
+export const getBlockPatternCategories = () => async ( { dispatch } ) => {
+	const categories = await apiFetch( {
+		path: '/wp/v2/block-patterns/categories',
+	} );
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 };

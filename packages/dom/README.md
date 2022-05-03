@@ -184,6 +184,18 @@ _Returns_
 
 -   `boolean`: True if entirely selected, false if not.
 
+### isFormElement
+
+Detects if element is a form element.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if form element and false otherwise.
+
 ### isHorizontalEdge
 
 Check whether the selection is horizontally at the edge of the container.

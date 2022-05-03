@@ -36,7 +36,6 @@ import { useBlockEditContext } from '../block-edit';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
-import { useCaretInFormat } from './use-caret-in-format';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
@@ -45,6 +44,7 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -131,6 +131,7 @@ function RichTextWrapper(
 		if ( originalIsSelected === undefined ) {
 			isSelected =
 				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
 				selectionStart.attributeKey === identifier;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
@@ -171,7 +172,26 @@ function RichTextWrapper(
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
-			selectionChange( clientId, identifier, start, end );
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			if ( typeof start === 'number' || unset ) {
+				selection.start = {
+					clientId,
+					attributeKey: identifier,
+					offset: start,
+				};
+			}
+
+			if ( typeof end === 'number' || unset ) {
+				selection.end = {
+					clientId,
+					attributeKey: identifier,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
 		},
 		[ clientId, identifier ]
 	);
@@ -247,7 +267,6 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -330,6 +349,7 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
@@ -339,6 +359,7 @@ function RichTextWrapper(
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
+						selectionChange,
 					} ),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
@@ -370,8 +391,8 @@ function RichTextWrapper(
 						disableLineBreaks,
 						onSplitAtEnd,
 					} ),
+					useFirefoxCompat(),
 					anchorRef,
-					forwardedRef,
 				] ) }
 				contentEditable={ true }
 				suppressContentEditableWarning={ true }

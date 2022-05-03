@@ -396,6 +396,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
 
+	$should_load_modal_view_script = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'];
+	if ( $should_load_modal_view_script ) {
+		wp_enqueue_script( 'wp-block-navigation-view-modal' );
+	}
+
 	$inner_blocks = $block->inner_blocks;
 
 	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
@@ -486,6 +491,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$layout_class .= ' no-wrap';
 	}
 
+	// Manually add block support text decoration as CSS class.
+	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
+	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
+
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
@@ -493,7 +502,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		$is_responsive_menu ? array( 'is-responsive' ) : array(),
 		$layout_class ? array( $layout_class ) : array(),
-		$is_fallback ? array( 'is-fallback' ) : array()
+		$is_fallback ? array( 'is-fallback' ) : array(),
+		$text_decoration ? array( $text_decoration_class ) : array()
 	);
 
 	$inner_blocks_html = '';

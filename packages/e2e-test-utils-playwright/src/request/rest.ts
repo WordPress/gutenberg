@@ -146,8 +146,8 @@ async function getMaxBatchSize( this: RequestUtils, forceRefetch = false ) {
 interface BatchRequest {
 	method?: string;
 	path: string;
-	headers: Record< string, string | string[] >;
-	body: any;
+	headers?: Record< string, string | string[] >;
+	body?: any;
 }
 
 async function batchRest< BatchResponse >(
@@ -168,7 +168,10 @@ async function batchRest< BatchResponse >(
 		return chunkResponses.flat();
 	}
 
-	const { responses } = await this.rest< { responses: BatchResponse[] } >( {
+	const batchResponses = await this.rest< {
+		failed?: string;
+		responses: BatchResponse[];
+	} >( {
 		method: 'POST',
 		path: '/batch/v1',
 		data: {
@@ -177,7 +180,11 @@ async function batchRest< BatchResponse >(
 		},
 	} );
 
-	return responses;
+	if ( batchResponses.failed ) {
+		throw batchResponses;
+	}
+
+	return batchResponses.responses;
 }
 
 export { setupRest, rest, getMaxBatchSize, batchRest };

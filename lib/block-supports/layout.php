@@ -11,7 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -28,14 +28,15 @@ function gutenberg_register_layout_support( $block_type ) {
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string  $selector CSS selector.
- * @param array   $layout   Layout object. The one that is passed has already checked the existence of default block layout.
- * @param boolean $has_block_gap_support Whether the theme has support for the block gap.
- * @param string  $gap_value The block gap value to apply.
+ * @param string  $selector                      CSS selector.
+ * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
+ * @param string  $gap_value                     The block gap value to apply.
+ * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  *
- * @return string CSS style.
+ * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -69,7 +70,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
@@ -80,6 +81,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'left'   => 'flex-start',
 			'right'  => 'flex-end',
 			'center' => 'center',
+		);
+
+		$vertical_alignment_options = array(
+			'top'    => 'flex-start',
+			'center' => 'center',
+			'bottom' => 'flex-end',
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
@@ -99,7 +106,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : '0.5em';
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
-			$gap_style = $gap_value ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
 			$style    .= "gap: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';
@@ -115,6 +122,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+			}
+
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
+			} else {
+				$style .= 'align-items: center;';
 			}
 		} else {
 			$style .= 'flex-direction: column;';
@@ -141,7 +154,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
 
 	if ( ! $support_layout ) {
 		return $block_content;
@@ -166,13 +179,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// because we only want to match against the value, not the CSS attribute.
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 		}
 	} else {
-		$gap_value = preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+		$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 	}
 
-	$style = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value );
+	// If a block's block.json skips serialization for spacing or spacing.blockGap,
+	// don't apply the user-defined value to the styles.
+	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(

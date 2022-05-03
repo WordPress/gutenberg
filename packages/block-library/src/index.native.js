@@ -179,6 +179,14 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
+// To be removed once Quote V2 is released on the web editor.
+function quoteCheck( quoteBlock, blocksFlags ) {
+	if ( blocksFlags?.__experimentalEnableQuoteBlockV2 ) {
+		quoteBlock.settings = quoteBlock?.settingsV2;
+	}
+	return quoteBlock;
+}
+
 // Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
@@ -230,8 +238,10 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
+ * @param {Object} [blocksFlags] Experimental flags
+ *
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -244,7 +254,7 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		separator,
 		list,
-		quote,
+		quoteCheck( quote, blocksFlags ),
 		mediaText,
 		preformatted,
 		gallery,

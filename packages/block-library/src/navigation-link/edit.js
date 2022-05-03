@@ -49,8 +49,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { name } from './block.json';
 
-const MAX_NESTING = 5;
-
 /**
  * A React hook to determine if it's dragging within the target element.
  *
@@ -344,7 +342,35 @@ function navStripHTML( html ) {
  * Add transforms to Link Control
  */
 
-function LinkControlTransforms( { block, transforms, replace } ) {
+function LinkControlTransforms( { clientId, replace } ) {
+	const { getBlock, blockTransforms } = useSelect(
+		( select ) => {
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+			} = select( blockEditorStore );
+
+			return {
+				getBlock: _getBlock,
+				blockTransforms: getBlockTransformItems(
+					_getBlock( clientId ),
+					getBlockRootClientId( clientId )
+				),
+			};
+		},
+		[ clientId ]
+	);
+
+	const featuredBlocks = [
+		'core/site-logo',
+		'core/social-links',
+		'core/search',
+	];
+	const transforms = blockTransforms.filter( ( item ) => {
+		return featuredBlocks.includes( item.name );
+	} );
+
 	if ( ! transforms?.length ) {
 		return null;
 	}
@@ -361,8 +387,11 @@ function LinkControlTransforms( { block, transforms, replace } ) {
 							key={ `transform-${ index }` }
 							onClick={ () =>
 								replace(
-									block.clientId,
-									switchToBlockType( block, item.name )
+									clientId,
+									switchToBlockType(
+										getBlock( clientId ),
+										item.name
+									)
 								)
 							}
 							className="link-control-transform__item"
@@ -400,6 +429,7 @@ export default function NavigationLinkEdit( {
 	} = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
+	const { maxNestingLevel } = context;
 
 	const link = {
 		url,
@@ -422,29 +452,19 @@ export default function NavigationLinkEdit( {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
-		hasDescendants,
+		hasChildren,
 		userCanCreatePages,
 		userCanCreatePosts,
-		thisBlock,
-		blockTransforms,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock,
 				getBlocks,
+				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
-				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
-				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
-				getBlockTransformItems,
 			} = select( blockEditorStore );
-
-			const selectedBlockId = getSelectedBlockClientId();
-
-			const descendants = getClientIdsOfDescendants( [ clientId ] )
-				.length;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
@@ -452,7 +472,7 @@ export default function NavigationLinkEdit( {
 					getBlockParentsByBlockName( clientId, [
 						name,
 						'core/navigation-submenu',
-					] ).length >= MAX_NESTING,
+					] ).length >= maxNestingLevel,
 				isTopLevelLink:
 					getBlockName( getBlockRootClientId( clientId ) ) ===
 					'core/navigation',
@@ -460,14 +480,7 @@ export default function NavigationLinkEdit( {
 					clientId,
 					true
 				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
-				hasDescendants: !! descendants,
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				hasChildren: !! getBlockCount( clientId ),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -475,11 +488,6 @@ export default function NavigationLinkEdit( {
 				userCanCreatePosts: select( coreStore ).canUser(
 					'create',
 					'posts'
-				),
-				thisBlock: getBlock( clientId ),
-				blockTransforms: getBlockTransformItems(
-					[ getBlock( clientId ) ],
-					getBlockRootClientId( clientId )
 				),
 			};
 		},
@@ -507,15 +515,6 @@ export default function NavigationLinkEdit( {
 		replaceBlock( clientId, newSubmenu );
 	}
 
-	const featuredBlocks = [
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-	const featuredTransforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
-
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
 		// ( When adding a new menu item)
@@ -525,7 +524,7 @@ export default function NavigationLinkEdit( {
 			setIsLinkOpen( true );
 		}
 		// If block has inner blocks, transform to Submenu.
-		if ( hasDescendants ) {
+		if ( hasChildren ) {
 			transformToSubmenu();
 		}
 	}, [] );
@@ -635,7 +634,7 @@ export default function NavigationLinkEdit( {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
-			'has-child': hasDescendants,
+			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
@@ -738,40 +737,49 @@ export default function NavigationLinkEdit( {
 					) : (
 						<>
 							{ ! isInvalid && ! isDraft && (
-								<RichText
-									ref={ ref }
-									identifier="label"
-									className="wp-block-navigation-item__label"
-									value={ label }
-									onChange={ ( labelValue ) =>
-										setAttributes( {
-											label: labelValue,
-										} )
-									}
-									onMerge={ mergeBlocks }
-									onReplace={ onReplace }
-									__unstableOnSplitAtEnd={ () =>
-										insertBlocksAfter(
-											createBlock(
-												'core/navigation-link'
-											)
-										)
-									}
-									aria-label={ __( 'Navigation link text' ) }
-									placeholder={ itemLabelPlaceholder }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/image',
-										'core/strikethrough',
-									] }
-									onClick={ () => {
-										if ( ! url ) {
-											setIsLinkOpen( true );
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
 										}
-									} }
-								/>
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
+												)
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
+										) }
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+										allowedFormats={ [
+											'core/bold',
+											'core/italic',
+											'core/image',
+											'core/strikethrough',
+										] }
+										onClick={ () => {
+											if ( ! url ) {
+												setIsLinkOpen( true );
+											}
+										} }
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
@@ -852,10 +860,7 @@ export default function NavigationLinkEdit( {
 									! url
 										? () => (
 												<LinkControlTransforms
-													block={ thisBlock }
-													transforms={
-														featuredTransforms
-													}
+													clientId={ clientId }
 													replace={ replaceBlock }
 												/>
 										  )

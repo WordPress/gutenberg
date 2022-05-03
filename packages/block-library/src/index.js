@@ -13,6 +13,7 @@ import {
  * Internal dependencies
  */
 import * as archives from './archives';
+import * as avatar from './avatar';
 import * as audio from './audio';
 import * as button from './button';
 import * as buttons from './buttons';
@@ -22,6 +23,7 @@ import * as classic from './freeform';
 import * as code from './code';
 import * as column from './column';
 import * as columns from './columns';
+import * as comments from './comments';
 import * as commentAuthorAvatar from './comment-author-avatar';
 import * as commentAuthorName from './comment-author-name';
 import * as commentContent from './comment-content';
@@ -30,10 +32,10 @@ import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
 import * as commentsPaginationPrevious from './comments-pagination-previous';
-import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
+import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -52,7 +54,6 @@ import * as mediaText from './media-text';
 import * as missing from './missing';
 import * as more from './more';
 import * as navigation from './navigation';
-import * as navigationArea from './navigation-area';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
@@ -137,7 +138,6 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
-	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -190,6 +190,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTagline,
 	query,
 	templatePart,
+	avatar,
 	postTitle,
 	postExcerpt,
 	postFeaturedImage,
@@ -203,7 +204,23 @@ export const __experimentalGetCoreBlocks = () => [
 	queryPaginationNext,
 	queryPaginationNumbers,
 	queryPaginationPrevious,
+	queryNoResults,
+	readMore,
+	comments,
+	commentAuthorName,
+	commentContent,
+	commentDate,
+	commentEditLink,
+	commentReplyLink,
+	commentTemplate,
+	commentsTitle,
+	commentsPagination,
+	commentsPaginationNext,
+	commentsPaginationNumbers,
+	commentsPaginationPrevious,
 	postComments,
+	postCommentsForm,
+	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
@@ -251,31 +268,18 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				homeLink,
 				postAuthorName,
-				queryNoResults,
+				...( window.__experimentalEnableListBlockV2
+					? [ listItem ]
+					: [] ),
 
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
 							commentAuthorAvatar,
-							commentAuthorName,
-							commentContent,
-							commentDate,
-							commentEditLink,
-							commentReplyLink,
-							commentTemplate,
-							commentsQueryLoop,
-							commentsPagination,
-							commentsPaginationNext,
-							commentsPaginationNumbers,
-							commentsPaginationPrevious,
-							navigationArea,
 							postComment,
 							postCommentsCount,
-							postCommentsForm,
 							postCommentsLink,
-							readMore,
 					  ]
 					: [] ),
 			].forEach( registerBlock );
