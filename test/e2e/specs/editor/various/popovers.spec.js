@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'new editor state', () => {
+test.describe( 'popovers', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-post-formats-support'
