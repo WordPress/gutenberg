@@ -310,8 +310,7 @@ describe( 'UnitControl', () => {
 			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
-			// TODO: investigate why `onChange` gets called twice instead of once
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
 
 			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
