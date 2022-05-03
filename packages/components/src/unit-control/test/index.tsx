@@ -12,10 +12,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UnitControl from '../';
+import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
+import type { UnitControlOnChangeCallback } from '../types';
 
-function render( jsx ) {
+function render( jsx: React.ReactElement ) {
 	return {
 		user: userEvent.setup( {
 			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
@@ -25,30 +26,44 @@ function render( jsx ) {
 	};
 }
 
-const getComponent = () =>
-	document.body.querySelector( '.components-unit-control' );
-const getInput = () =>
-	document.body.querySelector( '.components-unit-control input' );
-const getSelect = () =>
-	document.body.querySelector( '.components-unit-control select' );
-const getUnitLabel = () =>
-	document.body.querySelector( '.components-unit-control__unit-label' );
+const getInput = ( {
+	isInputTypeText = false,
+}: {
+	isInputTypeText?: boolean;
+} = {} ) =>
+	screen.getByRole(
+		isInputTypeText ? 'textbox' : 'spinbutton'
+	) as HTMLInputElement;
+const getSelect = () => screen.getByRole( 'combobox' ) as HTMLSelectElement;
+const getSelectOptions = () =>
+	screen.getAllByRole( 'option' ) as HTMLOptionElement[];
 
 const ControlledSyncUnits = () => {
-	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
+	const [ state, setState ] = useState( {
+		valueA: '',
+		valueB: '',
+	} );
 
 	// Keep the unit sync'd between the two `UnitControl` instances.
-	const onUnitControlChange = ( fieldName, newValue ) => {
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
+	const onUnitControlChange = (
+		fieldName: 'valueA' | 'valueB',
+		newValue?: string | number
+	) => {
+		const parsedQuantityAndUnit = parseQuantityAndUnitFromRawValue(
 			newValue
 		);
+		const quantity = parsedQuantityAndUnit[ 0 ];
 
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
 
-		const nextState = { ...state, [ fieldName ]: newValue };
+		const newUnit = parsedQuantityAndUnit[ 1 ];
+
+		const nextState = {
+			...state,
+			[ fieldName ]: newValue,
+		};
 
 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
 			const [
@@ -57,7 +72,9 @@ const ControlledSyncUnits = () => {
 			] = parseQuantityAndUnitFromRawValue( stateValue );
 
 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
-				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
+				nextState[
+					stateProp as 'valueA' | 'valueB'
+				] = `${ stateQuantity }${ newUnit }`;
 			}
 		} );
 
@@ -87,35 +104,46 @@ describe( 'UnitControl', () => {
 			const input = getInput();
 			const select = getSelect();
 
-			expect( input ).toBeTruthy();
-			expect( select ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
+			expect( select ).toBeInTheDocument();
 		} );
 
 		it( 'should render custom className', () => {
-			render( <UnitControl className="hello" /> );
+			const { container: withoutClassName } = render( <UnitControl /> );
 
-			const el = getComponent();
+			const { container: withClassName } = render(
+				<UnitControl className="hello" />
+			);
 
-			expect( el.classList.contains( 'hello' ) ).toBe( true );
+			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
+				withClassName.firstChild
+			);
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
 			render( <UnitControl value="3em" units={ [] } /> );
 			const input = getInput();
-			const select = getSelect();
+			// Using `queryByRole` instead of `getSelect` because we need to test
+			// for this element NOT to be in the document.
+			const select = screen.queryByRole( 'combobox' );
 
-			expect( input ).toBeTruthy();
-			expect( select ).toBeFalsy();
+			expect( input ).toBeInTheDocument();
+			expect( select ).not.toBeInTheDocument();
 		} );
 
 		it( 'should render label if single units', () => {
-			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
+			render(
+				<UnitControl
+					units={ [ { value: '%', label: '%' } ] }
+					value="30%"
+				/>
+			);
 
-			const select = getSelect();
-			const label = getUnitLabel();
+			const select = screen.queryByRole( 'combobox' );
+			const label = screen.getByText( '%' );
 
-			expect( select ).toBeFalsy();
-			expect( label ).toBeTruthy();
+			expect( select ).not.toBeInTheDocument();
+			expect( label ).toBeInTheDocument();
 		} );
 	} );
 
@@ -141,8 +169,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP press', async () => {
-			let state = '50px';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '50px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -155,8 +184,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', async () => {
-			let state = '50px';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '50px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -169,8 +199,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN press', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -183,8 +214,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl value={ state } onChange={ setState } />
@@ -197,8 +229,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should cancel change when ESCAPE key is pressed', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const { user } = render(
 				<UnitControl
@@ -208,7 +241,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '300px' );
 
@@ -222,10 +256,11 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should run onBlur callback when quantity input is blurred', async () => {
-			let state = '33%';
 			const onChangeSpy = jest.fn();
 			const onBlurSpy = jest.fn();
-			const setState = ( nextState ) => {
+
+			let state: string | undefined = '33%';
+			const setState: UnitControlOnChangeCallback = ( nextState ) => {
 				onChangeSpy( nextState );
 				state = nextState;
 			};
@@ -260,12 +295,11 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
-			let state = '15px';
-
 			const onUnitChangeSpy = jest.fn();
 			const onChangeSpy = jest.fn();
 
-			const setState = ( nextState ) => {
+			let state: string | undefined = '15px';
+			const setState: UnitControlOnChangeCallback = ( nextState ) => {
 				onChangeSpy( nextState );
 				state = nextState;
 			};
@@ -282,7 +316,8 @@ describe( 'UnitControl', () => {
 				</>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '41vh' );
 
@@ -309,8 +344,9 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
-			let state = '14rem';
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | undefined = '14rem';
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const spy = jest.fn();
 
@@ -337,8 +373,7 @@ describe( 'UnitControl', () => {
 
 			render( <UnitControl units={ units } /> );
 
-			const select = getSelect();
-			const options = select.querySelectorAll( 'option' );
+			const options = getSelectOptions();
 
 			expect( options.length ).toBe( 2 );
 
@@ -349,8 +384,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should reset value on unit change, if unit has default value', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -377,8 +413,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not reset value on unit change, if disabled', async () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state: string | number | undefined = 50;
+			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+				( state = nextState );
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -405,8 +442,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should set correct unit if single units', async () => {
-			let state = '50%';
-			const setState = ( value ) => ( state = value );
+			let state: string | undefined = '50%';
+			const setState: UnitControlOnChangeCallback = ( value ) =>
+				( state = value );
 
 			const { user } = render(
 				<UnitControl
@@ -519,7 +557,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
 			user.keyboard( '{Enter}' );
@@ -536,7 +575,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '61   PX' );
 			user.keyboard( '{Enter}' );
@@ -553,7 +593,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
 			user.keyboard( '{Enter}' );
@@ -570,7 +611,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '-10  %' );
 			user.keyboard( '{Enter}' );
@@ -587,7 +629,8 @@ describe( 'UnitControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			// Input type is `text` when the `isPressEnterToChange` prop is passed
+			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '123       rEm  ' );
 			user.keyboard( '{Enter}' );
