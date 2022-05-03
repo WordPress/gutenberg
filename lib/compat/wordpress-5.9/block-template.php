@@ -286,6 +286,9 @@ add_filter( 'render_block_context', 'gutenberg_template_render_without_post_bloc
  * @return void
  */
 function gutenberg_resolve_template_for_new_post( $wp_query ) {
+	if ( ! $wp_query->is_main_query() ) {
+		return;
+	}
 	remove_filter( 'pre_get_posts', 'gutenberg_resolve_template_for_new_post' );
 
 	// Pages.
