@@ -53,7 +53,6 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 			<ListView
 				id={ id }
 				showNestedBlocks
-				isExpanded={ false }
 				__experimentalFeatures
 				__experimentalPersistentListViewFeatures
 			/>
