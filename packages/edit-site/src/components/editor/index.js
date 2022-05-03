@@ -115,8 +115,9 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
-			isListViewOpenByDefault: select( editSiteStore ).isFeatureActive(
-				'listView'
+			isListViewOpenByDefault: select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
 			),
 		};
 	}, [] );

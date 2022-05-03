@@ -33,7 +33,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 label="Spotlight mode"
               />
               <WithSelect(WithDispatch(BaseOption))
-                featureName="listView"
+                featureName="showListViewByDefault"
                 help="Opens the block list view sidebar by default."
                 label="Always open list view"
               />
@@ -164,7 +164,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 label="Spotlight mode"
               />
               <WithSelect(WithDispatch(BaseOption))
-                featureName="listView"
+                featureName="showListViewByDefault"
                 help="Opens the block list view sidebar by default."
                 label="Always open list view"
               />

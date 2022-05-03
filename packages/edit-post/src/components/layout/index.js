@@ -132,7 +132,7 @@ function Layout( { styles } ) {
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			isListViewOpenByDefault: select( editPostStore ).isFeatureActive(
-				'listView'
+				'showListViewByDefault'
 			),
 		};
 	}, [] );
