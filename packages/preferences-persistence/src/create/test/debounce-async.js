@@ -43,6 +43,9 @@ describe( 'debounceAsync', () => {
 		expect( fn ).toHaveBeenCalledTimes( 2 );
 		expect( fn ).toHaveBeenCalledWith( 'A' );
 		expect( fn ).toHaveBeenCalledWith( 'D' );
+
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'ensures the delay has elapsed between calls', async () => {
@@ -76,6 +79,9 @@ describe( 'debounceAsync', () => {
 		await flushPromises();
 		jest.runAllTimers();
 		expect( fn ).toHaveBeenCalledTimes( 2 );
+
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'is thenable, returning any data from promise resolution of the debounced function', async () => {
