@@ -358,8 +358,8 @@ function block_core_navigation_get_fallback_blocks() {
  * @return array Array of post ids.
  */
 function block_core_navigation_get_post_ids( $inner_blocks ){
-	$post_list = array_map( 'get_post_id_from_navigation_blocks', iterator_to_array( $inner_blocks ) );
-	return array_unique( array_merge( ...$post_list ) );
+	$post_ids = array_map( 'block_core_navigation_get_post_ids_from_blocks', iterator_to_array( $inner_blocks ) );
+	return array_unique( array_merge( ...$post_ids ) );
 }
 
 /**
@@ -369,7 +369,7 @@ function block_core_navigation_get_post_ids( $inner_blocks ){
  *
  * @return array Array of post ids.
  */
-function get_post_id_from_navigation_block( $block ) {
+function block_core_navigation_get_post_ids_from_block( $block ) {
 	$post_ids = array();
 
 	if ( $block->inner_blocks ) {
