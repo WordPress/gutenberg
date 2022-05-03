@@ -18,13 +18,11 @@
 	&[style*="letter-spacing"] :where(.comment-reply-title) {
 		letter-spacing: inherit;
 	}
-
-	&[class*="-align-left"] :where(.comment-reply-title) {
+	:not(&[class*="-align-center"]) {
 		justify-content: space-between;
 	}
 	&[class*="-align-right"] :where(.comment-reply-title) {
 		flex-direction: row-reverse;
-		justify-content: space-between;
 	}
 	&[class*="-align-center"] :where(.comment-reply-title) {
 		justify-content: center;
