@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useRef, Fragment } from '@wordpress/element';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
@@ -127,7 +127,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	// Conditionally include NavMenu sidebar in Plugin only.
 	// Optimise for dead code elimination.
 	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavMenuSidebarToggle = 'Fragment';
+	let MaybeNavMenuSidebarToggle = Fragment;
 
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
