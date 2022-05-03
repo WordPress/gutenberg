@@ -19,8 +19,7 @@ import type { UnitControlOnChangeCallback } from '../types';
 function render( jsx: React.ReactElement ) {
 	return {
 		user: userEvent.setup( {
-			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
-			delay: null,
+			advanceTimers: jest.advanceTimersByTime,
 		} ),
 		...RTLrender( jsx ),
 	};
@@ -98,6 +97,15 @@ const ControlledSyncUnits = () => {
 };
 
 describe( 'UnitControl', () => {
+	beforeEach( () => {
+		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			render( <UnitControl /> );
