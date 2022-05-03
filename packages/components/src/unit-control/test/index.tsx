@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render as RTLrender, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -16,14 +16,9 @@ import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
 import type { UnitControlOnChangeCallback } from '../types';
 
-function render( jsx: React.ReactElement ) {
-	return {
-		user: userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} ),
-		...RTLrender( jsx ),
-	};
-}
+const user = userEvent.setup( {
+	advanceTimers: jest.advanceTimersByTime,
+} );
 
 const getInput = ( {
 	isInputTypeText = false,
@@ -160,9 +155,7 @@ describe( 'UnitControl', () => {
 			let state = '50px';
 			const setState = jest.fn( ( value ) => ( state = value ) );
 
-			const { user } = render(
-				<UnitControl value={ state } onChange={ setState } />
-			);
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
 			await user.clear( input );
@@ -181,9 +174,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
 				( state = nextState );
 
-			const { user } = render(
-				<UnitControl value={ state } onChange={ setState } />
-			);
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
 			await user.type( input, '{ArrowUp}' );
@@ -196,9 +187,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
 				( state = nextState );
 
-			const { user } = render(
-				<UnitControl value={ state } onChange={ setState } />
-			);
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
 			await user.type( input, '{Shift>}{ArrowUp}{/Shift}' );
@@ -211,9 +200,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
 				( state = nextState );
 
-			const { user } = render(
-				<UnitControl value={ state } onChange={ setState } />
-			);
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
 			await user.type( input, '{ArrowDown}' );
@@ -226,9 +213,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
 				( state = nextState );
 
-			const { user } = render(
-				<UnitControl value={ state } onChange={ setState } />
-			);
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
 			await user.type( input, '{Shift>}{ArrowDown}{/Shift}' );
@@ -241,7 +226,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
 				( state = nextState );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -273,7 +258,7 @@ describe( 'UnitControl', () => {
 				state = nextState;
 			};
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -304,7 +289,7 @@ describe( 'UnitControl', () => {
 				state = nextState;
 			};
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -345,7 +330,7 @@ describe( 'UnitControl', () => {
 
 			const spy = jest.fn();
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -388,7 +373,7 @@ describe( 'UnitControl', () => {
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
 
-			const { user } = render(
+			render(
 				<UnitControl
 					isResetValueOnUnitChange
 					units={ units }
@@ -417,7 +402,7 @@ describe( 'UnitControl', () => {
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
 
-			const { user } = render(
+			render(
 				<UnitControl
 					isResetValueOnUnitChange={ false }
 					value={ state }
@@ -441,7 +426,7 @@ describe( 'UnitControl', () => {
 			const setState: UnitControlOnChangeCallback = ( value ) =>
 				( state = value );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					units={ [ { value: '%', label: '%' } ] }
@@ -457,7 +442,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should update unit value when a new raw value is passed', async () => {
-			const { user } = render( <ControlledSyncUnits /> );
+			render( <ControlledSyncUnits /> );
 
 			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
 			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
@@ -490,9 +475,7 @@ describe( 'UnitControl', () => {
 				{ value: 'vmax', label: 'vmax' },
 			];
 
-			const { user } = render(
-				<UnitControl units={ units } value="5" />
-			);
+			render( <UnitControl units={ units } value="5" /> );
 
 			const select = getSelect();
 			await user.selectOptions( select, [ 'vmax' ] );
@@ -507,7 +490,7 @@ describe( 'UnitControl', () => {
 			const onUnitChangeSpy = jest.fn();
 			const onBlurSpy = jest.fn();
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value="15px"
 					onUnitChange={ onUnitChangeSpy }
@@ -536,7 +519,7 @@ describe( 'UnitControl', () => {
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -557,7 +540,7 @@ describe( 'UnitControl', () => {
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -578,7 +561,7 @@ describe( 'UnitControl', () => {
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -599,7 +582,7 @@ describe( 'UnitControl', () => {
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
@@ -620,7 +603,7 @@ describe( 'UnitControl', () => {
 			let state = '10px';
 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
 
-			const { user } = render(
+			render(
 				<UnitControl
 					value={ state }
 					onChange={ setState }
