@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
+-   [**] [Cover block] Improve color contrast between background and text [#40691]
 
 ## 1.75.0
 
