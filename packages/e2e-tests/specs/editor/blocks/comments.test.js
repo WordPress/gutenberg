@@ -33,7 +33,6 @@ describe( 'Comments', () => {
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();
 		await insertBlock( 'Comments' );
-		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.
 		await page.click(
@@ -94,7 +93,6 @@ describe( 'Comments', () => {
 		await setOption( 'page_comments', '0' );
 		await createNewPost();
 		await insertBlock( 'Comments' );
-		await insertBlock( 'Post Comments Form' );
 		await publishPost();
 		// Visit the post that was just published.
 		await page.click(
