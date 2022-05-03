@@ -17,6 +17,6 @@ export default function isNumberInput( node ) {
 	return (
 		isHTMLInputElement( node ) &&
 		node.type === 'number' &&
-		!! node.valueAsNumber
+		! Number.isNaN( node.valueAsNumber )
 	);
 }
