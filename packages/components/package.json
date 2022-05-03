@@ -36,6 +36,7 @@
 		"@emotion/serialize": "^1.0.2",
 		"@emotion/styled": "^11.6.0",
 		"@emotion/utils": "1.0.0",
+		"@types/react-dates": "17.1.10",
 		"@use-gesture/react": "^10.2.6",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",

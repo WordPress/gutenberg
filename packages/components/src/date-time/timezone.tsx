@@ -10,7 +10,8 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
 import Tooltip from '../tooltip';
 
 /**
- * Displays timezone information when user timezone is different from site timezone.
+ * Displays timezone information when user timezone is different from site
+ * timezone.
  */
 const TimeZone = () => {
 	const { timezone } = getDateSettings();
@@ -24,11 +25,9 @@ const TimeZone = () => {
 		return null;
 	}
 
-	const offsetSymbol = timezone.offset >= 0 ? '+' : '';
+	const offsetSymbol = Number( timezone.offset ) >= 0 ? '+' : '';
 	const zoneAbbr =
-		'' !== timezone.abbr && isNaN( timezone.abbr )
-			? timezone.abbr
-			: `UTC${ offsetSymbol }${ timezone.offset }`;
+		timezone.abbr || `UTC${ offsetSymbol }${ timezone.offset }`;
 
 	const timezoneDetail =
 		'UTC' === timezone.string

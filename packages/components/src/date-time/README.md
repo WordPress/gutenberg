@@ -71,3 +71,10 @@ A callback invoked when selecting the previous/next month in the date picker. Th
 
 -   Type: `Function`
 -   Required: No
+
+### events
+
+List of events to show in the date picker. Each event will appear as a dot on the day of the event.
+
+-   Type: `Array`
+-   Required: No
