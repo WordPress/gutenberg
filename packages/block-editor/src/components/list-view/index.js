@@ -52,20 +52,18 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object}  props                                          Components props.
- * @param {Array}   props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showNestedBlocks                         Flag to enable displaying nested blocks.
- * @param {boolean} props.showBlockMovers                          Flag to enable block movers
- * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
- * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
- * @param {string}  props.id                                       Unique identifier for the root list element (primarily for a11y purposes).
- * @param {boolean} props.isExpanded                               Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                                            Forwarded ref
+ * @param {Object}  props                                         Components props.
+ * @param {Array}   props.blocks                                  Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showNestedBlocks                        Flag to enable displaying nested blocks.
+ * @param {boolean} props.showBlockMovers                         Flag to enable block movers
+ * @param {boolean} props.__experimentalHideContainerBlockActions Flag to hide actions of top level blocks (like core/widget-area)
+ * @param {string}  props.id                                      Unique identifier for the root list element (primarily for a11y purposes).
+ * @param {boolean} props.isExpanded                              Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                                           Forwarded ref
  */
 function ListView(
 	{
 		blocks,
-		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
 		showBlockMovers,
@@ -129,7 +127,7 @@ function ListView(
 		BLOCK_LIST_ITEM_HEIGHT,
 		visibleBlockCount,
 		{
-			useWindowing: __experimentalPersistentListViewFeatures,
+			useWindowing: true,
 			windowOverscan: 40,
 		}
 	);
@@ -179,7 +177,6 @@ function ListView(
 
 	const contextValue = useMemo(
 		() => ( {
-			__experimentalPersistentListViewFeatures,
 			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
@@ -188,7 +185,6 @@ function ListView(
 			collapse,
 		} ),
 		[
-			__experimentalPersistentListViewFeatures,
 			__experimentalHideContainerBlockActions,
 			isMounted.current,
 			draggedClientIds,

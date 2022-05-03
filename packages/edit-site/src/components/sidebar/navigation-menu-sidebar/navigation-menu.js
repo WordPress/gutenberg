@@ -50,11 +50,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 	}, [ updateBlockListSettings, innerBlocks ] );
 	return (
 		<>
-			<ListView
-				id={ id }
-				showNestedBlocks
-				__experimentalPersistentListViewFeatures
-			/>
+			<ListView id={ id } showNestedBlocks />
 		</>
 	);
 }

@@ -99,7 +99,6 @@ function ListViewBlock( {
 		: __( 'Options' );
 
 	const {
-		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions: hideContainerBlockActions,
 		isTreeGridMounted,
 		expand,
@@ -122,27 +121,19 @@ function ListViewBlock( {
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
 	useEffect( () => {
-		if (
-			withExperimentalPersistentListViewFeatures &&
-			! isTreeGridMounted &&
-			isSelected
-		) {
+		if ( ! isTreeGridMounted && isSelected ) {
 			cellRef.current.focus();
 		}
 	}, [] );
 
-	const highlightBlock = withExperimentalPersistentListViewFeatures
-		? toggleBlockHighlight
-		: () => {};
-
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		highlightBlock( clientId, true );
-	}, [ clientId, setIsHovered, highlightBlock ] );
+		toggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		highlightBlock( clientId, false );
-	}, [ clientId, setIsHovered, highlightBlock ] );
+		toggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -189,8 +180,7 @@ function ListViewBlock( {
 		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
-		'is-branch-selected':
-			withExperimentalPersistentListViewFeatures && isBranchSelected,
+		'is-branch-selected': isBranchSelected,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 	} );

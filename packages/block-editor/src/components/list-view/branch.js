@@ -95,11 +95,7 @@ function ListViewBranch( props ) {
 		isExpanded,
 	} = props;
 
-	const {
-		expandedState,
-		draggedClientIds,
-		__experimentalPersistentListViewFeatures,
-	} = useListViewContext();
+	const { expandedState, draggedClientIds } = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
 	const blockCount = filteredBlocks.length;
@@ -119,11 +115,8 @@ function ListViewBranch( props ) {
 					);
 				}
 
-				const usesWindowing = __experimentalPersistentListViewFeatures;
-
 				const { itemInView } = fixedListWindow;
-				const blockInView =
-					! usesWindowing || itemInView( nextPosition );
+				const blockInView = itemInView( nextPosition );
 
 				const position = index + 1;
 				const updatedPath =
