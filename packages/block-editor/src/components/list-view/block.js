@@ -99,7 +99,6 @@ function ListViewBlock( {
 		: __( 'Options' );
 
 	const {
-		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions: hideContainerBlockActions,
 		isTreeGridMounted,
@@ -174,18 +173,15 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	// hide actions for blocks like core/widget-areas
 	const showBlockActions =
-		withExperimentalFeatures &&
-		// hide actions for blocks like core/widget-areas
-		( ! hideContainerBlockActions ||
-			( hideContainerBlockActions && level > 1 ) );
-
-	const hideBlockActions = withExperimentalFeatures && ! showBlockActions;
+		! hideContainerBlockActions ||
+		( hideContainerBlockActions && level > 1 );
 
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
-	} else if ( hideBlockActions ) {
+	} else if ( ! showBlockActions ) {
 		colSpan = 3;
 	}
 
@@ -196,7 +192,7 @@ function ListViewBlock( {
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
 		'is-dragging': isDragged,
-		'has-single-cell': hideBlockActions,
+		'has-single-cell': ! showBlockActions,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

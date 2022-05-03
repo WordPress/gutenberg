@@ -56,7 +56,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Array}   props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showNestedBlocks                         Flag to enable displaying nested blocks.
  * @param {boolean} props.showBlockMovers                          Flag to enable block movers
- * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  * @param {boolean} props.__experimentalHideContainerBlockActions  Flag to hide actions of top level blocks (like core/widget-area)
  * @param {string}  props.id                                       Unique identifier for the root list element (primarily for a11y purposes).
@@ -66,7 +65,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 function ListView(
 	{
 		blocks,
-		__experimentalFeatures,
 		__experimentalPersistentListViewFeatures,
 		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
@@ -181,7 +179,6 @@ function ListView(
 
 	const contextValue = useMemo(
 		() => ( {
-			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
@@ -191,7 +188,6 @@ function ListView(
 			collapse,
 		} ),
 		[
-			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			__experimentalHideContainerBlockActions,
 			isMounted.current,

@@ -63,7 +63,6 @@ export default function ListViewSidebar() {
 				<ListView
 					showNestedBlocks
 					__experimentalHideContainerBlockActions
-					__experimentalFeatures
 					__experimentalPersistentListViewFeatures
 				/>
 			</div>
