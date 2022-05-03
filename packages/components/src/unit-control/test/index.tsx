@@ -667,7 +667,7 @@ describe( 'UnitControl', () => {
 			);
 
 			const select = getSelect();
-			const options = select.querySelectorAll( 'option' );
+			const options = getSelectOptions();
 
 			expect( select.value ).toBe( '%' );
 			expect( options.length ).toBe( 3 );
