@@ -135,12 +135,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should render label if single units', () => {
-			render(
-				<UnitControl
-					units={ [ { value: '%', label: '%' } ] }
-					value="30%"
-				/>
-			);
+			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
 
 			const select = screen.queryByRole( 'combobox' );
 			const label = screen.getByText( '%' );
