@@ -7,14 +7,14 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	public function test_block_core_navigation_get_post_ids_from_block() {
 		$parsed_blocks = parse_blocks(
-			"<!-- wp:navigation-link {\"label\":\"Sample Page\",\"type\":\"page\",\"kind\":\"post-type\",\"id\":755,\"url\":\"http://localhost:8888/?page_id=755\"} /-->"
+			'<!-- wp:navigation-link {"label":"Sample Page","type":"page","kind":"post-type","id":755,"url":"http://localhost:8888/?page_id=755"} /-->'
 		);
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$post_ids = block_core_navigation_get_post_ids_from_block( $block );
-		$this->assertEqualSets( [ 755 ], $post_ids );
+		$this->assertEqualSets( array( 755 ), $post_ids );
 	}
 
 	/**
@@ -27,7 +27,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$post_ids = block_core_navigation_get_post_ids_from_block( $block );
-		$this->assertEqualSets( [ 755, 789 ], $post_ids );
+		$this->assertEqualSets( array( 755, 789 ), $post_ids );
 	}
 
 

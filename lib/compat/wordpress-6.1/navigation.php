@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Temporary compatibility shims for navigation block.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Iterate through all inner blocks recursively and get navigation link block's post ids..
