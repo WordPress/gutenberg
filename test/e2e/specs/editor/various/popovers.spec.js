@@ -31,7 +31,7 @@ test.describe( 'new editor state', () => {
 			await moreMenuToggleButton.click();
 			await expect( moreMenu ).toBeVisible();
 
-			//Toggle closed.
+			// Toggle closed.
 			await moreMenuToggleButton.click();
 			await expect( moreMenu ).not.toBeVisible();
 		} );
