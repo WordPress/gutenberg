@@ -37,7 +37,6 @@ export function BlockPreview( {
 	);
 	const settings = useMemo( () => {
 		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
 		return _settings;
 	}, [ originalSettings ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
