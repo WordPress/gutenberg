@@ -147,6 +147,7 @@ function Layout( { styles } ) {
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Check if the block list view should be open by default.
 	useEffect( () => {
 		if ( isListViewOpenByDefault ) {
 			setIsListViewOpened( true );

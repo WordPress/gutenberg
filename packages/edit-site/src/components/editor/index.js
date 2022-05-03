@@ -66,6 +66,7 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		isListViewOpenByDefault,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -114,9 +115,14 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			isListViewOpenByDefault: select( editSiteStore ).isFeatureActive(
+				'listView'
+			),
 		};
 	}, [] );
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setPage, setIsInserterOpened, setIsListViewOpened } = useDispatch(
+		editSiteStore
+	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const [
@@ -151,6 +157,13 @@ function Editor( { onError } ) {
 		} ),
 		[ page?.context ]
 	);
+
+	// Check if the block list view should be open by default.
+	useEffect( () => {
+		if ( isListViewOpenByDefault ) {
+			setIsListViewOpened( true );
+		}
+	}, [] );
 
 	useEffect( () => {
 		if ( isNavigationOpen ) {

@@ -118,7 +118,7 @@ export default function EditPostPreferencesModal() {
 							<EnableFeature
 								featureName="listView"
 								help={ __(
-									'Opens the block list view sidebar in the editor by default.'
+									'Opens the block list view sidebar by default.'
 								) }
 								label={ __( 'Always open list view' ) }
 							/>
