@@ -347,7 +347,7 @@ export class BlockList extends Component {
 				}
 				blockWidth={ blockWidth }
 				isGridItem={ isGridItem }
-				gridItemProps={ gridItemProps }
+				{ ...gridItemProps }
 			/>
 		);
 	}
