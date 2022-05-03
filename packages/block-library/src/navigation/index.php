@@ -357,8 +357,8 @@ function block_core_navigation_get_fallback_blocks() {
  *
  * @return array Array of post ids.
  */
-function block_core_navigation_get_post_ids( $inner_blocks ){
-	$post_ids = array_map( 'block_core_navigation_get_post_ids_from_blocks', iterator_to_array( $inner_blocks ) );
+function block_core_navigation_get_post_ids( $inner_blocks ) {
+	$post_ids = array_map( 'block_core_navigation_get_post_ids_from_block', iterator_to_array( $inner_blocks ) );
 	return array_unique( array_merge( ...$post_ids ) );
 }
 
@@ -376,7 +376,7 @@ function block_core_navigation_get_post_ids_from_block( $block ) {
 		$post_ids = block_core_navigation_get_post_ids( $block->inner_blocks );
 	}
 	if ( 'core/navigation-link' === $block->name || 'core/navigation-submenu' === $block->name ) {
-		if ( $block->attributes && isset( $block->attributes['kind'] ) && $block->attributes['kind'] === 'post-type' ) {
+		if ( $block->attributes && isset( $block->attributes['kind'] ) && 'post-type' === $block->attributes['kind'] ) {
 			$post_ids[] = $block->attributes['id'];
 		}
 	}
