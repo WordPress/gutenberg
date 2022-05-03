@@ -8,6 +8,25 @@ import { get, upperFirst } from 'lodash';
  */
 import type { GeneratedCSSRule, Style, Box, StyleOptions } from '../types';
 
+export function generateRule(
+	style: Style,
+	path: string[],
+	cssProperty: string,
+	options: StyleOptions
+) {
+	const styleValue: string | undefined = get( style, path, null );
+
+	return styleValue
+		? [
+				{
+					selector: options?.selector,
+					key: cssProperty,
+					value: styleValue,
+				},
+		  ]
+		: [];
+}
+
 export function generateBoxRules(
 	style: Style,
 	options: StyleOptions,

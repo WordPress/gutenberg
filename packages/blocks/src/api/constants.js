@@ -103,6 +103,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'text' ],
 		support: [ 'color', 'text' ],
 		requiresOptOut: true,
+		useEngine: true,
 	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
@@ -128,6 +129,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
+		useEngine: true,
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
@@ -164,10 +166,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
 		support: [ 'typography', '__experimentalTextTransform' ],
+		useEngine: true,
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
 	},
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],

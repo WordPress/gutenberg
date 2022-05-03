@@ -1,12 +1,80 @@
 /**
  * Internal dependencies
  */
-import fontSize from './fontSize';
-import fontWeight from './fontWeight';
-import lineHeight from './lineHeight';
-import textDecoration from './textDecoration';
-import textTransform from './textTransform';
-import letterSpacing from './letterSpacing';
+import type { Style, StyleOptions } from '../../types';
+import { generateRule } from '../utils';
+
+const fontSize = {
+	name: 'fontSize',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'fontSize' ],
+			'fontSize',
+			options
+		);
+	},
+};
+
+const fontWeight = {
+	name: 'fontSize',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'fontWeight' ],
+			'fontWeight',
+			options
+		);
+	},
+};
+
+const letterSpacing = {
+	name: 'letterSpacing',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'letterSpacing' ],
+			'letterSpacing',
+			options
+		);
+	},
+};
+
+const lineHeight = {
+	name: 'letterSpacing',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'lineHeight' ],
+			'lineHeight',
+			options
+		);
+	},
+};
+
+const textDecoration = {
+	name: 'textDecoration',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'textDecoration' ],
+			'textDecoration',
+			options
+		);
+	},
+};
+
+const textTransform = {
+	name: 'textTransform',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			[ 'typography', 'textTransform' ],
+			'textTransform',
+			options
+		);
+	},
+};
 
 export default [
 	fontSize,
