@@ -1,6 +1,11 @@
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * WordPress dependencies
+ */
 import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -37,6 +42,11 @@ function BlockNavigationDropdownToggle( {
 }
 
 function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
+	deprecated( 'wp.blockEditor.BlockNavigationDropdown', {
+		since: '6.1',
+		alternative: 'wp.components.Dropdown and wp.blockEditor.ListView',
+	} );
+
 	const hasBlocks = useSelect(
 		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
