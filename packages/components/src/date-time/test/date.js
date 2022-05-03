@@ -2,7 +2,8 @@
  * External dependencies
  */
 import moment from 'moment';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import 'react-dates/initialize';
 
 /**
@@ -32,7 +33,9 @@ describe( 'DatePicker', () => {
 		);
 	} );
 
-	it( 'should call onChange when a day is selected', () => {
+	it( 'should call onChange when a day is selected', async () => {
+		const user = userEvent.setup( { delay: null } );
+
 		const onChange = jest.fn();
 
 		render(
@@ -42,12 +45,14 @@ describe( 'DatePicker', () => {
 			/>
 		);
 
-		fireEvent.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
+		await user.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
 
-	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', () => {
+	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
+		const user = userEvent.setup( { delay: null } );
+
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();
 
@@ -59,7 +64,7 @@ describe( 'DatePicker', () => {
 			/>
 		);
 
-		fireEvent.click(
+		await user.click(
 			screen.getByLabelText( 'Move forward to switch to the next month.' )
 		);
 
@@ -67,7 +72,7 @@ describe( 'DatePicker', () => {
 			expect.stringMatching( /^2022-06/ )
 		);
 
-		fireEvent.click( screen.getByLabelText( 'Monday, June 20, 2022' ) );
+		await user.click( screen.getByLabelText( 'Monday, June 20, 2022' ) );
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
 	} );
@@ -93,7 +98,9 @@ describe( 'DatePicker', () => {
 		] );
 	} );
 
-	it( 'should not allow invalid date to be selected', () => {
+	it( 'should not allow invalid date to be selected', async () => {
+		const user = userEvent.setup( { delay: null } );
+
 		const onChange = jest.fn();
 
 		render(
@@ -104,7 +111,7 @@ describe( 'DatePicker', () => {
 			/>
 		);
 
-		fireEvent.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
+		await user.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
 
 		expect( onChange ).not.toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
