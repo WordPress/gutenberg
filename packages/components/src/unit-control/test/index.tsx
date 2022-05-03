@@ -532,10 +532,10 @@ describe( 'UnitControl', () => {
 	} );
 
 	describe( 'Unit Parser', () => {
-		let state = '10px';
-		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
-
 		it( 'should parse unit from input', async () => {
+			let state = '10px';
+			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
 			const { user } = render(
 				<UnitControl
 					value={ state }
@@ -554,6 +554,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse PX unit from input', async () => {
+			let state = '10px';
+			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
 			const { user } = render(
 				<UnitControl
 					value={ state }
@@ -572,6 +575,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse EM unit from input', async () => {
+			let state = '10px';
+			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
 			const { user } = render(
 				<UnitControl
 					value={ state }
@@ -590,6 +596,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse % unit from input', async () => {
+			let state = '10px';
+			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
 			const { user } = render(
 				<UnitControl
 					value={ state }
@@ -608,6 +617,9 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should parse REM unit from input', async () => {
+			let state = '10px';
+			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
 			const { user } = render(
 				<UnitControl
 					value={ state }
