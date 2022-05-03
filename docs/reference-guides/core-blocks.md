@@ -395,15 +395,6 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 -	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
-## Navigation Area
-
-Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-area))
-
--	**Name:** core/navigation-area
--	**Category:** theme
--	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** area
-
 ## Custom Link
 
 Add a page, link, or another item to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-link))
@@ -591,7 +582,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Name:** core/post-terms
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, term, textAlign
+-	**Attributes:** prefix, separator, suffix, term, textAlign
 
 ## Post Title
 
@@ -725,7 +716,7 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~), spacing (margin)
 -	**Attributes:** opacity
 
 ## Shortcode

@@ -10,6 +10,7 @@ import {
 	clickBlockToolbarButton,
 	clickButton,
 	clickMenuItem,
+	insertBlock,
 	openListView,
 	saveDraft,
 	transformBlockTo,
@@ -974,5 +975,52 @@ describe( 'Multi-block selection', () => {
 
 		// Expect two blocks with "&" in between.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+	describe( 'shift+click multi-selection', () => {
+		it( 'should multi-select block with text selection and a block without text selection', async () => {
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'hi' );
+			await page.keyboard.press( 'Enter' );
+			await insertBlock( 'Spacer' );
+			await page.keyboard.press( 'ArrowUp' );
+
+			const spacerBlock = await page.waitForSelector(
+				'.wp-block.wp-block-spacer'
+			);
+			const boundingBox = await spacerBlock.boundingBox();
+			const mousePosition = {
+				x: boundingBox.x + boundingBox.width / 2,
+				y: boundingBox.y + boundingBox.height / 2,
+			};
+			await page.keyboard.down( 'Shift' );
+			await page.mouse.click( mousePosition.x, mousePosition.y );
+			await page.keyboard.up( 'Shift' );
+
+			const selectedBlocks = await page.$$(
+				'.wp-block.is-multi-selected'
+			);
+			expect( selectedBlocks.length ).toBe( 2 );
+		} );
+		it( 'should multi-select blocks without text selection', async () => {
+			await insertBlock( 'Spacer' );
+			// Get the first spacer block element.
+			const spacerBlock = await page.waitForSelector(
+				'.wp-block.wp-block-spacer'
+			);
+			const boundingBox = await spacerBlock.boundingBox();
+			await page.keyboard.press( 'Enter' );
+			await insertBlock( 'Spacer' );
+			const mousePosition = {
+				x: boundingBox.x + boundingBox.width / 2,
+				y: boundingBox.y + boundingBox.height / 2,
+			};
+			await page.keyboard.down( 'Shift' );
+			await page.mouse.click( mousePosition.x, mousePosition.y );
+			await page.keyboard.up( 'Shift' );
+			const selectedBlocks = await page.$$(
+				'.wp-block.is-multi-selected'
+			);
+			expect( selectedBlocks.length ).toBe( 2 );
+		} );
 	} );
 } );

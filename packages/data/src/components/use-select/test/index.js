@@ -118,6 +118,71 @@ describe( 'useSelect', () => {
 		expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 'bar' );
 	} );
 
+	it( 'avoid calling nested listener after unmounted', async () => {
+		registry.registerStore( 'toggler', {
+			reducer: ( state = false, action ) =>
+				action.type === 'TOGGLE' ? ! state : state,
+			actions: {
+				toggle: () => ( { type: 'TOGGLE' } ),
+			},
+			selectors: {
+				get: ( state ) => state,
+			},
+		} );
+
+		const mapSelect = ( select ) => select( 'toggler' ).get();
+
+		const mapSelectChild = jest.fn( mapSelect );
+		function Child() {
+			const show = useSelect( mapSelectChild, [] );
+			return show ? 'yes' : 'no';
+		}
+
+		const mapSelectParent = jest.fn( mapSelect );
+		function Parent() {
+			const show = useSelect( mapSelectParent, [] );
+			return show ? <Child /> : 'none';
+		}
+
+		const rendered = render(
+			<RegistryProvider value={ registry }>
+				<Parent />
+			</RegistryProvider>
+		);
+
+		// Initial render renders only parent and subscribes the parent to store.
+		expect( rendered.getByText( 'none' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 0 );
+
+		// act() does batched updates internally, i.e., any scheduled setStates or effects
+		// will be executed only after the dispatch finishes. But we want to opt out of
+		// batched updates here. We want all the setStates to be done synchronously, as the
+		// store listeners are called. The async/await code is a trick to do it: do the
+		// dispatch in a different event loop tick, where the batched updates are no longer active.
+		await act( async () => {
+			await Promise.resolve();
+			registry.dispatch( 'toggler' ).toggle();
+		} );
+
+		// Child was rendered and subscribed to the store, as the _second_ subscription.
+		expect( rendered.getByText( 'yes' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+
+		await act( async () => {
+			await Promise.resolve();
+			registry.dispatch( 'toggler' ).toggle();
+		} );
+
+		// Check that child was unmounted without any extra state update being performed on it.
+		// I.e., `mapSelectChild` was never called again, and no "state update on an unmounted
+		// component" warning was triggered.
+		expect( rendered.getByText( 'none' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 4 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	describe( 'rerenders as expected with various mapSelect return types', () => {
 		const getComponent = ( mapSelectSpy ) => () => {
 			const data = useSelect( mapSelectSpy, [] );
@@ -819,10 +884,10 @@ describe( 'useSelect', () => {
 			// Ensure the async update was flushed during the rerender.
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
-			// initial render + subscription check + flushed store update
+			// initial render + subscription check + rerender with isAsync=false
 			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
-			// initial render + rerender with isAsync=false + store state update
-			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
+			// initial render + rerender with isAsync=false
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'cancels scheduled updates when mapSelect function changes', async () => {

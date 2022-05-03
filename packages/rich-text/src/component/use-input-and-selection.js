@@ -238,7 +238,7 @@ export function useInputAndSelection( props ) {
 		function onCompositionStart() {
 			isComposing = true;
 			// Do not update the selection when characters are being composed as
-			// this rerenders the component and might distroy internal browser
+			// this rerenders the component and might destroy internal browser
 			// editing state.
 			ownerDocument.removeEventListener(
 				'selectionchange',
