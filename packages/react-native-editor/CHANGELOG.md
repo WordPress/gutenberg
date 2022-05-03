@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
+
 ## 1.75.0
 
 -   [*] [Latest Posts block] Add featured image settings [#39257]
