@@ -52,23 +52,15 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object}  props                  Components props.
- * @param {Array}   props.blocks           Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showNestedBlocks Flag to enable displaying nested blocks.
- * @param {boolean} props.showBlockMovers  Flag to enable block movers
- * @param {string}  props.id               Unique identifier for the root list element (primarily for a11y purposes).
- * @param {boolean} props.isExpanded       Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                    Forwarded ref
+ * @param {Object}  props                 Components props.
+ * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers Flag to enable block movers
+ * @param {string}  props.id              Unique identifier for the root list element (primarily for a11y purposes).
+ * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                   Forwarded ref
  */
 function ListView(
-	{
-		blocks,
-		showNestedBlocks,
-		showBlockMovers,
-		id,
-		isExpanded = false,
-		...props
-	},
+	{ blocks, showBlockMovers, id, isExpanded = false, ...props },
 	ref
 ) {
 	const {
@@ -203,7 +195,6 @@ function ListView(
 					<ListViewBranch
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
-						showNestedBlocks={ showNestedBlocks }
 						showBlockMovers={ showBlockMovers }
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }

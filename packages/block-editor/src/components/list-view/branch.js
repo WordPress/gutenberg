@@ -85,7 +85,6 @@ function ListViewBranch( props ) {
 		blocks,
 		selectBlock,
 		showBlockMovers,
-		showNestedBlocks,
 		selectedClientIds,
 		level = 1,
 		path = '',
@@ -123,8 +122,7 @@ function ListViewBranch( props ) {
 					path.length > 0
 						? `${ path }_${ position }`
 						: `${ position }`;
-				const hasNestedBlocks =
-					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const hasNestedBlocks = !! innerBlocks?.length;
 
 				const shouldExpand = hasNestedBlocks
 					? expandedState[ clientId ] ?? isExpanded
@@ -172,7 +170,6 @@ function ListViewBranch( props ) {
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
 								showBlockMovers={ showBlockMovers }
-								showNestedBlocks={ showNestedBlocks }
 								level={ level + 1 }
 								path={ updatedPath }
 								listPosition={ nextPosition + 1 }

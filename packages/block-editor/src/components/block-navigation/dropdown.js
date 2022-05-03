@@ -36,10 +36,7 @@ function BlockNavigationDropdownToggle( {
 	);
 }
 
-function BlockNavigationDropdown(
-	{ isDisabled, __experimentalFeatures, ...props },
-	ref
-) {
+function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
 	const hasBlocks = useSelect(
 		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
@@ -65,10 +62,7 @@ function BlockNavigationDropdown(
 						{ __( 'List view' ) }
 					</p>
 
-					<ListView
-						showNestedBlocks
-						__experimentalFeatures={ __experimentalFeatures }
-					/>
+					<ListView />
 				</div>
 			) }
 		/>
