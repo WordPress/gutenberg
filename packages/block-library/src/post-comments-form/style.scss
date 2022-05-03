@@ -19,6 +19,20 @@
 		letter-spacing: inherit;
 	}
 
+	&[class*="-align-left"] :where(.comment-reply-title) {
+		justify-content: space-between;
+	}
+	&[class*="-align-right"] :where(.comment-reply-title) {
+		flex-direction: row-reverse;
+		justify-content: space-between;
+	}
+	&[class*="-align-center"] :where(.comment-reply-title) {
+		justify-content: center;
+		:where(small) {
+			margin-left: 0.5em;
+		}
+	}
+
 	// Styles copied from button block styles.
 	input[type="submit"] {
 		border: none;
@@ -71,9 +85,7 @@
 	.comment-reply-title {
 		align-items: baseline;
 		display: flex;
-		justify-content: space-between;
 		margin-bottom: 0;
-
 		:where(small) {
 			font-size: var(--wp--preset--font-size--medium, smaller);
 		}
