@@ -52,19 +52,17 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object}  props                                         Components props.
- * @param {Array}   props.blocks                                  Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showNestedBlocks                        Flag to enable displaying nested blocks.
- * @param {boolean} props.showBlockMovers                         Flag to enable block movers
- * @param {boolean} props.__experimentalHideContainerBlockActions Flag to hide actions of top level blocks (like core/widget-area)
- * @param {string}  props.id                                      Unique identifier for the root list element (primarily for a11y purposes).
- * @param {boolean} props.isExpanded                              Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                                           Forwarded ref
+ * @param {Object}  props                  Components props.
+ * @param {Array}   props.blocks           Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showNestedBlocks Flag to enable displaying nested blocks.
+ * @param {boolean} props.showBlockMovers  Flag to enable block movers
+ * @param {string}  props.id               Unique identifier for the root list element (primarily for a11y purposes).
+ * @param {boolean} props.isExpanded       Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                    Forwarded ref
  */
 function ListView(
 	{
 		blocks,
-		__experimentalHideContainerBlockActions,
 		showNestedBlocks,
 		showBlockMovers,
 		id,
@@ -177,21 +175,13 @@ function ListView(
 
 	const contextValue = useMemo(
 		() => ( {
-			__experimentalHideContainerBlockActions,
 			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
 			collapse,
 		} ),
-		[
-			__experimentalHideContainerBlockActions,
-			isMounted.current,
-			draggedClientIds,
-			expandedState,
-			expand,
-			collapse,
-		]
+		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
 	);
 
 	return (

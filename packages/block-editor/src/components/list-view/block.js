@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -19,7 +20,7 @@ import {
 	useCallback,
 	memo,
 } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -66,6 +67,19 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockName = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
+	);
+
+	// When a block hides its toolbar it also hides the block settings menu,
+	// since that menu is part of the toolbar in the editor canvas.
+	// List View respects this by also hiding the block settings menu.
+	const showBlockActions = hasBlockSupport(
+		blockName,
+		'__experimentalToolbar',
+		true
+	);
 	const { isLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
@@ -98,12 +112,7 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const {
-		__experimentalHideContainerBlockActions: hideContainerBlockActions,
-		isTreeGridMounted,
-		expand,
-		collapse,
-	} = useListViewContext();
+	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -163,11 +172,6 @@ function ListViewBlock( {
 		},
 		[ clientId, expand, collapse, isExpanded ]
 	);
-
-	// hide actions for blocks like core/widget-areas
-	const showBlockActions =
-		! hideContainerBlockActions ||
-		( hideContainerBlockActions && level > 1 );
 
 	let colSpan;
 	if ( hasRenderedMovers ) {
