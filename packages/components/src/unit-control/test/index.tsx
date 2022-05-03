@@ -273,7 +273,7 @@ describe( 'UnitControl', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41%' );
 
-			// Clicking document.body to trigget a blur event on the input.
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
@@ -307,7 +307,7 @@ describe( 'UnitControl', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 			expect( onUnitChangeSpy ).not.toHaveBeenCalled();
 
-			// Clicking document.body to trigget a blur event on the input.
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			// TODO: investigate why `onChange` gets called twice instead of once
@@ -507,7 +507,7 @@ describe( 'UnitControl', () => {
 				expect.anything()
 			);
 
-			// Clicking document.body to trigget a blur event on the input.
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
