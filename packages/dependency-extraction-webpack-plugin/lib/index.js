@@ -202,7 +202,7 @@ class DependencyExtractionWebpackPlugin {
 			// `entrypointChunk.contentHash` because that's not updated when
 			// assets are minified. Sigh.
 			// @todo Use `asset.info.contenthash` if we can make sure it's reliably set.
-			const hash = createHash( 'md4' );
+			const hash = createHash( 'sha512' );
 			for ( const filename of entrypoint.getFiles().sort() ) {
 				const asset = compilation.getAsset( filename );
 				hash.update( `${ filename }: ` );
@@ -216,7 +216,7 @@ class DependencyExtractionWebpackPlugin {
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: hash.digest( 'hex' ),
+				version: hash.digest( 'hex' ).substring( 0, 32 ),
 			};
 
 			const assetString = this.stringify( assetData );
