@@ -134,11 +134,9 @@ function ButtonEdit( props ) {
 	useEffect( () => {
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
 		// to avoid flashing caret after closing one of them
-		const isAnyBottomSheetVisible =
-			editorSidebarOpened || isLinkSheetVisible;
 		const richText = richTextRef?.current;
 		if ( Platform.OS === 'android' && richText ) {
-			if ( isAnyBottomSheetVisible ) {
+			if ( editorSidebarOpened || isLinkSheetVisible ) {
 				richText.blur();
 				onToggleButtonFocus( false );
 			} else {
