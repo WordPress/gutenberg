@@ -255,6 +255,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$inner_blocks_html .= $inner_block->render();
 		}
 
+		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
+			$html = str_replace( 'wp-block-navigation-item__content', 'wp-block-navigation-item__content current-menu-ancestor', $html );
+		}
+
 		$html .= sprintf(
 			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
