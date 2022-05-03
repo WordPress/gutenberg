@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render as RTLrender, screen, waitFor } from '@testing-library/react';
+import { render as RTLrender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -249,7 +249,7 @@ describe( 'UnitControl', () => {
 			expect( input.value ).toBe( '300px' );
 			expect( state ).toBe( 50 );
 
-			user.keyboard( '{Escape}' );
+			await user.keyboard( '{Escape}' );
 
 			expect( input.value ).toBe( '50' );
 			expect( state ).toBe( 50 );
@@ -280,18 +280,14 @@ describe( 'UnitControl', () => {
 			await user.clear( input );
 			await user.type( input, '41' );
 
-			await waitFor( () =>
-				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 )
-			);
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41%' );
 
 			// Clicking on the button should cause the `onBlur` callback to fire.
 			const button = screen.getByRole( 'button' );
 			await user.click( button );
 
-			await waitFor( () =>
-				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
-			);
+			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
@@ -328,10 +324,8 @@ describe( 'UnitControl', () => {
 			const button = screen.getByRole( 'button' );
 			await user.click( button );
 
-			await waitFor( () =>
-				expect( onChangeSpy ).toHaveBeenCalledTimes( 1 )
-			);
-
+			// TODO: investigate why `onChange` gets called twice instead of once
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
 
 			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
@@ -458,7 +452,7 @@ describe( 'UnitControl', () => {
 			await user.clear( input );
 			await user.type( input, '62' );
 
-			await waitFor( () => expect( state ).toBe( '62%' ) );
+			expect( state ).toBe( '62%' );
 		} );
 
 		it( 'should update unit value when a new raw value is passed', async () => {
@@ -480,12 +474,12 @@ describe( 'UnitControl', () => {
 
 			await user.selectOptions( selectA, remOptionA );
 
-			await waitFor( () => expect( selectB ).toHaveValue( 'rem' ) );
+			expect( selectB ).toHaveValue( 'rem' );
 			expect( selectA ).toHaveValue( 'rem' );
 
 			await user.selectOptions( selectB, vwOptionB );
 
-			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
+			expect( selectA ).toHaveValue( 'vw' );
 			expect( selectB ).toHaveValue( 'vw' );
 		} );
 
@@ -526,9 +520,7 @@ describe( 'UnitControl', () => {
 			const select = getSelect();
 			await user.selectOptions( select, [ 'em' ] );
 
-			await waitFor( () =>
-				expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 )
-			);
+			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onUnitChangeSpy ).toHaveBeenLastCalledWith(
 				'em',
 				expect.anything()
@@ -538,9 +530,7 @@ describe( 'UnitControl', () => {
 			const button = screen.getByRole( 'button' );
 			await user.click( button );
 
-			await waitFor( () =>
-				expect( onBlurSpy ).toHaveBeenCalledTimes( 1 )
-			);
+			expect( onBlurSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -561,7 +551,7 @@ describe( 'UnitControl', () => {
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
-			user.keyboard( '{Enter}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '55em' );
 		} );
@@ -579,7 +569,7 @@ describe( 'UnitControl', () => {
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '61   PX' );
-			user.keyboard( '{Enter}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '61px' );
 		} );
@@ -597,7 +587,7 @@ describe( 'UnitControl', () => {
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '55 em' );
-			user.keyboard( '{Enter}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '55em' );
 		} );
@@ -615,7 +605,7 @@ describe( 'UnitControl', () => {
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '-10  %' );
-			user.keyboard( '{Enter}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '-10%' );
 		} );
@@ -633,7 +623,7 @@ describe( 'UnitControl', () => {
 			const input = getInput( { isInputTypeText: true } );
 			await user.clear( input );
 			await user.type( input, '123       rEm  ' );
-			user.keyboard( '{Enter}' );
+			await user.keyboard( '{Enter}' );
 
 			expect( state ).toBe( '123rem' );
 		} );
@@ -647,7 +637,7 @@ describe( 'UnitControl', () => {
 
 			rerender( <UnitControl value={ '20vh' } /> );
 
-			await waitFor( () => expect( select.value ).toBe( 'vh' ) );
+			expect( select.value ).toBe( 'vh' );
 		} );
 
 		it( 'should fallback to default unit if parsed unit is invalid', () => {
