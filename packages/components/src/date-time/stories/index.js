@@ -71,6 +71,10 @@ export const WithDaysHighlighted = () => {
 	);
 };
 
+/**
+ * You can mark particular dates as invalid using the `isInvalidDate` prop. This
+ * prevents the user from being able to select it.
+ */
 export const WithInvalidDates = () => {
 	const [ currentDate, setCurrentDate ] = useState( now );
 
@@ -79,6 +83,7 @@ export const WithInvalidDates = () => {
 			currentDate={ currentDate }
 			onChange={ setCurrentDate }
 			isInvalidDate={ ( date ) =>
+				// Mark Saturdays and Sundays as invalid.
 				date.getDay() === 0 || date.getDay() === 6
 			}
 		/>
