@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, upperFirst } from 'lodash';
+import { get, kebabCase, upperFirst } from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ export function generateRule(
 	cssProperty: string,
 	options: StyleOptions
 ) {
-	const styleValue: string | undefined = get( style, path, null );
+	const styleValue: string | undefined = get( style, path );
 
 	return styleValue
 		? [
@@ -64,4 +64,17 @@ export function generateBoxRules(
 	}
 
 	return rules;
+}
+
+export function getSlugFromPreset(
+	styleValue: string,
+	styleContext: string
+): string | null {
+	if ( ! styleValue ) {
+		return null;
+	}
+
+	const presetValues = styleValue.split( `var:preset|${ styleContext }|` );
+
+	return presetValues[ 1 ] ? kebabCase( presetValues[ 1 ] ) : null;
 }

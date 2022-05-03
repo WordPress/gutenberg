@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getCSSRules, generate } from '../index';
+import { getCSSRules, generate, getClassnames } from '../index';
 
 describe( 'generate', () => {
 	it( 'should generate empty style', () => {
@@ -12,9 +12,16 @@ describe( 'generate', () => {
 		expect(
 			generate( {
 				spacing: { padding: '10px', margin: '12px' },
-				color: { text: '#381515' },
+				color: {
+					text: '#f1f1f1',
+					background: '#222222',
+					gradient:
+						'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%)',
+				},
 			} )
-		).toEqual( 'color: #381515; margin: 12px; padding: 10px;' );
+		).toEqual(
+			'background-color: #222222; gradient: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); color: #f1f1f1; margin: 12px; padding: 10px;'
+		);
 	} );
 
 	it( 'should generate styles with an optional selector', () => {
@@ -142,6 +149,40 @@ describe( 'getCSSRules', () => {
 				key: 'paddingBottom',
 				value: '5px',
 			},
+		] );
+	} );
+} );
+
+describe( 'getClassnames', () => {
+	it( 'should return an empty classnames array', () => {
+		expect( getClassnames( {} ) ).toEqual( [] );
+	} );
+
+	it( 'should generate classnames for eligible custom styles', () => {
+		expect(
+			getClassnames( {
+				spacing: { padding: '10px', margin: '12px' },
+				color: { text: '#381515', background: '#000000' },
+			} )
+		).toEqual( [ 'has-background', 'has-text-color' ] );
+	} );
+
+	it( 'should generate classnames for eligible preset values', () => {
+		expect(
+			getClassnames( {
+				spacing: { padding: '10px', margin: '12px' },
+				color: {
+					text: 'var:preset|color|whiteAsShow',
+					background: 'var:preset|color|mustardPickles',
+					gradient: 'var:preset|gradient|hairyOrange',
+				},
+			} )
+		).toEqual( [
+			'has-mustard-pickles-background-color',
+			'has-background',
+			'has-hairy-orange-gradient-background',
+			'has-white-as-show-color',
+			'has-text-color',
 		] );
 	} );
 } );

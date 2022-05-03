@@ -51,4 +51,5 @@ export type GeneratedCSSRule = {
 export interface StyleDefinition {
 	name: string;
 	generate: ( style: Style, options: StyleOptions ) => GeneratedCSSRule[];
+	getClassNames?: ( style: Style ) => string[];
 }

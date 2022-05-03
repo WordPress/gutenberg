@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, kebabCase } from 'lodash';
+import { groupBy, kebabCase, uniq } from 'lodash';
 
 /**
  * Internal dependencies
@@ -64,4 +64,21 @@ export function getCSSRules(
 	} );
 
 	return rules;
+}
+
+/**
+ * Returns an array of classnames.
+ *
+ * @param  style Style object.
+ *
+ * @return string[] An array of classnames.
+ */
+export function getClassnames( style: Style ): string[] {
+	const classNames: string[] = [];
+	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
+		if ( typeof definition.getClassNames === 'function' ) {
+			classNames.push( ...definition.getClassNames( style ) );
+		}
+	} );
+	return uniq( classNames );
 }

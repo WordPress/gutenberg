@@ -1,14 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { Style, StyleOptions } from '../../types';
-import { generateRule } from '../utils';
+import background from './background';
+import gradient from './gradient';
+import text from './text';
 
-const text = {
-	name: 'text',
-	generate: ( style: Style, options: StyleOptions ) => {
-		return generateRule( style, [ 'color', 'text' ], 'color', options );
-	},
-};
-
-export default [ text ];
+export default [ background, gradient, text ];
