@@ -48,9 +48,9 @@ window.addEventListener( 'load', () => {
 			return;
 		}
 
-		// we need to find the specific parent modal for this link
-		// since .close() won't work without an ID in case we have
-		// mutiple navigation menus in a post/page.
+		// Find the specific parent modal for this link
+		// since .close() won't work without an ID if there are
+		// multiple navigation menus in a post/page.
 		const modal = link.closest(
 			'.wp-block-navigation__responsive-container'
 		);
