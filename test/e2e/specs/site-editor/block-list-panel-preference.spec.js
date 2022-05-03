@@ -20,7 +20,7 @@ test.describe( 'Block list view', () => {
 
 		// Should display the Preview button.
 		await expect(
-			page.locator( '.edit-site-editor__list-view-panel' )
+			page.locator( 'role=region[name="List View"i]' )
 		).not.toBeVisible();
 
 		// Turn on block list view by default.
@@ -34,7 +34,7 @@ test.describe( 'Block list view', () => {
 
 		// Should display the Preview button.
 		await expect(
-			page.locator( '.edit-site-editor__list-view-panel' )
+			page.locator( 'role=region[name="List View"i]' )
 		).toBeVisible();
 	} );
 } );
