@@ -87,8 +87,21 @@
 				"padding": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
-			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background, > .block-library-cover__border-wrapper > .wp-block-cover__video-background, > .block-library-cover__border-wrapper > .wp-block-cover__image-background",
 			"text": false,
 			"background": false
 		}

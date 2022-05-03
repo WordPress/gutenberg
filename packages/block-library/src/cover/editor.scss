@@ -2,6 +2,7 @@
 	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
 	.editor-styles-wrapper & {
 		box-sizing: border-box;
+		overflow: initial;
 	}
 
 	// Override default cover styles
@@ -97,4 +98,62 @@
 // doesn't work with the transforms that are applied to resize the block in that context.
 .block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
 	background-attachment: scroll;
+}
+
+.block-library-cover__border-wrapper {
+	// Absolute positioning is needed to handle padding that might be applied
+	// to the main block wrapper via global styles.
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	// Hide backgrounds so they don't overflow the border.
+	overflow: hidden;
+	// Re-establish layout and handle custom positions.
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	// Inherits padding from main block wrapper.
+	padding: inherit;
+
+	// Position: Top
+	.is-position-top-left & {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	.is-position-top-center & {
+		align-items: flex-start;
+		justify-content: center;
+	}
+	.is-position-top-right & {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	// Position: Center
+	.is-position-center-left & {
+		align-items: center;
+		justify-content: flex-start;
+	}
+	.is-position-center-center & {
+		align-items: center;
+		justify-content: center;
+	}
+	.is-position-center-right & {
+		align-items: center;
+		justify-content: flex-end;
+	}
+	// Position: Bottom
+	.is-position-bottom-left & {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	.is-position-bottom-center & {
+		align-items: flex-end;
+		justify-content: center;
+	}
+	.is-position-bottom-right & {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
 }

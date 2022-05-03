@@ -11,6 +11,8 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	// Prevent overflow of background when block has border radius.
+	overflow: hidden;
 
 	&.has-parallax {
 		background-attachment: fixed;
