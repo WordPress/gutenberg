@@ -61,9 +61,6 @@ export default function BlockPopover( {
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
-			// Used to safeguard sticky position behavior against cases where it would permanently
-			// obscure specific sections of a block.
-			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
 			__unstableForcePosition
 			{ ...props }
 			className={ classnames(

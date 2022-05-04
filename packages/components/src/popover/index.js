@@ -163,7 +163,16 @@ const Popover = (
 			};
 		} else if ( getAnchorRect ) {
 			usedRef = {
-				getBoundingClientRect: getAnchorRect,
+				getBoundingClientRect() {
+					const rect = getAnchorRect();
+					return {
+						...rect,
+						x: rect.x ?? rect.left,
+						y: rect.y ?? rect.top,
+						height: rect.height ?? rect.bottom - rect.top,
+						width: rect.width ?? rect.right - rect.left,
+					};
+				},
 			};
 		} else if ( anchorRefFallback.current ) {
 			usedRef = anchorRefFallback.current;
