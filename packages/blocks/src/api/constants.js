@@ -28,6 +28,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color', 'background' ],
 		requiresOptOut: true,
+		useEngine: true,
 	},
 	borderColor: {
 		value: [ 'border', 'color' ],
