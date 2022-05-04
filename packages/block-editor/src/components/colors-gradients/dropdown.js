@@ -121,13 +121,16 @@ export default function ColorGradientSettingsDropdown( {
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
-	const dropdownPosition = __experimentalIsRenderedInSidebar
-		? 'bottom left'
-		: undefined;
-
 	const dropdownClassName = __experimentalIsItemGroup
 		? 'block-editor-panel-color-gradient-settings__dropdown'
 		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
+	let popoverProps;
+	if ( __experimentalIsRenderedInSidebar ) {
+		popoverProps = {
+			placement: 'left-start',
+			offset: 36,
+		};
+	}
 
 	return (
 		// Only wrap with `ItemGroup` if these controls are being rendered
@@ -170,7 +173,7 @@ export default function ColorGradientSettingsDropdown( {
 							{ ...props }
 						>
 							<Dropdown
-								position={ dropdownPosition }
+								popoverProps={ popoverProps }
 								className={ dropdownClassName }
 								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
 								renderToggle={ renderToggle( toggleSettings ) }
