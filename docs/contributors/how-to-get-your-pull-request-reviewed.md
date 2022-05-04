@@ -14,7 +14,7 @@ Approving a 50-line long PR takes days or hours and feels easy.
 
 Large batches slow you down. Ship your work in small chunks to merge more and learn faster.
 
-## Share ALL the context:
+## Share relevant context:
 
 Say:
 * What problem are you solving?
