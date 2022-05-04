@@ -32,21 +32,12 @@
 	border: none;
 	outline: none;
 	border-radius: $radius-block-ui;
-	max-height: fit-content !important;
 	& > div {
 		padding: 0;
 	}
 	.react-colorful__saturation {
 		border-top-right-radius: $radius-block-ui;
 		border-top-left-radius: $radius-block-ui;
-	}
-}
-
-@include break-medium() {
-	.components-dropdown__content.components-color-palette__custom-color-dropdown-content.is-rendered-in-sidebar {
-		.components-popover__content.components-popover__content {
-			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
-		}
 	}
 }
 

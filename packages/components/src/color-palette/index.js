@@ -6,7 +6,6 @@ import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -116,12 +115,12 @@ function MultiplePalettes( {
 export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	return (
 		<Dropdown
-			contentClassName={ classnames(
-				'components-color-palette__custom-color-dropdown-content',
-				{
-					'is-rendered-in-sidebar': isRenderedInSidebar,
-				}
-			) }
+			contentClassName="components-color-palette__custom-color-dropdown-content"
+			popoverProps={
+				isRenderedInSidebar
+					? { placement: 'left-start', offset: 20 }
+					: undefined
+			}
 			{ ...props }
 		/>
 	);

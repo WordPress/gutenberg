@@ -396,7 +396,7 @@ $block-navigation-max-indent: 8;
 }
 
 // Reset some popover defaults for the drop indicator.
-.block-editor-list-view-drop-indicator:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
+.block-editor-list-view-drop-indicator > .components-popover__content {
 	margin-left: 0;
 	border: none;
 	box-shadow: none;
