@@ -131,6 +131,7 @@ const test = base.extend<
 				requestUtils.activateTheme( 'twentytwentyone' ),
 				requestUtils.deleteAllPosts(),
 				requestUtils.deleteAllBlocks(),
+				requestUtils.resetPreferences(),
 			] );
 
 			await use( requestUtils );

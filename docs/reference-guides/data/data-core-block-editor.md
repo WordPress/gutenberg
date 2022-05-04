@@ -428,6 +428,7 @@ Items are returned ordered descendingly by their 'frecency'.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
+-   _blocks_ `Object|Object[]`: Block object or array objects.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_

@@ -47,7 +47,6 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	shouldAnchorIncludePadding,
 	container
 ) {
 	if ( anchorRect ) {
@@ -98,17 +97,14 @@ function computeAnchorRect(
 				container
 			);
 
-			if ( shouldAnchorIncludePadding ) {
-				return rect;
-			}
-
-			return withoutPadding( rect, anchorRef );
+			return rect;
 		}
 
 		const { top, bottom } = anchorRef;
 		const topRect = top.getBoundingClientRect();
 		const bottomRect = bottom.getBoundingClientRect();
-		const rect = offsetIframe(
+
+		return offsetIframe(
 			new window.DOMRect(
 				topRect.left,
 				topRect.top,
@@ -118,12 +114,6 @@ function computeAnchorRect(
 			top.ownerDocument,
 			container
 		);
-
-		if ( shouldAnchorIncludePadding ) {
-			return rect;
-		}
-
-		return withoutPadding( rect, anchorRef );
 	}
 
 	if ( ! anchorRefFallback.current ) {
@@ -131,45 +121,12 @@ function computeAnchorRect(
 	}
 
 	const { parentNode } = anchorRefFallback.current;
-	const rect = offsetIframe(
+
+	return offsetIframe(
 		parentNode.getBoundingClientRect(),
 		parentNode.ownerDocument,
 		container
 	);
-
-	if ( shouldAnchorIncludePadding ) {
-		return rect;
-	}
-
-	return withoutPadding( rect, parentNode );
-}
-
-function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
-}
-
-function withoutPadding( rect, element ) {
-	const {
-		paddingTop,
-		paddingBottom,
-		paddingLeft,
-		paddingRight,
-	} = getComputedStyle( element );
-	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
-	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
-	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;
-	const right = paddingRight ? parseInt( paddingRight, 10 ) : 0;
-
-	return {
-		x: rect.left + left,
-		y: rect.top + top,
-		width: rect.width - left - right,
-		height: rect.height - top - bottom,
-		left: rect.left + left,
-		right: rect.right - right,
-		top: rect.top + top,
-		bottom: rect.bottom - bottom,
-	};
 }
 
 /**
@@ -252,7 +209,6 @@ const Popover = (
 		range,
 		focusOnMount = 'firstElement',
 		anchorRef,
-		shouldAnchorIncludePadding,
 		anchorRect,
 		getAnchorRect,
 		expandOnMobile,
@@ -304,7 +260,6 @@ const Popover = (
 				anchorRect,
 				getAnchorRect,
 				anchorRef,
-				shouldAnchorIncludePadding,
 				containerRef.current
 			);
 
@@ -480,7 +435,6 @@ const Popover = (
 		anchorRect,
 		getAnchorRect,
 		anchorRef,
-		shouldAnchorIncludePadding,
 		position,
 		contentSize,
 		__unstableStickyBoundaryElement,

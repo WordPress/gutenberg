@@ -343,7 +343,7 @@ export function getEntityRecords( state, kind, name, query ) {
 }
 
 /**
- * Returns the  list of dirty entity records.
+ * Returns the list of dirty entity records.
  *
  * @param {Object} state State tree.
  *

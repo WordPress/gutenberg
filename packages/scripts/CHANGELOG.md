@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
+-   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
+
+### New Feature
+
+-   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
+
+## 22.5.0 (2022-04-21)
+
+### Bug Fixes
+
+-   Update `markdownlint` and `markdownlint-cli` to the latest versions ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
 ## 22.4.0 (2022-04-08)
 
 ### New Feature
@@ -13,7 +28,6 @@
 -   Add `vendor/` to `.markdownlintignore`, to match `lint-md-docs` docs ([#39724](https://github.com/WordPress/gutenberg/pull/39724)).
 -   Include files with `.jsx` extension in the build process ([#39613](https://github.com/WordPress/gutenberg/pull/39613)).
 -   Ensure that the default logic for entry points in the build commands is executed only when used the default config ([#39618](https://github.com/WordPress/gutenberg/pull/39618)).
--   Update `markdownlint` and `markdownlint-cli` to the latest versions ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
 
 ## 22.2.0 (2022-03-11)
 

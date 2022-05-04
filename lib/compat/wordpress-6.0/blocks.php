@@ -144,6 +144,16 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			'no_found_rows' => false,
 		);
 
+		if ( is_user_logged_in() ) {
+			$comment_args['include_unapproved'] = array( get_current_user_id() );
+		} else {
+			$unapproved_email = wp_get_unapproved_comment_author_email();
+
+			if ( $unapproved_email ) {
+				$comment_args['include_unapproved'] = array( $unapproved_email );
+			}
+		}
+
 		if ( ! empty( $block->context['postId'] ) ) {
 			$comment_args['post_id'] = (int) $block->context['postId'];
 		}
@@ -166,7 +176,10 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 				} elseif ( 'oldest' === $default_page ) {
 					$comment_args['paged'] = 1;
 				} elseif ( 'newest' === $default_page ) {
-					$comment_args['paged'] = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					$max_num_pages = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					if ( 0 !== $max_num_pages ) {
+						$comment_args['paged'] = $max_num_pages;
+					}
 				}
 				// Set the `cpage` query var to ensure the previous and next pagination links are correct
 				// when inheriting the Discussion Settings.
@@ -228,13 +241,14 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
 
 	$settings['__experimentalDiscussionSettings'] = array(
-		'commentOrder'        => get_option( 'comment_order' ),
-		'commentsPerPage'     => get_option( 'comments_per_page' ),
-		'defaultCommentsPage' => get_option( 'default_comments_page' ),
-		'pageComments'        => get_option( 'page_comments' ),
-		'threadComments'      => get_option( 'thread_comments' ),
-		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
-		'avatarURL'           => get_avatar_url(
+		'commentOrder'         => get_option( 'comment_order' ),
+		'commentsPerPage'      => get_option( 'comments_per_page' ),
+		'defaultCommentsPage'  => get_option( 'default_comments_page' ),
+		'pageComments'         => get_option( 'page_comments' ),
+		'threadComments'       => get_option( 'thread_comments' ),
+		'threadCommentsDepth'  => get_option( 'thread_comments_depth' ),
+		'defaultCommentStatus' => get_option( 'default_comment_status' ),
+		'avatarURL'            => get_avatar_url(
 			'',
 			array(
 				'size'          => 96,
@@ -269,3 +283,30 @@ function gutenberg_rest_comment_set_children_as_embeddable() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Registers the lock block attribute for block types.
+ *
+ * Once 6.0 is the minimum supported WordPress version for the Gutenberg
+ * plugin, this shim can be removed
+ *
+ * Doesn't need to be backported into Core.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_lock_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'lock', $args['attributes'] ) ) {
+		$args['attributes']['lock'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_lock_attribute' );

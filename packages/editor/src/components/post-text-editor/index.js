@@ -7,7 +7,7 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
@@ -29,6 +29,7 @@ export default function PostTextEditor() {
 	const [ value, setValue ] = useState( postContent );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const instanceId = useInstanceId( PostTextEditor );
+	const valueRef = useRef();
 
 	if ( ! isDirty && value !== postContent ) {
 		setValue( postContent );
@@ -64,6 +65,18 @@ export default function PostTextEditor() {
 			setIsDirty( false );
 		}
 	};
+
+	useEffect( () => {
+		valueRef.current = value;
+	}, [ value ] );
+
+	// Ensure changes aren't lost when component unmounts.
+	useEffect( () => {
+		return () => {
+			const blocks = parse( valueRef.current );
+			resetEditorBlocks( blocks );
+		};
+	}, [] );
 
 	return (
 		<>
