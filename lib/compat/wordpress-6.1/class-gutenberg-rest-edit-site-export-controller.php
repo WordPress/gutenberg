@@ -17,6 +17,8 @@
  */
 class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit_Site_Export_Controller {
 
+	protected $user_customisations = [];
+	protected $theme_file_path = '';
 
 	public function register_routes() {
 		register_rest_route(
@@ -36,6 +38,25 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 	}
 
 	/**
+	 * Checks whether the user has permission to edit themes. In classic themes
+	 * this controls access to Appearance > Theme Editor to edit theme files.
+	 * In block themes editing theme files via the visual editor is similar.
+	 *
+	 * @return WP_Error|bool True if the request has access, or WP_Error object.
+	 */
+	public function permissions_check() {
+		if ( current_user_can( 'edit_themes' ) ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_cannot_edit_theme',
+			__( 'Sorry, you are not allowed to edit theme templates and template parts.', 'gutenberg' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	}
+
+	/**
 	 * Update the files of the currently enabled block theme with the template and
 	 * template part customisations and additions made in the site editor.
 	 *
@@ -43,16 +64,63 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 	 */
 	public function export_to_theme_files() {
 		try {
+			$this->ensure_writeable_theme_folders();
+			$this->check_writeable_theme_files();
 			$this->update_template_and_parts_files();
 			$this->update_theme_json_file();
 		} catch ( Exception $e ) {
-			return new WP_Error( 'rest_cant_update_theme_files', __( 'Error updating theme files. ', 'gutenberg' ) . $e->getMessage(), array( 'status' => 500 ) );
+			return new WP_Error( 'rest_error_updating_theme', __( 'Error updating theme files. ', 'gutenberg' ) . $e->getMessage(), array( 'status' => 500 ) );
 		}
 
 		$this->clear_user_customizations();
 		return rest_ensure_response(  array( "theme_files_updated" => true ) );
+	}
 
+	protected function ensure_writeable_theme_folders() {
+		$user_customisations = $this->get_user_customisations();
 
+		foreach ( $user_customisations['templates'] as $template ) {
+			$fileToUpdateFolder = get_theme_file_path() . '/templates/';
+			if( ! wp_mkdir_p( $fileToUpdateFolder ) ) {
+				throw new Exception("Theme was not changed. Could not create: " . $fileToUpdateFolder);
+			}
+		}
+
+		foreach ( $user_customisations['template_parts'] as $template_part ) {
+			$fileToUpdateFolder = get_theme_file_path() . '/parts/';
+			if( ! wp_mkdir_p( $fileToUpdateFolder ) ) {
+				throw new Exception("Theme was not changed. Could not create: " . $fileToUpdateFolder);
+			}
+		}
+
+	}
+
+	protected function check_writeable_theme_files() {
+
+		$user_customisations = $this->get_user_customisations();
+
+		foreach ( $user_customisations['templates'] as $template ) {
+			$fileToUpdateFolder = get_theme_file_path() . '/templates/';
+			$fileToUpdate = $fileToUpdateFolder .
+				$template->slug . '.html';
+			if ( file_exists( $fileToUpdate ) && ! wp_is_writable( $fileToUpdate ) ) {
+				throw new Exception("Theme was not changed. Theme file is not writeable: " . $fileToUpdate);
+			}
+		}
+
+		foreach ( $user_customisations['template_parts'] as $template_part ) {
+			$fileToUpdateFolder = get_theme_file_path() . '/parts/';
+			$fileToUpdate = $fileToUpdateFolder .
+				$template_part->slug . '.html';
+			if ( file_exists( $fileToUpdate ) && ! wp_is_writable( $fileToUpdate ) ) {
+				throw new Exception("Theme was not changed. Theme file is not writeable: " . $fileToUpdate);
+			}
+		}
+
+		$fileToUpdate = get_theme_file_path() . '/theme.json';
+		if ( file_exists( $fileToUpdate ) && ! wp_is_writable( $fileToUpdate ) ) {
+			throw new Exception("Theme file is not writeable: " . $fileToUpdate);
+		}
 	}
 
 	protected function update_template_and_parts_files() {
@@ -60,51 +128,59 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 		$user_customisations = $this->get_user_customisations();
 
 		foreach ( $user_customisations['templates'] as $template ) {
-			$fileToUpdate = get_template_directory() . '/templates/' .
+			$fileToUpdateFolder = get_theme_file_path() . '/templates/';
+			$fileToUpdate = $fileToUpdateFolder .
 				$template->slug . '.html';
-			if ( ! file_exists( $fileToUpdate ) ) {
-				throw new Exception("Theme file does not exist: " . $fileToUpdate);
-			}
-			if ( ! wp_is_writable( $fileToUpdate ) ) {
-				throw new Exception("Theme file is not writeable: " . $fileToUpdate);
-			}
-			file_put_contents(
+			$filesystem_result = file_put_contents(
 				$fileToUpdate,
 				$template->content
 			);
+			if( $filesystem_result === false ) {
+				throw new Exception("Something went wrong updating $fileToUpdate" .
+				 "Some files may have been changed.");
+			}
 		}
 
 		foreach ( $user_customisations['template_parts'] as $template_part ) {
-			$fileToUpdate = get_template_directory() . '/parts/' .
+			$fileToUpdateFolder = get_theme_file_path() . '/parts/';
+			$fileToUpdate = $fileToUpdateFolder .
 				$template_part->slug . '.html';
-			if ( ! file_exists( $fileToUpdate ) ) {
-				throw new Exception("Theme file does not exist: " . $fileToUpdate);
-			}
-			if ( ! wp_is_writable( $fileToUpdate ) ) {
-				throw new Exception("Theme file is not writeable: " . $fileToUpdate);
-			}
-			file_put_contents(
+			$filesystem_result = file_put_contents(
 				$fileToUpdate,
 				$template_part->content
 			);
+			if( $filesystem_result === false ) {
+				throw new Exception("Something went wrong updating $fileToUpdate" .
+				 "Some files may have been changed.");
+			}
 		}
 	}
 
 	protected function update_theme_json_file() {
-		$fileToUpdate = get_template_directory() . '/theme.json';
-		if ( ! file_exists( $fileToUpdate ) ) {
-			throw new Exception("Theme file does not exist: " . $fileToUpdate);
-		}
-		if ( ! wp_is_writable( $fileToUpdate ) ) {
-			throw new Exception("Theme file is not writeable: " . $fileToUpdate);
-		}
-		file_put_contents(
+		$fileToUpdate = get_theme_file_path() . '/theme.json';
+		$filesystem_result === file_put_contents(
 			$fileToUpdate,
 			gutenberg_export_theme_json()
 		);
+		if( $filesystem_result === false ) {
+			throw new Exception("Something went wrong updating $fileToUpdate" .
+				 "Some files may have been changed.");
+		}
+	}
+
+	protected function get_theme_file_path() {
+		if ( $this->theme_file_path !== '' ) {
+			return $this->theme_file_path;
+		}
+		$this->theme_file_path = get_theme_file_path();
+		return $this->theme_file_path;
 	}
 
 	protected function get_user_customisations() {
+
+		if ( $this->user_customisations !== [] ) {
+			return $this->user_customisations;
+		}
 
 		$templates = gutenberg_get_block_templates();
 		$template_parts = gutenberg_get_block_templates ( array(), 'wp_template_part' );
@@ -128,10 +204,12 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_1 extends Gutenberg_REST_Edit
 			$exported_template_parts[] = $template_part;
 		}
 
-		return array(
+		$this->user_customisations = array(
 			'templates'=>$exported_templates,
 			'template_parts'=>$exported_template_parts
 		);
+
+		return $this->user_customisations;
 
 	}
 
