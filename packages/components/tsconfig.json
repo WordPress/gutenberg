@@ -17,6 +17,7 @@
 	},
 	"references": [
 		{ "path": "../compose" },
+		{ "path": "../date" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
