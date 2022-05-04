@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.0.0 (2022-05-04)
+
 ### Breaking change
 
 -   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
