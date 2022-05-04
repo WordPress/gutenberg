@@ -539,6 +539,12 @@ class WP_Theme_JSON_5_9 {
 			// individual block selector.
 			$block_selectors = explode( ',', static::$blocks_metadata[ $block_name ]['selector'] );
 			foreach ( static::ELEMENTS as $el_name => $el_selector ) {
+				// for elements defined under core/heading, selector should be h1 instead of h1 h1
+				if ("core/heading" === $block_name) {
+					static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $el_selector;
+					continue;
+				}
+
 				$element_selector = array();
 				foreach ( $block_selectors as $selector ) {
 					$element_selector[] = $selector . ' ' . $el_selector;
@@ -1381,44 +1387,43 @@ class WP_Theme_JSON_5_9 {
 			'selector' => static::ROOT_BLOCK_SELECTOR,
 		);
 
+		// Blocks.
+		if ( isset( $theme_json['styles']['blocks'] ) ) {
+			foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
+				$selector = null;
+				if ( isset( $selectors[ $name ]['selector'] ) ) {
+					$selector = $selectors[ $name ]['selector'];
+				}
+	
+				$duotone_selector = null;
+				if ( isset( $selectors[ $name ]['duotone'] ) ) {
+					$duotone_selector = $selectors[ $name ]['duotone'];
+				}
+	
+				$nodes[] = array(
+					'path'     => array( 'styles', 'blocks', $name ),
+					'selector' => $selector,
+					'duotone'  => $duotone_selector,
+				);
+	
+				if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
+					foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+						$nodes[] = array(
+							'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
+							'selector' => $selectors[ $name ]['elements'][ $element ],
+						);
+					}
+				}
+			}	
+		}
+
+		// Elements
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
 					'selector' => static::ELEMENTS[ $element ],
 				);
-			}
-		}
-
-		// Blocks.
-		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
-			return $nodes;
-		}
-
-		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
-			$selector = null;
-			if ( isset( $selectors[ $name ]['selector'] ) ) {
-				$selector = $selectors[ $name ]['selector'];
-			}
-
-			$duotone_selector = null;
-			if ( isset( $selectors[ $name ]['duotone'] ) ) {
-				$duotone_selector = $selectors[ $name ]['duotone'];
-			}
-
-			$nodes[] = array(
-				'path'     => array( 'styles', 'blocks', $name ),
-				'selector' => $selector,
-				'duotone'  => $duotone_selector,
-			);
-
-			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
-				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
-					$nodes[] = array(
-						'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-						'selector' => $selectors[ $name ]['elements'][ $element ],
-					);
-				}
 			}
 		}
 
