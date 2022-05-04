@@ -85,7 +85,6 @@ function ListViewBranch( props ) {
 		blocks,
 		selectBlock,
 		showBlockMovers,
-		showNestedBlocks,
 		selectedClientIds,
 		level = 1,
 		path = '',
@@ -95,11 +94,7 @@ function ListViewBranch( props ) {
 		isExpanded,
 	} = props;
 
-	const {
-		expandedState,
-		draggedClientIds,
-		__experimentalPersistentListViewFeatures,
-	} = useListViewContext();
+	const { expandedState, draggedClientIds } = useListViewContext();
 
 	const filteredBlocks = compact( blocks );
 	const blockCount = filteredBlocks.length;
@@ -119,19 +114,15 @@ function ListViewBranch( props ) {
 					);
 				}
 
-				const usesWindowing = __experimentalPersistentListViewFeatures;
-
 				const { itemInView } = fixedListWindow;
-				const blockInView =
-					! usesWindowing || itemInView( nextPosition );
+				const blockInView = itemInView( nextPosition );
 
 				const position = index + 1;
 				const updatedPath =
 					path.length > 0
 						? `${ path }_${ position }`
 						: `${ position }`;
-				const hasNestedBlocks =
-					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const hasNestedBlocks = !! innerBlocks?.length;
 
 				const shouldExpand = hasNestedBlocks
 					? expandedState[ clientId ] ?? isExpanded
@@ -179,7 +170,6 @@ function ListViewBranch( props ) {
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
 								showBlockMovers={ showBlockMovers }
-								showNestedBlocks={ showNestedBlocks }
 								level={ level + 1 }
 								path={ updatedPath }
 								listPosition={ nextPosition + 1 }
