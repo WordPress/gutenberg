@@ -70,9 +70,10 @@ function Layout( { styles } ) {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		setIsInserterOpened,
-		toggleFeature,
+		//toggleFeature,
 	} = useDispatch( editPostStore );
-	const { createInfoNotice, createErrorNotice } = useDispatch( noticesStore );
+	//const { createInfoNotice, createErrorNotice } = useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -137,18 +138,18 @@ function Layout( { styles } ) {
 		! sidebarIsOpened && ! isListViewOpened && ! isInserterOpened;
 
 	const [ isDistractionFree, setIsDistractionFree ] = useState(
-		hasReducedUI && noChromeOpened
+		hasReducedUI
 	);
 
 	useEffect( () => {
-		setIsDistractionFree( hasReducedUI && noChromeOpened );
-		if ( hasReducedUI && ! noChromeOpened ) {
-			toggleFeature( 'reducedUI' );
-			createInfoNotice( __( 'Distraction free mode turned off.' ), {
-				speak: true,
-				type: 'snackbar',
-			} );
-		}
+		setIsDistractionFree( hasReducedUI );
+		// if ( hasReducedUI && ! noChromeOpened ) {
+		// 	toggleFeature( 'reducedUI' );
+		// 	createInfoNotice( __( 'Distraction free mode turned off.' ), {
+		// 		speak: true,
+		// 		type: 'snackbar',
+		// 	} );
+		// }
 	}, [ noChromeOpened, hasReducedUI ] );
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {

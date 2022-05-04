@@ -123,15 +123,40 @@ html.interface-interface-skeleton__html-container {
 .is-distraction-free {
 	.edit-post-header {
 		box-shadow: $shadow-popover;
+		position: absolute;
+		width: 100vw;
 	}
 
 	.interface-interface-skeleton__header {
 		border-bottom: 0;
 	}
 
-	.interface-interface-skeleton__body {
-		margin-top: -60px;
+	.interface-interface-skeleton__secondary-sidebar,
+	&.is-sidebar-opened .interface-interface-skeleton__sidebar {
+		border: $border-width solid $gray-200;
+		margin: $grid-unit-15;
+		border-radius: 2px;
+		box-shadow: $shadow-popover;
+		position: absolute !important;
+		right: 0 !important;
+		left: auto !important;
+		width: 280px;
+		margin-top: 80px;
 	}
+
+	.interface-interface-skeleton__secondary-sidebar {
+		left: 0 !important;
+		right: auto !important;
+		width: 350px;
+	}
+
+	// .interface-interface-skeleton__body {
+	// 	margin-top: -60px;
+
+	// 	.interface-interface-skeleton__content {
+	// 		padding-top: 60px;
+	// 	}
+	// }
 }
 
 .interface-interface-skeleton__secondary-sidebar {
