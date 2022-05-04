@@ -39,11 +39,6 @@
 	font-size: 14px;
 }
 
-// Indent the popover to match the button position.
-.block-editor-block-switcher__popover {
-	margin-left: 6px;
-}
-
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	display: flex;
 
@@ -93,43 +88,11 @@
 	min-width: 300px;
 }
 
-// We keep the min width the same for the border to work.
-.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
-	min-width: auto;
-	display: flex;
-	background: $white;
-	padding: 0;
-
-	.components-menu-group {
-		margin: 0;
-	}
-}
-
-.block-editor-block-switcher__popover .components-popover__content {
-
-	.block-editor-block-styles {
-		margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
-	}
-
-	// Hide the bottom border on the last panel so it stacks with the popover.
-	.components-panel__body {
-		border: 0;
-
-		// Elevate this so the hover style is visible.
-		position: relative;
-		z-index: 1;
-	}
-
-	.components-panel__body + .components-panel__body {
-		border-top: $border-width solid $gray-200;
-	}
-}
-
 .block-editor-block-switcher__popover__preview__parent {
 	.block-editor-block-switcher__popover__preview__container {
 		position: absolute;
 		top: -$grid-unit-15;
-		left: calc(100% + #{$grid-unit-40});
+		left: calc(100% + #{$grid-unit-20});
 	}
 }
 
@@ -138,7 +101,6 @@
 
 	// Position correctly. Needs specificity.
 	&.components-popover {
-		margin-left: $grid-unit-05;
 		margin-top: $grid-unit-15 - $border-width;
 	}
 
