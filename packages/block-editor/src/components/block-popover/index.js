@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
-import { getScrollContainer } from '@wordpress/dom';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -50,22 +49,13 @@ export default function BlockPopover( {
 		bottom: lastSelectedElement,
 	};
 
-	const { ownerDocument } = selectedElement;
-	const stickyBoundaryElement =
-		ownerDocument.defaultView.frameElement ||
-		getScrollContainer( selectedElement ) ||
-		ownerDocument.body;
-
 	return (
 		<Popover
 			ref={ popoverScrollRef }
 			animate={ false }
-			placement="top-start"
+			position="top right left"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
-			__unstableStickyBoundaryElement={
-				__unstableCoverTarget ? undefined : stickyBoundaryElement
-			}
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }

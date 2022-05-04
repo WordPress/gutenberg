@@ -110,7 +110,6 @@ export default function Dropdown( props ) {
 						popoverProps ? popoverProps.className : undefined,
 						contentClassName
 					) }
-					noArrow={ false }
 				>
 					{ renderContent( args ) }
 				</Popover>

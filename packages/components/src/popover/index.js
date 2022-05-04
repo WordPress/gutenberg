@@ -46,14 +46,13 @@ const SLOT_NAME = 'Popover';
 const slotNameContext = createContext();
 
 const positionToPlacement = ( position ) => {
-	// TODO handle z.
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const [ x, y ] = position.split( ' ' );
+	const [ x, y, z ] = position.split( ' ' );
+
 	if ( [ 'top', 'bottom' ].includes( x ) ) {
 		let suffix = '';
-		if ( suffix === 'left' ) {
+		if ( ( !! z && z === 'left' ) || y === 'right' ) {
 			suffix = '-start';
-		} else if ( suffix === 'right' ) {
+		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
 			suffix = '-end';
 		}
 		return x + suffix;
@@ -77,7 +76,7 @@ const Popover = (
 		noArrow = true,
 		isAlternate,
 		position,
-		placement = 'bottom-end',
+		placement = 'bottom-start',
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
