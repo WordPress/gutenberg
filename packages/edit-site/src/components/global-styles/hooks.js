@@ -13,6 +13,11 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
 
 /**
  * Internal dependencies
@@ -26,10 +31,19 @@ import { GlobalStylesContext } from './context';
 
 const EMPTY_CONFIG = {
 	isGlobalStylesUserThemeJSON: true,
-	version: LATEST_SCHEMA,
 };
 
 export const useGlobalStylesReset = () => {
+	const { __unstableThemeJSONLatestSchema } = useSelect( ( select ) => {
+		return {
+			__unstableThemeJSONLatestSchema: select(
+				editSiteStore
+			).getSettings()?.__unstableThemeJSONLatestSchema,
+		};
+	}, [] );
+
+	EMPTY_CONFIG.version = __unstableThemeJSONLatestSchema;
+
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
