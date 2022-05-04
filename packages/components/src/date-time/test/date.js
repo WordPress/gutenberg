@@ -11,9 +11,25 @@ import 'react-dates/initialize';
  */
 import DatePicker from '../date';
 
+function setup( jsx ) {
+	return {
+		user: userEvent.setup( { advanceTimers: jest.advanceTimersByTime } ),
+		...render( jsx ),
+	};
+}
+
 describe( 'DatePicker', () => {
+	beforeEach( () => {
+		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'should highlight the current date', () => {
-		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
+		setup( <DatePicker currentDate="2022-05-02T11:00:00" /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
@@ -26,7 +42,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( "should highlight today's date when not provided a currentDate", () => {
-		render( <DatePicker /> );
+		setup( <DatePicker /> );
 
 		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
 		expect(
@@ -35,11 +51,9 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
-
 		const onChange = jest.fn();
 
-		render(
+		const { user } = setup(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				onChange={ onChange }
@@ -54,12 +68,10 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
-
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();
 
-		render(
+		const { user } = setup(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				onMonthPreviewed={ onMonthPreviewed }
@@ -85,7 +97,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should highlight events on the calendar', () => {
-		render(
+		setup(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				events={ [
@@ -106,11 +118,9 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should not allow invalid date to be selected', async () => {
-		const user = userEvent.setup( { delay: null } );
-
 		const onChange = jest.fn();
 
-		render(
+		const { user } = setup(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				onChange={ onChange }
