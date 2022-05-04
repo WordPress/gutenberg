@@ -117,7 +117,6 @@ function BlockStyles( {
 						>
 							<Text
 								as="span"
-								limit={ 12 }
 								ellipsizeMode="tail"
 								className="block-editor-block-styles__item-text"
 								truncate
