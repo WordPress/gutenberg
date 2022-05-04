@@ -3,7 +3,7 @@
  */
 import metadata from './block.json';
 
-const { attributes } = metadata;
+const { attributes, supports } = metadata;
 
 export default [
 	{
@@ -16,6 +16,7 @@ export default [
 				type: 'string',
 			},
 		},
+		supports,
 		migrate: ( oldAttributes ) => {
 			/* eslint-disable no-unused-vars */
 			const {
