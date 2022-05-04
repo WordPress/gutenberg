@@ -4,6 +4,7 @@
 import { get, find, isString } from 'lodash';
 
 /* Supporting data. */
+export const LATEST_SCHEMA = 2; // Need to be kept in sync with WP_Theme_JSON.
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [

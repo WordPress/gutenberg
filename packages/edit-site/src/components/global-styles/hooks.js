@@ -17,10 +17,17 @@ import {
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import {
+	getValueFromVariable,
+	getPresetVariableFromValue,
+	LATEST_SCHEMA,
+} from './utils';
 import { GlobalStylesContext } from './context';
 
-const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
+const EMPTY_CONFIG = {
+	isGlobalStylesUserThemeJSON: true,
+	version: LATEST_SCHEMA,
+};
 
 export const useGlobalStylesReset = () => {
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
