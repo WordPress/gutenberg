@@ -1,6 +1,6 @@
 # How To Get Your Pull Request Reviewed?
 
-Sometimes we publish a Pull Request and noone reviews our work. What to do?
+Sometimes we publish a Pull Request and no one reviews our work. What to do?
 
 Attracting a review largely isn't about the code – it is about making the reviewing easy.
 
@@ -14,9 +14,9 @@ Approving a 50-line long PR takes days or hours and feels easy.
 
 Large batches slow you down. Ship your work in small chunks to merge more and learn faster.
 
-## Share ALL the context:
+## Share relevant context:
 
-Say:
+Clarify:
 * What problem are you solving?
 * How does your PR solve it?
 * What feedback do you need?
@@ -35,7 +35,7 @@ All contributions are competing for attention. Make your stand out.
 The easiest way? Say why it matters:
 
 ❌ A new react hook to get data
-✅ useEntityRecord: get data with 10x less boilerplate
+✅ `useEntityRecord`: get data with 10x less boilerplate
 
 Then prove it with code examples, visuals, and screencasts.
 
@@ -45,7 +45,7 @@ Post a link to your PR in related issues & PRs.
 
 Ping commenters of related issues, previous committers, and tech leads.
 
-Bring it up on WP.org slack.
+Bring it up on [WP.org slack](https://make.wordpress.org/core/tag/core-editor-agenda/).
 
 Assign relevant labels, milestones, and projects (or ask someone).
 
@@ -61,7 +61,7 @@ Is their work unfamiliar? Do:
 * Propose a pair programming session
 * Skip, go for the next PR
 
-## Grease risk with clarity
+## Reduce risk with clarity
 
 Risk adds friction – an approval can backfire later.
 
@@ -78,6 +78,6 @@ Some PRs naturally get more traction than others.
 
 Double down on these.
 
-It’s like finding a product-market fit as a startup; only you’re after the idea–reviewers fit.
+Some Issues are more topical than others (e.g. those listed in the goals for an upcoming release) and thus will garner more attention. By focusing on these it will be easier to attract reviewers.
 
 How to get there quickly? Help with an active project from the WordPress roadmap
