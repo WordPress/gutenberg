@@ -9,12 +9,10 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { ResizableBox, Spinner } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
-	BlockIcon,
-	MediaPlaceholder,
 	withColors,
 	ColorPalette,
 	useBlockProps,
@@ -25,7 +23,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -33,7 +30,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import {
-	ALLOWED_MEDIA_TYPES,
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -45,6 +41,8 @@ import {
 } from './shared';
 import useCoverIsDark from './use-cover-is-dark';
 import Controls from './controls';
+import CoverPlaceholder from './cover-placeholder';
+import ResizableCover from './resizeable-cover';
 
 extend( [ namesPlugin ] );
 
@@ -61,51 +59,6 @@ function getInnerBlocksTemplate( attributes ) {
 	];
 }
 
-const RESIZABLE_BOX_ENABLE_OPTION = {
-	top: false,
-	right: false,
-	bottom: true,
-	left: false,
-	topRight: false,
-	bottomRight: false,
-	bottomLeft: false,
-	topLeft: false,
-};
-
-function ResizableCover( {
-	className,
-	onResizeStart,
-	onResize,
-	onResizeStop,
-	...props
-} ) {
-	const [ isResizing, setIsResizing ] = useState( false );
-
-	return (
-		<ResizableBox
-			className={ classnames( className, {
-				'is-resizing': isResizing,
-			} ) }
-			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ ( _event, _direction, elt ) => {
-				onResizeStart( elt.clientHeight );
-				onResize( elt.clientHeight );
-			} }
-			onResize={ ( _event, _direction, elt ) => {
-				onResize( elt.clientHeight );
-				if ( ! isResizing ) {
-					setIsResizing( true );
-				}
-			} }
-			onResizeStop={ ( _event, _direction, elt ) => {
-				onResizeStop( elt.clientHeight );
-				setIsResizing( false );
-			} }
-			{ ...props }
-		/>
-	);
-}
-
 /**
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
  * the media (image or video) is being uploaded and will not have an id allocated yet.
@@ -116,34 +69,6 @@ function ResizableCover( {
  * @return {boolean} Is the URL a Blob URL.
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
-
-function CoverPlaceholder( {
-	disableMediaButtons = false,
-	children,
-	onSelectMedia,
-	onError,
-	style,
-} ) {
-	return (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			labels={ {
-				title: __( 'Cover' ),
-				instructions: __(
-					'Drag and drop onto this block, upload, or select existing media from your library.'
-				),
-			} }
-			onSelect={ onSelectMedia }
-			accept="image/*,video/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			disableMediaButtons={ disableMediaButtons }
-			onError={ onError }
-			style={ style }
-		>
-			{ children }
-		</MediaPlaceholder>
-	);
-}
 
 function CoverEdit( {
 	attributes,
