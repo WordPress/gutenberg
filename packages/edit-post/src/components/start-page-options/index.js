@@ -30,11 +30,6 @@ function PatternSelection( { onChoosePattern } ) {
 	}, [] );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { resetEditorBlocks } = useDispatch( editorStore );
-	useEffect( () => {
-		if ( blockPatterns.length <= 1 ) {
-			onChoosePattern();
-		}
-	}, [ blockPatterns.length ] );
 	return (
 		<BlockPatternsList
 			blockPatterns={ blockPatterns }

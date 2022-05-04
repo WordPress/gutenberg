@@ -15,7 +15,7 @@ import {
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
@@ -33,7 +33,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/background' }>
+		<NavigationButtonAsItem path={ parentMenu + '/colors/background' }>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
@@ -42,7 +42,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
@@ -56,14 +56,14 @@ function TextColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/text' }>
+		<NavigationButtonAsItem path={ parentMenu + '/colors/text' }>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
@@ -77,14 +77,14 @@ function LinkColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/link' }>
+		<NavigationButtonAsItem path={ parentMenu + '/colors/link' }>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 

@@ -1710,6 +1710,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/preferences",
 		"slug": "packages-preferences",
 		"markdown_source": "../packages/preferences/README.md",

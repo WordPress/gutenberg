@@ -12,12 +12,14 @@ import type { APIRequestContext, Cookie } from '@playwright/test';
 import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
+import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { deleteAllPosts } from './posts';
+import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -120,6 +122,11 @@ class RequestUtils {
 	deleteAllWidgets = deleteAllWidgets;
 	addWidgetBlock = addWidgetBlock;
 	deleteAllTemplates = deleteAllTemplates;
+	resetPreferences = resetPreferences;
+	listMedia = listMedia;
+	uploadMedia = uploadMedia;
+	deleteMedia = deleteMedia;
+	deleteAllMedia = deleteAllMedia;
 }
 
 export type { StorageState };

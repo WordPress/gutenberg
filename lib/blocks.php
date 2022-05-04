@@ -21,7 +21,7 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'comments-query-loop',
+				'comments',
 				'group',
 				'heading',
 				'html',

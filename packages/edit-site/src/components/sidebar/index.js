@@ -4,7 +4,7 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
+import { useEffect, Fragment } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -62,7 +62,7 @@ export function SidebarComplementaryAreaFills() {
 	// Conditionally include NavMenu sidebar in Plugin only.
 	// Optimise for dead code elimination.
 	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavigationMenuSidebar = 'Fragment';
+	let MaybeNavigationMenuSidebar = Fragment;
 
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		MaybeNavigationMenuSidebar = NavigationMenuSidebar;

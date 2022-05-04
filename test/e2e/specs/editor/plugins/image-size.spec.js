@@ -1,52 +1,60 @@
 /**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'changing image size', () => {
-	test.beforeEach( async ( { requestUtils, pageUtils } ) => {
+	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-image-size' );
-		await pageUtils.createNewPost();
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-image-size' );
 	} );
 
 	test( 'should insert and change my image size', async ( {
 		page,
 		pageUtils,
+		requestUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
-		const inputElement = await page.$(
-			'figure[aria-label="Block: Image"] input[type=file]'
-		);
-
 		const filename = '1024x768_e2e_test_image_size.jpeg';
-		const filepath = './test/e2e/assets/' + filename;
+		const filepath = path.join( './test/e2e/assets', filename );
 
-		await inputElement.setInputFiles( filepath );
+		await pageUtils.createNewPost();
+		const media = await requestUtils.uploadMedia( filepath );
 
-		// // Wait for upload to finish.
-		const img = page.locator( `//img[contains(@src, "${ filename }")]` );
-		await img.waitFor();
-
-		await expect( img ).toBeVisible();
+		await pageUtils.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				// Specify alt text so that it can be queried by role selectors.
+				alt: filename,
+				id: media.id,
+				url: media.source_url,
+			},
+		} );
 
 		// Select the new size updated with the plugin.
 		await pageUtils.openDocumentSettingsSidebar();
-		await page.selectOption(
-			'.components-select-control__input',
-			'custom-size-one'
-		);
+		await page.selectOption( 'role=combobox[name="Image size"i]', {
+			label: 'Custom Size One',
+		} );
 
 		// Verify that the custom size was applied to the image.
-		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
-		await page.waitForFunction(
-			() =>
-				document.querySelector(
-					'.block-editor-image-size-control__width input'
-				).value === '499'
-		);
+		await expect(
+			page.locator( `role=img[name="${ filename }"]` )
+		).toHaveCSS( 'width', '499px' );
+		await expect(
+			page.locator( 'role=spinbutton[name="Width"i]' )
+		).toHaveValue( '499' );
 	} );
 } );

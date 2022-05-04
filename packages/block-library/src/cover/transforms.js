@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
+import cleanEmptyObject from '../utils/clean-empty-object';
 
 const transforms = {
 	from: [
@@ -73,6 +74,19 @@ const transforms = {
 					style,
 				} = attributes;
 
+				// If the Group block being transformed has a Cover block as its
+				// only child return that Cover block.
+				if (
+					innerBlocks?.length === 1 &&
+					innerBlocks[ 0 ]?.name === 'core/cover'
+				) {
+					return createBlock(
+						'core/cover',
+						innerBlocks[ 0 ].attributes,
+						innerBlocks[ 0 ].innerBlocks
+					);
+				}
+
 				// If no background or gradient color is provided, default to 50% opacity.
 				// This matches the styling of a Cover block with a background image,
 				// in the state where a background image has been removed.
@@ -99,14 +113,16 @@ const transforms = {
 					...attributes,
 					backgroundColor: undefined,
 					gradient: undefined,
-					style: {
+					style: cleanEmptyObject( {
 						...attributes?.style,
-						color: {
-							...attributes?.style?.color,
-							background: undefined,
-							gradient: undefined,
-						},
-					},
+						color: style?.color
+							? {
+									...style?.color,
+									background: undefined,
+									gradient: undefined,
+							  }
+							: undefined,
+					} ),
 				};
 
 				// Preserve the block by nesting it within the Cover block,
@@ -191,6 +207,95 @@ const transforms = {
 					align,
 					anchor,
 				} ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			isMatch: ( { url } ) => {
+				// If the Cover block uses background media, skip this transform,
+				// and instead use the Group block's default transform.
+				if ( url ) {
+					return false;
+				}
+				return true;
+			},
+			transform: ( attributes, innerBlocks ) => {
+				// Convert Cover overlay colors to comparable Group background colors.
+				const transformedColorAttributes = {
+					backgroundColor: attributes?.overlayColor,
+					gradient: attributes?.gradient,
+					style: cleanEmptyObject( {
+						...attributes?.style,
+						color:
+							attributes?.customOverlayColor ||
+							attributes?.customGradient ||
+							attributes?.style?.color
+								? {
+										background:
+											attributes?.customOverlayColor,
+										gradient: attributes?.customGradient,
+										...attributes?.style?.color,
+								  }
+								: undefined,
+					} ),
+				};
+
+				// If the Cover block contains only a single Group block as a direct child,
+				// then attempt to merge the Cover's background colors with the child Group block,
+				// and remove the Cover block as the wrapper.
+				if (
+					innerBlocks?.length === 1 &&
+					innerBlocks[ 0 ]?.name === 'core/group'
+				) {
+					const groupAttributes = cleanEmptyObject(
+						innerBlocks[ 0 ].attributes || {}
+					);
+
+					// If the Group block contains any kind of background color or gradient,
+					// skip merging Cover background colors, and preserve the Group block's colors.
+					if (
+						groupAttributes?.backgroundColor ||
+						groupAttributes?.gradient ||
+						groupAttributes?.style?.color?.background ||
+						groupAttributes?.style?.color?.gradient
+					) {
+						return createBlock(
+							'core/group',
+							groupAttributes,
+							innerBlocks[ 0 ]?.innerBlocks
+						);
+					}
+
+					return createBlock(
+						'core/group',
+						{
+							...transformedColorAttributes,
+							...groupAttributes,
+							style: cleanEmptyObject( {
+								...groupAttributes?.style,
+								color:
+									transformedColorAttributes?.style?.color ||
+									groupAttributes?.style?.color
+										? {
+												...transformedColorAttributes
+													?.style?.color,
+												...groupAttributes?.style
+													?.color,
+										  }
+										: undefined,
+							} ),
+						},
+						innerBlocks[ 0 ]?.innerBlocks
+					);
+				}
+
+				// In all other cases, transform the Cover block directly to a Group block.
+				return createBlock(
+					'core/group',
+					{ ...attributes, ...transformedColorAttributes },
+					innerBlocks
+				);
+			},
 		},
 	],
 };
