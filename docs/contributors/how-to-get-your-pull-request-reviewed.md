@@ -78,6 +78,6 @@ Some PRs naturally get more traction than others.
 
 Double down on these.
 
-It’s like finding a product-market fit as a startup; only you’re after the idea–reviewers fit.
+Some Issues are more topical than others (e.g. those listed in the goals for an upcoming release) and thus will garner more attention. By focusing on these it will be easier to attract reviewers.
 
 How to get there quickly? Help with an active project from the WordPress roadmap
