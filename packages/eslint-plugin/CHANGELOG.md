@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.2.0 (2022-05-04)
+
 ### Bug Fix
 
 -   Fix the `recommended` preset when Prettier is not installed ([#40634](https://github.com/WordPress/gutenberg/pull/40634)).

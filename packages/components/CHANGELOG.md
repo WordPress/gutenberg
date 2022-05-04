@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.10.0 (2022-05-04)
+
 ### Internal
 
 -   `UnitControl`: migrate unit tests to TypeScript ([#40697](https://github.com/WordPress/gutenberg/pull/40697)).
