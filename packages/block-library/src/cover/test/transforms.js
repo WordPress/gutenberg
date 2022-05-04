@@ -268,5 +268,34 @@ describe( 'transforms', () => {
 				name: 'core/group',
 			} );
 		} );
+
+		it( 'should skip merging Cover block gradient into child Group block if Group block has background color', () => {
+			const block = createBlock(
+				'core/cover',
+				{
+					gradient: 'my-gradient',
+				},
+				[
+					createBlock( 'core/group', {
+						fontSize: 'medium',
+						style: { color: { background: '#ff0000' } },
+					} ),
+				]
+			);
+
+			const transformedBlocks = switchToBlockType( block, 'core/group' );
+
+			expect( transformedBlocks[ 0 ] ).toMatchObject( {
+				attributes: {
+					fontSize: 'medium',
+					style: { color: { background: '#ff0000' } },
+				},
+				innerBlocks: [],
+				name: 'core/group',
+			} );
+			expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+				'gradient'
+			);
+		} );
 	} );
 } );

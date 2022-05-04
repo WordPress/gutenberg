@@ -250,6 +250,22 @@ const transforms = {
 					const groupAttributes = cleanEmptyObject(
 						innerBlocks[ 0 ].attributes || {}
 					);
+
+					// If the Group block contains any kind of background color or gradient,
+					// skip merging Cover background colors, and preserve the Group block's colors.
+					if (
+						groupAttributes?.backgroundColor ||
+						groupAttributes?.gradient ||
+						groupAttributes?.style?.color?.background ||
+						groupAttributes?.style?.color?.gradient
+					) {
+						return createBlock(
+							'core/group',
+							groupAttributes,
+							innerBlocks[ 0 ]?.innerBlocks
+						);
+					}
+
 					return createBlock(
 						'core/group',
 						{
