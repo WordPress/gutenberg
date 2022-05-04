@@ -61,7 +61,7 @@ Is their work unfamiliar? Do:
 * Propose a pair programming session
 * Skip, go for the next PR
 
-## Grease risk with clarity
+## Reduce risk with clarity
 
 Risk adds friction – an approval can backfire later.
 
