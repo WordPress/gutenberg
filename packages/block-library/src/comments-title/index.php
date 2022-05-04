@@ -37,9 +37,9 @@ function render_block_core_comments_title( $attributes ) {
 		if ( $show_post_title ) {
 			if ( '1' === $comments_count ) {
 				/* translators: %s: Post title. */
-				$comment_label = sprintf( __( 'One response to %s' ), $post_title );
+				$comments_title = sprintf( __( 'One response to %s' ), $post_title );
 			} else {
-				$comment_label = sprintf(
+				$comments_title = sprintf(
 					/* translators: 1: Number of comments, 2: Post title. */
 					_n(
 						'%1$s response to %2$s',
@@ -51,9 +51,9 @@ function render_block_core_comments_title( $attributes ) {
 				);
 			}
 		} elseif ( '1' === $comments_count ) {
-			$comment_label = __( 'One response' );
+			$comments_title = __( 'One response' );
 		} else {
-			$comment_label = sprintf(
+			$comments_title = sprintf(
 				/* translators: %s: Number of comments. */
 				_n( '%s responses', '%s responses', $comments_count ),
 				$comments_count
@@ -62,22 +62,22 @@ function render_block_core_comments_title( $attributes ) {
 	} elseif ( $show_post_title ) {
 		if ( '1' === $comments_count ) {
 			/* translators: %s: Post title. */
-			$comment_label = sprintf( __( 'Response to %s' ), $post_title );
+			$comments_title = sprintf( __( 'Response to %s' ), $post_title );
 		} else {
 			/* translators: %s: Post title. */
-			$comment_label = sprintf( __( 'Responses to %s' ), $post_title );
+			$comments_title = sprintf( __( 'Responses to %s' ), $post_title );
 		}
 	} elseif ( '1' === $comments_count ) {
-		$comment_label = __( 'Response' );
+		$comments_title = __( 'Response' );
 	} else {
-		$comment_label = __( 'Responses' );
+		$comments_title = __( 'Responses' );
 	}
 
 	return sprintf(
 		'<%1$s id="comments" %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		$comment_label
+		$comments_title
 	);
 }
 
