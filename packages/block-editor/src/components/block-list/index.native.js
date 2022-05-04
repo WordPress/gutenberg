@@ -328,7 +328,7 @@ export class BlockList extends Component {
 		const gridItemProps = gridProperties && {
 			numOfColumns: gridProperties.numColumns,
 			tileCount: blockClientIds.length,
-			index: blockClientIds.indexOf( clientId ),
+			tileIndex: blockClientIds.indexOf( clientId ),
 		};
 		return (
 			<BlockListItem

@@ -170,13 +170,13 @@ export class BlockListItem extends Component {
 		}
 
 		if ( isGridItem ) {
-			const { numOfColumns, tileCount, index } = this.props;
+			const { numOfColumns, tileCount, tileIndex } = this.props;
 			return (
 				<Grid
 					maxWidth={ parentWidth }
 					numOfColumns={ numOfColumns }
 					tileCount={ tileCount }
-					index={ index }
+					index={ tileIndex }
 				>
 					{ this.renderContent() }
 				</Grid>
