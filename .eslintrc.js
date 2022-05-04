@@ -261,7 +261,7 @@ module.exports = {
 					{
 						selector:
 							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
-						message: 'Prefer page.waitForSelector instead.',
+						message: 'Prefer page.locator instead.',
 					},
 				],
 			},
