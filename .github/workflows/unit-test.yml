@@ -62,7 +62,7 @@ jobs:
             - name: Use desired version of NodeJS
               uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install and build
@@ -96,7 +96,7 @@ jobs:
             - name: Use desired version of NodeJS
               uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install and build
