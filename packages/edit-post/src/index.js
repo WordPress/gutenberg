@@ -123,6 +123,12 @@ export function initializeEditor(
 	} );
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+
+	// Check if the block list view should be open by default.
+	if ( select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) ) {
+		dispatch( editPostStore ).setIsListViewOpened( true );
+	}
+
 	registerCoreBlocks();
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
