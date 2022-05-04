@@ -701,7 +701,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 				foreach ( $slugs as $slug ) {
 					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
 					$class_name = static::replace_slug_in_string( $class, $slug );
-					if ( ( ! str_contains( $class_name, '-color' ) && ! str_contains( $class_name, '-background' ) ) || str_contains( $class_name, '-gradient-background' ) ) {
+					if ( ! str_contains( $class_name, '-color' ) && ! str_contains( $class_name, '-background' ) ) {
 						$stylesheet .= static::to_ruleset(
 							static::append_to_selector( $selector, $class_name ),
 							array(
@@ -716,6 +716,10 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 							)
 						);
 					} else {
+						if ( str_contains( $class_name, '-gradient-background' ) ) {
+							$property = 'background-color';
+						}
+
 						$stylesheet .= static::to_ruleset(
 							static::append_to_selector( $selector, $class_name ),
 							array(

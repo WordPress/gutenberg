@@ -44,6 +44,14 @@
 	text-align: right;
 }
 
+.has-background {
+	background: var(--wp--user--preset--background-color);
+}
+
+.has-text-color {
+	color: var(--wp--user--preset--color);
+}
+
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
