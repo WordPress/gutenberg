@@ -72,7 +72,7 @@ dependencies {
     implementation "org.wordpress-mobile:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
-    implementation 'com.github.wordpress-mobile:react-native-reanimated:22ef6a0b66bd8b077b037f942b0cbd8f6291a25e'
+    implementation 'com.github.wordpress-mobile:react-native-reanimated:9e63336aa24daeefb9f756bbf8cdddfa2f3d44f5'
     implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
