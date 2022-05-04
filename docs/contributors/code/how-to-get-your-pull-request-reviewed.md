@@ -1,6 +1,6 @@
 # How To Get Your Pull Request Reviewed?
 
-Sometimes we publish a Pull Request and no one reviews our work. What to do?
+Sometimes we publish a Pull Request and no one [reviews](/docs/contributors/repository-management.md#code-review) our work. What to do?
 
 Attracting a review largely isn't about the code – it is about making the reviewing easy.
 
