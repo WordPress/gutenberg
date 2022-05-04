@@ -107,7 +107,7 @@ export default function Edit( {
 	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
 
 	let placeholder;
-	if ( showCommentsCount ) {
+	if ( showCommentsCount && commentsCount !== undefined ) {
 		if ( showPostTitle ) {
 			if ( commentsCount === 1 ) {
 				/* translators: %s: Post title. */
