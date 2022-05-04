@@ -16,7 +16,7 @@ Large batches slow you down. Ship your work in small chunks to merge more and le
 
 ## Share relevant context:
 
-Say:
+Clarify:
 * What problem are you solving?
 * How does your PR solve it?
 * What feedback do you need?
