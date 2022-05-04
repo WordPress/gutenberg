@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo } from 'lodash';
+import { pick, defaultTo, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -66,15 +66,29 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		__experimentalBlockPatternCategories: settingsBlockPatternCategories,
 	} = settings;
 
-	const { blockPatterns, blockPatternCategories } = useSelect(
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
-			blockPatterns:
-				settingsBlockPatterns ?? select( coreStore ).getBlockPatterns(),
-			blockPatternCategories:
-				settingsBlockPatternCategories ??
-				select( coreStore ).getBlockPatternCategories(),
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories: select(
+				coreStore
+			).getBlockPatternCategories(),
 		} ),
-		[ settingsBlockPatterns, settingsBlockPatternCategories ]
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		[ settingsBlockPatterns, restBlockPatterns ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			unionBy(
+				settingsBlockPatternCategories,
+				restBlockPatternCategories,
+				'name'
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
 	const { undo } = useDispatch( editorStore );

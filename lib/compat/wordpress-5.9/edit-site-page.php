@@ -120,6 +120,8 @@ function gutenberg_edit_site_init( $hook ) {
 		'defaultTemplateTypes'     => $indexed_template_types,
 		'defaultTemplatePartAreas' => get_allowed_block_template_part_areas(),
 		'__unstableHomeTemplate'   => gutenberg_resolve_home_template(),
+		'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 	);
 
 	/**
