@@ -45,7 +45,7 @@ Post a link to your PR in related issues & PRs.
 
 Ping commenters of related issues, previous committers, and tech leads.
 
-Bring it up on WP.org slack.
+Bring it up on [WP.org slack](https://make.wordpress.org/core/tag/core-editor-agenda/).
 
 Assign relevant labels, milestones, and projects (or ask someone).
 
