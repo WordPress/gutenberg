@@ -40,7 +40,7 @@ import { useHistory } from '../routes';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	'single-post',
+	'single',
 	'page',
 	'index',
 	'archive',
@@ -55,7 +55,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	'single-post': post,
+	single: post,
 	page,
 	archive,
 	search,
