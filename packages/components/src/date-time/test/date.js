@@ -16,7 +16,8 @@ describe( 'DatePicker', () => {
 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
 
 		expect(
-			screen.getByLabelText( 'Monday, May 2, 2022' ).classList
+			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
+				.classList
 		).toContain( 'CalendarDay__selected' );
 
 		// Expect React deprecation warning due to outdated 'react-dates' package.
@@ -28,9 +29,9 @@ describe( 'DatePicker', () => {
 		render( <DatePicker /> );
 
 		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
-		expect( screen.getByLabelText( todayDescription ).classList ).toContain(
-			'CalendarDay__selected'
-		);
+		expect(
+			screen.getByRole( 'button', { name: todayDescription } ).classList
+		).toContain( 'CalendarDay__selected' );
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
@@ -45,7 +46,9 @@ describe( 'DatePicker', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
@@ -65,14 +68,18 @@ describe( 'DatePicker', () => {
 		);
 
 		await user.click(
-			screen.getByLabelText( 'Move forward to switch to the next month.' )
+			screen.getByRole( 'button', {
+				name: 'Move forward to switch to the next month.',
+			} )
 		);
 
 		expect( onMonthPreviewed ).toHaveBeenCalledWith(
 			expect.stringMatching( /^2022-06/ )
 		);
 
-		await user.click( screen.getByLabelText( 'Monday, June 20, 2022' ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Monday, June 20, 2022' } )
+		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
 	} );
@@ -111,7 +118,9 @@ describe( 'DatePicker', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Friday, May 20, 2022' ) );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+		);
 
 		expect( onChange ).not.toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
