@@ -17,8 +17,7 @@ describe( 'DatePicker', () => {
 
 		expect(
 			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
-				.classList
-		).toContain( 'CalendarDay__selected' );
+		).toHaveClass( 'CalendarDay__selected' );
 
 		// Expect React deprecation warning due to outdated 'react-dates' package.
 		// TODO: Update 'react-dates'.
@@ -30,8 +29,8 @@ describe( 'DatePicker', () => {
 
 		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
 		expect(
-			screen.getByRole( 'button', { name: todayDescription } ).classList
-		).toContain( 'CalendarDay__selected' );
+			screen.getByRole( 'button', { name: todayDescription } )
+		).toHaveClass( 'CalendarDay__selected' );
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
