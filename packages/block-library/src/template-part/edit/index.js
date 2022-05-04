@@ -155,7 +155,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable &&
 				hasReplacements &&
-				( tagName === 'header' || tagName === 'footer' ) && (
+				( area === 'header' || area === 'footer' ) && (
 					<BlockControls>
 						<ToolbarGroup className="wp-block-template-part__block-control-group">
 							<ToolbarButton
