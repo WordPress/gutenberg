@@ -35,7 +35,7 @@ All contributions are competing for attention. Make your stand out.
 The easiest way? Say why it matters:
 
 ❌ A new react hook to get data
-✅ useEntityRecord: get data with 10x less boilerplate
+✅ `useEntityRecord`: get data with 10x less boilerplate
 
 Then prove it with code examples, visuals, and screencasts.
 
