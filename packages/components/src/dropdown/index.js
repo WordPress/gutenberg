@@ -31,12 +31,12 @@ export default function Dropdown( props ) {
 	const {
 		renderContent,
 		renderToggle,
-		position = 'bottom right',
 		className,
 		contentClassName,
 		expandOnMobile,
 		headerTitle,
 		focusOnMount,
+		position,
 		popoverProps,
 		onClose,
 		onToggle,

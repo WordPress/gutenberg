@@ -9,6 +9,7 @@ import {
 	shift,
 	autoUpdate,
 	arrow,
+	offset as offsetMiddleware,
 } from '@floating-ui/react-dom';
 
 /**
@@ -77,6 +78,7 @@ const Popover = (
 		isAlternate,
 		position,
 		placement = 'bottom-start',
+		offset,
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
@@ -98,6 +100,7 @@ const Popover = (
 		? positionToPlacement( position )
 		: placement;
 	const middlewares = [
+		offset ? offsetMiddleware( offset ) : undefined,
 		__unstableForcePosition ? undefined : flip(),
 		shift( {
 			crossAxis: true,
