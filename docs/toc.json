@@ -331,7 +331,7 @@
 				"docs/contributors/documentation/README.md": [
 					{ "docs/contributors/documentation/copy-guide.md": [] }
 				]
-			},,
+			},
 			{ "docs/contributors/triage.md": [] },
 			{ "docs/contributors/localizing.md": [] },
 			{ "docs/contributors/accessibility-testing.md": [] },
