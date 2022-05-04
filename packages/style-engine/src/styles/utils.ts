@@ -67,10 +67,10 @@ export function generateBoxRules(
 }
 
 export function getSlugFromPreset(
-	styleValue: string,
+	styleValue: string | number | undefined,
 	styleContext: string
 ): string | null {
-	if ( ! styleValue ) {
+	if ( typeof styleValue !== 'string' ) {
 		return null;
 	}
 

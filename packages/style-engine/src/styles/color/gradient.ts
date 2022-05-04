@@ -1,30 +1,22 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type { Style, StyleOptions } from '../../types';
 import { generateRule, getSlugFromPreset } from '../utils';
 
-const text = {
+const gradient = {
 	name: 'gradient',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
 			[ 'color', 'gradient' ],
-			'gradient',
+			'background',
 			options
 		);
 	},
 	getClassNames: ( style: Style ) => {
 		const classNames = [];
-		const styleValue: string | undefined = get( style, [
-			'color',
-			'gradient',
-		] );
+		const styleValue: string | number | undefined = style?.color?.gradient;
 
 		if ( styleValue ) {
 			const slug = getSlugFromPreset( styleValue, 'gradient' );
@@ -41,4 +33,4 @@ const text = {
 	},
 };
 
-export default text;
+export default gradient;

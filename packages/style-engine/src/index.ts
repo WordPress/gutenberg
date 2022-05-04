@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, kebabCase, uniq } from 'lodash';
+import { groupBy, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -80,5 +80,6 @@ export function getClassnames( style: Style ): string[] {
 			classNames.push( ...definition.getClassNames( style ) );
 		}
 	} );
-	return uniq( classNames );
+
+	return [ ...new Set( classNames ) ];
 }

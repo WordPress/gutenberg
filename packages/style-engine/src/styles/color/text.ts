@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type { Style, StyleOptions } from '../../types';
@@ -16,11 +11,7 @@ const text = {
 	},
 	getClassNames: ( style: Style ) => {
 		const classNames = [];
-		const styleValue: string | undefined = get( style, [
-			'color',
-			'text',
-		] );
-
+		const styleValue: string | undefined = style?.color?.text;
 		if ( styleValue ) {
 			const slug = getSlugFromPreset( styleValue, 'color' );
 			if ( slug ) {

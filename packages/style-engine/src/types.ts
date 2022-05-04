@@ -28,6 +28,8 @@ export interface Style {
 	};
 	color?: {
 		text?: CSSProperties[ 'color' ];
+		background?: CSSProperties[ 'backgroundColor' ];
+		gradient?: CSSProperties[ 'background' ];
 	};
 }
 

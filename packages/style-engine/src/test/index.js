@@ -20,7 +20,7 @@ describe( 'generate', () => {
 				},
 			} )
 		).toEqual(
-			'background-color: #222222; gradient: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); color: #f1f1f1; margin: 12px; padding: 10px;'
+			'background-color: #222222; background: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); color: #f1f1f1; margin: 12px; padding: 10px;'
 		);
 	} );
 

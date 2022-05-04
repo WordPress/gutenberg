@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type { Style, StyleOptions } from '../../types';
 import { generateRule, getSlugFromPreset } from '../utils';
 
-const text = {
+const background = {
 	name: 'background',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
@@ -21,10 +16,7 @@ const text = {
 	},
 	getClassNames: ( style: Style ) => {
 		const classNames = [];
-		const styleValue: string | undefined = get( style, [
-			'color',
-			'background',
-		] );
+		const styleValue: string | undefined = style?.color?.background;
 
 		if ( styleValue ) {
 			const slug = getSlugFromPreset( styleValue, 'color' );
@@ -41,4 +33,4 @@ const text = {
 	},
 };
 
-export default text;
+export default background;
