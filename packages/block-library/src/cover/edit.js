@@ -209,12 +209,12 @@ function CoverEdit( {
 		} );
 	};
 
-	const isDarkElement = useRef();
+	const mediaElement = useRef();
 	const isCoverDark = useCoverIsDark(
 		url,
 		dimRatio,
 		overlayColor.color,
-		isDarkElement
+		mediaElement
 	);
 
 	useEffect( () => {
@@ -281,7 +281,7 @@ function CoverEdit( {
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,
-		isDarkElement,
+		mediaElement,
 		hasInnerBlocks,
 		url,
 		isImgElement,
@@ -296,7 +296,7 @@ function CoverEdit( {
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 					setOverlayColor={ setOverlayColor }
-					ref={ ref }
+					coverRef={ ref }
 					onSelectMedia={ onSelectMedia }
 					currentSettings={ currentSettings }
 				/>
@@ -364,7 +364,7 @@ function CoverEdit( {
 				setAttributes={ setAttributes }
 				clientId={ clientId }
 				setOverlayColor={ setOverlayColor }
-				ref={ ref }
+				coverRef={ ref }
 				onSelectMedia={ onSelectMedia }
 				currentSettings={ currentSettings }
 			/>
@@ -412,7 +412,7 @@ function CoverEdit( {
 
 				{ url && isImageBackground && isImgElement && (
 					<img
-						ref={ isDarkElement }
+						ref={ mediaElement }
 						className="wp-block-cover__image-background"
 						alt={ alt }
 						src={ url }
@@ -421,7 +421,7 @@ function CoverEdit( {
 				) }
 				{ url && isVideoBackground && (
 					<video
-						ref={ isDarkElement }
+						ref={ mediaElement }
 						className="wp-block-cover__video-background"
 						autoPlay
 						muted
