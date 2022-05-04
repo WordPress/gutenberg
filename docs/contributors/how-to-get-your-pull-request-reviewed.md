@@ -53,7 +53,7 @@ Assign relevant labels, milestones, and projects (or ask someone).
 
 It’s the easiest way to get on others’ radar.
 
-Look up the PRs of folks listed in the previous tweet and review them.
+Look up the PRs of commenters of related issues, previous committers, and tech leads. Then review them.
 
 Is their work unfamiliar? Do:
 
