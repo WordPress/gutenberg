@@ -26,7 +26,7 @@ body.modal-open {
 	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
-	border-radius: $grid-unit;
+	border-radius: $radius-block-ui;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
