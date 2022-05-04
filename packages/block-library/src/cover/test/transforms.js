@@ -132,7 +132,7 @@ describe( 'transforms', () => {
 	} );
 
 	describe( 'transform from Cover to Group', () => {
-		it( 'should transform named gradient color to Group block', () => {
+		it( 'should transfer named gradient color to Group block', () => {
 			const block = createBlock( 'core/cover', {
 				gradient: 'my-gradient',
 			} );
@@ -145,7 +145,7 @@ describe( 'transforms', () => {
 			} );
 		} );
 
-		it( 'should transform custom gradient color to style object in Group block', () => {
+		it( 'should transfer custom gradient color to style object in Group block', () => {
 			const gradient =
 				'linear-gradient(90deg,rgb(188,138,51) 0%,rgb(65,88,208) 100%)';
 			const block = createBlock( 'core/cover', {
@@ -160,7 +160,7 @@ describe( 'transforms', () => {
 			} );
 		} );
 
-		it( 'should transform named background color to backgroundColor attribute in Group block', () => {
+		it( 'should transfer named background color to backgroundColor attribute in Group block', () => {
 			const block = createBlock( 'core/cover', {
 				overlayColor: 'my-background-color',
 			} );
@@ -173,7 +173,7 @@ describe( 'transforms', () => {
 			} );
 		} );
 
-		it( 'should transform custom background color to style object in Group block', () => {
+		it( 'should transfer custom background color to style object in Group block', () => {
 			const block = createBlock( 'core/cover', {
 				customOverlayColor: '#ff0000',
 			} );
