@@ -15,7 +15,8 @@
 	},
 	"usesContext": [ "queryId", "query" ],
 	"providesContext": {
-		"paginationArrow": "paginationArrow"
+		"paginationArrow": "paginationArrow",
+		"layout": "layout"
 	},
 	"supports": {
 		"align": true,

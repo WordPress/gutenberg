@@ -56,6 +56,17 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		}
 		wp_reset_postdata(); // Restore original Post Data.
 	}
+
+	// If there is no next page to navigate but a layout justification content setting
+	// is `center` or `space-between`, render a hidden element to avoid layout shifts when
+	// visting other pages.
+	if ( empty( $content ) && isset( $block->context['layout']['justifyContent'] ) && in_array( $block->context['layout']['justifyContent'], array( 'center', 'space-between' ), true ) ) {
+		return sprintf(
+			'<a %1$s>%2$s</a>',
+			get_block_wrapper_attributes( array( 'style' => 'visibility:hidden;' ) ),
+			$label
+		);
+	}
 	return $content;
 }
 
