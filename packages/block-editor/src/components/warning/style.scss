@@ -3,6 +3,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	font-family: $default-font;
+	font-size: $default-font-size;
 	padding: 1em;
 
 	// Block UI appearance.
@@ -14,6 +15,10 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
+		text-transform: none;
+		letter-spacing: normal;
+		font-weight: normal;
+		font-style: normal;
 		color: $gray-900;
 		margin: 0;
 	}
