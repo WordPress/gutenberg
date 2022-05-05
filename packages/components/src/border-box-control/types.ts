@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { Border, ColorProps, LabelProps } from '../border-control/types';
+import type {
+	Border,
+	ColorProps,
+	DropdownPopoverProps,
+	LabelProps,
+} from '../border-control/types';
 
 export type Borders = {
 	top?: Border;
@@ -14,12 +19,15 @@ export type AnyBorder = Border | Borders | undefined;
 export type BorderProp = keyof Border;
 export type BorderSide = keyof Borders;
 
-export type PopoverClassNames = {
-	linked?: string;
-	top?: string;
-	right?: string;
-	bottom?: string;
-	left?: string;
+/**
+ * Collection of `popoverProps` for each of the inner border controls.
+ */
+export type PopoversProps = {
+	linked?: DropdownPopoverProps;
+	top?: DropdownPopoverProps;
+	right?: DropdownPopoverProps;
+	bottom?: DropdownPopoverProps;
+	left?: DropdownPopoverProps;
 };
 
 export type BorderBoxControlProps = ColorProps &
@@ -35,10 +43,10 @@ export type BorderBoxControlProps = ColorProps &
 		 */
 		onChange: ( value: AnyBorder ) => void;
 		/**
-		 * An object defining CSS classnames for all the inner `BorderControl`
-		 * popover content.
+		 * An object defining the `popoverProps` for all the inner
+		 * `BorderControl` dropdowns.
 		 */
-		popoverClassNames?: PopoverClassNames;
+		popoversProps?: PopoversProps;
 		/**
 		 * An object representing the current border configuration.
 		 *
@@ -85,10 +93,10 @@ export type SplitControlsProps = ColorProps & {
 	 */
 	onChange: ( value: Border | undefined, side: BorderSide ) => void;
 	/**
-	 * An object defining CSS classnames for the split side `BorderControl`s'
-	 * popover content.
+	 * An object defining the `popoverProps` for the split side
+	 * `BorderControl` dropdowns.
 	 */
-	popoverClassNames?: PopoverClassNames;
+	popoversProps?: PopoversProps;
 	/**
 	 * An object representing the current border configuration. It contains
 	 * properties for each side, with each side an object reflecting the border

@@ -26,7 +26,7 @@ export type Colors = ColorOrigin[] | Color[];
  * dropdown's `popoverProps`. This should be replaced once the Dropdown or
  * Popover components are typed.
  */
-type DropdownPopoverProps = {
+export type DropdownPopoverProps = {
 	className?: string;
 	focusOnMount?: boolean;
 	position?: string;
