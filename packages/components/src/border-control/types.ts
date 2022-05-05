@@ -116,6 +116,24 @@ export type BorderControlProps = ColorProps &
 		withSlider?: boolean;
 	};
 
+/**
+ * Represents the available props that can be passed through the border control
+ * dropdown's `popoverProps`. This should be replaced once the Dropdown or
+ * Popover components are typed.
+ */
+type DropdownPopoverProps = {
+	className?: string;
+	focusOnMount?: boolean;
+	position?: string;
+	onClose?: () => void;
+	onFocusOutside?: () => void;
+	expandOnMobile?: boolean;
+	headerTitle?: string;
+	noArrow?: boolean;
+	anchorRect?: DOMRect;
+	getAnchorRect?: ( ref: HTMLAnchorElement ) => DOMRect;
+};
+
 export type DropdownProps = ColorProps & {
 	/**
 	 * An object representing a border or `undefined`. This component will
@@ -123,11 +141,6 @@ export type DropdownProps = ColorProps & {
 	 * values for its popover controls.
 	 */
 	border?: Border;
-	/**
-	 * A custom CSS class name to be assigned to the border control's
-	 * dropdown popover content.
-	 */
-	contentClassName?: string;
 	/**
 	 * This controls whether to render border style options.
 	 *
@@ -138,6 +151,11 @@ export type DropdownProps = ColorProps & {
 	 * A callback invoked when the border color or style selections change.
 	 */
 	onChange: ( newBorder?: Border ) => void;
+	/**
+	 * Properties of the `popoverProps` object will be passed as props to the
+	 * border control's dropdown popover.
+	 */
+	popoverProps?: DropdownPopoverProps;
 	/**
 	 * Any previous style selection made by the user. This can be used to
 	 * reapply that previous selection when, for example, a zero border width is

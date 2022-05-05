@@ -141,7 +141,7 @@ const BorderControlDropdown = (
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverClassName,
+		popoverProps,
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
@@ -236,7 +236,7 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			popoverProps={ { className: popoverClassName } }
+			popoverProps={ popoverProps }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>

@@ -68,11 +68,11 @@ const BorderControl = (
 					<BorderControlDropdown
 						border={ border }
 						colors={ colors }
-						contentClassName={ popoverContentClassName }
 						disableCustomColors={ disableCustomColors }
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
 						onChange={ onBorderChange }
+						popoverProps={ { className: popoverContentClassName } }
 						previousStyleSelection={ previousStyleSelection }
 						showDropdownHeader={ showDropdownHeader }
 						__experimentalHasMultipleOrigins={
