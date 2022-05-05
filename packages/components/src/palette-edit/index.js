@@ -60,8 +60,26 @@ function getNameForPosition( position ) {
 	return sprintf(
 		/* translators: %s: is a temporary id for a custom color */
 		__( 'Color %s ' ),
-		position + 1
+		position
 	);
+}
+
+function getNextPositionId( elements, slugPrefix ) {
+	return elements.reduce( ( previousValue, currentValue ) => {
+		if ( currentValue?.slug ) {
+			const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+			if ( typeof currentValue?.slug === 'string' ) {
+				const matches = currentValue?.slug.match( regex );
+				if ( matches ) {
+					const id = parseInt( matches[ 1 ], 10 );
+					if ( id >= previousValue ) {
+						return id + 1;
+					}
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
 }
 
 function Option( {
@@ -163,9 +181,10 @@ function Option( {
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient }, index ) {
+function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
-		slug === slugPrefix + kebabCase( getNameForPosition( index ) ) &&
+		regex.test( slug ) &&
 		( ( !! color && color === DEFAULT_COLOR ) ||
 			( !! gradient && gradient === DEFAULT_GRADIENT ) )
 	);
@@ -193,8 +212,7 @@ function PaletteEditListView( {
 				)
 			) {
 				const newElements = elementsReference.current.filter(
-					( element, index ) =>
-						! isTemporaryElement( slugPrefix, element, index )
+					( element ) => ! isTemporaryElement( slugPrefix, element )
 				);
 				onChange( newElements.length ? newElements : undefined );
 			}
@@ -309,8 +327,9 @@ export default function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionName = getNameForPosition(
-									elementsLength
+									getNextPositionId( elements, slugPrefix )
 								);
+
 								onChange( [
 									...elements,
 									{
