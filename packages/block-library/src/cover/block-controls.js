@@ -18,13 +18,22 @@ import { postFeaturedImage } from '@wordpress/icons';
  */
 import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from './shared';
 
-export function CoverBlockControlsPrimary( {
+export default function CoverBlockControls( {
+	attributes,
 	setAttributes,
-	contentPosition,
-	hasInnerBlocks,
-	minHeightUnit,
-	minHeight,
+	onSelectMedia,
+	currentSettings,
 } ) {
+	const {
+		contentPosition,
+		id,
+		useFeaturedImage,
+		dimRatio,
+		minHeight,
+		minHeightUnit,
+	} = attributes;
+	const { hasInnerBlocks, url } = currentSettings;
+
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
 		minHeightUnit
@@ -57,35 +66,6 @@ export function CoverBlockControlsPrimary( {
 		} );
 	};
 
-	return (
-		<>
-			<BlockAlignmentMatrixControl
-				label={ __( 'Change content position' ) }
-				value={ contentPosition }
-				onChange={ ( nextPosition ) =>
-					setAttributes( {
-						contentPosition: nextPosition,
-					} )
-				}
-				isDisabled={ ! hasInnerBlocks }
-			/>
-			<FullHeightAlignmentControl
-				isActive={ isMinFullHeight }
-				onToggle={ toggleMinFullHeight }
-				isDisabled={ ! hasInnerBlocks }
-			/>
-		</>
-	);
-}
-
-export function CoverBlockControlsOther( {
-	setAttributes,
-	useFeaturedImage,
-	dimRatio,
-	id,
-	url,
-	onSelectMedia,
-} ) {
 	const toggleUseFeaturedImage = () => {
 		setAttributes( {
 			id: undefined,
@@ -99,61 +79,40 @@ export function CoverBlockControlsOther( {
 	};
 	return (
 		<>
-			<ToolbarButton
-				icon={ postFeaturedImage }
-				label={ __( 'Use featured image' ) }
-				isPressed={ useFeaturedImage }
-				onClick={ toggleUseFeaturedImage }
-			/>
-			{ ! useFeaturedImage && (
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*,video/*"
-					onSelect={ onSelectMedia }
-					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
-				/>
-			) }
-		</>
-	);
-}
-export default function CoverBlockControls( {
-	attributes,
-	setAttributes,
-	onSelectMedia,
-	currentSettings,
-} ) {
-	const {
-		contentPosition,
-		id,
-		useFeaturedImage,
-		dimRatio,
-		minHeight,
-		minHeightUnit,
-	} = attributes;
-	const { hasInnerBlocks, url } = currentSettings;
-
-	return (
-		<>
 			<BlockControls group="block">
-				<CoverBlockControlsPrimary
-					setAttributes={ setAttributes }
-					contentPosition={ contentPosition }
-					hasInnerBlocks={ hasInnerBlocks }
-					minHeightUnit={ minHeightUnit }
-					minHeight={ minHeight }
+				<BlockAlignmentMatrixControl
+					label={ __( 'Change content position' ) }
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( {
+							contentPosition: nextPosition,
+						} )
+					}
+					isDisabled={ ! hasInnerBlocks }
+				/>
+				<FullHeightAlignmentControl
+					isActive={ isMinFullHeight }
+					onToggle={ toggleMinFullHeight }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
-				<CoverBlockControlsOther
-					setAttributes={ setAttributes }
-					useFeaturedImage={ useFeaturedImage }
-					dimRatio={ dimRatio }
-					id={ id }
-					url={ url }
-					onSelectMedia={ onSelectMedia }
+				<ToolbarButton
+					icon={ postFeaturedImage }
+					label={ __( 'Use featured image' ) }
+					isPressed={ useFeaturedImage }
+					onClick={ toggleUseFeaturedImage }
 				/>
+				{ ! useFeaturedImage && (
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*,video/*"
+						onSelect={ onSelectMedia }
+						name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+					/>
+				) }
 			</BlockControls>
 		</>
 	);
