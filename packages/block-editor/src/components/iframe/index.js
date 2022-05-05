@@ -34,7 +34,7 @@ const BLOCK_PREFIX = 'wp-block';
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
  */
-function useCompatRef() {
+function useStylesCompatibility() {
 	return useRefEffect( ( node ) => {
 		// Search the document for stylesheets targetting the editor canvas.
 		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
@@ -226,7 +226,7 @@ function Iframe(
 			} );
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
-	const styleCompatibilityRef = useCompatRef();
+	const styleCompatibilityRef = useStylesCompatibility();
 
 	head = (
 		<>
