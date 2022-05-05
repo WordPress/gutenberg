@@ -71,7 +71,8 @@ module.exports = function downloadSources( config, spinner ) {
 
 /**
  * Downloads the given source if necessary. The specific action taken depends
- * on the source type. The source is downloaded to source.path.
+ * on the source type. The source is downloaded to source.path and rwx permissions
+ * are applied.
  *
  * @param {WPSource} source             The source to download.
  * @param {Object}   options
@@ -85,6 +86,8 @@ async function downloadSource( source, options ) {
 	} else if ( source.type === 'zip' ) {
 		await downloadZipSource( source, options );
 	}
+
+	await fs.promises.chmod( source.path, 0o777 );
 }
 
 /**
