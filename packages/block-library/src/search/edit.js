@@ -217,6 +217,7 @@ export default function SearchEdit( {
 
 		return (
 			<input
+				type="search"
 				className={ textFieldClasses }
 				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
