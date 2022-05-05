@@ -13,7 +13,7 @@ function join( ...strings ) {
 }
 
 function compare( input, output, isExperimental, options = {} ) {
-	const blockLibraryPlugin = createBabelPlugin( () => true, isExperimental );
+	const blockLibraryPlugin = createBabelPlugin( isExperimental );
 	const { code } = transform( input, {
 		configFile: false,
 		plugins: [ [ blockLibraryPlugin, options ] ],

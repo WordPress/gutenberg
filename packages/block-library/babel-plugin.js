@@ -8,8 +8,6 @@ const fs = require( 'fs' );
  */
 const isBlockMetadataExperimental = require( './src/is-block-metadata-experimental' );
 
-const BLOCK_LIBRARY_INDEX_PATH = 'block-library/src/index.js';
-
 /**
  * Creates a babel plugin that wraps the references to experimental
  * blocks imported in BLOCK_LIBRARY_INDEX_PATH in conditional expressions.
@@ -24,13 +22,9 @@ const BLOCK_LIBRARY_INDEX_PATH = 'block-library/src/index.js';
  *
  * For more context, see https://github.com/WordPress/gutenberg/pull/40655/
  *
- * @param {Function} shouldProcessFile   Optional callback to decide whether a given file should be processed.
  * @param {Function} shouldProcessImport Optional callback to decide whether a given import should be processed.
  */
-function createBabelPlugin( shouldProcessFile, shouldProcessImport ) {
-	if ( ! shouldProcessFile ) {
-		shouldProcessFile = isProcessingBlockLibraryIndexJs;
-	}
+function createBabelPlugin( shouldProcessImport ) {
 	if ( ! shouldProcessImport ) {
 		shouldProcessImport = isImportDeclarationAnExperimentalBlock;
 	}
@@ -66,11 +60,7 @@ function createBabelPlugin( shouldProcessFile, shouldProcessImport ) {
 				this.transformedExperimentalBlocks = new Set();
 			},
 			visitor: {
-				ImportDeclaration( path, state ) {
-					if ( ! shouldProcessFile( state.file ) ) {
-						return;
-					}
-
+				ImportDeclaration( path ) {
 					// Only process the experimental blocks.
 					if ( ! shouldProcessImport( path ) ) {
 						return;
@@ -86,11 +76,7 @@ function createBabelPlugin( shouldProcessFile, shouldProcessImport ) {
 					// Keep track of all the imported identifiers of the experimental blocks.
 					this.importedExperimentalBlocks.add( name );
 				},
-				Identifier( path, state ) {
-					if ( ! shouldProcessFile( state.file ) ) {
-						return;
-					}
-
+				Identifier( path ) {
 					const { node } = path;
 
 					// Ignore if it's already been processed.
@@ -143,14 +129,8 @@ function createBabelPlugin( shouldProcessFile, shouldProcessImport ) {
 			/**
 			 * After the build, confirm that all the imported experimental blocks were
 			 * indeed transformed by the visitor above.
-			 *
-			 * @param {Object} fileState Babel-provided state.
 			 */
-			post( fileState ) {
-				if ( ! shouldProcessFile( fileState ) ) {
-					return;
-				}
-
+			post() {
 				if (
 					! areSetsEqual(
 						this.importedExperimentalBlocks,
@@ -164,8 +144,7 @@ function createBabelPlugin( shouldProcessFile, shouldProcessImport ) {
 						this.transformedExperimentalBlocks
 					).join( ', ' );
 					throw new Error(
-						'Some experimental blocks were not transformed in ' +
-							BLOCK_LIBRARY_INDEX_PATH +
+						'Some experimental blocks were not transformed' +
 							'.\n Imported:    ' + // Additional spaces to keep the outputs aligned in CLI.
 							importedAsString +
 							',\n Transformed: ' +
@@ -248,18 +227,6 @@ function isImportDeclarationAnExperimentalBlock( path ) {
 	}
 
 	return true;
-}
-
-/**
- * @param {Object} file Babel.js file object.
- * @return {boolean} true if file refers to packages/block-library/index.js.
- */
-function isProcessingBlockLibraryIndexJs( file ) {
-	return (
-		file.opts &&
-		file.opts.filename &&
-		file.opts.filename.endsWith( BLOCK_LIBRARY_INDEX_PATH )
-	);
 }
 
 /**
