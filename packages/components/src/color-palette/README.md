@@ -41,7 +41,6 @@ classes to be applied to the container.
 
 -   Type: `String`
 -   Required: No
--   Default: `Select or Upload Media`
 
 ### clearable
 

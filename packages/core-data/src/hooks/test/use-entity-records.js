@@ -19,6 +19,7 @@ import useEntityRecords from '../use-entity-records';
 
 describe( 'useEntityRecords', () => {
 	let registry;
+
 	beforeEach( () => {
 		jest.useFakeTimers();
 

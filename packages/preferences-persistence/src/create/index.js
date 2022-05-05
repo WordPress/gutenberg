@@ -86,6 +86,8 @@ export default function create( {
 		// The user meta endpoint seems susceptible to errors when consecutive
 		// requests are made in quick succession. Ensure there's a gap between
 		// any consecutive requests.
+		//
+		// Catch and do nothing with errors from the REST API.
 		debouncedApiFetch( {
 			path: '/wp/v2/users/me',
 			method: 'PUT',
@@ -100,7 +102,7 @@ export default function create( {
 					persisted_preferences: dataWithTimestamp,
 				},
 			},
-		} );
+		} ).catch( () => {} );
 	}
 
 	return {

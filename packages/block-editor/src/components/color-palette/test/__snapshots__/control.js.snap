@@ -231,7 +231,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             >
               <button
                 aria-describedby={null}
-                className="components-button components-circular-option-picker__clear is-secondary is-small"
+                className="components-button components-circular-option-picker__clear is-tertiary"
                 onClick={[Function]}
                 type="button"
               >

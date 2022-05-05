@@ -1,97 +1,127 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
 import moment from 'moment';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import 'react-dates/initialize';
 
 /**
  * Internal dependencies
  */
 import DatePicker from '../date';
 
-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
-
 describe( 'DatePicker', () => {
-	it( 'should pass down a moment object for currentDate', () => {
-		const currentDate = '1986-10-18T23:00:00';
-		const wrapper = shallow( <DatePicker currentDate={ currentDate } /> );
-		const date = wrapper.children().props().date;
-		expect( moment.isMoment( date ) ).toBe( true );
-		expect( date.isSame( moment( currentDate ) ) ).toBe( true );
+	it( 'should highlight the current date', () => {
+		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
+		).toHaveClass( 'CalendarDay__selected' );
+
+		// Expect React deprecation warning due to 'react-dates' using outdated
+		// React lifecycle methods.
+		// https://github.com/react-dates/react-dates/issues/1748
+		expect( console ).toHaveWarned();
 	} );
 
-	it( 'should pass down a null date when currentDate is set to null', () => {
-		const wrapper = shallow( <DatePicker currentDate={ null } /> );
-		expect( wrapper.children().props().date ).toBeNull();
+	it( "should highlight today's date when not provided a currentDate", () => {
+		render( <DatePicker /> );
+
+		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
+		expect(
+			screen.getByRole( 'button', { name: todayDescription } )
+		).toHaveClass( 'CalendarDay__selected' );
 	} );
 
-	it( 'should pass down a moment object for now when currentDate is undefined', () => {
-		const wrapper = shallow( <DatePicker /> );
-		const date = wrapper.children().props().date;
-		expect( moment.isMoment( date ) ).toBe( true );
+	it( 'should call onChange when a day is selected', async () => {
+		const user = userEvent.setup( { delay: null } );
+
+		const onChange = jest.fn();
+
+		render(
+			<DatePicker
+				currentDate="2022-05-02T11:00:00"
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
 
-	describe( 'onChangeMoment', () => {
-		it( 'should call onChange with a formated date of the input', () => {
-			const onChangeSpy = jest.fn();
-			const currentDate = '1986-10-18T11:00:00';
-			const wrapper = shallow(
-				<DatePicker
-					currentDate={ currentDate }
-					onChange={ onChangeSpy }
-				/>
-			);
-			const newDate = moment();
+	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
+		const user = userEvent.setup( { delay: null } );
 
-			wrapper.childAt( 0 ).props().onDateChange( newDate );
+		const onMonthPreviewed = jest.fn();
+		const onChange = jest.fn();
 
-			expect( onChangeSpy ).toHaveBeenCalledWith(
-				newDate.format( TIMEZONELESS_FORMAT )
-			);
-		} );
+		render(
+			<DatePicker
+				currentDate="2022-05-02T11:00:00"
+				onMonthPreviewed={ onMonthPreviewed }
+				onChange={ onChange }
+			/>
+		);
 
-		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is undefined', () => {
-			let onChangeSpyArgument;
-			const onChangeSpy = ( arg ) => ( onChangeSpyArgument = arg );
-			const wrapper = shallow( <DatePicker onChange={ onChangeSpy } /> );
-			const newDate = moment( '1986-10-18T11:00:00' );
-			const current = moment();
-			const newDateWithCurrentTime = newDate.clone().set( {
-				hours: current.hours(),
-				minutes: current.minutes(),
-				seconds: current.seconds(),
-			} );
-			wrapper.childAt( 0 ).props().onDateChange( newDate );
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Move forward to switch to the next month.',
+			} )
+		);
 
-			expect(
-				moment( onChangeSpyArgument ).isSame(
-					newDateWithCurrentTime,
-					'minute'
-				)
-			).toBe( true );
-		} );
+		expect( onMonthPreviewed ).toHaveBeenCalledWith(
+			expect.stringMatching( /^2022-06/ )
+		);
 
-		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is null', () => {
-			let onChangeSpyArgument;
-			const onChangeSpy = ( arg ) => ( onChangeSpyArgument = arg );
-			const wrapper = shallow(
-				<DatePicker currentDate={ null } onChange={ onChangeSpy } />
-			);
-			const newDate = moment( '1986-10-18T11:00:00' );
-			const current = moment();
-			const newDateWithCurrentTime = newDate.clone().set( {
-				hours: current.hours(),
-				minutes: current.minutes(),
-				seconds: current.seconds(),
-			} );
-			wrapper.childAt( 0 ).props().onDateChange( newDate );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Monday, June 20, 2022' } )
+		);
 
-			expect(
-				moment( onChangeSpyArgument ).isSame(
-					newDateWithCurrentTime,
-					'minute'
-				)
-			).toBe( true );
-		} );
+		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
+	} );
+
+	it( 'should highlight events on the calendar', () => {
+		render(
+			<DatePicker
+				currentDate="2022-05-02T11:00:00"
+				events={ [
+					{ date: new Date( '2022-05-04T00:00:00' ) },
+					{ date: new Date( '2022-05-19T00:00:00' ) },
+				] }
+			/>
+		);
+
+		expect(
+			screen
+				.getAllByLabelText( 'There is 1 event.', { exact: false } )
+				.map( ( day ) => day.getAttribute( 'aria-label' ) )
+		).toEqual( [
+			'Wednesday, May 4, 2022. There is 1 event.',
+			'Thursday, May 19, 2022. There is 1 event.',
+		] );
+	} );
+
+	it( 'should not allow invalid date to be selected', async () => {
+		const user = userEvent.setup( { delay: null } );
+
+		const onChange = jest.fn();
+
+		render(
+			<DatePicker
+				currentDate="2022-05-02T11:00:00"
+				onChange={ onChange }
+				isInvalidDate={ ( date ) => date.getDate() === 20 }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+		);
+
+		expect( onChange ).not.toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
 } );
