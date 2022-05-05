@@ -50,7 +50,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
-				popoverContentClassName={ popoverClassNames?.top }
+				popoverProps={ { className: popoverClassNames?.top } }
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
@@ -58,7 +58,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
-				popoverContentClassName={ popoverClassNames?.left }
+				popoverProps={ { className: popoverClassNames?.left } }
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
@@ -66,7 +66,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
-				popoverContentClassName={ popoverClassNames?.right }
+				popoverProps={ { className: popoverClassNames?.right } }
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
@@ -75,7 +75,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
-				popoverContentClassName={ popoverClassNames?.bottom }
+				popoverProps={ { className: popoverClassNames?.bottom } }
 				value={ value?.bottom }
 				{ ...sharedBorderControlProps }
 			/>

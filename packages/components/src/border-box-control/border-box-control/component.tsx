@@ -77,7 +77,9 @@ const BorderBoxControl = (
 						placeholder={
 							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
-						popoverContentClassName={ popoverClassNames?.linked }
+						popoverProps={ {
+							className: popoverClassNames?.linked,
+						} }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }

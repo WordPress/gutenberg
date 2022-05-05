@@ -43,7 +43,7 @@ const BorderControl = (
 		onSliderChange,
 		onWidthChange,
 		placeholder,
-		popoverContentClassName,
+		popoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
 		sliderClassName,
@@ -72,7 +72,7 @@ const BorderControl = (
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
 						onChange={ onBorderChange }
-						popoverProps={ { className: popoverContentClassName } }
+						popoverProps={ popoverProps }
 						previousStyleSelection={ previousStyleSelection }
 						showDropdownHeader={ showDropdownHeader }
 						__experimentalHasMultipleOrigins={

@@ -21,6 +21,24 @@ export type ColorOrigin = {
 
 export type Colors = ColorOrigin[] | Color[];
 
+/**
+ * Represents the available props that can be passed through the border control
+ * dropdown's `popoverProps`. This should be replaced once the Dropdown or
+ * Popover components are typed.
+ */
+type DropdownPopoverProps = {
+	className?: string;
+	focusOnMount?: boolean;
+	position?: string;
+	onClose?: () => void;
+	onFocusOutside?: () => void;
+	expandOnMobile?: boolean;
+	headerTitle?: string;
+	noArrow?: boolean;
+	anchorRect?: DOMRect;
+	getAnchorRect?: ( ref: HTMLAnchorElement ) => DOMRect;
+};
+
 export type ColorProps = {
 	/**
 	 * An array of color definitions. This may also be a multi-dimensional array
@@ -81,10 +99,10 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * A custom CSS class name to be assigned to the border control's
-		 * dropdown popover content.
+		 * Properties of the `popoverProps` object will be passed as props to
+		 * the border control's dropdown popover.
 		 */
-		popoverContentClassName?: string;
+		popoverProps?: DropdownPopoverProps;
 		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`
@@ -115,24 +133,6 @@ export type BorderControlProps = ColorProps &
 		 */
 		withSlider?: boolean;
 	};
-
-/**
- * Represents the available props that can be passed through the border control
- * dropdown's `popoverProps`. This should be replaced once the Dropdown or
- * Popover components are typed.
- */
-type DropdownPopoverProps = {
-	className?: string;
-	focusOnMount?: boolean;
-	position?: string;
-	onClose?: () => void;
-	onFocusOutside?: () => void;
-	expandOnMobile?: boolean;
-	headerTitle?: string;
-	noArrow?: boolean;
-	anchorRect?: DOMRect;
-	getAnchorRect?: ( ref: HTMLAnchorElement ) => DOMRect;
-};
 
 export type DropdownProps = ColorProps & {
 	/**
