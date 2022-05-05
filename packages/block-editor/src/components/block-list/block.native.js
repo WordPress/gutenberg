@@ -209,7 +209,9 @@ class BlockListBlock extends Component {
 		const isScreenWidthEqual = blockWidth === screenWidth;
 		const isScreenWidthWider = blockWidth < screenWidth;
 		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
-		const hasParent = !! rootClientId;
+
+		const draggingEnabled = ! rootClientId;
+		const draggingClientId = clientId;
 
 		return (
 			<TouchableWithoutFeedback
@@ -260,8 +262,8 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<BlockDraggable
-							enabled={ ! hasParent }
-							clientId={ clientId }
+							enabled={ draggingEnabled }
+							clientId={ draggingClientId }
 						>
 							{ () =>
 								isValid ? (
@@ -288,6 +290,8 @@ class BlockListBlock extends Component {
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={ isFullWidthToolbar }
+									draggingEnabled={ draggingEnabled }
+									draggingClientId={ draggingClientId }
 								/>
 							) }
 						</View>
