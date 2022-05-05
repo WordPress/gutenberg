@@ -88,7 +88,7 @@ function UnforwardedUnitControl(
 	);
 
 	const [ unit, setUnit ] = useControlledState< string | undefined >(
-		unitProp,
+		units.length === 1 ? units[ 0 ].value : unitProp,
 		{
 			initial: parsedUnit,
 			fallback: '',

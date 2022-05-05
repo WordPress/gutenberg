@@ -321,6 +321,15 @@ export class BlockList extends Component {
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
+
+		// Extracting the grid item properties here to avoid
+		// re-renders in the blockListItem component.
+		const isGridItem = !! gridProperties;
+		const gridItemProps = gridProperties && {
+			numOfColumns: gridProperties.numColumns,
+			tileCount: blockClientIds.length,
+			tileIndex: blockClientIds.indexOf( clientId ),
+		};
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -337,8 +346,8 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				gridProperties={ gridProperties }
-				items={ blockClientIds }
+				isGridItem={ isGridItem }
+				{ ...gridItemProps }
 			/>
 		);
 	}
