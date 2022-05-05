@@ -109,7 +109,7 @@ export default function NewTemplate( { postType } ) {
 			);
 
 			// Set template before navigating away to avoid initial stale value.
-			setTemplate( template.id );
+			setTemplate( template.id, template.slug );
 
 			// Navigate to the created template editor.
 			history.push( {
