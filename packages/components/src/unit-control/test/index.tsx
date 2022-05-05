@@ -135,12 +135,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should render label if single units', () => {
-			render(
-				<UnitControl
-					units={ [ { value: '%', label: '%' } ] }
-					value="30%"
-				/>
-			);
+			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
 
 			const select = screen.queryByRole( 'combobox' );
 			const label = screen.getByText( '%' );
@@ -318,6 +313,36 @@ describe( 'UnitControl', () => {
 				'vh',
 				expect.anything()
 			);
+		} );
+
+		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<>
+					<button>Click me</button>
+					<UnitControl
+						units={ [ { value: '%', label: '%' } ] }
+						onChange={ onChangeSpy }
+					/>
+				</>
+			);
+
+			const input = getInput();
+			await user.type( input, '62' );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				'62%',
+				expect.anything()
+			);
+
+			// Start counting again calls to `onChangeSpy`.
+			onChangeSpy.mockClear();
+
+			// Clicking on the button should cause the `onBlur` callback to fire.
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+
+			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 	} );
 

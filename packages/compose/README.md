@@ -404,7 +404,7 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
 -   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
