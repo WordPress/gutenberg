@@ -57,7 +57,7 @@ function NameInput( { value, onChange, label } ) {
 }
 
 /**
- * Returns a temporary name for a palette item in according to the format "Color + id".
+ * Returns a temporary name for a palette item in the format "Color + id".
  * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
