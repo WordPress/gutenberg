@@ -14,6 +14,7 @@
  */
 function block_core_post_template_uses_feature_image( $inner_blocks ) {
 	$inner_blocks_array = iterator_to_array( $inner_blocks );
+	$has_thumbnail      = false;
 	foreach ( $inner_blocks_array as $block ) {
 		if ( 'core/post-featured-image' === $block->name ) {
 			$has_thumbnail = true;
