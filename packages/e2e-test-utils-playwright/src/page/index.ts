@@ -23,6 +23,8 @@ import { setBrowserViewport } from './set-browser-viewport';
 import { showBlockToolbar } from './show-block-toolbar';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './site-editor';
+import {clickBlockAppender} from './click-block-appender';
+
 
 class PageUtils {
 	browser: Browser;
@@ -50,6 +52,7 @@ class PageUtils {
 	openPreviewPage = openPreviewPage;
 	setBrowserViewport = setBrowserViewport;
 	pressKeyTimes = pressKeyTimes;
+	clickBlockAppender = clickBlockAppender;
 }
 
 export { PageUtils };
