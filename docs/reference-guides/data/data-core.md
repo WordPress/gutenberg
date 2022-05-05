@@ -259,7 +259,7 @@ _Parameters_
 
 _Returns_
 
--   `any | undefined`: The entity record's edits.
+-   `Optional< any >`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
@@ -278,7 +278,7 @@ _Parameters_
 
 _Returns_
 
--   `any | undefined`: The entity record's non transient edits.
+-   `Optional< any >`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -352,7 +352,7 @@ _Parameters_
 
 _Returns_
 
--   `any | undefined`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getReferenceByDistinctEdits
 
@@ -398,7 +398,7 @@ _Parameters_
 
 _Returns_
 
--   `any | undefined`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getUserQueryResults
 
