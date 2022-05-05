@@ -8,6 +8,7 @@
 
 -   `UnitControl`: migrate unit tests to TypeScript ([#40697](https://github.com/WordPress/gutenberg/pull/40697)).
 -   `DatePicker`: Add improved unit tests ([#40754](https://github.com/WordPress/gutenberg/pull/40754)).
+-   Setup `user-event` in unit tests inline, once per test ([#40839](https://github.com/WordPress/gutenberg/pull/40839)).
 -   `DatePicker`: Update `react-dates` to 21.8.0 ([#40801](https://github.com/WordPress/gutenberg/pull/40801)).
 
 ### Enhancements
