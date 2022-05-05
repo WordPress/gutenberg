@@ -45,7 +45,7 @@ Post a link to your PR in related issues & PRs.
 
 Ping commenters of related issues, previous committers, and tech leads.
 
-Bring it up on [WP.org slack](https://make.wordpress.org/core/tag/core-editor-agenda/).
+Bring it up on the #core-editor channel of the WordPress.org slack. The easiest way to get feedback is to speak out during the [open floor section](https://make.wordpress.org/core/tag/core-editor-agenda/) of the weekly [Core Editor meeting](/docs/getting-started/README.md).
 
 Assign relevant labels, milestones, and projects (or ask someone).
 
