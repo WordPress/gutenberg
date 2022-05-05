@@ -19,8 +19,9 @@ describe( 'DatePicker', () => {
 			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
 		).toHaveClass( 'CalendarDay__selected' );
 
-		// Expect React deprecation warning due to outdated 'react-dates' package.
-		// TODO: Update 'react-dates'.
+		// Expect React deprecation warning due to 'react-dates' using outdated
+		// React lifecycle methods.
+		// https://github.com/react-dates/react-dates/issues/1748
 		expect( console ).toHaveWarned();
 	} );
 
