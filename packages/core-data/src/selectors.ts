@@ -961,7 +961,7 @@ export function canUser(
 	state: State,
 	action: string,
 	resource: string,
-	id?: number | string
+	id?: RecordKey
 ): boolean | undefined {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
