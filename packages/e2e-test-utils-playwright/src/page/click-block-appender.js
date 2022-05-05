@@ -1,14 +1,17 @@
 /**
  * Clicks the default block appender.
+ *
+ * @this {import('./').PageUtils}
  */
-export async function clickBlockAppender() {
+
+ export async function clickBlockAppender() {
 	// The block appender is only visible when there's no selection.
-	await page.evaluate( () =>
+	await this.page.evaluate( () =>
 		window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 	);
-	const appender = await page.waitForSelector(
+	const appender = await this.page.waitForSelector(
 		'.block-editor-default-block-appender__content'
 	);
 	await appender.click();
-	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+	await this.page.evaluate( () => new Promise( window.requestIdleCallback ) );
 }
