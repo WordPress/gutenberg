@@ -71,7 +71,7 @@ export function getCSSRules(
  *
  * @param  style Style object.
  *
- * @return string[] An array of classnames.
+ * @return An array of classnames.
  */
 export function getClassnames( style: Style ): string[] {
 	const classNames: string[] = [];
