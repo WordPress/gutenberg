@@ -45,7 +45,6 @@ function useStylesCompatibility() {
 			} catch ( e ) {
 				return;
 			}
-
 			const { ownerNode, cssRules } = styleSheet;
 
 			if ( ! cssRules ) {
@@ -65,6 +64,14 @@ function useStylesCompatibility() {
 				return;
 			}
 
+			let isFilenameMatch = false;
+			if ( styleSheet.href ) {
+				const url = new URL( styleSheet.href );
+				if ( url.pathname === '/wp-admin/css/common.css' ) {
+					isFilenameMatch = true;
+				}
+			}
+
 			const isMatch = Array.from( cssRules ).find(
 				( { selectorText } ) =>
 					selectorText &&
@@ -73,7 +80,7 @@ function useStylesCompatibility() {
 			);
 
 			if (
-				isMatch &&
+				( isMatch || isFilenameMatch ) &&
 				! node.ownerDocument.getElementById( ownerNode.id )
 			) {
 				// Display warning once we have a way to add style dependencies to the editor.
