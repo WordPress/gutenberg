@@ -74,7 +74,6 @@ describe( 'MediaUpload component', () => {
 			expectOptionForMediaType( MEDIA_TYPE_VIDEO, [
 				OPTION_TAKE_VIDEO,
 				OPTION_WORDPRESS_MEDIA_LIBRARY,
-				OPTION_INSERT_FROM_URL,
 			] );
 		} );
 
