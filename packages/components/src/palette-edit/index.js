@@ -56,30 +56,37 @@ function NameInput( { value, onChange, label } ) {
 	);
 }
 
-function getNameForPosition( position ) {
-	return sprintf(
-		/* translators: %s: is a temporary id for a custom color */
-		__( 'Color %s ' ),
-		position
-	);
-}
-
-function getNextPositionId( elements, slugPrefix ) {
-	return elements.reduce( ( previousValue, currentValue ) => {
-		if ( currentValue?.slug ) {
-			const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-			if ( typeof currentValue?.slug === 'string' ) {
-				const matches = currentValue?.slug.match( regex );
-				if ( matches ) {
-					const id = parseInt( matches[ 1 ], 10 );
-					if ( id >= previousValue ) {
-						return id + 1;
-					}
+/**
+ * Returns a temporary name for a palette item in according to the format "Color + id".
+ * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
+ * It expects slugs to be in the format: slugPrefix + color- + number.
+ * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+ *
+ * @param {string} elements   An array of color palette items.
+ * @param {string} slugPrefix The slug prefix used to match the element slug.
+ *
+ * @return {string} A unique name for a palette item.
+ */
+export function getNameForPosition( elements, slugPrefix ) {
+	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+	const position = elements.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( temporaryNameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
 				}
 			}
 		}
 		return previousValue;
 	}, 1 );
+
+	return sprintf(
+		/* translators: %s: is a temporary id for a custom color */
+		__( 'Color %s' ),
+		position
+	);
 }
 
 function Option( {
@@ -327,7 +334,8 @@ export default function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionName = getNameForPosition(
-									getNextPositionId( elements, slugPrefix )
+									elements,
+									slugPrefix
 								);
 
 								onChange( [
