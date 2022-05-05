@@ -21,6 +21,7 @@ import { store as editPostStore } from '../../store';
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
 		<div className="edit-post-text-editor">
+			<TextEditorGlobalKeyboardShortcuts />
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>
@@ -31,7 +32,6 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 					>
 						{ __( 'Exit code editor' ) }
 					</Button>
-					<TextEditorGlobalKeyboardShortcuts />
 				</div>
 			) }
 			<div className="edit-post-text-editor__body">
