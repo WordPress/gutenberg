@@ -15,6 +15,5 @@ index 22274f1..acc95f5 100644
 -    return () => Linking.removeEventListener('url', listener);
 +    return () => linkingSubscription.remove();
    }, [enabled, extractPathFromURL, ref]);
-
-   return {
  
+   return {
