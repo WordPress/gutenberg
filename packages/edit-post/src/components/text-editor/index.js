@@ -8,17 +8,21 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
 
-function TextEditor( { onExit, isRichEditingEnabled } ) {
+export default function TextEditor() {
+	const isRichEditingEnabled = useSelect( ( select ) => {
+		return select( editorStore ).getEditorSettings().richEditingEnabled;
+	}, [] );
+	const { switchEditorMode } = useDispatch( editPostStore );
+
 	return (
 		<div className="edit-post-text-editor">
 			<TextEditorGlobalKeyboardShortcuts />
@@ -27,7 +31,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 					<h2>{ __( 'Editing code' ) }</h2>
 					<Button
 						variant="tertiary"
-						onClick={ onExit }
+						onClick={ () => switchEditorMode( 'visual' ) }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
 						{ __( 'Exit code editor' ) }
@@ -41,17 +45,3 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 		</div>
 	);
 }
-
-export default compose(
-	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( editorStore ).getEditorSettings()
-			.richEditingEnabled,
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		return {
-			onExit() {
-				dispatch( editPostStore ).switchEditorMode( 'visual' );
-			},
-		};
-	} )
-)( TextEditor );
