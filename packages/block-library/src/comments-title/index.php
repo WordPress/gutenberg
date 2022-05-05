@@ -22,7 +22,7 @@ function render_block_core_comments_title( $attributes ) {
 	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
 	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$comments_count      = number_format_i18n( get_comments_number() );
+	$comments_count      = get_comments_number();
 	$post_title          = '&#8220;' . get_the_title() . '&#8221;';
 	$tag_name            = 'h2';
 	if ( isset( $attributes['level'] ) ) {
@@ -46,7 +46,7 @@ function render_block_core_comments_title( $attributes ) {
 						'%1$s responses to %2$s',
 						$comments_count
 					),
-					$comments_count,
+					number_format_i18n( $comments_count ),
 					$post_title
 				);
 			}
@@ -56,7 +56,7 @@ function render_block_core_comments_title( $attributes ) {
 			$comments_title = sprintf(
 				/* translators: %s: Number of comments. */
 				_n( '%s responses', '%s responses', $comments_count ),
-				$comments_count
+				number_format_i18n( $comments_count )
 			);
 		}
 	} elseif ( $show_post_title ) {
