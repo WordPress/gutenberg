@@ -23,6 +23,7 @@ import type { Context, User, WpTemplate } from './entity-types';
 type State = any;
 type RecordKey = number | string;
 type EntityRecord = any;
+type Optional< T > = T | undefined;
 
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
@@ -533,7 +534,7 @@ export function getEntityRecordEdits(
 	kind: string,
 	name: string,
 	recordId: RecordKey
-): any | undefined {
+): Optional< any > {
 	return get( state.entities.records, [ kind, name, 'edits', recordId ] );
 }
 
@@ -557,7 +558,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		kind: string,
 		name: string,
 		recordId: RecordKey
-	): any | undefined => {
+	): Optional< any > => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
@@ -795,7 +796,7 @@ function getCurrentUndoOffset( state: State ): number {
  *
  * @return The edit.
  */
-export function getUndoEdit( state: State ): any | undefined {
+export function getUndoEdit( state: State ): Optional< any > {
 	return state.undo[ state.undo.length - 2 + getCurrentUndoOffset( state ) ];
 }
 
@@ -807,7 +808,7 @@ export function getUndoEdit( state: State ): any | undefined {
  *
  * @return The edit.
  */
-export function getRedoEdit( state: State ): any | undefined {
+export function getRedoEdit( state: State ): Optional< any > {
 	return state.undo[ state.undo.length + getCurrentUndoOffset( state ) ];
 }
 
@@ -1089,7 +1090,7 @@ export function __experimentalGetTemplateForLink(
  */
 export function __experimentalGetCurrentThemeBaseGlobalStyles(
 	state: State
-): any | null {
+): any {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
