@@ -142,7 +142,6 @@ const BorderControlDropdown = (
 		onColorChange,
 		onStyleChange,
 		popoverClassName,
-		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
@@ -199,7 +198,7 @@ const BorderControlDropdown = (
 					</HStack>
 				) : undefined }
 				<ColorPalette
-					className={ popoverContentClassName }
+					className="" // TypeScript is throwing error if not present.
 					value={ color }
 					onChange={ onColorChange }
 					{ ...{ colors, disableCustomColors } }

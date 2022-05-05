@@ -136,7 +136,6 @@ export const borderControlPopoverControls = css`
 	}
 `;
 
-export const borderControlPopoverContent = css``;
 export const borderColorIndicator = css``;
 
 export const resetButton = css`
