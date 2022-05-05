@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import useQuerySelect from './use-query-select';
@@ -85,4 +90,17 @@ export default function useEntityRecord< RecordType >(
 		record,
 		...rest,
 	};
+}
+
+export function __experimentalUseEntityRecord(
+	kind: string,
+	name: string,
+	recordId: any,
+	options: any
+) {
+	deprecated( `wp.data.__experimentalUseEntityRecord`, {
+		alternative: 'wp.data.useEntityRecord',
+		since: '6.1',
+	} );
+	return useEntityRecord( kind, name, recordId, options );
 }

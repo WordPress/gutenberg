@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -87,4 +88,17 @@ export default function useEntityRecords< RecordType >(
 		records,
 		...rest,
 	};
+}
+
+export function __experimentalUseEntityRecords(
+	kind: string,
+	name: string,
+	queryArgs: any,
+	options: any
+) {
+	deprecated( `wp.data.__experimentalUseEntityRecords`, {
+		alternative: 'wp.data.useEntityRecords',
+		since: '6.1',
+	} );
+	return useEntityRecords( kind, name, queryArgs, options );
 }
