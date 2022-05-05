@@ -14,29 +14,21 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
-	if ( false === $attributes['useFeaturedImage'] ) {
+	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
 
-	$is_image_background = 'image' === $attributes['backgroundType'];
-	if ( ! $is_image_background ) {
-		return $content;
-	}
-
-	$is_img_element = ! ( $attributes['hasParallax'] || $attributes['isRepeated'] );
-
-	if ( $is_img_element ) {
-		$object_position = '';
-		if ( isset( $attributes['focalPoint'] ) ) {
-			$object_position = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
-		}
-
+	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
-			"class"                => "wp-block-cover__image-background",
-			"style"                => "object-position: " . $object_position,
-			"data-object-fit"      => "cover",
-			"data-object-position" => $object_position,
+			"class"           => "wp-block-cover__image-background",
+			"data-object-fit" => "cover",
 		);
+
+		if ( isset( $attributes['focalPoint'] ) ) {
+			$object_position              = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
+			$attr["data-object-position"] = $object_position;
+			$attr["style"]                = "object-position: " . $object_position;
+		}
 
 		$image = get_the_post_thumbnail( null, 'post-thumbnail', $attr );
 
@@ -58,7 +50,6 @@ function render_block_core_cover( $attributes, $content ) {
 			1
 		);
 	}
-
 
 	return $content;
 }
