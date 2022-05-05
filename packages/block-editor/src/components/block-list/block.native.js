@@ -190,7 +190,8 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 			name,
-			rootClientId,
+			draggingEnabled,
+			draggingClientId,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -209,9 +210,6 @@ class BlockListBlock extends Component {
 		const isScreenWidthEqual = blockWidth === screenWidth;
 		const isScreenWidthWider = blockWidth < screenWidth;
 		const isFullWidthToolbar = isFullWidth( align ) || isScreenWidthEqual;
-
-		const draggingEnabled = ! rootClientId;
-		const draggingClientId = clientId;
 
 		return (
 			<TouchableWithoutFeedback
@@ -329,6 +327,7 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
+			getBlockHierarchyRootClientId,
 		} = select( blockEditorStore );
 
 		const order = getBlockIndex( clientId );
@@ -373,6 +372,15 @@ export default compose( [
 		const baseGlobalStyles = getSettings()
 			?.__experimentalGlobalStylesBaseStyles;
 
+		const topRootClientId = getBlockHierarchyRootClientId( clientId );
+		const isRootBlock = clientId === topRootClientId;
+		// For blocks with inner blocks, we only enable the dragging in the nested blocks. This way
+		// we prevent the long-press gesture from being disabled for elements within the block UI.
+		const draggingEnabled = ! isRootBlock || ! isInnerBlockSelected;
+		// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
+		// will be the top in the hierarchy.
+		const draggingClientId = topRootClientId;
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -380,6 +388,8 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
+			draggingClientId,
+			draggingEnabled,
 			isSelected,
 			isInnerBlockSelected,
 			isValid,
