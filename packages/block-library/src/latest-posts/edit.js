@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy, uniqueId } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -28,9 +28,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -147,6 +148,22 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			selectedAuthor,
 		]
 	);
+
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Always remove previous warning if any to show one at a time
+		// and use a unique id to announce the message in screen readers
+		// in every click.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/latest-psts/redirection-prevented/${ uniqueId() }`;
+		createWarningNotice( __( 'Redirection is prevented in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
 
 	const imageSizeOptions = imageSizes
 		.filter( ( { slug } ) => slug !== 'full' )
@@ -466,7 +483,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ /* translators: excerpt truncation character, default …  */ }
 							{ __( ' … ' ) }
-							<a href={ post.link } rel="noopener noreferrer">
+							<a
+								href={ post.link }
+								rel="noopener noreferrer"
+								onClick={ showRedirectionPreventedNotice }
+							>
 								{ __( 'Read more' ) }
 							</a>
 						</>
@@ -483,6 +504,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
+											onClick={
+												showRedirectionPreventedNotice
+											}
 										>
 											{ featuredImage }
 										</a>
@@ -501,6 +525,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 										  }
 										: undefined
 								}
+								onClick={ showRedirectionPreventedNotice }
 							>
 								{ ! titleTrimmed ? __( '(no title)' ) : null }
 							</a>
