@@ -253,6 +253,23 @@ export function BorderPanel( props ) {
 	};
 
 	const hydratedBorder = getBorderObject( attributes, colors );
+	const popoversProps = {
+		linked: {
+			className: 'block-editor__border-box-control__popover',
+		},
+		top: {
+			className: 'block-editor__border-box-control__popover-top',
+		},
+		right: {
+			className: 'block-editor__border-box-control__popover-right',
+		},
+		bottom: {
+			className: 'block-editor__border-box-control__popover-bottom',
+		},
+		left: {
+			className: 'block-editor__border-box-control__popover-left',
+		},
+	};
 
 	return (
 		<InspectorControls __experimentalGroup="border">
@@ -269,17 +286,7 @@ export function BorderPanel( props ) {
 						colors={ colors }
 						enableAlpha={ true }
 						onChange={ onBorderChange }
-						popoverClassNames={ {
-							linked: 'block-editor__border-box-control__popover',
-							top:
-								'block-editor__border-box-control__popover-top',
-							right:
-								'block-editor__border-box-control__popover-right',
-							bottom:
-								'block-editor__border-box-control__popover-bottom',
-							left:
-								'block-editor__border-box-control__popover-left',
-						} }
+						popoversProps={ popoversProps }
 						showStyle={ isStyleSupported }
 						value={ hydratedBorder }
 						__experimentalHasMultipleOrigins={ true }
