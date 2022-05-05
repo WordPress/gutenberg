@@ -320,7 +320,7 @@ export function __experimentalGetEntityRecordNoResolver(
 	state: State,
 	kind: string,
 	name: string,
-	key: string | number
+	key: RecordKey
 ): EntityRecord | null {
 	return getEntityRecord( state, kind, name, key );
 }
@@ -341,7 +341,7 @@ export const getRawEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		key: string | number
+		key: RecordKey
 	): EntityRecord | undefined => {
 		const record = getEntityRecord( state, kind, name, key );
 		return (
@@ -446,7 +446,7 @@ export function getEntityRecords(
 
 type DirtyEntityRecord = {
 	title: string;
-	key: string;
+	key: RecordKey;
 	name: string;
 	kind: string;
 };
@@ -468,7 +468,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				const primaryKeys = Object.keys(
 					records[ kind ][ name ].edits
 				).filter(
-					( primaryKey: string | number ) =>
+					( primaryKey: RecordKey ) =>
 						// The entity record must exist (not be deleted),
 						// and it must have edits.
 						getEntityRecord( state, kind, name, primaryKey ) &&
@@ -1012,7 +1012,7 @@ export function canUserEditEntityRecord(
 export function getAutosaves(
 	state: State,
 	postType: string,
-	postId: number
+	postId: RecordKey
 ): Array< any > | undefined {
 	return state.autosaves[ postId ];
 }
@@ -1030,8 +1030,8 @@ export function getAutosaves(
 export function getAutosave(
 	state: State,
 	postType: string,
-	postId: number,
-	authorId: number
+	postId: RecordKey,
+	authorId: RecordKey
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
@@ -1054,7 +1054,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => (
 		state: State,
 		postType: string,
-		postId: number
+		postId: RecordKey
 	): boolean => {
 		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,

@@ -317,8 +317,8 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
--   _authorId_ `number`: The id of the author.
+-   _postId_ `RecordKey`: The id of the parent post.
+-   _authorId_ `RecordKey`: The id of the author.
 
 _Returns_
 
@@ -335,7 +335,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `RecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -582,7 +582,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `string | number`: Record's key.
+-   _key_ `RecordKey`: Record's key.
 
 _Returns_
 
@@ -700,7 +700,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `RecordKey`: The id of the parent post.
 
 _Returns_
 
