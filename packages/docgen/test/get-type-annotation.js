@@ -415,6 +415,68 @@ describe( 'Type annotations', () => {
 			).toBe( 'string[]' );
 		} );
 
+		it( 'should lean on `getDependants` if `selector` in `createSelector` is missing args', () => {
+			const { tokens } = engine(
+				'test.ts',
+				`/**
+				 * Returns a reference that changes only when the dependencies do.
+				 *
+				 * @param state - stores all the things
+				 */
+				 export const getCountReference = createSelector( () => [], ( state: State ) => [ state.items.length ] );
+				 `
+			);
+
+			expect(
+				getTypeAnnotation(
+					{ tag: 'param', name: 'state' },
+					tokens[ 0 ],
+					0
+				)
+			).toBe( 'State' );
+		} );
+
+		it( 'should ignore `getDependants` if `selector` in `createSelector` has more arguments', () => {
+			const { tokens } = engine(
+				'test.ts',
+				`/**
+				  * Returns a reference that changes only when the dependencies do.
+				  *
+				  * @param state - stores all the things
+				  */
+				 export const getCountReference = createSelector(
+				 	( state: State, id: number ) => [],
+				 	( estate: EState ) => [ estate.items.length ]
+				 );
+				 `
+			);
+
+			expect(
+				getTypeAnnotation(
+					{ tag: 'param', name: 'state' },
+					tokens[ 0 ],
+					0
+				)
+			).toBe( 'State' );
+		} );
+
+		it( 'should ignore `getDependants` if everything in `createSelector` ignores `state`', () => {
+			expect( () =>
+				engine(
+					'test.ts',
+					`/**
+				 * Returns a reference that changes only when the dependencies do.
+				 *
+				 * @param state - stores all the things
+				 */
+				 export const getCountReference = createSelector( () => [], () => [] );
+				 `
+				)
+			).toThrow(
+				/Could not find corresponding parameter token for documented parameter/
+			);
+		} );
+
 		it( 'should find types for inner function with `createRegistrySelector`', () => {
 			const { tokens } = engine(
 				'test.ts',
