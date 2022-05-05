@@ -17,6 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -110,7 +111,10 @@ export default function PostCommentsEdit( {
 						ref={ disabledRef }
 					>
 						<h3>
-							{ __( 'One response to' ) } “{ postTitle }”
+							{
+								/* translators: %s: Post title. */
+								sprintf( __( 'One response to %s' ), postTitle )
+							}
 						</h3>
 
 						<div className="navigation">
@@ -135,16 +139,25 @@ export default function PostCommentsEdit( {
 												width="32"
 												loading="lazy"
 											/>
-											<b className="fn">
-												<a href="#top" className="url">
-													{ __(
-														'A WordPress Commenter'
-													) }
-												</a>
-											</b>{ ' ' }
-											<span className="says">
-												{ __( 'says' ) }:
-											</span>
+											{ createInterpolateElement(
+												__(
+													'<b><a>A WordPress Commenter</a></b> <span>says:</span>'
+												),
+												{
+													span: (
+														<span className="says" />
+													),
+													a: (
+														/* eslint-disable jsx-a11y/anchor-has-content */
+														<a
+															href="#top"
+															className="url"
+														/>
+														/* eslint-enable jsx-a11y/anchor-has-content */
+													),
+													b: <b className="fn" />,
+												}
+											) }
 										</div>
 
 										<div className="comment-metadata">
@@ -174,13 +187,17 @@ export default function PostCommentsEdit( {
 												'To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.'
 											) }
 											<br />
-											{ __(
-												'Commenter avatars come from'
-											) }{ ' ' }
-											<a href="https://gravatar.com/">
-												Gravatar
-											</a>
-											.
+											{ createInterpolateElement(
+												__(
+													'Commenter avatars come from <a>Gravatar</a>'
+												),
+												{
+													a: (
+														/* eslint-disable-next-line jsx-a11y/anchor-has-content */
+														<a href="https://gravatar.com/" />
+													),
+												}
+											) }
 										</p>
 									</div>
 
@@ -188,7 +205,9 @@ export default function PostCommentsEdit( {
 										<a
 											className="comment-reply-link"
 											href="#top"
-											aria-label="Reply to A WordPress Commenter"
+											aria-label={ __(
+												'Reply to A WordPress Commenter'
+											) }
 										>
 											{ __( 'Reply' ) }
 										</a>
