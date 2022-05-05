@@ -1054,6 +1054,8 @@ describe( 'useSelect', () => {
 			const rendered = render( <App multiple={ 1 } /> );
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
+			// Check that the most recent value of `multiple` is used to render:
+			// the old callback wasn't memoized and there is no stale closure problem.
 			rendered.rerender( <App multiple={ 2 } /> );
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 2 );
 		} );
