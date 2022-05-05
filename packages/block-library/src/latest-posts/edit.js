@@ -158,8 +158,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		// and use a unique id to announce the message in screen readers
 		// in every click.
 		removeNotice( noticeId );
-		noticeId = `block-library/core/latest-psts/redirection-prevented/${ uniqueId() }`;
-		createWarningNotice( __( 'Redirection is prevented in the editor.' ), {
+		noticeId = `block-library/core/latest-posts/redirection-prevented/${ uniqueId() }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
 			id: noticeId,
 			type: 'snackbar',
 		} );
