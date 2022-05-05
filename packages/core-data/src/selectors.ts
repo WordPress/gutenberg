@@ -18,9 +18,47 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import type { Context, User, WpTemplate } from './entity-types';
+import type { Context, User, Theme, WpTemplate } from './entity-types';
 
-type State = any;
+// This is an incomplete, high-level approximation of the State type.
+// It makes the selectors slightly more safe, but is intended to evolve
+// into a more detailed representation over time.
+// See https://github.com/WordPress/gutenberg/pull/40025#discussion_r865410589 for more context.
+interface State {
+	autosaves: Record< string | number, Array< unknown > >;
+	blockPatterns: Array< unknown >;
+	blockPatternCategories: Array< unknown >;
+	currentGlobalStylesId: string;
+	currentTheme: Theme< 'edit' >;
+	currentUser: User< 'edit' >;
+	embedPreviews: Record< string, { html: string } >;
+	entities: EntitiesState;
+	themeBaseGlobalStyles: Record< string, Object >;
+	themeGlobalStyleVariations: Record< string, string >;
+	undo: UndoState;
+	users: UserState;
+}
+
+interface EntitiesState {
+	config: EntityConfig[];
+	records: Record< string, unknown >;
+}
+
+interface EntityConfig {
+	name: string;
+	kind: string;
+}
+
+interface UndoState extends Array< Object > {
+	flattenedUndo: unknown;
+	offset: number;
+}
+
+interface UserState {
+	queries: Record< string, RecordKey[] >;
+	byId: Record< RecordKey, User< 'edit' > >;
+}
+
 type RecordKey = number | string;
 type EntityRecord = any;
 type Optional< T > = T | undefined;
