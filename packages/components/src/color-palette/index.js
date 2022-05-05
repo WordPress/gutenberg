@@ -154,7 +154,7 @@ const extractColorNameFromCurrentValue = (
 
 export default function ColorPalette( {
 	clearable = true,
-	className,
+	className = undefined,
 	colors,
 	disableCustomColors = false,
 	enableAlpha,

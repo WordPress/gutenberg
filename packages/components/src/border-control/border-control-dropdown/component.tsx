@@ -198,7 +198,6 @@ const BorderControlDropdown = (
 					</HStack>
 				) : undefined }
 				<ColorPalette
-					className="" // TypeScript is throwing error if not present.
 					value={ color }
 					onChange={ onColorChange }
 					{ ...{ colors, disableCustomColors } }
