@@ -4,7 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
-	useEntityRecords as useEntityRecords,
+	useEntityRecords,
 } from '@wordpress/core-data';
 
 /**
