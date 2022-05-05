@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Enhancements
+
+-    Update `BorderControl` and `BorderBoxControl` to passthrough popover props to their dropdowns instead of classnames only. ([#40836](https://github.com/WordPress/gutenberg/pull/40836))
+
 ## 19.10.0 (2022-05-04)
 
 ### Internal
