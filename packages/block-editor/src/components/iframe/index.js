@@ -279,7 +279,10 @@ function Iframe(
 								 * rendered imperatively by cloning the parent,
 								 * it's important that this div's content remains uncontrolled.
 								 */ }
-								<div ref={ styleCompatibilityRef } />
+								<div
+									style={ { display: 'none' } }
+									ref={ styleCompatibilityRef }
+								/>
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>
