@@ -219,7 +219,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
+					contentHash: createHash( 'sha512' )
 						.update( assetString )
 						.digest( 'hex' ),
 				}
@@ -238,7 +238,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
+					contentHash: createHash( 'sha512' )
 						.update( assetString )
 						.digest( 'hex' ),
 				} );
