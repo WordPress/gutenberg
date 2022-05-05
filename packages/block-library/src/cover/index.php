@@ -18,47 +18,27 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	$current_featured_image = get_the_post_thumbnail_url();
-
-	if ( false === $current_featured_image ) {
+	$is_image_background = 'image' === $attributes['backgroundType'];
+	if ( ! $is_image_background ) {
 		return $content;
 	}
 
-	$is_img_element      = ! ( $attributes['hasParallax'] || $attributes['isRepeated'] );
-	$is_image_background = 'image' === $attributes['backgroundType'];
+	$is_img_element = ! ( $attributes['hasParallax'] || $attributes['isRepeated'] );
 
-	if ( $is_image_background && ! $is_img_element ) {
-		$content = preg_replace(
-			'/class=\".*?\"/',
-			'${0} style="background-image:url(' . esc_url( $current_featured_image ) . ')"',
-			$content,
-			1
-		);
-	}
-
-	if ( $is_image_background && $is_img_element ) {
+	if ( $is_img_element ) {
 		$object_position = '';
 		if ( isset( $attributes['focalPoint'] ) ) {
-			$object_position = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' .
-			round( $attributes['focalPoint']['y'] * 100 ) . '%';
+			$object_position = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 		}
 
-		$image_template = '<img
-			class="wp-block-cover__image-background"
-			alt="%s"
-			src="%s"
-			style="object-position: %s"
-			data-object-fit="cover"
-			data-object-position="%s"
-		/>';
-
-		$image = sprintf(
-			$image_template,
-			esc_attr( get_the_post_thumbnail_caption() ),
-			esc_url( $current_featured_image ),
-			esc_attr( $object_position ),
-			esc_attr( $object_position )
+		$attr = array(
+			"class"                => "wp-block-cover__image-background",
+			"style"                => "object-position: " . $object_position,
+			"data-object-fit"      => "cover",
+			"data-object-position" => $object_position,
 		);
+
+		$image = get_the_post_thumbnail( null, 'post-thumbnail', $attr );
 
 		$content = str_replace(
 			'</span><div',
@@ -66,7 +46,19 @@ function render_block_core_cover( $attributes, $content ) {
 			$content
 		);
 
+	} else {
+		if ( in_the_loop() ) {
+			update_post_thumbnail_cache();
+		}
+		$current_featured_image = get_the_post_thumbnail_url();
+		$content                = preg_replace(
+			'/class=\".*?\"/',
+			'${0} style="background-image:url(' . esc_url( $current_featured_image ) . ')"',
+			$content,
+			1
+		);
 	}
+
 
 	return $content;
 }
