@@ -80,6 +80,8 @@ export class MediaUpload extends Component {
 	}
 
 	getAllSources() {
+		const { onSelectURL } = this.props;
+		
 		const cameraImageSource = {
 			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
@@ -130,12 +132,14 @@ export class MediaUpload extends Component {
 			icon: globe,
 		};
 
+		// Only include `urlSource` option if `onSelectURL` prop is present
+		// (matches web behavior)
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
-			urlSource,
+			...onSelectURL ? [ urlSource]  : [],
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
