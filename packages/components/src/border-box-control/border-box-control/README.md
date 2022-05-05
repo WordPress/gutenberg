@@ -122,19 +122,19 @@ _Note: The will be `undefined` if a user clears all borders._
 
 - Required: Yes
 
-### `popoverClassNames`: `Object`
+### `popoversProps`: `Object`
 
-An object defining CSS classnames for all the inner `BorderControl` popover
-content.
+An object defining the `popoverProps` for all the inner `BorderControl`
+dropdowns.
 
 Example:
 ```js
 {
-	linked: 'linked-border-popover-content',
-	top: 'top-border-popover-content',
-	right: 'right-border-popover-content',
-	bottom: 'bottom-border-popover-content',
-	left: 'left-border-popover-content',
+	linked: { className: 'linked-border-popover-content' },
+	top: { className: 'top-border-popover-content' },
+	right: { className: 'right-border-popover-content' },
+	bottom: { className: 'bottom-border-popover-content' },
+	left: { className: 'left-border-popover-content' },
 }
 ```
 

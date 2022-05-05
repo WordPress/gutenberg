@@ -113,10 +113,10 @@ _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
 
-### `popoverContentClassName`: `string`
+### `popoverProps`: `Object`
 
-A custom CSS class name to be assigned to the `BorderControl`'s dropdown
-popover content.
+Properties of the `popoverProps` object will be passed as props to the border
+control's dropdown popover.
 
 - Required: No
 
