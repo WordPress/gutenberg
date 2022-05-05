@@ -33,7 +33,7 @@ function render_block_core_comments_title( $attributes ) {
 		return;
 	}
 
-	if ( $show_comments_count && ! empty( $comments_count ) ) {
+	if ( $show_comments_count ) {
 		if ( $show_post_title ) {
 			if ( '1' === $comments_count ) {
 				/* translators: %s: Post title. */
