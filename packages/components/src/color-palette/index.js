@@ -36,12 +36,12 @@ function SinglePalette( {
 	actions,
 } ) {
 	const colorOptions = useMemo( () => {
-		return map( colors, ( { color, name } ) => {
+		return map( colors, ( { color, name }, index ) => {
 			const colordColor = colord( color );
 
 			return (
 				<CircularOptionPicker.Option
-					key={ color }
+					key={ color + index }
 					isSelected={ value === color }
 					selectedIconProps={
 						value === color
