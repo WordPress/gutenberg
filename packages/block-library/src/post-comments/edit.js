@@ -53,7 +53,7 @@ export default function PostCommentsEdit( {
 	);
 
 	let warning = __(
-		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
+		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments" block.'
 	);
 	let showPlaceholder = true;
 

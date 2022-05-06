@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	category as categoryIcon,
 	page as pageIcon,
-	postTitle as postIcon,
+	postContent as postIcon,
 	tag as tagIcon,
 } from '@wordpress/icons';
 

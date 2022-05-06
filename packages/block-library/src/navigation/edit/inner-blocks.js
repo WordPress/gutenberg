@@ -5,7 +5,6 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
 	InnerBlocks,
-	__experimentalBlockContentOverlay as BlockContentOverlay,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -140,11 +139,5 @@ export default function NavigationInnerBlocks( {
 		}
 	);
 
-	return (
-		<BlockContentOverlay
-			clientId={ clientId }
-			tagName={ 'div' }
-			wrapperProps={ innerBlocksProps }
-		/>
-	);
+	return <div { ...innerBlocksProps } />;
 }

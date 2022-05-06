@@ -6,6 +6,29 @@
  */
 
 /**
+ * Loop through recursively to find blocks that use featured images.
+ *
+ * @param WP_Block_List $inner_blocks Inner block instance.
+ *
+ * @return bool
+ */
+function block_core_post_template_uses_feature_image( $inner_blocks ) {
+	foreach ( $inner_blocks as $block ) {
+		if ( 'core/post-featured-image' === $block->name ) {
+			return true;
+		}
+		if ( 'core/cover' === $block->name && $block->attributes && isset( $block->attributes['useFeaturedImage'] ) && $block->attributes['useFeaturedImage'] ) {
+			return true;
+		}
+		if ( $block->inner_blocks && block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Renders the `core/post-template` block on the server.
  *
  * @param array    $attributes Block attributes.
@@ -38,6 +61,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 	if ( ! $query->have_posts() ) {
 		return '';
+	}
+
+	if ( block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
+		update_post_thumbnail_cache( $query );
 	}
 
 	$classnames = '';

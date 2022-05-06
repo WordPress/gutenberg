@@ -1,15 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, insertBlock } from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-describe( 'Paragraph', () => {
-	beforeEach( async () => {
-		await createNewPost();
+test.describe( 'Paragraph', () => {
+	test.beforeEach( async ( { pageUtils } ) => {
+		await pageUtils.createNewPost();
 	} );
 
-	it( 'should output unwrapped editable paragraph', async () => {
-		await insertBlock( 'Paragraph' );
+	test( 'should output unwrapped editable paragraph', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.insertBlock( {
+			name: 'core/paragraph',
+		} );
 		await page.keyboard.type( '1' );
 
 		const firstBlockTagName = await page.evaluate( () => {
