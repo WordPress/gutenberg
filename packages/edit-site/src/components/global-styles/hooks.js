@@ -182,6 +182,13 @@ export function getSupportedGlobalStylesPanels( name ) {
 	}
 
 	const supportKeys = [];
+
+	// TODO: In order to remove the block gap CSS variable from `STYLE_PROPERTY`, we need to update the logic here.
+	// Before landing this change, let's find a better place for this type of check so that it's a little more declarative?
+	if ( blockType?.supports?.spacing?.blockGap ) {
+		supportKeys.push( 'blockGap' );
+	}
+
 	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
 		if ( ! STYLE_PROPERTY[ styleName ].support ) {
 			return;
