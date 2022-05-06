@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy, uniqueId } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,6 +32,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -67,6 +68,7 @@ function getFeaturedImageDetails( post, size ) {
 }
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
+	const instanceId = useInstanceId( LatestPostsEdit );
 	const {
 		postsToShow,
 		order,
@@ -154,11 +156,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	let noticeId;
 	const showRedirectionPreventedNotice = ( event ) => {
 		event.preventDefault();
-		// Always remove previous warning if any to show one at a time
-		// and use a unique id to announce the message in screen readers
-		// in every click.
+		// Remove previous warning if any, to show one at a time per block.
 		removeNotice( noticeId );
-		noticeId = `block-library/core/latest-posts/redirection-prevented/${ uniqueId() }`;
+		noticeId = `block-library/core/latest-posts/redirection-prevented/${ instanceId }`;
 		createWarningNotice( __( 'Links are disabled in the editor.' ), {
 			id: noticeId,
 			type: 'snackbar',
