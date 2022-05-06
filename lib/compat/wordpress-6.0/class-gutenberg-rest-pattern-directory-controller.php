@@ -59,7 +59,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 
 		$transient_key = $this->get_transient_key( $query_args );
 
-		/*
+		/**
 		 * Use network-wide transient to improve performance. The locale is the only site
 		 * configuration that affects the response, and it's included in the transient key.
 		 */
@@ -126,7 +126,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 		return new WP_REST_Response( $response );
 	}
 
-	/*
+	/**
 	 * Include a hash of the query args, so that different requests are stored in
 	 * separate caches.
 	 *
