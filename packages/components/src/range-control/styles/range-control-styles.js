@@ -141,7 +141,7 @@ export const Mark = styled.span`
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
-	top: -4px;
+	top: -7px;
 	width: 1px;
 
 	${ markFill };
