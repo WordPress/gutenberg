@@ -415,7 +415,7 @@ describe( 'Type annotations', () => {
 			).toBe( 'string[]' );
 		} );
 
-		it( 'should lean on `getDependants` if `selector` in `createSelector` is missing args', () => {
+		it( 'should infer arguments from `getDependants` if it more completely specifies them than `selector` does', () => {
 			const { tokens } = engine(
 				'test.ts',
 				`/**
@@ -436,7 +436,7 @@ describe( 'Type annotations', () => {
 			).toBe( 'State' );
 		} );
 
-		it( 'should ignore `getDependants` if `selector` in `createSelector` has more arguments', () => {
+		it( 'should _only_ infer from `getDependants` if it more completely specifies them than `selector` does', () => {
 			const { tokens } = engine(
 				'test.ts',
 				`/**
@@ -460,7 +460,7 @@ describe( 'Type annotations', () => {
 			).toBe( 'State' );
 		} );
 
-		it( 'should ignore `getDependants` if everything in `createSelector` ignores `state`', () => {
+		it( 'should acknowledge when the `selector` and `getDependants` are both argument-free', () => {
 			expect( () =>
 				engine(
 					'test.ts',
