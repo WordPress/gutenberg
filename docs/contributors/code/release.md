@@ -204,7 +204,7 @@ There is also an option to perform [Standalone Bugfix Package Releases](#standal
 
 ### Synchronizing Gutenberg Plugin
 
-For each Gutenberg plugin release, we also publish to npm an updated version of WordPress packages. This is automated with the [Release Tool](#release-tool) that handles releases for the Gutenberg plugin.
+For each Gutenberg plugin release, we also publish to npm an updated version of WordPress packages. This is automated with the [Release Tool](#release-tool) that handles releases for the Gutenberg plugin. A successful RC1 release triggers the npm publishing job, and this needs to be approved by the Gutenberg core team member who is part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress).
 
 We deliberately update the `wp/latest` branch within the Gutenberg repo with the content from the Gutenberg release `release/*` (example `release/12.7`) branch at the time of the Gutenberg RC1 release. This is done to ensure that the `wp/latest` branch is as close as possible to the latest version of the Gutenberg plugin. It also practically removes the chances of conflicts while backporting to `trunk` commits with updates applied during publishing to `package.json` and `CHANGELOG.md` files. In the past, we had many issues in that aspect when doing npm publishing after the regular Gutenberg release a week later. When publishing the new package versions to npm, we pick at least the `minor` version bump to account for future bugfix or security releases.
 
