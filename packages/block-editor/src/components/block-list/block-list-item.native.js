@@ -121,6 +121,7 @@ export class BlockListItem extends Component {
 			blockWidth,
 			...restProps
 		} = this.props;
+
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
@@ -162,25 +163,20 @@ export class BlockListItem extends Component {
 	}
 
 	render() {
-		const {
-			gridProperties,
-			clientId,
-			parentWidth,
-			items,
-			blockWidth,
-		} = this.props;
+		const { parentWidth, blockWidth, isGridItem } = this.props;
 
 		if ( ! blockWidth ) {
 			return null;
 		}
 
-		if ( gridProperties ) {
+		if ( isGridItem ) {
+			const { numOfColumns, tileCount, tileIndex } = this.props;
 			return (
 				<Grid
-					numOfColumns={ gridProperties.numColumns }
-					tileCount={ items.length }
-					index={ items.indexOf( clientId ) }
 					maxWidth={ parentWidth }
+					numOfColumns={ numOfColumns }
+					tileCount={ tileCount }
+					index={ tileIndex }
 				>
 					{ this.renderContent() }
 				</Grid>

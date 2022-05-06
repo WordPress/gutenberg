@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	store as coreStore,
-	__experimentalUseEntityRecords as useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData

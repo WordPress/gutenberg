@@ -12,7 +12,10 @@ import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	__experimentalUseDisabled as useIsDisabled,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
@@ -50,14 +53,18 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props                    Optional. Props to pass to the element. Must contain
- *                                           the ref if one is defined.
- * @param {Object}  options                  Options for internal use only.
+ * @param {Object}  props                        Optional. Props to pass to the element. Must contain
+ *                                               the ref if one is defined.
+ * @param {Object}  options                      Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
+ * @param {boolean} options.__unstableIsDisabled Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps(
+	props = {},
+	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
+) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
@@ -125,6 +132,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		useIsDisabled( { isDisabled: ! __unstableIsDisabled } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();

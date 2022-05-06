@@ -3,9 +3,7 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function CommentsQueryLoopSave( {
-	attributes: { tagName: Tag },
-} ) {
+export default function CommentsSave( { attributes: { tagName: Tag } } ) {
 	return (
 		<Tag { ...useBlockProps.save() }>
 			<InnerBlocks.Content />

@@ -8,13 +8,19 @@
 	"keywords": [ "document outline", "summary" ],
 	"textdomain": "default",
 	"attributes": {
+		"headings": {
+			"type": "array",
+			"items": {
+				"type": "object"
+			}
+		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
 			"default": false
 		}
 	},
-	"usesContext": [ "postId" ],
 	"supports": {
 		"html": false
-	}
+	},
+	"example": {}
 }

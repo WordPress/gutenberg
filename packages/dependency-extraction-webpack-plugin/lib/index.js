@@ -106,7 +106,7 @@ class DependencyExtractionWebpackPlugin {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
 				JSON.parse( JSON.stringify( asset ) )
-			) };`;
+			) };\n`;
 		}
 
 		return JSON.stringify( asset );
@@ -219,7 +219,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
+					contentHash: createHash( 'sha512' )
 						.update( assetString )
 						.digest( 'hex' ),
 				}
@@ -238,7 +238,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
+					contentHash: createHash( 'sha512' )
 						.update( assetString )
 						.digest( 'hex' ),
 				} );

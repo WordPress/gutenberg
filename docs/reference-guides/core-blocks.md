@@ -170,6 +170,15 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
+## Comments
+
+An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
+
+-	**Name:** core/comments-query-loop
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
+-	**Attributes:** tagName
+
 ## Comments Pagination
 
 Displays a paginated navigation to next/previous set of comments, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination))
@@ -206,15 +215,6 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
-## Comments Query Loop
-
-An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
-
--	**Name:** core/comments-query-loop
--	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
-
 ## Comments Title
 
 Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
@@ -222,7 +222,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 -	**Name:** core/comments-title
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** level, multipleCommentsLabel, showCommentsCount, showPostTitle, singleCommentLabel, textAlign
+-	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
@@ -478,7 +478,7 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Post Comment (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
 -	**Category:** theme
@@ -487,7 +487,7 @@ This block is deprecated. Please use the Comments Query Loop block instead. ([So
 
 ## Post Comments (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
@@ -798,7 +798,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** core/table-of-contents
 -	**Category:** layout
 -	**Supports:** ~~html~~
--	**Attributes:** onlyIncludeCurrentPage
+-	**Attributes:** headings, onlyIncludeCurrentPage
 
 ## Tag Cloud
 

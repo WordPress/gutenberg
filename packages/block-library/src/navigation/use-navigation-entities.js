@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * @typedef {Object} NavigationEntitiesData

@@ -32,6 +32,7 @@ import * as classic from './freeform';
 import * as code from './code';
 import * as column from './column';
 import * as columns from './columns';
+import * as comments from './comments';
 import * as commentAuthorAvatar from './comment-author-avatar';
 import * as commentAuthorName from './comment-author-name';
 import * as commentContent from './comment-content';
@@ -40,7 +41,6 @@ import * as commentEditLink from './comment-edit-link';
 import * as commentReplyLink from './comment-reply-link';
 import * as commentTemplate from './comment-template';
 import * as commentsPaginationPrevious from './comments-pagination-previous';
-import * as commentsQueryLoop from './comments-query-loop';
 import * as commentsPagination from './comments-pagination';
 import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
@@ -108,6 +108,7 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as table from './table';
+import * as tableOfContents from './table-of-contents';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
@@ -181,7 +182,6 @@ const getAllBlocks = () => [
 	socialLinks,
 	spacer,
 	table,
-	// tableOfContents,
 	tagCloud,
 	textColumns,
 	verse,
@@ -216,6 +216,7 @@ const getAllBlocks = () => [
 	queryPaginationPrevious,
 	queryNoResults,
 	readMore,
+	comments,
 	commentAuthorName,
 	commentContent,
 	commentDate,
@@ -223,14 +224,13 @@ const getAllBlocks = () => [
 	commentReplyLink,
 	commentTemplate,
 	commentsTitle,
-	commentsQueryLoop,
 	commentsPagination,
 	commentsPaginationNext,
 	commentsPaginationNumbers,
 	commentsPaginationPrevious,
-
 	postComments,
 	postCommentsForm,
+	tableOfContents,
 	homeLink,
 	logInOut,
 	termDescription,
