@@ -20,14 +20,14 @@ function render_block_core_cover( $attributes, $content ) {
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
-			"class"           => "wp-block-cover__image-background",
-			"data-object-fit" => "cover",
+			'class'           => 'wp-block-cover__image-background',
+			'data-object-fit' => 'cover',
 		);
 
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$object_position              = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
-			$attr["data-object-position"] = $object_position;
-			$attr["style"]                = "object-position: " . $object_position;
+			$attr['data-object-position'] = $object_position;
+			$attr['style']                = 'object-position: ' . $object_position;
 		}
 
 		$image = get_the_post_thumbnail( null, 'post-thumbnail', $attr );
