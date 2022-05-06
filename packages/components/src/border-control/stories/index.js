@@ -18,6 +18,11 @@ import Popover from '../../popover';
 export default {
 	title: 'Components (Experimental)/BorderControl',
 	component: BorderControl,
+	argTypes: {
+		__experimentalSide: {
+			options: [ undefined, 'all', 'left', 'top', 'right', 'bottom' ],
+		},
+	},
 };
 
 // Available border colors.
@@ -111,6 +116,7 @@ Default.args = {
 	withSlider: true,
 	__experimentalIsRenderedInSidebar: false,
 	__experimentalHasMultipleOrigins: false,
+	__experimentalSide: undefined,
 };
 
 const WrapperView = styled.div`
