@@ -136,7 +136,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 	 * @link https://stackoverflow.com/questions/3665247/fastest-hash-for-non-cryptographic-uses
 	 *
 	 * @since 6.0.0
-	 * @todo This should be removed when the minimum required WP version is >= 6.0.
+	 * @todo This should be removed when the minimum required WordPress version is >= 6.0.
 	 *
 	 * @param array $query_args Query arguments to generate a transient key from.
 	 * @return string Transient key.
