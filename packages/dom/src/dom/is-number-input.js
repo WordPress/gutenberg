@@ -14,9 +14,5 @@ import isHTMLInputElement from './is-html-input-element';
  */
 export default function isNumberInput( node ) {
 	/* eslint-enable jsdoc/valid-types */
-	return (
-		isHTMLInputElement( node ) &&
-		node.type === 'number' &&
-		!! node.valueAsNumber
-	);
+	return isHTMLInputElement( node ) && node.type === 'number';
 }
