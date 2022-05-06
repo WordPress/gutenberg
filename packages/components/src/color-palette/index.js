@@ -152,17 +152,19 @@ const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
-export default function ColorPalette( {
-	clearable = true,
-	className,
-	colors,
-	disableCustomColors = false,
-	enableAlpha,
-	onChange,
-	value,
-	__experimentalHasMultipleOrigins = false,
-	__experimentalIsRenderedInSidebar = false,
-} ) {
+export default function ColorPalette( props ) {
+	const {
+		clearable = true,
+		className,
+		colors,
+		disableCustomColors = false,
+		enableAlpha,
+		onChange,
+		value,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
+	} = props;
+
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const showMultiplePalettes =
 		__experimentalHasMultipleOrigins && colors?.length;
