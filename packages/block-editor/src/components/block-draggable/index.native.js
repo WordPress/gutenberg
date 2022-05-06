@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { AccessibilityInfo } from 'react-native';
 import Animated, {
 	runOnJS,
 	runOnUI,
@@ -263,6 +264,9 @@ const BlockDraggableWrapper = ( { children } ) => {
 const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	const wasBeingDragged = useRef( false );
 	const [ isEditingText, setIsEditingText ] = useState( false );
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
+	);
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),
@@ -325,16 +329,35 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	}, [] );
 
 	useEffect( () => {
+		let mounted = true;
+
 		const isAnyAztecInputFocused = RCTAztecView.InputState.isFocused();
 		if ( isAnyAztecInputFocused ) {
 			setIsEditingText( isAnyAztecInputFocused );
 		}
 
 		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
+
+		const screenReaderChangedListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			setIsScreenReaderEnabled
+		);
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
 		return () => {
+			mounted = false;
+
 			RCTAztecView.InputState.removeFocusChangeListener(
 				onFocusChangeAztec
 			);
+
+			screenReaderChangedListener.remove();
 		};
 	}, [] );
 
@@ -353,7 +376,10 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 		styles[ 'draggable-wrapper__container' ],
 	];
 
-	const canDragBlock = enabled && ( ! isBlockSelected || ! isEditingText );
+	const canDragBlock =
+		enabled &&
+		! isScreenReaderEnabled &&
+		( ! isBlockSelected || ! isEditingText );
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
