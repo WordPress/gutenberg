@@ -4,7 +4,7 @@ This Repository is used to perform several types of releases. This document serv
 
 To release a stable version of the Gutenberg plugin you need to be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams). On top of that, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
-To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
+To [release Gutenberg's npm packages](#packages-releases-to-npm-and-wordpress-core-updates), you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
 ## Plugin Releases
 
