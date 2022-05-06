@@ -7,12 +7,26 @@ import { get, kebabCase, upperFirst } from 'lodash';
  * Internal dependencies
  */
 import type { GeneratedCSSRule, Style, Box, StyleOptions } from '../types';
+import {
+	VARIABLE_REFERENCE_PREFIX,
+	VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE,
+} from './constants';
 
+/**
+ * Returns a JSON representation of the generated CSS rules.
+ *
+ * @param  style   Style object.
+ * @param  options Options object with settings to adjust how the styles are generated.
+ * @param  path    An array of strings representing the path to the style value in the style object.
+ * @param  ruleKey A CSS property key.
+ *
+ * @return GeneratedCSSRule[] CSS rules.
+ */
 export function generateRule(
 	style: Style,
+	options: StyleOptions,
 	path: string[],
-	cssProperty: string,
-	options: StyleOptions
+	ruleKey: string
 ) {
 	const styleValue: string | undefined = get( style, path );
 
@@ -20,13 +34,23 @@ export function generateRule(
 		? [
 				{
 					selector: options?.selector,
-					key: cssProperty,
+					key: ruleKey,
 					value: styleValue,
 				},
 		  ]
 		: [];
 }
 
+/**
+ * Returns a JSON representation of the generated CSS rules taking into account box model properties, top, right, bottom, left.
+ *
+ * @param  style   Style object.
+ * @param  options Options object with settings to adjust how the styles are generated.
+ * @param  path    An array of strings representing the path to the style value in the style object.
+ * @param  ruleKey A CSS property key.
+ *
+ * @return GeneratedCSSRule[] CSS rules.
+ */
 export function generateBoxRules(
 	style: Style,
 	options: StyleOptions,
@@ -66,6 +90,14 @@ export function generateBoxRules(
 	return rules;
 }
 
+/**
+ * Returns a slug from a style value following the pattern `var:preset|styleContext|slug`.
+ *
+ * @param  styleValue   A raw style value.
+ * @param  styleContext A style context to parse
+ *
+ * @return generated styles.
+ */
 export function getSlugFromPreset(
 	styleValue: string | number | undefined,
 	styleContext: string
@@ -74,7 +106,9 @@ export function getSlugFromPreset(
 		return null;
 	}
 
-	const presetValues = styleValue.split( `var:preset|${ styleContext }|` );
+	const presetValues = styleValue.split(
+		`${ VARIABLE_REFERENCE_PREFIX }preset${ VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE }${ styleContext }${ VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE }`
+	);
 
 	return presetValues[ 1 ] ? kebabCase( presetValues[ 1 ] ) : null;
 }

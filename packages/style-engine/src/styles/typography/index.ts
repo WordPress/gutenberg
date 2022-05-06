@@ -9,9 +9,9 @@ const fontSize = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'fontSize' ],
-			'fontSize',
-			options
+			'fontSize'
 		);
 	},
 };
@@ -21,9 +21,9 @@ const fontWeight = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'fontWeight' ],
-			'fontWeight',
-			options
+			'fontWeight'
 		);
 	},
 };
@@ -33,9 +33,9 @@ const letterSpacing = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'letterSpacing' ],
-			'letterSpacing',
-			options
+			'letterSpacing'
 		);
 	},
 };
@@ -45,9 +45,9 @@ const lineHeight = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'lineHeight' ],
-			'lineHeight',
-			options
+			'lineHeight'
 		);
 	},
 };
@@ -57,9 +57,9 @@ const textDecoration = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'textDecoration' ],
-			'textDecoration',
-			options
+			'textDecoration'
 		);
 	},
 };
@@ -69,9 +69,9 @@ const textTransform = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'typography', 'textTransform' ],
-			'textTransform',
-			options
+			'textTransform'
 		);
 	},
 };

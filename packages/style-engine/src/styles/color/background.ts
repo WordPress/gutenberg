@@ -9,9 +9,9 @@ const background = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'color', 'background' ],
-			'backgroundColor',
-			options
+			'backgroundColor'
 		);
 	},
 	getClassNames: ( style: Style ) => {

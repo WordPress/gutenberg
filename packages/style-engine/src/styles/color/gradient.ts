@@ -9,9 +9,9 @@ const gradient = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
+			options,
 			[ 'color', 'gradient' ],
-			'background',
-			options
+			'background'
 		);
 	},
 	getClassNames: ( style: Style ) => {

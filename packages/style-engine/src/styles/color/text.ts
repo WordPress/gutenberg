@@ -7,7 +7,7 @@ import { generateRule, getSlugFromPreset } from '../utils';
 const text = {
 	name: 'text',
 	generate: ( style: Style, options: StyleOptions ) => {
-		return generateRule( style, [ 'color', 'text' ], 'color', options );
+		return generateRule( style, options, [ 'color', 'text' ], 'color' );
 	},
 	getClassNames: ( style: Style ) => {
 		const classNames = [];
