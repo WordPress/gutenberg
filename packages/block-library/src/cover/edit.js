@@ -343,8 +343,13 @@ function CoverEdit( {
 
 	const toggleUseFeaturedImage = () => {
 		setAttributes( {
+			id: undefined,
+			url: undefined,
 			useFeaturedImage: ! useFeaturedImage,
 			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: useFeaturedImage
+				? IMAGE_BACKGROUND_TYPE
+				: undefined,
 		} );
 	};
 
