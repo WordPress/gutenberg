@@ -7,7 +7,6 @@
  */
 
 class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
-
 	function test_get_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -402,7 +401,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body { margin: 0; }body{--wp--style--block-gap: 1em;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }';
+		$expected = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: 1em; }body { --wp--style--block-gap: 1em; }';
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
@@ -528,7 +527,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variables = 'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
-		$styles    = 'body { margin: 0; }body{color: var(--wp--preset--color--grey);}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}';
+		$styles    = 'body { margin: 0; }body{color: var(--wp--preset--color--grey);}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: 0.5em; }body { --wp--style--block-gap: 0.5em; }a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}';
 		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-small-font-family{font-family: var(--wp--preset--font-family--small) !important;}.has-big-font-family{font-family: var(--wp--preset--font-family--big) !important;}';
 		$all       = $variables . $styles . $presets;
 		$this->assertEquals( $all, $theme_json->get_stylesheet() );
@@ -685,6 +684,218 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider data_get_layout_definitions
+	 *
+	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
+	 */
+	public function test_get_stylesheet_generates_layout_styles( $layout_definitions ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'layout'  => array(
+						'definitions' => $layout_definitions,
+					),
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+				),
+			),
+			'default'
+		);
+
+		// Results also include root site blocks styles.
+		$this->assertEquals(
+			'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: 1em; }body { --wp--style--block-gap: 1em; }body .is-layout-flow > *{margin-block-start: 0;margin-block-end: 0;}body .is-layout-flow > * + *{margin-block-start: 1em;margin-block-end: 0;}body .is-layout-flex{gap: 1em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;flex-wrap: wrap;align-items: center;}',
+			$theme_json->get_stylesheet( array( 'styles' ) )
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_layout_definitions
+	 *
+	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
+	 */
+	public function test_get_stylesheet_generates_fallback_gap_layout_styles( $layout_definitions ) {
+		add_theme_support( 'wp-block-styles' );
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'layout'  => array(
+						'definitions' => $layout_definitions,
+					),
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+				'styles'   => array(
+					'spacing' => array(
+						'blockGap' => '1em',
+					),
+				),
+			),
+			'default'
+		);
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
+		remove_theme_support( 'wp-block-styles' );
+
+		// Results also include root site blocks styles.
+		$this->assertEquals(
+			'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }body .is-layout-flex{gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;flex-wrap: wrap;align-items: center;}',
+			$stylesheet
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_layout_definitions
+	 *
+	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
+	 */
+	public function test_get_stylesheet_generates_base_fallback_gap_layout_styles( $layout_definitions ) {
+		add_theme_support( 'wp-block-styles' );
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'layout'  => array(
+						'definitions' => $layout_definitions,
+					),
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+			),
+			'default'
+		);
+		$stylesheet = $theme_json->get_stylesheet( array( 'base-layout-styles' ) );
+		remove_theme_support( 'wp-block-styles' );
+
+		// Note the `base-layout-styles` includes a fallback gap for the Columns block for backwards compatibility.
+		$this->assertEquals(
+			'body .is-layout-flex{gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;flex-wrap: wrap;align-items: center;}.wp-block-columns.is-layout-flex{gap: 2em;}',
+			$stylesheet
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_layout_definitions
+	 *
+	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
+	 */
+	public function test_get_stylesheet_generates_base_layout_styles_and_skips_layout_gap_styles( $layout_definitions ) {
+		remove_theme_support( 'wp-block-styles' );
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'layout'  => array(
+						'definitions' => $layout_definitions,
+					),
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+			),
+			'default'
+		);
+
+		// Results only include base layout styles such as alignment, and does not include gap values.
+		$this->assertEquals(
+			'body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;flex-wrap: wrap;align-items: center;}',
+			$theme_json->get_stylesheet( array( 'base-layout-styles' ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_layout_definitions() {
+		return array(
+			'layout definitions' => array(
+				array(
+					'default' => array(
+						'name'          => 'default',
+						'slug'          => 'flow',
+						'className'     => 'is-layout-flow',
+						'baseStyles'    => array(
+							array(
+								'selector' => ' > .alignleft',
+								'rules'    => array(
+									'float'               => 'left',
+									'margin-inline-start' => '0',
+									'margin-inline-end'   => '2em',
+								),
+							),
+							array(
+								'selector' => ' > .alignright',
+								'rules'    => array(
+									'float'               => 'right',
+									'margin-inline-start' => '2em',
+									'margin-inline-end'   => '0',
+								),
+							),
+							array(
+								'selector' => ' > .aligncenter',
+								'rules'    => array(
+									'margin-left'  => 'auto !important',
+									'margin-right' => 'auto !important',
+								),
+							),
+						),
+						'spacingStyles' => array(
+							array(
+								'selector' => ' > *',
+								'rules'    => array(
+									'margin-block-start' => '0',
+									'margin-block-end'   => '0',
+								),
+							),
+							array(
+								'selector' => ' > * + *',
+								'rules'    => array(
+									'margin-block-start' => null,
+									'margin-block-end'   => '0',
+								),
+							),
+						),
+					),
+					'flex'    => array(
+						'name'          => 'flex',
+						'slug'          => 'flex',
+						'className'     => 'is-layout-flex',
+						'baseStyles'    => array(
+							array(
+								'selector' => '',
+								'rules'    => array(
+									'display'     => 'flex',
+									'flex-wrap'   => 'wrap',
+									'align-items' => 'center',
+								),
+							),
+						),
+						'spacingStyles' => array(
+							array(
+								'selector' => '',
+								'rules'    => array(
+									'gap' => null,
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
 	function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -2557,7 +2768,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/group' => array(
 							'spacing' => array(
 								'margin'   => 'valid value',
-								'blockGap' => 'invalid value',
+								'blockGap' => 'valid value',
+								'invalid'  => 'invalid value',
 							),
 						),
 					),
@@ -2575,7 +2787,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'blocks'  => array(
 					'core/group' => array(
 						'spacing' => array(
-							'margin' => 'valid value',
+							'margin'   => 'valid value',
+							'blockGap' => 'valid value',
 						),
 					),
 				),

@@ -81,6 +81,18 @@ function gutenberg_get_block_editor_settings( $settings ) {
 				$block_classes['css'] = $actual_css;
 				$new_global_styles[]  = $block_classes;
 			}
+		} elseif ( current_theme_supports( 'wp-block-styles' ) ) {
+			// If there is no `theme.json` file, but the theme opts in to block styles, ensure base layout styles are available.
+			$block_classes = array(
+				'css'            => 'base-layout-styles',
+				'__unstableType' => 'theme',
+				'isGlobalStyles' => true,
+			);
+			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'] ) );
+			if ( '' !== $actual_css ) {
+				$block_classes['css'] = $actual_css;
+				$new_global_styles[]  = $block_classes;
+			}
 		}
 
 		$settings['styles'] = array_merge( $new_global_styles, $styles_without_existing_global_styles );
