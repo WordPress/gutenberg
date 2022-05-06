@@ -6,6 +6,10 @@
 
 -   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
 
+### New Features
+
+-   Add `useDisabled` hook.
+
 ## 5.6.0 (2022-05-04)
 
 ## 5.5.0 (2022-04-21)

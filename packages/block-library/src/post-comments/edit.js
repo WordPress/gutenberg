@@ -16,7 +16,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { useDisabled } from '@wordpress/compose';
 import { createInterpolateElement } from '@wordpress/element';
 
 /**
