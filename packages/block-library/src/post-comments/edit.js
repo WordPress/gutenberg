@@ -16,8 +16,9 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useDisabled } from '@wordpress/compose';
+import { createHigherOrderComponent, useDisabled } from '@wordpress/compose';
 import { createInterpolateElement } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -28,66 +29,22 @@ export default function PostCommentsEdit( {
 	attributes: { textAlign },
 	setAttributes,
 	context: { postType, postId },
+	showPlaceholder,
 } ) {
 	let [ postTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	postTitle = postTitle || __( 'Post Title' );
-
-	const [ commentStatus ] = useEntityProp(
-		'postType',
-		postType,
-		'comment_status',
-		postId
-	);
-
-	const { avatarURL, defaultCommentStatus } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
-	);
-
-	const isSiteEditor = postType === undefined || postId === undefined;
-
-	const postTypeSupportsComments = useSelect( ( select ) =>
-		postType
-			? !! select( coreStore ).getPostType( postType )?.supports.comments
-			: false
-	);
-
-	let warning = __(
-		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments" block.'
-	);
-	let showPlaceholder = true;
-
-	if ( ! isSiteEditor && 'open' !== commentStatus ) {
-		if ( 'closed' === commentStatus ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments block: Comments to this %s are not allowed.'
-				),
-				postType
-			);
-			showPlaceholder = false;
-		} else if ( ! postTypeSupportsComments ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments block: Comments for this post type (%s) are not enabled.'
-				),
-				postType
-			);
-			showPlaceholder = false;
-		} else if ( 'open' !== defaultCommentStatus ) {
-			warning = __( 'Post Comments block: Comments are not enabled.' );
-			showPlaceholder = false;
-		}
-	}
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	const { avatarURL } = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalDiscussionSettings
+	);
 
 	const disabledRef = useDisabled();
 
@@ -103,8 +60,6 @@ export default function PostCommentsEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				<Warning>{ warning }</Warning>
-
 				{ showPlaceholder && (
 					<div
 						className="wp-block-post-comments__placeholder"
@@ -245,3 +200,82 @@ export default function PostCommentsEdit( {
 		</>
 	);
 }
+
+export const withPostCommentsBlockDeprecationWarning = createHigherOrderComponent(
+	( BlockEdit ) => ( props, context ) => {
+		const { name } = props;
+
+		const { postType, postId } = context; // FIXME -- No block context available :(
+
+		const [ commentStatus ] = useEntityProp(
+			'postType',
+			postType,
+			'comment_status',
+			postId
+		);
+
+		const { defaultCommentStatus } = useSelect(
+			( select ) =>
+				select( blockEditorStore ).getSettings()
+					.__experimentalDiscussionSettings
+		);
+
+		const isSiteEditor = postType === undefined || postId === undefined;
+
+		const postTypeSupportsComments = useSelect( ( select ) =>
+			postType
+				? !! select( coreStore ).getPostType( postType )?.supports
+						.comments
+				: false
+		);
+
+		if ( name !== 'core/post-comments' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		let warning = __(
+			'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments" block.'
+		);
+		let showPlaceholder = true;
+
+		if ( ! isSiteEditor && 'open' !== commentStatus ) {
+			if ( 'closed' === commentStatus ) {
+				warning = sprintf(
+					/* translators: 1: Post type (i.e. "post", "page") */
+					__(
+						'Post Comments block: Comments to this %s are not allowed.'
+					),
+					postType
+				);
+				showPlaceholder = false;
+			} else if ( ! postTypeSupportsComments ) {
+				warning = sprintf(
+					/* translators: 1: Post type (i.e. "post", "page") */
+					__(
+						'Post Comments block: Comments for this post type (%s) are not enabled.'
+					),
+					postType
+				);
+				showPlaceholder = false;
+			} else if ( 'open' !== defaultCommentStatus ) {
+				warning = __(
+					'Post Comments block: Comments are not enabled.'
+				);
+				showPlaceholder = false;
+			}
+		}
+
+		return (
+			<>
+				<Warning>{ warning }</Warning>
+				<BlockEdit { ...props } showPlaceholder={ showPlaceholder } />
+			</>
+		);
+	}
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'core/post-comments/with-post-comments-block-deprecation-warning',
+	withPostCommentsBlockDeprecationWarning
+);
