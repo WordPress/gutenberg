@@ -260,8 +260,9 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<BlockDraggable
+							clientId={ clientId }
+							draggingClientId={ draggingClientId }
 							enabled={ draggingEnabled }
-							clientId={ draggingClientId }
 						>
 							{ () =>
 								isValid ? (
@@ -319,6 +320,7 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlockIndex,
+			getBlockCount,
 			getSettings,
 			isBlockSelected,
 			getBlock,
@@ -371,14 +373,17 @@ export default compose( [
 		const baseGlobalStyles = getSettings()
 			?.__experimentalGlobalStylesBaseStyles;
 
-		const topRootClientId = getBlockHierarchyRootClientId( clientId );
-		const isRootBlock = clientId === topRootClientId;
-		// For blocks with inner blocks, we only enable the dragging in the nested blocks. This way
-		// we prevent the long-press gesture from being disabled for elements within the block UI.
-		const draggingEnabled = ! isRootBlock || ! isInnerBlockSelected;
+		const hasInnerBlocks = getBlockCount( clientId ) > 0;
+		// For blocks with inner blocks, we only enable the dragging in the nested
+		// blocks if any of them are selected. This way we prevent the long-press
+		// gesture from being disabled for elements within the block UI.
+		const draggingEnabled =
+			! hasInnerBlocks ||
+			isSelected ||
+			! hasSelectedInnerBlock( clientId, true );
 		// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
 		// will be the top in the hierarchy.
-		const draggingClientId = topRootClientId;
+		const draggingClientId = getBlockHierarchyRootClientId( clientId );
 
 		return {
 			icon,
