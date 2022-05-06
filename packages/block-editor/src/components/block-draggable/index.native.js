@@ -262,9 +262,7 @@ const BlockDraggableWrapper = ( { children } ) => {
  */
 const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	const wasBeingDragged = useRef( false );
-	const [ isEditingText, setIsEditingText ] = useState(
-		RCTAztecView.InputState.isFocused()
-	);
+	const [ isEditingText, setIsEditingText ] = useState( false );
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),
@@ -327,6 +325,11 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 	}, [] );
 
 	useEffect( () => {
+		const isAnyAztecInputFocused = RCTAztecView.InputState.isFocused();
+		if ( isAnyAztecInputFocused ) {
+			setIsEditingText( isAnyAztecInputFocused );
+		}
+
 		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
 		return () => {
 			RCTAztecView.InputState.removeFocusChangeListener(

@@ -90,6 +90,7 @@ export const notifyInputChange = () => {
  */
 export const focus = ( element ) => {
 	TextInputState.focusTextInput( element );
+	notifyInputChange();
 };
 
 /**
@@ -99,6 +100,7 @@ export const focus = ( element ) => {
  */
 export const blur = ( element ) => {
 	TextInputState.blurTextInput( element );
+	notifyInputChange();
 };
 
 /**
