@@ -13,26 +13,19 @@
  * @return bool
  */
 function block_core_post_template_uses_feature_image( $inner_blocks ) {
-	$inner_blocks_array = iterator_to_array( $inner_blocks );
-	$has_thumbnail      = false;
-	foreach ( $inner_blocks_array as $block ) {
+	foreach ( $inner_blocks as $block ) {
 		if ( 'core/post-featured-image' === $block->name ) {
-			$has_thumbnail = true;
-			break;
+			return true;
 		}
 		if ( 'core/cover' === $block->name && $block->attributes && isset( $block->attributes['useFeaturedImage'] ) && $block->attributes['useFeaturedImage'] ) {
-			$has_thumbnail = true;
-			break;
+			return true;
 		}
-		if ( $block->inner_blocks ) {
-			if ( block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
-				$has_thumbnail = true;
-				break;
-			}
+		if ( $block->inner_blocks && block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
+			return true;
 		}
 	}
 
-	return $has_thumbnail;
+	return false;
 }
 
 /**
