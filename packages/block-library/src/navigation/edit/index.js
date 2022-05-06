@@ -354,7 +354,7 @@ function Navigation( {
 					! backgroundColor?.slug && backgroundColor?.color,
 			},
 		},
-		{ isDisabled: hasBlockOverlay }
+		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
 	const overlayClassnames = classnames( {

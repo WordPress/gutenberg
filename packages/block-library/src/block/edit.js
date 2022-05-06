@@ -69,7 +69,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
 				: 'block-library-block__reusable-block-container',
 		},
-		{ isDisabled: hasBlockOverlay }
+		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {

@@ -103,7 +103,7 @@ export default function TemplatePartEdit( {
 				? 'block-editor-block-content-overlay'
 				: undefined,
 		},
-		{ isDisabled: hasBlockOverlay }
+		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;

@@ -53,17 +53,17 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props                    Optional. Props to pass to the element. Must contain
- *                                           the ref if one is defined.
- * @param {Object}  options                  Options for internal use only.
+ * @param {Object}  props                        Optional. Props to pass to the element. Must contain
+ *                                               the ref if one is defined.
+ * @param {Object}  options                      Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
- * @param {boolean} options.isDisabled       Whether the block should be disabled.
+ * @param {boolean} options.__unstableIsDisabled Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps(
 	props = {},
-	{ __unstableIsHtml, isDisabled = false } = {}
+	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
 ) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
@@ -132,7 +132,7 @@ export function useBlockProps(
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		useIsDisabled( { isDisabled: ! isDisabled } ),
+		useIsDisabled( { isDisabled: ! __unstableIsDisabled } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
