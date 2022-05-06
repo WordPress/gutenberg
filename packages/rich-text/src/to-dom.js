@@ -73,28 +73,26 @@ function append( element, child ) {
 	return element.appendChild( child );
 }
 
-function appendText( node, text ) {
-	node.appendData( text );
-}
-
-function getLastChild( { lastChild } ) {
-	return lastChild;
-}
-
 function getParent( { parentNode } ) {
 	return parentNode;
 }
 
-function isText( node ) {
-	return node.nodeType === node.TEXT_NODE;
-}
+function createNewLine( node, multilineTagName ) {
+	const path = [];
 
-function getText( { nodeValue } ) {
-	return nodeValue;
-}
+	while ( node.tagName.toLowerCase() !== multilineTagName ) {
+		path.push( node );
+		node = node.parentNode;
+	}
 
-function remove( node ) {
-	return node.parentNode.removeChild( node );
+	let _pointer = node.parentNode.appendChild( node.cloneNode() );
+	let nodeToAppend;
+
+	while ( ( nodeToAppend = path.pop() ) ) {
+		_pointer = _pointer.appendChild( nodeToAppend.cloneNode() );
+	}
+
+	return _pointer;
 }
 
 export function toDom( {
@@ -132,21 +130,13 @@ export function toDom( {
 		multilineTag,
 		createEmpty,
 		append,
-		getLastChild,
 		getParent,
-		isText,
-		getText,
-		remove,
-		appendText,
-		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+		createNewLine,
+		onStartIndex( body, pointer, offset ) {
+			startPath = createPathToNode( pointer, body, offset );
 		},
-		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+		onEndIndex( body, pointer, offset ) {
+			endPath = createPathToNode( pointer, body, offset );
 		},
 		isEditableTree,
 		placeholder,
