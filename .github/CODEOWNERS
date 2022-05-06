@@ -20,6 +20,7 @@
 /packages/block-library/src/page-list           @tellthemachines
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments            @michalczaplinski
+/packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
 /lib/block-supports/duotone.php                       @ajlende
