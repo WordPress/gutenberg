@@ -702,7 +702,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
 				$block_rules .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
 				$block_rules .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
