@@ -12,6 +12,15 @@ import {
 /**
  * Internal dependencies
  */
+// When IS_GUTENBERG_PLUGIN is set to false, imports of experimental blocks
+// are transformed by packages/block-library/src/index.js as follows:
+//    import * as experimentalBlock from './experimental-block'
+// becomes
+//    const experimentalBlock = null;
+// This enables webpack to eliminate the experimental blocks code from the
+// production build to make the final bundle smaller.
+//
+// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -126,20 +135,6 @@ const registerBlock = ( block ) => {
  * Function to get all the block-library blocks in an array
  */
 const getAllBlocks = () => [
-	// This list contains both stable and experimental blocks.
-	// The experimental ones are wrapped in a conditional expression
-	// by the `packages/block-library/babel-plugin.js`.
-	//
-	// For example:
-	//    myExperimentalBlock,
-	// Becomes:
-	//    process.env.IS_GUTENBERG_PLUGIN === true ? myExperimentalBlock : void 0
-	//
-	// This enables storing both in the same list while ensuring the dead code
-	// elimination removes the experimental blocks code during the production build.
-	//
-	// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
-
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
 	paragraph,

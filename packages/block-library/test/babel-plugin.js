@@ -38,12 +38,12 @@ describe( 'babel-plugin', () => {
 	it( 'should transform experimental blocks', () => {
 		compare(
 			join(
-				'import * as experimentalBlock from "./experimental-block";',
+				'const experimentalBlock = null;',
 				'const blocks = [ experimentalBlock ];'
 			),
 			join(
-				'import * as experimentalBlock from "./experimental-block";',
-				'const blocks = [process.env.IS_GUTENBERG_PLUGIN === true ? experimentalBlock : void 0];'
+				'const experimentalBlock = null;',
+				'const blocks = [experimentalBlock];'
 			),
 			() => true
 		);
@@ -57,8 +57,8 @@ describe( 'babel-plugin', () => {
 			),
 			join(
 				'import * as stableBlock from "./stable-block";',
-				'import * as experimentalBlock from "./experimental-block";',
-				'const blocks = [stableBlock, process.env.IS_GUTENBERG_PLUGIN === true ? experimentalBlock : void 0];'
+				'const experimentalBlock = null;',
+				'const blocks = [stableBlock, experimentalBlock];'
 			),
 			( path ) =>
 				path.node.specifiers[ 0 ].local.name === 'experimentalBlock'

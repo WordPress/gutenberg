@@ -9,13 +9,13 @@ const fs = require( 'fs' );
 const isBlockMetadataExperimental = require( './src/is-block-metadata-experimental' );
 
 /**
- * Creates a babel plugin that wraps the references to experimental
- * blocks imported in BLOCK_LIBRARY_INDEX_PATH in conditional expressions.
+ * Creates a babel plugin that replaces experimental block imports with
+ * null variable declarations.
  *
  * For example:
- *     myExperimentalBlock,
+ *     import * as experimentalBlock from "./experimental-block";
  * On build becomes:
- *     process.env.IS_GUTENBERG_PLUGIN === true ? myExperimentalBlock : void 0
+ *     const experimentalBlock = null;
  *
  * This ensures the dead code elimination removes the experimental blocks modules
  * during the production build.
@@ -36,29 +36,15 @@ function createBabelPlugin( shouldProcessImport ) {
 	 * @return {import('@babel/core').PluginObj} Babel plugin object.
 	 */
 	return function babelPlugin( { types: t } ) {
-		const seen = Symbol();
-
-		const processEnvExpression = t.memberExpression(
-			t.identifier( 'process' ),
-			t.identifier( 'env' ),
-			false
-		);
-
-		const nodeEnvCheckExpression = t.binaryExpression(
-			'===',
-			t.memberExpression(
-				processEnvExpression,
-				t.identifier( 'IS_GUTENBERG_PLUGIN' ),
-				false
-			),
-			t.booleanLiteral( true )
-		);
+		// process.env.npm_package_config_IS_GUTENBERG_PLUGIN is a string, not a boolean
+		if (
+			String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) ===
+			'true'
+		) {
+			return {};
+		}
 
 		return {
-			pre() {
-				this.importedExperimentalBlocks = new Set();
-				this.transformedExperimentalBlocks = new Set();
-			},
 			visitor: {
 				ImportDeclaration( path ) {
 					// Only process the experimental blocks.
@@ -73,84 +59,15 @@ function createBabelPlugin( shouldProcessImport ) {
 					);
 					const { name } = namespaceSpecifier.local;
 
-					// Keep track of all the imported identifiers of the experimental blocks.
-					this.importedExperimentalBlocks.add( name );
-				},
-				Identifier( path ) {
-					const { node } = path;
-
-					// Ignore if it's already been processed.
-					if ( node[ seen ] ) {
-						return;
-					}
-
-					// Ignore if not used in an expression (but, say, a statement).
-					if ( ! path.isExpression( path.parent ) ) {
-						return;
-					}
-
-					// Ignore if it's not one of the experimental blocks identified in the ImportDeclaration visitor.
-					const names = Array.from( this.importedExperimentalBlocks );
-					const isExperimentalBlock =
-						names
-							.map( ( name ) => path.isIdentifier( { name } ) )
-							.filter( ( x ) => x ).length > 0;
-
-					if ( ! isExperimentalBlock ) {
-						return;
-					}
-
-					// Turns this code:
-					//
-					//    archives,
-					//
-					// Into this:
-					//
-					//    process.env.IS_GUTENBERG_PLUGIN === true ? archives : void 0;
-					//
-					// So that later, webpack can turn it into this:
-					//
-					//    true === true ? archives : void 0;
-					node[ seen ] = true;
 					path.replaceWith(
-						t.ifStatement(
-							nodeEnvCheckExpression,
-							t.blockStatement( [
-								t.expressionStatement( node ),
-							] )
-						)
+						t.variableDeclaration( 'const', [
+							t.variableDeclarator(
+								t.identifier( name ),
+								t.nullLiteral()
+							),
+						] )
 					);
-
-					// Keep track of all the transformations.
-					this.transformedExperimentalBlocks.add( node.name );
 				},
-			},
-
-			/**
-			 * After the build, confirm that all the imported experimental blocks were
-			 * indeed transformed by the visitor above.
-			 */
-			post() {
-				if (
-					! areSetsEqual(
-						this.importedExperimentalBlocks,
-						this.transformedExperimentalBlocks
-					)
-				) {
-					const importedAsString = Array.from(
-						this.importedExperimentalBlocks
-					).join( ', ' );
-					const transformedAsString = Array.from(
-						this.transformedExperimentalBlocks
-					).join( ', ' );
-					throw new Error(
-						'Some experimental blocks were not transformed' +
-							'.\n Imported:    ' + // Additional spaces to keep the outputs aligned in CLI.
-							importedAsString +
-							',\n Transformed: ' +
-							transformedAsString
-					);
-				}
 			},
 		};
 	};
@@ -227,18 +144,6 @@ function isImportDeclarationAnExperimentalBlock( path ) {
 	}
 
 	return true;
-}
-
-/**
- * @param {Set} set1 The first set.
- * @param {Set} set2 The second set.
- * @return {boolean} Whether the two sets contain the same data.
- */
-function areSetsEqual( set1, set2 ) {
-	return (
-		set1.size === set2.size &&
-		Array.from( set1 ).every( ( value ) => set2.has( value ) )
-	);
 }
 
 const babelPlugin = createBabelPlugin();
