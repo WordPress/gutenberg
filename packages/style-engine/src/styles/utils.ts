@@ -122,7 +122,10 @@ export function getSlugFromPreset(
  * @return string A CSS var value.
  */
 export function getCSSVarFromStyleValue( styleValue: string ): string {
-	if ( styleValue.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
+	if (
+		typeof styleValue === 'string' &&
+		styleValue.startsWith( VARIABLE_REFERENCE_PREFIX )
+	) {
 		const variable = styleValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
