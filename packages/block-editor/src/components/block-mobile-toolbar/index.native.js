@@ -34,7 +34,6 @@ const BlockMobileToolbar = ( {
 	blockWidth,
 	anchorNodeRef,
 	isFullWidth,
-	draggingEnabled,
 	draggingClientId,
 } ) => {
 	const [ fillsLength, setFillsLength ] = useState( null );
@@ -77,8 +76,8 @@ const BlockMobileToolbar = ( {
 			) }
 
 			<BlockDraggable
-				enabled={ draggingEnabled }
-				clientId={ draggingClientId }
+				clientId={ clientId }
+				draggingClientId={ draggingClientId }
 			>
 				{ () => <View style={ styles.spacer } /> }
 			</BlockDraggable>

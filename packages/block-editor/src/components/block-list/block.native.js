@@ -288,7 +288,6 @@ class BlockListBlock extends Component {
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={ isFullWidthToolbar }
-									draggingEnabled={ draggingEnabled }
 									draggingClientId={ draggingClientId }
 								/>
 							) }
