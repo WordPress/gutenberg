@@ -10,6 +10,7 @@ import type { GeneratedCSSRule, Style, Box, StyleOptions } from '../types';
 import {
 	VARIABLE_REFERENCE_PREFIX,
 	VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE,
+	VARIABLE_PATH_SEPARATOR_TOKEN_STYLE,
 } from './constants';
 
 /**
@@ -35,7 +36,7 @@ export function generateRule(
 				{
 					selector: options?.selector,
 					key: ruleKey,
-					value: styleValue,
+					value: getCSSVarFromStyleValue( styleValue ),
 				},
 		  ]
 		: [];
@@ -111,4 +112,22 @@ export function getSlugFromPreset(
 	);
 
 	return presetValues[ 1 ] ? kebabCase( presetValues[ 1 ] ) : null;
+}
+
+/**
+ * Returns a CSS var value from incoming style value following the pattern `var:description|context|slug`.
+ *
+ * @param  styleValue A raw style value.
+ *
+ * @return string A CSS var value.
+ */
+export function getCSSVarFromStyleValue( styleValue: string ): string {
+	if ( styleValue.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = styleValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return styleValue;
 }
