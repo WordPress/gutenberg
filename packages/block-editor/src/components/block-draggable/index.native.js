@@ -253,14 +253,20 @@ const BlockDraggableWrapper = ( { children } ) => {
  * This component serves for animating the block when it is being dragged.
  * Hence, it should be wrapped around the rendering of a block.
  *
- * @param {Object}      props           Component props.
- * @param {JSX.Element} props.children  Children to be rendered.
- * @param {string[]}    props.clientId  Client id of the block.
- * @param {boolean}     [props.enabled] Enables the draggable trigger.
+ * @param {Object}      props                    Component props.
+ * @param {JSX.Element} props.children           Children to be rendered.
+ * @param {string}      props.clientId           Client id of the block.
+ * @param {string}      [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
+ * @param {boolean}     [props.enabled]          Enables the draggable trigger.
  *
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
-const BlockDraggable = ( { clientId, children, enabled = true } ) => {
+const BlockDraggable = ( {
+	clientId,
+	children,
+	draggingClientId,
+	enabled = true,
+} ) => {
 	const wasBeingDragged = useRef( false );
 	const [ isEditingText, setIsEditingText ] = useState( false );
 
@@ -289,7 +295,6 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 				getTemplateLock,
 				isBlockBeingDragged,
 				getSelectedBlockClientId,
-				hasSelectedInnerBlock,
 			} = _select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
@@ -301,9 +306,7 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
 				isBlockSelected:
-					selectedBlockClientId &&
-					( selectedBlockClientId === clientId ||
-						hasSelectedInnerBlock( clientId, true ) ),
+					selectedBlockClientId && selectedBlockClientId === clientId,
 			};
 		},
 		[ clientId ]
@@ -361,7 +364,7 @@ const BlockDraggable = ( { clientId, children, enabled = true } ) => {
 
 	return (
 		<DraggableTrigger
-			id={ clientId }
+			id={ draggingClientId || clientId }
 			enabled={ enabled && canDragBlock }
 			minDuration={ Platform.select( {
 				// On iOS, using a lower min duration than the default
