@@ -217,26 +217,9 @@ export default function SearchEdit( {
 			: borderProps.style;
 
 		return (
-<<<<<<< HEAD
-			<input
-				type="search"
-				className={ textFieldClasses }
-				style={ textFieldStyles }
-				aria-label={ __( 'Optional placeholder text' ) }
-				// We hide the placeholder field's placeholder when there is a value. This
-				// stops screen readers from reading the placeholder field's placeholder
-				// which is confusing.
-				placeholder={
-					placeholder ? undefined : __( 'Optional placeholder…' )
-				}
-				value={ placeholder }
-				onChange={ ( event ) =>
-					setAttributes( { placeholder: event.target.value } )
-				}
-			/>
-=======
 			<>
 				<input
+					type="search"
 					className={ textFieldClasses }
 					style={ textFieldStyles }
 					aria-label={ __( 'Optional placeholder text' ) }
@@ -261,7 +244,6 @@ export default function SearchEdit( {
 						/>
 					) ) }
 			</>
->>>>>>> 1641205f40 (Add postType attribute to Search Block)
 		);
 	};
 
