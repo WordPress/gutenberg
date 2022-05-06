@@ -539,8 +539,8 @@ class WP_Theme_JSON_5_9 {
 			// individual block selector.
 			$block_selectors = explode( ',', static::$blocks_metadata[ $block_name ]['selector'] );
 			foreach ( static::ELEMENTS as $el_name => $el_selector ) {
-				// for elements defined under core/heading, selector should be h1 instead of h1 h1
-				if ("core/heading" === $block_name) {
+				// Avoid double selector (h1 h1) for elements inside heading block.
+				if ( 'core/heading' === $block_name && in_array( $el_selector, $block_selectors, true ) ) {
 					static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = $el_selector;
 					continue;
 				}
@@ -1394,18 +1394,18 @@ class WP_Theme_JSON_5_9 {
 				if ( isset( $selectors[ $name ]['selector'] ) ) {
 					$selector = $selectors[ $name ]['selector'];
 				}
-	
+
 				$duotone_selector = null;
 				if ( isset( $selectors[ $name ]['duotone'] ) ) {
 					$duotone_selector = $selectors[ $name ]['duotone'];
 				}
-	
+
 				$nodes[] = array(
 					'path'     => array( 'styles', 'blocks', $name ),
 					'selector' => $selector,
 					'duotone'  => $duotone_selector,
 				);
-	
+
 				if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
 					foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
 						$nodes[] = array(
@@ -1414,10 +1414,10 @@ class WP_Theme_JSON_5_9 {
 						);
 					}
 				}
-			}	
+			}
 		}
 
-		// Elements
+		// Elements.
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
 				$nodes[] = array(
