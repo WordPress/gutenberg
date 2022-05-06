@@ -140,8 +140,17 @@ export default function PostCommentsEdit( {
 												loading="lazy"
 											/>
 											{ createInterpolateElement(
-												__(
-													'<b><a>A WordPress Commenter</a></b> <span>says:</span>'
+												sprintf(
+													/* translators: %s: Comment author link. */
+													__(
+														'%s <span>says:</span>'
+													),
+													sprintf(
+														'<cite><a>%s</a></cite>',
+														__(
+															'A WordPress Commenter'
+														)
+													)
 												),
 												{
 													span: (
@@ -155,7 +164,9 @@ export default function PostCommentsEdit( {
 														/>
 														/* eslint-enable jsx-a11y/anchor-has-content */
 													),
-													b: <b className="fn" />,
+													cite: (
+														<cite className="fn" />
+													),
 												}
 											) }
 										</div>
@@ -205,8 +216,10 @@ export default function PostCommentsEdit( {
 										<a
 											className="comment-reply-link"
 											href="#top"
-											aria-label={ __(
-												'Reply to A WordPress Commenter'
+											aria-label={ sprintf(
+												/* translators: Comment reply button text. %s: Comment author name. */
+												__( 'Reply to %s' ),
+												__( 'A WordPress Commenter' )
 											) }
 										>
 											{ __( 'Reply' ) }
