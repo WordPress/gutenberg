@@ -13,7 +13,7 @@ function join( ...strings ) {
 }
 
 function compare( input, output, isExperimental, options = {} ) {
-	const blockLibraryPlugin = createBabelPlugin( isExperimental );
+	const blockLibraryPlugin = createBabelPlugin( isExperimental, false );
 	const { code } = transform( input, {
 		configFile: false,
 		plugins: [ [ blockLibraryPlugin, options ] ],
@@ -38,7 +38,7 @@ describe( 'babel-plugin', () => {
 	it( 'should transform experimental blocks', () => {
 		compare(
 			join(
-				'const experimentalBlock = null;',
+				'import * as experimentalBlock from "./experimental-block";',
 				'const blocks = [ experimentalBlock ];'
 			),
 			join(

@@ -23,10 +23,17 @@ const isBlockMetadataExperimental = require( './src/is-block-metadata-experiment
  * For more context, see https://github.com/WordPress/gutenberg/pull/40655/
  *
  * @param {Function} shouldProcessImport Optional callback to decide whether a given import should be processed.
+ * @param {boolean}  isGutenbergPlugin   Whether to run the plugin.
  */
-function createBabelPlugin( shouldProcessImport ) {
+function createBabelPlugin( shouldProcessImport, isGutenbergPlugin ) {
 	if ( ! shouldProcessImport ) {
 		shouldProcessImport = isImportDeclarationAnExperimentalBlock;
+	}
+	if ( isGutenbergPlugin === undefined ) {
+		// process.env.npm_package_config_IS_GUTENBERG_PLUGIN is a string, not a boolean
+		isGutenbergPlugin =
+			String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) ===
+			'true';
 	}
 	/**
 	 * The babel plugin created by createBabelPlugin.
@@ -36,11 +43,7 @@ function createBabelPlugin( shouldProcessImport ) {
 	 * @return {import('@babel/core').PluginObj} Babel plugin object.
 	 */
 	return function babelPlugin( { types: t } ) {
-		// process.env.npm_package_config_IS_GUTENBERG_PLUGIN is a string, not a boolean
-		if (
-			String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) ===
-			'true'
-		) {
+		if ( isGutenbergPlugin ) {
 			return {};
 		}
 
