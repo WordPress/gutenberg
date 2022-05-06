@@ -41,7 +41,6 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
-	PlainText,
 	store as blockEditorStore,
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
@@ -55,10 +54,10 @@ import {
 	replace,
 	fullscreen,
 	textColor,
-	warning,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '@wordpress/edit-post';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -187,7 +186,6 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			isCaptionSelected: false,
-			isInvalidURL: false,
 			uploadStatus: UPLOAD_STATE_IDLE,
 		};
 
@@ -348,7 +346,6 @@ export class ImageEdit extends Component {
 
 		this.setState( {
 			isCaptionSelected: false,
-			isInvalidURL: false,
 		} );
 	}
 
@@ -467,7 +464,12 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectURL( newURL ) {
-		const { attributes: url, imageDefaultSize, setAttributes } = this.props;
+		const {
+			attributes: url,
+			createNotice,
+			imageDefaultSize,
+			setAttributes,
+		} = this.props;
 
 		if ( newURL !== url ) {
 			if ( isURL( newURL ) ) {
@@ -478,13 +480,11 @@ export class ImageEdit extends Component {
 					height: undefined,
 					sizeSlug: imageDefaultSize,
 				} );
-				this.setState( {
-					isInvalidURL: false,
-				} );
 			} else {
-				this.setState( {
-					isInvalidURL: true,
-				} );
+				createNotice(
+					'error',
+					__( 'Invalid URL. Image file not found.' )
+				);
 			}
 		}
 	}
@@ -639,7 +639,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected, isInvalidURL } = this.state;
+		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -790,21 +790,6 @@ export class ImageEdit extends Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
-						{ isInvalidURL && (
-							<View style={ styles.errorContainer }>
-								<Icon
-									icon={ warning }
-									style={ styles.errorIcon }
-								/>
-								<PlainText
-									editable={ false }
-									value={ __(
-										'Invalid URL. Image file not found.'
-									) }
-									style={ styles.errorText }
-								/>
-							</View>
-						) }
 						{ isSelected && getInspectorControls() }
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
@@ -927,7 +912,10 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { createNotice } = dispatch( noticesStore );
+
 		return {
+			createNotice,
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
 			},
