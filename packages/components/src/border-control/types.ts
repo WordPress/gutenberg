@@ -8,6 +8,7 @@ export type Border = {
 	style?: CSSProperties[ 'borderStyle' ];
 	width?: CSSProperties[ 'borderWidth' ];
 };
+export type BorderSides = 'all' | 'left' | 'top' | 'right' | 'bottom';
 
 export type Color = {
 	name: string;
@@ -81,11 +82,6 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * A custom CSS class name to be assigned to the border control's
-		 * dropdown popover content.
-		 */
-		popoverContentClassName?: string;
-		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`
 		 * is returned as the new border value.
@@ -114,6 +110,11 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
+		/**
+		 * Identifies which side if any this border control will be
+		 * representing.
+		 */
+		__experimentalSide?: BorderSides;
 	};
 
 export type DropdownProps = ColorProps & {
@@ -150,6 +151,11 @@ export type DropdownProps = ColorProps & {
 	 * close button.
 	 */
 	showDropdownHeader?: boolean;
+	/**
+	 * Identifies which side if any this border control will be
+	 * representing.
+	 */
+	__experimentalSide?: BorderSides;
 };
 
 export type StylePickerProps = LabelProps & {

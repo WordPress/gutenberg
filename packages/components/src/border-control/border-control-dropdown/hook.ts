@@ -9,6 +9,7 @@ import { useMemo } from '@wordpress/element';
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { DropdownProps } from '../types';
@@ -20,9 +21,10 @@ export function useBorderControlDropdown(
 		border,
 		className,
 		colors,
-		contentClassName,
 		onChange,
 		previousStyleSelection,
+		__experimentalIsRenderedInSidebar,
+		__experimentalSide,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -64,16 +66,24 @@ export function useBorderControlDropdown(
 		return cx( styles.colorIndicatorWrapper( border ) );
 	}, [ border, cx ] );
 
+	// We only want to apply adjusted popover content styles when on desktop.
+	const responsiveSide = useResponsiveValue( [
+		undefined,
+		undefined,
+		__experimentalSide,
+	] );
+
 	const popoverClassName = useMemo( () => {
-		return cx( styles.borderControlPopover, contentClassName );
-	}, [ cx, contentClassName ] );
+		return cx(
+			styles.borderControlPopover(
+				__experimentalIsRenderedInSidebar,
+				responsiveSide
+			)
+		);
+	}, [ cx, __experimentalIsRenderedInSidebar, responsiveSide ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
-	}, [ cx ] );
-
-	const popoverContentClassName = useMemo( () => {
-		return cx( styles.borderControlPopoverContent );
 	}, [ cx ] );
 
 	const resetButtonClassName = useMemo( () => {
@@ -90,9 +100,9 @@ export function useBorderControlDropdown(
 		onColorChange,
 		onStyleChange,
 		onReset,
-		popoverClassName,
-		popoverContentClassName,
+		popoverProps: { className: popoverClassName },
 		popoverControlsClassName,
 		resetButtonClassName,
+		__experimentalIsRenderedInSidebar,
 	};
 }

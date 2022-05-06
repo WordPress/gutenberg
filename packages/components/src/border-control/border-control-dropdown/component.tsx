@@ -141,8 +141,7 @@ const BorderControlDropdown = (
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverClassName,
-		popoverContentClassName,
+		popoverProps,
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
@@ -199,7 +198,6 @@ const BorderControlDropdown = (
 					</HStack>
 				) : undefined }
 				<ColorPalette
-					className={ popoverContentClassName }
 					value={ color }
 					onChange={ onColorChange }
 					{ ...{ colors, disableCustomColors } }
@@ -237,7 +235,7 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			contentClassName={ popoverClassName }
+			popoverProps={ popoverProps }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>

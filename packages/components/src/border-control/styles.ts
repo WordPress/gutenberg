@@ -16,7 +16,7 @@ import {
 import { BackdropUI } from '../input-control/styles/input-control-styles';
 import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
 
-import type { Border } from './types';
+import type { Border, BorderSides } from './types';
 
 const labelStyles = css`
 	font-weight: 500;
@@ -44,6 +44,7 @@ export const innerWrapper = () => css`
 	 */
 	${ UnitControlWrapper } {
 		flex: 1;
+		height: 36px;
 		${ rtl( { marginLeft: 0 } )() }
 	}
 `;
@@ -115,11 +116,60 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 	`;
 };
 
-export const borderControlPopover = css`
+const sidebarBorderPopoverContentStyles = css`
+	width: 282px;
+	margin-bottom: calc( ${ space( 13 ) } * -1 );
+`;
+
+const borderControlPopoverContent = (
+	inSidebar?: boolean,
+	side?: BorderSides
+) => {
+	if ( ! inSidebar || ! side ) {
+		return;
+	}
+
+	/* High specificity below is required to counter Popover component styles */
+	switch ( side ) {
+		case 'top':
+		case 'bottom':
+			return css`
+				&&&& > div {
+					${ sidebarBorderPopoverContentStyles }
+					${ rtl( { marginRight: space( 26.75 ) } )() }
+				}
+			`;
+
+		case 'right':
+			return css`
+				&&&& > div {
+					${ sidebarBorderPopoverContentStyles }
+					${ rtl( { marginRight: space( 40.5 ) } )() }
+				}
+			`;
+
+		case 'left':
+		case 'all':
+		default:
+			return css`
+				&&&& > div {
+					${ sidebarBorderPopoverContentStyles }
+					${ rtl( { marginRight: space( 13 ) } )() }
+				}
+			`;
+	}
+};
+
+export const borderControlPopover = (
+	inSidebar?: boolean,
+	side?: BorderSides
+) => css`
 	/* Remove padding from content, this will be re-added via inner elements*/
 	&& > div > div {
 		padding: 0;
 	}
+	/* If rendering within the sidebar adjust width and bottom margin. */
+	${ borderControlPopoverContent( inSidebar, side ) }
 `;
 
 export const borderControlPopoverControls = css`
@@ -136,7 +186,6 @@ export const borderControlPopoverControls = css`
 	}
 `;
 
-export const borderControlPopoverContent = css``;
 export const borderColorIndicator = css``;
 
 export const resetButton = css`

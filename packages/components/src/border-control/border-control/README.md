@@ -113,13 +113,6 @@ _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
 
-### `popoverContentClassName`: `string`
-
-A custom CSS class name to be assigned to the `BorderControl`'s dropdown
-popover content.
-
-- Required: No
-
 ### `shouldSanitizeBorder`: `boolean`
 
 If opted into, sanitizing the border means that if no width or color have been
@@ -177,5 +170,11 @@ aware of whether the colors prop contains multiple origins.
 
 This is passed on to the color related sub-components so they may render more
 effectively when used within a sidebar.
+
+- Required: No
+
+### `__experimentalSide`: 'all' | 'left' | 'top' | 'right' | 'bottom';
+
+Identifies which side if any this border control will be representing.
 
 - Required: No
