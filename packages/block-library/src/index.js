@@ -230,7 +230,7 @@ const getAllBlocks = () => [
 	commentsPaginationPrevious,
 	postComments,
 	postCommentsForm,
-  tableOfContents,
+	tableOfContents,
 	homeLink,
 	logInOut,
 	termDescription,
