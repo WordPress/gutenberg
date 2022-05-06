@@ -54,7 +54,7 @@ _Parameters_
 
 _Returns_
 
--   `string[]`: string\[] An array of classnames.
+-   `string[]`: An array of classnames.
 
 ### getCSSRules
 

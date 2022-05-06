@@ -24,26 +24,33 @@ import { styleDefinitions } from './styles';
  */
 export function generate( style: Style, options: StyleOptions ): string {
 	const rules = getCSSRules( style, options );
+
+	// If no selector is provided, treat generated rules as inline styles to be returned as a single string.
+	if ( ! options?.selector ) {
+		const inlineRules: string[] = [];
+		rules.forEach( ( rule ) => {
+			inlineRules.push( `${ kebabCase( rule.key ) }: ${ rule.value };` );
+		} );
+		return inlineRules.join( ' ' );
+	}
+
 	const groupedRules = groupBy( rules, 'selector' );
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
-			const hasSelector = subSelector !== 'undefined';
-			const prefix = hasSelector ? `${ subSelector } { ` : '';
-			const suffix = subSelector !== 'undefined' ? ' }' : '';
 			acc.push(
-				`${ prefix }${ groupedRules[ subSelector ]
+				`${ subSelector } { ${ groupedRules[ subSelector ]
 					.map(
 						( rule: GeneratedCSSRule ) =>
 							`${ kebabCase( rule.key ) }: ${ rule.value };`
 					)
-					.join( ' ' ) }${ suffix }`
+					.join( ' ' ) } }`
 			);
 			return acc;
 		},
 		[]
 	);
 
-	return selectorRules.join( '' );
+	return selectorRules.join( '\n' );
 }
 
 /**

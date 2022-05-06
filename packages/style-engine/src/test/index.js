@@ -20,7 +20,7 @@ describe( 'generate', () => {
 				},
 			} )
 		).toEqual(
-			'background-color: #222222; background: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); color: #f1f1f1; margin: 12px; padding: 10px;'
+			'background-color: #222222; background: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); margin: 12px; padding: 10px;'
 		);
 	} );
 
@@ -164,7 +164,7 @@ describe( 'getClassnames', () => {
 				spacing: { padding: '10px', margin: '12px' },
 				color: { text: '#381515', background: '#000000' },
 			} )
-		).toEqual( [ 'has-background', 'has-text-color' ] );
+		).toEqual( [ 'has-background' ] );
 	} );
 
 	it( 'should generate classnames for eligible preset values', () => {
@@ -181,8 +181,6 @@ describe( 'getClassnames', () => {
 			'has-mustard-pickles-background-color',
 			'has-background',
 			'has-hairy-orange-gradient-background',
-			'has-white-as-show-color',
-			'has-text-color',
 		] );
 	} );
 } );
