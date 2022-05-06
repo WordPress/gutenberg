@@ -67,3 +67,7 @@ export const CenteredBorderControl = css`
 	grid-column: span 2;
 	margin: 0 auto;
 `;
+
+export const RightBorderControl = css`
+	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
+`;

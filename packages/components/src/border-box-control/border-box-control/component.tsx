@@ -51,7 +51,6 @@ const BorderBoxControl = (
 		linkedValue,
 		onLinkedChange,
 		onSplitChange,
-		popoverClassNames,
 		splitValue,
 		toggleLinked,
 		__experimentalHasMultipleOrigins,
@@ -77,7 +76,6 @@ const BorderBoxControl = (
 						placeholder={
 							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
-						popoverContentClassName={ popoverClassNames?.linked }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
@@ -88,6 +86,7 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__experimentalSide={ 'all' }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -96,7 +95,6 @@ const BorderBoxControl = (
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
 						onChange={ onSplitChange }
-						popoverClassNames={ popoverClassNames }
 						value={ splitValue }
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins

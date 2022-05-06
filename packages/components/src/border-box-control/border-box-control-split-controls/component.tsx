@@ -25,7 +25,7 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		onChange,
-		popoverClassNames,
+		rightAlignedClassName,
 		value,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
@@ -50,24 +50,25 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
-				popoverContentClassName={ popoverClassNames?.top }
 				value={ value?.top }
+				__experimentalSide={ 'top' }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
 				hideLabelFromVision={ true }
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
-				popoverContentClassName={ popoverClassNames?.left }
 				value={ value?.left }
+				__experimentalSide={ 'left' }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				className={ rightAlignedClassName }
 				hideLabelFromVision={ true }
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
-				popoverContentClassName={ popoverClassNames?.right }
 				value={ value?.right }
+				__experimentalSide={ 'right' }
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
@@ -75,8 +76,8 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
-				popoverContentClassName={ popoverClassNames?.bottom }
 				value={ value?.bottom }
+				__experimentalSide={ 'bottom' }
 				{ ...sharedBorderControlProps }
 			/>
 		</Grid>
