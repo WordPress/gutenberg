@@ -237,12 +237,6 @@ export function addSaveProps(
 		}
 	} );
 
-	// @TODO
-	// Experimental notes:
-	// Maybe the style engine could do the classname work of `addSaveProps` in packages/block-editor/src/hooks/color.js here?
-	// And addSaveProps in packages/block-editor/src/hooks/font-family.js
-	// And add it to props.className?
-
 	props.style = {
 		...getInlineStyles( style ),
 		...props.style,
