@@ -74,7 +74,7 @@ function PostAuthorEdit( {
 						! isDescendentOfQueryLoop &&
 						!! authors?.length && (
 							<SelectControl
-								label={ __( 'Author1' ) }
+								label={ __( 'Author' ) }
 								value={ authorId }
 								options={ authors.map( ( { id, name } ) => {
 									return {
