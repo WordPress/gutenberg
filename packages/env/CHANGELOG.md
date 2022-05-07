@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 4.2.1 (2022-05-07)
+
+### Enhancement
+-   Added support for ssh protocol.
+
 ## 4.2.0 (2022-01-27)
 
 ### Enhancement
