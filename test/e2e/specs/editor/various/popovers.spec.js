@@ -4,20 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'popovers', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-post-formats-support'
-		);
-	} );
-
 	test.beforeEach( async ( { pageUtils } ) => {
 		await pageUtils.createNewPost();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-post-formats-support'
-		);
 	} );
 
 	test.describe( 'dropdown', () => {
