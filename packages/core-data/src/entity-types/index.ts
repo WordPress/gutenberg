@@ -7,7 +7,6 @@ import type { Comment } from './comment';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
-import type { NavigationArea } from './navigation-area';
 import type { Page } from './page';
 import type { Plugin } from './plugin';
 import type { Post } from './post';
@@ -31,7 +30,6 @@ export type {
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
-	NavigationArea,
 	Page,
 	Plugin,
 	Post,
@@ -54,7 +52,6 @@ export type EntityRecord< C extends Context > =
 	| MenuLocation< C >
 	| NavMenu< C >
 	| NavMenuItem< C >
-	| NavigationArea< C >
 	| Page< C >
 	| Plugin< C >
 	| Post< C >

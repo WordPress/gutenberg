@@ -27,9 +27,15 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
+
 	beforeEach( async () => {
 		triggerFetch.mockReset();
 		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -147,6 +153,11 @@ describe( 'getEntityRecords', () => {
 	beforeEach( async () => {
 		triggerFetch.mockReset();
 		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
 	} );
 
 	it( 'dispatches the requested post type', async () => {

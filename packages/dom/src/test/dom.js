@@ -125,6 +125,8 @@ describe( 'DOM', () => {
 			'range',
 			'reset',
 			'submit',
+			'email',
+			'time',
 		];
 
 		/**
@@ -132,13 +134,7 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [
-			'text',
-			'password',
-			'search',
-			'url',
-			'email',
-		];
+		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {

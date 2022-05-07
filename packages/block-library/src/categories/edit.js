@@ -17,7 +17,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: {

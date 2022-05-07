@@ -317,7 +317,8 @@
 						]
 					},
 					{ "docs/contributors/code/backward-compatibility.md": [] },
-					{ "docs/contributors/code/deprecations.md": [] }
+					{ "docs/contributors/code/deprecations.md": [] },
+					{ "docs/contributors/code/how-to-get-your-pull-request-reviewed.md": [] }
 				]
 			},
 			{
