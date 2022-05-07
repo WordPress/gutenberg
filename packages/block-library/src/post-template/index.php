@@ -6,21 +6,24 @@
  */
 
 /**
- * Loop through recursively to find blocks that use featured images.
+ * Determines whether a block list contains a block that uses the featured image.
  *
  * @param WP_Block_List $inner_blocks Inner block instance.
  *
- * @return bool
+ * @return bool Whether the block list contains a block that uses the featured image.
  */
-function block_core_post_template_uses_feature_image( $inner_blocks ) {
+function block_core_post_template_uses_featured_image( $inner_blocks ) {
 	foreach ( $inner_blocks as $block ) {
 		if ( 'core/post-featured-image' === $block->name ) {
 			return true;
 		}
-		if ( 'core/cover' === $block->name && $block->attributes && isset( $block->attributes['useFeaturedImage'] ) && $block->attributes['useFeaturedImage'] ) {
+		if (
+			'core/cover' === $block->name &&
+			! empty( $block->attributes['useFeaturedImage'] )
+		) {
 			return true;
 		}
-		if ( $block->inner_blocks && block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
+		if ( $block->inner_blocks && block_core_post_template_uses_featured_image( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
@@ -63,7 +66,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	if ( block_core_post_template_uses_feature_image( $block->inner_blocks ) ) {
+	if ( block_core_post_template_uses_featured_image( $block->inner_blocks ) ) {
 		update_post_thumbnail_cache( $query );
 	}
 
