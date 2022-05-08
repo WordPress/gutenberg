@@ -4,7 +4,7 @@
 
 ### Internal
 
--   `CheckboxControl`: Convert to TypeScript ([#](https://github.com/WordPress/gutenberg/pull/)).
+-   `CheckboxControl`: Convert to TypeScript ([#40915](https://github.com/WordPress/gutenberg/pull/40915)).
 
 ## 19.10.0 (2022-05-04)
 
