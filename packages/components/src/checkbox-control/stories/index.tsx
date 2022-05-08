@@ -52,7 +52,29 @@ const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
 	);
 };
 
-const IndeterminateTemplate: ComponentStory< typeof CheckboxControl > = ( {
+export const Default: ComponentStory<
+	typeof CheckboxControl
+> = DefaultTemplate.bind( {} );
+Default.args = {};
+
+export const WithLabel: ComponentStory<
+	typeof CheckboxControl
+> = DefaultTemplate.bind( {} );
+WithLabel.args = {
+	...Default.args,
+	label: 'Is author',
+};
+
+export const WithLabelAndHelpText: ComponentStory<
+	typeof CheckboxControl
+> = DefaultTemplate.bind( {} );
+WithLabelAndHelpText.args = {
+	...Default.args,
+	label: 'Is author',
+	help: 'Is the user an author or not?',
+};
+
+export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -99,32 +121,6 @@ const IndeterminateTemplate: ComponentStory< typeof CheckboxControl > = ( {
 		</>
 	);
 };
-
-export const Default: ComponentStory<
-	typeof CheckboxControl
-> = DefaultTemplate.bind( {} );
-Default.args = {};
-
-export const WithLabel: ComponentStory<
-	typeof CheckboxControl
-> = DefaultTemplate.bind( {} );
-WithLabel.args = {
-	...Default.args,
-	label: 'Is author',
-};
-
-export const WithLabelAndHelpText: ComponentStory<
-	typeof CheckboxControl
-> = DefaultTemplate.bind( {} );
-WithLabelAndHelpText.args = {
-	...Default.args,
-	label: 'Is author',
-	help: 'Is the user an author or not?',
-};
-
-export const Indeterminate: ComponentStory<
-	typeof CheckboxControl
-> = IndeterminateTemplate.bind( {} );
 Indeterminate.args = {
 	label: 'Select all',
 };
