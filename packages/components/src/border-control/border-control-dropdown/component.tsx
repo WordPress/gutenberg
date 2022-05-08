@@ -164,6 +164,7 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
+	const showResetButton = color || ( style && style !== 'none' );
 	const dropdownPosition = __experimentalIsRenderedInSidebar
 		? 'bottom left'
 		: undefined;
@@ -220,16 +221,18 @@ const BorderControlDropdown = (
 					/>
 				) }
 			</VStack>
-			<Button
-				className={ resetButtonClassName }
-				variant="tertiary"
-				onClick={ () => {
-					onReset();
-					onClose();
-				} }
-			>
-				{ __( 'Reset to default' ) }
-			</Button>
+			{ showResetButton && (
+				<Button
+					className={ resetButtonClassName }
+					variant="tertiary"
+					onClick={ () => {
+						onReset();
+						onClose();
+					} }
+				>
+					{ __( 'Reset to default' ) }
+				</Button>
+			) }
 		</>
 	);
 
