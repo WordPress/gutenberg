@@ -110,7 +110,7 @@ A function that receives the checked state (boolean) as input.
 
 #### indeterminate
 
-If indeterminate is true, the checkbox will be rendered as indeterminate.
+If indeterminate is true the state of the checkbox will be indeterminate.
 
 -   Type: `Boolean`
 -   Required: No
