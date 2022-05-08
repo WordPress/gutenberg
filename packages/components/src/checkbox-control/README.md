@@ -108,6 +108,13 @@ A function that receives the checked state (boolean) as input.
 -   Type: `function`
 -   Required: Yes
 
+#### indeterminate
+
+If indeterminate is true, the checkbox will be rendered as indeterminate.
+
+-   Type: `Boolean`
+-   Required: No
+
 ## Related components
 
 -   To select one option from a set, and you want to show all the available options at once, use the `RadioControl` component.

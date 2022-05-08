@@ -36,6 +36,7 @@
 		"src/border-control/**/*",
 		"src/button/**/*",
 		"src/card/**/*",
+		"src/checkbox-control/**/*",
 		"src/circular-option-picker/**/*",
 		"src/color-indicator/**/*",
 		"src/color-palette/**/*",
