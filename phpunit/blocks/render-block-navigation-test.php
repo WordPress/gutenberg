@@ -14,7 +14,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$post_ids = block_core_navigation_get_post_ids_from_block( $block );
-		$this->assertEqualSets( array( 755 ), $post_ids );
+		$this->assertSameSets( array( 755 ), $post_ids );
 	}
 
 	/**
@@ -27,7 +27,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$post_ids = block_core_navigation_get_post_ids_from_block( $block );
-		$this->assertEqualSets( array( 755, 789 ), $post_ids );
+		$this->assertSameSetsWithIndex( array( 755, 789 ), $post_ids );
 	}
 
 
