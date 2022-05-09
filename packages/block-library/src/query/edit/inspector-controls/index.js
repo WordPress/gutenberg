@@ -23,6 +23,7 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
  */
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
+import ParentControl from './parent-control';
 import TaxonomyControls from './taxonomy-controls';
 import { usePostTypes } from '../../utils';
 
@@ -45,6 +46,7 @@ export default function QueryInspectorControls( {
 		sticky,
 		inherit,
 		taxQuery,
+		parents,
 	} = query;
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
@@ -155,6 +157,11 @@ export default function QueryInspectorControls( {
 						label={ __( 'Keyword' ) }
 						value={ querySearch }
 						onChange={ setQuerySearch }
+					/>
+					<ParentControl
+						parents={ parents }
+						postType={ postType }
+						onChange={ setQuery }
 					/>
 				</PanelBody>
 			) }
