@@ -4,6 +4,7 @@
 import moment from 'moment';
 import classnames from 'classnames';
 import type { Moment } from 'moment';
+import { noop } from 'lodash';
 
 // react-dates doesn't tree-shake correctly, so we import from the individual
 // component here, to avoid including too much of the library.
@@ -182,7 +183,7 @@ function DatePicker( {
 						events={ getEventsPerDay( day ) }
 					/>
 				) }
-				onFocusChange={ () => {} }
+				onFocusChange={ noop }
 			/>
 		</div>
 	);
