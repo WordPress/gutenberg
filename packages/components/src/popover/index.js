@@ -38,6 +38,7 @@ import { close } from '@wordpress/icons';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
+import { getAnimateClassName } from '../animate';
 
 /**
  * Name of slot in which popover should fill.
@@ -64,14 +65,41 @@ const positionToPlacement = ( position ) => {
 	return y;
 };
 
+const placementToAnimationOrigin = ( placement ) => {
+	const [ a, b ] = placement.split( '-' );
+
+	let x, y;
+	if ( a === 'top' || a === 'bottom' ) {
+		x = a === 'top' ? 'bottom' : 'top';
+		y = 'middle';
+		if ( b === 'start' ) {
+			y = 'left';
+		} else if ( b === 'end' ) {
+			y = 'right';
+		}
+	}
+
+	if ( a === 'left' || a === 'right' ) {
+		x = 'center';
+		y = a;
+		if ( b === 'start' ) {
+			x = 'bottom';
+		} else if ( b === 'end' ) {
+			x = 'top';
+		}
+	}
+
+	return x + ' ' + y;
+};
+
 const Popover = (
 	{
 		// Disable reason: We generate the `...contentProps` rest as remainder
 		// of props which aren't explicitly handled by this component.
 		/* eslint-disable no-unused-vars */
 		range,
-		animate,
 		/* eslint-enable no-unused-vars */
+		animate = true,
 		headerTitle,
 		onClose,
 		children,
@@ -257,6 +285,14 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement ] );
 
+	/** @type {false | string} */
+	const animateClassName =
+		!! animate &&
+		getAnimateClassName( {
+			type: 'appear',
+			origin: placementToAnimationOrigin( placementData ),
+		} );
+
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
@@ -264,10 +300,15 @@ const Popover = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			className={ classnames( 'components-popover', className, {
-				'is-expanded': isExpanded,
-				'is-alternate': isAlternate,
-			} ) }
+			className={ classnames(
+				'components-popover',
+				className,
+				animateClassName,
+				{
+					'is-expanded': isExpanded,
+					'is-alternate': isAlternate,
+				}
+			) }
 			{ ...contentProps }
 			ref={ mergedRefs }
 			{ ...dialogProps }
