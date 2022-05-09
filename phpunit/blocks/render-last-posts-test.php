@@ -53,8 +53,8 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts() {
-		$a = new MockAction();
-		add_filter( 'update_post_metadata_cache', array( $a, 'filter' ), 10, 2 );
+		$action = new MockAction();
+		add_filter( 'update_post_metadata_cache', array( $action, 'filter' ), 10, 2 );
 		$attributes = array(
 			'displayFeaturedImage' => true,
 			'postsToShow'          => 5,
@@ -63,7 +63,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		);
 
 		gutenberg_render_block_core_latest_posts( $attributes );
-		$args      = $a->get_args();
+		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertSameSets( self::$attachment_ids, $last_args[1], 'Attachment IDs must match' );
 	}
@@ -72,8 +72,8 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_no_priming() {
-		$a = new MockAction();
-		add_filter( 'update_post_metadata_cache', array( $a, 'filter' ), 10, 2 );
+		$action = new MockAction();
+		add_filter( 'update_post_metadata_cache', array( $action, 'filter' ), 10, 2 );
 		$attributes = array(
 			'displayFeaturedImage' => false,
 			'postsToShow'          => 5,
@@ -82,7 +82,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		);
 
 		gutenberg_render_block_core_latest_posts( $attributes );
-		$args      = $a->get_args();
+		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertContains( self::$posts[0]->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
 		$this->assertNotContains( self::$sticky_post->ID, $last_args[1], 'Ensure that sticky post is not in array of post ids that are primed' );
