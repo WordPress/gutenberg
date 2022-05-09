@@ -10,6 +10,7 @@ import {
 	autoUpdate,
 	arrow,
 	offset as offsetMiddleware,
+	limitShift,
 } from '@floating-ui/react-dom';
 
 /**
@@ -141,6 +142,7 @@ const Popover = (
 		__unstableForcePosition ? undefined : flip(),
 		shift( {
 			crossAxis: true,
+			limiter: limitShift(),
 		} ),
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
@@ -192,7 +194,18 @@ const Popover = (
 		// No ref or position have been passed
 		let usedRef;
 		if ( anchorRef?.top ) {
-			usedRef = anchorRef.top;
+			usedRef = {
+				getBoundingClientRect() {
+					const topRect = anchorRef.top.getBoundingClientRect();
+					const bottomRect = anchorRef.bottom.getBoundingClientRect();
+					return new window.DOMRect(
+						topRect.x,
+						topRect.y,
+						topRect.width,
+						bottomRect.bottom - topRect.top
+					);
+				},
+			};
 		} else if ( anchorRef ) {
 			usedRef = anchorRef;
 		} else if ( anchorRect ) {
