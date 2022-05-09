@@ -420,7 +420,19 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 		// ...
 		<div className="form-buttons">
 			<Button onClick={ handleSave } variant="primary" disabled={ ! hasEdits || isSaving }>
-				{ isSaving ? <Spinner/> : 'Save' }
+				{ isSaving ? (
+					<>
+						<Spinner/>
+						Saving
+					</>
+				) : 'Save' }
+			</Button>
+			<Button
+				onClick={ onCancel }
+				variant="tertiary"
+				disabled={ isSaving }
+			>
+				Cancel
 			</Button>
 		</div>
 		// ...
@@ -428,7 +440,9 @@ export function EditPageForm( { pageId, onSaveFinished } ) {
 }
 ```
 
-Note that we disable the save button when there are no edits and when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice.
+Note that we disable the _save_ button when there are no edits and when the page is currently being saved. This is to prevent the user from accidentally pressing the button twice.
+
+Also, interrupting a *save* in progress is not supported by `@wordpress/data` so we also conditionally disabled the _cancel_ button.
 
 Here's what it looks like in action:
 
@@ -503,9 +517,18 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 					variant="primary"
 					disabled={ ! hasEdits || isSaving }
 				>
-					{ isSaving ? <Spinner /> : 'Save' }
+					{ isSaving ? (
+						<>
+							<Spinner/>
+							Saving
+						</>
+					) : 'Save' }
 				</Button>
-				<Button onClick={ onCancel } variant="tertiary">
+				<Button
+					onClick={ onCancel }
+					variant="tertiary"
+					disabled={ isSaving }
+				>
 					Cancel
 				</Button>
 			</div>
