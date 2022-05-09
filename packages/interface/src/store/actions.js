@@ -10,15 +10,17 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
  */
-export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
+export const enableComplementaryArea = ( scope, area ) => {
 	// Return early if there's no area.
 	if ( ! area ) {
 		return;
 	}
 
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', area );
+	return {
+		type: 'ENABLE_COMPLEMENTARY_AREA',
+		scope,
+		area,
+	};
 };
 
 /**
@@ -26,10 +28,11 @@ export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
  *
  * @param {string} scope Complementary area scope.
  */
-export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', null );
+export const disableComplementaryArea = ( scope ) => {
+	return {
+		type: 'DISABLE_COMPLEMENTARY_AREA',
+		scope,
+	};
 };
 
 /**

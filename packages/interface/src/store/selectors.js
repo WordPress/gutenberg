@@ -13,11 +13,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
  *
  * @return {string} The complementary area that is active in the given scope.
  */
-export const getActiveComplementaryArea = createRegistrySelector(
-	( select ) => ( state, scope ) => {
-		return select( preferencesStore ).get( scope, 'complementaryArea' );
-	}
-);
+export function getActiveComplementaryArea( state, scope ) {
+	return state?.complementaryAreas?.[ scope ];
+}
 
 /**
  * Returns a boolean indicating if an item is pinned or not.

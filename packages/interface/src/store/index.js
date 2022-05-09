@@ -8,6 +8,7 @@ import { createReduxStore, register } from '@wordpress/data';
  */
 import * as actions from './actions';
 import * as selectors from './selectors';
+import reducer from './reducer';
 import { STORE_NAME } from './constants';
 
 /**
@@ -18,7 +19,7 @@ import { STORE_NAME } from './constants';
  * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
-	reducer: () => {},
+	reducer,
 	actions,
 	selectors,
 } );
