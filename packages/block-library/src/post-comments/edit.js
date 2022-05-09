@@ -13,6 +13,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
@@ -202,10 +203,16 @@ export default function PostCommentsEdit( {
 }
 
 export const withPostCommentsBlockDeprecationWarning = createHigherOrderComponent(
-	( BlockEdit ) => ( props, context ) => {
+	( BlockEdit ) => ( props ) => {
 		const { name } = props;
 
-		const { postType, postId } = context; // FIXME -- No block context available :(
+		// Unfortunately, the `editor.BlockEdit` filter doesn't give us access to
+		// block context from which we could infer postId and postType, so we
+		// have to gather that information ourselves.
+		const { postId, postType } = useSelect( ( select ) => ( {
+			postId: select( editorStore ).getCurrentPostId(),
+			postType: select( editorStore ).getCurrentPostType(),
+		} ) );
 
 		const [ commentStatus ] = useEntityProp(
 			'postType',
