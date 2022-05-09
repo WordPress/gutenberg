@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-const { createHash } = require( 'crypto' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 // In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
 const { RawSource } = webpack.sources || require( 'webpack-sources' );
 const json2php = require( 'json2php' );
 const isWebpack4 = webpack.version.startsWith( '4.' );
+const { createHash } = webpack.util;
 
 /**
  * Internal dependencies
@@ -200,14 +200,13 @@ class DependencyExtractionWebpackPlugin {
 
 			// Go through the assets and hash the sources. We can't just use
 			// `entrypointChunk.contentHash` because that's not updated when
-			// assets are minified. Sigh.
-			// @todo Use `asset.info.contenthash` if we can make sure it's reliably set.
-			const hash = createHash( 'sha512' );
+			// assets are minified.
+			const hash = createHash( compilation.outputOptions.hashFunction );
 			for ( const filename of entrypoint.getFiles().sort() ) {
 				const asset = compilation.getAsset( filename );
-				hash.update( `${ filename }: ` );
-				asset.source.updateHash( hash );
+				hash.update( asset.source.buffer() );
 			}
+			const version = hash.digest( compilation.outputOptions.hashDigest );
 
 			const entrypointChunk = isWebpack4
 				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
@@ -216,7 +215,7 @@ class DependencyExtractionWebpackPlugin {
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: hash.digest( 'hex' ).substring( 0, 32 ),
+				version,
 			};
 
 			const assetString = this.stringify( assetData );
