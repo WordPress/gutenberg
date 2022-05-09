@@ -30,7 +30,7 @@ export type DateTimeString = string;
 
 export type ValidDateTimeInput = Date | string | number | null;
 
-export interface TimePickerProps {
+export type TimePickerProps = {
 	/**
 	 * The initial current time the time picker should render.
 	 */
@@ -48,14 +48,14 @@ export interface TimePickerProps {
 	 * time as an argument.
 	 */
 	onChange?: ( time: DateTimeString ) => void;
-}
+};
 
-export interface DatePickerEvent {
+export type DatePickerEvent = {
 	/**
 	 * The date of the event.
 	 */
 	date: Date;
-}
+};
 
 export type DatePickerDayProps = {
 	/**
@@ -71,7 +71,7 @@ export type DatePickerDayProps = {
 	events?: DatePickerEvent[];
 };
 
-export interface DatePickerProps {
+export type DatePickerProps = {
 	/**
 	 * The current date and time at initialization. Optionally pass in a `null`
 	 * value to specify no date is currently selected.
@@ -103,12 +103,13 @@ export interface DatePickerProps {
 	 * dot on the day of the event.
 	 */
 	events?: DatePickerEvent[];
-}
+};
 
-export interface DateTimePickerProps extends DatePickerProps, TimePickerProps {
-	/**
-	 * The function called when a new date or time has been selected. It is
-	 * passed the date and time as an argument.
-	 */
-	onChange?: ( date: DateTimeString | null ) => void;
-}
+export type DateTimePickerProps = DatePickerProps &
+	TimePickerProps & {
+		/**
+		 * The function called when a new date or time has been selected. It is
+		 * passed the date and time as an argument.
+		 */
+		onChange?: ( date: DateTimeString | null ) => void;
+	};
