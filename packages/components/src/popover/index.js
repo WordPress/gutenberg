@@ -22,6 +22,7 @@ import {
 	forwardRef,
 	createContext,
 	useContext,
+	useMemo,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -100,7 +101,43 @@ const Popover = (
 	const usedPlacement = position
 		? positionToPlacement( position )
 		: placement;
+
+	/**
+	 * Offsets the the position of the popover when the anchor is inside an iframe.
+	 */
+	const frameOffset = useMemo( () => {
+		let ownerDocument = document;
+		if ( anchorRef?.top ) {
+			ownerDocument = anchorRef?.top.ownerDocument;
+		} else if ( anchorRef ) {
+			ownerDocument = anchorRef.ownerDocument;
+		} else if ( anchorRect && anchorRect?.ownerDocument ) {
+			ownerDocument = anchorRect.ownerDocument;
+		} else if ( getAnchorRect ) {
+			ownerDocument = getAnchorRect()?.ownerDocument ?? document;
+		}
+
+		const { defaultView } = ownerDocument;
+		const { frameElement } = defaultView;
+
+		if ( ! frameElement || ownerDocument === document ) {
+			return undefined;
+		}
+
+		const iframeRect = frameElement.getBoundingClientRect();
+		return {
+			name: 'iframeOffset',
+			fn( { x, y } ) {
+				return {
+					x: x + iframeRect.left,
+					y: y + iframeRect.top,
+				};
+			},
+		};
+	}, [ anchorRef, anchorRect, getAnchorRect ] );
+
 	const middlewares = [
+		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
 		__unstableForcePosition ? undefined : flip(),
 		shift( {
