@@ -174,6 +174,10 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       role="radiogroup"
     >
       <div
+        aria-hidden="true"
+        style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+      />
+      <div
         class="emotion-8 emotion-9"
         role="presentation"
         style="transform: translateX(0px); transition: none; width: 0px;"
@@ -395,6 +399,10 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       id="toggle-group-control-0"
       role="radiogroup"
     >
+      <div
+        aria-hidden="true"
+        style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+      />
       <div
         class="emotion-8 emotion-9"
         data-active="false"

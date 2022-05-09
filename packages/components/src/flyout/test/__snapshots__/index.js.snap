@@ -94,6 +94,10 @@ exports[`props should render correctly 1`] = `
     class="emotion-3 emotion-2"
   >
     <div
+      aria-hidden="true"
+      style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+    />
+    <div
       class="components-card__body components-card-body emotion-5 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardBody"
@@ -158,14 +162,12 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-@@ -14,11 +14,19 @@
-      data-wp-c16t="true"
-      data-wp-component="Card"
-    >
-      <div
-        class="css-mgwsf4-View-Content em57xhy0"
--     />
-+     >
+@@ -19,10 +19,17 @@
+      >
+        <div
+          aria-hidden="true"
+          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+        />
 +       <div
 +         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
 +         data-wp-c16t="true"
@@ -173,10 +175,9 @@ Snapshot Diff:
 +       >
 +         Code is Poetry
 +       </div>
-+     </div>
+      </div>
       <div
         aria-hidden="true"
         class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
         data-wp-c16t="true"
-        data-wp-component="Elevation"
 `;
