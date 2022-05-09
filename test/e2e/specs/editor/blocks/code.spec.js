@@ -20,11 +20,11 @@
  
 	 // Check the content
 	 const content = await pageUtils.getEditedPostContent();
-	 expect(content).toBe(
-	   `<!-- wp:code -->
- <pre class="wp-block-code"><code>&lt;?php</code></pre>
- <!-- /wp:code -->`
-	 );
+	 expect( content ).toBe(
+		`<!-- wp:code -->
+<pre class="wp-block-code"><code>&lt;?php</code></pre>
+<!-- /wp:code -->`
+	);
    });
  
    test("should delete block when backspace in an empty code", async ({
@@ -52,12 +52,12 @@
  
 	 // Check the content
 	 const content = await pageUtils.getEditedPostContent();
-	 expect(content).toBe(
-	   `<!-- wp:code -->
- <pre class="wp-block-code"><code>&lt;img />
-	 &lt;br></code></pre>
- <!-- /wp:code -->`
-	 );
+	 expect( content ).toBe(
+		`<!-- wp:code -->
+<pre class="wp-block-code"><code>&lt;img />
+	&lt;br></code></pre>
+<!-- /wp:code -->`
+	);
    });
  });
  
