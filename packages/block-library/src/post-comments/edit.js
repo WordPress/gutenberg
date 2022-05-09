@@ -227,7 +227,7 @@ export const withPostCommentsBlockDeprecationWarning = createHigherOrderComponen
 					.__experimentalDiscussionSettings
 		);
 
-		const isSiteEditor = postType === undefined || postId === undefined;
+		const isSiteEditor = ! postType || ! postId;
 
 		const postTypeSupportsComments = useSelect( ( select ) =>
 			postType
