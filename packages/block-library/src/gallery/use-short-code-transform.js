@@ -23,21 +23,14 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 			if ( ! shortCodeTransforms || shortCodeTransforms.length === 0 ) {
 				return;
 			}
-			const getMedia = select( coreStore ).getMedia;
-			return shortCodeTransforms.map( ( image ) => {
-				const imageData = getMedia( image.id );
-				if ( imageData ) {
-					return {
-						id: imageData.id,
-						type: 'image',
-						url: imageData.source_url,
-						mime: imageData.mime_type,
-						alt: imageData.alt_text,
-						link: imageData.link,
-						caption: imageData?.caption?.raw,
-					};
-				}
-				return undefined;
+
+			const imageIds = shortCodeTransforms
+				.map( ( image ) => image.id )
+				.sort();
+
+			return select( coreStore ).getMediaItems( {
+				include: imageIds.join( ',' ),
+				per_page: -1,
 			} );
 		},
 		[ shortCodeTransforms ]
@@ -47,7 +40,17 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 		return;
 	}
 
-	if ( every( newImageData, ( img ) => img && img.url ) ) {
-		return newImageData;
+	if ( every( newImageData, ( img ) => img && img.source_url ) ) {
+		return newImageData.map( ( imageData ) => {
+			return {
+				id: imageData.id,
+				type: 'image',
+				url: imageData.source_url,
+				mime: imageData.mime_type,
+				alt: imageData.alt_text,
+				link: imageData.link,
+				caption: imageData?.caption?.raw,
+			};
+		} );
 	}
 }

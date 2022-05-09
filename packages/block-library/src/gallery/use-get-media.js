@@ -24,7 +24,8 @@ export default function useGetMedia( innerBlockImages ) {
 
 			const imageIds = innerBlockImages
 				.map( ( imageBlock ) => imageBlock.attributes.id )
-				.filter( ( id ) => id !== undefined );
+				.filter( ( id ) => id !== undefined )
+				.sort();
 
 			if ( imageIds.length === 0 ) {
 				return currentImageMedia;
