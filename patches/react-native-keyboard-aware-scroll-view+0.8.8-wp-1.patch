@@ -43,7 +43,7 @@ index 30f62c9..83a6920 100644
 +      // Patch applied to avoid invoking the removed
 +      // `scrollResponderScrollToEnd` method. This patch could be removed if we
 +      // upgrade to `react-native-keyboard-aware-view@^0.9.5`
-+      // https://github.com/APSL/react-native-keyboard-aware-scroll-view/commit/de9579b04178720c7d028482465515dd5e0b2d2a
++      // https://git.io/JPb6a
 +      if (!responder) return;
 +      if (responder.scrollResponderScrollToEnd) {
 +        // React Native < 0.65
@@ -62,7 +62,7 @@ index 30f62c9..83a6920 100644
 -        responder && responder.scrollResponderScrollTo( { x: 0, y: scrollOffsetY, animated: true } );
 +        // Patch applied to avoid invoking the removed `scrollResponderScrollTo`
 +        // method. This patch could be removed if we upgrade to
-+        // `react-native-keyboard-aware-view@^0.9.5` https://github.com/APSL/react-native-keyboard-aware-scroll-view/commit/de9579b04178720c7d028482465515dd5e0b2d2a
++        // `react-native-keyboard-aware-view@^0.9.5` https://git.io/JPb6a
 +        if (!responder) return;
 +        if (responder.scrollResponderScrollTo) {
 +          // React Native < 0.65
