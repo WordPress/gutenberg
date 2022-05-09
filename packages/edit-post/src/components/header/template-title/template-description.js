@@ -32,7 +32,7 @@ export default function TemplateDescription() {
 				className="edit-post-template-details__description"
 				size="body"
 				as="p"
-				style={ { marginTop: '12px' } }
+				style={ { marginTop: '12px', marginBottom: '12px' } }
 			>
 				{ description }
 			</Text>
