@@ -137,6 +137,8 @@ const Popover = (
 		let ownerDocument = document;
 		if ( anchorRef?.top ) {
 			ownerDocument = anchorRef?.top.ownerDocument;
+		} else if ( anchorRef?.startContainer ) {
+			ownerDocument = anchorRef.startContainer.ownerDocument;
 		} else if ( anchorRef ) {
 			ownerDocument = anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
