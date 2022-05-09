@@ -5,7 +5,7 @@ index 30f62c9..83a6920 100644
 @@ -264,9 +264,13 @@ function KeyboardAwareHOC(
        })
      }
-
+ 
 -    componentWillReceiveProps(nextProps: KeyboardAwareHOCProps) {
 -      if (nextProps.viewIsInsideTabBar !== this.props.viewIsInsideTabBar) {
 -        const keyboardSpace: number = nextProps.viewIsInsideTabBar
@@ -20,7 +20,7 @@ index 30f62c9..83a6920 100644
            : 0
          if (this.state.keyboardSpace !== keyboardSpace) {
 @@ -293,12 +297,33 @@ function KeyboardAwareHOC(
-
+ 
      scrollToPosition = (x: number, y: number, animated: boolean = true) => {
        const responder = this.getScrollResponder()
 -      responder && responder.scrollResponderScrollTo({ x, y, animated })
@@ -36,7 +36,7 @@ index 30f62c9..83a6920 100644
 +        responder.scrollTo({ x, y, animated })
 +      }
      }
-
+ 
      scrollToEnd = (animated?: boolean = true) => {
        const responder = this.getScrollResponder()
 -      responder && responder.scrollResponderScrollToEnd({ animated })
@@ -53,10 +53,10 @@ index 30f62c9..83a6920 100644
 +        responder.scrollToEnd({ animated })
 +      }
      }
-
+ 
      scrollForExtraHeightOnAndroid = (extraHeight: number) => {
 @@ -553,7 +578,17 @@ function KeyboardAwareHOC(
-
+ 
          scrollOffsetY = Math.max(0, scrollOffsetY); //prevent negative scroll offset
          const responder = this.getScrollResponder();
 -        responder && responder.scrollResponderScrollTo( { x: 0, y: scrollOffsetY, animated: true } );
@@ -72,5 +72,5 @@ index 30f62c9..83a6920 100644
 +          responder.scrollTo( { x: 0, y: scrollOffsetY, animated: true } )
 +        }
        }
-
+ 
        const measureLayoutErrorHandler = ( e: Object ) => {

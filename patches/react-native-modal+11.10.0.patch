@@ -9,7 +9,7 @@ index 165cd55..85f820c 100644
 -        DeviceEventEmitter.addListener('didUpdateDimensions', this.handleDimensionsUpdate);
 +		// The following `didUpdateDimensionsEmitter` changes were added via
 +		// patch-package. The patch can be removed once we upgrade to
-+		// react-native-modal@^13.0.0. git.io/JPQgq
++		// react-native-modal@^13.0.0. https://git.io/JPQgq
 +        this.didUpdateDimensionsEmitter = DeviceEventEmitter.addListener(
 +            'didUpdateDimensions',
 +            this.handleDimensionsUpdate
@@ -24,7 +24,7 @@ index 165cd55..85f820c 100644
 -        DeviceEventEmitter.removeListener('didUpdateDimensions', this.handleDimensionsUpdate);
 +		// The following `didUpdateDimensionsEmitter` changes were added via
 +		// patch-package. The patch can be removed once we upgrade to
-+		// react-native-modal@^13.0.0. git.io/JPQgq
++		// react-native-modal@^13.0.0. https://git.io/JPQgq
 +        if ( this.didUpdateDimensionsEmitter ) {
 +            this.didUpdateDimensionsEmitter.remove();
 +        }
