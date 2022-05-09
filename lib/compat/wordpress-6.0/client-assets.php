@@ -49,7 +49,7 @@ function gutenberg_resolve_assets() {
 	);
 
 	if ( current_theme_supports( 'wp-block-styles' ) ) {
-		$style_handles[] = 'wp-block-styles';
+		$style_handles[] = 'wp-block-library-theme';
 	}
 
 	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
