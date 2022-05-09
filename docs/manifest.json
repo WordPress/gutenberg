@@ -1710,6 +1710,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/preferences",
 		"slug": "packages-preferences",
 		"markdown_source": "../packages/preferences/README.md",
@@ -2091,6 +2097,12 @@
 		"title": "Deprecations",
 		"slug": "deprecations",
 		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
+	},
+	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/code/how-to-get-your-pull-request-reviewed.md",
 		"parent": "code"
 	},
 	{

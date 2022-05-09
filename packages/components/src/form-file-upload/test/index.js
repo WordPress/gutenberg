@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render as RTLrender, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -14,16 +14,6 @@ import FormFileUpload from '../';
  */
 const { File } = window;
 
-function render( jsx ) {
-	return {
-		user: userEvent.setup( {
-			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
-			delay: null,
-		} ),
-		...RTLrender( jsx ),
-	};
-}
-
 // @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
 const fakePath = expect.objectContaining( {
 	target: expect.objectContaining( {
@@ -32,6 +22,15 @@ const fakePath = expect.objectContaining( {
 } );
 
 describe( 'FormFileUpload', () => {
+	beforeEach( () => {
+		jest.useFakeTimers();
+	} );
+
+	afterEach( () => {
+		jest.runOnlyPendingTimers();
+		jest.useRealTimers();
+	} );
+
 	it( 'should show an Icon Button and a hidden input', () => {
 		render( <FormFileUpload>My Upload Button</FormFileUpload> );
 
@@ -42,9 +41,13 @@ describe( 'FormFileUpload', () => {
 	} );
 
 	it( 'should not fire a change event after selecting the same file', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChange = jest.fn();
 
-		const { user } = render(
+		render(
 			<FormFileUpload onChange={ onChange }>
 				My Upload Button
 			</FormFileUpload>
@@ -65,9 +68,13 @@ describe( 'FormFileUpload', () => {
 	} );
 
 	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChange = jest.fn();
 
-		const { user } = render(
+		render(
 			<FormFileUpload
 				onClick={ jest.fn( ( e ) => ( e.target.value = '' ) ) }
 				onChange={ onChange }

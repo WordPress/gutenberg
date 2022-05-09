@@ -16,12 +16,15 @@ export async function deleteAllWidgets() {
 		} ) )
 	);
 
-	await this.batchRest(
-		sidebars.map( ( sidebar ) => ( {
-			method: 'POST',
-			path: `/wp/v2/sidebars/${ sidebar.id }`,
-			body: { id: sidebar.id, widgets: [] },
-		} ) )
+	// The endpoint doesn't support batch requests yet.
+	await Promise.all(
+		sidebars.map( ( sidebar ) =>
+			this.rest( {
+				method: 'POST',
+				path: `/wp/v2/sidebars/${ sidebar.id }`,
+				data: { id: sidebar.id, widgets: [] },
+			} )
+		)
 	);
 }
 

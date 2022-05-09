@@ -167,7 +167,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
         <button
           aria-expanded="false"
           aria-haspopup="true"
-          aria-label="View options"
+          aria-label="Panel header options"
           class="components-button components-dropdown-menu__toggle is-small has-icon"
           type="button"
         >

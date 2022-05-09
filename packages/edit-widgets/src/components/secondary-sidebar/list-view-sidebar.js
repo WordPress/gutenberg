@@ -60,12 +60,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<ListView
-					showNestedBlocks
-					__experimentalHideContainerBlockActions
-					__experimentalFeatures
-					__experimentalPersistentListViewFeatures
-				/>
+				<ListView />
 			</div>
 		</div>
 	);

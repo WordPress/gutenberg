@@ -36,12 +36,22 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
+	$prefix = "<div $wrapper_attributes>";
+	if ( isset( $attributes['prefix'] ) && $attributes['prefix'] ) {
+		$prefix .= '<span class="wp-block-post-terms__prefix">' . $attributes['prefix'] . '</span>';
+	}
+
+	$suffix = '</div>';
+	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
+		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
+	}
+
 	return get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
-		"<div $wrapper_attributes>",
+		wp_kses_post( $prefix ),
 		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
-		'</div>'
+		wp_kses_post( $suffix )
 	);
 }
 

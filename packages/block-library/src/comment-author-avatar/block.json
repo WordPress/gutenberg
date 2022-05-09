@@ -1,6 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
+	"__experimental": "fse",
 	"name": "core/comment-author-avatar",
 	"title": "Comment Author Avatar (deprecated)",
 	"category": "theme",

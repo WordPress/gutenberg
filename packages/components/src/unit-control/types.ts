@@ -74,7 +74,10 @@ export type UnitSelectControlProps = {
 
 // TODO: when available, should (partially) extend `NumberControl` props.
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
-	Pick< InputControlProps, 'hideLabelFromVision' > & {
+	Pick<
+		InputControlProps,
+		'hideLabelFromVision' | '__next36pxDefaultSize'
+	> & {
 		__unstableStateReducer?: StateReducer;
 		__unstableInputWidth?: CSSProperties[ 'width' ];
 		/**

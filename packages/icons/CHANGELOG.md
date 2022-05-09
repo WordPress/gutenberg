@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+-   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
+
+### Enhancement
+-   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
+
+## 8.4.0 (2022-05-04)
+
 ## 8.3.0 (2022-04-21)
 ### New Features
 
