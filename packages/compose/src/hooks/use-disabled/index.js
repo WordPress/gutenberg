@@ -43,7 +43,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
  *
  * @example
  * ```js
- * import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+ * import { useDisabled } from '@wordpress/compose';
  * const DisabledExample = () => {
  * 	const disabledRef = useDisabled();
  *	return (
