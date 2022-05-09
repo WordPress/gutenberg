@@ -1,7 +1,17 @@
 <?php
+/**
+ * Navigation block rendering tests.
+ *
+ * @package WordPress
+ * @subpackage Blocks
+ */
 
+/**
+ * Tests for the Navigation block.
+ *
+ * @group blocks
+ */
 class Render_Block_Navigation_Test extends WP_UnitTestCase {
-
 	/**
 	 * @covers ::gutenberg_block_core_navigation_from_block_get_post_ids
 	 */
