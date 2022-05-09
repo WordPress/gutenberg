@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
+
 ## 19.10.0 (2022-05-04)
 
 ### Internal
