@@ -16,7 +16,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { useDisabled } from '@wordpress/compose';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,7 +54,7 @@ export default function PostCommentsEdit( {
 	);
 
 	let warning = __(
-		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
+		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments" block.'
 	);
 	let showPlaceholder = true;
 
@@ -110,7 +111,10 @@ export default function PostCommentsEdit( {
 						ref={ disabledRef }
 					>
 						<h3>
-							{ __( 'One response to' ) } “{ postTitle }”
+							{
+								/* translators: %s: Post title. */
+								sprintf( __( 'One response to %s' ), postTitle )
+							}
 						</h3>
 
 						<div className="navigation">
@@ -135,23 +139,43 @@ export default function PostCommentsEdit( {
 												width="32"
 												loading="lazy"
 											/>
-											<b className="fn">
-												<a href="#top" className="url">
-													{ __(
-														'A WordPress Commenter'
-													) }
-												</a>
-											</b>{ ' ' }
-											<span className="says">
-												{ __( 'says' ) }:
-											</span>
+											{ createInterpolateElement(
+												sprintf(
+													/* translators: %s: Comment author link. */
+													__(
+														'%s <span>says:</span>'
+													),
+													sprintf(
+														'<cite><a>%s</a></cite>',
+														__(
+															'A WordPress Commenter'
+														)
+													)
+												),
+												{
+													span: (
+														<span className="says" />
+													),
+													a: (
+														/* eslint-disable jsx-a11y/anchor-has-content */
+														<a
+															href="#top"
+															className="url"
+														/>
+														/* eslint-enable jsx-a11y/anchor-has-content */
+													),
+													cite: (
+														<cite className="fn" />
+													),
+												}
+											) }
 										</div>
 
 										<div className="comment-metadata">
 											<a href="#top">
-												<time dateTime="2000-01-01T00:00:00+00:00">
+												<time dateTime="2000-01-01T12:00:00+00:00">
 													{ __(
-														'January 1, 2000 at 00:00 am'
+														'January 1, 2000 at 12:00 am'
 													) }
 												</time>
 											</a>{ ' ' }
@@ -174,13 +198,17 @@ export default function PostCommentsEdit( {
 												'To get started with moderating, editing, and deleting comments, please visit the Comments screen in the dashboard.'
 											) }
 											<br />
-											{ __(
-												'Commenter avatars come from'
-											) }{ ' ' }
-											<a href="https://gravatar.com/">
-												Gravatar
-											</a>
-											.
+											{ createInterpolateElement(
+												__(
+													'Commenter avatars come from <a>Gravatar</a>'
+												),
+												{
+													a: (
+														/* eslint-disable-next-line jsx-a11y/anchor-has-content */
+														<a href="https://gravatar.com/" />
+													),
+												}
+											) }
 										</p>
 									</div>
 
@@ -188,7 +216,11 @@ export default function PostCommentsEdit( {
 										<a
 											className="comment-reply-link"
 											href="#top"
-											aria-label="Reply to A WordPress Commenter"
+											aria-label={ sprintf(
+												/* translators: Comment reply button text. %s: Comment author name. */
+												__( 'Reply to %s' ),
+												__( 'A WordPress Commenter' )
+											) }
 										>
 											{ __( 'Reply' ) }
 										</a>

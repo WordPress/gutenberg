@@ -10,7 +10,6 @@ import {
 	useState,
 	createPortal,
 	forwardRef,
-	useEffect,
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
@@ -34,61 +33,66 @@ const BLOCK_PREFIX = 'wp-block';
  *
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
- *
- * @param {Document} doc The document to append cloned stylesheets to.
  */
-function styleSheetsCompat( doc ) {
-	// Search the document for stylesheets targetting the editor canvas.
-	Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-		try {
-			// May fail for external styles.
-			// eslint-disable-next-line no-unused-expressions
-			styleSheet.cssRules;
-		} catch ( e ) {
-			return;
-		}
-
-		const { ownerNode, cssRules } = styleSheet;
-
-		if ( ! cssRules ) {
-			return;
-		}
-
-		// Generally, ignore inline styles. We add inline styles belonging to a
-		// stylesheet later, which may or may not match the selectors.
-		if ( ownerNode.tagName !== 'LINK' ) {
-			return;
-		}
-
-		// Don't try to add the reset styles, which were removed as a dependency
-		// from `edit-blocks` for the iframe since we don't need to reset admin
-		// styles.
-		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-			return;
-		}
-
-		const isMatch = Array.from( cssRules ).find(
-			( { selectorText } ) =>
-				selectorText &&
-				( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-					selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-		);
-
-		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			// Display warning once we have a way to add style dependencies to the editor.
-			// See: https://github.com/WordPress/gutenberg/pull/37466.
-
-			doc.head.appendChild( ownerNode.cloneNode( true ) );
-
-			// Add inline styles belonging to the stylesheet.
-			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
-			const inlineCssElement = document.getElementById( inlineCssId );
-
-			if ( inlineCssElement ) {
-				doc.head.appendChild( inlineCssElement.cloneNode( true ) );
+function useStylesCompatibility() {
+	return useRefEffect( ( node ) => {
+		// Search the document for stylesheets targetting the editor canvas.
+		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+			try {
+				// May fail for external styles.
+				// eslint-disable-next-line no-unused-expressions
+				styleSheet.cssRules;
+			} catch ( e ) {
+				return;
 			}
-		}
-	} );
+
+			const { ownerNode, cssRules } = styleSheet;
+
+			if ( ! cssRules ) {
+				return;
+			}
+
+			// Generally, ignore inline styles. We add inline styles belonging to a
+			// stylesheet later, which may or may not match the selectors.
+			if ( ownerNode.tagName !== 'LINK' ) {
+				return;
+			}
+
+			// Don't try to add the reset styles, which were removed as a dependency
+			// from `edit-blocks` for the iframe since we don't need to reset admin
+			// styles.
+			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+				return;
+			}
+
+			const isMatch = Array.from( cssRules ).find(
+				( { selectorText } ) =>
+					selectorText &&
+					( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
+						selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+			);
+
+			if (
+				isMatch &&
+				! node.ownerDocument.getElementById( ownerNode.id )
+			) {
+				// Display warning once we have a way to add style dependencies to the editor.
+				// See: https://github.com/WordPress/gutenberg/pull/37466.
+				node.appendChild( ownerNode.cloneNode( true ) );
+
+				// Add inline styles belonging to the stylesheet.
+				const inlineCssId = ownerNode.id.replace(
+					'-css',
+					'-inline-css'
+				);
+				const inlineCssElement = document.getElementById( inlineCssId );
+
+				if ( inlineCssElement ) {
+					node.appendChild( inlineCssElement.cloneNode( true ) );
+				}
+			}
+		} );
+	}, [] );
 }
 
 /**
@@ -222,12 +226,7 @@ function Iframe(
 			} );
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
-
-	useEffect( () => {
-		if ( iframeDocument ) {
-			styleSheetsCompat( iframeDocument );
-		}
-	}, [ iframeDocument ] );
+	const styleCompatibilityRef = useStylesCompatibility();
 
 	head = (
 		<>
@@ -275,6 +274,15 @@ function Iframe(
 									...bodyClasses
 								) }
 							>
+								{ /*
+								 * This is a wrapper for the extra styles and scripts
+								 * rendered imperatively by cloning the parent,
+								 * it's important that this div's content remains uncontrolled.
+								 */ }
+								<div
+									style={ { display: 'none' } }
+									ref={ styleCompatibilityRef }
+								/>
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>
