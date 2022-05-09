@@ -110,14 +110,14 @@ export function getInlineStyles( styles = {} ) {
 
 function compileElementsStyles( selector, elements = {} ) {
 	return Object.entries( elements )
-		.map( ( [ key, styles ] ) => {
+		.map( ( [ element, styles ] ) => {
 			const elementStyles = getInlineStyles( styles );
 			if ( ! isEmpty( elementStyles ) ) {
 				// The .editor-styles-wrapper selector is required on elements styles. As it is
 				// added to all other editor styles, not providing it causes reset and global
 				// styles to override element styles because of higher specificity.
 				return [
-					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ key ] }{`,
+					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
 					...Object.entries( elementStyles ).map(
 						( [ cssProperty, value ] ) =>
 							`\t${ kebabCase( cssProperty ) }: ${ value };`
