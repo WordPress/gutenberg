@@ -67,7 +67,9 @@ export function getCSSRules(
 ): GeneratedCSSRule[] {
 	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
-		rules.push( ...definition.generate( style, options ) );
+		if ( typeof definition.generate === 'function' ) {
+			rules.push( ...definition.generate( style, options ) );
+		}
 	} );
 
 	return rules;
