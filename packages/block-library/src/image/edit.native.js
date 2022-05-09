@@ -466,7 +466,7 @@ export class ImageEdit extends Component {
 	onSelectURL( newURL ) {
 		const {
 			attributes: url,
-			createNotice,
+			createErrorNotice,
 			imageDefaultSize,
 			setAttributes,
 		} = this.props;
@@ -481,10 +481,7 @@ export class ImageEdit extends Component {
 					sizeSlug: imageDefaultSize,
 				} );
 			} else {
-				createNotice(
-					'error',
-					__( 'Invalid URL. Image file not found.' )
-				);
+				createErrorNotice( __( 'Invalid URL. Image file not found.' ) );
 			}
 		}
 	}
@@ -912,10 +909,10 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( noticesStore );
+		const { createErrorNotice } = dispatch( noticesStore );
 
 		return {
-			createNotice,
+			createErrorNotice,
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
 			},
