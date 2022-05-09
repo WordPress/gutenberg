@@ -41,6 +41,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'./.eslintrc-auto-import.json',
 	],
 	globals: {
 		wp: 'off',

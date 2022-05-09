@@ -4,6 +4,7 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { join } = require( 'path' );
 const { flatMap } = require( 'lodash' );
+const AutoImport = require( 'unplugin-auto-import/webpack' );
 
 /**
  * WordPress dependencies
@@ -152,6 +153,25 @@ module.exports = {
 				} ) )
 				.concat( bundledPackagesPhpConfig )
 				.concat( vendorsCopyConfig ),
+		} ),
+		AutoImport( {
+			/* options */
+			include: [
+				/\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+			],
+			// global imports to register
+			imports: [
+				// WordPress dependencies
+				{
+					'@wordpress/element': [ 'useState' ],
+				},
+			],
+			eslintrc: {
+				enabled: true, // Default `false`
+				filepath: './.eslintrc-auto-import.json', // Default `./.eslintrc-auto-import.json`
+				globalsPropValue: true, // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
+			},
+			dts: './auto-imports.d.ts',
 		} ),
 	].filter( Boolean ),
 };
