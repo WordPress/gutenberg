@@ -47,10 +47,7 @@ const VARIABLE_REFERENCE_PREFIX = 'var:';
 const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
 function compileStyleValue( uncompiledValue ) {
-	if (
-		typeof uncompiledValue === 'string' &&
-		uncompiledValue.startsWith( VARIABLE_REFERENCE_PREFIX )
-	) {
+	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -74,7 +71,7 @@ export function getInlineStyles( styles = {} ) {
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
 		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== path[ 0 ] ) {
+		if ( has( styles, path ) && 'elements' !== path?.[ 0 ] ) {
 			// Checking if style value is a string allows for shorthand css
 			// option and backwards compatibility for border radius support.
 			const styleValue = get( styles, path );
@@ -112,20 +109,18 @@ export function getInlineStyles( styles = {} ) {
 }
 
 function compileElementsStyles( selector, elements = {} ) {
-	return Object.keys( elements )
-		.map( ( key ) => {
-			const elementStyles = getInlineStyles( elements[ key ] );
+	return Object.entries( elements )
+		.map( ( [ key, styles ] ) => {
+			const elementStyles = getInlineStyles( styles );
 			if ( ! isEmpty( elementStyles ) ) {
 				// The .editor-styles-wrapper selector is required on elements styles. As it is
 				// added to all other editor styles, not providing it causes reset and global
 				// styles to override element styles because of higher specificity.
 				return [
 					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ key ] }{`,
-					...Object.keys( elementStyles ).map(
-						( cssProperty ) =>
-							`\t${ kebabCase( cssProperty ) }: ${
-								elementStyles[ cssProperty ]
-							};`
+					...Object.entries( elementStyles ).map(
+						( cssProperty, value ) =>
+							`\t${ kebabCase( cssProperty ) }: ${ value };`
 					),
 					'}',
 				].join( '\n' );
@@ -230,20 +225,17 @@ export function addSaveProps(
 	}
 
 	let { style } = attributes;
-
-	Object.keys( skipPaths ).forEach( ( indicator ) => {
+	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization = getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {
-			style = omit( style, skipPaths[ indicator ] );
+			style = omit( style, path );
 		}
 
 		if ( Array.isArray( skipSerialization ) ) {
 			skipSerialization.forEach( ( featureName ) => {
 				const feature = renamedFeatures[ featureName ] || featureName;
-				style = omit( style, [
-					[ ...skipPaths[ indicator ], feature ],
-				] );
+				style = omit( style, [ [ ...path, feature ] ] );
 			} );
 		}
 	} );
