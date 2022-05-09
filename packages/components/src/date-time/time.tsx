@@ -4,7 +4,7 @@
 import classnames from 'classnames';
 import { isInteger } from 'lodash';
 import moment from 'moment';
-import type { FocusEvent, ReactNode } from 'react';
+import type { FocusEvent } from 'react';
 import type { Moment } from 'moment';
 
 /**
@@ -25,19 +25,12 @@ import Button from '../button';
 import ButtonGroup from '../button-group';
 import TimeZone from './timezone';
 import type { WordPressComponentProps } from '../ui/context';
-import type { TimePickerProps } from './types';
+import type { UpdateOnBlurAsIntegerFieldProps, TimePickerProps } from './types';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
-}
-
-interface UpdateOnBlurAsIntegerFieldProps {
-	value: number | string;
-	onUpdate: ( value: number ) => void;
-	className?: string;
-	children?: ReactNode;
 }
 
 /**
