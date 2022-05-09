@@ -69,13 +69,11 @@ register( store );
 
 export { default as EntityProvider } from './entity-provider';
 export {
-	default as useEntityRecord,
+	useEntityRecord,
 	__experimentalUseEntityRecord,
-} from './hooks/use-entity-record';
-export {
-	default as useEntityRecords,
+	useEntityRecords,
 	__experimentalUseEntityRecords,
-} from './hooks/use-entity-records';
+} from './hooks';
 export * from './entity-provider';
 export * from './fetch';
 export * from './entity-types';
