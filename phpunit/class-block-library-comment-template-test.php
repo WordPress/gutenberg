@@ -57,7 +57,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals(
+		$this->assertSameSetsWithIndex(
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -85,7 +85,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals(
+		$this->assertSameSetsWithIndex(
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -106,7 +106,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 		$block = new WP_Block( $parsed_blocks[0] );
 
-		$this->assertEquals(
+		$this->assertSameSetsWithIndex(
 			array(
 				'orderby'       => 'comment_date_gmt',
 				'order'         => 'ASC',
@@ -129,7 +129,7 @@ class Block_Library_Comment_Template_Test extends WP_UnitTestCase {
 
 		// This could be any number, we set a fixed one instead of a random for better performance.
 		$comment_query_max_num_pages = 5;
-		// We substract 1 because we created 1 comment at the beginning.
+		// We subtract 1 because we created 1 comment at the beginning.
 		$post_comments_numbers = ( self::$per_page * $comment_query_max_num_pages ) - 1;
 		self::factory()->comment->create_post_comments(
 			self::$custom_post->ID,
@@ -336,8 +336,7 @@ END
 
 		add_filter( 'wp_get_current_commenter', $commenter_filter );
 
-		$this->assertEquals(
-			build_comment_query_vars_from_block( $block ),
+		$this->assertSameSetsWithIndex(
 			array(
 				'orderby'            => 'comment_date_gmt',
 				'order'              => 'ASC',
@@ -348,7 +347,8 @@ END
 				'hierarchical'       => 'threaded',
 				'number'             => 5,
 				'paged'              => 1,
-			)
+			),
+			build_comment_query_vars_from_block( $block )
 		);
 	}
 
@@ -379,7 +379,7 @@ END
 			)
 		);
 
-		$commenter_filter = function () {
+		$commenter_filter = static function () {
 			return array(
 				'comment_author_email' => 'unapproved@example.org',
 			);
@@ -387,17 +387,19 @@ END
 
 		add_filter( 'wp_get_current_commenter', $commenter_filter );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li><li id="comment-' . $unapproved_comment[0] . '" class="comment odd alt thread-even depth-1"><div class="wp-block-comment-author-name">Visitor</div><div class="wp-block-comment-content"><p><em class="comment-awaiting-moderation">Your comment is awaiting moderation.</em></p>Hi there! My comment needs moderation.</div></li></ol>',
-			str_replace( array( "\n", "\t" ), '', $block->render() )
+			str_replace( array( "\n", "\t" ), '', $block->render() ),
+			'Should include unapproved comments when filter applied'
 		);
 
 		remove_filter( 'wp_get_current_commenter', $commenter_filter );
 
 		// Test it again and ensure the unmoderated comment doesn't leak out.
-		$this->assertEquals(
+		$this->assertSame(
 			'<ol class="wp-block-comment-template"><li id="comment-' . self::$comment_ids[0] . '" class="comment even thread-odd thread-alt depth-1"><div class="wp-block-comment-author-name"><a rel="external nofollow ugc" href="http://example.com/author-url/" target="_self" >Test</a></div><div class="wp-block-comment-content"><p>Hello world</p></div></li></ol>',
-			str_replace( array( "\n", "\t" ), '', $block->render() )
+			str_replace( array( "\n", "\t" ), '', $block->render() ),
+			'Should not include any unapproved comments after removing filter'
 		);
 	}
 }
