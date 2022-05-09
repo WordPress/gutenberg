@@ -27,7 +27,9 @@ const TimeZone = () => {
 
 	const offsetSymbol = Number( timezone.offset ) >= 0 ? '+' : '';
 	const zoneAbbr =
-		timezone.abbr || `UTC${ offsetSymbol }${ timezone.offset }`;
+		'' !== timezone.abbr && isNaN( Number( timezone.abbr ) )
+			? timezone.abbr
+			: `UTC${ offsetSymbol }${ timezone.offset }`;
 
 	const timezoneDetail =
 		'UTC' === timezone.string
