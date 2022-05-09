@@ -262,20 +262,22 @@ export function addSaveProps( props, blockType, attributes ) {
 	// Primary color classes must come before the `has-text-color`,
 	// `has-background` and `has-link-color` classes to maintain backwards
 	// compatibility and avoid block invalidations.
-	if ( textColor && shouldSerialize( 'text' ) ) {
-		colorStyles.text = `var:preset|color|${ textColor }`;
+	if ( shouldSerialize( 'text' ) ) {
+		colorStyles.text = textColor
+			? `var:preset|color|${ textColor }`
+			: style?.color?.text;
 	}
 
-	if (
-		gradient &&
-		shouldSerialize( 'gradients' ) &&
-		hasGradientSupport( blockType )
-	) {
-		colorStyles.gradient = `var:preset|gradient|${ gradient }`;
+	if ( shouldSerialize( 'gradients' ) && hasGradientSupport( blockType ) ) {
+		colorStyles.gradient = gradient
+			? `var:preset|gradient|${ gradient }`
+			: style?.color?.gradient;
 	}
 
-	if ( backgroundColor && shouldSerialize( 'background' ) ) {
-		colorStyles.background = `var:preset|color|${ backgroundColor }`;
+	if ( shouldSerialize( 'background' ) ) {
+		colorStyles.background = backgroundColor
+			? `var:preset|color|${ backgroundColor }`
+			: style?.color?.background;
 	}
 
 	const newClassName = classnames(
