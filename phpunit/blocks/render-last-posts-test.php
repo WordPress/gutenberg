@@ -12,8 +12,17 @@
  * @group blocks
  */
 class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
+	/**
+	 * @var WP_Post
+	 */
 	protected static $post;
+	/**
+	 * @var WP_Post
+	 */
 	protected static $sticky_post;
+	/**
+	 * @var int
+	 */
 	protected static $attachment_id;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
@@ -33,9 +42,8 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		set_post_thumbnail( self::$post, self::$attachment_id );
 	}
 
-	public static function tear_down_after_class() {
+	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$attachment_id, true );
-		parent::tear_down_after_class();
 	}
 
 	/**
@@ -73,7 +81,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		render_block_core_latest_posts( $attributes );
 		$args      = $a->get_args();
 		$last_args = end( $args );
-		$this->assertContains( self::$post->ID, $last_args );
-		$this->assertNotContains( self::$sticky_post->ID, $last_args[1] );
+		$this->assertContains( self::$post->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
+		$this->assertNotContains( self::$sticky_post->ID, $last_args[1], 'Ensure that sticky post is not in array of post ids that are primed' );
 	}
 }
