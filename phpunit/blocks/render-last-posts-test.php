@@ -39,7 +39,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers render_block_core_latest_posts
+	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts() {
 		$a = new MockAction();
@@ -58,7 +58,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers render_block_core_latest_posts
+	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_no_priming() {
 		$a = new MockAction();
