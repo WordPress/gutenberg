@@ -220,6 +220,9 @@ class DependencyExtractionWebpackPlugin {
 			};
 
 			const assetString = this.stringify( assetData );
+			const contentHash = createHash( 'sha512' )
+				.update( assetString )
+				.digest( 'hex' );
 
 			// Determine a filename for the asset file.
 			const [ filename, query ] = entrypointName.split( '?', 2 );
@@ -230,9 +233,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'sha512' )
-						.update( assetString )
-						.digest( 'hex' ),
+					contentHash,
 				}
 			);
 
@@ -249,9 +250,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'sha512' )
-						.update( assetString )
-						.digest( 'hex' ),
+					contentHash,
 				} );
 			} else {
 				assetFilename = buildFilename.replace(
