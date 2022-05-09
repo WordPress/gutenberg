@@ -200,7 +200,10 @@ class DependencyExtractionWebpackPlugin {
 
 			// Go through the assets and hash the sources. We can't just use
 			// `entrypointChunk.contentHash` because that's not updated when
-			// assets are minified.
+			// assets are minified. In practice the hash is updated by
+			// `RealContentHashPlugin` after minification, but it only modifies
+			// already-produced asset filenames and the updated hash is not
+			// available to plugins.
 			const hash = createHash( compilation.outputOptions.hashFunction );
 			for ( const filename of entrypoint.getFiles().sort() ) {
 				const asset = compilation.getAsset( filename );
