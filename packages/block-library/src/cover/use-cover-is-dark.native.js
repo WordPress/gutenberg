@@ -7,7 +7,7 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * useCoverIsDark is a hook that returns a boolean variable specifying if the cover

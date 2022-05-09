@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 export default function useClientWidth( ref, dependencies ) {
 	const [ clientWidth, setClientWidth ] = useState();

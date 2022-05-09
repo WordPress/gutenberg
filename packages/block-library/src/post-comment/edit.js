@@ -3,7 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+
 import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 

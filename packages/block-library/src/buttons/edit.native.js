@@ -16,7 +16,7 @@ import {
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
 
 /**

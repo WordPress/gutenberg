@@ -14,7 +14,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { memo, useState } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 

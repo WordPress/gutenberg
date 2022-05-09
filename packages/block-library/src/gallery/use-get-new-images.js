@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Keeps track of images already in the gallery to allow new innerBlocks to be identified. This

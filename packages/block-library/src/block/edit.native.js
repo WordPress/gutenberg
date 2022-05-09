@@ -12,7 +12,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import {
 	useEntityBlockEditor,
 	useEntityProp,

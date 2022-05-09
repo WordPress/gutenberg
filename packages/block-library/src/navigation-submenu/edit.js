@@ -32,7 +32,6 @@ import {
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
 	Fragment,
-	useState,
 	useEffect,
 	useRef,
 	createInterpolateElement,

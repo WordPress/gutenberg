@@ -15,7 +15,7 @@ import styles from './gallery-styles.scss';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockCaption, useInnerBlocksProps } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';

@@ -23,7 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+
 import { getFilename } from '@wordpress/url';
 
 const ALLOWED_TYPES = [ 'text/vtt' ];

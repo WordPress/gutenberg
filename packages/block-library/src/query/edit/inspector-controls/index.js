@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies

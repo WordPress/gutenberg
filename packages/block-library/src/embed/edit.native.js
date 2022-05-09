@@ -24,7 +24,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { useCallback, useState, useEffect } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,

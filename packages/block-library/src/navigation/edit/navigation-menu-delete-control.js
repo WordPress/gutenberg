@@ -8,7 +8,7 @@ import {
 	useEntityProp,
 } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+
 import { __, sprintf } from '@wordpress/i18n';
 
 export default function NavigationMenuDeleteControl( { onDelete } ) {

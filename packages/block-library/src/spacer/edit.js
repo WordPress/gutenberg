@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useBlockProps } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { View } from '@wordpress/primitives';
 
 /**

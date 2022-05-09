@@ -23,7 +23,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies

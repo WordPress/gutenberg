@@ -29,7 +29,6 @@ import {
 import { withDispatch, useSelect } from '@wordpress/data';
 import {
 	useEffect,
-	useState,
 	useContext,
 	useMemo,
 	useCallback,

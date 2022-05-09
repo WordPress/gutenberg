@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, memo } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {

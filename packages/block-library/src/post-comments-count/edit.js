@@ -12,7 +12,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';

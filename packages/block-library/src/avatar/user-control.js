@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
 
 const AUTHORS_QUERY = {
 	who: 'authors',

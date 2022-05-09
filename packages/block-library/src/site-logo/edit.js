@@ -11,7 +11,6 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
-	useState,
 	useRef,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';

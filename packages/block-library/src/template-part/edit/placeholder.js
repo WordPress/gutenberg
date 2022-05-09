@@ -3,7 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Button, Spinner } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies

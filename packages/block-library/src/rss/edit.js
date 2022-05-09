@@ -16,7 +16,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';

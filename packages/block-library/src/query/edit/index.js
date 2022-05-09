@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore, cloneBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,

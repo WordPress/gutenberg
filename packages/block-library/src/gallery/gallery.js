@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';

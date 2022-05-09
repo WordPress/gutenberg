@@ -9,13 +9,7 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import {
-	Fragment,
-	useEffect,
-	useRef,
-	useState,
-	useMemo,
-} from '@wordpress/element';
+import { Fragment, useEffect, useRef, useMemo } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,

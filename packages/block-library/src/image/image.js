@@ -30,7 +30,7 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { createBlock, switchToBlockType } from '@wordpress/blocks';

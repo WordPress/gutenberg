@@ -3,7 +3,7 @@
  */
 import { useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**

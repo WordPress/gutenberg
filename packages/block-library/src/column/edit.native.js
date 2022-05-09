@@ -8,7 +8,7 @@ import { View, Dimensions } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,

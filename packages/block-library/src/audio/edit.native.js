@@ -28,7 +28,6 @@ import {
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isURL } from '@wordpress/url';
