@@ -56,9 +56,8 @@ export function useResizeLabel( {
 	showPx = false,
 }: UseResizeLabelArgs ): UseResizeLabelProps {
 	/*
-	 * The width/height values derive from this special useResizeAware hook.
-	 * This custom hook uses injects an iFrame into the element, allowing it
-	 * to tap into the onResize (window) callback events.
+	 * The width/height values derive from this special useResizeObserver hook.
+	 * This custom hook uses the ResizeObserver API to listen for resize events.
 	 */
 	const [ resizeListener, sizes ] = useResizeObserver();
 
