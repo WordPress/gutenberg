@@ -59,7 +59,7 @@ const EMPTY_ARRAY = [];
  * @return Entity records data.
  * @template RecordType
  */
-export default function useEntityRecords< RecordType >(
+export function useEntityRecords< RecordType >(
 	kind: string,
 	name: string,
 	queryArgs: Record< string, unknown > = {},
@@ -89,6 +89,8 @@ export default function useEntityRecords< RecordType >(
 		...rest,
 	};
 }
+
+export default useEntityRecords;
 
 export function __experimentalUseEntityRecords(
 	kind: string,
