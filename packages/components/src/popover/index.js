@@ -9,7 +9,6 @@ import {
 	shift,
 	autoUpdate,
 	arrow,
-	hide,
 	offset as offsetMiddleware,
 } from '@floating-ui/react-dom';
 
@@ -144,7 +143,6 @@ const Popover = (
 			crossAxis: true,
 		} ),
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
-		hide(),
 	].filter( ( m ) => !! m );
 	const anchorRefFallback = useRef( null );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
@@ -176,10 +174,7 @@ const Popover = (
 		refs,
 		update,
 		placement: placementData,
-		middlewareData: {
-			arrow: arrowData = {},
-			hide: { referenceHidden } = {},
-		},
+		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( {
 		placement: usedPlacement,
 		middleware: middlewares,
@@ -264,16 +259,15 @@ const Popover = (
 			ref={ mergedRefs }
 			{ ...dialogProps }
 			tabIndex="-1"
-			style={ {
-				...( isExpanded
+			style={
+				isExpanded
 					? undefined
 					: {
 							position: strategy,
 							left: Number.isNaN( x ) ? 0 : x,
 							top: Number.isNaN( y ) ? 0 : y,
-					  } ),
-				visibility: referenceHidden ? 'hidden' : 'visible',
-			} }
+					  }
+			}
 		>
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
