@@ -6,9 +6,11 @@ import classnames from 'classnames';
 import type { Moment } from 'moment';
 import { noop } from 'lodash';
 
-// react-dates doesn't tree-shake correctly, so we import from the individual
-// component here, to avoid including too much of the library.
-// @ts-ignore
+// `react-dates` doesn't tree-shake correctly, so we import from the individual
+// component here.
+// @ts-expect-error TypeScript won't find any type declarations at
+// `react-dates/lib/components/DayPickerSingleDateController` as they're located
+// at `react-dates`.
 import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 import type { DayPickerSingleDateController } from 'react-dates';
 const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
