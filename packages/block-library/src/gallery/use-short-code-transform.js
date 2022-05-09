@@ -34,6 +34,7 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 						mime: imageData.mime_type,
 						alt: imageData.alt_text,
 						link: imageData.link,
+						caption: imageData?.caption?.raw,
 					};
 				}
 				return undefined;

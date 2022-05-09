@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).
+-   Add new line at the end of generated `*.asset.php` files ([#40753](https://github.com/WordPress/gutenberg/pull/40753)).
+
 ## 3.3.0 (2022-01-27)
 
 -   Add the optional `externalizedReportFile` option ([#35106](https://github.com/WordPress/gutenberg/pull/35106)).

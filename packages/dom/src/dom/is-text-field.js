@@ -26,6 +26,8 @@ export default function isTextField( node ) {
 		'reset',
 		'submit',
 		'number',
+		'email',
+		'time',
 	];
 	return (
 		( isHTMLInputElement( node ) &&

@@ -85,7 +85,21 @@ function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post Content' ) }</p>
+			<p>
+				{ __(
+					'This is the Post Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+				) }
+			</p>
 		</div>
 	);
 }

@@ -18,7 +18,7 @@ import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __experimentalUseEntityRecord as useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies

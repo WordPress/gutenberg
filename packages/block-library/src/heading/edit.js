@@ -42,10 +42,13 @@ function HeadingEdit( {
 	} );
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
+		const settings = getSettings();
 
 		return {
-			canGenerateAnchors: !! settings.generateAnchors,
+			canGenerateAnchors:
+				!! settings.generateAnchors ||
+				getGlobalBlockCount( 'core/table-of-contents' ) > 0,
 		};
 	}, [] );
 
