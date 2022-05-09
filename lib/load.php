@@ -125,7 +125,6 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
-require __DIR__ . '/compat/wordpress-6.1/navigation.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 
 // Experimental features.
