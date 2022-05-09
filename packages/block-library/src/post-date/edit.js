@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useRef } from '@wordpress/element';
+
 import {
 	dateI18n,
 	__experimentalGetSettings as getDateSettings,

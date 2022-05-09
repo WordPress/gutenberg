@@ -9,7 +9,7 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,

@@ -6,7 +6,7 @@ import {
 	getDefaultBlockName,
 	cloneBlock,
 } from '@wordpress/blocks';
-import { useRef } from '@wordpress/element';
+
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';

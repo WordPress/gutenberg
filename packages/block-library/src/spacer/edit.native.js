@@ -9,7 +9,6 @@ import { View } from 'react-native';
 import { useConvertUnitToMobile } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies

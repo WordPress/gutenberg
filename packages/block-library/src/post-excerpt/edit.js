@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+
 import {
 	AlignmentToolbar,
 	BlockControls,

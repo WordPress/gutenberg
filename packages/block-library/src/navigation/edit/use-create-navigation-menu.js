@@ -4,7 +4,6 @@
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies

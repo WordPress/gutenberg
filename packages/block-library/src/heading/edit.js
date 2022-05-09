@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, Platform } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {

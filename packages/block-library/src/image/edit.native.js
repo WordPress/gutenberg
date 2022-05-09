@@ -7,7 +7,7 @@ import { useRoute } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { Component, useEffect } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,

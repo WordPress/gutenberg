@@ -27,13 +27,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import {
-	useEffect,
-	useContext,
-	useMemo,
-	useCallback,
-	memo,
-} from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { columns } from '@wordpress/icons';

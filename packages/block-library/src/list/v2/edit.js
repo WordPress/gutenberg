@@ -24,7 +24,6 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**

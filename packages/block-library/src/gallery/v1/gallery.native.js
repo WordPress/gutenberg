@@ -20,7 +20,7 @@ import {
 	BlockCaption,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
 import { alignmentHelpers } from '@wordpress/components';

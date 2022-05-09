@@ -1,5 +1,11 @@
 {
   "globals": {
+    "memo": true,
+    "useCallback": true,
+    "useContext": true,
+    "useEffect": true,
+    "useMemo": true,
+    "useRef": true,
     "useState": true
   }
 }

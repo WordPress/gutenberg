@@ -9,7 +9,6 @@ import { TouchableOpacity, TouchableWithoutFeedback, Text } from 'react-native';
 import { View } from '@wordpress/primitives';
 
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { requestPreview } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';

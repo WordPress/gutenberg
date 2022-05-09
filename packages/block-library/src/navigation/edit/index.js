@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useCallback, Platform } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,

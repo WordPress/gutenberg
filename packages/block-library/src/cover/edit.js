@@ -9,7 +9,6 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { Fragment, useEffect, useRef, useMemo } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -46,6 +45,7 @@ import {
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { postFeaturedImage, cover as icon } from '@wordpress/icons';

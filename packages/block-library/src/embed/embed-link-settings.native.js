@@ -9,7 +9,6 @@ import {
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 const EmbedLinkSettings = ( {
 	autoFocus,

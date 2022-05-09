@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { memo, useMemo } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
 
 /**

@@ -33,12 +33,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import {
-	Fragment,
-	useEffect,
-	useRef,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { Fragment, createInterpolateElement } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';

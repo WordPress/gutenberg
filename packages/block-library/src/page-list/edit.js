@@ -14,7 +14,6 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 

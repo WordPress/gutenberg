@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+
 import { useDispatch } from '@wordpress/data';
 import { store as noticeStore } from '@wordpress/notices';
 

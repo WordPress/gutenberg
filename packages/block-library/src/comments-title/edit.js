@@ -15,7 +15,6 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 

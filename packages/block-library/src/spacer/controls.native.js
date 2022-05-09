@@ -7,7 +7,7 @@ import {
 	getValueAndUnit,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+
 import { useSetting } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 

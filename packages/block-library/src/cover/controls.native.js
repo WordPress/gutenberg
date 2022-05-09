@@ -20,7 +20,6 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-import { useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSetting, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';

@@ -25,7 +25,7 @@ import {
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useMemo } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';

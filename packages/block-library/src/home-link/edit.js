@@ -10,7 +10,6 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
 
 const preventDefault = ( event ) => event.preventDefault();
 

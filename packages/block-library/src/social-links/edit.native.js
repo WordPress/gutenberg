@@ -10,7 +10,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useRef, useEffect } from '@wordpress/element';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**

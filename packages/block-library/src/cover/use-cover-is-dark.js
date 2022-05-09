@@ -4,11 +4,6 @@
 import FastAverageColor from 'fast-average-color';
 import { colord } from 'colord';
 
-/**
- * WordPress dependencies
- */
-import { useEffect } from '@wordpress/element';
-
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();

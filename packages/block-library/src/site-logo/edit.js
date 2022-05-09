@@ -8,11 +8,7 @@ import { includes, pick } from 'lodash';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import {
-	createInterpolateElement,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	MenuItem,

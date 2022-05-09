@@ -25,7 +25,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';

@@ -13,7 +13,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 

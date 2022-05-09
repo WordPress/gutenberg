@@ -10,7 +10,6 @@ import {
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useCallback } from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,

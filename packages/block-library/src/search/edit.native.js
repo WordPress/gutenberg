@@ -21,7 +21,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
-import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**

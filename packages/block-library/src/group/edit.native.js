@@ -16,7 +16,6 @@ import {
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
 
 /**

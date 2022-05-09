@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
  * Keeps track of images already in the gallery to allow new innerBlocks to be identified. This
  * is required so default gallery attributes can be applied without overwriting any custom
  * attributes applied to existing images.

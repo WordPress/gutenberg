@@ -4,11 +4,6 @@
 import { get, some } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
  * Calculates the image sizes that are avaible for the current gallery images in order to
  * populate the 'Image size' selector.
  *

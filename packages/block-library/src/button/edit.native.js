@@ -6,7 +6,6 @@ import { View, AccessibilityInfo, Platform, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {

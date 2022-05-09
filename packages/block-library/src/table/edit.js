@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+
 import {
 	InspectorControls,
 	BlockControls,

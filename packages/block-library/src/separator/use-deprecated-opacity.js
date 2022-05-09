@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+
 import { usePrevious } from '@wordpress/compose';
 
 export default function useDeprecatedOpacity(

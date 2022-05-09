@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useRef } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,

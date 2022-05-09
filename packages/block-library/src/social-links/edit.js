@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect, useRef } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	useInnerBlocksProps,

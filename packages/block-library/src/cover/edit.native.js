@@ -49,7 +49,6 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useRef, useCallback, useMemo } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 import { store as editPostStore } from '@wordpress/edit-post';

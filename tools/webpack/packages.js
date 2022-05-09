@@ -163,7 +163,15 @@ module.exports = {
 			imports: [
 				// WordPress dependencies
 				{
-					'@wordpress/element': [ 'useState' ],
+					'@wordpress/element': [
+						'useState',
+						'useCallback',
+						'useEffect',
+						'memo',
+						'useMemo',
+						'useContext',
+						'useRef',
+					],
 				},
 			],
 			eslintrc: {

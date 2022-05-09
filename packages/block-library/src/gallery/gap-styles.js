@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { BlockList } from '@wordpress/block-editor';
-import { useContext, createPortal } from '@wordpress/element';
+import { createPortal } from '@wordpress/element';
 
 export default function GapStyles( { blockGap, clientId } ) {
 	const styleElement = useContext( BlockList.__unstableElementContext );

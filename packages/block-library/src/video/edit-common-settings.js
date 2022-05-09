@@ -3,7 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { ToggleControl, SelectControl } from '@wordpress/components';
-import { useMemo, useCallback, Platform } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },

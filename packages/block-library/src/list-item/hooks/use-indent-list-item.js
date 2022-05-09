@@ -6,7 +6,7 @@ import { first } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 

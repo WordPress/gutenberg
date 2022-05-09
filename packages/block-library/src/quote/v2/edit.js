@@ -18,7 +18,7 @@ import {
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { Platform, useEffect } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
