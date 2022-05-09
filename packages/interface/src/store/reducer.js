@@ -19,6 +19,8 @@ export function complementaryAreas( state = {}, action ) {
 			return newState;
 		}
 	}
+
+	return state;
 }
 
 export default combineReducers( {

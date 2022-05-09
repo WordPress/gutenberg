@@ -11,11 +11,30 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * @param {Object} state Global application state.
  * @param {string} scope Item scope.
  *
- * @return {string} The complementary area that is active in the given scope.
+ * @return {string | null | undefined} The complementary area that is active in the given scope.
  */
-export function getActiveComplementaryArea( state, scope ) {
-	return state?.complementaryAreas?.[ scope ];
-}
+export const getActiveComplementaryArea = createRegistrySelector(
+	( select ) => ( state, scope ) => {
+		const isComplementaryAreaVisible = select( preferencesStore ).get(
+			scope,
+			'isComplementaryAreaVisible'
+		);
+
+		// Return `undefined` to indicate that the user has never toggled
+		// visibility, this is the vanilla default. Other code relies on this
+		// nuance in the return value.
+		if ( isComplementaryAreaVisible === undefined ) {
+			return undefined;
+		}
+
+		// Return `null` to indicate the user hid the complementary area.
+		if ( ! isComplementaryAreaVisible ) {
+			return null;
+		}
+
+		return state?.complementaryAreas?.[ scope ];
+	}
+);
 
 /**
  * Returns a boolean indicating if an item is pinned or not.
