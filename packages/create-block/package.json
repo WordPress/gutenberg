@@ -34,7 +34,7 @@
 		"@wordpress/lazy-import": "file:../lazy-import",
 		"chalk": "^4.0.0",
 		"check-node-version": "^4.1.0",
-		"commander": "^4.1.0",
+		"commander": "^9.2.0",
 		"execa": "^4.0.2",
 		"fast-glob": "^3.2.7",
 		"inquirer": "^7.1.0",

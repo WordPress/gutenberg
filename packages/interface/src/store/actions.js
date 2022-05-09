@@ -91,9 +91,9 @@ export const unpinItem = ( scope, item ) => ( { registry } ) => {
  */
 export function toggleFeature( scope, featureName ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).toggleFeature`, {
+		deprecated( `dispatch( 'core/interface' ).toggleFeature`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).toggle`,
+			alternative: `dispatch( 'core/preferences' ).toggle`,
 		} );
 
 		registry.dispatch( preferencesStore ).toggle( scope, featureName );
@@ -112,9 +112,9 @@ export function toggleFeature( scope, featureName ) {
  */
 export function setFeatureValue( scope, featureName, value ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).setFeatureValue`, {
+		deprecated( `dispatch( 'core/interface' ).setFeatureValue`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).set`,
+			alternative: `dispatch( 'core/preferences' ).set`,
 		} );
 
 		registry
@@ -133,9 +133,9 @@ export function setFeatureValue( scope, featureName, value ) {
  */
 export function setFeatureDefaults( scope, defaults ) {
 	return function ( { registry } ) {
-		deprecated( `wp.dispatch( 'core/interface' ).setFeatureDefaults`, {
+		deprecated( `dispatch( 'core/interface' ).setFeatureDefaults`, {
 			since: '6.0',
-			alternative: `wp.dispatch( 'core/preferences' ).setDefaults`,
+			alternative: `dispatch( 'core/preferences' ).setDefaults`,
 		} );
 
 		registry.dispatch( preferencesStore ).setDefaults( scope, defaults );

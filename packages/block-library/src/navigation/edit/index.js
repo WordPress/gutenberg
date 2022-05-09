@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,8 +24,9 @@ import {
 	ContrastChecker,
 	getColorClassName,
 	Warning,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { EntityProvider, useEntityProp } from '@wordpress/core-data';
+import { EntityProvider } from '@wordpress/core-data';
 
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -109,7 +109,6 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-	context: { navigationArea },
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -129,34 +128,12 @@ function Navigation( {
 		hasIcon,
 	} = attributes;
 
-	let areaMenu,
-		setAreaMenu = noop;
-	// Navigation areas are deprecated and on their way out. Let's not perform
-	// the request unless we're in an environment where the endpoint exists.
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		[ areaMenu, setAreaMenu ] = useEntityProp(
-			'root',
-			'navigationArea',
-			'navigation',
-			navigationArea
-		);
-	}
-
-	const navigationAreaMenu = areaMenu === 0 ? undefined : areaMenu;
-
-	const ref = navigationArea ? navigationAreaMenu : attributes.ref;
+	const ref = attributes.ref;
 
 	const registry = useRegistry();
-	const setRef = useCallback(
-		( postId ) => {
-			setAttributes( { ref: postId } );
-			if ( navigationArea ) {
-				setAreaMenu( postId );
-			}
-		},
-		[ navigationArea ]
-	);
+	const setRef = ( postId ) => {
+		setAttributes( { ref: postId } );
+	};
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		`navigationMenu/${ ref }`
@@ -261,8 +238,6 @@ function Navigation( {
 		setHasSavedUnsavedInnerBlocks,
 	] = useState( false );
 
-	const isWithinUnassignedArea = !! navigationArea && ! ref;
-
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
 		false
 	);
@@ -322,13 +297,12 @@ function Navigation( {
 	// - there is no classic menu conversion process in progress.
 	// - there is no menu creation process in progress.
 	// - there are no uncontrolled blocks.
-	// - (legacy) there is a Navigation Area without a ref attribute pointing to a Navigation Post.
 	const isPlaceholder =
 		! ref &&
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
-		( ! hasUncontrolledInnerBlocks || isWithinUnassignedArea );
+		! hasUncontrolledInnerBlocks;
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
@@ -347,33 +321,41 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const blockProps = useBlockProps( {
-		ref: navRef,
-		className: classnames( className, {
-			'items-justified-right': justifyContent === 'right',
-			'items-justified-space-between': justifyContent === 'space-between',
-			'items-justified-left': justifyContent === 'left',
-			'items-justified-center': justifyContent === 'center',
-			'is-vertical': orientation === 'vertical',
-			'no-wrap': flexWrap === 'nowrap',
-			'is-responsive': 'never' !== overlayMenu,
-			'has-text-color': !! textColor.color || !! textColor?.class,
-			[ getColorClassName(
-				'color',
-				textColor?.slug
-			) ]: !! textColor?.slug,
-			'has-background': !! backgroundColor.color || backgroundColor.class,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor?.slug
-			) ]: !! backgroundColor?.slug,
-			[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-		} ),
-		style: {
-			color: ! textColor?.slug && textColor?.color,
-			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
+		{
+			ref: navRef,
+			className: classnames( className, {
+				'items-justified-right': justifyContent === 'right',
+				'items-justified-space-between':
+					justifyContent === 'space-between',
+				'items-justified-left': justifyContent === 'left',
+				'items-justified-center': justifyContent === 'center',
+				'is-vertical': orientation === 'vertical',
+				'no-wrap': flexWrap === 'nowrap',
+				'is-responsive': 'never' !== overlayMenu,
+				'has-text-color': !! textColor.color || !! textColor?.class,
+				[ getColorClassName(
+					'color',
+					textColor?.slug
+				) ]: !! textColor?.slug,
+				'has-background':
+					!! backgroundColor.color || backgroundColor.class,
+				[ getColorClassName(
+					'background-color',
+					backgroundColor?.slug
+				) ]: !! backgroundColor?.slug,
+				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
+				'block-editor-block-content-overlay': hasBlockOverlay,
+			} ),
+			style: {
+				color: ! textColor?.slug && textColor?.color,
+				backgroundColor:
+					! backgroundColor?.slug && backgroundColor?.color,
+			},
 		},
-	} );
+		{ __unstableIsDisabled: hasBlockOverlay }
+	);
 
 	const overlayClassnames = classnames( {
 		'has-text-color':
@@ -567,9 +549,6 @@ function Navigation( {
 
 	const resetToEmptyBlock = useCallback( () => {
 		registry.batch( () => {
-			if ( navigationArea ) {
-				setAreaMenu( 0 );
-			}
 			setAttributes( {
 				ref: undefined,
 			} );
