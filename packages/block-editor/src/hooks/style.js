@@ -119,7 +119,7 @@ function compileElementsStyles( selector, elements = {} ) {
 				return [
 					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ key ] }{`,
 					...Object.entries( elementStyles ).map(
-						( cssProperty, value ) =>
+						( [ cssProperty, value ] ) =>
 							`\t${ kebabCase( cssProperty ) }: ${ value };`
 					),
 					'}',
