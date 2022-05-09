@@ -65,7 +65,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		gutenberg_render_block_core_latest_posts( $attributes );
 		$args      = $a->get_args();
 		$last_args = end( $args );
-		$this->assertSameSets( self::$attachment_ids, $last_args[1] );
+		$this->assertSameSets( self::$attachment_ids, $last_args[1], 'Attachment IDs must match' );
 	}
 
 	/**
