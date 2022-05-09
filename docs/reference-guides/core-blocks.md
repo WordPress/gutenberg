@@ -96,7 +96,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 -	**Name:** core/column
 -	**Category:** text
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), ~~html~~, ~~reusable~~
--	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
+-	**Attributes:** allowedBlocks, clipContent, templateLock, verticalAlignment, width
 
 ## Columns
 

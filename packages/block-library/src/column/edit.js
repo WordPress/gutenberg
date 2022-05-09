@@ -17,19 +17,23 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	__experimentalUseCustomUnits as useCustomUnits,
 	PanelBody,
+	ToggleControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
 	attributes: {
+		allowedBlocks,
+		clipContent,
+		templateLock = false,
 		verticalAlignment,
 		width,
-		templateLock = false,
-		allowedBlocks,
+		style,
 	},
 	setAttributes,
 	clientId,
@@ -79,7 +83,10 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style: {
+			flexBasis: widthWithUnit,
+			overflow: clipContent ? 'hidden' : undefined,
+		},
 	} );
 
 	const columnsCount = columnsIds.length;
@@ -128,6 +135,31 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			{ !! style?.border?.radius && (
+				<InspectorControls __experimentalGroup="border">
+					<ToolsPanelItem
+						hasValue={ () => clipContent !== undefined }
+						label={ __( 'Clip content' ) }
+						onDeselect={ () =>
+							setAttributes( { clipContent: undefined } )
+						}
+						resetAllFilter={ () => ( { clipContent: undefined } ) }
+						isShownByDefault={ true }
+						panelId={ clientId }
+					>
+						<ToggleControl
+							label={ __( 'Clip content' ) }
+							checked={ !! clipContent }
+							onChange={ () =>
+								setAttributes( { clipContent: ! clipContent } )
+							}
+							help={ __(
+								"Turning this on prevents content overflowing beyond the column's borders"
+							) }
+						/>
+					</ToolsPanelItem>
+				</InspectorControls>
+			) }
 			<div { ...innerBlocksProps } />
 		</>
 	);

@@ -8,18 +8,21 @@
 	"description": "A single column within a columns block.",
 	"textdomain": "default",
 	"attributes": {
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"clipContent": {
+			"type": "boolean"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", false ]
+		},
 		"verticalAlignment": {
 			"type": "string"
 		},
 		"width": {
 			"type": "string"
-		},
-		"allowedBlocks": {
-			"type": "array"
-		},
-		"templateLock": {
-			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", false ]
 		}
 	},
 	"supports": {
@@ -43,10 +46,12 @@
 		},
 		"__experimentalBorder": {
 			"color": true,
+			"radius": true,
 			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"color": true,
+				"radius": true,
 				"style": true,
 				"width": true
 			}

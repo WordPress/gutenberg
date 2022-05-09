@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment, width } = attributes;
+	const { clipContent, verticalAlignment, width } = attributes;
 
 	const wrapperClasses = classnames( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -30,6 +30,10 @@ export default function save( { attributes } ) {
 				'%';
 		}
 		style = { flexBasis };
+	}
+
+	if ( clipContent ) {
+		style = { ...style, overflow: 'hidden' };
 	}
 
 	const blockProps = useBlockProps.save( {
