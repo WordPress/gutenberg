@@ -149,9 +149,9 @@ export default function PostCommentsEdit( {
 
 										<div className="comment-metadata">
 											<a href="#top">
-												<time dateTime="2000-01-01T00:00:00+00:00">
+												<time dateTime="2000-01-01T12:00:00+00:00">
 													{ __(
-														'January 1, 2000 at 00:00 am'
+														'January 1, 2000 at 12:00 am'
 													) }
 												</time>
 											</a>{ ' ' }
