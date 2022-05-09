@@ -45,7 +45,7 @@ function gutenberg_resolve_assets() {
 	$style_handles  = array(
 		'wp-block-editor',
 		'wp-block-library',
-		'wp-edit-blocks'
+		'wp-edit-blocks',
 	);
 
 	if ( current_theme_supports( 'wp-block-styles' ) ) {
