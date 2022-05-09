@@ -151,9 +151,9 @@ function convertPanelsToOldFormat( inactivePanels, openPanels ) {
  * @return {Object} Preferences Object.
  */
 export const getPreferences = createRegistrySelector( ( select ) => () => {
-	deprecated( `wp.data.select( 'core/edit-post' ).getPreferences`, {
+	deprecated( `select( 'core/edit-post' ).getPreferences`, {
 		since: '6.0',
-		alternative: `wp.data.select( 'core/preferences' ).get`,
+		alternative: `select( 'core/preferences' ).get`,
 	} );
 
 	// These preferences now exist in the preferences store.
@@ -204,9 +204,9 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
  * @return {*} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
-	deprecated( `wp.data.select( 'core/edit-post' ).getPreference`, {
+	deprecated( `select( 'core/edit-post' ).getPreference`, {
 		since: '6.0',
-		alternative: `wp.data.select( 'core/preferences' ).get`,
+		alternative: `select( 'core/preferences' ).get`,
 	} );
 
 	// Avoid using the `getPreferences` registry selector where possible.

@@ -2100,6 +2100,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/code/how-to-get-your-pull-request-reviewed.md",
+		"parent": "code"
+	},
+	{
 		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",

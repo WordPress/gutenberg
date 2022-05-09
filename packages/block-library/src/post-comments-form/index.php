@@ -18,9 +18,13 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		return '';
 	}
 
+	if ( post_password_required( $block->context['postId'] ) ) {
+		return;
+	}
+
 	$classes = 'comment-respond'; // See comment further below.
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= 'has-text-align-' . $attributes['textAlign'];
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
