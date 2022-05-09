@@ -3,10 +3,10 @@
  */
  const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  test.describe( 'HTML block', () => {
-	 test.beforeEach( async ({pageUtils}) => {
+	 test.beforeEach( async ( { pageUtils } ) => {
 		 await pageUtils.createNewPost();
 	 } );
-	 test( 'can be created by typing "/html"', async ({page,pageUtils}) => {
+	 test( 'can be created by typing "/html"', async ( { page, pageUtils } ) => {
 		 // Create a Custom HTML block with the slash shortcut.
 		 await page.click( 'role=button[name="Add default block"i]' );
 		 await page.keyboard.type( '/html' );
