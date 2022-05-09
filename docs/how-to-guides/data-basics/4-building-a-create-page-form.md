@@ -12,7 +12,7 @@ Let’s start by building a button to display the _create page_ form. It’s sim
 import { useDispatch } from '@wordpress/data';
 import { Button, Modal, TextControl } from '@wordpress/components';
 
-function PageCreateButton() {
+function CreatePageButton() {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
@@ -49,7 +49,7 @@ function MyFirstApp() {
 		<div>
 			<div className="list-controls">
 				<SearchControl onChange={ setSearchTerm } value={ searchTerm } />
-				<PageCreateButton />
+				<CreatePageButton />
 			</div>
 			<PagesList hasResolved={ hasResolved } pages={ pages } />
 		</div>
@@ -262,7 +262,6 @@ And that’s it! Here's what our new form looks like in action:
 Here’s everything we built in this chapter in one place:
 
 ```js
-
 export function CreatePageForm( { onCancel, onSaveFinished } ) {
 	const [ title, setTitle ] = useState();
 	const { lastError, isSaving } = useSelect(
@@ -318,7 +317,7 @@ export function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
 			onSaveFinished();
 		}
 	};
-	const handleChange = ( title ) =>  editEntityRecord( 'postType', 'page', page.id, { title } );
+	const handleChange = ( title ) => editEntityRecord( 'postType', 'page', page.id, { title } );
 
 	return (
 		<PageForm
