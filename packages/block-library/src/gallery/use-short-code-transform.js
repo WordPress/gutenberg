@@ -24,13 +24,12 @@ export default function useShortCodeTransform( shortCodeTransforms ) {
 				return;
 			}
 
-			const imageIds = shortCodeTransforms
-				.map( ( image ) => image.id )
-				.sort();
+			const imageIds = shortCodeTransforms.map( ( image ) => image.id );
 
 			return select( coreStore ).getMediaItems( {
 				include: imageIds.join( ',' ),
 				per_page: -1,
+				orderby: 'include',
 			} );
 		},
 		[ shortCodeTransforms ]
