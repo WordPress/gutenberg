@@ -21,7 +21,7 @@ export const LinkedBorderControl = css`
 export const BorderBoxControlLinkedButton = css`
 	flex: 0;
 	flex-basis: 36px;
-	margin-top: 7px;
+	margin-top: 3px;
 `;
 
 const BorderBoxStyleWithFallback = ( border?: Border ) => {
@@ -42,9 +42,9 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
 export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
 	return css`
 		position: absolute;
-		top: 20px;
+		top: 15px;
 		right: 30px;
-		bottom: 20px;
+		bottom: 15px;
 		left: 30px;
 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };

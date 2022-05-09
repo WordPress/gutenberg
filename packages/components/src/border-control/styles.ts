@@ -30,6 +30,11 @@ export const innerWrapper = () => css`
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 	border-radius: 2px;
 	flex: 1 0 40%;
+	/*
+	 * When default control height is 36px the following height should be
+	 * removed. See: InputControl and __next36pxDefaultSize.
+	 */
+	height: 30px;
 
 	/*
 	 * Needs more thought. Aim is to prevent the border for BorderBoxControl
@@ -69,7 +74,12 @@ export const borderControlDropdown = () => css`
 	)() }
 
 	&& > button {
-		padding: ${ space( 1 ) };
+		/*
+		 * Override button component height and padding to fit within
+		 * BorderControl
+		 */
+		height: 28px;
+		padding: 0 ${ space( 0.5 ) };
 		border-radius: inherit;
 	}
 `;
@@ -93,8 +103,9 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: 28px;
-		height: 28px;
+		/* Dimensions adjusted to fit in 30px control height. */
+		width: 24px;
+		height: 24px;
 		padding: 2px;
 
 		/*
@@ -104,6 +115,9 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
+			/* Dimensions adjusted to fit in 30px overall control height. */
+			height: 16px;
+			width: 16px;
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
