@@ -22,3 +22,5 @@ jest.mock( '@wordpress/compose', () => {
 if ( ! window.wp?.galleryBlockV2Enabled ) {
 	window.wp = { ...window.wp, galleryBlockV2Enabled: true };
 }
+
+global.ResizeObserver = require( 'resize-observer-polyfill' );
