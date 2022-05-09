@@ -15,6 +15,7 @@ import {
 	useBlockDisplayInformation,
 	RichText,
 } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -30,6 +31,7 @@ export default function PostTermsEdit( {
 	clientId,
 	context,
 	setAttributes,
+	insertBlocksAfter,
 } ) {
 	const { term, textAlign, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
@@ -86,6 +88,12 @@ export default function PostTermsEdit( {
 				{ isLoading && <Spinner /> }
 				{ ! isLoading && hasPostTerms && (
 					<RichText
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 						className="wp-block-post-terms__prefix"
 						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
@@ -124,6 +132,12 @@ export default function PostTermsEdit( {
 						__( 'Term items not found.' ) ) }
 				{ ! isLoading && hasPostTerms && (
 					<RichText
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 						className="wp-block-post-terms__suffix"
 						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
@@ -133,6 +147,9 @@ export default function PostTermsEdit( {
 							setAttributes( { suffix: value } )
 						}
 						tagName="span"
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
 			</div>
