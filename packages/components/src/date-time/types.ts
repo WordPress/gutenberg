@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import type { Moment } from 'moment';
+
 export type DateTimeString = string;
 
 export type ValidDateTimeInput = Date | string | number | null;
@@ -28,6 +33,20 @@ export interface DatePickerEvent {
 	 */
 	date: Date;
 }
+
+export type DatePickerDayProps = {
+	/**
+	 * The day to display.
+	 */
+	day: Moment;
+
+	/**
+	 * List of events to show on this day.
+	 *
+	 * @default []
+	 */
+	events?: DatePickerEvent[];
+};
 
 export interface DatePickerProps {
 	/**

@@ -22,15 +22,10 @@ import { isRTL, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getMomentDate } from './utils';
-import type { DatePickerEvent, DatePickerProps } from './types';
+import type { DatePickerDayProps, DatePickerProps } from './types';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
-
-interface DatePickerDayProps {
-	day: Moment;
-	events?: DatePickerEvent[];
-}
 
 function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 	const ref = useRef< HTMLDivElement >( null );
