@@ -16,11 +16,6 @@ export type UpdateOnBlurAsIntegerFieldProps = {
 	onUpdate: ( value: number ) => void;
 
 	/**
-	 * Classes to add to the field.
-	 */
-	className?: string;
-
-	/**
 	 * Children to render inside the field.
 	 */
 	children?: ReactNode;
