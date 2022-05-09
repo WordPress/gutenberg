@@ -239,14 +239,12 @@ class EditorPage {
 			);
 
 			await pasteButton.click();
-			// await this.driver.sleep( 3000 ); // Wait for paste notification to disappear.
 		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
 
 	async dismissKeyboard() {
-		// await this.driver.sleep( 1000 ); // Wait for any keyboard animations.
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
@@ -699,17 +697,11 @@ class EditorPage {
 		let optionMenuButton = await waitForVisible( this.driver, locator );
 		await optionMenuButton.click();
 
-		// await this.driver.elementByXPath( locator ).click();
 		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
 		optionMenuButton = await waitForVisible(
 			this.driver,
 			optionMenuButtonLocator
 		);
-
-		// const optionMenuButton = await waitForVisible(
-		// 	this.driver,
-		// 	locator
-		// );
 
 		return await optionMenuButton.click();
 	}

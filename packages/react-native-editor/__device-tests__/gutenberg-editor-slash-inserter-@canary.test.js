@@ -5,8 +5,6 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import { slashInserter, shortText } from './helpers/test-data';
 
-// const ANIMATION_TIME = 200;
-
 // Helper function for asserting slash inserter presence.
 async function assertSlashInserterPresent( checkIsVisible ) {
 	let areResultsDisplayed;
@@ -42,7 +40,6 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			paragraphBlockElement,
 			slashInserter
 		);
-		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
@@ -62,7 +59,6 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			paragraphBlockElement,
 			slashInserter
 		);
-		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
@@ -80,7 +76,6 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 				false
 			);
 		}
-		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		// Check if the slash inserter UI no longer exists.
 		assertSlashInserterPresent( false );
@@ -101,7 +96,6 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 			paragraphBlockElement,
 			`${ slashInserter }image`
 		);
-		// await editorPage.driver.sleep( ANIMATION_TIME );
 
 		assertSlashInserterPresent( true );
 
