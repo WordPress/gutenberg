@@ -198,18 +198,20 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
+			const { hashFunction, hashDigest } = compilation.outputOptions;
+
 			// Go through the assets and hash the sources. We can't just use
 			// `entrypointChunk.contentHash` because that's not updated when
 			// assets are minified. In practice the hash is updated by
 			// `RealContentHashPlugin` after minification, but it only modifies
 			// already-produced asset filenames and the updated hash is not
 			// available to plugins.
-			const hash = createHash( compilation.outputOptions.hashFunction );
+			const hash = createHash( hashFunction );
 			for ( const filename of entrypoint.getFiles().sort() ) {
 				const asset = compilation.getAsset( filename );
 				hash.update( asset.source.buffer() );
 			}
-			const version = hash.digest( compilation.outputOptions.hashDigest );
+			const version = hash.digest( hashDigest );
 
 			const entrypointChunk = isWebpack4
 				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
@@ -222,9 +224,9 @@ class DependencyExtractionWebpackPlugin {
 			};
 
 			const assetString = this.stringify( assetData );
-			const contentHash = createHash( 'sha512' )
+			const contentHash = createHash( hashFunction )
 				.update( assetString )
-				.digest( 'hex' );
+				.digest( hashDigest );
 
 			// Determine a filename for the asset file.
 			const [ filename, query ] = entrypointName.split( '?', 2 );
