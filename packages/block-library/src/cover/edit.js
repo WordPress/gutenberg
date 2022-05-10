@@ -40,7 +40,8 @@ import {
 	mediaPosition,
 } from './shared';
 import useCoverIsDark from './use-cover-is-dark';
-import Controls from './controls';
+import CoverInspectorControls from './inspector-controls';
+import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCover from './resizeable-cover';
 
@@ -216,13 +217,18 @@ function CoverEdit( {
 	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				<Controls
+				<CoverBlockControls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					onSelectMedia={ onSelectMedia }
+					currentSettings={ currentSettings }
+				/>
+				<CoverInspectorControls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 					setOverlayColor={ setOverlayColor }
 					coverRef={ ref }
-					onSelectMedia={ onSelectMedia }
 					currentSettings={ currentSettings }
 				/>
 				<div
@@ -284,13 +290,18 @@ function CoverEdit( {
 
 	return (
 		<>
-			<Controls
+			<CoverBlockControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				onSelectMedia={ onSelectMedia }
+				currentSettings={ currentSettings }
+			/>
+			<CoverInspectorControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				clientId={ clientId }
 				setOverlayColor={ setOverlayColor }
 				coverRef={ ref }
-				onSelectMedia={ onSelectMedia }
 				currentSettings={ currentSettings }
 			/>
 			<div

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Fragment, useState, useMemo } from '@wordpress/element';
+import { Fragment, useMemo } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -12,7 +12,6 @@ import {
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	ToolbarButton,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -20,27 +19,17 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	BlockControls,
 	InspectorControls,
-	MediaReplaceFlow,
 	useSetting,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
-	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { postFeaturedImage } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import {
-	ALLOWED_MEDIA_TYPES,
-	COVER_MIN_HEIGHT,
-	mediaPosition,
-	IMAGE_BACKGROUND_TYPE,
-} from './shared';
+import { COVER_MIN_HEIGHT, mediaPosition } from './shared';
 
 function CoverHeightInput( {
 	onChange,
@@ -97,19 +86,15 @@ function CoverHeightInput( {
 		</BaseControl>
 	);
 }
-
-export default function Controls( {
+export default function CoverInspectorControls( {
 	attributes,
 	setAttributes,
 	clientId,
 	setOverlayColor,
 	coverRef,
-	onSelectMedia,
 	currentSettings,
 } ) {
 	const {
-		contentPosition,
-		id,
 		useFeaturedImage,
 		dimRatio,
 		focalPoint,
@@ -123,45 +108,12 @@ export default function Controls( {
 		isVideoBackground,
 		isImageBackground,
 		mediaElement,
-		hasInnerBlocks,
 		url,
 		isImgElement,
 		overlayColor,
 	} = currentSettings;
 
-	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
-		minHeightUnit
-	);
-
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
-	const toggleMinFullHeight = () => {
-		if ( isMinFullHeight ) {
-			// If there aren't previous values, take the default ones.
-			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
-				return setAttributes( {
-					minHeight: undefined,
-					minHeightUnit: undefined,
-				} );
-			}
-
-			// Set the previous values of height.
-			return setAttributes( {
-				minHeight: prevMinHeightValue,
-				minHeightUnit: prevMinHeightUnit,
-			} );
-		}
-
-		setPrevMinHeightValue( minHeight );
-		setPrevMinHeightUnit( minHeightUnit );
-
-		// Set full height.
-		return setAttributes( {
-			minHeight: 100,
-			minHeightUnit: 'vh',
-		} );
-	};
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -173,18 +125,6 @@ export default function Controls( {
 	const toggleIsRepeated = () => {
 		setAttributes( {
 			isRepeated: ! isRepeated,
-		} );
-	};
-
-	const toggleUseFeaturedImage = () => {
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
 		} );
 	};
 
@@ -200,41 +140,6 @@ export default function Controls( {
 	};
 	return (
 		<>
-			<BlockControls group="block">
-				<BlockAlignmentMatrixControl
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( {
-							contentPosition: nextPosition,
-						} )
-					}
-					isDisabled={ ! hasInnerBlocks }
-				/>
-				<FullHeightAlignmentControl
-					isActive={ isMinFullHeight }
-					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasInnerBlocks }
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<ToolbarButton
-					icon={ postFeaturedImage }
-					label={ __( 'Use featured image' ) }
-					isPressed={ useFeaturedImage }
-					onClick={ toggleUseFeaturedImage }
-				/>
-				{ ! useFeaturedImage && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*,video/*"
-						onSelect={ onSelectMedia }
-						name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
-					/>
-				) }
-			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
