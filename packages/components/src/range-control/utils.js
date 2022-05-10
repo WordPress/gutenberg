@@ -33,6 +33,12 @@ export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
 		}
 		onChange( next );
 	};
+	// When the value entered in the input is out of range then a clamped value
+	// is sent through onChange and that goes on to update the input. In such
+	// circumstances this effect overwrites the input value with the entered
+	// value to avoid interfering with typing. E.g. Without this effect, if
+	// `min` is 20 and the user intends to type 25, as soon as 2 is typed the
+	// input will update to 20 and likely lead to an entry of 205.
 	useEffect( () => {
 		if ( ref.current && isDiverging.current ) {
 			const input = ref.current;
