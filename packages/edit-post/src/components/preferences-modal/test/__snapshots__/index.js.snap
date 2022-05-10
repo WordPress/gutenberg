@@ -33,6 +33,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 label="Spotlight mode"
               />
               <WithSelect(WithDispatch(BaseOption))
+                featureName="showListViewByDefault"
+                help="Opens the block list view sidebar by default."
+                label="Always open list view"
+              />
+              <WithSelect(WithDispatch(BaseOption))
                 featureName="showIconLabels"
                 help="Shows text instead of icons."
                 label="Display button labels"
@@ -157,6 +162,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 featureName="focusMode"
                 help="Highlights the current block and fades other content."
                 label="Spotlight mode"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showListViewByDefault"
+                help="Opens the block list view sidebar by default."
+                label="Always open list view"
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="showIconLabels"
