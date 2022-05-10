@@ -14,13 +14,15 @@ import {
 	useState,
 	useRef,
 } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
+	ExternalLink,
 	MenuItem,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	Placeholder,
@@ -52,13 +54,22 @@ import useClientWidth from '../image/use-client-width';
  * Module constants
  */
 import { MIN_SIZE } from '../image/constants';
+import { getFilename } from '@wordpress/url';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
-	alt,
-	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	attributes: {
+		url = '',
+		align,
+		alt,
+		width,
+		height,
+		isLink,
+		linkTarget,
+		shouldSyncIcon,
+	},
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -115,11 +126,30 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
+	function updateAlt( newAlt ) {
+		setAttributes( { alt: newAlt } );
+	}
+
+	const filename = getFilename( url );
+	let defaultedAlt;
+
+	if ( alt ) {
+		defaultedAlt = alt;
+	} else if ( filename ) {
+		defaultedAlt = sprintf(
+			/* translators: %s: file name */
+			__( 'This image has an empty alt attribute; its file name is %s' ),
+			filename
+		);
+	} else {
+		defaultedAlt = __( 'This image has an empty alt attribute' );
+	}
+
 	const img = (
 		<img
 			className="custom-logo"
 			src={ logoUrl }
-			alt={ alt }
+			alt={ defaultedAlt }
 			onLoad={ ( event ) => {
 				setNaturalSize(
 					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
@@ -291,6 +321,23 @@ const SiteLogo = ( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					<TextareaControl
+						label={ __( 'Alt text (alternative text)' ) }
+						value={ alt }
+						onChange={ updateAlt }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image'
+									) }
+								</ExternalLink>
+								{ __(
+									'Leave empty if the image is purely decorative.'
+								) }
+							</>
+						}
+					/>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
