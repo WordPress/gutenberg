@@ -111,6 +111,7 @@ Default.args = {
 	withSlider: true,
 	__experimentalIsRenderedInSidebar: false,
 	__experimentalHasMultipleOrigins: false,
+	__next36pxDefaultSize: false,
 };
 
 const WrapperView = styled.div`

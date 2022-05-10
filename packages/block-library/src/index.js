@@ -12,6 +12,15 @@ import {
 /**
  * Internal dependencies
  */
+// When IS_GUTENBERG_PLUGIN is set to false, imports of experimental blocks
+// are transformed by packages/block-library/src/index.js as follows:
+//    import * as experimentalBlock from './experimental-block'
+// becomes
+//    const experimentalBlock = null;
+// This enables webpack to eliminate the experimental blocks code from the
+// production build to make the final bundle smaller.
+//
+// See https://github.com/WordPress/gutenberg/pull/40655 for more context.
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -107,6 +116,8 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
+import isBlockMetadataExperimental from './is-block-metadata-experimental';
+
 /**
  * Function to register an individual block.
  *
@@ -122,16 +133,9 @@ const registerBlock = ( block ) => {
 };
 
 /**
- * Function to get all the core blocks in an array.
- *
- * @example
- * ```js
- * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
- *
- * const coreBlocks = __experimentalGetCoreBlocks();
- * ```
+ * Function to get all the block-library blocks in an array
  */
-export const __experimentalGetCoreBlocks = () => [
+const getAllBlocks = () => [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
 	paragraph,
@@ -139,6 +143,7 @@ export const __experimentalGetCoreBlocks = () => [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -152,6 +157,7 @@ export const __experimentalGetCoreBlocks = () => [
 	code,
 	column,
 	columns,
+	commentAuthorAvatar,
 	cover,
 	embed,
 	file,
@@ -196,6 +202,10 @@ export const __experimentalGetCoreBlocks = () => [
 	postFeaturedImage,
 	postContent,
 	postAuthor,
+	postAuthorName,
+	postComment,
+	postCommentsCount,
+	postCommentsLink,
 	postDate,
 	postTerms,
 	postNavigationLink,
@@ -220,12 +230,28 @@ export const __experimentalGetCoreBlocks = () => [
 	commentsPaginationPrevious,
 	postComments,
 	postCommentsForm,
+	tableOfContents,
 	homeLink,
 	logInOut,
 	termDescription,
 	queryTitle,
 	postAuthorBiography,
 ];
+
+/**
+ * Function to get all the core blocks in an array.
+ *
+ * @example
+ * ```js
+ * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
+ *
+ * const coreBlocks = __experimentalGetCoreBlocks();
+ * ```
+ */
+export const __experimentalGetCoreBlocks = () =>
+	getAllBlocks().filter(
+		( { metadata } ) => ! isBlockMetadataExperimental( metadata )
+	);
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -266,23 +292,19 @@ export const registerCoreBlocks = (
 export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	.IS_GUTENBERG_PLUGIN
 	? ( { enableFSEBlocks } = {} ) => {
-			[
-				// Experimental blocks.
-				postAuthorName,
-				tableOfContents,
-				...( window.__experimentalEnableListBlockV2
-					? [ listItem ]
-					: [] ),
-
-				// Full Site Editing blocks.
-				...( enableFSEBlocks
-					? [
-							commentAuthorAvatar,
-							postComment,
-							postCommentsCount,
-							postCommentsLink,
-					  ]
-					: [] ),
-			].forEach( registerBlock );
+			const enabledExperiments = [
+				window.__experimentalEnableListBlockV2 ? 'list-v2' : null,
+				enableFSEBlocks ? 'fse' : null,
+			];
+			getAllBlocks()
+				.filter( ( { metadata } ) =>
+					isBlockMetadataExperimental( metadata )
+				)
+				.filter(
+					( { metadata: { __experimental } } ) =>
+						__experimental === true ||
+						enabledExperiments.includes( __experimental )
+				)
+				.forEach( registerBlock );
 	  }
 	: undefined;

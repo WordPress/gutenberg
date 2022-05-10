@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { RichText } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -101,7 +101,7 @@ export const Gallery = ( props ) => {
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
 			/>
 		</figure>

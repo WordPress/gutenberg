@@ -14,6 +14,13 @@ import { useResizeObserver } from '@wordpress/compose';
  */
 import Placeholder from '../';
 
+jest.mock( '@wordpress/compose', () => {
+	return {
+		...jest.requireActual( '@wordpress/compose' ),
+		useResizeObserver: jest.fn( () => [] ),
+	};
+} );
+
 describe( 'Placeholder', () => {
 	beforeEach( () => {
 		useResizeObserver.mockReturnValue( [

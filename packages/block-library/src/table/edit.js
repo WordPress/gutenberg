@@ -40,7 +40,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -505,7 +505,9 @@ function TableEdit( {
 					// Deselect the selected table cell when the caption is focused.
 					unstableOnFocus={ () => setSelectedCell() }
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

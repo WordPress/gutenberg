@@ -33,6 +33,7 @@ export default function useGetMedia( innerBlockImages ) {
 			return select( coreStore ).getMediaItems( {
 				include: imageIds.join( ',' ),
 				per_page: -1,
+				orderby: 'include',
 			} );
 		},
 		[ innerBlockImages ]

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+
 ## 7.5.0 (2022-05-04)
 
 ## 7.4.0 (2022-04-21)

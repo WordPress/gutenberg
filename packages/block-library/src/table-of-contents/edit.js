@@ -15,13 +15,13 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import {
-	Disabled,
 	PanelBody,
 	Placeholder,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { useDisabled } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
@@ -55,6 +55,7 @@ export default function TableOfContentsEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
+	const disabledRef = useDisabled();
 
 	const listBlockExists = useSelect(
 		( select ) => !! select( blocksStore ).getBlockType( 'core/list' ),
@@ -285,13 +286,9 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<Disabled>
-					<ol>
-						<TableOfContentsList
-							nestedHeadingList={ headingTree }
-						/>
-					</ol>
-				</Disabled>
+				<ol ref={ disabledRef }>
+					<TableOfContentsList nestedHeadingList={ headingTree } />
+				</ol>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }
