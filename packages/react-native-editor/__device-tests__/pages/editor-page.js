@@ -572,7 +572,7 @@ class EditorPage {
 		// Go to the correct list at position
 		const listBlockPositionLocator = isAndroid()
 			? `//android.view.ViewGroup[@content-desc="List Block. Row ${ position }"]`
-			: `(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[5]`;
+			: `(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[1]`;
 
 		let listBlock = await waitForVisible(
 			this.driver,
