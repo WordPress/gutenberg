@@ -8,7 +8,7 @@ import { cover as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES } from './shared';
+import { ALLOWED_MEDIA_TYPES } from '../shared';
 
 export default function CoverPlaceholder( {
 	disableMediaButtons = false,

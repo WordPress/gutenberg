@@ -29,7 +29,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { COVER_MIN_HEIGHT, mediaPosition } from './shared';
+import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 
 function CoverHeightInput( {
 	onChange,

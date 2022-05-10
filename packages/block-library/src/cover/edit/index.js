@@ -38,7 +38,7 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
-} from './shared';
+} from '../shared';
 import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';

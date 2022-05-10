@@ -16,7 +16,7 @@ import { postFeaturedImage } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from './shared';
+import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from '../shared';
 
 export default function CoverBlockControls( {
 	attributes,

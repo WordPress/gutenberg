@@ -13,7 +13,7 @@ jest.mock( '@wordpress/block-editor', () => ( {
 /**
  * Internal dependencies
  */
-import CoverBlockControls from '../block-controls';
+import CoverBlockControls from '../edit/block-controls';
 
 const setAttributes = jest.fn();
 const onSelectMedia = jest.fn();
