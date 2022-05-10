@@ -147,8 +147,10 @@ function readBlockJSON( filename ) {
 	const blockjson = require( filename );
 
 	const sourcefile = getSourceFromFile( filename );
-	const supportsAugmented = augmentSupports( blockjson.supports );
-	const supportsList = processObjWithInnerKeys( supportsAugmented );
+	const supportsList =
+		blockjson.supports !== undefined
+			? processObjWithInnerKeys( augmentSupports( blockjson.supports ) )
+			: [];
 	const attributes = getTruthyKeys( blockjson.attributes );
 
 	return `

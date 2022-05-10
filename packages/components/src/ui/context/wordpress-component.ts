@@ -18,9 +18,10 @@ export type WordPressComponentProps<
 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > &
 	( IsPolymorphic extends true
 		? {
+				/** The HTML element or React component to render the component as. */
 				as?: T | keyof JSX.IntrinsicElements;
 		  }
-		: { as?: never } );
+		: {} );
 
 export type WordPressComponent<
 	T extends React.ElementType,
@@ -29,7 +30,7 @@ export type WordPressComponent<
 > = {
 	< TT extends React.ElementType >(
 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
-			( IsPolymorphic extends true ? { as: TT } : { as: never } )
+			( IsPolymorphic extends true ? { as: TT } : {} )
 	): JSX.Element | null;
 	(
 		props: WordPressComponentProps< O, T, IsPolymorphic >

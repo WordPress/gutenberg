@@ -31,7 +31,7 @@ export function useBaseField( props ) {
 		hasError = false,
 		isInline = false,
 		isSubtle = false,
-		// extract these because useFlex doesn't accept it
+		// Extract these because useFlex doesn't accept it.
 		defaultValue,
 		disabled,
 		...flexProps
@@ -50,7 +50,7 @@ export function useBaseField( props ) {
 				isInline && styles.inline,
 				className
 			),
-		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
+		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
 	);
 
 	return {

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalListView as ListView,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import {
 	useFocusOnMount,
@@ -24,12 +21,6 @@ import { store as editWidgetsStore } from '../../store';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
-
-	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
-	async function selectEditorBlock( clientId ) {
-		await clearSelectedBlock();
-		selectBlock( clientId, -1 );
-	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
@@ -69,13 +60,7 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<ListView
-					onSelect={ selectEditorBlock }
-					showNestedBlocks
-					__experimentalHideContainerBlockActions
-					__experimentalFeatures
-					__experimentalPersistentListViewFeatures
-				/>
+				<ListView />
 			</div>
 		</div>
 	);

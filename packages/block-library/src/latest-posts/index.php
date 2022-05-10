@@ -37,11 +37,12 @@ function render_block_core_latest_posts( $attributes ) {
 	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
-		'posts_per_page'   => $attributes['postsToShow'],
-		'post_status'      => 'publish',
-		'order'            => $attributes['order'],
-		'orderby'          => $attributes['orderBy'],
-		'suppress_filters' => false,
+		'posts_per_page'      => $attributes['postsToShow'],
+		'post_status'         => 'publish',
+		'order'               => $attributes['order'],
+		'orderby'             => $attributes['orderBy'],
+		'ignore_sticky_posts' => true,
+		'no_found_rows'       => true,
 	);
 
 	$block_core_latest_posts_excerpt_length = $attributes['excerptLength'];
@@ -54,7 +55,12 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	$recent_posts = get_posts( $args );
+	$query        = new WP_Query;
+	$recent_posts = $query->query( $args );
+
+	if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {
+		update_post_thumbnail_cache( $query );
+	}
 
 	$list_items_markup = '';
 
@@ -105,7 +111,7 @@ function render_block_core_latest_posts( $attributes ) {
 		}
 
 		$list_items_markup .= sprintf(
-			'<a href="%1$s">%2$s</a>',
+			'<a class="wp-block-latest-posts__post-title" href="%1$s">%2$s</a>',
 			esc_url( $post_link ),
 			$title
 		);
@@ -119,7 +125,7 @@ function render_block_core_latest_posts( $attributes ) {
 			if ( ! empty( $author_display_name ) ) {
 				$list_items_markup .= sprintf(
 					'<div class="wp-block-latest-posts__post-author">%1$s</div>',
-					esc_html( $byline )
+					$byline
 				);
 			}
 		}
@@ -128,7 +134,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$list_items_markup .= sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
 				esc_attr( get_the_date( 'c', $post ) ),
-				esc_html( get_the_date( '', $post ) )
+				get_the_date( '', $post )
 			);
 		}
 

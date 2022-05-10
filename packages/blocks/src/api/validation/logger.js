@@ -1,3 +1,9 @@
+/**
+ * @typedef LoggerItem
+ * @property {Function}   log  Which logger recorded the message
+ * @property {Array<any>} args White arguments were supplied to the logger
+ */
+
 export function createLogger() {
 	/**
 	 * Creates a log handler with block validation prefix.
@@ -36,7 +42,7 @@ export function createQueuedLogger() {
 	/**
 	 * The list of enqueued log actions to print.
 	 *
-	 * @type {Array}
+	 * @type {Array<LoggerItem>}
 	 */
 	const queue = [];
 

@@ -23,7 +23,12 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$classes = '';
+	if ( isset( $attributes['fontSize'] ) ) {
+		$classes .= 'has-' . esc_attr( $attributes['fontSize'] ) . '-font-size';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$formatted_date     = get_comment_date(
 		isset( $attributes['format'] ) ? $attributes['format'] : '',
 		$comment
@@ -31,7 +36,7 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	$link               = get_comment_link( $comment );
 
 	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), esc_html( $formatted_date ) );
+		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
 	}
 
 	return sprintf(

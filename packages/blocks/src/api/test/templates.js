@@ -19,7 +19,7 @@ import {
 
 describe( 'templates', () => {
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 

@@ -1,15 +1,14 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/categories",
 		"isValid": true,
 		"attributes": {
 			"displayAsDropdown": false,
 			"showHierarchy": false,
 			"showPostCounts": false,
-			"showOnlyTopLevel": false
+			"showOnlyTopLevel": false,
+			"showEmpty": false
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

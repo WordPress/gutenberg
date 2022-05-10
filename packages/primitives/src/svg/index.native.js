@@ -62,7 +62,7 @@ export const SVG = ( {
 
 	return (
 		<SvgWrapper
-			//We want to re-render when style color is changed
+			// We want to re-render when style color is changed.
 			key={ appliedProps.style.color }
 			height="100%"
 			width="100%"

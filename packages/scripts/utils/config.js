@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-const { basename, dirname, join } = require( 'path' );
+const chalk = require( 'chalk' );
+const { readFileSync } = require( 'fs' );
+const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 
 /**
@@ -15,6 +17,7 @@ const {
 } = require( './cli' );
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
+const { log } = console;
 
 // See https://babeljs.io/docs/en/config-files#configuration-file-types.
 const hasBabelConfig = () =>
@@ -181,20 +184,34 @@ function getWebpackEntryPoints() {
 		return JSON.parse( process.env.WP_ENTRY );
 	}
 
-	// 2. Checks whether any block metadata files can be detected in the `src` directory.
+	// Continue only if the source directory exists.
+	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
+		log(
+			chalk.yellow(
+				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+			)
+		);
+		return {};
+	}
+
+	// 2. Checks whether any block metadata files can be detected in the defined source directory.
 	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
-	const blockMetadataFiles = glob( 'src/**/block.json', {
-		absolute: true,
-	} );
+	const blockMetadataFiles = glob(
+		`${ process.env.WP_SRC_DIRECTORY }/**/block.json`,
+		{
+			absolute: true,
+		}
+	);
 
 	if ( blockMetadataFiles.length > 0 ) {
+		const srcDirectory = fromProjectRoot(
+			process.env.WP_SRC_DIRECTORY + sep
+		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
-				const {
-					editorScript,
-					script,
-					viewScript,
-				} = require( blockMetadataFile );
+				const { editorScript, script, viewScript } = JSON.parse(
+					readFileSync( blockMetadataFile )
+				);
 				[ editorScript, script, viewScript ]
 					.flat()
 					.filter( ( value ) => value && value.startsWith( 'file:' ) )
@@ -203,24 +220,54 @@ function getWebpackEntryPoints() {
 						const filepath = join(
 							dirname( blockMetadataFile ),
 							value.replace( 'file:', '' )
-						).replace( /\\/g, '/' );
+						);
 
-						// Takes the path without the file extension, and relative to the `src` directory.
-						const [ , entryName ] = filepath
-							.split( '.' )[ 0 ]
-							.split( 'src/' );
-						if ( ! entryName ) {
+						// Takes the path without the file extension, and relative to the defined source directory.
+						if ( ! filepath.startsWith( srcDirectory ) ) {
+							log(
+								chalk.yellow(
+									`Skipping "${ value.replace(
+										'file:',
+										''
+									) }" listed in "${ blockMetadataFile.replace(
+										fromProjectRoot( sep ),
+										''
+									) }". File is located outside of the "${
+										process.env.WP_SRC_DIRECTORY
+									}" directory.`
+								)
+							);
 							return;
 						}
+						const entryName = filepath
+							.replace( extname( filepath ), '' )
+							.replace( srcDirectory, '' )
+							.replace( /\\/g, '/' );
 
-						// Detects the proper file extension used in the `src` directory.
+						// Detects the proper file extension used in the defined source directory.
 						const [ entryFilepath ] = glob(
-							`src/${ entryName }.[jt]s?(x)`,
+							`${ process.env.WP_SRC_DIRECTORY }/${ entryName }.[jt]s?(x)`,
 							{
 								absolute: true,
 							}
 						);
 
+						if ( ! entryFilepath ) {
+							log(
+								chalk.yellow(
+									`Skipping "${ value.replace(
+										'file:',
+										''
+									) }" listed in "${ blockMetadataFile.replace(
+										fromProjectRoot( sep ),
+										''
+									) }". File does not exist in the "${
+										process.env.WP_SRC_DIRECTORY
+									}" directory.`
+								)
+							);
+							return;
+						}
 						accumulator[ entryName ] = entryFilepath;
 					} );
 				return accumulator;
@@ -233,12 +280,20 @@ function getWebpackEntryPoints() {
 		}
 	}
 
-	// 3. Checks whether a standard file name can be detected in the `src` directory,
+	// 3. Checks whether a standard file name can be detected in the defined source directory,
 	//    and converts the discovered file to entry point.
-	const [ entryFile ] = glob( 'src/index.[jt]s?(x)', {
-		absolute: true,
-	} );
+	const [ entryFile ] = glob(
+		`${ process.env.WP_SRC_DIRECTORY }/index.[jt]s?(x)`,
+		{
+			absolute: true,
+		}
+	);
 	if ( ! entryFile ) {
+		log(
+			chalk.yellow(
+				`No entry file discovered in the "${ process.env.WP_SRC_DIRECTORY }" directory.`
+			)
+		);
 		return {};
 	}
 

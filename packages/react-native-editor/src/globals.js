@@ -33,18 +33,18 @@ import './jsdom-patches';
 
 global.wp = {
 	element: {
-		createElement, // load the element creation function, needed by Gutenberg-web
+		createElement, // Load the element creation function, needed by Gutenberg-web.
 	},
 };
 
 const doc = jsdom.html( '', null, null );
 
-// inject a simple version of the missing createHTMLDocument method that `hpq` depends on
+// Inject a simple version of the missing createHTMLDocument method that `hpq` depends on.
 doc.implementation.createHTMLDocument = function ( html ) {
 	return jsdom.html( html, null, null );
 };
 
-// `hpq` depends on `document` be available globally
+// `hpq` depends on `document` be available globally.
 global.document = doc;
 
 if ( ! global.window.Node ) {
@@ -61,5 +61,5 @@ if ( ! global.window.matchMedia ) {
 
 global.window.navigator.userAgent = global.window.navigator.userAgent ?? '';
 
-// Leverages existing console polyfill from react-native
+// Leverages existing console polyfill from react-native.
 global.nativeLoggingHook = nativeLoggingHook;

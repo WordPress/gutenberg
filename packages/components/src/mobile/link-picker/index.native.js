@@ -22,7 +22,7 @@ import LinkPickerResults from './link-picker-results';
 import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
-// this creates a search suggestion for adding a url directly
+// This creates a search suggestion for adding a url directly.
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
@@ -64,8 +64,8 @@ export const LinkPicker = ( {
 	} );
 	const directEntry = createDirectEntry( value );
 
-	// the title of a direct entry is displayed as the raw input value, but if we
-	// are replacing empty text, we want to use the generated url
+	// The title of a direct entry is displayed as the raw input value, but if we
+	// are replacing empty text, we want to use the generated url.
 	const pickLink = ( { title, url, isDirectEntry } ) => {
 		onLinkPicked( { title: isDirectEntry ? url : title, url } );
 	};

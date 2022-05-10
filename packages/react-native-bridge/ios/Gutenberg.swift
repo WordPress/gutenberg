@@ -9,7 +9,7 @@ import Aztec
 import RNTAztecView
 
 @objc
-public class Gutenberg: NSObject {
+public class Gutenberg: UIResponder {
     public static func supportedBlocks(isDev: Bool = false) -> [String] {
         guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
         let data = Data(json.utf8)
@@ -202,6 +202,10 @@ public class Gutenberg: NSObject {
         
         if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
             settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
+        }
+
+        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
+            settingsUpdates["quoteBlockV2"] = quoteBlockV2
         }
 
         if let rawStyles = editorSettings?.rawStyles {

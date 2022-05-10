@@ -28,6 +28,14 @@
 	}
 }
 
+.edit-post-template__notice {
+	margin: 0 0 $grid-unit-10 0;
+
+	.components-notice__content {
+		margin: 0;
+	}
+}
+
 .edit-post-template__actions {
 	button:not(:last-child) {
 		margin-right: $grid-unit-10;

@@ -7,7 +7,7 @@ import { useElevation } from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                        forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
  */
 function Elevation( props, forwardedRef ) {
 	const elevationProps = useElevation( props );

@@ -291,7 +291,10 @@ const transforms = {
 									url,
 									alt,
 									caption,
-									imageSizeSlug,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
+									href,
+									linkTarget,
 								},
 							} ) =>
 								createBlock( 'core/image', {
@@ -301,6 +304,9 @@ const transforms = {
 									caption,
 									sizeSlug: imageSizeSlug,
 									align,
+									linkDestination,
+									href,
+									linkTarget,
 								} )
 						);
 					}

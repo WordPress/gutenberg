@@ -135,7 +135,7 @@ export const registerBlock = ( block ) => {
 		{
 			name,
 			...metadata,
-			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT.
 			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
 			supports?.color?.gradients
 				? {
@@ -171,13 +171,21 @@ const registerBlockVariations = ( block ) => {
 	} );
 };
 
-// only enable code block for development
+// Only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
 // eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
+
+// To be removed once Quote V2 is released on the web editor.
+function quoteCheck( quoteBlock, blocksFlags ) {
+	if ( blocksFlags?.__experimentalEnableQuoteBlockV2 ) {
+		quoteBlock.settings = quoteBlock?.settingsV2;
+	}
+	return quoteBlock;
+}
 
 // Hide the Classic block and SocialLink block
 addFilter(
@@ -230,8 +238,10 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
+ * @param {Object} [blocksFlags] Experimental flags
+ *
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -244,7 +254,7 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		separator,
 		list,
-		quote,
+		quoteCheck( quote, blocksFlags ),
 		mediaText,
 		preformatted,
 		gallery,

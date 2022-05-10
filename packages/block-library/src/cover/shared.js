@@ -44,7 +44,7 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 		}
 
 		let mediaType;
-		// for media selections originated from a file upload.
+		// For media selections originated from a file upload.
 		if ( media.media_type ) {
 			if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
 				mediaType = IMAGE_BACKGROUND_TYPE;
@@ -54,7 +54,7 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 				mediaType = VIDEO_BACKGROUND_TYPE;
 			}
 		} else {
-			// for media selections originated from existing files in the media library.
+			// For media selections originated from existing files in the media library.
 			if (
 				media.type !== IMAGE_BACKGROUND_TYPE &&
 				media.type !== VIDEO_BACKGROUND_TYPE

@@ -5,7 +5,6 @@ import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
 	InnerBlocks,
-	__experimentalBlockContentOverlay as BlockContentOverlay,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -38,19 +37,18 @@ const LAYOUT = {
 };
 
 export default function NavigationInnerBlocks( {
-	isVisible,
 	clientId,
 	hasCustomPlaceholder,
 	orientation,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
-		selectedBlockHasDescendants,
+		selectedBlockHasChildren,
 		isSelected,
 	} = useSelect(
 		( select ) => {
 			const {
-				getClientIdsOfDescendants,
+				getBlockCount,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
@@ -61,12 +59,10 @@ export default function NavigationInnerBlocks( {
 					clientId,
 					false
 				),
-				selectedBlockHasDescendants: !! getClientIdsOfDescendants( [
-					selectedBlockId,
-				] )?.length,
+				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
 
 				// This prop is already available but computing it here ensures it's
-				// fresh compared to isImmediateParentOfSelectedBlock
+				// fresh compared to isImmediateParentOfSelectedBlock.
 				isSelected: selectedBlockId === clientId,
 			};
 		},
@@ -94,9 +90,18 @@ export default function NavigationInnerBlocks( {
 	// appender.
 	const parentOrChildHasSelection =
 		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasDescendants );
+		( isImmediateParentOfSelectedBlock && ! selectedBlockHasChildren );
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
+	const hasMenuItems = !! blocks?.length;
+
+	// If there is a `ref` attribute pointing to a `wp_navigation` but
+	// that menu has no **items** (i.e. empty) then show a placeholder.
+	// The block must also be selected else the placeholder will display
+	// alongside the appender.
+	const showPlaceholder =
+		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -119,7 +124,7 @@ export default function NavigationInnerBlocks( {
 			renderAppender:
 				isSelected ||
 				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
+					! selectedBlockHasChildren ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				parentOrChildHasSelection
 					? InnerBlocks.ButtonBlockAppender
@@ -130,16 +135,9 @@ export default function NavigationInnerBlocks( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder:
-				! isVisible || hasCustomPlaceholder ? undefined : placeholder,
+			placeholder: showPlaceholder ? placeholder : undefined,
 		}
 	);
 
-	return (
-		<BlockContentOverlay
-			clientId={ clientId }
-			tagName={ 'div' }
-			wrapperProps={ innerBlocksProps }
-		/>
-	);
+	return <div { ...innerBlocksProps } />;
 }

@@ -8,6 +8,12 @@ import { css } from '@emotion/react';
  */
 import { COLORS, CONFIG } from '../utils';
 
+// Since the border for `Card` is rendered via the `box-shadow` property
+// (as opposed to the `border` property), the value of the border radius needs
+// to be adjusted by removing 1px (this is because the `box-shadow` renders
+// as an "outer radius").
+const adjustedBorderRadius = `calc(${ CONFIG.cardBorderRadius } - 1px)`;
+
 export const Card = css`
 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
 	outline: none;
@@ -62,13 +68,13 @@ export const Divider = css`
 
 export const borderRadius = css`
 	&:first-of-type {
-		border-top-left-radius: ${ CONFIG.cardBorderRadius };
-		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+		border-top-left-radius: ${ adjustedBorderRadius };
+		border-top-right-radius: ${ adjustedBorderRadius };
 	}
 
 	&:last-of-type {
-		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
-		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+		border-bottom-left-radius: ${ adjustedBorderRadius };
+		border-bottom-right-radius: ${ adjustedBorderRadius };
 	}
 `;
 
@@ -85,7 +91,7 @@ export const borderless = css`
 `;
 
 export const rounded = css`
-	border-radius: ${ CONFIG.cardBorderRadius };
+	border-radius: ${ adjustedBorderRadius };
 `;
 
 const xSmallCardPadding = css`

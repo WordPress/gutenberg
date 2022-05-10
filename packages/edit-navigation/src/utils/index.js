@@ -59,7 +59,7 @@ export function createMenuPreloadingMiddleware( preloadedData ) {
 
 		if ( menu.length > 0 ) {
 			menuDataLoaded = true;
-			// We don't have headers because we "emulate" this request
+			// We don't have headers because we "emulate" this request.
 			return sendSuccessResponse(
 				{ body: menu[ 0 ], headers: {} },
 				parse

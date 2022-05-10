@@ -7,7 +7,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Module constants
  */
-const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
+const HEIGHT_OFFSET = 10; // Used by the arrow and a bit of empty space.
 
 /**
  * Utility used to compute the popover position over the xAxis
@@ -39,7 +39,7 @@ export function computePopoverXAxisPosition(
 ) {
 	const { width } = contentSize;
 
-	// Correct xAxis for RTL support
+	// Correct xAxis for RTL support.
 	if ( xAxis === 'left' && isRTL() ) {
 		xAxis = 'right';
 	} else if ( xAxis === 'right' && isRTL() ) {
@@ -52,7 +52,7 @@ export function computePopoverXAxisPosition(
 		corner = 'left';
 	}
 
-	// x axis alignment choices
+	// X axis alignment choices.
 	const anchorMidPoint = Math.round( anchorRect.left + anchorRect.width / 2 );
 	const centerAlignment = {
 		popoverLeft: anchorMidPoint,
@@ -91,7 +91,7 @@ export function computePopoverXAxisPosition(
 				: width,
 	};
 
-	// Choosing the x axis
+	// Choosing the x axis.
 	let chosenXAxis = xAxis;
 	let contentWidth = null;
 
@@ -228,7 +228,7 @@ export function computePopoverYAxisPosition(
 		}
 	}
 
-	// y axis alignment choices
+	// Y axis alignment choices.
 	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;
 
 	if ( corner === 'bottom' ) {
@@ -261,7 +261,7 @@ export function computePopoverYAxisPosition(
 				: height,
 	};
 
-	// Choosing the y axis
+	// Choosing the y axis.
 	let chosenYAxis = yAxis;
 	let contentHeight = null;
 

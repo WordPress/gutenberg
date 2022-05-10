@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
 } from '@wordpress/e2e-test-utils';
@@ -10,8 +10,8 @@ import {
 describe( 'Site Editor Inserter', () => {
 	beforeAll( async () => {
 		await activateTheme( 'emptytheme' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );

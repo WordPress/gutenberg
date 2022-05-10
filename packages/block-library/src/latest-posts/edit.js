@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
 import {
 	BaseControl,
 	PanelBody,
@@ -29,9 +28,11 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticeStore } from '@wordpress/notices';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -67,6 +68,7 @@ function getFeaturedImageDetails( post, size ) {
 }
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
+	const instanceId = useInstanceId( LatestPostsEdit );
 	const {
 		postsToShow,
 		order,
@@ -148,6 +150,20 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			selectedAuthor,
 		]
 	);
+
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Remove previous warning if any, to show one at a time per block.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/latest-posts/redirection-prevented/${ instanceId }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
 
 	const imageSizeOptions = imageSizes
 		.filter( ( { slug } ) => slug !== 'full' )
@@ -467,7 +483,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.join( ' ' ) }
 							{ /* translators: excerpt truncation character, default …  */ }
 							{ __( ' … ' ) }
-							<a href={ post.link } rel="noopener noreferrer">
+							<a
+								href={ post.link }
+								rel="noopener noreferrer"
+								onClick={ showRedirectionPreventedNotice }
+							>
 								{ __( 'Read more' ) }
 							</a>
 						</>
@@ -481,8 +501,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (
 										<a
+											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
+											onClick={
+												showRedirectionPreventedNotice
+											}
 										>
 											{ featuredImage }
 										</a>
@@ -491,12 +515,19 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									) }
 								</div>
 							) }
-							<a href={ post.link } rel="noreferrer noopener">
-								{ titleTrimmed ? (
-									<RawHTML>{ titleTrimmed }</RawHTML>
-								) : (
-									__( '(no title)' )
-								) }
+							<a
+								href={ post.link }
+								rel="noreferrer noopener"
+								dangerouslySetInnerHTML={
+									!! titleTrimmed
+										? {
+												__html: titleTrimmed,
+										  }
+										: undefined
+								}
+								onClick={ showRedirectionPreventedNotice }
+							>
+								{ ! titleTrimmed ? __( '(no title)' ) : null }
 							</a>
 							{ displayAuthor && currentAuthor && (
 								<div className="wp-block-latest-posts__post-author">
@@ -523,11 +554,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								) }
 							{ displayPostContent &&
 								displayPostContentRadio === 'full_post' && (
-									<div className="wp-block-latest-posts__post-full-content">
-										<RawHTML key="html">
-											{ post.content.raw.trim() }
-										</RawHTML>
-									</div>
+									<div
+										className="wp-block-latest-posts__post-full-content"
+										dangerouslySetInnerHTML={ {
+											__html: post.content.raw.trim(),
+										} }
+									/>
 								) }
 						</li>
 					);

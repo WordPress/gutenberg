@@ -124,10 +124,6 @@ export function useInputAndSelection( props ) {
 		 * @param {Event|DOMHighResTimeStamp} event
 		 */
 		function handleSelectionChange( event ) {
-			if ( ownerDocument.activeElement !== element ) {
-				return;
-			}
-
 			const {
 				record,
 				applyRecord,
@@ -136,14 +132,53 @@ export function useInputAndSelection( props ) {
 				onSelectionChange,
 			} = propsRef.current;
 
-			if ( event.type !== 'selectionchange' && ! isSelected ) {
-				return;
-			}
-
 			// Check if the implementor disabled editing. `contentEditable`
 			// does disable input, but not text selection, so we must ignore
 			// selection changes.
 			if ( element.contentEditable !== 'true' ) {
+				return;
+			}
+
+			// If the selection changes where the active element is a parent of
+			// the rich text instance (writing flow), call `onSelectionChange`
+			// for the rich text instance that contains the start or end of the
+			// selection.
+			if ( ownerDocument.activeElement !== element ) {
+				if ( ! ownerDocument.activeElement.contains( element ) ) {
+					return;
+				}
+
+				const selection = defaultView.getSelection();
+				const { anchorNode, focusNode } = selection;
+
+				if (
+					element.contains( anchorNode ) &&
+					element !== anchorNode &&
+					element.contains( focusNode ) &&
+					element !== focusNode
+				) {
+					const { start, end } = createRecord();
+					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
+					onSelectionChange( start, end );
+				} else if (
+					element.contains( anchorNode ) &&
+					element !== anchorNode
+				) {
+					const { start, end: offset = start } = createRecord();
+					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
+					onSelectionChange( offset );
+				} else if (
+					element.contains( focusNode ) &&
+					element !== focusNode
+				) {
+					const { start, end: offset = start } = createRecord();
+					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
+					onSelectionChange( undefined, offset );
+				}
+				return;
+			}
+
+			if ( event.type !== 'selectionchange' && ! isSelected ) {
 				return;
 			}
 
@@ -203,7 +238,7 @@ export function useInputAndSelection( props ) {
 		function onCompositionStart() {
 			isComposing = true;
 			// Do not update the selection when characters are being composed as
-			// this rerenders the component and might distroy internal browser
+			// this rerenders the component and might destroy internal browser
 			// editing state.
 			ownerDocument.removeEventListener(
 				'selectionchange',
@@ -231,6 +266,12 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 			} = propsRef.current;
 
+			// When the whole editor is editable, let writing flow handle
+			// selection.
+			if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+				return;
+			}
+
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.
 				// It will be recalculated on the next mouseup, keyup, or touchend
@@ -254,25 +295,12 @@ export function useInputAndSelection( props ) {
 			// at this point, but this focus event is still too early to calculate
 			// the selection.
 			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
-
-			ownerDocument.addEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
-		}
-
-		function onBlur() {
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 		}
 
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
-		element.addEventListener( 'blur', onBlur );
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for
@@ -280,6 +308,10 @@ export function useInputAndSelection( props ) {
 		element.addEventListener( 'keyup', handleSelectionChange );
 		element.addEventListener( 'mouseup', handleSelectionChange );
 		element.addEventListener( 'touchend', handleSelectionChange );
+		ownerDocument.addEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
 		return () => {
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(
@@ -288,7 +320,6 @@ export function useInputAndSelection( props ) {
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
-			element.removeEventListener( 'blur', onBlur );
 			element.removeEventListener( 'keyup', handleSelectionChange );
 			element.removeEventListener( 'mouseup', handleSelectionChange );
 			element.removeEventListener( 'touchend', handleSelectionChange );

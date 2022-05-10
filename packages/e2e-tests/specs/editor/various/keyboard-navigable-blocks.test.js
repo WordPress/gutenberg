@@ -20,7 +20,7 @@ async function getActiveLabel() {
 }
 
 const navigateToContentEditorTop = async () => {
-	// Use 'Ctrl+`' to return to the top of the editor
+	// Use 'Ctrl+`' to return to the top of the editor.
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 };
@@ -81,7 +81,7 @@ describe( 'Order of block keyboard navigation', () => {
 	it( 'permits tabbing through paragraph blocks in the expected order', async () => {
 		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
 
-		// create 3 paragraphs blocks with some content
+		// Create 3 paragraphs blocks with some content.
 		for ( const paragraphBlock of paragraphBlocks ) {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( paragraphBlock );
@@ -206,5 +206,28 @@ describe( 'Order of block keyboard navigation', () => {
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'ArrowRight' );
 		await expect( await getActiveLabel() ).toBe( 'Move up' );
+	} );
+
+	it( 'allows the first element within a block to receive focus', async () => {
+		// Insert a image block.
+		await insertBlock( 'Image' );
+
+		// Make sure the upload button has focus.
+		const uploadButton = await page.waitForXPath(
+			'//button[contains( text(), "Upload" ) ]'
+		);
+		await expect( uploadButton ).toHaveFocus();
+
+		// Try to focus the image block wrapper.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( await getActiveLabel() ).toBe( 'Block: Image' );
+	} );
+
+	it( 'allows the block wrapper to gain focus for a group block instead of the first element', async () => {
+		// Insert a group block.
+		await insertBlock( 'Group' );
+
+		// If active label matches, that means focus did not change from group block wrapper.
+		await expect( await getActiveLabel() ).toBe( 'Block: Group' );
 	} );
 } );

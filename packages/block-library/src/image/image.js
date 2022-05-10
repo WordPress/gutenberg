@@ -33,7 +33,11 @@ import {
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -95,7 +99,10 @@ export default function Image( {
 			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && isSelected
+						? getMedia( id, { context: 'view' } )
+						: null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -367,7 +374,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
 							label={ __( 'Alt text (alternative text)' ) }
@@ -595,7 +602,9 @@ export default function Image( {
 					}
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

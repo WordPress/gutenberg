@@ -29,7 +29,7 @@ export default function LetterSpacingControl( {
 } ) {
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
-		defaultValues: { px: '2', em: '.2', rem: '.2' },
+		defaultValues: { px: 2, em: 0.2, rem: 0.2 },
 	} );
 	return (
 		<UnitControl

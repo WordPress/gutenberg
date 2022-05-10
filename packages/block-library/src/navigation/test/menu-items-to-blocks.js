@@ -320,7 +320,7 @@ describe( 'converting menu items to blocks', () => {
 				type_label: 'Custom Link',
 				object: 'custom',
 				parent: 0,
-				menu_order: 0, // capturing 0 edge case.
+				menu_order: 0, // Capturing 0 edge case.
 				target: '',
 				classes: [ '' ],
 				xfn: [ '' ],

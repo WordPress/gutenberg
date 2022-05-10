@@ -1,4 +1,4 @@
-// These are necessary to load TinyMCE successfully
+// These are necessary to load TinyMCE successfully.
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
 	// Without this, TinyMCE tries to determine its URL by looking at the
@@ -23,7 +23,7 @@ global.window.cancelAnimationFrame = function cancelAnimationFrame( handle ) {
 	return clearTimeout( handle );
 };
 
-// Ignoring `options` argument since we unconditionally schedule this ASAP
+// Ignoring `options` argument since we unconditionally schedule this ASAP.
 global.window.requestIdleCallback = function requestIdleCallback( callback ) {
 	const start = Date.now();
 
@@ -47,12 +47,12 @@ global.window.matchMedia = () => ( {
 	removeListener: () => {},
 } );
 
-// Setup fake localStorage
+// Setup fake localStorage.
 const storage = {};
 global.window.localStorage = {
 	getItem: ( key ) => ( key in storage ? storage[ key ] : null ),
 	setItem: ( key, value ) => ( storage[ key ] = value ),
 };
 
-// UserSettings global
+// UserSettings global.
 global.window.userSettings = { uid: 1 };

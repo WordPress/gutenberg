@@ -66,10 +66,6 @@ function AudioEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const onError = () => {
-		createErrorNotice( __( 'Failed to insert audio file.' ) );
-	};
-
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			setAttributes( { [ attribute ]: newValue } );
@@ -88,13 +84,13 @@ function AudioEdit( {
 
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( { src: undefined, id: undefined } );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
 		setAttributes( { src: media.url, id: media.id } );
 	}
 
@@ -144,7 +140,6 @@ function AudioEdit( {
 			<MediaUploadProgress
 				mediaId={ id }
 				onFinishMediaUploadWithSuccess={ onFileChange }
-				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
 				containerStyle={ styles.progressContainer }
 				progressBarStyle={ styles.progressBar }
@@ -182,7 +177,7 @@ function AudioEdit( {
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }

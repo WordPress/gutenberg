@@ -1,12 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comment-reply-link",
 		"isValid": true,
 		"attributes": {
 			"textAlign": "right",
-			"fontFamily": "cambria-georgia",
 			"fontSize": "extra-large",
+			"fontFamily": "cambria-georgia",
 			"style": {
 				"typography": {
 					"lineHeight": "0.8",
@@ -25,7 +24,6 @@
 				}
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

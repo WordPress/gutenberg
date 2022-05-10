@@ -324,7 +324,7 @@ describe( 'converting menu items to blocks', () => {
 				type_label: 'Custom Link',
 				object: 'custom',
 				parent: 0,
-				menu_order: 0, // capturing 0 edge case.
+				menu_order: 0, // Capturing 0 edge case.
 				target: '',
 				classes: [ '' ],
 				xfn: [ '' ],
@@ -677,7 +677,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 		it( 'does not map block attribute "id" to menu item "object_id" field for custom (non-entity) links', () => {
 			const customLinkBlockAttributes = {
-				id: 12345, // added for test purposes only - should't exist.
+				id: 12345, // Added for test purposes only - should't exist.
 				type: 'custom', // custom type indicates we shouldn't need an `id` field.
 				kind: 'custom', // custom type indicates we shouldn't need an `id` field.
 				label: 'Example Custom Link',
@@ -708,7 +708,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 		it( 'correctly maps "tag" block type variation to "post_tag" value as expected in "object" type field', () => {
 			const tagLinkBlockVariation = {
-				id: 12345, // added for test purposes only - should't exist.
+				id: 12345, // Added for test purposes only - should't exist.
 				type: 'tag', // custom type indicates we shouldn't need an `id` field.
 				kind: 'taxonomy', // custom type indicates we shouldn't need an `id` field.
 				label: 'Example Tag',
@@ -765,7 +765,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 		it( 'allows for setting and unsetting of target property based on opensInNewTab arttribute boolean', () => {
 			const shared = {
-				id: 12345, // added for test purposes only - should't exist.
+				id: 12345, // Added for test purposes only - should't exist.
 				type: 'custom', // custom type indicates we shouldn't need an `id` field.
 				kind: 'custom', // custom type indicates we shouldn't need an `id` field.
 				label: 'Example',
@@ -819,7 +819,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				xfn: [ '' ],
 				classes: [ '' ],
 				attr_title: '',
-				object_id: 123456, // added for test purposes.
+				object_id: 123456, // Added for test purposes.
 				object: 'custom',
 				type: 'custom',
 				target: '_blank',

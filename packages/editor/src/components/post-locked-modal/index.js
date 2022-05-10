@@ -24,7 +24,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { getWPAdminURL } from '../../utils/url';
 import { store as editorStore } from '../../store';
 
 export default function PostLockedModal() {
@@ -164,7 +163,7 @@ export default function PostLockedModal() {
 		action: 'edit',
 		_wpnonce: postLockUtils.nonce,
 	} );
-	const allPostsUrl = getWPAdminURL( 'edit.php', {
+	const allPostsUrl = addQueryArgs( 'edit.php', {
 		post_type: get( postType, [ 'slug' ] ),
 	} );
 	const allPostsLabel = __( 'Exit editor' );

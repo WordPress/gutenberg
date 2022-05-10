@@ -6,7 +6,7 @@
 export function isInDefaultBlock() {
 	return page.evaluate( () => {
 		const activeElement = document.activeElement;
-		// activeElement may be null in that case we should return false
+		// activeElement may be null in that case we should return false.
 		if ( ! activeElement ) {
 			return false;
 		}

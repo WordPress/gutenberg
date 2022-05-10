@@ -4,6 +4,12 @@
 	}
 }
 
+.block-editor-color-gradient-control__fieldset {
+	// Prevents the `fieldset` from growing beyond its parent's size
+	// in order to fit its content.
+	min-width: 0;
+}
+
 .block-editor-panel-color-gradient-settings {
 	.block-editor-panel-color-gradient-settings__panel-title {
 		display: flex;

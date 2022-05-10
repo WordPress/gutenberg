@@ -1,10 +1,10 @@
-// Utils
+// Utils.
 export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
 
 // Compose helper (aliased flowRight from Lodash)
 export { default as compose } from './higher-order/compose';
 
-// Higher-order components
+// Higher-order components.
 export { default as ifCondition } from './higher-order/if-condition';
 export { default as pure } from './higher-order/pure';
 export { default as withGlobalEvents } from './higher-order/with-global-events';
@@ -13,7 +13,7 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 export { default as withPreferredColorScheme } from './higher-order/with-preferred-color-scheme';
 
-// Hooks
+// Hooks.
 export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
 export { default as __experimentalUseDragging } from './hooks/use-dragging';
 export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';

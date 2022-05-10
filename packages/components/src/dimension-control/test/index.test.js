@@ -132,7 +132,7 @@ describe( 'DimensionControl', () => {
 				.at( 0 )
 				.simulate( 'change', {
 					target: {
-						value: '', // this happens when you select the "default" <option />
+						value: '', // This happens when you select the "default" <option />
 					},
 				} );
 

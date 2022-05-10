@@ -60,6 +60,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
     private static final String MAP_KEY_THEME_UPDATE_RAW_STYLES = "rawStyles";
+    private static final String MAP_KEY_THEME_UPDATE_RAW_FEATURES = "rawFeatures";
     private static final String MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
@@ -149,6 +150,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         Serializable colors = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_COLORS);
         Serializable gradients = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_GRADIENTS);
         Serializable rawStyles = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_STYLES);
+        Serializable rawFeatures = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_FEATURES);
 
         // We must assign null here to distinguish between a missing value and false
         Boolean galleryWithImageBlocks = null;
@@ -167,6 +169,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
         if (rawStyles != null) {
             writableMap.putString(MAP_KEY_THEME_UPDATE_RAW_STYLES, rawStyles.toString());
+        }
+
+        if (rawFeatures != null) {
+            writableMap.putString(MAP_KEY_THEME_UPDATE_RAW_FEATURES, rawFeatures.toString());
         }
 
         if (galleryWithImageBlocks != null) {

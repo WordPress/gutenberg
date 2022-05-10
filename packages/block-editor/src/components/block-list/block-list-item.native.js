@@ -121,6 +121,7 @@ export class BlockListItem extends Component {
 			blockWidth,
 			...restProps
 		} = this.props;
+
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
@@ -162,25 +163,20 @@ export class BlockListItem extends Component {
 	}
 
 	render() {
-		const {
-			gridProperties,
-			clientId,
-			parentWidth,
-			items,
-			blockWidth,
-		} = this.props;
+		const { parentWidth, blockWidth, isGridItem } = this.props;
 
 		if ( ! blockWidth ) {
 			return null;
 		}
 
-		if ( gridProperties ) {
+		if ( isGridItem ) {
+			const { numOfColumns, tileCount, tileIndex } = this.props;
 			return (
 				<Grid
-					numOfColumns={ gridProperties.numColumns }
-					tileCount={ items.length }
-					index={ items.indexOf( clientId ) }
 					maxWidth={ parentWidth }
+					numOfColumns={ numOfColumns }
+					tileCount={ tileCount }
+					index={ tileIndex }
 				>
 					{ this.renderContent() }
 				</Grid>
@@ -209,18 +205,18 @@ export default compose( [
 				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-				// if list is empty, show the insertion point (via the default appender)
+				// If list is empty, show the insertion point (via the default appender)
 				( blockClientIds.length === 0 ||
-					// or if the insertion point is right before the denoted block
+					// Or if the insertion point is right before the denoted block.
 					blockClientIds[ insertionPoint.index ] === clientId );
 
 			const shouldShowInsertionPointAfter =
 				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
-				// if the insertion point is at the end of the list
+				// If the insertion point is at the end of the list.
 				blockClientIds.length === insertionPoint.index &&
-				// and the denoted block is the last one on the list, show the indicator at the end of the block
+				// And the denoted block is the last one on the list, show the indicator at the end of the block.
 				blockClientIds[ insertionPoint.index - 1 ] === clientId;
 
 			const isReadOnly = getSettings().readOnly;

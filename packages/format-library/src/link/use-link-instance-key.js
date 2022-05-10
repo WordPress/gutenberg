@@ -1,7 +1,7 @@
 // Weakly referenced map allows unused ids to be garbage collected.
 const weakMap = new WeakMap();
 
-// Incrementing zero-based ID value
+// Incrementing zero-based ID value.
 let id = -1;
 
 const prefix = 'link-control-instance';

@@ -16,8 +16,8 @@ import {
 	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { store as interfaceStore } from '@wordpress/interface';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -50,11 +50,11 @@ export default function WidgetAreasBlockEditorProvider( {
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
 				: [],
-			isFixedToolbarActive: select( interfaceStore ).isFeatureActive(
+			isFixedToolbarActive: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'fixedToolbar'
 			),
-			keepCaretInsideBlock: select( interfaceStore ).isFeatureActive(
+			keepCaretInsideBlock: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'keepCaretInsideBlock'
 			),

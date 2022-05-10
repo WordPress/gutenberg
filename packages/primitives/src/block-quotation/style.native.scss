@@ -1,7 +1,8 @@
 %wpBlockQuote-shared {
 	border-left-width: 4px;
 	border-left-style: solid;
-	padding-left: 8px;
+	padding-left: $block-edge-to-content;
+	padding-top: $dashed-border-space;
 	margin-left: 0;
 }
 
@@ -18,4 +19,8 @@
 .wpBlockQuoteCitation {
 	margin-top: 16px;
 	font-size: 14px;
+}
+
+.paddingWithBackground {
+	padding-top: $block-edge-to-content - $block-selected-margin;
 }

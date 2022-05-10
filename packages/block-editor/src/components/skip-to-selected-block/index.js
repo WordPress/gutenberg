@@ -28,6 +28,9 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	) : null;
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md
+ */
 export default withSelect( ( select ) => {
 	return {
 		selectedBlockClientId: select(

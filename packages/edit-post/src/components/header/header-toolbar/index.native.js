@@ -6,7 +6,7 @@ import { Platform, ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -40,7 +40,11 @@ function HeaderToolbar( {
 	getStylesFromColorScheme,
 	onHideKeyboard,
 	isRTL,
+	noContentSelected,
 } ) {
+	const wasNoContentSelected = useRef( noContentSelected );
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		// scrollview doesn't seem to automatically adjust to RTL on Android so, scroll to end when Android
@@ -53,7 +57,7 @@ function HeaderToolbar( {
 	};
 	const renderHistoryButtons = () => {
 		const buttons = [
-			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */
+			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo. */
 			<ToolbarButton
 				key="undoButton"
 				title={ __( 'Undo' ) }
@@ -79,12 +83,32 @@ function HeaderToolbar( {
 		return isRTL ? buttons.reverse() : buttons;
 	};
 
+	const onToggleInserter = useCallback(
+		( isOpen ) => {
+			if ( isOpen ) {
+				wasNoContentSelected.current = noContentSelected;
+			}
+			setIsInserterOpen( isOpen );
+		},
+		[ noContentSelected ]
+	);
+
+	// Expanded mode should be preserved while the inserter is open.
+	// This way we prevent style updates during the opening transition.
+	const useExpandedMode = isInserterOpen
+		? wasNoContentSelected.current
+		: noContentSelected;
+
 	return (
 		<View
-			style={ getStylesFromColorScheme(
-				styles.container,
-				styles.containerDark
-			) }
+			style={ [
+				getStylesFromColorScheme(
+					styles[ 'header-toolbar__container' ],
+					styles[ 'header-toolbar__container--dark' ]
+				),
+				useExpandedMode &&
+					styles[ 'header-toolbar__container--expanded' ],
+			] }
 		>
 			<ScrollView
 				ref={ scrollViewRef }
@@ -93,14 +117,24 @@ function HeaderToolbar( {
 				showsHorizontalScrollIndicator={ false }
 				keyboardShouldPersistTaps="always"
 				alwaysBounceHorizontal={ false }
-				contentContainerStyle={ styles.scrollableContent }
+				contentContainerStyle={
+					styles[ 'header-toolbar__scrollable-content' ]
+				}
 			>
-				<Inserter disabled={ ! showInserter } />
+				<Inserter
+					disabled={ ! showInserter }
+					useExpandedMode={ useExpandedMode }
+					onToggle={ onToggleInserter }
+				/>
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<ToolbarGroup passedStyle={ styles.keyboardHideContainer }>
+				<ToolbarGroup
+					passedStyle={
+						styles[ 'header-toolbar__keyboard-hide-container' ]
+					}
+				>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }
@@ -121,8 +155,10 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			hasInserterItems,
+			hasSelectedBlock,
 		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
+		const isAnyBlockSelected = hasSelectedBlock();
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
@@ -136,6 +172,7 @@ export default compose( [
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
+			noContentSelected: ! isAnyBlockSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

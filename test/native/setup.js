@@ -5,12 +5,16 @@ import 'react-native-gesture-handler/jestSetup';
 import { Image, NativeModules as RNNativeModules } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
-// testing environment: https://git.io/JSSBg
+// testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
 global.navigator = global.navigator ?? {};
 
 // Set up the app runtime globals for the test environment, which includes
 // modifying the above `global.navigator`
 require( '../../packages/react-native-editor/src/globals' );
+
+// Set up Reanimated library for testing
+require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
+global.__reanimatedWorkletInit = jest.fn();
 
 RNNativeModules.UIManager = RNNativeModules.UIManager || {};
 RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
@@ -81,6 +85,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
 		provideToNative_Html: jest.fn(),
+		requestImageFailedRetryDialog: jest.fn(),
+		requestImageUploadCancelDialog: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
@@ -169,7 +175,7 @@ jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
-// Mock native modules incompatible with testing environment
+// Mock native modules incompatible with testing environment.
 jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',

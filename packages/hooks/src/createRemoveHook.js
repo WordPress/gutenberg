@@ -40,7 +40,7 @@ function createRemoveHook( hooks, storeKey, removeAll = false ) {
 			return;
 		}
 
-		// Bail if no hooks exist by this name
+		// Bail if no hooks exist by this name.
 		if ( ! hooksStore[ hookName ] ) {
 			return 0;
 		}

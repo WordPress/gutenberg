@@ -77,7 +77,7 @@ export const Gallery = ( props ) => {
 			if ( isCaptionSelected ) {
 				setIsCaptionSelected( false );
 			}
-			// we need to fully invoke the curried function here
+			// We need to fully invoke the curried function here.
 			onSelectImage( index )();
 		};
 	};
@@ -152,7 +152,7 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>

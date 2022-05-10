@@ -28,7 +28,9 @@ export function PostTaxonomies( {
 	);
 	const visibleTaxonomies = filter(
 		availableTaxonomies,
-		( taxonomy ) => taxonomy.visibility.show_ui
+		// In some circumstances .visibility can end up as undefined so optional chaining operator required.
+		// https://github.com/WordPress/gutenberg/issues/40326
+		( taxonomy ) => taxonomy.visibility?.show_ui
 	);
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical

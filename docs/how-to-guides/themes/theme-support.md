@@ -435,7 +435,7 @@ Link support has been made stable as part of WordPress 5.8. It's `false` by defa
 }
 ```
 
-> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support( 'experimental-link-color' )` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.8 as the minimum version.
+> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support( 'experimental-link-color' )` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.9 as the minimum version.
 
 When the user sets the link color of a block, a new style will be added in the form of:
 

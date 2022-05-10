@@ -16,7 +16,7 @@ import { act } from '@testing-library/react';
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
-			// Mount: Enzyme shallow does not support wrapping multiple nodes
+			// Mount: Enzyme shallow does not support wrapping multiple nodes.
 			const wrapper = mount(
 				<Tooltip>
 					<div />
@@ -145,10 +145,13 @@ describe( 'Tooltip', () => {
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
-			// Force delayedSetIsOver to be called
+			// Force delayedSetIsOver to be called.
 			setTimeout( () => {
 				const popoverAfterTimeout = wrapper.find( 'Popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
 			}, TOOLTIP_DELAY );
 		} );
 
@@ -183,6 +186,9 @@ describe( 'Tooltip', () => {
 			setTimeout( () => {
 				const popoverAfterTimeout = wrapper.find( 'Popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
 			}, 2000 );
 		} );
 

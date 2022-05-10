@@ -80,7 +80,7 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
 		const comparisonNode =
 			node.parent.type === 'MemberExpression' ? node.parent : node;
 
-		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
+		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE.
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
 		const hasCorrectOperands =
 			( parent.left === comparisonNode &&

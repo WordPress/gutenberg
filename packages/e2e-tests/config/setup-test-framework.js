@@ -13,6 +13,7 @@ import {
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	resetPreferences,
 	setBrowserViewport,
 	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
@@ -65,7 +66,7 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  */
 const pageEvents = [];
 
-// The Jest timeout is increased because these tests are a bit slow
+// The Jest timeout is increased because these tests are a bit slow.
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 // Retry failed tests at most 2 times in CI.
@@ -242,6 +243,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
+	await resetPreferences();
 	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
@@ -253,6 +255,7 @@ beforeAll( async () => {
 } );
 
 afterEach( async () => {
+	await resetPreferences();
 	await setupBrowser();
 } );
 

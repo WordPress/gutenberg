@@ -14,7 +14,6 @@ import {
 	CardHeader,
 	CardMedia,
 } from '../';
-import { CONFIG } from '../../utils';
 
 describe( 'Card', () => {
 	describe( 'Card component', () => {
@@ -51,12 +50,15 @@ describe( 'Card', () => {
 		} );
 
 		it( 'should add rounded border when the isRounded prop is true', () => {
-			const { container } = render(
+			const { container: containerRounded } = render(
 				<Card isRounded={ true }>Code is Poetry</Card>
 			);
-			expect( container.firstChild ).toHaveStyle( {
-				borderRadius: CONFIG.cardBorderRadius,
-			} );
+			const { container: containerSquared } = render(
+				<Card isRounded={ false }>Code is Poetry</Card>
+			);
+			expect( containerRounded.firstChild ).toMatchStyleDiffSnapshot(
+				containerSquared.firstChild
+			);
 		} );
 
 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {

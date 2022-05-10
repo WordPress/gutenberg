@@ -70,12 +70,12 @@ describe.each( [
 	 * WHEN the USER selects the SETTINGS BUTTON on the EDIT IMAGE BLOCK or EDIT BUTTON BLOCK;
 	 */
 	it( 'should display the LINK SETTINGS with an EMPTY LINK TO field.', async () => {
-		// Arrange
+		// Arrange.
 		const url = 'https://tonytahmouchtest.files.wordpress.com';
 		const subject = await initializeEditor( { initialHtml } );
 		Clipboard.getString.mockReturnValue( url );
 
-		// Act
+		// Act.
 		const block = await waitFor( () =>
 			subject.getByA11yLabel(
 				type === 'core/image' ? /Image Block/ : /Button Block/
@@ -87,7 +87,7 @@ describe.each( [
 			await waitFor( () => subject.getByA11yLabel( 'Open Settings' ) )
 		);
 
-		// Assert
+		// Assert.
 		const linkToField = await waitFor( () =>
 			subject.getByA11yLabel(
 				`Link to, ${
@@ -107,12 +107,12 @@ describe.each( [
 			 * WHEN the USER selects the LINK TO cell;
 			 */
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async () => {
-				// Arrange
+				// Arrange.
 				const url = 'tonytahmouchtest.files.wordpress.com';
 				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
-				// Act
+				// Act.
 				const block = await waitFor( () =>
 					subject.getByA11yLabel(
 						type === 'core/image' ? /Image Block/ : /Button Block/
@@ -145,7 +145,7 @@ describe.each( [
 				}
 				await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
 
-				// Assert
+				// Assert.
 				expect(
 					subject.queryByA11yLabel( /Copy URL from the clipboard[,]/ )
 				).toBeNull();
@@ -160,12 +160,12 @@ describe.each( [
 			 * WHEN the USER selects the LINK TO cell;
 			 */
 			it( 'should display the LINK PICKER with NO FROM CLIPBOARD CELL.', async () => {
-				// Arrange
+				// Arrange.
 				const url = 'https://tonytahmouchtest.files.wordpress.com';
 				const subject = await initializeEditor( { initialHtml } );
 				Clipboard.getString.mockReturnValue( url );
 
-				// Act
+				// Act.
 				const block = await waitFor( () =>
 					subject.getByA11yLabel(
 						type === 'core/image' ? /Image Block/ : /Button Block/
@@ -221,7 +221,7 @@ describe.each( [
 				}
 				await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
 
-				// Assert
+				// Assert.
 				expect(
 					subject.queryByA11yLabel( /Copy URL from the clipboard[,]/ )
 				).toBeNull();
@@ -239,12 +239,12 @@ describe.each( [
 				'should display the LINK PICKER with the FROM CLIPBOARD CELL populated' +
 					' with the URL from the CLIPBOARD.',
 				async () => {
-					// Arrange
+					// Arrange.
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
 					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
-					// Act
+					// Act.
 					const block = await waitFor( () =>
 						subject.getByA11yLabel(
 							type === 'core/image'
@@ -283,7 +283,7 @@ describe.each( [
 						)
 					);
 
-					// Assert
+					// Assert.
 					const clipboardUrl = await waitFor( () =>
 						subject.getByText( url )
 					);
@@ -306,12 +306,12 @@ describe.each( [
 				'should display the LINK SETTINGS with the URL from the CLIPBOARD' +
 					' populated in the LINK TO field.',
 				async () => {
-					// Arrange
+					// Arrange.
 					const url = 'https://tonytahmouchtest.files.wordpress.com';
 					const subject = await initializeEditor( { initialHtml } );
 					Clipboard.getString.mockReturnValue( url );
 
-					// Act
+					// Act.
 					const block = await waitFor( () =>
 						subject.getByA11yLabel(
 							type === 'core/image'
@@ -352,7 +352,7 @@ describe.each( [
 						)
 					);
 
-					// Assert
+					// Assert.
 					const linkToField = await waitFor( () =>
 						subject.getByA11yLabel(
 							`Link to, ${
