@@ -18,7 +18,7 @@ import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import { DEFAULT_SIDEBAR, SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -30,7 +30,7 @@ export function SidebarComplementaryAreaFills() {
 		( select ) => {
 			const _sidebar = select(
 				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
+			).getActiveComplementaryArea( STORE_NAME, DEFAULT_SIDEBAR );
 			const _isEditorSidebarOpened = [
 				SIDEBAR_BLOCK,
 				SIDEBAR_TEMPLATE,

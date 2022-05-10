@@ -8,13 +8,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Returns the complementary area that is active in a given scope.
  *
- * @param {Object} state Global application state.
- * @param {string} scope Item scope.
+ * @param {Object} state       Global application state.
+ * @param {string} scope       Item scope.
+ * @param {string} defaultArea The default area to show if the area is visible.
  *
  * @return {string | null | undefined} The complementary area that is active in the given scope.
  */
 export const getActiveComplementaryArea = createRegistrySelector(
-	( select ) => ( state, scope ) => {
+	( select ) => ( state, scope, defaultArea ) => {
 		const isComplementaryAreaVisible = select( preferencesStore ).get(
 			scope,
 			'isComplementaryAreaVisible'
@@ -32,7 +33,7 @@ export const getActiveComplementaryArea = createRegistrySelector(
 			return null;
 		}
 
-		return state?.complementaryAreas?.[ scope ];
+		return state?.complementaryAreas?.[ scope ] ?? defaultArea;
 	}
 );
 
