@@ -81,11 +81,11 @@ const placementToAnimationOrigin = ( placement ) => {
 
 	if ( a === 'left' || a === 'right' ) {
 		x = 'center';
-		y = a;
+		y = a === 'left' ? 'right' : 'left';
 		if ( b === 'start' ) {
-			x = 'bottom';
-		} else if ( b === 'end' ) {
 			x = 'top';
+		} else if ( b === 'end' ) {
+			x = 'bottom';
 		}
 	}
 
