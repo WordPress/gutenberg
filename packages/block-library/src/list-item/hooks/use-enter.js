@@ -15,7 +15,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import useIndentListItem from './use-indent-list-item';
+import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -27,7 +27,7 @@ export default function useEnter( props ) {
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	const [ canIndent, indentListItem ] = useIndentListItem(
+	const [ canOutdent, outdentListItem ] = useOutdentListItem(
 		propsRef.current.clientId
 	);
 	return useRefEffect(
@@ -41,8 +41,8 @@ export default function useEnter( props ) {
 					return;
 				}
 				event.preventDefault();
-				if ( canIndent ) {
-					indentListItem();
+				if ( canOutdent ) {
+					outdentListItem();
 					return;
 				}
 				// Here we are in top level list so we need to split.
@@ -89,6 +89,6 @@ export default function useEnter( props ) {
 				element.removeEventListener( 'keydown', onKeyDown );
 			};
 		},
-		[ canIndent ]
+		[ canOutdent ]
 	);
 }
