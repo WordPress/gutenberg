@@ -33,11 +33,6 @@ export const innerWrapper = () => css`
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 	border-radius: 2px;
 	flex: 1 0 40%;
-	/*
-	 * When default control height is 36px the following height should be
-	 * removed. See: InputControl and __next36pxDefaultSize.
-	 */
-	height: 30px;
 
 	/*
 	 * Needs more thought. Aim is to prevent the border for BorderBoxControl
@@ -69,6 +64,16 @@ export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	`;
 };
 
+/*
+ * When default control height is 36px the following should be removed.
+ * See: InputControl and __next36pxDefaultSize.
+ */
+export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+	return css`
+		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
+	`;
+};
+
 export const borderControlDropdown = () => css`
 	background: #fff;
 	${ rtl(
@@ -87,7 +92,7 @@ export const borderControlDropdown = () => css`
 		 * Override button component height and padding to fit within
 		 * BorderControl
 		 */
-		height: 28px;
+		height: 100%;
 		padding: ${ space( 0.75 ) };
 		border-radius: inherit;
 	}
@@ -105,17 +110,19 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = ( border?: Border ) => {
+export const colorIndicatorWrapper = (
+	border?: Border,
+	__next36pxDefaultSize?: boolean
+) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		/* Dimensions adjusted to fit in 30px control height. */
-		width: 22px;
-		height: 22px;
-		padding: 1px;
+		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -124,9 +131,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
-			/* Dimensions adjusted to fit in 30px overall control height. */
-			height: 16px;
-			width: 16px;
+			${ ! __next36pxDefaultSize
+				? css`
+						/* Dimensions fit in 30px overall control height. */
+						height: 16px;
+						width: 16px;
+				  `
+				: '' }
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,

@@ -15,16 +15,20 @@ import type { LinkedButtonProps } from '../types';
 export function useBorderBoxControlLinkedButton(
 	props: WordPressComponentProps< LinkedButtonProps, 'div' >
 ) {
-	const { className, ...otherProps } = useContextSystem(
-		props,
-		'BorderBoxControlLinkedButton'
-	);
+	const {
+		className,
+		__next36pxDefaultSize = false,
+		...otherProps
+	} = useContextSystem( props, 'BorderBoxControlLinkedButton' );
 
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderBoxControlLinkedButton, className );
-	}, [ className ] );
+		return cx(
+			styles.BorderBoxControlLinkedButton( __next36pxDefaultSize ),
+			className
+		);
+	}, [ className, cx, __next36pxDefaultSize ] );
 
 	return { ...otherProps, className: classes };
 }
