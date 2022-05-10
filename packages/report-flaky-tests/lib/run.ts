@@ -1,148 +1,116 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
-const github = require( '@actions/github' );
-const core = require( '@actions/core' );
-const unzipper = require( 'unzipper' );
-const { formatResultsErrors } = require( 'jest-message-util' );
+import * as github from '@actions/github';
+import * as core from '@actions/core';
 
-const TEST_RESULTS_LIST = {
-	open: `<!-- __TEST_RESULTS_LIST__ -->`,
-	close: `<!-- /__TEST_RESULTS_LIST__ -->`,
-};
-const TEST_RESULT = {
-	open: '<!-- __TEST_RESULT__ -->',
-	close: '<!-- /__TEST_RESULT__ -->',
-};
-
-const metaData = {
-	render: ( json ) => `<!-- __META_DATA__:${ JSON.stringify( json ) } -->`,
-	get: ( str ) => {
-		const matched = str.match( /<!-- __META_DATA__:(.*) -->/ );
-		if ( matched ) {
-			return JSON.parse( matched[ 1 ] );
-		}
-	},
-};
+/**
+ * Internal dependencies
+ */
+import { GitHubAPI } from './github-api';
+import {
+	renderIssueBody,
+	formatTestErrorMessage,
+	formatTestResults,
+	parseIssueBody,
+} from './markdown';
 
 async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
-	const label = core.getInput( 'label', { required: true } );
 	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
 		required: true,
 	} );
 
-	const octokit = github.getOctokit( token );
+	const api = new GitHubAPI( token );
 
-	const flakyTests = await downloadReportFromArtifact(
-		octokit,
+	const flakyTests = await api.downloadReportFromArtifact(
 		artifactNamePrefix
 	);
 
 	if ( ! flakyTests ) {
+		// No flaky tests reported in this run.
 		return;
 	}
 
-	const issues = await fetchAllIssuesLabeledFlaky( octokit, label );
+	const label = core.getInput( 'label', { required: true } );
+	const issues = await api.fetchAllIssuesLabeledFlaky( label );
 
 	for ( const flakyTest of flakyTests ) {
-		const {
-			runner: testRunner = 'jest-circus',
-			title: testTitle,
-			path: testPath,
-			results: testResults,
-		} = flakyTest;
+		const { title: testTitle } = flakyTest;
 		const issueTitle = getIssueTitle( testTitle );
 		const reportedIssue = issues.find(
 			( issue ) => issue.title === issueTitle
 		);
-		const isTrunk = getHeadBranch() === 'trunk';
+		const testPath = flakyTest.path.startsWith( process.cwd() )
+			? flakyTest.path.slice( process.cwd().length )
+			: flakyTest.path;
 		let issue;
 
+		const currentFormattedTestResults = formatTestResults( {
+			date: new Date(),
+			failedTimes: flakyTest.results.length,
+			headBranch: api.headBranch,
+			runURL: api.runURL,
+			// Always output the latest test results' stacks.
+			errorMessage: formatTestErrorMessage( flakyTest ),
+		} );
+
 		if ( reportedIssue ) {
-			const body = reportedIssue.body;
-			const meta = metaData.get( body );
+			const body = reportedIssue.body!;
 
-			if ( isTrunk ) {
-				const headCommit = github.context.sha;
-				const baseCommit = meta.baseCommit || github.context.sha;
-				meta.baseCommit = baseCommit;
-
+			// The issue is closed.
+			if ( reportedIssue.closed_at ) {
 				try {
-					const { data } = await octokit.rest.repos.compareCommits( {
-						...github.context.repo,
-						base: baseCommit,
-						head: headCommit,
-						per_page: 1,
-					} );
+					// Represent the latest base commit on trunk.
+					const latestAncestorCommit = await api.findMergeBaseCommit(
+						'trunk',
+						github.context.sha
+					);
+					const latestAncestorDate =
+						latestAncestorCommit.committer?.date;
 
-					meta.failedTimes += testResults.length;
-					meta.totalCommits = data.total_commits + 1;
+					// Cannot find the commit date, skipping.
+					if ( ! latestAncestorDate ) {
+						return;
+					}
+
+					const closedTime = new Date(
+						reportedIssue.closed_at
+					).getTime();
+					const latestAncestorTime = new Date(
+						latestAncestorDate
+					).getTime();
+
+					// The issue is closed after the latest base commit on trunk,
+					// which means the branch/PR/commit is outdated and the flaky test
+					// has probably already been fixed. Skip reporting the outdated flaky tests.
+					if ( closedTime >= latestAncestorTime ) {
+						return;
+					}
 				} catch ( err ) {
-					// It might be a deleted commit,
-					// treat the current commit as the base commit.
-					meta.baseCommit = headCommit;
-					meta.failedTimes = testResults.length;
-					meta.totalCommits = 1;
+					// It might be a deleted commit or something else.
+					core.error( err as Error );
+					return;
 				}
 			}
 
-			let testResultsList =
-				body.includes( TEST_RESULTS_LIST.open ) &&
-				body.includes( TEST_RESULTS_LIST.close )
-					? body
-							.slice(
-								body.indexOf( TEST_RESULTS_LIST.open ) +
-									TEST_RESULTS_LIST.open.length,
-								body.indexOf( TEST_RESULTS_LIST.close )
-							)
-							/**
-							 * Split the text from:
-							 * ```
-							 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
-							 * ...
-							 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
-							 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
-							 * ```
-							 *
-							 * into:
-							 * ```
-							 * [
-							 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
-							 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
-							 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
-							 * ]
-							 * ```
-							 */
-							.split(
-								new RegExp(
-									`(?<=${ TEST_RESULT.close })\n+(?:\.\.\.\n+)?(?=${ TEST_RESULT.open })`
-								)
-							)
-					: [];
-			// GitHub issues has character limits on issue's body,
-			// so we only preserve the first and the 9 latest results.
-			if ( testResultsList.length > 10 ) {
-				testResultsList = [
-					testResultsList[ 0 ],
-					'...',
-					...testResultsList.slice( -9 ),
-				];
-			}
+			const { meta, testResults: prevTestResults } = parseIssueBody(
+				body
+			);
 
 			// Concat the test results list with the latest test results.
 			const formattedTestResults = [
-				...testResultsList,
-				formatTestResults( {
-					testRunner,
-					testPath,
-					testResults,
-				} ),
-			].join( '\n' );
+				...prevTestResults.map( ( testResult ) =>
+					formatTestResults( {
+						...testResult,
+						// Don't output previous test results' stacks.
+						errorMessage: undefined,
+					} )
+				),
+				currentFormattedTestResults,
+			].join( '\n<br/>\n' );
 
-			const response = await octokit.rest.issues.update( {
-				...github.context.repo,
+			issue = await api.updateIssue( {
 				issue_number: reportedIssue.number,
 				state: 'open',
 				body: renderIssueBody( {
@@ -152,183 +120,25 @@ async function run() {
 					formattedTestResults,
 				} ),
 			} );
-
-			issue = response.data;
 		} else {
-			const meta = isTrunk
-				? {
-						failedTimes: testResults.length,
-						totalCommits: 1,
-						baseCommit: github.context.sha,
-				  }
-				: {
-						failedTimes: 0,
-						totalCommits: 0,
-				  };
-
-			const response = await octokit.rest.issues.create( {
-				...github.context.repo,
+			issue = await api.createIssue( {
 				title: issueTitle,
 				body: renderIssueBody( {
-					meta,
+					meta: {},
 					testTitle,
 					testPath,
-					formattedTestResults: formatTestResults( testResults ),
+					formattedTestResults: currentFormattedTestResults,
 				} ),
 				labels: [ label ],
 			} );
-
-			issue = response.data;
 		}
 
 		core.info( `Reported flaky test to ${ issue.html_url }` );
 	}
 }
 
-async function fetchAllIssuesLabeledFlaky( octokit, label ) {
-	const issues = await octokit.paginate( 'GET /repos/{owner}/{repo}/issues', {
-		...github.context.repo,
-		state: 'all',
-		labels: label,
-	} );
-
-	return issues;
-}
-
-async function downloadReportFromArtifact( octokit, artifactNamePrefix ) {
-	const {
-		data: { artifacts },
-	} = await octokit.rest.actions.listWorkflowRunArtifacts( {
-		...github.context.repo,
-		run_id: github.context.payload.workflow_run.id,
-	} );
-
-	const matchArtifact = artifacts.find( ( artifact ) =>
-		artifact.name.startsWith( artifactNamePrefix )
-	);
-
-	if ( ! matchArtifact ) {
-		// No flaky tests reported in this run.
-		return;
-	}
-
-	const download = await octokit.rest.actions.downloadArtifact( {
-		...github.context.repo,
-		artifact_id: matchArtifact.id,
-		archive_format: 'zip',
-	} );
-
-	const { files } = await unzipper.Open.buffer(
-		Buffer.from( download.data )
-	);
-	const fileBuffers = await Promise.all(
-		files.map( ( file ) => file.buffer() )
-	);
-	const parsedFiles = fileBuffers.map( ( buffer ) =>
-		JSON.parse( buffer.toString() )
-	);
-
-	return parsedFiles;
-}
-
-function getIssueTitle( testTitle ) {
+function getIssueTitle( testTitle: string ) {
 	return `[Flaky Test] ${ testTitle }`;
-}
-
-function renderIssueBody( {
-	meta,
-	testTitle,
-	testPath,
-	formattedTestResults,
-} ) {
-	return `${ metaData.render( meta ) }
-**Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
-
-## Test title
-${ testTitle }
-
-## Test path
-\`${ testPath }\`
-
-## Flaky rate (_estimated_)
-\`${ meta.failedTimes } / ${ meta.totalCommits + meta.failedTimes }\` runs
-
-## Errors
-${ TEST_RESULTS_LIST.open }
-${ formattedTestResults }
-${ TEST_RESULTS_LIST.close }
-`;
-}
-
-function formatTestErrorMessage( { testRunner, testResults, testPath } ) {
-	switch ( testRunner ) {
-		case '@playwright/test': {
-			// Could do a slightly better formatting than this.
-			return stripAnsi(
-				testResults.map( ( result ) => result.error.stack ).join( '\n' )
-			);
-		}
-		case 'jest-circus':
-		default: {
-			return stripAnsi(
-				formatResultsErrors(
-					testResults,
-					{
-						rootDir: path.join(
-							process.cwd(),
-							'packages/e2e-tests'
-						),
-					},
-					{},
-					testPath
-				)
-			);
-		}
-	}
-}
-
-function formatTestResults( { testRunner, testPath, testResults } ) {
-	const date = new Date().toISOString();
-	// It will look something like this without formatting:
-	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
-	return `${ TEST_RESULT.open }<details>
-<summary>
-	<time datetime="${ date }"><code>[${ date }]</code></time>
-		Test passed after ${ testResults.length } failed ${
-		testResults.length === 0 ? 'attempt' : 'attempts'
-	} on <a href="${ getRunURL() }"><code>${ getHeadBranch() }</code></a>.
-</summary>
-
-\`\`\`
-${ formatTestErrorMessage( { testRunner, testPath, testResults } ) }
-\`\`\`
-</details>${ TEST_RESULT.close }`;
-}
-
-function getHeadBranch() {
-	return github.context.payload.workflow_run.head_branch;
-}
-
-function getRunURL() {
-	return github.context.payload.workflow_run.html_url;
-}
-
-/**
- * Copied pasted from `strip-ansi` to use without ESM.
- * @see https://github.com/chalk/strip-ansi
- * Licensed under MIT license.
- */
-function stripAnsi( string ) {
-	return string.replace(
-		new RegExp(
-			[
-				'[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)',
-				'(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))',
-			].join( '|' ),
-			'g'
-		),
-		''
-	);
 }
 
 export { run };

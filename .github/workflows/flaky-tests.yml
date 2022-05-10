@@ -24,9 +24,11 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Npm install
+            - name: Npm install and build
+              # We don't have to build the entire project, just the action itself.
               run: |
                   npm ci
+                  npm run build:package-types
 
             - name: Report flaky tests
               uses: ./packages/report-flaky-tests
