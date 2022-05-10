@@ -1,12 +1,12 @@
 declare namespace jest {
 	interface Matchers< R > {
-		toHaveErrored(): void;
-		toHaveErroredWith( ...data: any[] ): void;
-		toHaveInformed(): void;
-		toHaveInformedWith( ...data: any[] ): void;
-		toHaveLogged(): void;
-		toHaveLoggedWith( ...data: any[] ): void;
-		toHaveWarned(): void;
-		toHaveWarnedWith( ...data: any[] ): void;
+		toHaveErrored(): R;
+		toHaveErroredWith( ...data: any[] ): R;
+		toHaveInformed(): R;
+		toHaveInformedWith( ...data: any[] ): R;
+		toHaveLogged(): R;
+		toHaveLoggedWith( ...data: any[] ): R;
+		toHaveWarned(): R;
+		toHaveWarnedWith( ...data: any[] ): R;
 	}
 }
