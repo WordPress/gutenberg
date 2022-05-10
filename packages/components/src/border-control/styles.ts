@@ -27,7 +27,7 @@ export const borderControl = css`
 `;
 
 export const innerWrapper = () => css`
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 	border-radius: 2px;
 	flex: 1 0 40%;
 
@@ -60,11 +60,11 @@ export const borderControlDropdown = () => css`
 	${ rtl(
 		{
 			borderRadius: `1px 0 0 1px`,
-			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
+			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.ui.border }`,
 		},
 		{
 			borderRadius: `0 1px 1px 0`,
-			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
+			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.ui.border }`,
 		}
 	)() }
 
