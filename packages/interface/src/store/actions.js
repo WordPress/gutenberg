@@ -5,6 +5,20 @@ import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
+ * Set a default complementary area.
+ *
+ * @param {string} scope Complementary area scope.
+ * @param {string} area  Area identifier.
+ *
+ * @return {Object} Action object.
+ */
+export const setDefaultComplementaryArea = ( scope, area ) => ( {
+	type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+	scope,
+	area,
+} );
+
+/**
  * Enable the complementary area.
  *
  * @param {string} scope Complementary area scope.
