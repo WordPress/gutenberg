@@ -48,7 +48,7 @@ function PostSwitchToDraftButton( {
 					setShowConfirmDialog( true );
 				} }
 				disabled={ isSaving }
-				variant="tertiary"
+				variant="secondary"
 			>
 				{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
 			</Button>
