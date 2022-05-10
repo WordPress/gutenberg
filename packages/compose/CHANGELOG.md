@@ -10,6 +10,10 @@
 
 -   Add `useDisabled` hook.
 
+### Internal
+
+-   Update the implementation of useResizeObserver to rely on the ResizableObserver API.
+
 ## 5.6.0 (2022-05-04)
 
 ## 5.5.0 (2022-04-21)

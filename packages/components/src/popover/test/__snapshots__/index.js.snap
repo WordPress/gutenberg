@@ -16,6 +16,10 @@ exports[`Popover should pass additional props to portaled element 1`] = `
       <div
         style="position: relative;"
       >
+        <div
+          aria-hidden="true"
+          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+        />
         Hello
       </div>
     </div>
@@ -38,6 +42,10 @@ exports[`Popover should render content 1`] = `
       <div
         style="position: relative;"
       >
+        <div
+          aria-hidden="true"
+          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+        />
         Hello
       </div>
     </div>
