@@ -4,6 +4,17 @@
 import type { Style, StyleOptions } from '../../types';
 import { generateRule } from '../utils';
 
+const fontFamily = {
+	name: 'fontFamily',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontFamily' ],
+			'fontFamily'
+		);
+	},
+};
 const fontSize = {
 	name: 'fontSize',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -16,8 +27,20 @@ const fontSize = {
 	},
 };
 
+const fontStyle = {
+	name: 'fontStyle',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontStyle' ],
+			'fontStyle'
+		);
+	},
+};
+
 const fontWeight = {
-	name: 'fontSize',
+	name: 'fontWeight',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
@@ -77,7 +100,9 @@ const textTransform = {
 };
 
 export default [
+	fontFamily,
 	fontSize,
+	fontStyle,
 	fontWeight,
 	letterSpacing,
 	lineHeight,

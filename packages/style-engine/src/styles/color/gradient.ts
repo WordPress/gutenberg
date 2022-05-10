@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { Style, StyleOptions } from '../../types';
-import { generateRule, getSlugFromPreset } from '../utils';
+import { generateRule } from '../utils';
 
 const gradient = {
 	name: 'gradient',
@@ -13,23 +13,6 @@ const gradient = {
 			[ 'color', 'gradient' ],
 			'background'
 		);
-	},
-	getClassNames: ( style: Style ) => {
-		const classNames = [];
-		const styleValue: string | number | undefined = style?.color?.gradient;
-
-		if ( styleValue ) {
-			const slug = getSlugFromPreset( styleValue, 'gradient' );
-			if ( slug ) {
-				classNames.push( `has-${ slug }-gradient-background` );
-			}
-			// Primary color classes must come before the `has-text-color`,
-			// `has-background` and `has-link-color` classes to maintain backwards
-			// compatibility and avoid block invalidations.
-			classNames.push( 'has-background' );
-		}
-
-		return classNames;
 	},
 };
 

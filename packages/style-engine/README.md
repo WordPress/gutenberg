@@ -44,18 +44,6 @@ _Returns_
 
 -   `string`: generated stylesheet.
 
-### getClassnames
-
-Returns an array of classnames.
-
-_Parameters_
-
--   _style_ `Style`: Style object.
-
-_Returns_
-
--   `string[]`: An array of classnames.
-
 ### getCSSRules
 
 Returns a JSON representation of the generated CSS rules.
