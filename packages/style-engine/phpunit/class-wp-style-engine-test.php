@@ -157,6 +157,32 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'style_block_with_selector_and_pretty_css'     => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => '42px',
+							'left'   => '2%',
+							'bottom' => '44px',
+							'right'  => '5rem',
+						),
+					),
+				),
+				'options'         => array(
+					'selector' => '.wp-selector > p',
+					'prettify' => true,
+				),
+				'expected_output' => array(
+					'css' => '.wp-selector > p {
+	padding-top: 42px;
+	padding-left: 2%;
+	padding-bottom: 44px;
+	padding-right: 5rem;
+}
+',
+				),
+			),
+
 			'elements_with_css_var_value'                  => array(
 				'block_styles'    => array(
 					'color' => array(
