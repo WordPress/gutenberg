@@ -77,7 +77,6 @@ export function SidebarComplementaryAreaFills() {
 				closeLabel={ __( 'Close settings sidebar' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar__panel-tabs"
-				isActiveByDefault
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<PanelBody>

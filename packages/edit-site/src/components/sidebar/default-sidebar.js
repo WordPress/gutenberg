@@ -16,7 +16,6 @@ export default function DefaultSidebar( {
 	header,
 	headerClassName,
 	panelClassName,
-	isActiveByDefault,
 } ) {
 	return (
 		<>
@@ -30,7 +29,6 @@ export default function DefaultSidebar( {
 				header={ header }
 				headerClassName={ headerClassName }
 				panelClassName={ panelClassName }
-				isActiveByDefault={ isActiveByDefault }
 			>
 				{ children }
 			</ComplementaryArea>
