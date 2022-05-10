@@ -88,7 +88,7 @@ export const borderControlDropdown = () => css`
 		 * BorderControl
 		 */
 		height: 28px;
-		padding: 0 ${ space( 0.5 ) };
+		padding: ${ space( 0.75 ) };
 		border-radius: inherit;
 	}
 `;
@@ -113,9 +113,9 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
 		/* Dimensions adjusted to fit in 30px control height. */
-		width: 24px;
-		height: 24px;
-		padding: 2px;
+		width: 22px;
+		height: 22px;
+		padding: 1px;
 
 		/*
 		 * ColorIndicator
