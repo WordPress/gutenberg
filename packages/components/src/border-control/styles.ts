@@ -14,7 +14,10 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
-import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
+import {
+	Root as UnitControlWrapper,
+	UnitSelect,
+} from '../unit-control/styles/unit-control-styles';
 
 import type { Border } from './types';
 
@@ -46,12 +49,28 @@ export const innerWrapper = () => css`
 		flex: 1;
 		${ rtl( { marginLeft: 0 } )() }
 	}
+
+	&& ${ UnitSelect } {
+		/* Prevent default styles forcing heights larger than BorderControl */
+		min-height: 0;
+		${ rtl( { marginRight: 0 } )() }
+	}
 `;
 
 export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	return css`
 		width: ${ width };
 		flex: 0 0 auto;
+	`;
+};
+
+/*
+ * When default control height is 36px the following should be removed.
+ * See: InputControl and __next36pxDefaultSize.
+ */
+export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+	return css`
+		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
 	`;
 };
 
@@ -69,7 +88,12 @@ export const borderControlDropdown = () => css`
 	)() }
 
 	&& > button {
-		padding: ${ space( 1 ) };
+		/*
+		 * Override button component height and padding to fit within
+		 * BorderControl
+		 */
+		height: 100%;
+		padding: ${ space( 0.75 ) };
 		border-radius: inherit;
 	}
 `;
@@ -86,16 +110,19 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = ( border?: Border ) => {
+export const colorIndicatorWrapper = (
+	border?: Border,
+	__next36pxDefaultSize?: boolean
+) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: 28px;
-		height: 28px;
-		padding: 2px;
+		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -104,6 +131,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
+			${ ! __next36pxDefaultSize
+				? css`
+						/* Dimensions fit in 30px overall control height. */
+						height: 16px;
+						width: 16px;
+				  `
+				: '' }
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
