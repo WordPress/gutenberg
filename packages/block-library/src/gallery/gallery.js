@@ -10,7 +10,7 @@ import { RichText, useInnerBlocksProps } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
 
 const allowedBlocks = [ 'core/image' ];
@@ -89,7 +89,7 @@ export const Gallery = ( props ) => {
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
 			/>
 		</figure>
