@@ -83,11 +83,20 @@ After waiting for everything to build, the demo app should be running from the i
 
 ## Android
 
+### Java Development Kit (JDK)
+
+The JDK recommended in [the React Native documentation](https://reactnative.dev/docs/environment-setup) is called Azul Zulu. It can be installed [Homebrew](https://brew.sh/). To install it, run the following commands in a terminal after installing Homebrew:
+
+```
+brew tap homebrew/cask-versions
+brew install --cask zulu11
+```
+
+If you already have a JDK installed on your system, it should be JDK 11 or newer.
+
 ### Set up Android Studio
 
-We'll use Android Studio for all JDK and SDK package management. 
-
-The first step is [downloading Android Studio](https://developer.android.com/studio).
+To compile the Android app, [download Android Studio](https://developer.android.com/studio). 
 
 Next, open an existing project and select the Gutenberg folder you cloned. 
 
