@@ -10,7 +10,6 @@ exports[`Popover should pass additional props to portaled element 1`] = `
   >
     <div
       class="components-popover__content"
-      style="width: 700px; height: 500px;"
     >
       <div
         style="position: absolute; min-width: 100%;"
@@ -35,7 +34,6 @@ exports[`Popover should render content 1`] = `
   >
     <div
       class="components-popover__content"
-      style="width: 700px; height: 500px;"
     >
       <div
         style="position: absolute; min-width: 100%;"
