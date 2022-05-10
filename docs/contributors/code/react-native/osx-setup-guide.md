@@ -42,6 +42,21 @@ npm ci
 
 ## iOS
 
+### CocoaPods
+
+[CocoaPods](https://guides.cocoapods.org/using/getting-started.html) is needed to fetch React and third-party dependencies:
+
+```
+sudo gem install cocoapods
+```
+
+Note, Mac M1 is not directly compatible with Cocoapods. If you encounter issues, try running these commands to install the ffi package, which will enable pods to be installed with the proper architecture:
+
+```
+sudo arch -x86_64 gem install ffi
+arch -x86_64 pod install
+```
+
 ### Set up Xcode
 
 Install [Xcode](https://developer.apple.com/xcode/) via the app store and then open it up:
@@ -85,7 +100,7 @@ After waiting for everything to build, the demo app should be running from the i
 
 ### Java Development Kit (JDK)
 
-The JDK recommended in [the React Native documentation](https://reactnative.dev/docs/environment-setup) is called Azul Zulu. It can be installed [Homebrew](https://brew.sh/). To install it, run the following commands in a terminal after installing Homebrew:
+The JDK recommended in [the React Native documentation](https://reactnative.dev/docs/environment-setup) is called Azul Zulu. It can be installed using [Homebrew](https://brew.sh/). To install it, run the following commands in a terminal after installing Homebrew:
 
 ```
 brew tap homebrew/cask-versions
