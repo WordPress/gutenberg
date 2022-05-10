@@ -26,9 +26,8 @@ export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
 	/** @type {import('../input-control/types').InputChangeCallback}*/
 	const changeHandler = ( next ) => {
 		next = parseFloat( next );
-		const isOverflow = next < min || next > max;
-		isDiverging.current = isNaN( next ) || isOverflow;
-		if ( isOverflow ) {
+		if ( next < min || next > max ) {
+			isDiverging.current = true;
 			next = Math.max( min, Math.min( max, next ) );
 		}
 		onChange( next );
