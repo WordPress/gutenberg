@@ -21,7 +21,12 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useEnter, useIndentListItem, useOutdentListItem } from './hooks';
+import {
+	useEnter,
+	useBackspace,
+	useIndentListItem,
+	useOutdentListItem,
+} from './hooks';
 
 function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
@@ -61,11 +66,12 @@ export default function ListItemEdit( {
 		allowedBlocks: [ 'core/list' ],
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
+	const useBackspaceRef = useBackspace( { clientId } );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef ] ) }
+					ref={ useMergeRefs( [ useEnterRef, useBackspaceRef ] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
