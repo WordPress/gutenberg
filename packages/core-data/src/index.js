@@ -68,12 +68,7 @@ export const store = createReduxStore( STORE_NAME, storeConfig() );
 register( store );
 
 export { default as EntityProvider } from './entity-provider';
-export {
-	useEntityRecord,
-	__experimentalUseEntityRecord,
-	useEntityRecords,
-	__experimentalUseEntityRecords,
-} from './hooks';
 export * from './entity-provider';
-export * from './fetch';
 export * from './entity-types';
+export * from './fetch';
+export * from './hooks';

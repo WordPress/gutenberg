@@ -1,8 +1,8 @@
 export {
-	useEntityRecord,
+	default as useEntityRecord,
 	__experimentalUseEntityRecord,
 } from './use-entity-record';
 export {
-	useEntityRecords,
+	default as useEntityRecords,
 	__experimentalUseEntityRecords,
 } from './use-entity-records';

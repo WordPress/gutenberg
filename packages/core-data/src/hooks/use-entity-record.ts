@@ -70,7 +70,7 @@ export interface Options {
  * @return Entity record data.
  * @template RecordType
  */
-export function useEntityRecord< RecordType >(
+export default function useEntityRecord< RecordType >(
 	kind: string,
 	name: string,
 	recordId: string | number,
@@ -91,8 +91,6 @@ export function useEntityRecord< RecordType >(
 		...rest,
 	};
 }
-
-export default useEntityRecord;
 
 export function __experimentalUseEntityRecord(
 	kind: string,
