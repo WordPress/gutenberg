@@ -328,7 +328,7 @@ jobs:
             - name: Setup Node
               uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version-file: '.nvmrc'
+                  node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
 
             - name: Publish packages to npm ("latest" dist-tag)
