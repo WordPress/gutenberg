@@ -37,7 +37,7 @@ export default function useTitle( title ) {
 			const formattedTitle = sprintf(
 				/* translators: Admin screen title. 1: Admin screen name, 2: Network or site name. */
 				__( '%1$s ‹ %2$s — WordPress' ),
-				title,
+				decodeEntities( title ),
 				decodeEntities( siteTitle )
 			);
 
