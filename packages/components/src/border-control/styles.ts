@@ -103,8 +103,8 @@ export const borderControlDropdown = () => css`
 		height: 100%;
 		padding: ${ space( 0.75 ) };
 		${ rtl(
-			{ borderRadius: `1px 0 0 1px` },
-			{ borderRadius: `0 1px 1px 0` }
+			{ borderRadius: `2px 0 0 2px` },
+			{ borderRadius: `0 2px 2px 0` }
 		)() }
 		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 		position: relative;
