@@ -465,10 +465,10 @@ const waitForMediaLibrary = async ( driver ) => {
 };
 
 /**
- *
  * @param {string} driver
  * @param {string} elementLocator
  * @param {number} iteration - Default value is 0
+ * @return {string} - Returns the first element found, throws error if no element found
  */
 const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 25;
@@ -492,6 +492,12 @@ const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	return locator[ 0 ];
 };
 
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} iteration - Default value is 0
+ * @return {boolean} - Returns true if element is found, false otherwise
+ */
 const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 5;
 	const timeout = 1000;
@@ -511,6 +517,13 @@ const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	}
 
 	return true;
+};
+
+// Only for Android
+const waitIfAndroid = async () => {
+	if ( isAndroid() ) {
+		await editorPage.driver.sleep( 1000 );
+	}
 };
 
 module.exports = {
@@ -537,4 +550,5 @@ module.exports = {
 	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
+	waitIfAndroid,
 };
