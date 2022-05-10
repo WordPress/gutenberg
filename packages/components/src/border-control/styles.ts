@@ -25,13 +25,15 @@ const labelStyles = css`
 	font-weight: 500;
 `;
 
+const focusBoxShadow = css`
+	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
+`;
+
 export const borderControl = css`
 	position: relative;
 `;
 
 export const innerWrapper = () => css`
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
-	border-radius: 2px;
 	flex: 1 0 40%;
 
 	/*
@@ -47,14 +49,9 @@ export const innerWrapper = () => css`
 	 */
 	${ UnitControlWrapper } {
 		flex: 1;
-		${ rtl( { marginLeft: 0 } )() }
+		${ rtl( { marginLeft: -1 } )() }
 	}
 
-	/*
-	 * Increased specificity is to overcome the border which doubles the "focus"
-	 * outline/border width. The box shadow brings the focus for the UnitSelect
-	 * into line with the input control's backdrop and the dropdown button.
-	 */
 	&& ${ UnitSelect } {
 		/* Prevent default styles forcing heights larger than BorderControl */
 		min-height: 0;
@@ -68,11 +65,12 @@ export const innerWrapper = () => css`
 				marginLeft: 0,
 			}
 		)() }
+		transition: box-shadow 0.1s linear, border 0.1s linear;
 
 		&:focus {
-			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
-				${ COLORS.ui.borderFocus };
-			border: none;
+			z-index: 1;
+			${ focusBoxShadow }
+			border: 1px solid ${ COLORS.ui.borderFocus };
 		}
 	}
 `;
@@ -96,17 +94,6 @@ export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
 
 export const borderControlDropdown = () => css`
 	background: #fff;
-	z-index: 1;
-	${ rtl(
-		{
-			borderRadius: `1px 0 0 1px`,
-			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.ui.border }`,
-		},
-		{
-			borderRadius: `0 1px 1px 0`,
-			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.ui.border }`,
-		}
-	)() }
 
 	&& > button {
 		/*
@@ -115,12 +102,19 @@ export const borderControlDropdown = () => css`
 		 */
 		height: 100%;
 		padding: ${ space( 0.75 ) };
-		border-radius: inherit;
+		${ rtl(
+			{ borderRadius: `1px 0 0 1px` },
+			{ borderRadius: `0 1px 1px 0` }
+		)() }
+		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+		position: relative;
 
-		/* Specificity needed to overcome tertiary button styles. */
+		&:focus,
 		&:hover:not( :disabled ) {
-			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
-				${ COLORS.ui.borderFocus };
+			${ focusBoxShadow }
+			border-color: ${ COLORS.ui.borderFocus };
+			z-index: 1;
+			position: relative;
 		}
 	}
 `;
@@ -214,23 +208,17 @@ export const resetButton = css`
 export const borderWidthControl = () => css`
 	/* Target the InputControl's backdrop */
 	&&& ${ BackdropUI } {
-		border: none;
-		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+		${ rtl( {
+			borderTopLeftRadius: 0,
+			borderBottomLeftRadius: 0,
+		} )() }
+		transition: box-shadow 0.1s linear;
 	}
 
 	/* Specificity required to overcome UnitControl padding */
 	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
 	&&& input {
 		${ rtl( { paddingRight: 0 } )() }
-
-		/*
-		 * Allows the input control's backdrop to overlay its box shadow over
-		 * the BorderControl's wrapper border.
-		 */
-		&:focus ~ ${ BackdropUI } {
-			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
-				${ COLORS.ui.borderFocus };
-		}
 	}
 `;
 
