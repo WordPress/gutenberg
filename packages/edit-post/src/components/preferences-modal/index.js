@@ -116,6 +116,13 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Spotlight mode' ) }
 							/>
 							<EnableFeature
+								featureName="showListViewByDefault"
+								help={ __(
+									'Opens the block list view sidebar by default.'
+								) }
+								label={ __( 'Always open list view' ) }
+							/>
+							<EnableFeature
 								featureName="showIconLabels"
 								help={ __( 'Shows text instead of icons.' ) }
 								label={ __( 'Display button labels' ) }
