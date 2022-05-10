@@ -507,7 +507,7 @@ const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, iteration + 1 );
+		return isElementVisible( driver, elementLocator, iteration + 1 );
 	}
 
 	return true;

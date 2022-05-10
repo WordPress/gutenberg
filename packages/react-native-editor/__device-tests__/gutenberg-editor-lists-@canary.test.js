@@ -8,7 +8,7 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests for List block', () => {
 	it( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( blockNames.list );
-		let listBlockElement = await editorPage.getListBlockAtPosition( {
+		let listBlockElement = await editorPage.getListBlockAtPosition( 1, {
 			isEmptyBlock: true,
 		} );
 
