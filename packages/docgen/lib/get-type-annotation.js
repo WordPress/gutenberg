@@ -423,11 +423,11 @@ function unwrapWrappedSelectors( token ) {
 			 *
 			 * In these cases we'll use the argument list from `getSelector`
 			 * even though that will result in wrong location information for
-			 * the chosen argument nodes. This is fine because `docgen` doens't
+			 * the chosen argument nodes. This is fine because `docgen` doesn't
 			 * currently use that location information but if it starts to
 			 * we'll need to update this.
 			 *
-			 * The arguments for `gepDependants` must be a strict subset of the
+			 * The arguments for `getDependants` must be a strict subset of the
 			 * arguments for the selector, but `state` is _always_ an implicit
 			 * argument provided by the system, so we always have to have at
 			 * least that. If both functions have no arguments it would imply
