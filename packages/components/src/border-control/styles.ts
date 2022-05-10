@@ -50,10 +50,30 @@ export const innerWrapper = () => css`
 		${ rtl( { marginLeft: 0 } )() }
 	}
 
+	/*
+	 * Increased specificity is to overcome the border which doubles the "focus"
+	 * outline/border width. The box shadow brings the focus for the UnitSelect
+	 * into line with the input control's backdrop and the dropdown button.
+	 */
 	&& ${ UnitSelect } {
 		/* Prevent default styles forcing heights larger than BorderControl */
 		min-height: 0;
-		${ rtl( { marginRight: 0 } )() }
+		${ rtl(
+			{
+				borderRadius: '0 1px 1px 0',
+				marginRight: 0,
+			},
+			{
+				borderRadius: '1px 0 0 1px',
+				marginLeft: 0,
+			}
+		)() }
+
+		&:focus {
+			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
+				${ COLORS.ui.borderFocus };
+			border: none;
+		}
 	}
 `;
 
@@ -76,6 +96,7 @@ export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
 
 export const borderControlDropdown = () => css`
 	background: #fff;
+	z-index: 1;
 	${ rtl(
 		{
 			borderRadius: `1px 0 0 1px`,
@@ -188,12 +209,22 @@ export const borderWidthControl = () => css`
 	/* Target the InputControl's backdrop */
 	&&& ${ BackdropUI } {
 		border: none;
+		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 	}
 
 	/* Specificity required to overcome UnitControl padding */
 	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
 	&&& input {
 		${ rtl( { paddingRight: 0 } )() }
+
+		/*
+		 * Allows the input control's backdrop to overlay its box shadow over
+		 * the BorderControl's wrapper border.
+		 */
+		&:focus ~ ${ BackdropUI } {
+			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
+				${ COLORS.ui.borderFocus };
+		}
 	}
 `;
 
