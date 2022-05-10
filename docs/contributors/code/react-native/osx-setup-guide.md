@@ -4,20 +4,7 @@ Are you interested in contributing to the native mobile editor? This guide is a 
 
 Note that these instructions are primarily focused on the macOS environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup) has helpful pointers and steps for getting set up.
 
-## Install Xcode
-
-Install [Xcode](https://developer.apple.com/xcode/) via the app store and then open it up:
-
--   Accept the license agreement.
--   Verify that `Xcode > Preferences > Locations > Command Line Tools` points to the current Xcode version.
-
-<img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="700px" alt="Screenshot of XCode command line tools settings.">
-
 ## Clone Gutenberg
-
-If Xcode was installed successfully, we'll also have a version of Git available. (It's possible to update this later if we want to use a more recent version).
-
-In a terminal run:
 
 ```sh
 git clone git@github.com:WordPress/gutenberg.git
@@ -27,7 +14,9 @@ git clone git@github.com:WordPress/gutenberg.git
 
 If you’re working in multiple JS projects, a node version manager may make sense. A manager will let you switch between different node and npm versions of your choosing.
 
-We recommend [nvm](https://github.com/nvm-sh/nvm). After installing nvm, run the following from the top-level directory of the cloned project:
+We recommend [nvm](https://github.com/nvm-sh/nvm). 
+
+After installing nvm, run the following from the top-level directory of the cloned project:
 
 ```sh
 nvm install 'lts/*'
@@ -41,7 +30,7 @@ Then install dependencies:
 npm ci
 ```
 
-#### Do you have an older existing Gutenberg checkout?
+### Do you have an older existing Gutenberg checkout?
 
 If you have an existing Gutenberg checkout be sure to fully clean `node_modules` and re-install dependencies.
 This may help avoid errors in the future.
@@ -51,17 +40,20 @@ npm run distclean
 npm ci
 ```
 
-## Unit Tests
-
-Unit tests should work at this point.
-
-```sh
-npm run native test
-```
-
 ## iOS
 
-[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your checkout, or relative to `/packages/react-native-editor folder`, run:
+### Set up Xcode
+
+Install [Xcode](https://developer.apple.com/xcode/) via the app store and then open it up:
+
+-   Accept the license agreement.
+-   Verify that `Xcode > Preferences > Locations > Command Line Tools` points to the current Xcode version.
+
+<img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="700px" alt="Screenshot of XCode command line tools settings.">
+
+### react-native doctor
+
+[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your Gutenberg checkout, or relative to `/packages/react-native-editor folder`, run:
 
 ```sh
 npx @react-native-community/cli doctor
@@ -70,6 +62,8 @@ npx @react-native-community/cli doctor
 <img src="https://developer.wordpress.org/files/2021/10/react-native-doctor.png" width="700px" alt="Screenshot of react-native-community/cli doctor tool running in the terminal.">
 
 See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android" still has ❌s at this stage, we'll get to those later!)
+
+### Run the demo app
 
 Once all common and iOS issues are resolved, try:
 
@@ -89,11 +83,15 @@ After waiting for everything to build, the demo app should be running from the i
 
 ## Android
 
+### Set up Android Studio
+
 We'll use Android Studio for all JDK and SDK package management. 
 
 The first step is [downloading Android Studio](https://developer.android.com/studio).
 
-Next, open an existing project and select the Gutenberg folder you cloned. From here, click on the cube icon that's highlighted in the following screenshot to access the SDK Manager. Another way to the SDK Manager is to navigate to `Tools > SDK Manager`:
+Next, open an existing project and select the Gutenberg folder you cloned. 
+
+From here, click on the cube icon that's highlighted in the following screenshot to access the SDK Manager. Another way to the SDK Manager is to navigate to `Tools > SDK Manager`:
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-package-manager.png" width="700px" alt="Screenshot highlighting where the package manager button is located in Android Studio.">
 
@@ -159,7 +157,7 @@ Pick the target SDK version. This is the targetSdkVersion set in the [build.grad
 
 There are some advanced settings we can toggle, but these are optional. Click finish.
 
-### Putting it all together
+### Run the demo app
 
 Start metro:
 
@@ -176,6 +174,12 @@ npm run native android
 After a bit of a wait, we’ll see something like this:
 
 <img src="https://developer.wordpress.org/files/2021/10/android-simulator.png" width="700px" alt="Screenshot of a the block editor in Android Simulator.">
+
+## Unit Tests
+
+```sh
+npm run native test
+```
 
 ## Integration Tests
 
