@@ -117,6 +117,7 @@ export function initializeEditor(
 		preferredStyleVariations: {},
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
+		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
