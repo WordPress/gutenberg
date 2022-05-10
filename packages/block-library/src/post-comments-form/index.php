@@ -78,3 +78,33 @@ function post_comments_form_block_form_defaults( $fields ) {
 
 	return $fields;
 }
+
+function add_post_comments_form_onsubmit_handler() {
+    ?>
+		<script>
+			window.onload = function() {
+				const form = document.querySelector( '.comment-form' );
+				form.addEventListener( 'submit', submitted, false );
+			}
+
+			function submitted( event ) {
+				event.preventDefault();
+				const date = new Date();
+
+				const form = document.querySelector( '.comment-form' );
+
+				const author = document.querySelector( '#author' ).value;
+				const content = document.querySelector( '#comment' ).value;
+
+				const context = {
+					author,
+					content,
+					timestamp: date
+				};
+				form.innerHTML = wpCommentTemplate( context );
+
+			}
+		</script>
+    <?php
+}
+add_action('wp_head', 'add_post_comments_form_onsubmit_handler');

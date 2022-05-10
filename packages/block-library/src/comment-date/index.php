@@ -18,28 +18,42 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$comment = get_comment( $block->context['commentId'] );
-	if ( empty( $comment ) ) {
-		return '';
-	}
+	if ( 0 === $block->context['commentId'] ) {
+		// TODO: Translate format to JS-style.
+		$formatted_date = <<<END
+		\${ context.timestamp.toLocaleString( "en", {
+			year: 'numeric', month: 'long', day: 'numeric',
+			hour: 'numeric', minute: 'numeric'
+		} ) }
+		END;
+		$timestamp = '${ context.timestamp.toISOString() }';
+		$wrapper_attributes = get_block_wrapper_attributes();
+	} else {
+		$comment = get_comment( $block->context['commentId'] );
+		if ( empty( $comment ) ) {
+			return '';
+		}
 
-	$classes = '';
+		$classes = '';
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
-	$formatted_date     = get_comment_date(
-		isset( $attributes['format'] ) ? $attributes['format'] : '',
-		$comment
-	);
-	$link               = get_comment_link( $comment );
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+		$formatted_date     = get_comment_date(
+			isset( $attributes['format'] ) ? $attributes['format'] : '',
+			$comment
+		);
+		$link               = get_comment_link( $comment );
 
-	if ( ! empty( $attributes['isLink'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		if ( ! empty( $attributes['isLink'] ) ) {
+			$formatted_date = sprintf( '<a href="%1s">%2s</a>', esc_url( $link ), $formatted_date );
+		}
+
+		$timestamp = esc_attr( get_comment_date( 'c', $comment ) );
 	}
 
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		esc_attr( get_comment_date( 'c', $comment ) ),
+		$timestamp,
 		$formatted_date
 	);
 }
