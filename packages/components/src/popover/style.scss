@@ -35,6 +35,11 @@
 		outline: none;
 		border-top: $border-width solid $gray-900;
 	}
+
+	> div {
+		// Without this, potentially the width will get recomputed forever.
+		box-sizing: border-box;
+	}
 }
 
 .components-popover__header {
