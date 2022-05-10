@@ -139,14 +139,12 @@ function inputControlStateReducer(
  * @param  stateReducer    An external state reducer.
  * @param  initialState    The initial state for the reducer.
  * @param  onChangeHandler A handler for the onChange event.
- * @param  isFocused       Focus state.
  * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(
 	stateReducer: StateReducer = initialStateReducer,
 	initialState: Partial< InputState > = initialInputControlState,
-	onChangeHandler: InputChangeCallback,
-	isFocused: Boolean
+	onChangeHandler: InputChangeCallback
 ) {
 	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
@@ -205,9 +203,8 @@ export function useInputControlStateReducer(
 		currentValueProp.current = initialState.value;
 	} );
 	useLayoutEffect( () => {
-		if ( ! refEvent.current ) return;
-
 		if (
+			refEvent.current &&
 			state.value !== currentValueProp.current &&
 			! currentState.current.isDirty
 		) {
@@ -217,16 +214,15 @@ export function useInputControlStateReducer(
 					| PointerEvent< HTMLInputElement >,
 			} );
 		}
-		refEvent.current = null;
-	}, [ state.value, state.isDragging, isFocused ] );
+	}, [ state.value ] );
 	useLayoutEffect( () => {
 		if (
-			! refEvent.current &&
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
 			dispatch( { value: initialState.value } );
 		}
+		if ( refEvent.current ) refEvent.current = null;
 	}, [ initialState.value ] );
 
 	return {
