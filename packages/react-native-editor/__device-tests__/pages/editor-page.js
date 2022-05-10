@@ -565,14 +565,19 @@ class EditorPage {
 	// List Block functions
 	// =========================
 
-	async getListBlockAtPosition( position = 1, options = { isEmptyBlock: false } ) {
-
+	async getListBlockAtPosition(
+		position = 1,
+		options = { isEmptyBlock: false }
+	) {
 		// Go to the correct list at position
-		const listBlockPositionLocator = isAndroid() 
+		const listBlockPositionLocator = isAndroid()
 			? `//android.view.ViewGroup[@content-desc="List Block. Row ${ position }"]`
-			: `(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[5]`
+			: `(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[5]`;
 
-		let listBlock = await waitForVisible( this.driver, listBlockPositionLocator );
+		let listBlock = await waitForVisible(
+			this.driver,
+			listBlockPositionLocator
+		);
 		await listBlock.click();
 
 		// iOS needs a click to get the text element
@@ -581,19 +586,16 @@ class EditorPage {
 				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
 				: `//XCUIElementTypeButton[contains(@name, "List")]`;
 
-			listBlock = await waitForVisible(
-				this.driver,
-				listBlockLocator
-			);
+			listBlock = await waitForVisible( this.driver, listBlockLocator );
 			await listBlock.click();
 		}
 
-		const listBlockTextLocatorIOS = options.isEmptyBlock 
-			? `(//XCUIElementTypeStaticText[contains(@name, "List")])` 
-			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`; 
-		
-		const listBlockTextLocator = isAndroid() 
-			? `//android.view.ViewGroup[contains(@content-desc, "List Block.")]/android.widget.EditText` 
+		const listBlockTextLocatorIOS = options.isEmptyBlock
+			? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
+			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
+
+		const listBlockTextLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "List Block.")]/android.widget.EditText`
 			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );

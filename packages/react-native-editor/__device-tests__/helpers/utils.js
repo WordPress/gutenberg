@@ -470,11 +470,7 @@ const waitForMediaLibrary = async ( driver ) => {
  * @param {string} elementLocator
  * @param {number} iteration - Default value is 0
  */
-const waitForVisible = async (
-	driver,
-	elementLocator,
-	iteration = 0
-) => {
+const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 25;
 	const timeout = 1000;
 
@@ -490,21 +486,13 @@ const waitForVisible = async (
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible(
-			driver,
-			elementLocator,
-			iteration + 1
-		);
+		return waitForVisible( driver, elementLocator, iteration + 1 );
 	}
 
 	return locator[ 0 ];
 };
 
-const isElementVisible = async (	
-	driver,
-	elementLocator,
-	iteration = 0
-) => {
+const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const maxIteration = 5;
 	const timeout = 1000;
 
@@ -519,15 +507,11 @@ const isElementVisible = async (
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible(
-			driver,
-			elementLocator,
-			iteration + 1
-		);
+		return waitForVisible( driver, elementLocator, iteration + 1 );
 	}
 
 	return true;
-}
+};
 
 module.exports = {
 	backspace,
