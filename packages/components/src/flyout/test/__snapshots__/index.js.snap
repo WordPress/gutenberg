@@ -93,12 +93,9 @@ exports[`props should render correctly 1`] = `
   <div
     class="emotion-3 emotion-2"
   >
-    <iframe
+    <div
       aria-hidden="true"
-      frameborder="0"
-      src="about:blank"
-      style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-      tabindex="-1"
+      style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
     />
     <div
       class="components-card__body components-card-body emotion-5 emotion-2"
@@ -165,11 +162,11 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-@@ -22,10 +22,17 @@
-          frameborder="0"
-          src="about:blank"
-          style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-          tabindex="-1"
+@@ -19,10 +19,17 @@
+      >
+        <div
+          aria-hidden="true"
+          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
         />
 +       <div
 +         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"

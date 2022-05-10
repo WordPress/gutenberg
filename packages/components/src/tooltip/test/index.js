@@ -149,6 +149,9 @@ describe( 'Tooltip', () => {
 			setTimeout( () => {
 				const popoverAfterTimeout = wrapper.find( 'Popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
 			}, TOOLTIP_DELAY );
 		} );
 
@@ -183,6 +186,9 @@ describe( 'Tooltip', () => {
 			setTimeout( () => {
 				const popoverAfterTimeout = wrapper.find( 'Popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
 			}, 2000 );
 		} );
 

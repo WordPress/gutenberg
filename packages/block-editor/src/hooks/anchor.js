@@ -117,7 +117,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						 * We plan to remove scoping anchors to 'core/heading' to support
 						 * anchors for all eligble blocks. Additionally we plan to explore
 						 * leveraging InspectorAdvancedControls instead of a custom
-						 * PanelBody title. https://git.io/Jtcov
+						 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
 						 */ }
 						{ ! isWeb && props.name === 'core/heading' && (
 							<InspectorControls>

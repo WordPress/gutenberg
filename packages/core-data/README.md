@@ -265,14 +265,14 @@ Calling this may trigger an OPTIONS request to the REST API via the
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `string=`: Optional ID of the rest resource to check.
+-   _id_ `RecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
--   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 ### canUserEditEntityRecord
 
@@ -285,14 +285,14 @@ Calling this may trigger an OPTIONS request to the REST API via the
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `string`: Record's id.
+-   _recordId_ `RecordKey`: Record's id.
 
 _Returns_
 
--   `boolean|undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 ### getAuthors
 
@@ -302,12 +302,12 @@ Returns all available authors.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _query_ `Object|undefined`: Optional object of query parameters to include with request.
+-   _state_ `State`: Data state.
+-   _query_ `EntityQuery< any >`: Optional object of query parameters to include with request.
 
 _Returns_
 
--   `Array`: Authors list.
+-   `User< 'edit' >[]`: Authors list.
 
 ### getAutosave
 
@@ -315,14 +315,14 @@ Returns the autosave for the post and author.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
--   _authorId_ `number`: The id of the author.
+-   _postId_ `RecordKey`: The id of the parent post.
+-   _authorId_ `RecordKey`: The id of the author.
 
 _Returns_
 
--   `?Object`: The autosave for the post and author.
+-   `EntityRecord | undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
@@ -333,13 +333,13 @@ author for each post.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `RecordKey`: The id of the parent post.
 
 _Returns_
 
--   `?Array`: An array of autosaves for the post, or undefined if there is none.
+-   `Array< any > | undefined`: An array of autosaves for the post, or undefined if there is none.
 
 ### getBlockPatternCategories
 
@@ -347,11 +347,11 @@ Retrieve the list of registered block pattern categories.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Array`: Block pattern category list.
+-   `Array< any >`: Block pattern category list.
 
 ### getBlockPatterns
 
@@ -359,11 +359,11 @@ Retrieve the list of registered block patterns.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Array`: Block pattern list.
+-   `Array< any >`: Block pattern list.
 
 ### getCurrentTheme
 
@@ -371,11 +371,11 @@ Return the current theme.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Object`: The current theme.
+-   `any`: The current theme.
 
 ### getCurrentUser
 
@@ -383,11 +383,11 @@ Returns the current user.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `Object`: Current user object.
+-   `User< 'edit' >`: Current user object.
 
 ### getEditedEntityRecord
 
@@ -395,14 +395,14 @@ Returns the specified entity record, merged with its edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number|string`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record, merged with its edits.
+-   `EntityRecord | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -410,12 +410,12 @@ Returns the embed preview for the given URL.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
 
--   `*`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+-   `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
 
 ### getEntitiesByKind
 
@@ -425,12 +425,12 @@ Returns the loaded entities for the given kind.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 
 _Returns_
 
--   `Array<Object>`: Array of entities with config matching kind.
+-   `Array< any >`: Array of entities with config matching kind.
 
 ### getEntitiesConfig
 
@@ -438,12 +438,12 @@ Returns the loaded entities for the given kind.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 
 _Returns_
 
--   `Array<Object>`: Array of entities with config matching kind.
+-   `Array< any >`: Array of entities with config matching kind.
 
 ### getEntity
 
@@ -453,13 +453,13 @@ Returns the entity config given its kind and name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 
 _Returns_
 
--   `Object`: Entity config
+-   `any`: Entity config
 
 ### getEntityConfig
 
@@ -467,13 +467,13 @@ Returns the entity config given its kind and name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 
 _Returns_
 
--   `Object`: Entity config
+-   `any`: Entity config
 
 ### getEntityRecord
 
@@ -483,15 +483,15 @@ entity object if it exists and is received.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `number`: Record's key
--   _query_ `?Object`: Optional query.
+-   _key_ `RecordKey`: Record's key
+-   _query_ `EntityQuery< any >`: Optional query.
 
 _Returns_
 
--   `Object|undefined`: Record.
+-   `EntityRecord | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -499,14 +499,14 @@ Returns the specified entity record's edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's edits.
+-   `Optional< any >`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
@@ -518,14 +518,14 @@ They are defined in the entity's config.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's non transient edits.
+-   `Optional< any >`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -533,14 +533,14 @@ Returns the Entity's records.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `?Object`: Optional terms query.
+-   _query_ `EntityQuery< any >`: Optional terms query.
 
 _Returns_
 
--   `?Array`: Records.
+-   `Array< EntityRecord > | undefined`: Records.
 
 ### getLastEntityDeleteError
 
@@ -548,14 +548,14 @@ Returns the specified entity record's last delete error.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's save error.
+-   `any`: The entity record's save error.
 
 ### getLastEntitySaveError
 
@@ -563,14 +563,14 @@ Returns the specified entity record's last save error.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
--   `Object?`: The entity record's save error.
+-   `any`: The entity record's save error.
 
 ### getRawEntityRecord
 
@@ -579,14 +579,14 @@ with its attributes mapped to their raw values.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `number`: Record's key.
+-   _key_ `RecordKey`: Record's key.
 
 _Returns_
 
--   `Object?`: Object with the entity's raw attributes.
+-   `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
 
@@ -595,11 +595,11 @@ for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
--   `Object?`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getReferenceByDistinctEdits
 
@@ -616,11 +616,11 @@ _Usage_
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `State`: Editor state.
 
 _Returns_
 
--   `*`: A value whose reference will change only when an edit occurs.
+-   A value whose reference will change only when an edit occurs.
 
 ### getThemeSupports
 
@@ -628,11 +628,11 @@ Return theme supports data in the index.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 
 _Returns_
 
--   `*`: Index data.
+-   `any`: Index data.
 
 ### getUndoEdit
 
@@ -641,11 +641,11 @@ for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
--   `Object?`: The edit.
+-   `Optional< any >`: The edit.
 
 ### getUserQueryResults
 
@@ -653,12 +653,12 @@ Returns all the users returned by a query ID.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _queryID_ `string`: Query ID.
 
 _Returns_
 
--   `Array`: Users list.
+-   `User< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
@@ -667,10 +667,10 @@ and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number|string`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
@@ -683,10 +683,10 @@ or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `?Object`: Optional terms query.
+-   _query_ `EntityQuery< any >`: Optional terms query.
 
 _Returns_
 
@@ -698,9 +698,9 @@ Returns true if the REST request for autosaves has completed.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `number`: The id of the parent post.
+-   _postId_ `RecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -713,7 +713,7 @@ for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
@@ -726,7 +726,7 @@ for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 
 _Returns_
 
@@ -738,10 +738,10 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
@@ -753,10 +753,10 @@ Returns true if the specified entity record is deleting, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
@@ -772,7 +772,7 @@ get back from the oEmbed preview API.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
@@ -786,7 +786,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `State`: Data state.
 -   _url_ `string`: URL the preview would be for.
 
 _Returns_
@@ -799,16 +799,106 @@ Returns true if the specified entity record is saving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `number|string`: Record ID.
+-   _recordId_ `RecordKey`: Record ID.
 
 _Returns_
 
 -   `boolean`: Whether the entity record is saving or not.
 
 <!-- END TOKEN(Autogenerated selectors|src/selectors.ts) -->
+
+## Hooks
+
+The following set of react hooks available to import from the `@wordpress/core-data` package:
+
+<!-- START TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
+
+### useEntityRecord
+
+Resolves the specified entity record.
+
+_Usage_
+
+```js
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageTitleDisplay( { id } ) {
+	const { record, isResolving } = useEntityRecord( 'postType', 'page', id );
+
+	if ( isResolving ) {
+		return 'Loading...';
+	}
+
+	return record.title;
+}
+
+// Rendered in the application:
+// <PageTitleDisplay id={ 1 } />
+```
+
+In the above example, when `PageTitleDisplay` is rendered into an
+application, the page and the resolution details will be retrieved from
+the store state using `getEntityRecord()`, or resolved if missing.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _recordId_ `string | number`: ID of the requested entity record.
+-   _options_ `Options`: Optional hook options.
+
+_Returns_
+
+-   `EntityRecordResolution< RecordType >`: Entity record data.
+
+### useEntityRecords
+
+Resolves the specified entity records.
+
+_Usage_
+
+```js
+import { useEntityRecord } from '@wordpress/core-data';
+
+function PageTitlesList() {
+	const { records, isResolving } = useEntityRecords( 'postType', 'page' );
+
+	if ( isResolving ) {
+		return 'Loading...';
+	}
+
+	return (
+		<ul>
+			{ records.map( ( page ) => (
+				<li>{ page.title }</li>
+			) ) }
+		</ul>
+	);
+}
+
+// Rendered in the application:
+// <PageTitlesList />
+```
+
+In the above example, when `PageTitlesList` is rendered into an
+application, the list of records and the resolution details will be retrieved from
+the store state using `getEntityRecords()`, or resolved if missing.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+-   _name_ `string`: Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+-   _queryArgs_ `Record< string, unknown >`: Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+-   _options_ `Options`: Optional hook options.
+
+_Returns_
+
+-   `EntityRecordsResolution< RecordType >`: Entity records data.
+
+<!-- END TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
 
 ## Contributing to this package
 

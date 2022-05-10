@@ -17,6 +17,7 @@
 	},
 	"references": [
 		{ "path": "../compose" },
+		{ "path": "../date" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
@@ -35,6 +36,7 @@
 		"src/border-box-control/**/*",
 		"src/border-control/**/*",
 		"src/button/**/*",
+		"src/button-group/**/*",
 		"src/card/**/*",
 		"src/circular-option-picker/**/*",
 		"src/color-indicator/**/*",
@@ -42,6 +44,7 @@
 		"src/color-picker/**/*",
 		"src/confirm-dialog/**/*",
 		"src/dashicon/**/*",
+		"src/date-time/**/*",
 		"src/disabled/**/*",
 		"src/divider/**/*",
 		"src/draggable/**/*",
