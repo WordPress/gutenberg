@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+- Deprecate `isNumberInput`, as it is no longer used internally.
+
 ## 3.8.0 (2022-05-04)
 
 ## 3.7.0 (2022-04-21)
