@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Breaking Change
+### Deprecation
 
 - Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).
 
