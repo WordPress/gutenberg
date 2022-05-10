@@ -14,7 +14,10 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
-import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
+import {
+	Root as UnitControlWrapper,
+	UnitSelect,
+} from '../unit-control/styles/unit-control-styles';
 
 import type { Border } from './types';
 
@@ -50,6 +53,12 @@ export const innerWrapper = () => css`
 	${ UnitControlWrapper } {
 		flex: 1;
 		${ rtl( { marginLeft: 0 } )() }
+	}
+
+	&& ${ UnitSelect } {
+		/* Prevent default styles forcing heights larger than BorderControl */
+		min-height: 0;
+		${ rtl( { marginRight: 0 } )() }
 	}
 `;
 
