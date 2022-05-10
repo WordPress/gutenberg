@@ -46,7 +46,6 @@ function IndentUI( { clientId } ) {
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
 				describedBy={ __( 'Indent list item' ) }
-				shortcut={ _x( 'Space', 'keyboard key' ) }
 				isDisabled={ ! canIndent }
 				onClick={ indentListItem }
 			/>

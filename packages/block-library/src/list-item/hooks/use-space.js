@@ -20,19 +20,21 @@ export default function useSpace( clientId ) {
 	return useRefEffect(
 		( element ) => {
 			function onKeyDown( event ) {
-				if ( event.defaultPrevented || event.keyCode !== SPACE ) {
+				if (
+					event.defaultPrevented ||
+					event.keyCode !== SPACE ||
+					! canIndent
+				) {
 					return;
 				}
-				if ( canIndent ) {
-					const selectionStart = getSelectionStart();
-					const selectionEnd = getSelectionEnd();
-					if (
-						selectionStart.offset === 0 &&
-						selectionEnd.offset === 0
-					) {
-						event.preventDefault();
-						indentListItem();
-					}
+				const selectionStart = getSelectionStart();
+				const selectionEnd = getSelectionEnd();
+				if (
+					selectionStart.offset === 0 &&
+					selectionEnd.offset === 0
+				) {
+					event.preventDefault();
+					indentListItem();
 				}
 			}
 
