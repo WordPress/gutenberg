@@ -101,6 +101,7 @@ export default function Dropdown( props ) {
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
+					offset={ 13 }
 					{ ...popoverProps }
 					anchorRef={
 						popoverProps?.anchorRef ?? containerRef.current
