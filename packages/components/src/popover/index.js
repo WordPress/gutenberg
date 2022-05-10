@@ -139,7 +139,10 @@ const Popover = (
 			ownerDocument = anchorRef?.top.ownerDocument;
 		} else if ( anchorRef?.startContainer ) {
 			ownerDocument = anchorRef.startContainer.ownerDocument;
+		} else if ( anchorRef?.current ) {
+			ownerDocument = anchorRef.current.ownerDocument;
 		} else if ( anchorRef ) {
+			// This one should be deprecated.
 			ownerDocument = anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			ownerDocument = anchorRect.ownerDocument;
@@ -236,6 +239,8 @@ const Popover = (
 					);
 				},
 			};
+		} else if ( anchorRef?.current ) {
+			usedRef = anchorRef.current;
 		} else if ( anchorRef ) {
 			usedRef = anchorRef;
 		} else if ( anchorRect ) {

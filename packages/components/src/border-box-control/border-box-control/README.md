@@ -122,23 +122,31 @@ _Note: The will be `undefined` if a user clears all borders._
 
 - Required: Yes
 
-### `popoverClassNames`: `Object`
+### `popoverPlacement`: `Object`
 
-An object defining CSS classnames for all the inner `BorderControl` popover
-content.
+The position of the color popover relative to the control wrapper.
 
 Example:
 ```js
 {
-	linked: 'linked-border-popover-content',
-	top: 'top-border-popover-content',
-	right: 'right-border-popover-content',
-	bottom: 'bottom-border-popover-content',
-	left: 'left-border-popover-content',
+	popoverPlacement: "left-start"
 }
 ```
 
-By default, popovers are displayed relative to the button that initiated the popover. By supplying classnames for each individual popover, it is possible to add styling rules to align the popover positions to an unrelated design element, for example, the sidebar inspector in the block editor.
+By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
+
+- Required: No
+
+### `popoverOffset`: `Object`
+
+Works in conjunctions with `popoverPlacement` and allows to leave a space between the color popover and the control wrapper.
+
+Example:
+```js
+{
+	popoverOffset: 10
+}
+```
 
 - Required: No
 

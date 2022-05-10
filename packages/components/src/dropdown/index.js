@@ -82,6 +82,10 @@ export default function Dropdown( props ) {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
+	const hasAnchorRef =
+		!! popoverProps?.anchorRef ||
+		!! popoverProps?.getAnchorRect ||
+		!! popoverProps?.anchorRect;
 
 	return (
 		<div
@@ -102,10 +106,8 @@ export default function Dropdown( props ) {
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
 					offset={ 13 }
+					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
 					{ ...popoverProps }
-					anchorRef={
-						popoverProps?.anchorRef ?? containerRef.current
-					}
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,
