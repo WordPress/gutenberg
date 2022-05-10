@@ -116,6 +116,12 @@ export const borderControlDropdown = () => css`
 		height: 100%;
 		padding: ${ space( 0.75 ) };
 		border-radius: inherit;
+
+		/* Specificity needed to overcome tertiary button styles. */
+		&:hover:not( :disabled ) {
+			box-shadow: 0 0 0 ${ CONFIG.borderWidthFocus }
+				${ COLORS.ui.borderFocus };
+		}
 	}
 `;
 
