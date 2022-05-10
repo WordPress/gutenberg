@@ -1,12 +1,43 @@
 declare namespace jest {
-	interface Matchers< R > {
+	interface Matchers< R, T > {
+		/**
+		 * Ensure that `console.error` function was called.
+		 */
 		toHaveErrored(): R;
-		toHaveErroredWith( ...data: any[] ): R;
+
+		/**
+		 * Ensure that `console.error` function was called with specific arguments.
+		 */
+		toHaveErroredWith( ...args: any[] ): R;
+
+		/**
+		 * Ensure that `console.info` function was called.
+		 */
 		toHaveInformed(): R;
-		toHaveInformedWith( ...data: any[] ): R;
+
+		/**
+		 * Ensure that `console.info` function was called with specific arguments.
+		 */
+		toHaveInformedWith( ...args: any[] ): R;
+
+		/**
+		 * Ensure that `console.log` function was called.
+		 */
 		toHaveLogged(): R;
-		toHaveLoggedWith( ...data: any[] ): R;
+
+		/**
+		 * Ensure that `console.log` function was called with specific arguments.
+		 */
+		toHaveLoggedWith( ...args: any[] ): R;
+
+		/**
+		 * Ensure that `console.warn` function was called.
+		 */
 		toHaveWarned(): R;
-		toHaveWarnedWith( ...data: any[] ): R;
+
+		/**
+		 * Ensure that `console.warn` function was called with specific arguments.
+		 */
+		toHaveWarnedWith( ...args: any[] ): R;
 	}
 }
