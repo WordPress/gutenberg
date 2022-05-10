@@ -495,11 +495,16 @@ const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
 /**
  * @param {string} driver
  * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
  * @param {number} iteration - Default value is 0
  * @return {boolean} - Returns true if element is found, false otherwise
  */
-const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
-	const maxIteration = 5;
+const isElementVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
@@ -513,7 +518,12 @@ const isElementVisible = async ( driver, elementLocator, iteration = 0 ) => {
 	const locator = await driver.elementsByXPath( elementLocator );
 	if ( locator.length !== 1 ) {
 		// if locator is not visible, try again
-		return isElementVisible( driver, elementLocator, iteration + 1 );
+		return isElementVisible(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
 	}
 
 	return true;

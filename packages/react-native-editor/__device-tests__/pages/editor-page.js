@@ -558,7 +558,7 @@ class EditorPage {
 			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
 			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
 
-		return await isElementVisible( this.driver, slashInserterLocator );
+		return await isElementVisible( this.driver, slashInserterLocator, 5 );
 	}
 
 	// =========================
