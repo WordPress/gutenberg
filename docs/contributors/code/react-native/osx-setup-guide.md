@@ -1,20 +1,12 @@
 # Setup guide for React Native development (macOS)
 
-Are you interested in contributing to the native mobile editor? This
-guide is a detailed walk through designed to get you up and running!
+Are you interested in contributing to the native mobile editor? This guide is a detailed walk through designed to get you up and running!
 
-Note that the following instructions here are primarily focused on the
-macOS environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup)
-has helpful pointers and steps for getting set up.
+Note that the following instructions here are primarily focused on the macOS environment. For other environments, [the React Native quickstart documentation](https://reactnative.dev/docs/environment-setup) has helpful pointers and steps for getting set up.
 
 ## Install Xcode
 
-Install [Xcode](https://developer.apple.com/xcode/) via the app store. We'll be using
-the XCode to both compile the iOS app and use the phone simulator app.
-
-Once it has been installed from the App Store, open it by visiting `Applications > Xcode`
-
-After opening the application:
+Install [Xcode](https://developer.apple.com/xcode/) via the app store. After you have finished installing, open the app to do the following:
 
 -   Accept the license agreement.
 -   Verify that `Xcode > Preferences > Locations > Command Line Tools` points at the current Xcode version.
@@ -23,8 +15,7 @@ After opening the application:
 
 ## Clone Gutenberg
 
-If Xcode was installed successfully, we'll also have a version of git available. (It's possible to
-update this later if we want to use a more recent version).
+If Xcode was installed successfully, we'll also have a version of Git available. (It's possible to update this later if we want to use a more recent version).
 
 In a terminal run:
 
@@ -34,8 +25,7 @@ git clone git@github.com:WordPress/gutenberg.git
 
 ### Install node and npm
 
-If you’re working in multiple JS projects, a node version manager may make sense. A manager will let you
-switch between different node and npm versions of your choosing.
+If you’re working in multiple JS projects, a node version manager may make sense. A manager will let you switch between different node and npm versions of your choosing.
 
 Some good options are [nvm](https://github.com/nvm-sh/nvm) or [volta](https://volta.sh/).
 
@@ -81,9 +71,7 @@ npm run native test
 
 ## iOS
 
-The easiest way to figure out what needs to be installed is using the
-[react native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor). From your checkout, or
-relative to `/packages/react-native-editor folder`, run:
+The easiest way to figure out what needs to be installed is by using the [react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor). From your checkout, or relative to `/packages/react-native-editor folder`, run:
 
 ```sh
 npx @react-native-community/cli doctor
@@ -105,31 +93,25 @@ In another terminal type:
 npm run native ios
 ```
 
-After waiting for everything to build we should see:
+After waiting for everything to build we should see the following:
 
 <img src="https://developer.wordpress.org/files/2021/10/iOS-Simulator.png" alt="Screenshot of the block editor in iOS simulator." />
 
 ## Android
 
-To keep things simple, let's use Android Studio for all JDK and SDK package management.
-The first step is [downloading Android Studio](https://developer.android.com/studio).
+We'll use Android Studio for all JDK and SDK package management. The first step is [downloading Android Studio](https://developer.android.com/studio).
 
-Next, open an existing project and select the gutenberg folder you cloned:
-
-Click on the cube with the down arrow:
+Next, open an existing project and select the Gutenberg folder you cloned. From here, click on the cube icon that's highlighted in the following screenshot to access the SDK Manager. Another way to the SDK Manager is to navigate to `Tools > SDK Manager`:
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-package-manager.png" alt="Screenshot highlighting where the package manager button is located in Android Studio.">
 
-We can download SDK platforms, packages and other tools on this screen. Specific versions are
-hidden behind the "Show package details" checkbox, check it, since our build requires specific versions for E2E and
-development:
+We can download SDK platforms, packages and other tools on this screen. Specific versions are hidden behind the "Show package details" checkbox, check it, since our build requires specific versions for E2E and development:
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-show-package-details.png" alt="Screenshot of the package manager in Android Studio, highlighting the Show Package Details checkbox.">
 
-Check all related packages from [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle).
-Then click on "Apply" to download items. There may be other related dependencies from build.gradle files in node_modules.
-If you don’t want to dig through files, stack traces will complain of missing packages, but it does take quite a number
-of tries if you go through this route.
+Check all related packages from [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle). Then click on "Apply" to download items. There may be other related dependencies from build.gradle files in node_modules.
+
+If you don’t want to dig through files, stack traces will complain of missing packages, but it does take quite a number of tries if you go through this route.
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-editor-build-gradle.png" alt="Screenshot of the build.gradle configuration file.">
 
@@ -179,8 +161,7 @@ This brings up the “Android Virtual Device Manager” or (AVD). Click on “Cr
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-android-select-hardware.png" alt="Screenshot of the Virtual Device Configuration setup.">
 
-Pick the target SDK version. This is the targetSdkVersion set in the
-[build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle) file.
+Pick the target SDK version. This is the targetSdkVersion set in the [build.gradle](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/android/build.gradle) file.
 
 <img src="https://developer.wordpress.org/files/2021/10/react-native-adv-system-image.png" alt="Screenshot of picking a system image in the Android Device Manager workflow.">
 
@@ -218,8 +199,7 @@ Resolve any required dependencies.
 
 ### iOS Integration Tests
 
-If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes.
-This was launched previously with `npm run native start:reset`.
+If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run native start:reset`.
 
 Then in terminal type:
 
