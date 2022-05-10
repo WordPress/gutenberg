@@ -2,13 +2,13 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { backspace, isAndroid, isLocalEnvironment } from './helpers/utils';
+import { backspace, isAndroid } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for List block', () => {
 	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
 	it( 'should handle spaces in a list', async () => {
 		await editorPage.addNewBlock( blockNames.list );
-		let listBlockElement = await editorPage.getListBlock();
+		let listBlockElement = await editorPage.getListBlockAtPosition();
 
 		// Send the list item text.
 		await editorPage.typeTextToTextBlock( listBlockElement, '  a', false );
@@ -17,8 +17,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
 
 		// Click List block on Android.
-		// Only needed when testing in local environment
-		if ( isAndroid() && isLocalEnvironment() ) {
+		if ( isAndroid() ) {
 			await listBlockElement.click();
 		}
 
@@ -31,7 +30,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// There is a delay in Sauce Labs when a key is sent
 		// There isn't an element to check as it's being typed into an element that already exists, workaround is to add this wait until there's a better solution
-		if ( isAndroid() && ! isLocalEnvironment() ) {
+		if ( isAndroid() ) {
 			await editorPage.driver.sleep( 1500 );
 		}
 
@@ -45,7 +44,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		);
 
 		// Remove list block to reset editor to clean state.
-		listBlockElement = await editorPage.getListBlock();
+		listBlockElement = await editorPage.getListBlockAtPosition();
 		await listBlockElement.click();
 		await editorPage.removeBlockAtPosition( blockNames.list );
 	} );

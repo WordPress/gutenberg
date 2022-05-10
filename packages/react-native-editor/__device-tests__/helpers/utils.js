@@ -468,23 +468,17 @@ const waitForMediaLibrary = async ( driver ) => {
  *
  * @param {string} driver
  * @param {string} elementLocator
- * @param {boolean} returnBool - To return boolean instead of the first element/throw error. Useful for asserts.
  * @param {number} iteration - Default value is 0
  */
 const waitForVisible = async (
 	driver,
 	elementLocator,
-	returnBool,
 	iteration = 0
 ) => {
-	const maxIteration = returnBool ? 5 : 25;
+	const maxIteration = 25;
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		if ( returnBool ) {
-			return false;
-		}
-
 		throw new Error(
 			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
 		);
@@ -499,38 +493,64 @@ const waitForVisible = async (
 		return waitForVisible(
 			driver,
 			elementLocator,
-			returnBool,
 			iteration + 1
 		);
 	}
 
-	if ( returnBool ) {
-		return true;
-	}
 	return locator[ 0 ];
 };
 
+const isElementVisible = async (	
+	driver,
+	elementLocator,
+	iteration = 0
+) => {
+	const maxIteration = 5;
+	const timeout = 1000;
+
+	if ( iteration >= maxIteration ) {
+		// Element is still not visible after waiting, return false
+		return false;
+	} else if ( iteration !== 0 ) {
+		// wait before trying to locate element again
+		await driver.sleep( timeout );
+	}
+
+	const locator = await driver.elementsByXPath( elementLocator );
+	if ( locator.length !== 1 ) {
+		// if locator is not visible, try again
+		return waitForVisible(
+			driver,
+			elementLocator,
+			iteration + 1
+		);
+	}
+
+	return true;
+}
+
 module.exports = {
 	backspace,
-	timer,
-	setupDriver,
-	isLocalEnvironment,
-	isAndroid,
-	typeString,
-	clickMiddleOfElement,
 	clickBeginningOfElement,
+	clickMiddleOfElement,
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	isElementVisible,
+	isLocalEnvironment,
 	longPressMiddleOfElement,
-	tapSelectAllAboveElement,
+	setupDriver,
+	stopDriver,
+	swipeDown,
+	swipeFromTo,
+	swipeUp,
 	tapCopyAboveElement,
 	tapPasteAboveElement,
-	swipeDown,
-	swipeUp,
-	swipeFromTo,
-	stopDriver,
+	tapSelectAllAboveElement,
+	timer,
 	toggleHtmlMode,
 	toggleOrientation,
-	doubleTap,
-	isEditorVisible,
+	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
 };

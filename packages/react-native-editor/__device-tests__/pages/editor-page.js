@@ -5,6 +5,7 @@ const {
 	doubleTap,
 	isAndroid,
 	isEditorVisible,
+	isElementVisible,
 	longPressMiddleOfElement,
 	setupDriver,
 	stopDriver,
@@ -557,35 +558,43 @@ class EditorPage {
 			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
 			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
 
-		return await waitForVisible( this.driver, slashInserterLocator, true );
+		return await isElementVisible( this.driver, slashInserterLocator );
 	}
 
 	// =========================
 	// List Block functions
 	// =========================
 
-	async getListBlock( options = { isEmptyBlock: false } ) {
+	async getListBlockAtPosition( position = 1, options = { isEmptyBlock: false } ) {
+
+		// Go to the correct list at position
+		const listBlockPositionLocator = isAndroid() 
+			? `//android.view.ViewGroup[@content-desc="List Block. Row ${ position }"]`
+			: `(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[5]`
+
+		let listBlock = await waitForVisible( this.driver, listBlockPositionLocator );
+		await listBlock.click();
+
 		// iOS needs a click to get the text element
 		if ( ! isAndroid() ) {
 			const listBlockLocator = options.isEmptyBlock
 				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
 				: `//XCUIElementTypeButton[contains(@name, "List")]`;
 
-			const textBlock = await waitForVisible(
+			listBlock = await waitForVisible(
 				this.driver,
 				listBlockLocator
 			);
-			await textBlock.click();
+			await listBlock.click();
 		}
 
-		let listBlockTextLocator =
-			! isAndroid() && options.isEmptyBlock
-				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
-				: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
-
-		if ( isAndroid() ) {
-			listBlockTextLocator = `//android.view.ViewGroup[contains(@content-desc, "List Block.")]/android.widget.EditText`;
-		}
+		const listBlockTextLocatorIOS = options.isEmptyBlock 
+			? `(//XCUIElementTypeStaticText[contains(@name, "List")])` 
+			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`; 
+		
+		const listBlockTextLocator = isAndroid() 
+			? `//android.view.ViewGroup[contains(@content-desc, "List Block.")]/android.widget.EditText` 
+			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );
 	}

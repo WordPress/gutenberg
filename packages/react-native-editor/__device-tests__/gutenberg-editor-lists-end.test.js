@@ -7,7 +7,7 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor tests for List block (end)', () => {
 	it( 'should be able to end a List block', async () => {
 		await editorPage.addNewBlock( blockNames.list );
-		const listBlockElement = await editorPage.getListBlock();
+		const listBlockElement = await editorPage.getListBlockAtPosition();
 
 		await editorPage.typeTextToTextBlock(
 			listBlockElement,
