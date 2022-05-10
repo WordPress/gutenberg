@@ -59,7 +59,11 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const {
+		isStackedOnMobile,
+		reverseMobileStackingOrder,
+		verticalAlignment,
+	} = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -73,6 +77,8 @@ function ColumnsEditContainer( {
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-reversed-on-mobile` ]:
+			isStackedOnMobile && reverseMobileStackingOrder,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -117,6 +123,20 @@ function ColumnsEditContainer( {
 							} )
 						}
 					/>
+					{ isStackedOnMobile && (
+						<ToggleControl
+							label={ __( 'Reverse mobile stacking order' ) }
+							checked={ reverseMobileStackingOrder }
+							onChange={ () =>
+								setAttributes( {
+									reverseMobileStackingOrder: ! reverseMobileStackingOrder,
+								} )
+							}
+							help={ __(
+								'When selected, columns on mobile will stack right to left instead of left to right.'
+							) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />

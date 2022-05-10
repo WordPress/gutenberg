@@ -13,7 +13,11 @@
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
-		}
+		},
+        "reverseMobileStackingOrder": {
+            "type": "boolean",
+            "default": false
+        }
 	},
 	"supports": {
 		"anchor": true,
