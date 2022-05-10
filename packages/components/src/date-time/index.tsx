@@ -5,6 +5,7 @@
 // See: https://github.com/airbnb/react-dates#initialize
 import 'react-dates/initialize';
 import { noop } from 'lodash';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -18,10 +19,11 @@ import { __, _x } from '@wordpress/i18n';
 import Button from '../button';
 import { default as DatePicker } from './date';
 import { default as TimePicker } from './time';
+import type { DateTimePickerProps } from './types';
 
 export { DatePicker, TimePicker };
 
-function DateTimePicker(
+function UnforwardedDateTimePicker(
 	{
 		currentDate,
 		is12Hour,
@@ -29,8 +31,8 @@ function DateTimePicker(
 		onMonthPreviewed = noop,
 		onChange,
 		events,
-	},
-	ref
+	}: DateTimePickerProps,
+	ref: ForwardedRef< any >
 ) {
 	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
 		false
@@ -148,7 +150,7 @@ function DateTimePicker(
 					<Button
 						className="components-datetime__date-reset-button"
 						variant="link"
-						onClick={ () => onChange( null ) }
+						onClick={ () => onChange?.( null ) }
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -167,4 +169,29 @@ function DateTimePicker(
 	);
 }
 
-export default forwardRef( DateTimePicker );
+/**
+ * DateTimePicker is a React component that renders a calendar and clock for
+ * date and time selection. The calendar and clock components can be accessed
+ * individually using the `DatePicker` and `TimePicker` components respectively.
+ *
+ * @example
+ * ```jsx
+ * import { DateTimePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyDateTimePicker = () => {
+ *   const [ date, setDate ] = useState( new Date() );
+ *
+ *   return (
+ *     <DateTimePicker
+ *       currentDate={ date }
+ *       onChange={ ( newDate ) => setDate( newDate ) }
+ *       is12Hour={ true }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+
+export default DateTimePicker;

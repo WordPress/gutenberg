@@ -4,7 +4,7 @@
 import {
 	category,
 	page,
-	postTitle,
+	postContent,
 	tag,
 	customPostType,
 } from '@wordpress/icons';
@@ -17,7 +17,7 @@ import fallbackVariations from './fallback-variations';
 function getIcon( variationName ) {
 	switch ( variationName ) {
 		case 'post':
-			return postTitle;
+			return postContent;
 		case 'page':
 			return page;
 		case 'tag':

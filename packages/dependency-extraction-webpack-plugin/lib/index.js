@@ -128,7 +128,7 @@ class DependencyExtractionWebpackPlugin {
 							name: this.constructor.name,
 							stage:
 								compiler.webpack.Compilation
-									.PROCESS_ASSETS_STAGE_ADDITIONAL,
+									.PROCESS_ASSETS_STAGE_ANALYSE,
 						},
 						() => this.addAssets( compilation, compiler )
 					);
@@ -198,6 +198,17 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
+			// Go through the assets and hash the sources. We can't just use
+			// `entrypointChunk.contentHash` because that's not updated when
+			// assets are minified. Sigh.
+			// @todo Use `asset.info.contenthash` if we can make sure it's reliably set.
+			const hash = createHash( 'sha512' );
+			for ( const filename of entrypoint.getFiles().sort() ) {
+				const asset = compilation.getAsset( filename );
+				hash.update( `${ filename }: ` );
+				asset.source.updateHash( hash );
+			}
+
 			const entrypointChunk = isWebpack4
 				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
 				: entrypoint.getEntrypointChunk();
@@ -205,7 +216,7 @@ class DependencyExtractionWebpackPlugin {
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: entrypointChunk.hash,
+				version: hash.digest( 'hex' ).substring( 0, 32 ),
 			};
 
 			const assetString = this.stringify( assetData );

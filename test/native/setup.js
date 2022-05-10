@@ -5,7 +5,7 @@ import 'react-native-gesture-handler/jestSetup';
 import { Image, NativeModules as RNNativeModules } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
-// testing environment: https://git.io/JSSBg
+// testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
 global.navigator = global.navigator ?? {};
 
 // Set up the app runtime globals for the test environment, which includes

@@ -110,7 +110,7 @@ const style = `
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
 	 *
-	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 * These styles have been copied from the web version (https://github.com/WordPress/gutenberg/blob/7901895ca20cf61e402925e31571d659dab64721/packages/block-library/src/embed/style.scss#L42-L89) and
 	 * adapted for the native version.
 	 */
 	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {

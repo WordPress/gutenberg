@@ -3,10 +3,17 @@
  */
 import moment from 'moment';
 import classnames from 'classnames';
+import type { Moment } from 'moment';
+import { noop } from 'lodash';
 
-// react-dates doesn't tree-shake correctly, so we import from the individual
-// component here, to avoid including too much of the library
-import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+// `react-dates` doesn't tree-shake correctly, so we import from the individual
+// component here.
+// @ts-expect-error TypeScript won't find any type declarations at
+// `react-dates/lib/components/DayPickerSingleDateController` as they're located
+// at `react-dates`.
+import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+import type { DayPickerSingleDateController } from 'react-dates';
+const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
 
 /**
  * WordPress dependencies
@@ -18,15 +25,13 @@ import { isRTL, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getMomentDate } from './utils';
+import type { DatePickerDayProps, DatePickerProps } from './types';
 
-/**
- * Module Constants
- */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
 
-function DatePickerDay( { day, events = [] } ) {
-	const ref = useRef();
+function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
+	const ref = useRef< HTMLDivElement >( null );
 
 	/*
 	 * a11y hack to make the `There is/are n events` string
@@ -36,7 +41,7 @@ function DatePickerDay( { day, events = [] } ) {
 	 */
 	useEffect( () => {
 		// Bail when no parent node.
-		if ( ! ref?.current?.parentNode ) {
+		if ( ! ( ref?.current?.parentNode instanceof Element ) ) {
 			return;
 		}
 
@@ -81,9 +86,9 @@ function DatePicker( {
 	events,
 	isInvalidDate,
 	onMonthPreviewed,
-} ) {
-	const nodeRef = useRef();
-	const onMonthPreviewedHandler = ( newMonthDate ) => {
+}: DatePickerProps ) {
+	const nodeRef = useRef< HTMLDivElement >( null );
+	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
 		onMonthPreviewed?.( newMonthDate.toISOString() );
 		keepFocusInside();
 	};
@@ -111,7 +116,7 @@ function DatePicker( {
 			const focusRegion = nodeRef.current.querySelector(
 				'.DayPicker_focusRegion'
 			);
-			if ( ! focusRegion ) {
+			if ( ! ( focusRegion instanceof HTMLElement ) ) {
 				return;
 			}
 			// Keep the focus on focus region.
@@ -119,7 +124,11 @@ function DatePicker( {
 		}
 	};
 
-	const onChangeMoment = ( newDate ) => {
+	const onChangeMoment = ( newDate: Moment | null ) => {
+		if ( ! newDate ) {
+			return;
+		}
+
 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
 		const momentDate = currentDate ? moment( currentDate ) : moment();
 		const momentTime = {
@@ -128,13 +137,13 @@ function DatePicker( {
 			seconds: 0,
 		};
 
-		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+		onChange?.( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
 
 		// Keep focus on the date picker.
 		keepFocusInside();
 	};
 
-	const getEventsPerDay = ( day ) => {
+	const getEventsPerDay = ( day: Moment ) => {
 		if ( ! events?.length ) {
 			return [];
 		}
@@ -148,7 +157,7 @@ function DatePicker( {
 
 	return (
 		<div className="components-datetime__date" ref={ nodeRef }>
-			<DayPickerSingleDateController
+			<TypedDayPickerSingleDateController
 				date={ momentDate }
 				daySize={ 30 }
 				focused
@@ -166,7 +175,7 @@ function DatePicker( {
 				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
 				isRTL={ isRTL() }
 				isOutsideRange={ ( date ) => {
-					return isInvalidDate && isInvalidDate( date.toDate() );
+					return !! isInvalidDate && isInvalidDate( date.toDate() );
 				} }
 				onPrevMonthClick={ onMonthPreviewedHandler }
 				onNextMonthClick={ onMonthPreviewedHandler }
@@ -176,6 +185,7 @@ function DatePicker( {
 						events={ getEventsPerDay( day ) }
 					/>
 				) }
+				onFocusChange={ noop }
 			/>
 		</div>
 	);
