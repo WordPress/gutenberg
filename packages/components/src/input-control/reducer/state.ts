@@ -9,22 +9,24 @@ import type { Reducer } from 'react';
 import type { InputAction } from './actions';
 
 export interface InputState {
-	_event: Event | {};
 	error: unknown;
-	initialValue?: string;
+	initialValue: string;
 	isDirty: boolean;
 	isDragEnabled: boolean;
 	isDragging: boolean;
 	isPressEnterToChange: boolean;
-	value?: string;
+	value: string;
 }
 
-export type StateReducer = Reducer< InputState, InputAction >;
+export type StateReducer = Reducer<
+	InputState,
+	InputAction | Partial< InputState >
+>;
+export type SecondaryReducer = Reducer< InputState, InputAction >;
 
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;
 
 export const initialInputControlState: InputState = {
-	_event: {},
 	error: null,
 	initialValue: '',
 	isDirty: false,

@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,61 +10,45 @@ import { clamp, noop } from 'lodash';
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 
 /**
- * Internal dependencies
+ * Enables entry of out-of-range and invalid values that diverge from state.
+ *
+ * @param {Object}                 props          Props
+ * @param {number|null}            props.value    Incoming value.
+ * @param {number}                 props.max      Maximum valid value.
+ * @param {number}                 props.min      Minimum valid value.
+ * @param {(next: number) => void} props.onChange Callback for changes.
+ *
+ * @return {Object} Assorted props for the input.
  */
-import { useControlledState } from '../utils/hooks';
+export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
+	const ref = useRef();
+	const isDiverging = useRef( false );
+	/** @type {import('../input-control/types').InputChangeCallback}*/
+	const changeHandler = ( next ) => {
+		next = parseFloat( next );
+		if ( next < min || next > max ) {
+			isDiverging.current = true;
+			next = Math.max( min, Math.min( max, next ) );
+		}
+		onChange( next );
+	};
+	// When the value entered in the input is out of range then a clamped value
+	// is sent through onChange and that goes on to update the input. In such
+	// circumstances this effect overwrites the input value with the entered
+	// value to avoid interfering with typing. E.g. Without this effect, if
+	// `min` is 20 and the user intends to type 25, as soon as 2 is typed the
+	// input will update to 20 and likely lead to an entry of 205.
+	useEffect( () => {
+		if ( ref.current && isDiverging.current ) {
+			const input = ref.current;
+			const entry = input.value;
+			const { defaultView } = input.ownerDocument;
+			defaultView.requestAnimationFrame( () => ( input.value = entry ) );
+			isDiverging.current = false;
+		}
+	}, [ value ] );
 
-/**
- * A float supported clamp function for a specific value.
- *
- * @param {number|null} value The value to clamp.
- * @param {number}      min   The minimum value.
- * @param {number}      max   The maximum value.
- *
- * @return {number} A (float) number
- */
-export function floatClamp( value, min, max ) {
-	if ( typeof value !== 'number' ) {
-		return null;
-	}
-
-	return parseFloat( clamp( value, min, max ) );
-}
-
-/**
- * Hook to store a clamped value, derived from props.
- *
- * @param {Object} settings         Hook settings.
- * @param {number} settings.min     The minimum value.
- * @param {number} settings.max     The maximum value.
- * @param {number} settings.value   The current value.
- * @param {any}    settings.initial The initial value.
- *
- * @return {[*, Function]} The controlled value and the value setter.
- */
-export function useControlledRangeValue( {
-	min,
-	max,
-	value: valueProp,
-	initial,
-} ) {
-	const [ state, setInternalState ] = useControlledState(
-		floatClamp( valueProp, min, max ),
-		{ initial, fallback: null }
-	);
-
-	const setState = useCallback(
-		( nextValue ) => {
-			if ( nextValue === null ) {
-				setInternalState( null );
-			} else {
-				setInternalState( floatClamp( nextValue, min, max ) );
-			}
-		},
-		[ min, max ]
-	);
-
-	return [ state, setState ];
+	return { max, min, ref, value, onChange: changeHandler };
 }
 
 /**
