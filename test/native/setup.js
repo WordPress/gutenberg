@@ -132,6 +132,22 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
+// To be replaced with built in mocks when we upgrade to the latest version
+jest.mock( 'react-native-safe-area-context', () => {
+	const inset = { top: 0, right: 0, bottom: 0, left: 0 };
+	const frame = { x: 0, y: 0, width: 0, height: 0 };
+	return {
+		SafeAreaProvider: jest
+			.fn()
+			.mockImplementation( ( { children } ) => children ),
+		SafeAreaConsumer: jest
+			.fn()
+			.mockImplementation( ( { children } ) => children( inset ) ),
+		useSafeAreaInsets: jest.fn().mockImplementation( () => inset ),
+		useSafeAreaFrame: jest.fn().mockImplementation( () => frame ),
+	};
+} );
+
 jest.mock(
 	'@react-native-community/slider',
 	() => {
@@ -151,16 +167,6 @@ jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
 
 jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
-} );
-
-jest.mock( 'react-native-reanimated', () => {
-	const Reanimated = require( 'react-native-reanimated/mock' );
-
-	// The mock for `call` immediately calls the callback which is incorrect
-	// So we override it with a no-op
-	Reanimated.default.call = () => {};
-
-	return Reanimated;
 } );
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the

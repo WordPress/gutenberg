@@ -7,12 +7,17 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
@@ -127,7 +132,8 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+
+		AztecInputState.blur( this.aztecViewRef.current );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -179,16 +185,16 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+		AztecInputState.blur( this.aztecViewRef.current );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( this.aztecViewRef.current );
+		AztecInputState.focus( this.aztecViewRef.current );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedInput();
-		return focusedField && focusedField === this.aztecViewRef.current;
+		const focusedElement = AztecInputState.getCurrentFocusedElement();
+		return focusedElement && focusedElement === this.aztecViewRef.current;
 	}
 
 	_onPress( event ) {
@@ -250,5 +256,7 @@ class AztecView extends Component {
 }
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
+
+AztecView.InputState = AztecInputState;
 
 export default AztecView;

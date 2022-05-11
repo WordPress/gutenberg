@@ -167,7 +167,6 @@ function Controls( {
 							styles.mediaPreview,
 							mediaBackground,
 						] }
-						onLongPress={ openMediaOptions }
 					>
 						<View style={ styles.mediaInner }>
 							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
