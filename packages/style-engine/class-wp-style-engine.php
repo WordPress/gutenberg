@@ -69,15 +69,7 @@ class WP_Style_Engine {
 		),
 		'elements' => array(
 			'link' => array(
-				'color' => array(
-					'text' => array(
-						'property_key' => 'color',
-						'path'         => array( 'elements', 'link', 'color', 'text' ),
-						'css_vars'     => array(
-							'--wp--preset--color--$slug' => 'color',
-						),
-					),
-				),
+				'path' => array( 'spacing', 'padding' ),
 			),
 		),
 		'spacing'    => array(
@@ -130,6 +122,20 @@ class WP_Style_Engine {
 				'path'         => array( 'typography', 'letterSpacing' ),
 			),
 		),
+	);
+
+	const ELEMENTS_STYLES_DEFINITIONS_METADATA = array(
+		'link' => array(
+			'color' => array(
+				'text' => array(
+					'property_key' => 'color',
+					'path'         => array( 'color', 'text' ),
+					'css_vars'     => array(
+						'--wp--preset--color--$slug' => 'color',
+					),
+				),
+			),
+		)
 	);
 
 	/**
@@ -230,12 +236,16 @@ class WP_Style_Engine {
 		$element       = isset( $options['element'] ) ? $options['element'] : null;
 		$block_definitions = self::BLOCK_STYLE_DEFINITIONS_METADATA;
 
-		if ( ! empty( $element ) && isset( self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'][ $element ] ) ) {
-			$block_definitions = self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'][ $element ];
+		if ( $element ) {
+			$block_definitions = isset( self::ELEMENTS_STYLES_DEFINITIONS_METADATA[ $element ] ) ? self::ELEMENTS_STYLES_DEFINITIONS_METADATA[ $element ] : array();
 		}
 
 		// Collect CSS and classnames.
 		foreach ( $block_definitions as $definition_group ) {
+			if ( ! $definition_group ) {
+				continue;
+			}
+
 			foreach ( $definition_group as $style_definition ) {
 				$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 

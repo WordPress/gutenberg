@@ -87,7 +87,8 @@ function gutenberg_render_elements_support( $block_content, $block ) {
  * @return null
  */
 function gutenberg_render_elements_support_styles( $pre_render, $block ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
 
 	/*
 	* For now we only care about link color.
@@ -100,15 +101,19 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	if ( $skip_link_color_serialization ) {
 		return null;
 	}
+	$class_name        = gutenberg_get_elements_class_name( $block );
+	$styles            = array();
+	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	$block_styles           = isset( $block['attrs']['style'] ) ? $block['attrs']['style'] : null;
-	$class_name             = gutenberg_get_elements_class_name( $block );
-	$styles                 = gutenberg_style_engine_generate(
-		$block_styles,
-		array( 'selector' => ".$class_name a", 'element' => 'link' )
-	);
+	if ( $link_block_styles ) {
+		$styles = gutenberg_style_engine_generate(
+			$link_block_styles,
+			array( 'selector' => ".$class_name a", 'element' => 'link' )
+		);
+	}
 
-	if ( ! empty( $styles['css'] ) ) {
+
+	if ( ! $styles ) {
 		gutenberg_enqueue_block_support_styles( $styles['css'] );
 	}
 

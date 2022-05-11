@@ -150,12 +150,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 			'elements_with_css_var_value'                => array(
 				'block_styles'    => array(
-					'elements' => array(
-						'link' => array(
-							'color'   => array(
-								'text' => 'var:preset|color|my-little-pony',
-							),
-						),
+					'color'   => array(
+						'text' => 'var:preset|color|my-little-pony',
 					),
 				),
 				'options' => array( 'selector' => '.wp-selector', 'element' => 'link' ),
@@ -165,6 +161,16 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 }
 ',
 				),
+			),
+
+			'elements_with_invalid_element'                => array(
+				'block_styles'    => array(
+					'color'   => array(
+						'text' => 'var:preset|color|my-little-pony',
+					),
+				),
+				'options' => array( 'selector' => '.wp-selector', 'element' => 'marquee' ),
+				'expected_output' => array(),
 			),
 
 			'valid_classnames_deduped'                     => array(
