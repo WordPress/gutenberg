@@ -32,30 +32,19 @@ export default function useIndentListItem( clientId ) {
 			const clonedBlocks = clientIds.map( ( _clientId ) =>
 				cloneBlock( getBlock( _clientId ) )
 			);
+			const previousSiblingId = getPreviousBlockClientId( clientId );
+			const newListItem = cloneBlock( getBlock( previousSiblingId ) );
+			// If the sibling has no innerBlocks, create a new `list` block.
+			if ( ! newListItem.innerBlocks?.length ) {
+				newListItem.innerBlocks = [ createBlock( 'core/list' ) ];
+			}
 			// A list item usually has one `list`, but it's possible to have
 			// more. So we need to preserve the previous `list` blocks and
 			// merge the new blocks to the last `list`.
-			const previousSiblingId = getPreviousBlockClientId( clientId );
-			const previousSibling = getBlock( previousSiblingId );
-			const lastInnerBlock = previousSibling.innerBlocks.slice( -1 )[ 0 ];
-			// We also need to check if the previous sibling has innerBlocks already.
-			// If not we need to create a new `list` block.
-			const newInnerBlocks = !! lastInnerBlock
-				? [
-						...previousSibling.innerBlocks.slice( 0, -1 ),
-						{
-							...lastInnerBlock,
-							innerBlocks: [
-								...lastInnerBlock.innerBlocks,
-								...clonedBlocks,
-							],
-						},
-				  ]
-				: [ createBlock( 'core/list', {}, clonedBlocks ) ];
-			const newListItem = {
-				...previousSibling,
-				innerBlocks: newInnerBlocks,
-			};
+			newListItem.innerBlocks[
+				newListItem.innerBlocks.length - 1
+			].innerBlocks.push( ...clonedBlocks );
+
 			// We get the selection start/end here, because when
 			// we replace blocks, the selection is updated too.
 			const selectionStart = getSelectionStart();
