@@ -18,7 +18,6 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	ElementButton,
 	InspectorControls,
 	RichText,
 	useBlockProps,
@@ -26,6 +25,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
+	ELEMENT_BUTTON_CLASS_NAME,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -162,7 +162,6 @@ function ButtonEdit( props ) {
 				} ) }
 			>
 				<RichText
-					tagName={ ElementButton.Link }
 					ref={ richTextRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
@@ -178,7 +177,8 @@ function ButtonEdit( props ) {
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
-						}
+						},
+						ELEMENT_BUTTON_CLASS_NAME
 					) }
 					style={ {
 						...borderProps.style,

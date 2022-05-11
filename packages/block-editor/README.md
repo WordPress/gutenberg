@@ -347,7 +347,7 @@ _Returns_
 
 Undocumented declaration.
 
-### ElementButton
+### ELEMENT_BUTTON_CLASS_NAME
 
 Undocumented declaration.
 
