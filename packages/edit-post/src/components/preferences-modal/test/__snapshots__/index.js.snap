@@ -29,7 +29,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="showIconLabels"
-                help="Show text instead of icons on buttons"
+                help="Show text instead of icons on buttons."
                 label="Show button text labels"
               />
               <WithSelect(WithDispatch(BaseOption))
@@ -160,7 +160,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="showIconLabels"
-                help="Show text instead of icons on buttons"
+                help="Show text instead of icons on buttons."
                 label="Show button text labels"
               />
               <WithSelect(WithDispatch(BaseOption))

@@ -112,7 +112,7 @@ export default function EditPostPreferencesModal() {
 								featureName="showIconLabels"
 								label={ __( 'Show button text labels' ) }
 								help={ __(
-									'Show text instead of icons on buttons'
+									'Show text instead of icons on buttons.'
 								) }
 							/>
 							<EnableFeature
