@@ -14,7 +14,6 @@
  *
  * @access private
  */
-
 class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
 }
