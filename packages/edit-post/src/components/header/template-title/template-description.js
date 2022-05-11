@@ -25,17 +25,19 @@ export default function TemplateDescription() {
 	}
 	return (
 		<>
-			<Heading level={ 4 } weight={ 600 }>
-				{ title }
-			</Heading>
-			<Text
-				className="edit-post-template-details__description"
-				size="body"
-				as="p"
-				style={ { marginTop: '12px', marginBottom: '12px' } }
-			>
-				{ description }
-			</Text>
+			<div className="edit-site-template-details__group">
+				<Heading level={ 4 } weight={ 600 }>
+					{ title }
+				</Heading>
+				<Text
+					className="edit-post-template-details__description"
+					size="body"
+					as="p"
+					style={ { marginTop: '12px' } }
+				>
+					{ description }
+				</Text>
+			</div>
 		</>
 	);
 }
