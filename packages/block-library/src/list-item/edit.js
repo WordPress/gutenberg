@@ -7,7 +7,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { isRTL, __, _x } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import {
