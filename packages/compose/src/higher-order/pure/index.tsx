@@ -7,24 +7,29 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import {
+	PropsOf,
+	createHigherOrderComponent,
+} from '../../utils/create-higher-order-component';
 
 /**
  * External dependencies
  */
-import type { ComponentType, ComponentClass } from 'react';
+import type { ComponentType } from 'react';
 
 /**
  * Given a component returns the enhanced component augmented with a component
  * only re-rendering when its props/state change
  */
-const pure = createHigherOrderComponent(
-	< TProps extends Record< string, any > >(
-		Wrapped: ComponentType< TProps >
+const pure: < Inner extends ComponentType< any > >(
+	Inner: Inner
+) => ComponentType< PropsOf< Inner > > = createHigherOrderComponent(
+	< Props extends Record< string, any > >(
+		Wrapped: ComponentType< Props >
 	) => {
 		if ( Wrapped.prototype instanceof Component ) {
-			return class extends ( Wrapped as ComponentClass< TProps > ) {
-				shouldComponentUpdate( nextProps: TProps, nextState: any ) {
+			return class extends Component< Props > {
+				shouldComponentUpdate( nextProps: Props, nextState: Props ) {
 					return (
 						! isShallowEqual( nextProps, this.props ) ||
 						! isShallowEqual( nextState, this.state )
@@ -33,8 +38,8 @@ const pure = createHigherOrderComponent(
 			};
 		}
 
-		return class extends Component< TProps > {
-			shouldComponentUpdate( nextProps: TProps ) {
+		return class extends Component< Props > {
+			shouldComponentUpdate( nextProps: Props ) {
 				return ! isShallowEqual( nextProps, this.props );
 			}
 

@@ -79,7 +79,7 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponent_ `HigherOrderComponent< HOCProps >`: Function mapping component to enhanced component.
+-   _mapComponent_ `( Inner: ComponentType< any > ) => ComponentType< any >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
@@ -105,7 +105,7 @@ const ConditionalComponent = ifCondition(
 
 _Parameters_
 
--   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
+-   _predicate_ Function to test condition.
 
 _Returns_
 
@@ -115,6 +115,10 @@ _Returns_
 
 Given a component returns the enhanced component augmented with a component
 only re-rendering when its props/state change
+
+_Type_
+
+-   `( Inner: Inner ) => ComponentType< PropsOf< Inner > >`
 
 ### useAsyncList
 
@@ -550,10 +554,18 @@ _Returns_
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
+_Type_
+
+-   `( Inner: Inner ) => ComponentType< Omit< PropsOf< Inner >, 'instanceId' > >`
+
 ### withSafeTimeout
 
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
+
+_Type_
+
+-   `( Inner: Inner ) => ComponentType< Omit< PropsOf< Inner >, keyof TimeoutProps > >`
 
 ### withState
 
