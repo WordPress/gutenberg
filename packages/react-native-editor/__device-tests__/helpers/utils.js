@@ -467,63 +467,53 @@ const waitForMediaLibrary = async ( driver ) => {
 /**
  * @param {string} driver
  * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25
  * @param {number} iteration - Default value is 0
- * @return {string} - Returns the first element found, throws error if no element found
+ * @return {string} - Returns the first element found, empty string if not found
  */
-const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
-	const maxIteration = 25;
+const waitForVisible = async ( 
+	driver, 
+	elementLocator, 
+	maxIteration = 25, 
+	iteration = 0 
+) => {
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		throw new Error(
-			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
-		);
+		// if element not found, print error and return empty string
+		// eslint-disable-next-line no-console
+		console.error(`"${ elementLocator }" is still not visible after ${ iteration } retries!`)
+		return ''
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
 		await driver.sleep( timeout );
 	}
 
-	const locator = await driver.elementsByXPath( elementLocator );
-	if ( locator.length !== 1 ) {
+	const element = await driver.elementsByXPath( elementLocator );
+	if ( element.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, iteration + 1 );
+		return waitForVisible( driver, elementLocator, maxIteration, iteration + 1 );
 	}
 
-	return locator[ 0 ];
+	return element[ 0 ];
 };
 
 /**
  * @param {string} driver
  * @param {string} elementLocator
  * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
- * @param {number} iteration - Default value is 0
  * @return {boolean} - Returns true if element is found, false otherwise
  */
-const isElementVisible = async (
-	driver,
-	elementLocator,
-	maxIteration = 25,
-	iteration = 0
+const isElementVisible = async ( 
+	driver, 
+	elementLocator, 
+	maxIteration = 25 
 ) => {
-	const timeout = 1000;
+	const element = await waitForVisible(driver, elementLocator, maxIteration)
 
-	if ( iteration >= maxIteration ) {
-		// Element is still not visible after waiting, return false
+	// if there is no element, return false
+	if ( ! element ) { 
 		return false;
-	} else if ( iteration !== 0 ) {
-		// wait before trying to locate element again
-		await driver.sleep( timeout );
-	}
-
-	const locator = await driver.elementsByXPath( elementLocator );
-	if ( locator.length !== 1 ) {
-		// if locator is not visible, try again
-		return isElementVisible(
-			driver,
-			elementLocator,
-			maxIteration,
-			iteration + 1
-		);
 	}
 
 	return true;
