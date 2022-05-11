@@ -160,9 +160,7 @@ export function ImageEdit( {
 		noticeOperations.createErrorNotice(
 			sprintf(
 				/* translators: %s url or missing image */
-				__(
-					'There was an error loading the image for this block. The image was: %s'
-				),
+				__( 'Error loading image: %s' ),
 				url
 			)
 		);
