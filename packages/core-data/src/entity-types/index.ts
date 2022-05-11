@@ -21,6 +21,7 @@ import type { WidgetType } from './widget-type';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
 
+export type { EntityType } from './entities';
 export type { BaseEntityRecords } from './base-entity-records';
 
 export type {
