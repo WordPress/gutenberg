@@ -52,6 +52,14 @@ function inputControlStateReducer(
 	composedStateReducers: StateReducer
 ): StateReducer {
 	return ( state, action ) => {
+		// Updates state and returns early when there's no action type. These
+		// are controlled updates and need no exposure to additional reducers.
+		if ( ! ( 'type' in action ) ) {
+			return {
+				...state,
+				value: `${ action.value ?? '' }`,
+			};
+		}
 		const nextState = { ...state };
 
 		switch ( action.type ) {
@@ -98,7 +106,7 @@ function inputControlStateReducer(
 			case actions.RESET:
 				nextState.error = null;
 				nextState.isDirty = false;
-				nextState.value = action.payload.value || state.initialValue;
+				nextState.value = action.payload.value ?? state.initialValue;
 				break;
 
 			/**
@@ -107,10 +115,6 @@ function inputControlStateReducer(
 			case actions.INVALIDATE:
 				nextState.error = action.payload.error;
 				break;
-		}
-
-		if ( action.payload.event ) {
-			nextState._event = action.payload.event;
 		}
 
 		/**
@@ -151,15 +155,7 @@ export function useInputControlStateReducer(
 		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
 		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
 	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
-
+		refEvent.current = event;
 		dispatch( {
 			type,
 			payload: { value: nextValue, event },
@@ -169,21 +165,14 @@ export function useInputControlStateReducer(
 	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
 		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
 	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
-
+		refEvent.current = event;
 		dispatch( { type, payload: { event } } );
 	};
 
 	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
 		payload: actions.DragEventAction[ 'payload' ]
 	) => {
+		refEvent.current = payload.event;
 		dispatch( { type, payload } );
 	};
 
@@ -191,8 +180,10 @@ export function useInputControlStateReducer(
 	 * Actions for the reducer
 	 */
 	const change = createChangeEvent( actions.CHANGE );
-	const invalidate = ( error: unknown, event: SyntheticEvent ) =>
+	const invalidate = ( error: unknown, event: SyntheticEvent ) => {
+		refEvent.current = event;
 		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
+	};
 	const reset = createChangeEvent( actions.RESET );
 	const commit = createChangeEvent( actions.COMMIT );
 
@@ -206,17 +197,19 @@ export function useInputControlStateReducer(
 
 	const currentState = useRef( state );
 	const currentValueProp = useRef( initialState.value );
+	const refEvent = useRef< SyntheticEvent | null >( null );
 	useLayoutEffect( () => {
 		currentState.current = state;
 		currentValueProp.current = initialState.value;
 	} );
 	useLayoutEffect( () => {
 		if (
+			refEvent.current &&
 			state.value !== currentValueProp.current &&
 			! currentState.current.isDirty
 		) {
 			onChangeHandler( state.value ?? '', {
-				event: currentState.current._event as
+				event: refEvent.current as
 					| ChangeEvent< HTMLInputElement >
 					| PointerEvent< HTMLInputElement >,
 			} );
@@ -227,11 +220,9 @@ export function useInputControlStateReducer(
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
-			reset(
-				initialState.value,
-				currentState.current._event as SyntheticEvent
-			);
+			dispatch( { value: initialState.value } );
 		}
+		if ( refEvent.current ) refEvent.current = null;
 	}, [ initialState.value ] );
 
 	return {

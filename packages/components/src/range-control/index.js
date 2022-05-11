@@ -18,8 +18,8 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { COLORS } from '../utils';
-import { floatClamp, useControlledRangeValue } from './utils';
+import { COLORS, useControlledState } from '../utils';
+import { useUnimpededRangedNumberEntry } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
@@ -70,13 +70,10 @@ function RangeControl(
 	},
 	ref
 ) {
-	const [ value, setValue ] = useControlledRangeValue( {
-		min,
-		max,
-		value: valueProp,
-		initial: initialPosition,
-	} );
 	const isResetPendent = useRef( false );
+	const [ value, setValue ] = useControlledState( valueProp, {
+		fallback: null,
+	} );
 
 	if ( step === 'any' ) {
 		// The tooltip and number input field are hidden when the step is "any"
@@ -102,15 +99,15 @@ function RangeControl(
 	const isThumbFocused = ! disabled && isFocused;
 
 	const isValueReset = value === null;
-	const currentValue = value !== undefined ? value : currentInput;
+	const usedValue = isValueReset
+		? resetFallbackValue ?? initialPosition
+		: value ?? currentInput;
 
-	const inputSliderValue = isValueReset ? '' : currentValue;
-
-	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
-
-	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
-	const fillValue = isValueReset ? 50 : calculatedFillValue;
-	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+	const fillPercent = `${
+		usedValue === null || usedValue === undefined
+			? 50
+			: ( ( clamp( usedValue, min, max ) - min ) / ( max - min ) ) * 100
+	}%`;
 
 	const classes = classnames( 'components-range-control', className );
 
@@ -129,23 +126,20 @@ function RangeControl(
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( nextValue ) => {
-		nextValue = parseFloat( nextValue );
-		setValue( nextValue );
-		/*
-		 * Calls onChange only when nextValue is numeric
-		 * otherwise may queue a reset for the blur event.
-		 */
-		if ( ! isNaN( nextValue ) ) {
-			if ( nextValue < min || nextValue > max ) {
-				nextValue = floatClamp( nextValue, min, max );
+	const someNumberInputProps = useUnimpededRangedNumberEntry( {
+		max,
+		min,
+		value: usedValue ?? '',
+		onChange: ( nextValue ) => {
+			if ( ! isNaN( nextValue ) ) {
+				setValue( nextValue );
+				onChange( nextValue );
+				isResetPendent.current = false;
+			} else if ( allowReset ) {
+				isResetPendent.current = true;
 			}
-			onChange( nextValue );
-			isResetPendent.current = false;
-		} else if ( allowReset ) {
-			isResetPendent.current = true;
-		}
-	};
+		},
+	} );
 
 	const handleOnInputNumberBlur = () => {
 		if ( isResetPendent.current ) {
@@ -155,30 +149,20 @@ function RangeControl(
 	};
 
 	const handleOnReset = () => {
-		let resetValue = parseFloat( resetFallbackValue );
-		let onChangeResetValue = resetValue;
+		const resetValue = parseFloat( resetFallbackValue );
 
 		if ( isNaN( resetValue ) ) {
-			resetValue = null;
-			onChangeResetValue = undefined;
+			setValue( null );
+			/*
+			 * If the value is reset without a resetFallbackValue, the onChange
+			 * callback receives undefined as that was the behavior when the
+			 * component was stablized.
+			 */
+			onChange( undefined );
+		} else {
+			setValue( resetValue );
+			onChange( resetValue );
 		}
-
-		setValue( resetValue );
-
-		/**
-		 * Previously, this callback would always receive undefined as
-		 * an argument. This behavior is unexpected, specifically
-		 * when resetFallbackValue is defined.
-		 *
-		 * The value of undefined is not ideal. Passing it through
-		 * to internal <input /> elements would change it from a
-		 * controlled component to an uncontrolled component.
-		 *
-		 * For now, to minimize unexpected regressions, we're going to
-		 * preserve the undefined callback argument, except when a
-		 * resetFallbackValue is defined.
-		 */
-		onChange( onChangeResetValue );
 	};
 
 	const handleShowTooltip = () => setShowTooltip( true );
@@ -197,7 +181,7 @@ function RangeControl(
 	};
 
 	const offsetStyle = {
-		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+		[ isRTL() ? 'right' : 'left' ]: fillPercent,
 	};
 
 	return (
@@ -235,7 +219,7 @@ function RangeControl(
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
 						step={ step }
-						value={ inputSliderValue }
+						value={ usedValue ?? '' }
 					/>
 					<RangeRail
 						aria-hidden={ true }
@@ -245,13 +229,13 @@ function RangeControl(
 						min={ min }
 						railColor={ railColor }
 						step={ step }
-						value={ rangeFillValue }
+						value={ usedValue }
 					/>
 					<Track
 						aria-hidden={ true }
 						className="components-range-control__track"
 						disabled={ disabled }
-						style={ { width: fillValueOffset } }
+						style={ { width: fillPercent } }
 						trackColor={ trackColor }
 					/>
 					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
@@ -285,13 +269,10 @@ function RangeControl(
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
-						max={ max }
-						min={ min }
 						onBlur={ handleOnInputNumberBlur }
-						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
-						value={ inputSliderValue }
+						{ ...someNumberInputProps }
 					/>
 				) }
 				{ allowReset && (
