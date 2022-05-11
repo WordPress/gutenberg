@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid } from './helpers/utils';
+import { isAndroid, waitForVisible } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Cover Block test', () => {
@@ -10,7 +10,9 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
 		const coverBlock = await editorPage.getBlockAtPosition(
-			blockNames.cover
+			blockNames.cover,
+			1,
+			{ useWaitForVisible: true }
 		);
 
 		// Temporarily this test is skipped on Android,due to the inconsistency of the results,
@@ -36,7 +38,9 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
 		const coverBlock = await editorPage.getBlockAtPosition(
-			blockNames.cover
+			blockNames.cover,
+			1,
+			{ useWaitForVisible: true }
 		);
 		await coverBlock.click();
 
@@ -57,14 +61,30 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			);
 			await addMediaButton.click();
 			await editorPage.chooseMediaLibrary();
+			await editorPage.driver.sleep( 2000 ); // Await media load.
+
+			// Get Edit image button of block
+			const editImageButtonLocator =
+				'//XCUIElementTypeButton[@name="Edit image"][@enabled="true"]';
+			const blockEditImageButton = await waitForVisible(
+				editorPage.driver,
+				editImageButtonLocator
+			);
 
 			// Edit media within block settings.
 			await settingsButton.click();
 			await editorPage.driver.sleep( 2000 ); // Await media load.
-			const editImageButton = await editorPage.driver.elementsByAccessibilityId(
-				'Edit image'
+
+			// Get Edit image button of block settings.
+			// NOTE: Since we have multiple Edit image buttons at this
+			// point, we have to filter them to obtain the correct one.
+			const settingsEditImageButtons = await editorPage.driver.elementsByXPath(
+				editImageButtonLocator
 			);
-			await editImageButton[ editImageButton.length - 1 ].click();
+			const settingsEditImageButton = settingsEditImageButtons.find(
+				( element ) => element.value !== blockEditImageButton.value
+			);
+			await settingsEditImageButton.click();
 
 			// Replace image.
 			const replaceButton = await editorPage.driver.elementByAccessibilityId(
