@@ -65,9 +65,9 @@ export default function ColorPanel( {
 		<InspectorControls __experimentalGroup="color">
 			<ColorGradientSettingsDropdown
 				enableAlpha={ enableAlpha }
-				isItemGroup={ false }
 				panelId={ clientId }
 				settings={ settings }
+				__experimentalIsItemGroup={ false }
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 				{ ...colorGradientSettings }
