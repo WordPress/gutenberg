@@ -89,14 +89,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	const ELEMENTS = array(
-		'link' => 'a',
-		'h1'   => 'h1',
-		'h2'   => 'h2',
-		'h3'   => 'h3',
-		'h4'   => 'h4',
-		'h5'   => 'h5',
-		'h6'   => 'h6',
-		// We have the .wp-block-button class so that this will target older buttons that have been serialized.
-		'button' => '.wp-element-button, .wp-block-button',
+		'link'   => 'a',
+		'h1'     => 'h1',
+		'h2'     => 'h2',
+		'h3'     => 'h3',
+		'h4'     => 'h4',
+		'h5'     => 'h5',
+		'h6'     => 'h6',
+		'button' => '.wp-element-button, .wp-block-button', // We have the .wp-block-button class so that this will target older buttons that have been serialized.
 	);
 }
