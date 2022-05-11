@@ -24,6 +24,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import {
 	useEnter,
 	useBackspace,
+	useSpace,
 	useIndentListItem,
 	useOutdentListItem,
 } from './hooks';
@@ -67,11 +68,16 @@ export default function ListItemEdit( {
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useBackspaceRef = useBackspace( { clientId } );
+	const useSpaceRef = useSpace( clientId );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef, useBackspaceRef ] ) }
+					ref={ useMergeRefs( [
+						useEnterRef,
+						useBackspaceRef,
+						useSpaceRef,
+					] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
