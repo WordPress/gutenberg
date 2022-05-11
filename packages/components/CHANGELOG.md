@@ -6,10 +6,12 @@
 
 -   `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
 -   `BorderControl` & `BorderBoxControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40920](https://github.com/WordPress/gutenberg/pull/40920)).
+-   `BorderControl` improved focus and border radius styling for component. [#40951](https://github.com/WordPress/gutenberg/pull/40951)
 
 ### Internal
 
 -   `DateTimePicker`: Convert to TypeScript ([#40775](https://github.com/WordPress/gutenberg/pull/40775)).
+-   `DateTimePicker`: Convert unit tests to TypeScript ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
 
 ## 19.10.0 (2022-05-04)
 

@@ -17,7 +17,7 @@ import type { ValidDateTimeInput } from './types';
  *                                    date or null to signify no selection.
  * @return {?moment.Moment} Moment object for selected date or null.
  */
-export const getMomentDate = ( date: ValidDateTimeInput | undefined ) => {
+export const getMomentDate = ( date?: ValidDateTimeInput ) => {
 	if ( null === date ) {
 		return null;
 	}

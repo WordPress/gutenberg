@@ -14,7 +14,7 @@ describe( 'getMomentDate', () => {
 		const momentDate = getMomentDate( currentDate );
 
 		expect( moment.isMoment( momentDate ) ).toBe( true );
-		expect( momentDate.isSame( moment( currentDate ) ) ).toBe( true );
+		expect( momentDate?.isSame( moment( currentDate ) ) ).toBe( true );
 	} );
 
 	it( 'should return null when given a null argument', () => {

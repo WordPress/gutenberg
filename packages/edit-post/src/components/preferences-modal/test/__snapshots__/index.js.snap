@@ -23,14 +23,14 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               title="Appearance"
             >
               <WithSelect(WithDispatch(BaseOption))
-                featureName="reducedUI"
-                help="Compacts options and outlines in the toolbar."
-                label="Reduce the interface"
-              />
-              <WithSelect(WithDispatch(BaseOption))
                 featureName="focusMode"
                 help="Highlights the current block and fades other content."
                 label="Spotlight mode"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showIconLabels"
+                help="Show text instead of icons on buttons."
+                label="Show button text labels"
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="showListViewByDefault"
@@ -38,9 +38,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 label="Always open list view"
               />
               <WithSelect(WithDispatch(BaseOption))
-                featureName="showIconLabels"
-                help="Shows text instead of icons."
-                label="Display button labels"
+                featureName="reducedUI"
+                help="Compacts options and outlines in the toolbar."
+                label="Reduce the interface"
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="themeStyles"
@@ -154,14 +154,14 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               title="Appearance"
             >
               <WithSelect(WithDispatch(BaseOption))
-                featureName="reducedUI"
-                help="Compacts options and outlines in the toolbar."
-                label="Reduce the interface"
-              />
-              <WithSelect(WithDispatch(BaseOption))
                 featureName="focusMode"
                 help="Highlights the current block and fades other content."
                 label="Spotlight mode"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="showIconLabels"
+                help="Show text instead of icons on buttons."
+                label="Show button text labels"
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="showListViewByDefault"
@@ -169,9 +169,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 label="Always open list view"
               />
               <WithSelect(WithDispatch(BaseOption))
-                featureName="showIconLabels"
-                help="Shows text instead of icons."
-                label="Display button labels"
+                featureName="reducedUI"
+                help="Compacts options and outlines in the toolbar."
+                label="Reduce the interface"
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="themeStyles"

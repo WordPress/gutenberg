@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import {
+	__experimentalUnitControl as UnitControl,
+	Tooltip,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const CORNERS = {
@@ -39,16 +42,21 @@ export default function BoxInputControls( {
 			  };
 
 	// Controls are wrapped in tooltips as visible labels aren't desired here.
+	// Tooltip rendering also requires the UnitControl to be wrapped. See:
+	// https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
 	return (
 		<div className="components-border-radius-control__input-controls-wrapper">
 			{ Object.entries( CORNERS ).map( ( [ key, label ] ) => (
-				<UnitControl
-					{ ...props }
-					key={ key }
-					aria-label={ label }
-					value={ values[ key ] }
-					onChange={ createHandleOnChange( key ) }
-				/>
+				<Tooltip text={ label } position="top" key={ key }>
+					<div className="components-border-radius-control__tooltip-wrapper">
+						<UnitControl
+							{ ...props }
+							aria-label={ label }
+							value={ values[ key ] }
+							onChange={ createHandleOnChange( key ) }
+						/>
+					</div>
+				</Tooltip>
 			) ) }
 		</div>
 	);
