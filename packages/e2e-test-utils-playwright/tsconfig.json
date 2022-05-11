@@ -13,9 +13,7 @@
 		"declarationDir": "build-types",
 		"emitDeclarationOnly": false,
 		"allowJs": true,
-		"checkJs": false,
+		"checkJs": false
 	},
-	"include": [
-		"src/**/*"
-	]
+	"include": [ "src/**/*" ]
 }

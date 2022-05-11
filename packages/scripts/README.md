@@ -152,7 +152,7 @@ _Flags_:
 
 ### `format`
 
-It helps to enforce coding style guidelines for your files (JavaScript, YAML) by formatting source code in a consistent way.
+It helps to enforce coding style guidelines for your files (enabled by default for JavaScript, JSON, TypeScript, YAML) by formatting source code in a consistent way.
 
 _Example:_
 

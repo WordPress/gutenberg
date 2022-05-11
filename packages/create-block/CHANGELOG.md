@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix the `.editorconfig` file include to work correctly with YAML files ([#40994](https://github.com/WordPress/gutenberg/pull/40994)).
+
 ### Internal
 
 -   Updated `commander` dependency from requiring `^4.1.0` to `^9.2.0` ([#40927](https://github.com/WordPress/gutenberg/pull/40927)).

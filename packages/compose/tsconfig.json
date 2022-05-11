@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../element" },
@@ -12,7 +12,5 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" }
 	],
-	"include": [
-		"src/**/*"
-	]
+	"include": [ "src/**/*" ]
 }
