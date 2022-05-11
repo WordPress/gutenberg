@@ -23,21 +23,20 @@ export default function TemplateDescription() {
 	if ( ! description ) {
 		return null;
 	}
+
 	return (
-		<>
-			<div className="edit-site-template-details__group">
-				<Heading level={ 4 } weight={ 600 }>
-					{ title }
-				</Heading>
-				<Text
-					className="edit-post-template-details__description"
-					size="body"
-					as="p"
-					style={ { marginTop: '12px' } }
-				>
-					{ description }
-				</Text>
-			</div>
-		</>
+		<div className="edit-site-template-details__group">
+			<Heading level={ 4 } weight={ 600 }>
+				{ title }
+			</Heading>
+			<Text
+				className="edit-post-template-details__description"
+				size="body"
+				as="p"
+				style={ { marginTop: '12px' } }
+			>
+				{ description }
+			</Text>
+		</div>
 	);
 }
