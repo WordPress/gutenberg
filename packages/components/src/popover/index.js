@@ -31,6 +31,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -122,6 +123,13 @@ const Popover = (
 	},
 	ref
 ) => {
+	if ( range ) {
+		deprecated( 'range prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+		} );
+	}
+
 	const arrowRef = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
