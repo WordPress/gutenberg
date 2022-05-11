@@ -67,6 +67,19 @@ class WP_Style_Engine {
 				),
 			),
 		),
+		'elements' => array(
+			'link' => array(
+				'color' => array(
+					'text' => array(
+						'property_key' => 'color',
+						'path'         => array( 'elements', 'link', 'color', 'text' ),
+						'css_vars'     => array(
+							'--wp--preset--color--$slug' => 'color',
+						),
+					),
+				),
+			),
+		),
 		'spacing'    => array(
 			'padding' => array(
 				'property_key' => 'padding',
@@ -190,13 +203,8 @@ class WP_Style_Engine {
 	 * @return array        An array of CSS rules.
 	 */
 	protected static function get_css( $style_value, $style_definition ) {
-		// Low-specificity check to see if the value is a CSS preset.
-		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
-			return array();
-		}
-
 		// If required in the future, style definitions could define a callable `value_func` to generate custom CSS rules.
-		return static::get_css_rules( $style_value, $style_definition['property_key'] );
+		return static::get_css_rules( $style_value, $style_definition );
 	}
 
 	/**
@@ -204,13 +212,14 @@ class WP_Style_Engine {
 	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
+	 * @param array $options An array of options to determine the output.
 	 *
 	 * @return array|null array(
-	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
+	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function generate( $block_styles ) {
+	public function generate( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
@@ -218,9 +227,15 @@ class WP_Style_Engine {
 		$css_rules     = array();
 		$classnames    = array();
 		$styles_output = array();
+		$element       = isset( $options['element'] ) ? $options['element'] : null;
+		$block_definitions = self::BLOCK_STYLE_DEFINITIONS_METADATA;
+
+		if ( ! empty( $element ) && isset( self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'][ $element ] ) ) {
+			$block_definitions = self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'][ $element ];
+		}
 
 		// Collect CSS and classnames.
-		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
+		foreach ( $block_definitions as $definition_group ) {
 			foreach ( $definition_group as $style_definition ) {
 				$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
@@ -234,21 +249,34 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$css_output = '';
+		$selector   = isset( $options['selector'] ) ? $options['selector'] : null;
+		$css_output = array();
+
 		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
-			// In the future there might be a flag in the option to output
-			// inline CSS rules (for HTML style attributes) vs selectors + rules for style tags.
 			foreach ( $css_rules as $rule => $value ) {
 				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
 				if ( ! empty( $filtered_css ) ) {
-					$css_output .= $filtered_css . '; ';
+					$css_output[] = $filtered_css . ';';
 				}
 			}
 		}
 
 		if ( ! empty( $css_output ) ) {
-			$styles_output['css'] = trim( $css_output );
+			if ( $selector ) {
+				$style_block          = "$selector {\n";
+				$css_output           = array_map(
+					function ( $value ) {
+						return "\t$value\n";
+					},
+					$css_output
+				);
+				$style_block         .= implode( '', $css_output );
+				$style_block         .= "}\n";
+				$styles_output['css'] = $style_block;
+			} else {
+				$styles_output['css'] = implode( ' ', $css_output );
+			}
 		}
 
 		if ( ! empty( $classnames ) ) {
@@ -263,15 +291,34 @@ class WP_Style_Engine {
 	 * If the input contains an array, it will be treated like a box model
 	 * for styles such as margins and padding
 	 *
-	 * @param string|array $style_value    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param string       $style_property The CSS property for which we're creating a rule.
+	 * @param string|array $style_value A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array        $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @return array The class name for the added style.
 	 */
-	protected static function get_css_rules( $style_value, $style_property ) {
+	protected static function get_css_rules( $style_value, $style_definition ) {
 		$rules = array();
 
 		if ( ! $style_value ) {
+			return $rules;
+		}
+
+		$style_property = $style_definition[ 'property_key' ];
+
+		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
+		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
+			if ( $style_definition['css_vars'] ) {
+				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
+					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+					if ( $slug ) {
+						$css_var = strtr(
+							$css_var_pattern,
+							array( '$slug' => $slug )
+						);
+						$rules[ $style_property ] = "var($css_var)";
+					}
+				}
+			}
 			return $rules;
 		}
 
@@ -295,16 +342,17 @@ class WP_Style_Engine {
  * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
  *
  * @param array $block_styles An array of styles from a block's attributes.
+ * @param array $options An array of options to determine the output.
  *
  * @return array|null array(
  *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
  *     'classnames' => (string) Classnames separated by a space.
  * );
  */
-function wp_style_engine_generate( $block_styles ) {
+function wp_style_engine_generate( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->generate( $block_styles );
+		return $style_engine->generate( $block_styles, $options );
 	}
 	return null;
 }
