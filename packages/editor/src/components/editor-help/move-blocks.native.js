@@ -26,25 +26,25 @@ const MoveBlocks = () => {
 				sourceDarkMode={ require( './images/drag-and-drop-dark.png' ) }
 			/>
 			<View style={ styles.helpDetailContainer }>
-				<HelpDetailBodyText
-					text={ __(
-						'You can rearrange blocks by long pressing over a block, this will enable the drag mode which displays a visual indicator of the block being dragged.'
-					) }
+				<HelpDetailSectionHeadingText
+					text={ __( 'Drag & drop' ) }
 				/>
 				<HelpDetailBodyText
 					text={ __(
-						'In this mode, you can move the block around the post or page and drop it at the desired location by releasing the finger from the screen.'
+						'Drag & drop makes rearranging blocks a breeze. Press and hold on a block, then drag it to its new location and release.'
 					) }
 				/>
+			</View>
+			<HelpDetailImage
+				source={ require( './images/move-light.png' ) }
+				sourceDarkMode={ require( './images/move-dark.png' ) }
+			/>
+			<View style={ styles.helpDetailContainer }>
 				<HelpDetailSectionHeadingText text={ __( 'Arrow buttons' ) } />
 				<HelpDetailBodyText
 					text={ __(
-						'Blocks can also be arranged by tapping a block and then tapping the up and down arrows that appear on the bottom left side of the block to move it above or below other blocks.'
+						'You can also rearrange blocks by tapping a block and then tapping the up and down arrows that appear on the bottom left side of the block to move it up or down.'
 					) }
-				/>
-				<HelpDetailImage
-					source={ require( './images/move-light.png' ) }
-					sourceDarkMode={ require( './images/move-dark.png' ) }
 				/>
 			</View>
 		</>
