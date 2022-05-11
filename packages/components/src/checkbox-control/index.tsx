@@ -22,8 +22,6 @@ import type { WordPressComponentProps } from '../ui/context';
 /**
  * Checkboxes allow the user to select one or more items from a set.
  *
- *
- * @example
  * ```jsx
  * import { CheckboxControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
