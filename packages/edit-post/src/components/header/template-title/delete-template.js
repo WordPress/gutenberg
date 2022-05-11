@@ -80,10 +80,14 @@ export default function DeleteTemplate() {
 				<MenuItem
 					className="edit-post-template-top-area__delete-template-button"
 					isDestructive={ ! isRevertable }
-					variant="secondary"
 					onClick={ () => {
 						setShowConfirmDialog( true );
 					} }
+					info={
+						isRevertable
+							? __( 'Restore template to default state' )
+							: undefined
+					}
 				>
 					{ isRevertable
 						? __( 'Clear customizations' )
