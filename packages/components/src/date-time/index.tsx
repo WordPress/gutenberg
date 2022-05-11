@@ -174,7 +174,6 @@ function UnforwardedDateTimePicker(
  * date and time selection. The calendar and clock components can be accessed
  * individually using the `DatePicker` and `TimePicker` components respectively.
  *
- * @example
  * ```jsx
  * import { DateTimePicker } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
@@ -186,7 +185,7 @@ function UnforwardedDateTimePicker(
  *     <DateTimePicker
  *       currentDate={ date }
  *       onChange={ ( newDate ) => setDate( newDate ) }
- *       is12Hour={ true }
+ *       is12Hour
  *     />
  *   );
  * };

@@ -80,6 +80,26 @@ function UpdateOnBlurAsIntegerField( {
 	} );
 }
 
+/**
+ * TimePicker is a React component that renders a clock for time selection.
+ *
+ * ```jsx
+ * import { TimePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTimePicker = () => {
+ *   const [ time, setTime ] = useState( new Date() );
+ *
+ *   return (
+ *     <TimePicker
+ *       currentTime={ date }
+ *       onChange={ ( newTime ) => setTime( newTime ) }
+ *       is12Hour
+ *     />
+ *   );
+ * };
+ * ```
+ */
 export function TimePicker( {
 	is12Hour,
 	currentTime,
