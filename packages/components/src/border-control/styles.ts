@@ -14,7 +14,10 @@ import {
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
 import { BackdropUI } from '../input-control/styles/input-control-styles';
-import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
+import {
+	Root as UnitControlWrapper,
+	UnitSelect,
+} from '../unit-control/styles/unit-control-styles';
 
 import type { Border } from './types';
 
@@ -22,13 +25,15 @@ const labelStyles = css`
 	font-weight: 500;
 `;
 
+const focusBoxShadow = css`
+	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
+`;
+
 export const borderControl = css`
 	position: relative;
 `;
 
 export const innerWrapper = () => css`
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
-	border-radius: 2px;
 	flex: 1 0 40%;
 
 	/*
@@ -44,7 +49,29 @@ export const innerWrapper = () => css`
 	 */
 	${ UnitControlWrapper } {
 		flex: 1;
-		${ rtl( { marginLeft: 0 } )() }
+		${ rtl( { marginLeft: -1 } )() }
+	}
+
+	&& ${ UnitSelect } {
+		/* Prevent default styles forcing heights larger than BorderControl */
+		min-height: 0;
+		${ rtl(
+			{
+				borderRadius: '0 1px 1px 0',
+				marginRight: 0,
+			},
+			{
+				borderRadius: '1px 0 0 1px',
+				marginLeft: 0,
+			}
+		)() }
+		transition: box-shadow 0.1s linear, border 0.1s linear;
+
+		&:focus {
+			z-index: 1;
+			${ focusBoxShadow }
+			border: 1px solid ${ COLORS.ui.borderFocus };
+		}
 	}
 `;
 
@@ -55,22 +82,40 @@ export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	`;
 };
 
+/*
+ * When default control height is 36px the following should be removed.
+ * See: InputControl and __next36pxDefaultSize.
+ */
+export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+	return css`
+		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
+	`;
+};
+
 export const borderControlDropdown = () => css`
 	background: #fff;
-	${ rtl(
-		{
-			borderRadius: `1px 0 0 1px`,
-			borderRight: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
-		},
-		{
-			borderRadius: `0 1px 1px 0`,
-			borderLeft: `${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] }`,
-		}
-	)() }
 
 	&& > button {
-		padding: ${ space( 1 ) };
-		border-radius: inherit;
+		/*
+		 * Override button component height and padding to fit within
+		 * BorderControl
+		 */
+		height: 100%;
+		padding: ${ space( 0.75 ) };
+		${ rtl(
+			{ borderRadius: `2px 0 0 2px` },
+			{ borderRadius: `0 2px 2px 0` }
+		)() }
+		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+		position: relative;
+
+		&:focus,
+		&:hover:not( :disabled ) {
+			${ focusBoxShadow }
+			border-color: ${ COLORS.ui.borderFocus };
+			z-index: 1;
+			position: relative;
+		}
 	}
 `;
 
@@ -86,16 +131,19 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = ( border?: Border ) => {
+export const colorIndicatorWrapper = (
+	border?: Border,
+	__next36pxDefaultSize?: boolean
+) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: 28px;
-		height: 28px;
-		padding: 2px;
+		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
+		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -104,6 +152,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
+			${ ! __next36pxDefaultSize
+				? css`
+						/* Dimensions fit in 30px overall control height. */
+						height: 16px;
+						width: 16px;
+				  `
+				: '' }
 			background: linear-gradient(
 				-45deg,
 				transparent 48%,
@@ -153,7 +208,11 @@ export const resetButton = css`
 export const borderWidthControl = () => css`
 	/* Target the InputControl's backdrop */
 	&&& ${ BackdropUI } {
-		border: none;
+		${ rtl( {
+			borderTopLeftRadius: 0,
+			borderBottomLeftRadius: 0,
+		} )() }
+		transition: box-shadow 0.1s linear;
 	}
 
 	/* Specificity required to overcome UnitControl padding */

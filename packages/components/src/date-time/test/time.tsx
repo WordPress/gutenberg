@@ -237,11 +237,21 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		expect( screen.getByLabelText( 'Month' ).value ).toBe( '07' );
-		expect( screen.getByLabelText( 'Day' ).value ).toBe( '13' );
-		expect( screen.getByLabelText( 'Year' ).value ).toBe( '2020' );
-		expect( screen.getByLabelText( 'Hours' ).value ).toBe( '06' );
-		expect( screen.getByLabelText( 'Minutes' ).value ).toBe( '00' );
+		expect(
+			( screen.getByLabelText( 'Month' ) as HTMLInputElement ).value
+		).toBe( '07' );
+		expect(
+			( screen.getByLabelText( 'Day' ) as HTMLInputElement ).value
+		).toBe( '13' );
+		expect(
+			( screen.getByLabelText( 'Year' ) as HTMLInputElement ).value
+		).toBe( '2020' );
+		expect(
+			( screen.getByLabelText( 'Hours' ) as HTMLInputElement ).value
+		).toBe( '06' );
+		expect(
+			( screen.getByLabelText( 'Minutes' ) as HTMLInputElement ).value
+		).toBe( '00' );
 		/**
 		 * This is not ideal, but best of we can do for now until we refactor
 		 * AM/PM into accessible elements, like radio buttons.
@@ -267,14 +277,12 @@ describe( 'TimePicker', () => {
 			</form>
 		);
 
-		const form = screen.getByRole( 'form' );
+		const form = screen.getByRole( 'form' ) as HTMLFormElement;
 
-		let monthInputIndex = [].indexOf.call(
-			form.elements,
+		let monthInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Month' )
 		);
-		let dayInputIndex = [].indexOf.call(
-			form.elements,
+		let dayInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Day' )
 		);
 
@@ -290,12 +298,10 @@ describe( 'TimePicker', () => {
 			</form>
 		);
 
-		monthInputIndex = [].indexOf.call(
-			form.elements,
+		monthInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Month' )
 		);
-		dayInputIndex = [].indexOf.call(
-			form.elements,
+		dayInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Day' )
 		);
 
@@ -313,11 +319,20 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const monthInput = screen.getByLabelText( 'Month' ).value;
-		const dayInput = screen.getByLabelText( 'Day' ).value;
-		const yearInput = screen.getByLabelText( 'Year' ).value;
-		const hoursInput = screen.getByLabelText( 'Hours' ).value;
-		const minutesInput = screen.getByLabelText( 'Minutes' ).value;
+		const monthInput = ( screen.getByLabelText(
+			'Month'
+		) as HTMLInputElement ).value;
+		const dayInput = ( screen.getByLabelText( 'Day' ) as HTMLInputElement )
+			.value;
+		const yearInput = ( screen.getByLabelText(
+			'Year'
+		) as HTMLInputElement ).value;
+		const hoursInput = ( screen.getByLabelText(
+			'Hours'
+		) as HTMLInputElement ).value;
+		const minutesInput = ( screen.getByLabelText(
+			'Minutes'
+		) as HTMLInputElement ).value;
 
 		expect( Number.isNaN( parseInt( monthInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( dayInput, 10 ) ) ).toBe( false );

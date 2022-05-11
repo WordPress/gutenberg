@@ -18,11 +18,15 @@ export const LinkedBorderControl = css`
 	flex: 1;
 `;
 
-export const BorderBoxControlLinkedButton = css`
-	flex: 0;
-	flex-basis: 36px;
-	margin-top: 7px;
-`;
+export const BorderBoxControlLinkedButton = (
+	__next36pxDefaultSize?: boolean
+) => {
+	return css`
+		flex: 0;
+		flex-basis: 36px;
+		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
+	`;
+};
 
 const BorderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
@@ -39,12 +43,15 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
 };
 
-export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
+export const BorderBoxControlVisualizer = (
+	borders?: Borders,
+	__next36pxDefaultSize?: boolean
+) => {
 	return css`
 		position: absolute;
-		top: 20px;
+		top: ${ __next36pxDefaultSize ? '18px' : '15px' };
 		right: 30px;
-		bottom: 20px;
+		bottom: ${ __next36pxDefaultSize ? '18px' : '15px' };
 		left: 30px;
 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };

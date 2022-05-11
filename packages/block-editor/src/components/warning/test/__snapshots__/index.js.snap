@@ -2,16 +2,25 @@
 
 exports[`Warning should match snapshot 1`] = `
 <div
-  className="block-editor-warning"
+  style={
+    Object {
+      "all": "initial",
+      "display": "contents",
+    }
+  }
 >
   <div
-    className="block-editor-warning__contents"
+    className="block-editor-warning"
   >
-    <p
-      className="block-editor-warning__message"
+    <div
+      className="block-editor-warning__contents"
     >
-      error
-    </p>
+      <p
+        className="block-editor-warning__message"
+      >
+        error
+      </p>
+    </div>
   </div>
 </div>
 `;

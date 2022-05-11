@@ -1,19 +1,17 @@
 /**
- * External dependencies
- */
-import useResizeAware from 'react-resize-aware';
-
-/**
  * WordPress dependencies
  */
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import {
+	useIsomorphicLayoutEffect,
+	useResizeObserver,
+} from '@wordpress/compose';
 
 /**
  *
  * @param { { onResize?: () => any } } onResize
  */
 export function useFlyoutResizeUpdater( { onResize } ) {
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [ resizeListener, sizes ] = useResizeObserver();
 
 	useIsomorphicLayoutEffect( () => {
 		onResize?.();

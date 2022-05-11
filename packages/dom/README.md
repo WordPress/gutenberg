@@ -211,8 +211,7 @@ _Returns_
 
 ### isNumberInput
 
-Check whether the given element is an input field of type number
-and has a valueAsNumber
+Check whether the given element is an input field of type number.
 
 _Parameters_
 
@@ -220,7 +219,7 @@ _Parameters_
 
 _Returns_
 
--   `node is HTMLInputElement`: True if the node is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is number input.
 
 ### isPhrasingContent
 

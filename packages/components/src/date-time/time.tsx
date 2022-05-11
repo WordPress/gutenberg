@@ -4,6 +4,8 @@
 import classnames from 'classnames';
 import { isInteger } from 'lodash';
 import moment from 'moment';
+import type { FocusEvent } from 'react';
+import type { Moment } from 'moment';
 
 /**
  * WordPress dependencies
@@ -22,25 +24,18 @@ import { __ } from '@wordpress/i18n';
 import Button from '../button';
 import ButtonGroup from '../button-group';
 import TimeZone from './timezone';
+import type { WordPressComponentProps } from '../ui/context';
+import type { UpdateOnBlurAsIntegerFieldProps, TimePickerProps } from './types';
 
-/**
- * Module Constants
- */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-function from12hTo24h( hours, isPm ) {
+function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
 }
 
 /**
- * <UpdateOnBlurAsIntegerField>
- * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
- *
- * @param {Object}        props             Component props.
- * @param {string}        props.as          Render the component as specific element tag, defaults to "input".
- * @param {number|string} props.value       The default value of the component which will be parsed to integer.
- * @param {Function}      props.onUpdate    Call back when blurred and validated.
- * @param {string}        [props.className]
+ * A shared component to parse, validate, and handle remounting of the
+ * underlying form field element like <input> and <select>.
  */
 function UpdateOnBlurAsIntegerField( {
 	as,
@@ -48,11 +43,11 @@ function UpdateOnBlurAsIntegerField( {
 	onUpdate,
 	className,
 	...props
-} ) {
-	function handleBlur( event ) {
+}: WordPressComponentProps< UpdateOnBlurAsIntegerFieldProps, 'input', true > ) {
+	function handleBlur( event: FocusEvent< HTMLInputElement > ) {
 		const { target } = event;
 
-		if ( value === target.value ) {
+		if ( String( value ) === target.value ) {
 			return;
 		}
 
@@ -65,10 +60,10 @@ function UpdateOnBlurAsIntegerField( {
 			( typeof props.min !== 'undefined' && parsedValue < props.min )
 		) {
 			// If validation failed, reset the value to the previous valid value.
-			target.value = value;
+			target.value = String( value );
 		} else {
 			// Otherwise, it's valid, call onUpdate.
-			onUpdate( target.name, parsedValue );
+			onUpdate( parsedValue );
 		}
 	}
 
@@ -85,20 +80,14 @@ function UpdateOnBlurAsIntegerField( {
 	} );
 }
 
-/**
- * <TimePicker>
- *
- * @typedef {Date|string|number} WPValidDateTimeFormat
- *
- * @param {Object}                props             Component props.
- * @param {boolean}               props.is12Hour    Should the time picker showed in 12 hour format or 24 hour format.
- * @param {WPValidDateTimeFormat} props.currentTime The initial current time the time picker should render.
- * @param {Function}              props.onChange    Callback function when the date changed.
- */
-export function TimePicker( { is12Hour, currentTime, onChange } ) {
+export function TimePicker( {
+	is12Hour,
+	currentTime,
+	onChange,
+}: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
-		moment( currentTime ).startOf( 'minutes' )
+		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
 	);
 
 	// Reset the state when currentTime changed.
@@ -115,7 +104,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 			year: date.format( 'YYYY' ),
 			minutes: date.format( 'mm' ),
 			hours: date.format( is12Hour ? 'hh' : 'HH' ),
-			am: date.format( 'H' ) <= 11 ? 'AM' : 'PM',
+			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
 		} ),
 		[ date, is12Hour ]
 	);
@@ -124,28 +113,30 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 	 * Function that sets the date state and calls the onChange with a new date.
 	 * The date is truncated at the minutes.
 	 *
-	 * @param {Object} newDate The date object.
+	 * @param {Moment} newDate The date object.
 	 */
-	function changeDate( newDate ) {
+	function changeDate( newDate: Moment ) {
 		setDate( newDate );
-		onChange( newDate.format( TIMEZONELESS_FORMAT ) );
+		onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
 	}
 
-	function update( name, value ) {
-		// If the 12-hour format is being used and the 'PM' period is selected, then
-		// the incoming value (which ranges 1-12) should be increased by 12 to match
-		// the expected 24-hour format.
-		let adjustedValue = value;
-		if ( name === 'hours' && is12Hour ) {
-			adjustedValue = from12hTo24h( value, am === 'PM' );
-		}
+	function update( name: 'date' | 'month' | 'year' | 'hours' | 'minutes' ) {
+		return ( value: number ) => {
+			// If the 12-hour format is being used and the 'PM' period is selected, then
+			// the incoming value (which ranges 1-12) should be increased by 12 to match
+			// the expected 24-hour format.
+			let adjustedValue = value;
+			if ( name === 'hours' && is12Hour ) {
+				adjustedValue = from12hTo24h( value, am === 'PM' );
+			}
 
-		// Clone the date and call the specific setter function according to `name`.
-		const newDate = date.clone()[ name ]( adjustedValue );
-		changeDate( newDate );
+			// Clone the date and call the specific setter function according to `name`.
+			const newDate = date.clone()[ name ]( adjustedValue );
+			changeDate( newDate );
+		};
 	}
 
-	function updateAmPm( value ) {
+	function updateAmPm( value: 'AM' | 'PM' ) {
 		return () => {
 			if ( am === value ) {
 				return;
@@ -173,7 +164,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 				step={ 1 }
 				min={ 1 }
 				max={ 31 }
-				onUpdate={ update }
+				onUpdate={ update( 'date' ) }
 			/>
 		</div>
 	);
@@ -187,7 +178,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 				name="month"
 				value={ month }
 				// The value starts from 0, so we have to -1 when setting month.
-				onUpdate={ ( key, value ) => update( key, value - 1 ) }
+				onUpdate={ ( value ) => update( 'month' )( value - 1 ) }
 			>
 				<option value="01">{ __( 'January' ) }</option>
 				<option value="02">{ __( 'February' ) }</option>
@@ -236,7 +227,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 							min={ 0 }
 							max={ 9999 }
 							value={ year }
-							onUpdate={ update }
+							onUpdate={ update( 'year' ) }
 						/>
 					</div>
 				</div>
@@ -257,7 +248,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 							min={ is12Hour ? 1 : 0 }
 							max={ is12Hour ? 12 : 23 }
 							value={ hours }
-							onUpdate={ update }
+							onUpdate={ update( 'hours' ) }
 						/>
 						<span
 							className="components-datetime__time-separator"
@@ -274,7 +265,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 							min={ 0 }
 							max={ 59 }
 							value={ minutes }
-							onUpdate={ update }
+							onUpdate={ update( 'minutes' ) }
 						/>
 					</div>
 					{ is12Hour && (

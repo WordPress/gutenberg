@@ -7,10 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseDisabled as useDisabled,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 
