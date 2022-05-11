@@ -221,7 +221,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
-			$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), array() );
+			$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), false );
 			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector      = $metadata['selector'];
 			$settings      = _wp_array_get( $this->theme_json, array( 'settings' ) );
