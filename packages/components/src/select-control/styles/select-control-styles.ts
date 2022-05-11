@@ -49,17 +49,14 @@ const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
 		default: {
 			height: 30,
-			lineHeight: 1,
 			minHeight: 30,
 		},
 		small: {
 			height: 24,
-			lineHeight: 1,
 			minHeight: 24,
 		},
 		'__unstable-large': {
 			height: 40,
-			lineHeight: 1,
 			minHeight: 40,
 		},
 	};
