@@ -198,7 +198,11 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			const { hashFunction, hashDigest } = compilation.outputOptions;
+			const {
+				hashFunction,
+				hashDigest,
+				hashDigestLength,
+			} = compilation.outputOptions;
 
 			// Go through the assets and hash the sources. We can't just use
 			// `entrypointChunk.contentHash` because that's not updated when
@@ -211,7 +215,9 @@ class DependencyExtractionWebpackPlugin {
 				const asset = compilation.getAsset( filename );
 				hash.update( asset.source.buffer() );
 			}
-			const version = hash.digest( hashDigest );
+			const version = hash
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
 
 			const entrypointChunk = isWebpack4
 				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
@@ -226,7 +232,8 @@ class DependencyExtractionWebpackPlugin {
 			const assetString = this.stringify( assetData );
 			const contentHash = createHash( hashFunction )
 				.update( assetString )
-				.digest( hashDigest );
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
 
 			// Determine a filename for the asset file.
 			const [ filename, query ] = entrypointName.split( '?', 2 );
