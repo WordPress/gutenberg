@@ -153,10 +153,7 @@ const BlockPatternSetup = ( {
 	const [ showBlank, setShowBlank ] = useState( false );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
-	const [
-		contentResizeListener,
-		{ height: contentHeight },
-	] = useResizeObserver();
+	const { height: contentHeight, ref } = useResizeObserver( {} );
 
 	if ( ! patterns?.length || showBlank ) {
 		return startBlankComponent;
@@ -174,38 +171,34 @@ const BlockPatternSetup = ( {
 		  }
 		: undefined;
 	return (
-		<>
-			{ contentResizeListener }
-			<div
-				className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
-			>
-				<SetupContent
-					viewMode={ viewMode }
-					activeSlide={ activeSlide }
-					patterns={ patterns }
-					onBlockPatternSelect={ onPatternSelectCallback }
-					height={ contentHeight - 2 * 60 }
-				/>
-				<SetupToolbar
-					viewMode={ viewMode }
-					setViewMode={ setViewMode }
-					activeSlide={ activeSlide }
-					totalSlides={ patterns.length }
-					handleNext={ () => {
-						setActiveSlide( ( active ) => active + 1 );
-					} }
-					handlePrevious={ () => {
-						setActiveSlide( ( active ) => active - 1 );
-					} }
-					onBlockPatternSelect={ () => {
-						onPatternSelectCallback(
-							patterns[ activeSlide ].blocks
-						);
-					} }
-					onStartBlank={ onStartBlank }
-				/>
-			</div>
-		</>
+		<div
+			ref={ ref }
+			className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
+		>
+			<SetupContent
+				viewMode={ viewMode }
+				activeSlide={ activeSlide }
+				patterns={ patterns }
+				onBlockPatternSelect={ onPatternSelectCallback }
+				height={ contentHeight - 2 * 60 }
+			/>
+			<SetupToolbar
+				viewMode={ viewMode }
+				setViewMode={ setViewMode }
+				activeSlide={ activeSlide }
+				totalSlides={ patterns.length }
+				handleNext={ () => {
+					setActiveSlide( ( active ) => active + 1 );
+				} }
+				handlePrevious={ () => {
+					setActiveSlide( ( active ) => active - 1 );
+				} }
+				onBlockPatternSelect={ () => {
+					onPatternSelectCallback( patterns[ activeSlide ].blocks );
+				} }
+				onStartBlank={ onStartBlank }
+			/>
+		</div>
 	);
 };
 

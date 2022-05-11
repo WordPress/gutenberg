@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import type { RefCallback } from 'react';
 
 /**
  * WordPress dependencies
@@ -23,8 +24,8 @@ export type Position = typeof POSITIONS[ keyof typeof POSITIONS ];
 interface UseResizeLabelProps {
 	/** The label value. */
 	label?: string;
-	/** Element to be rendered for resize listening events. */
-	resizeListener: JSX.Element;
+	/** Element ref to listen to resize listening events. */
+	resizableRef: RefCallback< HTMLDivElement >;
 }
 
 interface UseResizeLabelArgs {
@@ -59,7 +60,7 @@ export function useResizeLabel( {
 	 * The width/height values derive from this special useResizeObserver hook.
 	 * This custom hook uses the ResizeObserver API to listen for resize events.
 	 */
-	const [ resizeListener, sizes ] = useResizeObserver();
+	const { width, height, ref: resizableRef } = useResizeObserver( {} );
 
 	/*
 	 * Indicates if the x/y axis is preferred.
@@ -79,7 +80,6 @@ export function useResizeLabel( {
 	 * Cached dimension values to check for width/height updates from the
 	 * sizes property from useResizeAware()
 	 */
-	const { width, height } = sizes;
 	const heightRef = useRef( height );
 	const widthRef = useRef( width );
 
@@ -162,7 +162,7 @@ export function useResizeLabel( {
 
 	return {
 		label,
-		resizeListener,
+		resizableRef,
 	};
 }
 

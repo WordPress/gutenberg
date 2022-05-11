@@ -17,6 +17,12 @@ import type { WPElement } from '@wordpress/element';
 
 type SubscriberCleanup = () => void;
 type SubscriberResponse = SubscriberCleanup | void;
+type UseResizeObserverConfig< T > = {
+	ref?: RefObject< T > | T | null | undefined;
+	onResize?: ResizeHandler;
+	box?: ResizeObserverBoxOptions;
+	round?: RoundingFunction;
+};
 
 // This of course could've been more streamlined with internal state instead of
 // refs, but then host hooks / components could not opt out of renders.
@@ -169,12 +175,7 @@ const extractSize = (
 type RoundingFunction = ( n: number ) => number;
 
 function useResizeObserver< T extends HTMLElement >(
-	opts: {
-		ref?: RefObject< T > | T | null | undefined;
-		onResize?: ResizeHandler;
-		box?: ResizeObserverBoxOptions;
-		round?: RoundingFunction;
-	} = {}
+	opts: UseResizeObserverConfig< T > = {}
 ): HookResponse< T > {
 	// Saving the callback as a ref. With this, I don't need to put onResize in the
 	// effect dep array, and just passing in an anonymous function without memoising
@@ -322,25 +323,33 @@ function useResizeObserver< T extends HTMLElement >(
  *
  * ```js
  * const App = () => {
- * 	const [ resizeListener, sizes ] = useResizeObserver();
+ * 	const { width, height, ref } = useResizeObserver( {} );
  *
  * 	return (
- * 		<div>
- * 			{ resizeListener }
+ * 		<div ref={ ref }>
  * 			Your content here
  * 		</div>
  * 	);
  * };
  * ```
+ *
+ * @param {Object} opts - Options for the hook.
  */
-export default function useResizeAware(): [
-	WPElement,
-	{ width: number | null; height: number | null }
-] {
-	const { ref, width, height } = useResizeObserver();
+export default function useResizeAware< T extends HTMLDivElement >(
+	opts?: UseResizeObserverConfig< T >
+):
+	| [ WPElement, { width: number | null; height: number | null } ]
+	| HookResponse< T > {
+	const ret = useResizeObserver( opts );
+	const { ref, width, height } = ret;
 	const sizes = useMemo( () => {
 		return { width: width ?? null, height: height ?? null };
 	}, [ width, height ] );
+
+	if ( opts ) {
+		return ret;
+	}
+
 	const resizeListener = (
 		<div
 			style={ {

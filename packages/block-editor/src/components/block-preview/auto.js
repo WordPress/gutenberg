@@ -24,10 +24,9 @@ function AutoBlockPreview( {
 	__experimentalPadding,
 	__experimentalMinHeight,
 } ) {
-	const [
-		containerResizeListener,
-		{ width: containerWidth },
-	] = useResizeObserver();
+	const { width: containerWidth, ref: containerRef } = useResizeObserver(
+		{}
+	);
 	const [
 		contentResizeListener,
 		{ height: contentHeight },
@@ -61,8 +60,10 @@ function AutoBlockPreview( {
 	const scale = containerWidth / viewportWidth;
 
 	return (
-		<div className="block-editor-block-preview__container">
-			{ containerResizeListener }
+		<div
+			className="block-editor-block-preview__container"
+			ref={ containerRef }
+		>
 			<Disabled
 				className="block-editor-block-preview__content"
 				style={ {

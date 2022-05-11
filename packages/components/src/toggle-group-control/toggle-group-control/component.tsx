@@ -53,7 +53,7 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
+	const { width, ref: resizeRef } = useResizeObserver( {} );
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
@@ -108,13 +108,16 @@ function ToggleGroupControl(
 					as={ View }
 					className={ classes }
 					{ ...otherProps }
-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+					ref={ useMergeRefs( [
+						containerRef,
+						forwardedRef,
+						resizeRef,
+					] ) }
 				>
-					{ resizeListener }
 					<ToggleGroupControlBackdrop
 						{ ...radio }
 						containerRef={ containerRef }
-						containerWidth={ sizes.width }
+						containerWidth={ width }
 						isAdaptiveWidth={ isAdaptiveWidth }
 					/>
 					{ children }
