@@ -105,6 +105,8 @@ export default function Dropdown( props ) {
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
+					// This value is used to ensure that the dropdowns
+					// align with the editor header by default.
 					offset={ 13 }
 					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
 					{ ...popoverProps }
