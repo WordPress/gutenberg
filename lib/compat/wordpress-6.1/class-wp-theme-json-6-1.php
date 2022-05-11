@@ -349,7 +349,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path );
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && ( ! $use_root_vars || static::ROOT_BLOCK_SELECTOR !== $selector ) ) {
 				continue;
 			}
 
@@ -359,6 +359,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			// Root padding requires special logic to split shorthand values.
 			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
+				if ( empty( $value ) ) {
+					$value = '0 0 0 0';
+				}
 
 				$shorthand_top    = '0';
 				$shorthand_right  = '0';
@@ -414,7 +417,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				);
 
 				$declarations = array_merge( $declarations, $all_properties );
-
 				continue;
 			}
 
@@ -445,7 +447,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// If a variable value is added to the root, the corresponding property should be removed.
 		foreach ( $root_variable_duplicates as $duplicate ) {
 			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
-			if ( $discard ) {
+			if ( $discard !== false ) {
 				array_splice( $declarations, $discard, 1 );
 			}
 		}
