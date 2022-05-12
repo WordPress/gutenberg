@@ -7,6 +7,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  * Internal dependencies
  */
 import DateTimePicker from '..';
+import { daysFromNow, isWeekend } from './utils';
 
 const meta: ComponentMeta< typeof DateTimePicker > = {
 	title: 'Components/DateTimePicker',
@@ -30,12 +31,6 @@ export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
 	{}
 );
 
-function daysFromNow( days: number ) {
-	const date = new Date();
-	date.setDate( date.getDate() + days );
-	return date;
-}
-
 export const WithEvents: ComponentStory<
 	typeof DateTimePicker
 > = Template.bind( {} );
@@ -54,6 +49,5 @@ export const WithInvalidDates: ComponentStory<
 > = Template.bind( {} );
 WithInvalidDates.args = {
 	currentDate: new Date(),
-	// Mark Saturdays and Sundays as invalid.
-	isInvalidDate: ( date ) => date.getDay() === 0 || date.getDay() === 6,
+	isInvalidDate: isWeekend,
 };
