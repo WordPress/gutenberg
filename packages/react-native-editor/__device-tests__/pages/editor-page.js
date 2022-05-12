@@ -545,10 +545,9 @@ class EditorPage {
 
 	async getNumberOfParagraphBlocks() {
 		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]/android.widget.EditText`
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
 
-		await waitForVisible( this.driver, paragraphBlockLocator );
 		const locator = await this.driver.elementsByXPath(
 			paragraphBlockLocator
 		);
@@ -594,7 +593,7 @@ class EditorPage {
 			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
 		const listBlockTextLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]/android.widget.EditText`
+			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
 			: listBlockTextLocatorIOS;
 
 		return await waitForVisible( this.driver, listBlockTextLocator );
