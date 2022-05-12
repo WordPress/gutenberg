@@ -241,7 +241,10 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			popoverProps={ __unstablePopoverProps }
+			popoverProps={ {
+				...__unstablePopoverProps,
+				className: popoverClassName,
+			} }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>
