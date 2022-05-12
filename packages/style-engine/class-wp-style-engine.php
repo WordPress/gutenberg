@@ -242,7 +242,8 @@ class WP_Style_Engine {
 			foreach ( $css_rules as $rule => $value ) {
 				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
 				if ( ! empty( $filtered_css ) ) {
-					$css_output .= $filtered_css . '; ';
+					$css_output_suffix = str_ends_with( $filtered_css, ';' ) ? ' ' : '; ';
+					$css_output .= $filtered_css . $css_output_suffix;
 				}
 			}
 		}
