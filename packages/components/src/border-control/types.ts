@@ -81,8 +81,7 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * A custom CSS class name to be assigned to the border control's
-		 * dropdown popover content.
+		 * An internal prop used to control the visibility of the dropdown.
 		 */
 		__unstablePopoverProps?: Record< string, unknown >;
 		/**
