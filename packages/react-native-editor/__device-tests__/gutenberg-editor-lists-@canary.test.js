@@ -40,7 +40,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		let listBlockElement = await editorPage.getListBlockAtPosition();
 
 		if ( isAndroid() ) {
-			listBlockElement.click();
+			await listBlockElement.click();
 		}
 
 		// Send a click on the order list format button.
