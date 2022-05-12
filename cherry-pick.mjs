@@ -60,14 +60,13 @@ function cherryPickAll( PRs ) {
 	while ( remainingPRs.length ) {
 		console.log( `Cherry-picking round ${ i ++ }: ` );
 		const [successes, failures] = cherryPickRound( remainingPRs );
-		allSuccesses = [...allSuccesses, successes];
+		allSuccesses = [...allSuccesses, ...successes];
 		remainingPRs = failures;
 		if ( !successes.length ) {
 			console.log( 'Nothing merged cleanly in the last round, breaking.' );
 			break;
 		}
 	}
-	console.log( allSuccesses );
 	console.log( 'Cherry-picking finished!' );
 	console.log( 'Summary:' );
 	console.log( indent( `✅  ${ allSuccesses.length } PRs got cherry-picked cleanly` ) );
