@@ -107,7 +107,10 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	if ( $link_block_styles ) {
 		gutenberg_style_engine_generate(
 			$link_block_styles,
-			array( 'selector' => ".$class_name a", 'enqueue_block_support_styles' => true )
+			array(
+				'selector'                     => ".$class_name a",
+				'enqueue_block_support_styles' => true,
+			)
 		);
 	}
 
