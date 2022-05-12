@@ -26,7 +26,6 @@ import {
 } from '@wordpress/element';
 import {
 	useViewportMatch,
-	useResizeObserver,
 	useMergeRefs,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
@@ -95,11 +94,7 @@ const placementToAnimationOrigin = ( placement ) => {
 
 const Popover = (
 	{
-		// Disable reason: We generate the `...contentProps` rest as remainder
-		// of props which aren't explicitly handled by this component.
-		/* eslint-disable no-unused-vars */
 		range,
-		/* eslint-enable no-unused-vars */
 		animate = true,
 		headerTitle,
 		onClose,
@@ -190,7 +185,6 @@ const Popover = (
 	const anchorRefFallback = useRef( null );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
-	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const onDialogClose = ( type, event ) => {
 		// Ideally the popover should have just a single onClose prop and
@@ -351,11 +345,8 @@ const Popover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content" style={ sizes }>
-				<div style={ { position: 'absolute', minWidth: '100%' } }>
-					{ resizeObserver }
-					{ children }
-				</div>
+			<div className="components-popover__content">
+				<div style={ { width: 'min-content' } }>{ children }</div>
 			</div>
 			{ hasArrow && (
 				<div
