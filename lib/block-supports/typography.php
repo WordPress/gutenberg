@@ -141,7 +141,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_generate( array( 'typography' => $typography_block_styles ) );
+	$styles     = gutenberg_style_engine_generate( array( 'typography' => $typography_block_styles ), array( 'classnames' => true ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];

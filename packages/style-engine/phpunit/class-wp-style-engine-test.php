@@ -76,7 +76,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin' => '111px',
 					),
 				),
-				'options' => null,
+				'options' => array( 'classnames' => true ),
 				'expected_output' => array(
 					'css'        => 'margin: 111px;',
 					'classnames' => 'has-text-color has-texas-flood-color',
@@ -136,15 +136,9 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options' => array( 'selector' => '.wp-selector' ),
+				'options' => array( 'selector' => '.wp-selector > p' ),
 				'expected_output' => array(
-					'css' => '.wp-selector {
-	padding-top: 42px;
-	padding-left: 2%;
-	padding-bottom: 44px;
-	padding-right: 5rem;
-}
-',
+					'css' => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
 				),
 			),
 
@@ -154,22 +148,19 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text' => 'var:preset|color|my-little-pony',
 					),
 				),
-				'options' => array( 'selector' => '.wp-selector', 'element' => 'link' ),
+				'options' => array( 'selector' => '.wp-selector' ),
 				'expected_output' => array(
-					'css' => '.wp-selector {
-	color: var(--wp--preset--color--my-little-pony);
-}
-',
+					'css' => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
 				),
 			),
 
-			'elements_with_invalid_element'                => array(
+			'elements_with_invalid_preset_style_property'                => array(
 				'block_styles'    => array(
 					'color'   => array(
-						'text' => 'var:preset|color|my-little-pony',
+						'text' => 'var:preset|invalid_property|my-little-pony',
 					),
 				),
-				'options' => array( 'selector' => '.wp-selector', 'element' => 'marquee' ),
+				'options' => array( 'selector' => '.wp-selector' ),
 				'expected_output' => array(),
 			),
 
@@ -185,7 +176,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'fontFamily' => 'var:preset|font-family|totally-awesome',
 					),
 				),
-				'options' => null,
+				'options' => array( 'classnames' => true ),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
 				),
@@ -198,7 +189,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background' => null,
 					),
 				),
-				'options' => null,
+				'options' => array( 'classnames' => true ),
 				'expected_output' => array(
 					'css'        => 'color: #fff;',
 					'classnames' => 'has-text-color',
@@ -216,7 +207,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'padding' => 'var:preset|spacing|padding',
 					),
 				),
-				'options' => null,
+				'options' => array( 'classnames' => true ),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-background',
 				),
@@ -233,7 +224,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options' => null,
+				'options' => array( 'classnames' => true ),
 				'expected_output' => array(),
 			),
 		);

@@ -45,6 +45,9 @@ class WP_Style_Engine {
 			'text'       => array(
 				'property_key' => 'color',
 				'path'         => array( 'color', 'text' ),
+				'css_vars'     => array(
+					'--wp--preset--color--$slug' => 'color',
+				),
 				'classnames'   => array(
 					'has-text-color' => true,
 					'has-%s-color'   => 'color',
@@ -124,20 +127,6 @@ class WP_Style_Engine {
 		),
 	);
 
-	const ELEMENTS_STYLES_DEFINITIONS_METADATA = array(
-		'link' => array(
-			'color' => array(
-				'text' => array(
-					'property_key' => 'color',
-					'path'         => array( 'color', 'text' ),
-					'css_vars'     => array(
-						'--wp--preset--color--$slug' => 'color',
-					),
-				),
-			),
-		)
-	);
-
 	/**
 	 * Utility method to retrieve the main instance of the class.
 	 *
@@ -205,12 +194,51 @@ class WP_Style_Engine {
 	 *
 	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
 	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param boolean       $should_return_css_vars Whether to try build and return CSS var values.
 	 *
 	 * @return array        An array of CSS rules.
 	 */
-	protected static function get_css( $style_value, $style_definition ) {
-		// If required in the future, style definitions could define a callable `value_func` to generate custom CSS rules.
-		return static::get_css_rules( $style_value, $style_definition );
+	protected static function get_css( $style_value, $style_definition, $should_return_css_vars ) {
+		$rules = array();
+
+		if ( ! $style_value ) {
+			return $rules;
+		}
+
+		// Before default processing, style definitions could define a callable `value_func` to generate custom CSS rules at this point.
+
+		$style_property = $style_definition[ 'property_key' ];
+
+		// Build CSS var values from var:? values, e..g, `var(--wp--css--rule-slug )`
+		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
+		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
+			if ( $should_return_css_vars && $style_definition['css_vars'] ) {
+				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
+					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+					if ( $slug ) {
+						$css_var = strtr(
+							$css_var_pattern,
+							array( '$slug' => $slug )
+						);
+						$rules[ $style_property ] = "var($css_var)";
+					}
+				}
+			}
+			return $rules;
+		}
+
+		// Default rule builder.
+		// If the input contains an array, ee assume box model-like properties
+		// for styles such as margins and padding
+		if ( is_array( $style_value ) ) {
+			foreach ( $style_value as $key => $value ) {
+				$rules[ "$style_property-$key" ] = $value;
+			}
+		} else {
+			$rules[ $style_property ] = $style_value;
+		}
+
+		return $rules;
 	}
 
 	/**
@@ -218,10 +246,13 @@ class WP_Style_Engine {
 	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options An array of options to determine the output.
+	 * @param array $options array(
+	 *     'selector'   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'classnames' => (boolean) Whether to return classnames. If `true` var:? values will be parsed to return classnames instead of CSS vars. Default is `false`.
+	 * );
 	 *
 	 * @return array|null array(
-	 *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
+	 *     'css'        => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
@@ -230,18 +261,13 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_rules     = array();
-		$classnames    = array();
-		$styles_output = array();
-		$element       = isset( $options['element'] ) ? $options['element'] : null;
-		$block_definitions = self::BLOCK_STYLE_DEFINITIONS_METADATA;
-
-		if ( $element ) {
-			$block_definitions = isset( self::ELEMENTS_STYLES_DEFINITIONS_METADATA[ $element ] ) ? self::ELEMENTS_STYLES_DEFINITIONS_METADATA[ $element ] : array();
-		}
+		$css_rules                               = array();
+		$classnames                              = array();
+		$styles_output                           = array();
+		$should_generate_classnames_from_presets = isset( $options['classnames'] ) ? true === $options['classnames'] : false;
 
 		// Collect CSS and classnames.
-		foreach ( $block_definitions as $definition_group ) {
+		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
 			if ( ! $definition_group ) {
 				continue;
 			}
@@ -253,8 +279,12 @@ class WP_Style_Engine {
 					continue;
 				}
 
-				$classnames = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_rules  = array_merge( $css_rules, static::get_css( $style_value, $style_definition ) );
+				// Generate classnames from var:? values.
+				if ( $should_generate_classnames_from_presets ) {
+					$classnames = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
+				}
+
+				$css_rules  = array_merge( $css_rules, static::get_css( $style_value, $style_definition, ! $should_generate_classnames_from_presets ) );
 			}
 		}
 
@@ -274,15 +304,9 @@ class WP_Style_Engine {
 
 		if ( ! empty( $css_output ) ) {
 			if ( $selector ) {
-				$style_block          = "$selector {\n";
-				$css_output           = array_map(
-					function ( $value ) {
-						return "\t$value\n";
-					},
-					$css_output
-				);
-				$style_block         .= implode( '', $css_output );
-				$style_block         .= "}\n";
+				$style_block          = "$selector { ";
+				$style_block         .= implode( ' ', $css_output );
+				$style_block         .= " }";
 				$styles_output['css'] = $style_block;
 			} else {
 				$styles_output['css'] = implode( ' ', $css_output );
@@ -297,51 +321,29 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Default style value parser that returns a CSS ruleset.
-	 * If the input contains an array, it will be treated like a box model
-	 * for styles such as margins and padding
+	 * This function takes care of adding inline styles
+	 * in the proper place, depending on the theme in use.
 	 *
-	 * @param string|array $style_value A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array        $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * For block themes, it's loaded in the head.
+	 * For classic ones, it's loaded in the body
+	 * because the wp_head action  happens before
+	 * the render_block.
 	 *
-	 * @return array The class name for the added style.
+	 * @link https://core.trac.wordpress.org/ticket/53494.
+	 *
+	 * @param string $style String containing the CSS styles to be added.
 	 */
-	protected static function get_css_rules( $style_value, $style_definition ) {
-		$rules = array();
-
-		if ( ! $style_value ) {
-			return $rules;
+	private function enqueue_block_support_styles( $styles ) {
+		$action_hook_name = 'wp_footer';
+		if ( wp_is_block_theme() ) {
+			$action_hook_name = 'wp_head';
 		}
-
-		$style_property = $style_definition[ 'property_key' ];
-
-		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
-		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
-			if ( $style_definition['css_vars'] ) {
-				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
-					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
-					if ( $slug ) {
-						$css_var = strtr(
-							$css_var_pattern,
-							array( '$slug' => $slug )
-						);
-						$rules[ $style_property ] = "var($css_var)";
-					}
-				}
+		add_action(
+			$action_hook_name,
+			static function () use ( $styles ) {
+				echo "<style>$styles</style>\n";
 			}
-			return $rules;
-		}
-
-		// We assume box model-like properties.
-		if ( is_array( $style_value ) ) {
-			foreach ( $style_value as $key => $value ) {
-				$rules[ "$style_property-$key" ] = $value;
-			}
-		} else {
-			$rules[ $style_property ] = $style_value;
-		}
-
-		return $rules;
+		);
 	}
 }
 

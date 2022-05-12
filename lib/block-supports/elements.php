@@ -108,12 +108,12 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	if ( $link_block_styles ) {
 		$styles = gutenberg_style_engine_generate(
 			$link_block_styles,
-			array( 'selector' => ".$class_name a", 'element' => 'link' )
+			array( 'selector' => ".$class_name a" )
 		);
 	}
 
 
-	if ( ! $styles ) {
+	if ( ! empty( $styles ) ) {
 		gutenberg_enqueue_block_support_styles( $styles['css'] );
 	}
 
