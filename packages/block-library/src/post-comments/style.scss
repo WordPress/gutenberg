@@ -9,6 +9,14 @@
 	}
 	/* end utility classes */
 
+	.navigation {
+		&::after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+	}
+
 	.commentlist {
 		clear: both;
 		list-style: none;
@@ -94,10 +102,6 @@
 		#wp-comment-cookies-consent {
 			margin-top: 0.35em;
 		}
-	}
-
-	.comment-respond {
-		clear: both;
 	}
 
 	.comment-reply-title {
