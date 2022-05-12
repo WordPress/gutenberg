@@ -11,6 +11,7 @@ import {
 	arrow,
 	offset as offsetMiddleware,
 	limitShift,
+	size,
 } from '@floating-ui/react-dom';
 
 /**
@@ -176,6 +177,20 @@ const Popover = (
 		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
 		__unstableForcePosition ? undefined : flip(),
+		__unstableForcePosition
+			? undefined
+			: size( {
+					apply( { width, height } ) {
+						if ( ! refs.floating.current ) return;
+
+						Object.assign( refs.floating.current.firstChild.style, {
+							maxWidth: `${ width }px`,
+							maxHeight: `${ height }px`,
+							overflow: 'auto',
+						} );
+					},
+			  } ),
+		,
 		shift( {
 			crossAxis: true,
 			limiter: limitShift(),
