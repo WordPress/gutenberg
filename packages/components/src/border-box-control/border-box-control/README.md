@@ -122,7 +122,7 @@ _Note: The will be `undefined` if a user clears all borders._
 
 - Required: Yes
 
-### `popoverPlacement`: `Object`
+### `popoverPlacement`: `string`
 
 The position of the color popover relative to the control wrapper.
 
@@ -137,9 +137,9 @@ By default, popovers are displayed relative to the button that initiated the pop
 
 - Required: No
 
-### `popoverOffset`: `Object`
+### `popoverOffset`: `number`
 
-Works in conjunctions with `popoverPlacement` and allows to leave a space between the color popover and the control wrapper.
+Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
 
 Example:
 ```js
