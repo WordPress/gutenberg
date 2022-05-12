@@ -24,19 +24,16 @@ export default function createBlockSelectorEngine() {
 	function assembleDOMSelector( { tag, name, title, clientId } ) {
 		const tagPart = tag ?? '*';
 		const namePart = name ? `[data-type="${ name }"]` : undefined;
+		// Always include a `data-block` attribute selector even if there's no
+		// clientId to select. This ensures the selector only returns blocks.
 		const clientIdPart = clientId
 			? `[data-block="${ clientId }"]`
-			: undefined;
+			: '[data-block]';
 		const titlePart = title ? `[data-title="${ title }"]` : undefined;
 
 		const attributeParts = [ namePart, clientIdPart, titlePart ]
 			.filter( ( part ) => !! part )
 			.join( '' );
-
-		if ( attributeParts.length === 0 ) {
-			// Always return block by matching any 'data-block' attribute.
-			return `${ tagPart }[data-block]`;
-		}
 
 		return `${ tagPart }${ attributeParts }`;
 	}
