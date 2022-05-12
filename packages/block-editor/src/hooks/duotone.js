@@ -332,7 +332,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
 
 		const values = props?.attributes?.style?.color?.duotone;
-		
+
 		const duotonePalette = useMultiOriginPresets( {
 			presetSetting: 'color.duotone',
 			defaultSetting: 'color.defaultDuotone',
@@ -354,14 +354,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 				{ element &&
 					createPortal(
 						<>
-							{values && <InlineDuotone
-								selector={ selectorsGroup }
-								id={ id }
-								values={ getValuesFromColors( values ) }
-							/>}
-							{!values && duotonePalette.map(
-								preset => <PresetDuotoneFilter preset={preset} key={preset.slug} />
-							)}
+							{ values && (
+								<InlineDuotone
+									selector={ selectorsGroup }
+									id={ id }
+									values={ getValuesFromColors( values ) }
+								/>
+							) }
+							{ ! values &&
+								duotonePalette.map( ( preset ) => (
+									<PresetDuotoneFilter
+										preset={ preset }
+										key={ preset.slug }
+									/>
+								) ) }
 						</>,
 						element
 					) }
