@@ -302,7 +302,7 @@
 		"prepare": "husky install"
 	},
 	"lint-staged": {
-		"*.{js,json,ts,ts,yml,yaml}": [
+		"*.{js,json,ts,tsx,yml,yaml}": [
 			"wp-scripts format"
 		],
 		"*.{js,ts,tsx}": [
