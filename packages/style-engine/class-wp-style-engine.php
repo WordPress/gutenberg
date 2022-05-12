@@ -31,6 +31,11 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
+	 * Registered block support styles.
+	 */
+	private $registered_block_support_styles = array();
+
+	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -68,11 +73,6 @@ class WP_Style_Engine {
 					'has-background'             => true,
 					'has-%s-gradient-background' => 'gradient',
 				),
-			),
-		),
-		'elements' => array(
-			'link' => array(
-				'path' => array( 'spacing', 'padding' ),
 			),
 		),
 		'spacing'    => array(
@@ -126,6 +126,13 @@ class WP_Style_Engine {
 			),
 		),
 	);
+
+	/**
+	 * Register action for outputting styles when the class is constructed.
+	 */
+	public function __construct() {
+		$this->enqueue_block_support_styles();
+	}
 
 	/**
 	 * Utility method to retrieve the main instance of the class.
@@ -206,7 +213,6 @@ class WP_Style_Engine {
 		}
 
 		// Before default processing, style definitions could define a callable `value_func` to generate custom CSS rules at this point.
-
 		$style_property = $style_definition[ 'property_key' ];
 
 		// Build CSS var values from var:? values, e..g, `var(--wp--css--rule-slug )`
@@ -247,8 +253,9 @@ class WP_Style_Engine {
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
 	 * @param array $options array(
-	 *     'selector'   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'classnames' => (boolean) Whether to return classnames. If `true` var:? values will be parsed to return classnames instead of CSS vars. Default is `false`.
+	 *     'enqueue_block_support_styles' => (boolean) Whether to register generated styles and output them together in a style block. A `selector` is required.
+	 *     'selector'                     => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'classnames'                   => (boolean) Whether to return classnames. If `true` var:? values will be parsed to return classnames instead of CSS vars. Default is `false`.
 	 * );
 	 *
 	 * @return array|null array(
@@ -263,8 +270,8 @@ class WP_Style_Engine {
 
 		$css_rules                               = array();
 		$classnames                              = array();
-		$styles_output                           = array();
-		$should_generate_classnames_from_presets = isset( $options['classnames'] ) ? true === $options['classnames'] : false;
+		$should_generate_classnames_from_presets = isset( $options['classnames'] ) && true === $options['classnames'];
+		$should_enqueue_block_support_styles     = isset( $options['enqueue_block_support_styles'] ) && true === $options['enqueue_block_support_styles'];
 
 		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
@@ -289,30 +296,42 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$selector   = isset( $options['selector'] ) ? $options['selector'] : null;
-		$css_output = array();
+		$selector      = isset( $options['selector'] ) ? $options['selector'] : null;
+		$css           = array();
+		$styles_output = array();
 
 		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
 			foreach ( $css_rules as $rule => $value ) {
 				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
 				if ( ! empty( $filtered_css ) ) {
-					$css_output[] = $filtered_css . ';';
+					$css[] = $filtered_css . ';';
 				}
 			}
 		}
 
-		if ( ! empty( $css_output ) ) {
+		// Return css, if any.
+		if ( ! empty( $css ) ) {
 			if ( $selector ) {
 				$style_block          = "$selector { ";
-				$style_block         .= implode( ' ', $css_output );
+				$style_block         .= implode( ' ', $css );
 				$style_block         .= " }";
 				$styles_output['css'] = $style_block;
+
+				// Enqueue block support styles where there is a selector.
+				if ( $should_enqueue_block_support_styles ) {
+					if ( isset( $this->registered_block_support_styles[ $selector ] ) ) {
+						$css = array_unique( array_merge( $this->registered_block_support_styles[ $selector ], $css ) );
+					}
+					$this->registered_block_support_styles[ $selector ] = $css;
+				}
+
 			} else {
-				$styles_output['css'] = implode( ' ', $css_output );
+				$styles_output['css'] = implode( ' ', $css );
 			}
 		}
 
+		// Return classnames, if any.
 		if ( ! empty( $classnames ) ) {
 			$styles_output['classnames'] = implode( ' ', array_unique( $classnames ) );
 		}
@@ -321,6 +340,29 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Prints registered styles in the page head or footer.
+	 *
+	 * @see $this->enqueue_block_support_styles
+	 */
+	public function output_registered_block_support_styles() {
+		if ( empty( $this->registered_block_support_styles ) ) {
+			return;
+		}
+
+		$output = '';
+
+		foreach ( $this->registered_block_support_styles as $selector => $rules ) {
+				$output .= "\t$selector { ";
+				$output .= implode( ' ', $rules );
+				$output .= " }\n";
+		}
+
+		echo "<style>\n$output</style>\n";
+	}
+
+	/**
+	 * Taken from gutenberg_enqueue_block_support_styles()
+	 *
 	 * This function takes care of adding inline styles
 	 * in the proper place, depending on the theme in use.
 	 *
@@ -329,20 +371,17 @@ class WP_Style_Engine {
 	 * because the wp_head action  happens before
 	 * the render_block.
 	 *
-	 * @link https://core.trac.wordpress.org/ticket/53494.
+	 * @see gutenberg_enqueue_block_support_styles()
 	 *
-	 * @param string $style String containing the CSS styles to be added.
 	 */
-	private function enqueue_block_support_styles( $styles ) {
+	private function enqueue_block_support_styles() {
 		$action_hook_name = 'wp_footer';
 		if ( wp_is_block_theme() ) {
 			$action_hook_name = 'wp_head';
 		}
 		add_action(
 			$action_hook_name,
-			static function () use ( $styles ) {
-				echo "<style>$styles</style>\n";
-			}
+			array( $this, 'output_registered_block_support_styles' )
 		);
 	}
 }
@@ -352,6 +391,8 @@ class WP_Style_Engine {
  *
  * Returns an CSS ruleset.
  * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ *
+ * @access public
  *
  * @param array $block_styles An array of styles from a block's attributes.
  * @param array $options An array of options to determine the output.

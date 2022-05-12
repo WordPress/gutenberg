@@ -102,19 +102,13 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		return null;
 	}
 	$class_name        = gutenberg_get_elements_class_name( $block );
-	$styles            = array();
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
 	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_generate(
+		gutenberg_style_engine_generate(
 			$link_block_styles,
-			array( 'selector' => ".$class_name a" )
+			array( 'selector' => ".$class_name a", 'enqueue_block_support_styles' => true )
 		);
-	}
-
-
-	if ( ! empty( $styles ) ) {
-		gutenberg_enqueue_block_support_styles( $styles['css'] );
 	}
 
 	return null;
