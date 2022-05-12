@@ -70,7 +70,7 @@ function cherryPickAll( PRs ) {
 	console.log( 'Cherry-picking finished!' );
 	console.log( 'Summary:' );
 	console.log( indent( `✅  ${ allSuccesses.length } PRs got cherry-picked cleanly` ) );
-	console.log( indent( `❌  ${ remainingPRs.length } PRs failed` ) );
+	console.log( indent( `${ remainingPRs.length > 0 ? '✅' : '❌' }  ${ remainingPRs.length } PRs failed` ) );
 	console.log( '' );
 	return [allSuccesses, remainingPRs];
 }
