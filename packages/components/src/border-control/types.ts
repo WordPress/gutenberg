@@ -114,6 +114,13 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the
+		 * default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next36pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps & {
@@ -150,6 +157,13 @@ export type DropdownProps = ColorProps & {
 	 * close button.
 	 */
 	showDropdownHeader?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type StylePickerProps = LabelProps & {

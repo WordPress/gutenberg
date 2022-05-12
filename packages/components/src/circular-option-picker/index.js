@@ -87,8 +87,7 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 				'components-circular-option-picker__clear',
 				className
 			) }
-			isSmall
-			variant="secondary"
+			variant="tertiary"
 			{ ...additionalProps }
 		>
 			{ children }

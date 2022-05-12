@@ -26,8 +26,8 @@ const reactNativeSetup = () => {
 		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
 		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of
 		 * LayoutAnimation collides with both BottomSheet and NavigationContainer
-		 * usage of LayoutAnimation simultaneously https://git.io/J1lZv,
-		 * https://git.io/J1lZY
+		 * usage of LayoutAnimation simultaneously https://github.com/facebook/react-native/issues/12663,
+		 * https://github.com/facebook/react-native/issues/10606
 		 */
 		'Overriding previous layout animation',
 	] );

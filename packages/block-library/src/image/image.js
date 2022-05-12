@@ -33,7 +33,11 @@ import {
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -598,7 +602,9 @@ export default function Image( {
 					}
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

@@ -14,13 +14,18 @@
  */
 function render_block_core_comments_title( $attributes ) {
 
+	if ( post_password_required() ) {
+		return;
+	}
+
 	$align_class_name    = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
 	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$post_title          = $show_post_title ? sprintf( '"%1$s"', get_the_title() ) : null;
-	$comments_count      = number_format_i18n( get_comments_number() );
-	$tag_name            = 'h2';
+	$comments_count      = get_comments_number();
+	/* translators: %s: Post title. */
+	$post_title = sprintf( __( '&#8220;%s&#8221;' ), get_the_title() );
+	$tag_name   = 'h2';
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 'h' . $attributes['level'];
 	}
@@ -29,21 +34,45 @@ function render_block_core_comments_title( $attributes ) {
 		return;
 	}
 
-	$single_default_comment_label = $show_post_title ? __( 'One response to' ) : __( 'One response' );
-	$single_comment_label         = ! empty( $attributes['singleCommentLabel'] ) ? $attributes['singleCommentLabel'] : $single_default_comment_label;
-
-	$multiple_default_comment_label = $show_post_title ? __( 'Responses to' ) : __( 'Responses' );
-	$multiple_comment_label         = ! empty( $attributes['multipleCommentsLabel'] ) ? $attributes['multipleCommentsLabel'] : $multiple_default_comment_label;
-
-	$comments_title = '%1$s %2$s %3$s';
-
-	$comments_title = sprintf(
-		$comments_title,
-		// If there is only one comment, only display the label.
-		'1' !== $comments_count && $show_comments_count ? $comments_count : null,
-		'1' === $comments_count ? $single_comment_label : $multiple_comment_label,
-		$post_title
-	);
+	if ( $show_comments_count ) {
+		if ( $show_post_title ) {
+			if ( '1' === $comments_count ) {
+				/* translators: %s: Post title. */
+				$comments_title = sprintf( __( 'One response to %s' ), $post_title );
+			} else {
+				$comments_title = sprintf(
+					/* translators: 1: Number of comments, 2: Post title. */
+					_n(
+						'%1$s response to %2$s',
+						'%1$s responses to %2$s',
+						$comments_count
+					),
+					number_format_i18n( $comments_count ),
+					$post_title
+				);
+			}
+		} elseif ( '1' === $comments_count ) {
+			$comments_title = __( 'One response' );
+		} else {
+			$comments_title = sprintf(
+				/* translators: %s: Number of comments. */
+				_n( '%s responses', '%s responses', $comments_count ),
+				number_format_i18n( $comments_count )
+			);
+		}
+	} elseif ( $show_post_title ) {
+		if ( '1' === $comments_count ) {
+			/* translators: %s: Post title. */
+			$comments_title = sprintf( __( 'Response to %s' ), $post_title );
+		} else {
+			/* translators: %s: Post title. */
+			$comments_title = sprintf( __( 'Responses to %s' ), $post_title );
+		}
+	} elseif ( '1' === $comments_count ) {
+		$comments_title = __( 'Response' );
+	} else {
+		$comments_title = __( 'Responses' );
+	}
 
 	return sprintf(
 		'<%1$s id="comments" %2$s>%3$s</%1$s>',
@@ -53,9 +82,9 @@ function render_block_core_comments_title( $attributes ) {
 	);
 }
 
-	/**
-	 * Registers the `core/comments-title` block on the server.
-	 */
+/**
+ * Registers the `core/comments-title` block on the server.
+ */
 function register_block_core_comments_title() {
 	register_block_type_from_metadata(
 		__DIR__ . '/comments-title',
@@ -65,4 +94,4 @@ function register_block_core_comments_title() {
 	);
 }
 
-	add_action( 'init', 'register_block_core_comments_title' );
+add_action( 'init', 'register_block_core_comments_title' );

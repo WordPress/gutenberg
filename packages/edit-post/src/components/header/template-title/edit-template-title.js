@@ -29,7 +29,8 @@ export default function EditTemplateTitle() {
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings } = useDispatch( editorStore );
 
-	if ( template.has_theme_file ) {
+	// Only user-created and non-default templates can change the name.
+	if ( ! template.is_custom || template.has_theme_file ) {
 		return null;
 	}
 

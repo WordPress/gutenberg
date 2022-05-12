@@ -130,6 +130,7 @@ export function TypographyPanel( props ) {
 			{ ! isFontSizeDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasFontSizeValue( props ) }
+					/* translators: Ensure translation is distinct from "Letter case" */
 					label={ __( 'Font size' ) }
 					onDeselect={ () => resetFontSize( props ) }
 					isShownByDefault={ defaultControls?.fontSize }
@@ -205,6 +206,7 @@ export function TypographyPanel( props ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => hasTextTransformValue( props ) }
+					/* translators: Ensure translation is distinct from "Font size" */
 					label={ __( 'Letter case' ) }
 					onDeselect={ () => resetTextTransform( props ) }
 					isShownByDefault={ defaultControls?.textTransform }

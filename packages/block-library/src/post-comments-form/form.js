@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalUseDisabled as useDisabled,
-	useInstanceId,
-} from '@wordpress/compose';
+import { useDisabled, useInstanceId } from '@wordpress/compose';
 
 const CommentsForm = () => {
 	const disabledFormRef = useDisabled();

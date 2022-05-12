@@ -21,15 +21,23 @@ export default function debounceAsync( func, delayMS ) {
 
 	return async function debounced( ...args ) {
 		// This is a leading edge debounce. If there's no promise or timeout
-		// in progress,
+		// in progress, call the debounced function immediately.
 		if ( ! activePromise && ! timeoutId ) {
-			// Keep a reference to the promise.
-			activePromise = func( ...args ).finally( () => {
-				// As soon this promise is complete, clear the way for the
-				// next one to happen immediately.
-				activePromise = null;
+			return new Promise( ( resolve, reject ) => {
+				// Keep a reference to the promise.
+				activePromise = func( ...args )
+					.then( ( ...thenArgs ) => {
+						resolve( ...thenArgs );
+					} )
+					.catch( ( error ) => {
+						reject( error );
+					} )
+					.finally( () => {
+						// As soon this promise is complete, clear the way for the
+						// next one to happen immediately.
+						activePromise = null;
+					} );
 			} );
-			return;
 		}
 
 		if ( activePromise ) {
@@ -44,14 +52,24 @@ export default function debounceAsync( func, delayMS ) {
 			timeoutId = null;
 		}
 
-		// Schedule the next request but with a delay.
-		timeoutId = setTimeout( () => {
-			activePromise = func( ...args ).finally( () => {
-				// As soon this promise is complete, clear the way for the
-				// next one to happen immediately.
-				activePromise = null;
-				timeoutId = null;
-			} );
-		}, delayMS );
+		// Trigger any trailing edge calls to the function.
+		return new Promise( ( resolve, reject ) => {
+			// Schedule the next request but with a delay.
+			timeoutId = setTimeout( () => {
+				activePromise = func( ...args )
+					.then( ( ...thenArgs ) => {
+						resolve( ...thenArgs );
+					} )
+					.catch( ( error ) => {
+						reject( error );
+					} )
+					.finally( () => {
+						// As soon this promise is complete, clear the way for the
+						// next one to happen immediately.
+						activePromise = null;
+						timeoutId = null;
+					} );
+			}, delayMS );
+		} );
 	};
 }

@@ -25,9 +25,14 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item';
+import BlockListItemCell from './block-list-item-cell';
+import {
+	BlockListProvider,
+	BlockListConsumer,
+	DEFAULT_BLOCK_LIST_CONTEXT,
+} from './block-list-context';
+import { BlockDraggableWrapper } from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
-
-const BlockListContext = createContext();
 
 export const OnCaretVerticalPositionChange = createContext();
 
@@ -78,6 +83,9 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+		this.getCellRendererComponent = this.getCellRendererComponent.bind(
+			this
+		);
 
 		this.onLayout = this.onLayout.bind( this );
 
@@ -154,6 +162,17 @@ export class BlockList extends Component {
 		return this.extraData;
 	}
 
+	getCellRendererComponent( { children, item } ) {
+		const { rootClientId } = this.props;
+		return (
+			<BlockListItemCell
+				children={ children }
+				clientId={ item }
+				rootClientId={ rootClientId }
+			/>
+		);
+	}
+
 	onLayout( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
@@ -173,17 +192,24 @@ export class BlockList extends Component {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 		const blockList = isRootList ? (
-			<BlockListContext.Provider value={ this.scrollViewRef }>
-				{ this.renderList() }
-			</BlockListContext.Provider>
+			<BlockListProvider
+				value={ {
+					...DEFAULT_BLOCK_LIST_CONTEXT,
+					scrollRef: this.scrollViewRef,
+				} }
+			>
+				<BlockDraggableWrapper>
+					{ ( { onScroll } ) => this.renderList( { onScroll } ) }
+				</BlockDraggableWrapper>
+			</BlockListProvider>
 		) : (
-			<BlockListContext.Consumer>
-				{ ( ref ) =>
+			<BlockListConsumer>
+				{ ( { scrollRef } ) =>
 					this.renderList( {
-						parentScrollRef: ref,
+						parentScrollRef: scrollRef,
 					} )
 				}
-			</BlockListContext.Consumer>
+			</BlockListConsumer>
 		);
 
 		return (
@@ -212,7 +238,7 @@ export class BlockList extends Component {
 			contentResizeMode,
 			blockWidth,
 		} = this.props;
-		const { parentScrollRef } = extraProps;
+		const { parentScrollRef, onScroll } = extraProps;
 
 		const {
 			blockToolbar,
@@ -279,6 +305,7 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
+					CellRendererComponent={ this.getCellRendererComponent }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
@@ -286,6 +313,7 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
+					onScroll={ onScroll }
 				/>
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
@@ -321,6 +349,15 @@ export class BlockList extends Component {
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
+
+		// Extracting the grid item properties here to avoid
+		// re-renders in the blockListItem component.
+		const isGridItem = !! gridProperties;
+		const gridItemProps = gridProperties && {
+			numOfColumns: gridProperties.numColumns,
+			tileCount: blockClientIds.length,
+			tileIndex: blockClientIds.indexOf( clientId ),
+		};
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -337,8 +374,8 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				gridProperties={ gridProperties }
-				items={ blockClientIds }
+				isGridItem={ isGridItem }
+				{ ...gridItemProps }
 			/>
 		);
 	}

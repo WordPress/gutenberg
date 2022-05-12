@@ -64,7 +64,18 @@ export function reinitializeEditor( target, settings ) {
 			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
+			shouldListViewOpenByDefault: false,
 		} );
+
+		// Check if the block list view should be open by default.
+		if (
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			)
+		) {
+			dispatch( editSiteStore ).setIsListViewOpened( true );
+		}
 
 		dispatch( editSiteStore ).updateSettings( settings );
 
@@ -103,7 +114,6 @@ export function initializeEditor( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	const target = document.getElementById( id );
 

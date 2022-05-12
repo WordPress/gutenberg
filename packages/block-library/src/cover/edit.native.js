@@ -9,6 +9,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -47,7 +48,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
 	useEffect,
 	useState,
@@ -71,6 +72,7 @@ import {
 	COVER_DEFAULT_HEIGHT,
 } from './shared';
 import Controls from './controls';
+import useCoverIsDark from './use-cover-is-dark';
 
 /**
  * Constants
@@ -113,6 +115,7 @@ const Cover = ( {
 		customGradient,
 		gradient,
 		overlayColor,
+		isDark,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
@@ -180,18 +183,6 @@ const Cover = ( {
 
 	const openMediaOptionsRef = useRef();
 
-	// Used to set a default color for its InnerBlocks
-	// since there's no system to inherit styles yet
-	// the RichText component will check if there are
-	// parent styles for the current block. If there are,
-	// it will use that color instead.
-	useEffect( () => {
-		// While we don't support theme colors.
-		if ( ! attributes.overlayColor || ( ! attributes.overlay && url ) ) {
-			setAttributes( { childrenStyles: styles.defaultColor } );
-		}
-	}, [ setAttributes ] );
-
 	// Initialize uploading flag to false, awaiting sync.
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
 
@@ -256,6 +247,42 @@ const Cover = ( {
 		setCustomColorPickerShowing( true );
 		openGeneralSidebar();
 	}
+
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
+	const isCoverDark = useCoverIsDark(
+		isDark,
+		url,
+		dimRatio,
+		overlayColorValue?.color
+	);
+
+	useEffect( () => {
+		// This side-effect should not create an undo level.
+		__unstableMarkNextChangeAsNotPersistent();
+		// Used to set a default color for its InnerBlocks
+		// since there's no system to inherit styles yet
+		// the RichText component will check if there are
+		// parent styles for the current block. If there are,
+		// it will use that color instead.
+		setAttributes( {
+			isDark: isCoverDark,
+			childrenStyles: isCoverDark
+				? styles.defaultColor
+				: styles.defaultColorLightMode,
+		} );
+
+		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
+		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
+			const className = classnames( attributes.className, {
+				'is-light': false,
+			} );
+			setAttributes( {
+				className: className !== '' ? className : undefined,
+			} );
+		}
+	}, [ isCoverDark ] );
 
 	const backgroundColor = getStylesFromColorScheme(
 		styles.backgroundSolid,
@@ -375,7 +402,6 @@ const Cover = ( {
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptionsRef.current }
 			disabled={ ! isParentSelected }
 		>
 			<View style={ [ styles.background, backgroundColor ] }>
