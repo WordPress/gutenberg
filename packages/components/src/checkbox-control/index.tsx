@@ -40,7 +40,12 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function CheckboxControl(
-	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
+	// ref forwarding to CheckboxControl.
+	props: Omit<
+		WordPressComponentProps< CheckboxControlProps, 'input', false >,
+		'ref'
+	>
 ) {
 	const {
 		label,
@@ -65,7 +70,7 @@ export function CheckboxControl(
 		false
 	);
 
-	// Run the following callback everytime the `ref` (and the additional
+	// Run the following callback every time the `ref` (and the additional
 	// dependencies) change.
 	const ref = useRefEffect< HTMLInputElement >(
 		( node ) => {

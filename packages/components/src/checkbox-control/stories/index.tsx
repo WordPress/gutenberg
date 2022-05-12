@@ -28,6 +28,7 @@ const meta: ComponentMeta< typeof CheckboxControl > = {
 	parameters: {
 		controls: {
 			expanded: true,
+			exclude: [ 'heading' ],
 		},
 		docs: { source: { state: 'open' } },
 	},
