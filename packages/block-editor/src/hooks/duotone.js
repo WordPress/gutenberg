@@ -324,13 +324,19 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const values = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! values ) {
+		if ( ! duotoneSupport ) {
 			return <BlockListBlock { ...props } />;
 		}
 
 		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+
+		const values = props?.attributes?.style?.color?.duotone;
+		
+		const duotonePalette = useMultiOriginPresets( {
+			presetSetting: 'color.duotone',
+			defaultSetting: 'color.defaultDuotone',
+		} );
 
 		// Extra .editor-styles-wrapper specificity is needed in the editor
 		// since we're not using inline styles to apply the filter. We need to
@@ -343,16 +349,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 		const className = classnames( props?.className, id );
 
 		const element = useContext( BlockList.__unstableElementContext );
-
 		return (
 			<>
 				{ element &&
 					createPortal(
-						<InlineDuotone
-							selector={ selectorsGroup }
-							id={ id }
-							values={ getValuesFromColors( values ) }
-						/>,
+						<>
+							{values && <InlineDuotone
+								selector={ selectorsGroup }
+								id={ id }
+								values={ getValuesFromColors( values ) }
+							/>}
+							{!values && duotonePalette.map(
+								preset => <PresetDuotoneFilter preset={preset} key={preset.slug} />
+							)}
+						</>,
 						element
 					) }
 				<BlockListBlock { ...props } className={ className } />
