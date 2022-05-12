@@ -23,17 +23,18 @@ test.describe( 'changing image size', () => {
 	} );
 
 	test( 'should insert and change my image size', async ( {
+		admin,
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 	} ) => {
 		const filename = '1024x768_e2e_test_image_size.jpeg';
 		const filepath = path.join( './test/e2e/assets', filename );
 
-		await pageUtils.createNewPost();
+		await admin.createNewPost();
 		const media = await requestUtils.uploadMedia( filepath );
 
-		await pageUtils.insertBlock( {
+		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
 				// Specify alt text so that it can be queried by role selectors.
@@ -44,7 +45,7 @@ test.describe( 'changing image size', () => {
 		} );
 
 		// Select the new size updated with the plugin.
-		await pageUtils.openDocumentSettingsSidebar();
+		await editor.openDocumentSettingsSidebar();
 		await page.selectOption( 'role=combobox[name="Image size"i]', {
 			label: 'Custom Size One',
 		} );

@@ -1,14 +1,15 @@
 /**
  * Internal dependencies
  */
+import type { Editor } from './index';
 const { expect } = require( '../test' );
 
 /**
  * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
  *
- * @this {import('./').PageUtils}
+ * @param {Editor} this
  */
-export async function openDocumentSettingsSidebar() {
+export async function openDocumentSettingsSidebar( this: Editor ) {
 	const editorSettings = this.page.locator(
 		'role=region[name="Editor settings"i]'
 	);
