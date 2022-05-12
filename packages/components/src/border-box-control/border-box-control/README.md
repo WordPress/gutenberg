@@ -126,27 +126,15 @@ _Note: The will be `undefined` if a user clears all borders._
 
 The position of the color popover relative to the control wrapper.
 
-Example:
-```js
-{
-	popoverPlacement: "left-start"
-}
-```
-
 By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
+
+The available base placements are 'top', 'right', 'bottom', 'left'. Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
 
 - Required: No
 
 ### `popoverOffset`: `number`
 
 Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
-
-Example:
-```js
-{
-	popoverOffset: 10
-}
-```
 
 - Required: No
 
