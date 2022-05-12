@@ -2,33 +2,33 @@
 	"title": "Style variation name",
 	"settings": {
 		"typography": {
-				"fontSizes": [
-					{
-						"name": "Font size name"
-					}
-				],
-				"fontFamilies": [
-					{
-						"name": "Font family name"
-					}
-				]
+			"fontSizes": [
+				{
+					"name": "Font size name"
+				}
+			],
+			"fontFamilies": [
+				{
+					"name": "Font family name"
+				}
+			]
 		},
 		"color": {
-				"palette": [
-					{
-						"name": "Color name"
-					}
-				],
-				"gradients": [
-					{
-						"name": "Gradient name"
-					}
-				],
-				"duotone": [
-					{
-						"name": "Duotone name"
-					}
-				]
+			"palette": [
+				{
+					"name": "Color name"
+				}
+			],
+			"gradients": [
+				{
+					"name": "Gradient name"
+				}
+			],
+			"duotone": [
+				{
+					"name": "Duotone name"
+				}
+			]
 		},
 		"blocks": {
 			"*": {

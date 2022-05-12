@@ -23,7 +23,7 @@
 		},
 		"smallestFontSize": {
 			"type": "string",
-			"default": "8pt" 
+			"default": "8pt"
 		},
 		"largestFontSize": {
 			"type": "string",
