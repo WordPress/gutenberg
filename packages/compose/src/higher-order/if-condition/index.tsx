@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import type { ComponentType } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 
 /**
  * Internal dependencies
  */
-import {
-	PropsOf,
-	createHigherOrderComponent,
-} from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -30,9 +27,11 @@ import {
  */
 const ifCondition: < Inner extends ComponentType< any > >(
 	predicate: (
-		props: Record< string, unknown > & PropsOf< Inner >
+		props: Record< string, unknown > & ComponentProps< Inner >
 	) => boolean
-) => ( Inner: Inner ) => ComponentType< PropsOf< Inner > > = ( predicate ) =>
+) => ( Inner: Inner ) => ComponentType< ComponentProps< Inner > > = (
+	predicate
+) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
 			if ( ! predicate( props ) ) {

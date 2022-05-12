@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import type { ComponentType } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 
 /**
  * Internal dependencies
  */
-import {
-	PropsOf,
-	createHigherOrderComponent,
-} from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import useInstanceId from '../../hooks/use-instance-id';
 
 /**
@@ -19,7 +16,7 @@ import useInstanceId from '../../hooks/use-instance-id';
 const withInstanceId: < Inner extends ComponentType< any > >(
 	Inner: Inner
 ) => ComponentType<
-	Omit< PropsOf< Inner >, 'instanceId' >
+	Omit< ComponentProps< Inner >, 'instanceId' >
 > = createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
 		const instanceId = useInstanceId( WrappedComponent );

@@ -7,15 +7,12 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	PropsOf,
-	createHigherOrderComponent,
-} from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * External dependencies
  */
-import type { ComponentType } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 
 /**
  * Given a component returns the enhanced component augmented with a component
@@ -23,7 +20,7 @@ import type { ComponentType } from 'react';
  */
 const pure: < Inner extends ComponentType< any > >(
 	Inner: Inner
-) => ComponentType< PropsOf< Inner > > = createHigherOrderComponent(
+) => ComponentType< ComponentProps< Inner > > = createHigherOrderComponent(
 	< Props extends Record< string, any > >(
 		Wrapped: ComponentType< Props >
 	) => {

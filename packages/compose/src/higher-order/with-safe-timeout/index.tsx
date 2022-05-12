@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { without } from 'lodash';
-import type { ComponentType } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 
 /**
  * WordPress dependencies
@@ -12,10 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	PropsOf,
-	createHigherOrderComponent,
-} from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * We cannot use the `Window['setTimeout']` and `Window['clearTimeout']`
@@ -37,7 +34,7 @@ type TimeoutProps = {
 const withSafeTimeout: < Inner extends ComponentType< any > >(
 	Inner: Inner
 ) => ComponentType<
-	Omit< PropsOf< Inner >, keyof TimeoutProps >
+	Omit< ComponentProps< Inner >, keyof TimeoutProps >
 > = createHigherOrderComponent(
 	< Props extends Record< string, any > >(
 		OriginalComponent: ComponentType< Props >

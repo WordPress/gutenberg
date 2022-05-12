@@ -118,7 +118,7 @@ only re-rendering when its props/state change
 
 _Type_
 
--   `( Inner: Inner ) => ComponentType< PropsOf< Inner > >`
+-   `( Inner: Inner ) => ComponentType< ComponentProps< Inner > >`
 
 ### useAsyncList
 
@@ -556,7 +556,7 @@ component.
 
 _Type_
 
--   `( Inner: Inner ) => ComponentType< Omit< PropsOf< Inner >, 'instanceId' > >`
+-   `( Inner: Inner ) => ComponentType< Omit< ComponentProps< Inner >, 'instanceId' > >`
 
 ### withSafeTimeout
 
@@ -565,7 +565,7 @@ that ought to be bound to a component's lifecycle.
 
 _Type_
 
--   `( Inner: Inner ) => ComponentType< Omit< PropsOf< Inner >, keyof TimeoutProps > >`
+-   `( Inner: Inner ) => ComponentType< Omit< ComponentProps< Inner >, keyof TimeoutProps > >`
 
 ### withState
 
