@@ -20,8 +20,7 @@ test.describe( 'Using Block API', () => {
 		await admin.createNewPost();
 
 		await editor.insertBlock( { name: 'e2e-tests/hello-world' } );
-
-		const block = page.locator( '[data-type="e2e-tests/hello-world"]' );
+		const block = page.locator( 'block=e2e-tests/hello-world' );
 		await expect( block ).toHaveText( 'Hello Editor!' );
 	} );
 } );

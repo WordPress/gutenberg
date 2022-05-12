@@ -2,13 +2,14 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, selectors } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
 
 /**
  * Internal dependencies
  */
 import { Admin, Editor, PageUtils, RequestUtils } from './index';
+import createBlockSelectorEngine from './selectors/block-selector-engine';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -105,6 +106,7 @@ const test = base.extend<
 	},
 	{
 		requestUtils: RequestUtils;
+		registerSelectors: void;
 	}
 >( {
 	admin: async ( { page, pageUtils }, use ) => {
@@ -145,6 +147,14 @@ const test = base.extend<
 			await use( requestUtils );
 		},
 		{ scope: 'worker' },
+	],
+	// See https://github.com/microsoft/playwright/issues/11058#issuecomment-999930304.
+	registerSelectors: [
+		async ( {}, use ) => {
+			await selectors.register( 'block', createBlockSelectorEngine );
+			await use();
+		},
+		{ scope: 'worker', auto: true },
 	],
 	// An automatic fixture to configure snapshot settings globally.
 	snapshotConfig: [

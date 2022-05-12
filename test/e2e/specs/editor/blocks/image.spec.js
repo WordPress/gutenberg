@@ -34,9 +34,7 @@ test.describe( 'Image', () => {
 	test( 'can be inserted', async ( { editor, page, imageBlockUtils } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		await expect( imageBlock ).toBeVisible();
 
 		const filename = await imageBlockUtils.upload(
@@ -62,9 +60,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
@@ -148,9 +144,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
@@ -175,9 +169,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const fileName = await imageBlockUtils.upload(
@@ -204,9 +196,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const fileName = await imageBlockUtils.upload(
@@ -241,9 +231,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const tmpInput = await page.evaluateHandle( () => {
@@ -285,9 +273,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
@@ -342,9 +328,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
@@ -390,9 +374,7 @@ test.describe( 'Image', () => {
 		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
@@ -430,9 +412,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		{
@@ -490,9 +470,7 @@ test.describe( 'Image', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
-		const imageBlock = page.locator(
-			'role=document[name="Block: Image"i]'
-		);
+		const imageBlock = page.locator( 'block=core/image' );
 		const image = imageBlock.locator( 'role=img' );
 
 		const filename = await imageBlockUtils.upload(
