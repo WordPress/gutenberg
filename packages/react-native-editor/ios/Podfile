@@ -30,7 +30,7 @@ target 'GutenbergDemo' do
     # Let Pods targets inherit deployment target from the app
     # This solution is suggested here: https://github.com/CocoaPods/CocoaPods/issues/4859
     installer.pods_project.targets.each do |target|
-        # Exclude RCT-Folly as it requires explicit deployment target https://git.io/JPb73
+        # Exclude RCT-Folly as it requires explicit deployment target https://github.com/facebook/flipper/issues/834#issuecomment-899725463
         if (target.name != 'RCT-Folly')
           target.build_configurations.each do |configuration|
             pod_ios_deployment_target = Gem::Version.new(configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])

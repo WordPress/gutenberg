@@ -88,13 +88,13 @@
 			{
 				"docs/how-to-guides/data-basics/README.md": [
 					{
-					  "docs/how-to-guides/data-basics/1-data-basics-setup.md": []
+						"docs/how-to-guides/data-basics/1-data-basics-setup.md": []
 					},
 					{
-					  "docs/how-to-guides/data-basics/2-building-a-list-of-pages.md": []
+						"docs/how-to-guides/data-basics/2-building-a-list-of-pages.md": []
 					},
 					{
-					  "docs/how-to-guides/data-basics/3-building-an-edit-form.md": []
+						"docs/how-to-guides/data-basics/3-building-an-edit-form.md": []
 					}
 				]
 			},
@@ -278,7 +278,9 @@
 				"docs/explanations/user-interface/README.md": [
 					{ "docs/explanations/user-interface/block-design.md": [] },
 					{ "docs/explanations/user-interface/animation.md": [] },
-					{ "docs/explanations/user-interface/design-resources.md": [] }
+					{
+						"docs/explanations/user-interface/design-resources.md": []
+					}
 				]
 			},
 			{ "docs/explanations/faq.md": [] },
@@ -317,7 +319,10 @@
 						]
 					},
 					{ "docs/contributors/code/backward-compatibility.md": [] },
-					{ "docs/contributors/code/deprecations.md": [] }
+					{ "docs/contributors/code/deprecations.md": [] },
+					{
+						"docs/contributors/code/how-to-get-your-pull-request-reviewed.md": []
+					}
 				]
 			},
 			{

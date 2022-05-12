@@ -86,6 +86,14 @@
 		}
 	}
 
+	.comment-reply-title {
+		margin-bottom: 0;
+		:where(small) {
+			font-size: var(--wp--preset--font-size--medium, smaller);
+			margin-left: 0.5em;
+		}
+	}
+
 	.reply {
 		font-size: 0.875em;
 		margin-bottom: 1.4em;

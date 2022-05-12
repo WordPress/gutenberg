@@ -191,7 +191,6 @@ class MediaContainer extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View
@@ -222,7 +221,7 @@ class MediaContainer extends Component {
 		);
 	}
 
-	renderVideo( params, openMediaOptions ) {
+	renderVideo( params ) {
 		const {
 			aligmentStyles,
 			mediaUrl,
@@ -251,7 +250,6 @@ class MediaContainer extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View style={ [ styles.videoContainer, aligmentStyles ] }>
@@ -305,7 +303,7 @@ class MediaContainer extends Component {
 				mediaElement = this.renderImage( params, openMediaOptions );
 				break;
 			case MEDIA_TYPE_VIDEO:
-				mediaElement = this.renderVideo( params, openMediaOptions );
+				mediaElement = this.renderVideo( params );
 				break;
 		}
 		return mediaElement;

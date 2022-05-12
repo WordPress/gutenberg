@@ -402,7 +402,6 @@ const Cover = ( {
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
-			onLongPress={ openMediaOptionsRef.current }
 			disabled={ ! isParentSelected }
 		>
 			<View style={ [ styles.background, backgroundColor ] }>

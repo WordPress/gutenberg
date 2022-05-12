@@ -14,7 +14,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 
 const isWebPlatform = Platform.OS === 'web';
@@ -102,7 +102,9 @@ export default function QuoteEdit( {
 						className="wp-block-quote__citation"
 						textAlign={ align }
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

@@ -71,7 +71,7 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align
 -	**Attributes:** month, year
 
-## Categories
+## Categories List
 
 Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
@@ -222,7 +222,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 -	**Name:** core/comments-title
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** level, multipleCommentsLabel, showCommentsCount, showPostTitle, singleCommentLabel, textAlign
+-	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
@@ -798,7 +798,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** core/table-of-contents
 -	**Category:** layout
 -	**Supports:** ~~html~~
--	**Attributes:** onlyIncludeCurrentPage
+-	**Attributes:** headings, onlyIncludeCurrentPage
 
 ## Tag Cloud
 

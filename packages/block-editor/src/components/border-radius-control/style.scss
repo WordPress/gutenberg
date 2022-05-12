@@ -13,7 +13,7 @@
 		> .components-unit-control-wrapper {
 			width: 110px;
 			margin-bottom: 0;
-			margin-right: #{ $grid-unit-10 };
+			margin-right: #{ $grid-unit-15 };
 			flex-shrink: 0;
 		}
 
@@ -41,7 +41,7 @@
 		width: 70%;
 		flex-wrap: wrap;
 
-		.components-unit-control-wrapper {
+		.components-border-radius-control__tooltip-wrapper {
 			width: calc(50% - #{ $grid-unit-10 });
 			margin-bottom: $grid-unit-10;
 			margin-right: $grid-unit-10;
@@ -52,6 +52,7 @@
 		display: flex;
 		justify-content: center;
 		margin-left: 2px;
+		margin-top: 3px;
 
 		svg {
 			margin-right: 0;

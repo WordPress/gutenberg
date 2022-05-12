@@ -11,7 +11,7 @@ declare interface DependencyExtractionWebpackPluginOptions {
 	injectPolyfill?: boolean;
 	useDefaults?: boolean;
 	outputFormat?: 'php' | 'json';
-	outputFilename?: string | Function,
+	outputFilename?: string | Function;
 	requestToExternal?: ( request: string ) => string | string[] | undefined;
 	requestToHandle?: ( request: string ) => string | undefined;
 	combinedOutputFile?: string | null;

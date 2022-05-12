@@ -5,7 +5,7 @@ import 'react-native-gesture-handler/jestSetup';
 import { Image, NativeModules as RNNativeModules } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
-// testing environment: https://git.io/JSSBg
+// testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
 global.navigator = global.navigator ?? {};
 
 // Set up the app runtime globals for the test environment, which includes
@@ -132,6 +132,22 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
+// To be replaced with built in mocks when we upgrade to the latest version
+jest.mock( 'react-native-safe-area-context', () => {
+	const inset = { top: 0, right: 0, bottom: 0, left: 0 };
+	const frame = { x: 0, y: 0, width: 0, height: 0 };
+	return {
+		SafeAreaProvider: jest
+			.fn()
+			.mockImplementation( ( { children } ) => children ),
+		SafeAreaConsumer: jest
+			.fn()
+			.mockImplementation( ( { children } ) => children( inset ) ),
+		useSafeAreaInsets: jest.fn().mockImplementation( () => inset ),
+		useSafeAreaFrame: jest.fn().mockImplementation( () => frame ),
+	};
+} );
+
 jest.mock(
 	'@react-native-community/slider',
 	() => {
@@ -151,16 +167,6 @@ jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
 
 jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
-} );
-
-jest.mock( 'react-native-reanimated', () => {
-	const Reanimated = require( 'react-native-reanimated/mock' );
-
-	// The mock for `call` immediately calls the callback which is incorrect
-	// So we override it with a no-op
-	Reanimated.default.call = () => {};
-
-	return Reanimated;
 } );
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the

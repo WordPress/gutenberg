@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -333,7 +334,7 @@ class NativeEditorProvider extends Component {
 					settings={ editorSettings }
 					{ ...props }
 				>
-					{ children }
+					<SafeAreaProvider>{ children }</SafeAreaProvider>
 				</EditorProvider>
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
