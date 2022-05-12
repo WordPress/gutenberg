@@ -48,6 +48,8 @@ export default function DeleteTemplate() {
 		templateTitle = template.title;
 	}
 
+	const isRevertable = template?.has_theme_file;
+
 	const onDelete = () => {
 		clearSelectedBlock();
 		setIsEditingTemplate( false );
@@ -77,14 +79,19 @@ export default function DeleteTemplate() {
 			<>
 				<MenuItem
 					className="edit-post-template-top-area__delete-template-button"
-					isDestructive
-					variant="secondary"
-					aria-label={ __( 'Delete template' ) }
+					isDestructive={ ! isRevertable }
 					onClick={ () => {
 						setShowConfirmDialog( true );
 					} }
+					info={
+						isRevertable
+							? __( 'Restore template to default state' )
+							: undefined
+					}
 				>
-					{ __( 'Delete template' ) }
+					{ isRevertable
+						? __( 'Clear customizations' )
+						: __( 'Delete template' ) }
 				</MenuItem>
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }
