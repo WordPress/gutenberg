@@ -14,7 +14,6 @@ const meta: ComponentMeta< typeof DatePicker > = {
 	component: DatePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
-		events: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
