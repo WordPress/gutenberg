@@ -354,20 +354,20 @@ const withDuotoneStyles = createHigherOrderComponent(
 				{ element &&
 					createPortal(
 						<>
-							{ values && (
+							{ values ? (
 								<InlineDuotone
 									selector={ selectorsGroup }
 									id={ id }
 									values={ getValuesFromColors( values ) }
 								/>
-							) }
-							{ ! values &&
+							) : (
 								duotonePalette.map( ( preset ) => (
 									<PresetDuotoneFilter
 										preset={ preset }
 										key={ preset.slug }
 									/>
-								) ) }
+								) )
+							) }
 						</>,
 						element
 					) }
