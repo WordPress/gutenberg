@@ -117,15 +117,15 @@
 
 	&.components-guide__back-button {
 		left: $grid-unit-40;
+		color: #1386bf;
+		font-weight: bold;
 	}
 
-	&.components-guide__forward-button {
+	&.components-guide__forward-button,
+	&.components-guide__finish-button {
 		right: $grid-unit-40;
 		color: #1386bf;
 		font-weight: bold;
 	}
 
-	&.components-guide__finish-button {
-		right: $grid-unit-40;
-	}
 }
