@@ -9,6 +9,7 @@ import type { Ref, ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,21 +46,26 @@ function ResizeTooltip(
 	}: ResizeTooltipProps,
 	ref: ForwardedRef< HTMLDivElement >
 ): JSX.Element | null {
-	const { label, resizeListener } = useResizeLabel( {
+	const { label, resizableRef } = useResizeLabel( {
 		axis,
 		fadeTimeout,
 		onResize,
 		showPx,
 		position,
 	} );
+	const mergedRef = useMergeRefs( [ ref, resizableRef ] );
 
 	if ( ! isVisible ) return null;
 
 	const classes = classnames( 'components-resize-tooltip', className );
 
 	return (
-		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>
-			{ resizeListener }
+		<Root
+			aria-hidden="true"
+			className={ classes }
+			ref={ mergedRef }
+			{ ...props }
+		>
 			<Label
 				aria-hidden={ props[ 'aria-hidden' ] }
 				label={ label }

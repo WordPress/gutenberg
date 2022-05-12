@@ -15,10 +15,7 @@ function ResponsiveWrapper( {
 	children,
 	isInline = false,
 } ) {
-	const [
-		containerResizeListener,
-		{ width: containerWidth },
-	] = useResizeObserver();
+	const { ref, width: containerWidth } = useResizeObserver( {} );
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}
@@ -30,8 +27,7 @@ function ResponsiveWrapper( {
 	};
 	const TagName = isInline ? 'span' : 'div';
 	return (
-		<TagName className="components-responsive-wrapper">
-			{ containerResizeListener }
+		<TagName ref={ ref } className="components-responsive-wrapper">
 			<TagName style={ imageStyle } />
 			{ cloneElement( children, {
 				className: classnames(

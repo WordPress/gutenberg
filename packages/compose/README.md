@@ -453,16 +453,15 @@ _Usage_
 
 ```js
 const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+	const { width, height, ref } = useResizeObserver( {} );
 
-	return (
-		<div>
-			{ resizeListener }
-			Your content here
-		</div>
-	);
+	return <div ref={ ref }>Your content here</div>;
 };
 ```
+
+_Parameters_
+
+-   _opts_ `Object`: - Options for the hook.
 
 ### useThrottle
 

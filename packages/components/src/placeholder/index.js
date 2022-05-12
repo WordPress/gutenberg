@@ -39,7 +39,7 @@ function Placeholder( {
 	isColumnLayout,
 	...additionalProps
 } ) {
-	const [ resizeListener, { width } ] = useResizeObserver();
+	const { width, ref } = useResizeObserver( {} );
 
 	// Since `useResizeObserver` will report a width of `null` until after the
 	// first render, avoid applying any modifier classes until width is known.
@@ -61,8 +61,7 @@ function Placeholder( {
 		'is-column-layout': isColumnLayout,
 	} );
 	return (
-		<div { ...additionalProps } className={ classes }>
-			{ resizeListener }
+		<div ref={ ref } { ...additionalProps } className={ classes }>
 			{ notices }
 			{ preview && (
 				<div className="components-placeholder__preview">
