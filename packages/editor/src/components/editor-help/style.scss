@@ -62,12 +62,17 @@
 }
 
 .helpDetailSectionHeading {
+	flex-direction: row;
+	align-items: center;
+}
+
+.helpDetailSectionHeadingText {
 	color: $light-primary;
 	font-weight: 700;
 	font-size: 16px;
 }
 
-.helpDetailSectionHeadingDark {
+.helpDetailSectionHeadingTextDark {
 	color: $dark-primary;
 }
 
@@ -79,4 +84,17 @@
 
 .helpDetailBodyDark {
 	color: $dark-secondary;
+}
+
+.helpDetailBadgeContainer {
+	padding: 2px 6px;
+	margin-right: 8px;
+	border-radius: 6px;
+	background-color: #c9356e;
+}
+
+.helpDetailBadgeText {
+	color: $white;
+	font-weight: 500;
+	font-size: 12px;
 }
