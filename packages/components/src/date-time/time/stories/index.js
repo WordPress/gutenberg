@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import TimePicker from '../time';
+import TimePicker from '..';
 
 /**
  * External dependencies
