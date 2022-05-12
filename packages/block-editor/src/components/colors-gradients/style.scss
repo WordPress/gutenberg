@@ -59,9 +59,7 @@
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	& > div {
-		width: $sidebar-width;
-	}
+	width: $sidebar-width;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown:last-child > div {

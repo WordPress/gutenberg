@@ -345,9 +345,7 @@ const Popover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content">
-				<div style={ { width: 'min-content' } }>{ children }</div>
-			</div>
+			<div className="components-popover__content">{ children }</div>
 			{ hasArrow && (
 				<div
 					className="components-popover__arrow"

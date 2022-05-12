@@ -19,6 +19,7 @@
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 	box-sizing: border-box;
+	width: min-content;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast.
 	.is-alternate & {
@@ -34,11 +35,6 @@
 		border: none;
 		outline: none;
 		border-top: $border-width solid $gray-900;
-	}
-
-	> div {
-		// Without this, potentially the width will get recomputed forever.
-		box-sizing: border-box;
 	}
 }
 

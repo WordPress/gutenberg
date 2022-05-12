@@ -32,9 +32,8 @@
 	border: none;
 	outline: none;
 	border-radius: $radius-block-ui;
-	& > div {
-		padding: 0;
-	}
+	padding: 0;
+
 	.react-colorful__saturation {
 		border-top-right-radius: $radius-block-ui;
 		border-top-left-radius: $radius-block-ui;

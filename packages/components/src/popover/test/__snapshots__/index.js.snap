@@ -11,15 +11,7 @@ exports[`Popover should pass additional props to portaled element 1`] = `
     <div
       class="components-popover__content"
     >
-      <div
-        style="position: absolute; min-width: 100%;"
-      >
-        <div
-          aria-hidden="true"
-          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
-        />
-        Hello
-      </div>
+      Hello
     </div>
   </div>
 </span>
@@ -35,15 +27,7 @@ exports[`Popover should render content 1`] = `
     <div
       class="components-popover__content"
     >
-      <div
-        style="position: absolute; min-width: 100%;"
-      >
-        <div
-          aria-hidden="true"
-          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
-        />
-        Hello
-      </div>
+      Hello
     </div>
   </div>
 </span>

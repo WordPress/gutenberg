@@ -311,7 +311,7 @@ $block-inserter-tabs-height: 44px;
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-inserter__popover.is-quick > .components-popover__content > div {
+.block-editor-inserter__popover.is-quick > .components-popover__content {
 	padding: 0;
 }
 
