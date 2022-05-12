@@ -112,7 +112,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
-	const hasBlocks = blocks.length === 0;
+	const hasBlocks = blocks.length !== 0;
 
 	const NavMenuSidebarToggle = () => (
 		<ToolbarGroup>
