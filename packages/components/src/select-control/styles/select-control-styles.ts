@@ -50,14 +50,20 @@ const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 		default: {
 			height: 30,
 			minHeight: 30,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 		small: {
 			height: 24,
 			minHeight: 24,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 		'__unstable-large': {
 			height: 40,
 			minHeight: 40,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 	};
 
