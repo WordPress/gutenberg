@@ -12,15 +12,19 @@ import {
 	Modal,
 	TextControl,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function RenameMenuItem( { template, onClose } ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+	const { edit, save } = useEntityRecord(
+		'postType',
+		template.type,
+		template.id
+	);
+
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
@@ -32,9 +36,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 		event.preventDefault();
 
 		try {
-			await editEntityRecord( 'postType', template.type, template.id, {
-				title,
-			} );
+			await edit( { title } );
 
 			// Update state before saving rerenders the list.
 			setTitle( '' );
@@ -42,12 +44,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 			onClose();
 
 			// Persist edited entity.
-			await saveEditedEntityRecord(
-				'postType',
-				template.type,
-				template.id,
-				{ throwOnError: true }
-			);
+			await save( { throwOnError: true } );
 
 			createSuccessNotice( __( 'Entity renamed.' ), {
 				type: 'snackbar',

@@ -99,7 +99,8 @@ export default function useEntityRecord< RecordType >(
 		() => ( {
 			edit: ( record ) =>
 				editEntityRecord( kind, name, recordId, record ),
-			save: () => saveEditedEntityRecord( kind, name, recordId ),
+			save: ( saveOptions: any ) =>
+				saveEditedEntityRecord( kind, name, recordId, saveOptions ),
 		} ),
 		[ recordId ]
 	);
