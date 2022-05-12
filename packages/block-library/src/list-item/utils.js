@@ -7,7 +7,7 @@ export function createListItem( listItemAttributes, listAttributes, children ) {
 	return createBlock(
 		'core/list-item',
 		listItemAttributes,
-		! children || ! children.length
+		! children?.length
 			? []
 			: [ createBlock( 'core/list', listAttributes, children ) ]
 	);
