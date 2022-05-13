@@ -24,8 +24,9 @@ import { isRTL, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getMomentDate } from './utils';
-import type { DatePickerDayProps, DatePickerProps } from './types';
+import { getMomentDate } from '../utils';
+import type { DatePickerDayProps, DatePickerProps } from '../types';
+import { Day } from './styles';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
@@ -68,16 +69,18 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
 	}, [ events.length ] );
 
-	return (
-		<div
-			ref={ ref }
-			className={ classnames( 'components-datetime__date__day', {
-				'has-events': events?.length,
-			} ) }
-		>
-			{ day.format( 'D' ) }
-		</div>
-	);
+	return <Day hasEvents={ !! events?.length }>{ day.format( 'D' ) }</Day>;
+
+	// return (
+	// 	<div
+	// 		ref={ ref }
+	// 		className={ classnames( 'components-datetime__date__day', {
+	// 			'has-events': events?.length,
+	// 		} ) }
+	// 	>
+	// 		{ day.format( 'D' ) }
+	// 	</div>
+	// );
 }
 
 function DatePicker( {
@@ -184,6 +187,12 @@ function DatePicker( {
 						day={ day }
 						events={ getEventsPerDay( day ) }
 					/>
+				) }
+				renderMonthElement={ ( { month } ) => (
+					<>
+						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
+						{ month.format( 'YYYY' ) }
+					</>
 				) }
 				onFocusChange={ noop }
 			/>

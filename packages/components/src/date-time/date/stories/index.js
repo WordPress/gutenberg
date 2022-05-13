@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import DatePicker from '../date';
+import DatePicker from '..';
 
 /**
  * WordPress dependencies
