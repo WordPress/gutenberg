@@ -23,7 +23,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
-import TimeZone from '../timezone';
+import TimeZone from './timezone';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
 	UpdateOnBlurAsIntegerFieldProps,

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import moment from 'moment';
-import classnames from 'classnames';
 import type { Moment } from 'moment';
 import { noop } from 'lodash';
 

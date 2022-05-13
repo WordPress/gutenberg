@@ -87,3 +87,7 @@ export const yearField = css`
 	${ baseInput }
 	width: 55px;
 `;
+
+export const TimeZone = styled.div`
+	text-decoration: underline dotted;
+`;
