@@ -360,6 +360,11 @@ if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 	 */
 	function wp_maybe_inline_block_style_parts( $settings, $metadata ) {
 
+		// Bail early if wp_should_load_separate_core_block_assets() is false.
+		if ( ! wp_should_load_separate_core_block_assets() ) {
+			return $settings;
+		}
+
 		// Bail early if `styledClasses` is not set.
 		if ( empty( $metadata['styledClasses'] ) ) {
 			return $settings;
