@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useState, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
+	InspectorControls,
 	PlainText,
 	transformStyles,
 	useBlockProps,
@@ -15,12 +16,15 @@ import {
 	Disabled,
 	SandBox,
 	ToolbarGroup,
+	PanelBody,
+	ToggleControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
+	const { showPreview } = attributes;
 
 	const styles = useSelect( ( select ) => {
 		// Default styles used to unset some of the styles
@@ -42,6 +46,14 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		];
 	}, [] );
 
+	useEffect( () => {
+		if ( !! showPreview ) {
+			setIsPreview( true );
+		} else {
+			setIsPreview( false );
+		}
+	}, [ showPreview ] );
+
 	function switchToPreview() {
 		setIsPreview( true );
 	}
@@ -52,6 +64,17 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 
 	return (
 		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						label={ __( 'Preview by default' ) }
+						checked={ showPreview }
+						onChange={ () =>
+							setAttributes( { showPreview: ! showPreview } )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
