@@ -99,6 +99,15 @@ module.exports = {
 					},
 					transform: stylesTransform,
 				} ) ),
+				{
+					from: `./packages/block-library/build-style/*/style-part-*.css`,
+					to( { absoluteFilename } ) {
+						const parts = absoluteFilename.split( sep );
+						const dirname = parts[ parts.length - 2 ];
+						return `build/block-library/blocks/${ dirname }/[name].css`;
+					},
+					transform: stylesTransform,
+				},
 				Object.entries( {
 					'./packages/block-library/src/':
 						'build/block-library/blocks/',
