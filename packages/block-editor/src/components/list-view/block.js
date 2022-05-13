@@ -56,6 +56,7 @@ function ListViewBlock( {
 	preventAnnouncement,
 } ) {
 	const cellRef = useRef( null );
+	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 	const isFirstSelectedBlock =
@@ -173,6 +174,14 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	// Allow right-clicking an item in the List View to open up the block settings dropdown.
+	const onContextMenu = useCallback( ( event ) => {
+		if ( showBlockActions ) {
+			event.preventDefault();
+			settingsRef.current?.click();
+		}
+	} );
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -227,6 +236,7 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
+							onContextMenu={ onContextMenu }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -284,6 +294,7 @@ function ListViewBlock( {
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
+					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
