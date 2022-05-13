@@ -9,7 +9,7 @@
  * This function takes care of adding inline styles
  * in the proper place, depending on the theme in use.
  *
- * This method was added to core in 5.9.1, but with with a single param ($style). The second param ($priority) was
+ * This method was added to core in 5.9.1, but with a single param ($style). The second param ($priority) was
  * added post 6.0, so the 6.1 release needs to have wp_enqueue_block_support_styles updated to include this param.
  *
  * For block themes, it's loaded in the head.
