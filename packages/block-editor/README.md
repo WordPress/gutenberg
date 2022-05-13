@@ -349,7 +349,7 @@ Undocumented declaration.
 
 ### ELEMENT_BUTTON_CLASS_NAME
 
-Undocumented declaration.
+When this class name is given to an element it will be treated as a button element, and controlled by the settings in `{ "styles": { "elements": { "button": { }}}}`.
 
 ### FontSizePicker
 
