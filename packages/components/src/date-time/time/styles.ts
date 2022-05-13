@@ -25,7 +25,9 @@ export const Legend = styled.legend`
 	padding: 0;
 `;
 
-export const TimeWrapper = styled.div``;
+export const TimeWrapper = styled.div`
+	display: flex;
+`;
 
 const baseField = css`
 	height: 36px;
@@ -50,13 +52,18 @@ export const hoursField = css`
 	${ baseField }
 	${ baseInput }
 	width: 35px;
-	border-right: 0;
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
 
-	// TODO: how to make this work?
+	// TODO: how to make this work? what is it for?
 	/*rtl:ignore*/
 	direction: ltr;
+
+	// Extra specificity needed as these are commonly overruled.
+	&[type='number'] {
+		border-right: 0;
+		border-bottom-right-radius: 0;
+		border-top-right-radius: 0;
+		margin: 0;
+	}
 `;
 
 export const TimeSeparator = styled.span`
@@ -70,9 +77,14 @@ export const minutesField = css`
 	${ baseField }
 	${ baseInput }
 	width: 35px;
-	border-left: 0;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
+
+	// Extra specificity needed as these are commonly overruled.
+	&[type='number'] {
+		border-left: 0;
+		border-bottom-left-radius: 0;
+		border-top-left-radius: 0;
+		margin: 0;
+	}
 `;
 
 export const monthField = css`
