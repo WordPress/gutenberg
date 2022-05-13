@@ -25,7 +25,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'h4'     => 'h4',
 		'h5'     => 'h5',
 		'h6'     => 'h6',
-		'button' =>  '.wp-element-button, .wp-block-button', // We have the .wp-block-button class so that this will target older buttons that have been serialized.
+		'button' =>  '.wp-element-button, .wp-block-button, button', // We have the .wp-block-button class so that this will target older buttons that have been serialized.
 	);
 	/**
 	 * Returns the metadata for each block.
