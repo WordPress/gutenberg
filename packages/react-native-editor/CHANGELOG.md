@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
 
 ## 1.76.0
 
