@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.77.0
+
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+
 ## 1.76.1
 
 -   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
