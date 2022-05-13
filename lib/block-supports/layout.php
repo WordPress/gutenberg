@@ -37,7 +37,8 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string                                CSS style.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_type               = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$full_width_should_stretch = isset( $layout['fullWidthShouldStretch'] ) && true === $layout['fullWidthShouldStretch'];
 
 	$style = '';
 	if ( 'default' === $layout_type ) {
@@ -140,7 +141,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style .= "$selector > * { margin: 0; }";
 	}
-
+	if ( $full_width_should_stretch ) {
+		$style .= "$selector.alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1) !important; margin-left: calc(var(--wp--style--root--padding-left) * -1) !important; width: unset; }";
+	}
 	return $style;
 }
 
@@ -164,15 +167,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout           = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $default_layout ) {
 			return $block_content;
 		}
 		$used_layout = $default_layout;
 	}
+	$used_layout['fullWidthShouldStretch'] = isset( $default_layout['fullWidthShouldStretch'] ) && true === $default_layout['fullWidthShouldStretch'] && isset( $block['attrs']['align'] ) && $block['attrs']['align'] === 'full';
 
 	$class_name = wp_unique_id( 'wp-container-' );
-	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+
+	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.

@@ -4,7 +4,8 @@
 		"appearanceTools": true,
 		"layout": {
 			"contentSize": "840px",
-			"wideSize": "1100px"
+			"wideSize": "1100px",
+			"fullWidthShouldStretch": true
 		}
 	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
