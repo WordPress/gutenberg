@@ -53,6 +53,10 @@ export const hoursField = css`
 	border-right: 0;
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
+
+	// TODO: how to make this work?
+	/*rtl:ignore*/
+	direction: ltr;
 `;
 
 export const TimeSeparator = styled.span`
