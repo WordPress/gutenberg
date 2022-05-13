@@ -1,7 +1,7 @@
 export default function createBlockSelectorEngine() {
-	// TODO - for some reason the parse and assemble functions need to be
-	// within this function, but it'd be great if that wasn't the case and they
-	// could be unit tested.
+	// Util functions need to be defined in the `createBlockSelectorEngine`
+	// body. Playwright converts this function to a string, and won't be able
+	// to reach functions that are defined outside the body.
 	function parsePlaywrightSelector( selector ) {
 		if ( ! selector ) {
 			return {};
@@ -21,17 +21,17 @@ export default function createBlockSelectorEngine() {
 		};
 	}
 
-	function assembleDOMSelector( { tag, name, title, clientId } ) {
-		const tagPart = tag ?? '*';
-		const namePart = name ? `[data-type="${ name }"]` : undefined;
+	function assembleDOMSelector( { clientId, name, tag, title } ) {
 		// Always include a `data-block` attribute selector even if there's no
 		// clientId to select. This ensures the selector only returns blocks.
 		const clientIdPart = clientId
 			? `[data-block="${ clientId }"]`
 			: '[data-block]';
+		const namePart = name ? `[data-type="${ name }"]` : undefined;
+		const tagPart = tag ?? '*';
 		const titlePart = title ? `[data-title="${ title }"]` : undefined;
 
-		const attributeParts = [ namePart, clientIdPart, titlePart ]
+		const attributeParts = [ clientIdPart, namePart, titlePart ]
 			.filter( ( part ) => !! part )
 			.join( '' );
 
@@ -52,5 +52,7 @@ export default function createBlockSelectorEngine() {
 			const DOMSelector = assembleDOMSelector( selectorParams );
 			return Array.from( root.querySelectorAll( DOMSelector ) );
 		},
+		parsePlaywrightSelector,
+		assembleDOMSelector,
 	};
 }

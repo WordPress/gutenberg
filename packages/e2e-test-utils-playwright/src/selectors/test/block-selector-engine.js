@@ -1,13 +1,12 @@
 /**
  * Internal dependencies
  */
-import {
-	parsePlaywrightSelector,
-	assembleDOMSelector,
-} from '../block-selector-engine';
+import createBlockSelectorEngine from '../block-selector-engine';
 
-describe.skip( 'parsePlaywrightSelector', () => {
+describe( 'parsePlaywrightSelector', () => {
 	it( 'parses various selectors, returning data in an object', () => {
+		const { parsePlaywrightSelector } = createBlockSelectorEngine();
+
 		expect( parsePlaywrightSelector( 'core/paragraph' ) ).toEqual(
 			expect.objectContaining( {
 				name: 'core/paragraph',
@@ -63,8 +62,10 @@ describe.skip( 'parsePlaywrightSelector', () => {
 	} );
 } );
 
-describe.skip( 'assembleDOMSelector', () => {
+describe( 'assembleDOMSelector', () => {
 	it( 'assembles various DOM selectors for blocks', () => {
+		const { assembleDOMSelector } = createBlockSelectorEngine();
+
 		// Return the first block.
 		expect( assembleDOMSelector( {} ) ).toBe( '*[data-block]' );
 
@@ -84,13 +85,13 @@ describe.skip( 'assembleDOMSelector', () => {
 			assembleDOMSelector( {
 				name: 'core/paragraph',
 			} )
-		).toBe( '*[data-type="core/paragraph"]' );
+		).toBe( '*[data-block][data-type="core/paragraph"]' );
 
 		expect(
 			assembleDOMSelector( {
 				title: 'Spacer',
 			} )
-		).toBe( '*[data-title="Spacer"]' );
+		).toBe( '*[data-block][data-title="Spacer"]' );
 
 		expect(
 			assembleDOMSelector( {
@@ -100,7 +101,7 @@ describe.skip( 'assembleDOMSelector', () => {
 				title: 'Template Part',
 			} )
 		).toBe(
-			'header[data-type="core/template-part"][data-block="b4745090-1dd6-4178-9205-38baf7a10795"][data-title="Template Part"]'
+			'header[data-block="b4745090-1dd6-4178-9205-38baf7a10795"][data-type="core/template-part"][data-title="Template Part"]'
 		);
 	} );
 } );
