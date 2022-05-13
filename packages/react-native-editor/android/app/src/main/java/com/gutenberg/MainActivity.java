@@ -42,6 +42,12 @@ public class MainActivity extends ReactActivity {
                 String localeSlug = languageString.replace("_", "-").toLowerCase(Locale.ENGLISH);
                 bundle.putString(GutenbergProps.PROP_LOCALE, localeSlug);
 
+                if (BuildConfig.INITIAL_CONTENT != null) {
+                    // FIXME once the GutenbergProps.PROP_INITIAL_DATA is public in a released
+                    //  build, switch the key from being a raw string to using that
+                    bundle.putString("initialData", BuildConfig.INITIAL_CONTENT);
+                }
+
                 // Add capabilities
                 Bundle capabilities = new Bundle();
                 capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);

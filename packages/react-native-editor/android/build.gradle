@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradlePluginVersion = '7.1.1'
-        kotlinVersion = '1.5.32'
+        kotlinVersion = '1.6.10'
         buildToolsVersion = "30.0.2"
         minSdkVersion = 21
         compileSdkVersion = 30
@@ -19,6 +19,10 @@ buildscript {
     }
 }
 
+project.ext {
+    benchmarkLastBlockText = "This is the end"
+}
+
 allprojects {
     repositories {
         mavenCentral()
@@ -29,6 +33,7 @@ allprojects {
                 includeGroup "org.wordpress"
                 includeGroup "org.wordpress.aztec"
                 includeGroup "org.wordpress-mobile"
+                includeGroup "org.wordpress-mobile.gutenberg-mobile"
             }
         }
         maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }

@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 apply plugin: "com.android.application"
 apply from: "../../../react-native-bridge/android/extractPackageVersion.gradle"
 
@@ -96,11 +98,6 @@ apply from: "../../../../node_modules/react-native/react.gradle"
 def enableSeparateBuildPerCPUArchitecture = false
 
 /**
- * Run Proguard to shrink the Java bytecode in release builds.
- */
-def enableProguardInReleaseBuilds = false
-
-/**
  * Whether to enable the Hermes VM.
  *
  * This should be set on project.ext.react and mirrored here.  If it is not set
@@ -124,6 +121,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    def buildConfigKeyInitialContent = "INITIAL_CONTENT"
+
     defaultConfig {
         applicationId "com.gutenberg"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -132,8 +131,9 @@ android {
         versionName "1.0"
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "mips"
-
         }
+        // This is only used in benchmark builds, but it must be defined for all builds
+        buildConfigField "String", buildConfigKeyInitialContent, "null"
     }
     splits {
         abi {
@@ -145,12 +145,28 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+
+        benchmark {
+            initWith release
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
         }
     }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
+
+        if (variant.getName() == "benchmark") {
+            def initialContent = new File("${project.rootDir}/../src/initial-html.js")
+                    .text
+                    .replace("\n", " ") // make into a single line
+                    .replace("\"", "\\\"") // escape quotes
+
+            buildConfigField "String", buildConfigKeyInitialContent, "\"$initialContent<!-- wp:heading {\\\"level\\\":1} --><h1>${project.benchmarkLastBlockText}</h1><!-- /wp:heading -->\""
+        }
+
         variant.outputs.each { output ->
             // For each separate APK per architecture, set a unique version code as described here:
             // https://developer.android.com/studio/build/configure-apk-splits.html
@@ -169,10 +185,15 @@ android {
     }
 }
 
+def bridgeVersion = readVersion('../../../react-native-bridge/package.json')
 dependencies {
-    implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+    debugImplementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
     })
+    benchmarkImplementation("org.wordpress-mobile.gutenberg-mobile:react-native-gutenberg-bridge:v$bridgeVersion", {
+        exclude group: 'org.wordpress', module: 'utils'
+    })
+
     implementation 'androidx.appcompat:appcompat:1.2.0'
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
@@ -192,7 +213,7 @@ dependencies {
     implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
-    
+
     implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
@@ -204,4 +225,24 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.implementation
     into 'libs'
+}
+
+def readVersion(pathToJson) {
+    def json = new JsonSlurper().parse file(pathToJson)
+    return json.get('version')
+}
+
+project.afterEvaluate {
+    task benchmarkWarning {
+        description 'Warns that we are not using the local version of react-native-bridge in benchmark builds'
+        doLast {
+            def message =
+                    "\n******\n"+
+                    "This is a benchmark build, so we're building using the react-native-bridge's v${bridgeVersion} artifact!" +
+                    "\n******\n"
+            logger.warn message
+        }
+    }
+
+    preBenchmarkBuild.dependsOn benchmarkWarning
 }
