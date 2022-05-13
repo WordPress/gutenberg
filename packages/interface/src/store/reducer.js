@@ -25,12 +25,6 @@ export function complementaryAreas( state = {}, action ) {
 				[ scope ]: area,
 			};
 		}
-		case 'DISABLE_COMPLEMENTARY_AREA': {
-			const { scope } = action;
-			const newState = { ...state };
-			delete newState[ scope ];
-			return newState;
-		}
 	}
 
 	return state;
