@@ -39,6 +39,7 @@
 		"src/button/**/*",
 		"src/button-group/**/*",
 		"src/card/**/*",
+		"src/checkbox-control/**/*",
 		"src/circular-option-picker/**/*",
 		"src/color-indicator/**/*",
 		"src/color-palette/**/*",

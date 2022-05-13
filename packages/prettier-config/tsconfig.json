@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"rootDir": "lib",
 		"declarationDir": "build-types",
-		"types": [ "node" ],
+		"types": [ "node" ]
 	},
 	"include": [ "lib/**/*" ]
 }

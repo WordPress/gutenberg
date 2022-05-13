@@ -1,0 +1,56 @@
+name: Publish npm packages
+
+on:
+    workflow_dispatch:
+        inputs:
+            wp_version:
+                description: 'WordPress major version'
+                required: true
+                type: string
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    wp-release:
+        name: WordPress major bugfix release
+        runs-on: ubuntu-latest
+        environment: WordPress packages
+        steps:
+            - name: Checkout (for CLI)
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  path: main
+                  ref: trunk
+
+            - name: Checkout (for publishing)
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  path: publish
+                  # Later, we switch this branch in the script that publishes packages.
+                  ref: trunk
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+
+            - name: Configure git user name and email (for publishing)
+              run: |
+                  cd publish
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Setup Node (for CLI)
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              with:
+                  node-version-file: 'main/.nvmrc'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Publish packages to npm ("wp/${{ github.event.inputs.wp_version }}" dist-tag)
+              run: |
+                  cd main
+                  npm ci
+                  ./bin/plugin/cli.js npm-wp --wp-version=${{ github.event.inputs.wp_version }} --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

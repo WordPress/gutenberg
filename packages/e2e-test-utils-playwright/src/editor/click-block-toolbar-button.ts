@@ -1,10 +1,15 @@
 /**
+ * Internal dependencies
+ */
+import type { Editor } from './index';
+
+/**
  * Clicks a block toolbar button.
  *
- * @this {import('./').PageUtils}
+ * @param {Editor} this
  * @param {string} label The text string of the button label.
  */
-export async function clickBlockToolbarButton( label ) {
+export async function clickBlockToolbarButton( this: Editor, label: string ) {
 	await this.showBlockToolbar();
 
 	const blockToolbar = this.page.locator(

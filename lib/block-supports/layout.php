@@ -114,7 +114,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
-			$style .= 'align-items: center;';
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented

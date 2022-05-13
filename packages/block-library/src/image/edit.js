@@ -19,7 +19,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
 /**
@@ -156,6 +156,14 @@ export function ImageEdit( {
 		 has been deleted.
 	*/
 	function onImageError( isReplaced = false ) {
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice(
+			sprintf(
+				/* translators: %s url or missing image */
+				__( 'Error loading image: %s' ),
+				url
+			)
+		);
 		// If the image block was not replaced with an embed,
 		// clear the attributes and trigger the placeholder.
 		if ( ! isReplaced ) {

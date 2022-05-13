@@ -41,7 +41,7 @@ import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	'single-post',
+	'single',
 	'page',
 	'index',
 	'archive',
@@ -56,7 +56,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	'single-post': post,
+	single: post,
 	page,
 	archive,
 	search,
