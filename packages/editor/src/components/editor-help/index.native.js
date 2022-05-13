@@ -14,13 +14,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	helpFilled,
-	plusCircleFilled,
-	alignJustify,
-	trash,
-	cog,
-} from '@wordpress/icons';
+import { helpFilled, plusCircleFilled, trash, cog } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -41,6 +35,7 @@ import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
 import RemoveBlocks from './remove-blocks';
 import CustomizeBlocks from './customize-blocks';
+import moveBlocksIcon from './icon-move-blocks.native';
 
 const HELP_TOPICS = [
 	{
@@ -53,7 +48,7 @@ const HELP_TOPICS = [
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: alignJustify, view: <MoveBlocks /> },
+	{ label: __( 'Move blocks' ), icon: moveBlocksIcon, view: <MoveBlocks /> },
 	{ label: __( 'Remove blocks' ), icon: trash, view: <RemoveBlocks /> },
 	{
 		label: __( 'Customize blocks' ),
