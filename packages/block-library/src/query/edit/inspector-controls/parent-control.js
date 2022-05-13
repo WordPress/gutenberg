@@ -13,19 +13,9 @@ import { useDebounce } from '@wordpress/compose';
  */
 import { getEntitiesInfo, mapToIHasNameAndId } from '../../utils';
 
-function useIsPostTypeHierarchical( postType ) {
-	return useSelect(
-		( select ) => {
-			const type = select( coreStore ).getPostType( postType );
-			return type?.viewable && type?.hierarchical;
-		},
-		[ postType ]
-	);
-}
-
 const EMPTY_ARRAY = [];
 const SUGGESTIONS_QUERY = {
-	per_page: -1,
+	per_page: 20,
 	order: 'asc',
 	orderby: 'title',
 	_fields: 'id,title',
@@ -33,7 +23,6 @@ const SUGGESTIONS_QUERY = {
 };
 
 function ParentControl( { parents, postType, onChange } ) {
-	const isHierarchical = useIsPostTypeHierarchical( postType );
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
@@ -112,11 +101,6 @@ function ParentControl( { parents, postType, onChange } ) {
 		if ( ! searchHasResolved ) return;
 		setSuggestions( entitiesInfo.names );
 	}, [ entitiesInfo.names?.join(), searchHasResolved ] );
-
-	// Parent control is only needed for hierarchical post types.
-	if ( ! isHierarchical ) {
-		return null;
-	}
 
 	const getIdByValue = ( entitiesMappedByName, entity ) => {
 		const id = entity?.id || entitiesMappedByName?.[ entity ]?.id;

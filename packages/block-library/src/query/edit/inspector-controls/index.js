@@ -17,6 +17,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,6 +28,16 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import TaxonomyControls from './taxonomy-controls';
 import { usePostTypes } from '../../utils';
+
+function useIsPostTypeHierarchical( postType ) {
+	return useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return type?.viewable && type?.hierarchical;
+		},
+		[ postType ]
+	);
+}
 
 const stickyOptions = [
 	{ label: __( 'Include' ), value: '' },
@@ -50,6 +62,7 @@ export default function QueryInspectorControls( {
 	} = query;
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
 	}, [ postType ] );
@@ -74,6 +87,8 @@ export default function QueryInspectorControls( {
 		if ( newValue !== 'post' ) {
 			updateQuery.sticky = '';
 		}
+		// We need to reset `parents` because they are tied to each post type.
+		updateQuery.parents = [];
 		setQuery( updateQuery );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
@@ -158,11 +173,13 @@ export default function QueryInspectorControls( {
 						value={ querySearch }
 						onChange={ setQuerySearch }
 					/>
-					<ParentControl
-						parents={ parents }
-						postType={ postType }
-						onChange={ setQuery }
-					/>
+					{ isPostTypeHierarchical && (
+						<ParentControl
+							parents={ parents }
+							postType={ postType }
+							onChange={ setQuery }
+						/>
+					) }
 				</PanelBody>
 			) }
 		</InspectorControls>
