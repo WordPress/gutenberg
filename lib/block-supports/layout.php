@@ -70,7 +70,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap, var( --wp--style--root--block-gap ) )';
 			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
 			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
 		}
@@ -106,7 +106,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : '0.5em';
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
-			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap, 0.5em )';
+			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap, var( --wp--style--root--block-gap, 0.5em ) )';
 			$style    .= "gap: $gap_style;";
 		} else {
 			$style .= 'gap: 0.5em;';

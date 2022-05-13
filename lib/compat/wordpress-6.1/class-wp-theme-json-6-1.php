@@ -22,13 +22,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * path to the value in theme.json & block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
-		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
-		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
-		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
-		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
-		'--wp--style--root--block-gap'      => array( 'spacing', 'blockGap' ),
-		'--wp--style--block-gap'            => array( 'spacing', 'blockGap' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
 		'border-radius'                     => array( 'border', 'radius' ),
@@ -71,16 +64,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
-	);
-
-	const ROOT_STYLE_CSS_VARIABLES = array(
-		'padding'                => '--wp--style--root--padding',
-		'padding-top'            => '--wp--style--root--padding-top',
-		'padding-right'          => '--wp--style--root--padding-right',
-		'padding-bottom'         => '--wp--style--root--padding-bottom',
-		'padding-left'           => '--wp--style--root--padding-left',
-		// This should be 'gap'.
-		'--wp--style--block-gap' => '--wp--style--root--block-gap',
+		'--wp--style--block-gap'            => array( 'spacing', 'blockGap' ),
+		'--wp--style--root--block-gap'            => array( 'spacing', 'blockGap' ),
 	);
 
 	/**
@@ -147,15 +132,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$declaration_block = array_reduce(
 				$declarations,
 				function ( $carry, $element ) use ( $selector ) {
+					// @TODO fix all these via a dictionay lookup or some other clever mechansim.
+					// Nothing to see here!
 					if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-						if ( array_key_exists( $element['name'], static::ROOT_STYLE_CSS_VARIABLES ) ) {
-							return $carry .= "\t" . $element['name'] . ': var(' . static::ROOT_STYLE_CSS_VARIABLES[ $element['name'] ] . ");\n";
+						// Block gap var for general usage doesn't belong in the root selector.
+						if ( str_starts_with( $element['name'], '--wp--style--block-gap' ) ) {
+							return $carry;
 						}
+					// Root vars don't belong anywhere else but the root selector
 					} elseif ( str_starts_with( $element['name'], '--wp--style--root--' ) ) {
 						return $carry;
 					}
 					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n";
-					},
+				},
 				''
 			);
 			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
@@ -163,14 +152,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$declaration_block = array_reduce(
 				$declarations,
 				function ( $carry, $element ) use ( $selector ) {
-					if (
-						array_key_exists( $element['name'], static::ROOT_STYLE_CSS_VARIABLES )
-					) {
-						if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-							return $carry .= $element['name'] . ': var(' . static::ROOT_STYLE_CSS_VARIABLES[ $element['name'] ] . ');';
-						}
-						return $carry;
-					}
 					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
 				''
 			);

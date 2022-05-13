@@ -8,11 +8,13 @@
 		}
 	},
 	"styles" : {
-		"spacing": { "padding": "50px" },
+		"spacing": { "padding": "50px",
+"blockGap": "44px"
+		},
 		"blocks": {
 			"core/group": {
 				"spacing": {
-					"blockGap": "100px"
+				"blockGap": "133px"
 				}
 			}
 		}
