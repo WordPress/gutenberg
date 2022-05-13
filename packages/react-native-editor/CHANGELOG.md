@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
 
 ## 1.76.0
 
