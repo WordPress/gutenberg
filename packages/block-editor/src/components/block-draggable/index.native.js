@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { AccessibilityInfo } from 'react-native';
+import {
+	useSafeAreaInsets,
+	useSafeAreaFrame,
+} from 'react-native-safe-area-context';
 import Animated, {
 	runOnJS,
 	runOnUI,
@@ -61,10 +65,11 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
  *
  * @param {Object}      props          Component props.
  * @param {JSX.Element} props.children Children to be rendered.
+ * @param {boolean}     props.isRTL    Check if current locale is RTL.
  *
  * @return {Function} Render function that passes `onScroll` event handler.
  */
-const BlockDraggableWrapper = ( { children } ) => {
+const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const [ draggedBlockIcon, setDraggedBlockIcon ] = useState();
 
 	const {
@@ -75,6 +80,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
+	const { left, right } = useSafeAreaInsets();
+	const { width } = useSafeAreaFrame();
+	const safeAreaOffset = left + right;
+	const maxWidth = width - safeAreaOffset;
 	animatedScrollRef( scrollRef );
 
 	const scroll = {
@@ -198,9 +207,16 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const chipDynamicStyles = useAnimatedStyle( () => {
+		const chipOffset = chip.width.value / 2;
+		const translateX = ! isRTL
+			? chip.x.value - chipOffset
+			: -( maxWidth - ( chip.x.value + chipOffset ) );
+
 		return {
 			transform: [
-				{ translateX: chip.x.value - chip.width.value / 2 },
+				{
+					translateX,
+				},
 				{
 					translateY:
 						chip.y.value -
