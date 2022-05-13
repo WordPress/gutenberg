@@ -246,7 +246,7 @@ export default function SearchEdit( {
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
-			elementButtonClassName,
+			elementButtonClassName
 		);
 		const buttonStyles = {
 			...colorProps.style,
