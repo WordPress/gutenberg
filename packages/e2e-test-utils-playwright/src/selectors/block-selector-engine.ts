@@ -15,10 +15,12 @@ export default function createBlockSelectorEngine() {
 		}
 
 		const [ , name ] = selector.match( /^([a-z0-9\/\-]+)/ ) ?? [];
-		const [ , title ] = selector.match( /title="(.+?)"/ ) ?? [];
+
+		const [ , squareBracketParams ] = selector.match( /\[(.*)\]/ ) ?? [];
+		const [ , title ] = squareBracketParams?.match( /title="(.+?)"/ ) ?? [];
 		const [ , clientId ] =
-			selector.match( /clientId="([0-9a-f\-]+?)"/ ) ?? [];
-		const [ , tag ] = selector.match( /tag="(.+?)"/ ) ?? [];
+			squareBracketParams?.match( /clientId="([0-9a-f\-]+?)"/ ) ?? [];
+		const [ , tag ] = squareBracketParams?.match( /tag="(.+?)"/ ) ?? [];
 
 		return {
 			clientId,
