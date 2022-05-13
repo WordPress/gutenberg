@@ -477,6 +477,10 @@
 					}
 				}
 			]
+		},
+		"styledClasses": {
+			"description": "An array of class names that have individual stylesheets. If defined, overrides the 'style' property on the frontend, loading styles only when the class is present.",
+			"type": "array"
 		}
 	},
 	"required": [ "name", "title" ],

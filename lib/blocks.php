@@ -349,3 +349,75 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
+	/**
+	 * Inlines tree-shaked CSS for blocks, instead of a single file.
+	 * Filters the settings determined from the block type metadata.
+	 *
+	 * @param array $settings Array of determined settings for registering a block type.
+	 * @param array $metadata Metadata provided for registering a block type.
+	 */
+	function wp_maybe_inline_block_style_parts( $settings, $metadata ) {
+
+		// Bail early if `styledClasses` is not set.
+		if ( empty( $metadata['styledClasses'] ) ) {
+			return $settings;
+		}
+
+		// Bail early if not a frontend request.
+		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+			return $settings;
+		}
+
+		// Bail early if the block doesn't have a "style" defined.
+		if ( empty( $settings['style'] ) ) {
+			return $settings;
+		}
+
+		// Get the stylesheet handle.
+		$handle = $settings['style'];
+
+		global $wp_styles;
+		// Remove the default style. We'll be adding style-parts depending on the block content.
+		$wp_styles->registered[ $handle ]->src = '';
+		// Get the block's folder path which will be later used to get the individual files.
+		// Use the folder-path of the style.css file if available, otherwise fallback to the block.json parent folder.
+		$block_path = dirname( $metadata['file'] );
+		if ( ! empty( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
+			$block_path = dirname( $wp_styles->registered[ $handle ]->extra['path'] );
+		}
+
+		// Unset the default style's path to prevent inlining the whole file.
+		unset( $wp_styles->registered[ $handle ]->extra['path'] );
+
+		/**
+		 * Callback to add the style-parts to the block.
+		 *
+		 * @param  string $block_content Rendered block content.
+		 * @param  array  $block         Block object.
+		 * @return string                Filtered block content.
+		 */
+		$callback = static function( $block_content, $block ) use ( $handle, $block_path, $metadata ) {
+			// Check that we're on the right block.
+			if ( $block['blockName'] !== $metadata['name'] ) {
+				return $block_content;
+			}
+
+			// Add inline styles for the class-names that exist in the content.
+			foreach ( $metadata['styledClasses'] as $class_name ) {
+				if ( false === strpos( $block_content, $class_name ) ) {
+					continue;
+				}
+				wp_add_inline_style( $handle, file_get_contents( $block_path . "/style-part-{$class_name}.css" ) );
+			}
+			return $block_content;
+		};
+
+		// Add the callback to the block's render callback.
+		add_filter( 'render_block', $callback, 10, 2 );
+
+		return $settings;
+	}
+}
+add_filter( 'block_type_metadata_settings', 'wp_maybe_inline_block_style_parts', 10, 2 );
