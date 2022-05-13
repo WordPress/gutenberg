@@ -3,6 +3,7 @@
  */
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
+import convertPreferencesPackageData from './migrations/preferences-package-data';
 
 export { create };
 
@@ -34,9 +35,9 @@ export function __unstableCreatePersistenceLayer( serverData, userId ) {
 
 	let preloadedData;
 	if ( serverData && serverModified >= localModified ) {
-		preloadedData = serverData;
+		preloadedData = convertPreferencesPackageData( serverData );
 	} else if ( localData ) {
-		preloadedData = localData;
+		preloadedData = convertPreferencesPackageData( localData );
 	} else {
 		// Check if there is data in the legacy format from the old persistence system.
 		preloadedData = convertLegacyLocalStorageData( userId );
