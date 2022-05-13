@@ -21,11 +21,11 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	useElementButtonClassName,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
+	ELEMENT_BUTTON_CLASS_NAME,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -178,7 +178,7 @@ function ButtonEdit( props ) {
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
 						},
-						useElementButtonClassName()
+						ELEMENT_BUTTON_CLASS_NAME
 					) }
 					style={ {
 						...borderProps.style,
