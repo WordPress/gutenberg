@@ -19,6 +19,7 @@ const meta: ComponentMeta< typeof DateTimePicker > = {
 	component: DateTimePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
+		onChange: { action: 'onChange', control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -29,6 +30,7 @@ export default meta;
 
 const Template: ComponentStory< typeof DateTimePicker > = ( {
 	currentDate,
+	onChange,
 	...args
 } ) => {
 	const [ date, setDate ] = useState( currentDate );
@@ -36,7 +38,14 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
 		setDate( currentDate );
 	}, [ currentDate ] );
 	return (
-		<DateTimePicker { ...args } currentDate={ date } onChange={ setDate } />
+		<DateTimePicker
+			{ ...args }
+			currentDate={ date }
+			onChange={ ( newDate ) => {
+				setDate( newDate );
+				onChange?.( newDate );
+			} }
+		/>
 	);
 };
 

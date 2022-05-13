@@ -19,6 +19,7 @@ const meta: ComponentMeta< typeof DatePicker > = {
 	component: DatePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
+		onChange: { action: 'onChange', control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -29,13 +30,23 @@ export default meta;
 
 const Template: ComponentStory< typeof DatePicker > = ( {
 	currentDate,
+	onChange,
 	...args
 } ) => {
 	const [ date, setDate ] = useState( currentDate );
 	useEffect( () => {
 		setDate( currentDate );
 	}, [ currentDate ] );
-	return <DatePicker { ...args } currentDate={ date } onChange={ setDate } />;
+	return (
+		<DatePicker
+			{ ...args }
+			currentDate={ date }
+			onChange={ ( newDate ) => {
+				setDate( newDate );
+				onChange?.( newDate );
+			} }
+		/>
+	);
 };
 
 export const Default: ComponentStory< typeof DatePicker > = Template.bind( {} );
