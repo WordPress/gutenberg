@@ -131,6 +131,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'elementButtonClassName',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',

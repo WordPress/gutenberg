@@ -746,6 +746,10 @@ _Returns_
 
 -   `any`: value
 
+### useElementButtonClassName
+
+Undocumented declaration.
+
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper

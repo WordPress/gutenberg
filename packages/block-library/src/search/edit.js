@@ -8,13 +8,13 @@ import classnames from 'classnames';
  */
 import {
 	useBlockProps,
+	useElementButtonClassName,
 	BlockControls,
 	InspectorControls,
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
-	ELEMENT_BUTTON_CLASS_NAME,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -93,6 +93,7 @@ export default function SearchEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
+
 	useEffect( () => {
 		if ( ! insertedInNavigationBlock ) return;
 		// This side-effect should not create an undo level.
@@ -236,6 +237,8 @@ export default function SearchEdit( {
 		);
 	};
 
+	const elementButtonClassName = useElementButtonClassName();
+
 	const renderButton = () => {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
 		const buttonClasses = classnames(
@@ -243,7 +246,7 @@ export default function SearchEdit( {
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
-			ELEMENT_BUTTON_CLASS_NAME
+			elementButtonClassName,
 		);
 		const buttonStyles = {
 			...colorProps.style,

@@ -9,10 +9,10 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
+	useElementButtonClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
-	ELEMENT_BUTTON_CLASS_NAME,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
@@ -43,7 +43,7 @@ export default function save( { attributes, className } ) {
 			// block support.
 			'no-border-radius': style?.border?.radius === 0,
 		},
-		ELEMENT_BUTTON_CLASS_NAME
+		useElementButtonClassName.save
 	);
 	const buttonStyle = {
 		...borderProps.style,

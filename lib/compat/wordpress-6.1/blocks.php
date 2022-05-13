@@ -158,3 +158,11 @@ function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
 	return $metadata;
 }
 add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
+
+add_filter(
+	'block_editor_settings_all',
+	function( $settings ) {
+		$settings['elementButtonClassName'] = WP_THEME_JSON_GUTENBERG::ELEMENT_BUTTON_CLASS_NAME;
+		return $settings;
+	}
+);
