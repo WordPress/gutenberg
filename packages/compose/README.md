@@ -93,11 +93,15 @@ the given condition is satisfied or with the given optional prop name.
 
 _Usage_
 
-    type Props = { foo: string };
-    const Component = ( props: Props ) => <div>{ props.foo }</div>;
-    const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
-    <ConditionalComponent foo="" />; // => null
-    <ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```ts
+type Props = { foo: string };
+const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const ConditionalComponent = ifCondition(
+	( props: Props ) => props.foo.length !== 0
+)( Component );
+<ConditionalComponent foo="" />; // => null
+<ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```
 
 _Parameters_
 
