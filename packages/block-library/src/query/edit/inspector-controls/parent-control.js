@@ -17,7 +17,7 @@ const EMPTY_ARRAY = [];
 const SUGGESTIONS_QUERY = {
 	per_page: 20,
 	order: 'asc',
-	orderby: 'title',
+	orderby: 'relevance',
 	_fields: 'id,title',
 	context: 'view',
 };
