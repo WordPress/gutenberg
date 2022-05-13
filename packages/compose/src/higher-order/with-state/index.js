@@ -9,6 +9,8 @@ import deprecated from '@wordpress/deprecated';
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
 
+/** @typedef {import('react').ComponentType} ComponentType */
+
 /**
  * A Higher Order Component used to provide and manage internal component state
  * via props.
@@ -25,7 +27,9 @@ export default function withState( initialState = {} ) {
 		alternative: 'wp.element.useState',
 	} );
 
-	return createHigherOrderComponent( ( OriginalComponent ) => {
+	return createHigherOrderComponent( (
+		/** @type ComponentType */ OriginalComponent
+	) => {
 		return class WrappedComponent extends Component {
 			constructor( /** @type {any} */ props ) {
 				super( props );

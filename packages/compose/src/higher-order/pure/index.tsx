@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentProps, ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -10,23 +15,19 @@ import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
- * External dependencies
- */
-import type { ComponentProps, ComponentType } from 'react';
-
-/**
  * Given a component returns the enhanced component augmented with a component
  * only re-rendering when its props/state change
  */
-const pure: < Inner extends ComponentType< any > >(
-	Inner: Inner
-) => ComponentType< ComponentProps< Inner > > = createHigherOrderComponent(
-	< Props extends Record< string, any > >(
+const pure = createHigherOrderComponent(
+	< Props extends ComponentProps< any >, State = any >(
 		Wrapped: ComponentType< Props >
-	) => {
+	): ComponentType< Props > => {
 		if ( Wrapped.prototype instanceof Component ) {
-			return class extends Component< Props > {
-				shouldComponentUpdate( nextProps: Props, nextState: Props ) {
+			return class extends Component< Props, State > {
+				shouldComponentUpdate(
+					nextProps: Readonly< Props >,
+					nextState: Readonly< State >
+				) {
 					return (
 						! isShallowEqual( nextProps, this.props ) ||
 						! isShallowEqual( nextState, this.state )
@@ -36,7 +37,7 @@ const pure: < Inner extends ComponentType< any > >(
 		}
 
 		return class extends Component< Props > {
-			shouldComponentUpdate( nextProps: Props ) {
+			shouldComponentUpdate( nextProps: Readonly< Props > ) {
 				return ! isShallowEqual( nextProps, this.props );
 			}
 

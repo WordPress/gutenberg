@@ -22,27 +22,26 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
  * In the case of this component, we only handle the simplest case where
  * `setTimeout` only accepts a function (not a string) and an optional delay.
  */
-type TimeoutProps = {
+interface TimeoutProps extends ComponentProps< any > {
 	setTimeout: ( fn: () => void, delay: number ) => number;
 	clearTimeout: ( id: number ) => void;
-};
+}
 
 /**
  * A higher-order component used to provide and manage delayed function calls
  * that ought to be bound to a component's lifecycle.
  */
-const withSafeTimeout: < Inner extends ComponentType< any > >(
-	Inner: Inner
-) => ComponentType<
-	Omit< ComponentProps< Inner >, keyof TimeoutProps >
-> = createHigherOrderComponent(
-	< Props extends Record< string, any > >(
+const withSafeTimeout = createHigherOrderComponent(
+	<
+		Props extends Partial< TimeoutProps >,
+		OProps extends Omit< Props, 'setTimeout' | 'clearTimeout' >
+	>(
 		OriginalComponent: ComponentType< Props >
-	) => {
-		return class WrappedComponent extends Component< Props > {
+	): ComponentType< OProps > => {
+		return class WrappedComponent extends Component< OProps > {
 			timeouts: number[];
 
-			constructor( props: Props ) {
+			constructor( props: OProps ) {
 				super( props );
 				this.timeouts = [];
 				this.setTimeout = this.setTimeout.bind( this );
@@ -68,13 +67,14 @@ const withSafeTimeout: < Inner extends ComponentType< any > >(
 			}
 
 			render() {
-				const props = {
-					...this.props,
-					setTimeout: this.setTimeout,
-					clearTimeout: this.clearTimeout,
-				};
-
-				return <OriginalComponent { ...props } />;
+				return (
+					// @ts-expect-error
+					<OriginalComponent
+						{ ...this.props }
+						setTimeout={ this.setTimeout }
+						clearTimeout={ this.clearTimeout }
+					/>
+				);
 			}
 		};
 	},
