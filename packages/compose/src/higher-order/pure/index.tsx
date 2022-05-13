@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ComponentType } from 'react';
+import type { ComponentClass, ComponentProps, ComponentType } from 'react';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ const pure = createHigherOrderComponent(
 		Wrapped: ComponentType< Props >
 	): ComponentType< Props > => {
 		if ( Wrapped.prototype instanceof Component ) {
-			return class extends Component< Props, State > {
+			return class extends ( Wrapped as ComponentClass< Props, State > ) {
 				shouldComponentUpdate(
 					nextProps: Readonly< Props >,
 					nextState: Readonly< State >
