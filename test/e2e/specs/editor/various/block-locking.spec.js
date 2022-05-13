@@ -13,8 +13,7 @@ test.describe( 'Block Locking', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Some paragraph' );
 
-			await editor.clickBlockToolbarButton( 'Options' );
-			await page.click( 'role=menuitem[name="Lock"]' );
+			await editor.clickBlockOptionsMenuItem( 'Lock' );
 
 			await page.click( 'role=checkbox[name="Prevent removal"]' );
 			await page.click( 'role=button[name="Apply"]' );
@@ -31,8 +30,7 @@ test.describe( 'Block Locking', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Second paragraph' );
 
-			await editor.clickBlockToolbarButton( 'Options' );
-			await page.click( 'role=menuitem[name="Lock"]' );
+			await editor.clickBlockOptionsMenuItem( 'Lock' );
 
 			await page.click( 'role=checkbox[name="Disable movement"]' );
 			await page.click( 'role=button[name="Apply"]' );
@@ -55,8 +53,7 @@ test.describe( 'Block Locking', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Some paragraph' );
 
-			await editor.clickBlockToolbarButton( 'Options' );
-			await page.click( 'role=menuitem[name="Lock"]' );
+			await editor.clickBlockOptionsMenuItem( 'Lock' );
 
 			await page.click( 'role=checkbox[name="Lock all"]' );
 			await page.click( 'role=button[name="Apply"]' );
@@ -71,8 +68,7 @@ test.describe( 'Block Locking', () => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'Some paragraph' );
 
-			await editor.clickBlockToolbarButton( 'Options' );
-			await page.click( 'role=menuitem[name="Lock"]' );
+			await editor.clickBlockOptionsMenuItem( 'Lock' );
 
 			await page.click( 'role=checkbox[name="Lock all"]' );
 			await page.click( 'role=button[name="Apply"]' );
