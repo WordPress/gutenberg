@@ -14,10 +14,8 @@ import { useDebounce } from '@wordpress/compose';
 import { getEntitiesInfo, mapToIHasNameAndId } from '../../utils';
 
 const EMPTY_ARRAY = [];
-const SUGGESTIONS_QUERY = {
-	per_page: 20,
+const BASE_QUERY = {
 	order: 'asc',
-	orderby: 'relevance',
 	_fields: 'id,title',
 	context: 'view',
 };
@@ -39,9 +37,11 @@ function ParentControl( { parents, postType, onChange } ) {
 				'postType',
 				postType,
 				{
-					...SUGGESTIONS_QUERY,
+					...BASE_QUERY,
 					search,
+					orderby: 'relevance',
 					exclude: parents,
+					per_page: 20,
 				},
 			];
 			return {
@@ -59,8 +59,9 @@ function ParentControl( { parents, postType, onChange } ) {
 			if ( ! parents?.length ) return EMPTY_ARRAY;
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', postType, {
-				...SUGGESTIONS_QUERY,
+				...BASE_QUERY,
 				include: parents,
+				per_page: parents.length,
 			} );
 		},
 		[ parents ]
