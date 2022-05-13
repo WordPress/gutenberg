@@ -100,7 +100,7 @@ function ParentControl( { parents, postType, onChange } ) {
 	useEffect( () => {
 		if ( ! searchHasResolved ) return;
 		setSuggestions( entitiesInfo.names );
-	}, [ entitiesInfo.names?.join(), searchHasResolved ] );
+	}, [ entitiesInfo.names, searchHasResolved ] );
 
 	const getIdByValue = ( entitiesMappedByName, entity ) => {
 		const id = entity?.id || entitiesMappedByName?.[ entity ]?.id;
