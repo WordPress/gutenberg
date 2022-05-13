@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { Image as RNImage, View, TouchableWithoutFeedback } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 /**
@@ -45,7 +45,7 @@ import {
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
+import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -465,25 +465,27 @@ export class ImageEdit extends Component {
 
 	onSelectURL( newURL ) {
 		const {
-			attributes: url,
 			createErrorNotice,
 			imageDefaultSize,
 			setAttributes,
 		} = this.props;
 
-		if ( newURL !== url ) {
-			if ( isURL( newURL ) ) {
+		// Use RN's Image.getSize to determine if URL is a valid image
+		RNImage.getSize(
+			newURL,
+			( width, height ) => {
 				setAttributes( {
 					url: newURL,
 					id: undefined,
-					width: undefined,
-					height: undefined,
+					width,
+					height,
 					sizeSlug: imageDefaultSize,
 				} );
-			} else {
+			},
+			() => {
 				createErrorNotice( __( 'Invalid URL. Image file not found.' ) );
 			}
-		}
+		);
 	}
 
 	onFocusCaption() {
