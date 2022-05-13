@@ -4,6 +4,11 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState, useEffect } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import DatePicker from '../date';
@@ -22,9 +27,16 @@ const meta: ComponentMeta< typeof DatePicker > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof DatePicker > = ( args ) => (
-	<DatePicker { ...args } />
-);
+const Template: ComponentStory< typeof DatePicker > = ( {
+	currentDate,
+	...args
+} ) => {
+	const [ date, setDate ] = useState( currentDate );
+	useEffect( () => {
+		setDate( currentDate );
+	}, [ currentDate ] );
+	return <DatePicker { ...args } currentDate={ date } onChange={ setDate } />;
+};
 
 export const Default: ComponentStory< typeof DatePicker > = Template.bind( {} );
 
