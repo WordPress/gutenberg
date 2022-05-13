@@ -233,19 +233,10 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
+
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
 
-	const shouldEscapeTitle =
-		title !== '' &&
-		normalizedTitle !== normalizedURL &&
-		originalLabel !== title;
-
-	const decodedTitle = decodeEntities( title );
-
-	const label = shouldEscapeTitle
-		? decodedTitle
-		: originalLabel || escape( normalizedURL );
+	const label = decodeEntities( title ) || originalLabel || normalizedURL;
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -746,7 +737,7 @@ export default function NavigationLinkEdit( {
 										ref={ ref }
 										identifier="label"
 										className="wp-block-navigation-item__label"
-										value={ label }
+										value={ escape( label ) }
 										onChange={ ( labelValue ) =>
 											setAttributes( {
 												label: labelValue,
