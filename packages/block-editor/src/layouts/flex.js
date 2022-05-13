@@ -116,7 +116,7 @@ export default {
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
-				: 'var( --wp--style--block-gap, 0.5em )';
+				: 'var( --wp--style--block-gap, , var( --wp--style--root--block-gap, 0.5em ) )';
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;

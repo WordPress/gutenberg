@@ -8,8 +8,8 @@
 		}
 	},
 	"styles" : {
-		"spacing": { "padding": "50px",
-"blockGap": "44px"
+		"spacing": {
+			"blockGap": "44px"
 		},
 		"blocks": {
 			"core/group": {

@@ -125,7 +125,7 @@ export default {
 			blockGapStyleValue?.top &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? blockGapStyleValue?.top
-				: 'var( --wp--style--block-gap )';
+				: 'var( --wp--style--block-gap, var( --wp--style--root--block-gap ) )';
 
 		let output =
 			!! contentSize || !! wideSize
