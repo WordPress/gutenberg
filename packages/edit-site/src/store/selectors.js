@@ -128,6 +128,10 @@ export const getSettings = createSelector(
 				state,
 				'showIconLabels'
 			),
+			allowRightClickOverrides: !! __unstableGetPreference(
+				state,
+				'allowRightClickOverrides'
+			),
 			__experimentalSetIsInserterOpened: setIsInserterOpen,
 			__experimentalReusableBlocks: getReusableBlocks( state ),
 			__experimentalPreferPatternsOnRoot:
@@ -155,6 +159,7 @@ export const getSettings = createSelector(
 		__unstableGetPreference( state, 'fixedToolbar' ),
 		__unstableGetPreference( state, 'keepCaretInsideBlock' ),
 		__unstableGetPreference( state, 'showIconLabels' ),
+		__unstableGetPreference( state, 'allowRightClickOverrides' ),
 		getReusableBlocks( state ),
 		getEditedPostType( state ),
 	]

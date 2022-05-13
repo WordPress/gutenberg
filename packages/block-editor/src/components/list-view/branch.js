@@ -82,7 +82,6 @@ const countReducer = (
 
 function ListViewBranch( props ) {
 	const {
-		allowRightClickOverrides,
 		blocks,
 		selectBlock,
 		showBlockMovers,
@@ -145,9 +144,6 @@ function ListViewBranch( props ) {
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
 							<ListViewBlock
-								allowRightClickOverrides={
-									allowRightClickOverrides
-								}
 								block={ block }
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }

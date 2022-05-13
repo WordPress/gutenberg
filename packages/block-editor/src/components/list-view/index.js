@@ -50,22 +50,15 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}  props                          Components props.
- * @param {boolean} props.allowRightClickOverrides Flag to enable right click contextual menu.
- * @param {string}  props.id                       An HTML element id for the root element of ListView.
- * @param {Array}   props.blocks                   Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {boolean} props.showBlockMovers          Flag to enable block movers
- * @param {boolean} props.isExpanded               Flag to determine whether nested levels are expanded by default.
- * @param {Object}  ref                            Forwarded ref
+ * @param {Object}  props                 Components props.
+ * @param {string}  props.id              An HTML element id for the root element of ListView.
+ * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers Flag to enable block movers
+ * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                   Forwarded ref
  */
 function ListView(
-	{
-		allowRightClickOverrides,
-		id,
-		blocks,
-		showBlockMovers = false,
-		isExpanded = false,
-	},
+	{ id, blocks, showBlockMovers = false, isExpanded = false },
 	ref
 ) {
 	const {
@@ -198,7 +191,6 @@ function ListView(
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
-						allowRightClickOverrides={ allowRightClickOverrides }
 						blocks={ clientIdsTree }
 						selectBlock={ selectEditorBlock }
 						showBlockMovers={ showBlockMovers }

@@ -36,6 +36,7 @@ function Editor( {
 	...props
 } ) {
 	const {
+		allowRightClickOverrides,
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
@@ -80,6 +81,9 @@ function Editor( {
 			const isViewable = getPostType( postType )?.viewable ?? false;
 
 			return {
+				allowRightClickOverrides: isFeatureActive(
+					'allowRightClickOverrides'
+				),
 				hasFixedToolbar:
 					isFeatureActive( 'fixedToolbar' ) ||
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
@@ -118,6 +122,7 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
+			allowRightClickOverrides,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -145,6 +150,7 @@ function Editor( {
 
 		return result;
 	}, [
+		allowRightClickOverrides,
 		settings,
 		hasFixedToolbar,
 		focusMode,
