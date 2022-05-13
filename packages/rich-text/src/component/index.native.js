@@ -1050,6 +1050,7 @@ export class RichText extends Component {
 			baseGlobalStyles,
 			selectionStart,
 			selectionEnd,
+			disableSuggestions,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1230,11 +1231,13 @@ export class RichText extends Component {
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
-						<BlockFormatControls>
-							<ToolbarButtonWithOptions
-								options={ this.suggestionOptions() }
-							/>
-						</BlockFormatControls>
+						{ ! disableSuggestions && (
+							<BlockFormatControls>
+								<ToolbarButtonWithOptions
+									options={ this.suggestionOptions() }
+								/>
+							</BlockFormatControls>
+						) }
 					</>
 				) }
 			</View>

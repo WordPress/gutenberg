@@ -76,6 +76,7 @@ function removeNativeProps( props ) {
 		'minWidth',
 		'maxWidth',
 		'setRef',
+		'disableSuggestions',
 	] );
 }
 
