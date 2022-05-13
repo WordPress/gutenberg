@@ -9,7 +9,7 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -25,6 +25,10 @@ export default function ListViewSidebar() {
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
+	const allowRightClickOverrides = useSelect( ( select ) =>
+		select( editPostStore ).isFeatureActive( 'allowRightClickOverrides' )
+	);
+
 	function closeOnEscape( event ) {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -60,7 +64,9 @@ export default function ListViewSidebar() {
 					focusOnMountRef,
 				] ) }
 			>
-				<ListView />
+				<ListView
+					allowRightClickOverrides={ allowRightClickOverrides }
+				/>
 			</div>
 		</div>
 	);

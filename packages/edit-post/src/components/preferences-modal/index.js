@@ -145,6 +145,15 @@ export default function EditPostPreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
+							<EnableFeature
+								featureName="allowRightClickOverrides"
+								help={ __(
+									'Allows contextual menus via right-click, overriding browser defaults.'
+								) }
+								label={ __(
+									'Allow right-click contextual menus'
+								) }
+							/>
 						</PreferencesModalSection>
 					</>
 				),

@@ -59,6 +59,7 @@ export function reinitializeEditor( target, settings ) {
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	{
 		dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+			allowRightClickOverrides: true,
 			editorMode: 'visual',
 			fixedToolbar: false,
 			focusMode: false,

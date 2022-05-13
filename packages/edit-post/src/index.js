@@ -107,6 +107,7 @@ export function initializeEditor(
 	);
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,

@@ -40,6 +40,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
+	allowRightClickOverrides,
 	block,
 	isDragged,
 	isSelected,
@@ -176,7 +177,7 @@ function ListViewBlock( {
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback( ( event ) => {
-		if ( showBlockActions ) {
+		if ( showBlockActions && allowRightClickOverrides ) {
 			event.preventDefault();
 			settingsRef.current?.click();
 		}
