@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ChangeEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -15,17 +16,48 @@ import { Icon, check, reset } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import type { CheckboxControlProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export default function CheckboxControl( {
-	label,
-	className,
-	heading,
-	checked,
-	indeterminate,
-	help,
-	onChange,
-	...props
-} ) {
+/**
+ * Checkboxes allow the user to select one or more items from a set.
+ *
+ * ```jsx
+ * import { CheckboxControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyCheckboxControl = () => {
+ *   const [ isChecked, setChecked ] = useState( true );
+ *   return (
+ *     <CheckboxControl
+ *       label="Is author"
+ *       help="Is the user a author or not?"
+ *       checked={ isChecked }
+ *       onChange={ setChecked }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export function CheckboxControl(
+	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
+	// ref forwarding to CheckboxControl.
+	props: Omit<
+		WordPressComponentProps< CheckboxControlProps, 'input', false >,
+		'ref'
+	>
+) {
+	const {
+		label,
+		className,
+		heading,
+		checked,
+		indeterminate,
+		help,
+		onChange,
+		...additionalProps
+	} = props;
+
 	if ( heading ) {
 		deprecated( '`heading` prop in `CheckboxControl`', {
 			alternative: 'a separate element to implement a heading',
@@ -38,9 +70,9 @@ export default function CheckboxControl( {
 		false
 	);
 
-	// Run the following callback everytime the `ref` (and the additional
+	// Run the following callback every time the `ref` (and the additional
 	// dependencies) change.
-	const ref = useRefEffect(
+	const ref = useRefEffect< HTMLInputElement >(
 		( node ) => {
 			if ( ! node ) {
 				return;
@@ -56,7 +88,8 @@ export default function CheckboxControl( {
 	);
 	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
-	const onChangeValue = ( event ) => onChange( event.target.checked );
+	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+		onChange( event.target.checked );
 
 	return (
 		<BaseControl
@@ -75,7 +108,7 @@ export default function CheckboxControl( {
 					onChange={ onChangeValue }
 					checked={ checked }
 					aria-describedby={ !! help ? id + '__help' : undefined }
-					{ ...props }
+					{ ...additionalProps }
 				/>
 				{ showIndeterminateIcon ? (
 					<Icon
@@ -101,3 +134,5 @@ export default function CheckboxControl( {
 		</BaseControl>
 	);
 }
+
+export default CheckboxControl;
