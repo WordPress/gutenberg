@@ -7,5 +7,15 @@
 			"wideSize": "1100px"
 		}
 	},
+	"styles" : {
+		"spacing": { "padding": "50px" },
+		"blocks": {
+			"core/group": {
+				"spacing": {
+					"blockGap": "100px"
+				}
+			}
+		}
+	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

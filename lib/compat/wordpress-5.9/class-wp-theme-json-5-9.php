@@ -850,7 +850,7 @@ class WP_Theme_JSON_5_9 {
 				continue;
 			}
 
-			$selector = $metadata['selector'];
+			$selector = ':root';
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$declarations = array_merge( static::compute_preset_vars( $node, $origins ), static::compute_theme_vars( $node ) );
@@ -891,6 +891,9 @@ class WP_Theme_JSON_5_9 {
 			$declaration_block = array_reduce(
 				$declarations,
 				function ( $carry, $element ) {
+					if ( array_key_exists( $element['name'], static::ROOT_STYLE_CSS_VARIABLES ) ) {
+
+					}
 					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
 				''
 			);
