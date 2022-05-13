@@ -52,6 +52,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 help="Shows block breadcrumbs at the bottom of the editor."
                 label="Display block breadcrumbs"
               />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="allowRightClickOverrides"
+                help="Allows contextual menus via right-click, overriding browser defaults."
+                label="Allow right-click contextual menus"
+              />
             </Section>
           </React.Fragment>,
           "name": "general",
@@ -182,6 +187,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                 featureName="showBlockBreadcrumbs"
                 help="Shows block breadcrumbs at the bottom of the editor."
                 label="Display block breadcrumbs"
+              />
+              <WithSelect(WithDispatch(BaseOption))
+                featureName="allowRightClickOverrides"
+                help="Allows contextual menus via right-click, overriding browser defaults."
+                label="Allow right-click contextual menus"
               />
             </Section>
           </React.Fragment>,
