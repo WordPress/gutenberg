@@ -33,6 +33,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	Fragment,
 	useState,
@@ -234,13 +235,16 @@ export const updateNavigationLinkBlockAttributes = (
 	} = updatedValue;
 	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
-	const escapeTitle =
+
+	const shouldEscapeTitle =
 		title !== '' &&
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 
-	const label = escapeTitle
-		? escape( title )
+	const decodedTitle = decodeEntities( title );
+
+	const label = shouldEscapeTitle
+		? decodedTitle
 		: originalLabel || escape( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
