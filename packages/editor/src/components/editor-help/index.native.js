@@ -125,10 +125,17 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 												</HelpSectionTitle>
 												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
-													( { label, icon } ) => {
+													(
+														{ label, icon },
+														index
+													) => {
 														const labelSlug = kebabCase(
 															label
 														);
+														const isLastItem =
+															index ===
+															HELP_TOPICS.length -
+																1;
 														return (
 															<HelpTopicRow
 																key={
@@ -138,6 +145,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 																icon={ icon }
 																screenName={
 																	labelSlug
+																}
+																isLastItem={
+																	isLastItem
 																}
 															/>
 														);
