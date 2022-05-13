@@ -1252,10 +1252,17 @@ RichText.defaultProps = {
 };
 
 const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} = props;
 	const { formatTypes } = useFormatTypes( {
-		clientId: props.clientId,
-		identifier: props.identifier,
-		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
