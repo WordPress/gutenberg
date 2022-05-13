@@ -31,6 +31,21 @@
 	padding: 0;
 }
 
+.helpSectionTitleContainer {
+	margin-top: 24px;
+	margin-bottom: 16px;
+}
+
+.helpSectionTitle {
+	color: $light-primary;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.helpSectionTitleDark {
+	color: $dark-secondary;
+}
+
 .helpDetailContainer {
 	padding: 0 16px;
 }

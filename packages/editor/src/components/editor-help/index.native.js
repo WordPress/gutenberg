@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { kebabCase } from 'lodash';
-import { Text, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
 /**
@@ -17,7 +17,6 @@ import { __ } from '@wordpress/i18n';
 import { helpFilled, plusCircleFilled, trash, cog } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
@@ -35,7 +34,8 @@ import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
 import RemoveBlocks from './remove-blocks';
 import CustomizeBlocks from './customize-blocks';
-import moveBlocksIcon from './icon-move-blocks.native';
+import moveBlocksIcon from './icon-move-blocks';
+import HelpSectionTitle from './help-section-title';
 
 const HELP_TOPICS = [
 	{
@@ -61,11 +61,6 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
-
-	const sectionTitle = usePreferredColorSchemeStyle(
-		styles.helpDetailSectionHeading,
-		styles.helpDetailSectionHeadingDark
-	);
 
 	const title =
 		postType === 'page'
@@ -125,9 +120,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											} }
 										>
 											<PanelBody>
-												<Text style={ sectionTitle }>
+												<HelpSectionTitle>
 													{ __( 'The basics' ) }
-												</Text>
+												</HelpSectionTitle>
 												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
 													( { label, icon } ) => {
@@ -149,11 +144,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 													}
 												) }
 												{
-													<Text
-														style={ sectionTitle }
-													>
+													<HelpSectionTitle>
 														{ __( 'Get support' ) }
-													</Text>
+													</HelpSectionTitle>
 												}
 												{
 													<HelpGetSupportButton
