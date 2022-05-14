@@ -49,10 +49,8 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	useEffect( () => {
 		if ( !! showPreview ) {
 			setIsPreview( true );
-		} else {
-			setIsPreview( false );
 		}
-	}, [ showPreview ] );
+	}, [] );
 
 	function switchToPreview() {
 		setIsPreview( true );
