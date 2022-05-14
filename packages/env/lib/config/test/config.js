@@ -59,7 +59,6 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'core' );
 			const config = await readConfig( '.wp-env.json' );
-
 			expect( config.env.development.coreSource ).not.toBeNull();
 			expect( config.env.tests.coreSource ).not.toBeNull();
 			expect( config.env.development.pluginSources ).toHaveLength( 0 );
@@ -102,7 +101,6 @@ describe( 'readConfig', () => {
 
 			process.env.WP_ENV_HOME = 'here/is/a/path';
 			const configWith = await readConfig( '.wp-env.json' );
-
 			expect(
 				configWith.workDirectoryPath.includes(
 					`here${ sep }is${ sep }a${ sep }path`
