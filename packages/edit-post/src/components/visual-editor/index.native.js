@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Platform } from '@wordpress/element';
 import { BlockList } from '@wordpress/block-editor';
 /**
  * External dependencies
@@ -25,27 +25,35 @@ export default class VisualEditor extends Component {
 	}
 
 	componentDidMount() {
-		this.keyboardDidShow = Keyboard.addListener(
-			'keyboardDidShow',
-			this.keyboardDidShow
-		);
-		this.keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			this.keyboardDidHide
-		);
+		if ( Platform.isIOS ) {
+			this.keyboardDidShow = Keyboard.addListener(
+				'keyboardDidShow',
+				this.keyboardDidShow
+			);
+			this.keyboardDidHideListener = Keyboard.addListener(
+				'keyboardDidHide',
+				this.keyboardDidHide
+			);
+		}
 	}
 
 	componentWillUnmount() {
-		this.keyboardDidShow.remove();
-		this.keyboardDidHideListener.remove();
+		if ( Platform.isIOS ) {
+			this.keyboardDidShow.remove();
+			this.keyboardDidHideListener.remove();
+		}
 	}
 
 	keyboardDidShow() {
-		this.setState( { isAutoScrollEnabled: false } );
+		if ( Platform.isIOS ) {
+			this.setState( { isAutoScrollEnabled: false } );
+		}
 	}
 
 	keyboardDidHide() {
-		this.setState( { isAutoScrollEnabled: true } );
+		if ( Platform.isIOS ) {
+			this.setState( { isAutoScrollEnabled: true } );
+		}
 	}
 
 	renderHeader() {
@@ -55,7 +63,12 @@ export default class VisualEditor extends Component {
 
 	render() {
 		const { safeAreaBottomInset } = this.props;
-		const { isAutoScrollEnabled } = this.state;
+
+		// Not needed for autoscroll behavior on Android, so reduce rerenders
+		// by keeping the passed prop constant on Android.
+		const isAutoScrollEnabled = Platform.isIOS
+			? this.state.isAutoScrollEnabled
+			: undefined;
 
 		return (
 			<BlockList
