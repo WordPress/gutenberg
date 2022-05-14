@@ -3,7 +3,8 @@
 		"name": "core/html",
 		"isValid": true,
 		"attributes": {
-			"content": "<h1>Some HTML code</h1>\n<div>This is a div</div>"
+			"content": "<h1>Some HTML code</h1>\n<div>This is a div</div>",
+			"showPreview": false
 		},
 		"innerBlocks": []
 	}
