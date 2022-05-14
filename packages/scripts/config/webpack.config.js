@@ -235,6 +235,24 @@ const config = {
 					from: copyWebpackPatterns,
 					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( blockJson[ key ] ) {
+										blockJson[ key ] = blockJson[
+											key
+										].replace( /\.(j|t)sx?$/, '.js' );
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
 				},
 			],
 		} ),
