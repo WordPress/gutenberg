@@ -541,7 +541,7 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-	"core": "WordPress/WordPress#trunk",
+	"core": "WordPress/WordPress#master",
 	"plugins": [ "." ]
 }
 ```
