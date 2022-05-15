@@ -21,7 +21,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
 	__unstableBlockNameContext,
-	InnerBlocks,
 } from '@wordpress/block-editor';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
@@ -189,9 +188,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						className="edit-site-block-editor__block-list wp-site-blocks"
 						__experimentalLayout={ LAYOUT }
 						renderAppender={
-							isTemplatePart && hasBlocks
-								? false
-								: InnerBlocks.ButtonBlockAppender
+							isTemplatePart && hasBlocks ? false : undefined
 						}
 					/>
 				</ResizableEditor>
