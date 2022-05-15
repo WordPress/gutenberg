@@ -4,7 +4,7 @@
  */
 const { readFile, stat } = require( 'fs' ).promises;
 const os = require( 'os' );
-const { sep, resolve } = require( 'path' );
+const { join, resolve } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -103,7 +103,7 @@ describe( 'readConfig', () => {
 			const configWith = await readConfig( '.wp-env.json' );
 			expect(
 				configWith.workDirectoryPath.includes(
-					`here${ sep }is${ sep }a${ sep }path`
+					join( 'here', 'is', 'a', 'path' )
 				)
 			).toBe( true );
 
@@ -111,7 +111,7 @@ describe( 'readConfig', () => {
 			const configWithout = await readConfig( '.wp-env.json' );
 			expect(
 				configWithout.workDirectoryPath.includes(
-					`here${ sep }is${ sep }a${ sep }path`
+					join( 'here', 'is', 'a', 'path' )
 				)
 			).toBe( false );
 
@@ -132,7 +132,7 @@ describe( 'readConfig', () => {
 			const configWith = await readConfig( '.wp-env.json' );
 			expect(
 				configWith.workDirectoryPath.includes(
-					`here${ sep }is${ sep }a${ sep }path`
+					join( 'here', 'is', 'a', 'path' )
 				)
 			).toBe( true );
 
@@ -140,7 +140,7 @@ describe( 'readConfig', () => {
 			const configWithout = await readConfig( '.wp-env.json' );
 			expect(
 				configWithout.workDirectoryPath.includes(
-					`here${ sep }is${ sep }a${ sep }path`
+					join( 'here', 'is', 'a', 'path' )
 				)
 			).toBe( false );
 
@@ -260,6 +260,7 @@ describe( 'readConfig', () => {
 				)
 			);
 			const config = await readConfig( '.wp-env.json' );
+
 			expect( config.env.development ).toMatchObject( {
 				pluginSources: [
 					{
@@ -682,6 +683,7 @@ describe( 'readConfig', () => {
 			expect( config.env.development.mappings ).toEqual( {
 				test1: {
 					basename: 'test1',
+					// resolve is required to remove drive letters on Windows.
 					path: resolve( '/test1' ),
 					type: 'local',
 				},
