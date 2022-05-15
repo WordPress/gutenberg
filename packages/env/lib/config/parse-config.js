@@ -145,7 +145,11 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
 
-	if ( ! gitHubFields[ 5 ] && gitHubFields[ 1 ] === 'WordPress' ) {
+	if (
+		gitHubFields &&
+		! gitHubFields[ 5 ] &&
+		gitHubFields[ 1 ] === 'WordPress'
+	) {
 		gitHubFields[ 5 ] =
 			gitHubFields[ 2 ] === 'WordPress' ? 'master' : 'trunk';
 	}
