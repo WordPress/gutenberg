@@ -82,6 +82,7 @@ function CoverEdit( {
 	context: { postId, postType },
 } ) {
 	const {
+		align,
 		contentPosition,
 		id,
 		useFeaturedImage,
@@ -305,10 +306,10 @@ function CoverEdit( {
 				currentSettings={ currentSettings }
 			/>
 			<div
-				{ ...blockProps }
-				className={ classnames( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
-				data-url={ url }
+				className={ classnames( 'block-library-cover__outer-wrapper', {
+					[ `align${ align }` ]: align,
+					'is-selected': isSelected,
+				} ) }
 			>
 				<ResizableCover
 					className="block-library-cover__resize-container"
@@ -325,54 +326,60 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
+				<div
+					{ ...blockProps }
+					className={ classnames( classes, blockProps.className ) }
+					style={ { ...style, ...blockProps.style } }
+					data-url={ url }
+				>
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ { backgroundImage: gradientValue, ...bgStyle } }
+					/>
 
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__background',
-						dimRatioToClass( dimRatio ),
-						{
-							[ overlayColor.class ]: overlayColor.class,
-							'has-background-dim': dimRatio !== undefined,
-							// For backwards compatibility. Former versions of the Cover Block applied
-							// `.wp-block-cover__gradient-background` in the presence of
-							// media, a gradient and a dim.
-							'wp-block-cover__gradient-background':
-								url && gradientValue && dimRatio !== 0,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
+					{ url && isImageBackground && isImgElement && (
+						<img
+							ref={ mediaElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
 					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
-				/>
-
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ mediaElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
+					{ url && isVideoBackground && (
+						<video
+							ref={ mediaElement }
+							className="wp-block-cover__video-background"
+							autoPlay
+							muted
+							loop
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) }
+					{ isUploadingMedia && <Spinner /> }
+					<CoverPlaceholder
+						disableMediaButtons
+						onSelectMedia={ onSelectMedia }
+						onError={ onUploadError }
 					/>
-				) }
-				{ url && isVideoBackground && (
-					<video
-						ref={ mediaElement }
-						className="wp-block-cover__video-background"
-						autoPlay
-						muted
-						loop
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
-				{ isUploadingMedia && <Spinner /> }
-				<CoverPlaceholder
-					disableMediaButtons
-					onSelectMedia={ onSelectMedia }
-					onError={ onUploadError }
-				/>
-				<div { ...innerBlocksProps } />
+					<div { ...innerBlocksProps } />
+				</div>
 			</div>
 		</>
 	);
