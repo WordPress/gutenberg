@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 // Styles that overrides the calendar styling provided by react-dates goes in
 // style.scss. Everything else goes here.
@@ -33,4 +34,19 @@ export const Day = styled.div< DayProps >`
 			width: 4px;
 		}
 		` }
+`;
+
+const baseNavButton = css`
+	position: absolute;
+	top: 15px;
+`;
+
+export const prevNavButton = css`
+	${ baseNavButton }
+	left: 0;
+`;
+
+export const nextNavButton = css`
+	${ baseNavButton }
+	right: 0;
 `;

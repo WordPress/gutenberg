@@ -19,13 +19,16 @@ const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController 
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { isRTL, _n, sprintf } from '@wordpress/i18n';
+import { arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { getMomentDate } from '../utils';
 import type { DatePickerDayProps, DatePickerProps } from '../types';
-import { Day } from './styles';
+import { Day, prevNavButton, nextNavButton } from './styles';
+import Button from '../../button';
+import { useCx } from '../../utils';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
@@ -90,6 +93,8 @@ function DatePicker( {
 	onMonthPreviewed,
 }: DatePickerProps ) {
 	const nodeRef = useRef< HTMLDivElement >( null );
+	const cx = useCx();
+
 	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
 		onMonthPreviewed?.( newMonthDate.toISOString() );
 		keepFocusInside();
@@ -162,6 +167,7 @@ function DatePicker( {
 			<TypedDayPickerSingleDateController
 				date={ momentDate }
 				daySize={ 30 }
+				horizontalMonthPadding={ 0 }
 				focused
 				hideKeyboardShortcutsPanel
 				// This is a hack to force the calendar to update on month or year change
@@ -192,6 +198,26 @@ function DatePicker( {
 						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
 						{ month.format( 'YYYY' ) }
 					</>
+				) }
+				// @ts-ignore The react-dates typings are missing this prop.
+				renderNavPrevButton={ ( { ariaLabel, ...props } ) => (
+					<Button
+						className={ cx( prevNavButton ) }
+						icon={ arrowLeft }
+						variant="tertiary"
+						aria-label={ ariaLabel }
+						{ ...props }
+					/>
+				) }
+				// @ts-ignore The react-dates typings are missing this prop.
+				renderNavNextButton={ ( { ariaLabel, ...props } ) => (
+					<Button
+						className={ cx( nextNavButton ) }
+						icon={ arrowRight }
+						variant="tertiary"
+						aria-label={ ariaLabel }
+						{ ...props }
+					/>
 				) }
 				onFocusChange={ noop }
 			/>
