@@ -8,7 +8,7 @@ export function defaultColumnsNumber( imageCount ) {
 }
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	const imageProps = pick( image, [ 'alt', 'id', 'link' ] );
 	imageProps.url =
 		get( image, [ 'sizes', sizeSlug, 'url' ] ) ||
 		get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] ) ||
