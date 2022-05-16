@@ -20,6 +20,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { useSetting } from '@wordpress/block-editor';
 
@@ -386,6 +387,7 @@ export default compose( [
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
+			__unstableMarkLastChangeAsPersistent,
 		} = dispatch( blockEditorStore );
 
 		return {
@@ -419,8 +421,19 @@ export default compose( [
 			onChange: ( attributes ) => {
 				updateBlockAttributes( ownProps.clientId, attributes );
 			},
-			onReplace( blocks, indexToSelect ) {
-				replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+			onReplace( blocks, indexToSelect, initialPosition ) {
+				if (
+					blocks.length &&
+					! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
+				) {
+					__unstableMarkLastChangeAsPersistent();
+				}
+				replaceBlocks(
+					[ ownProps.clientId ],
+					blocks,
+					indexToSelect,
+					initialPosition
+				);
 			},
 		};
 	} ),

@@ -276,7 +276,7 @@ function RichTextWrapper(
 							value: before,
 							multilineTag,
 						} ),
-						! isAfterOriginal
+						isAfterOriginal
 					)
 				);
 				lastPastedBlockIndex += 1;
@@ -304,7 +304,7 @@ function RichTextWrapper(
 							value: after,
 							multilineTag,
 						} ),
-						isAfterOriginal
+						! isAfterOriginal
 					)
 				);
 			}

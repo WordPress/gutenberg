@@ -1236,11 +1236,18 @@ function selectionHelper( state = {}, action ) {
 				return {};
 			}
 
+			const offset =
+				action.initialPosition !== undefined
+					? action.initialPosition == -1
+						? blockToSelect.value.legnth
+						: 0
+					: state.offset;
+
 			if ( blockToSelect.clientId === state.clientId ) {
-				return state;
+				return { ...state, offset };
 			}
 
-			return { clientId: blockToSelect.clientId };
+			return { clientId: blockToSelect.clientId, offset };
 		}
 	}
 
