@@ -22,7 +22,7 @@ import ColorGradientControl from './control';
 
 // When the `ColorGradientSettingsDropdown` controls are being rendered to a
 // `ToolsPanel` they must be wrapped in a `ToolsPanelItem`.
-const WithToolsPanelItem = ( { setting, children, ...props } ) => {
+const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 	const clearValue = () => {
 		if ( setting.colorValue ) {
 			setting.onColorChange();
@@ -42,10 +42,9 @@ const WithToolsPanelItem = ( { setting, children, ...props } ) => {
 					? setting.isShownByDefault
 					: true
 			}
-			resetAllFilter={ () => {} }
 			{ ...props }
 			className="block-editor-tools-panel-color-gradient-settings__item"
-			panelId="sdds"
+			panelId={ panelId }
 		>
 			{ children }
 		</ToolsPanelItem>

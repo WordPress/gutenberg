@@ -89,8 +89,7 @@ export const PanelColorGradientSettingsInner = ( {
 					);
 				} );
 			} }
-			key={ 'asaa' }
-			panelId="sdds"
+			panelId={ panelId }
 			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"
@@ -99,7 +98,7 @@ export const PanelColorGradientSettingsInner = ( {
 			<ColorGradientSettingsDropdown
 				settings={ settings }
 				__experimentalIsItemGroup={ false }
-				panelId="sdds"
+				panelId={ panelId }
 				{ ...{
 					colors,
 					gradients,
