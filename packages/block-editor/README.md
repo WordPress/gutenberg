@@ -347,6 +347,10 @@ _Returns_
 
 Undocumented declaration.
 
+### ELEMENT_BUTTON_CLASS_NAME
+
+Undocumented declaration.
+
 ### FontSizePicker
 
 _Related_
