@@ -133,7 +133,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 			return {
 				type: 'git',
 				url: sshUrl.href.split( '#' )[ 0 ],
-				ref: sshUrl.hash.slice( 1 ) || 'master',
+				ref: sshUrl.hash.slice( 1 ) || undefined,
 				path: workingPath,
 				clonePath: workingPath,
 				basename,
@@ -145,20 +145,11 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
 
-	if (
-		gitHubFields &&
-		! gitHubFields[ 5 ] &&
-		gitHubFields[ 1 ] === 'WordPress'
-	) {
-		gitHubFields[ 5 ] =
-			gitHubFields[ 2 ] === 'WordPress' ? 'master' : 'trunk';
-	}
-
 	if ( gitHubFields ) {
 		return {
 			type: 'git',
 			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 5 ] || 'main',
+			ref: gitHubFields[ 5 ],
 			path: path.resolve(
 				workDirectoryPath,
 				gitHubFields[ 2 ],

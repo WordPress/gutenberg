@@ -1,6 +1,9 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ],
+	"plugins": [
+		".",
+		"ssh://git@github.com/wpengine/atlas-content-modeler#main"
+	],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
 		"tests": {
