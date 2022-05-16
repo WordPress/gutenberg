@@ -30,6 +30,13 @@
 				"link": true
 			}
 		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,

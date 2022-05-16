@@ -635,7 +635,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), spacing (blockGap, padding), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
 ## Next Page
@@ -644,7 +644,7 @@ Displays the next posts page link. ([Source](https://github.com/WordPress/gutenb
 
 -	**Name:** core/query-pagination-next
 -	**Category:** theme
--	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Page Numbers
@@ -653,7 +653,7 @@ Displays a list of page numbers for pagination ([Source](https://github.com/Word
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
--	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Previous Page
@@ -662,7 +662,7 @@ Displays the previous posts page link. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/query-pagination-previous
 -	**Category:** theme
--	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Query Title
