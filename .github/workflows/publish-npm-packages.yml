@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
     release:
-        name: Release ${{ github.event.inputs.release_type }}
+        name: Release - ${{ github.event.inputs.release_type }}
         runs-on: ubuntu-latest
         environment: WordPress packages
         steps:
@@ -73,7 +73,7 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-            - name: Publish packages to npm for WP major ("wp/${{ github.event.inputs.wp_version }}" dist-tag)
+            - name: Publish packages to npm for WP major ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd main
