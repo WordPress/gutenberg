@@ -5,16 +5,69 @@ import fetch from 'node-fetch';
 
 import { spawnSync } from 'node:child_process';
 
+const LABEL = "Backport to WP Beta/RC";
+const BRANCH = getCurrentBranch();
+const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', ['auth', 'status'] )
+	?.stderr
+	?.toString()
+	.includes( '✓ Logged in to github.com as' );
+if ( !GITHUB_CLI_AVAILABLE ) {
+	// communicate the situation
+	// ask the user whether to proceed
+	// add a CLI option to explicitly disable the automatic GitHub handling
+	// add a CLI option to disable user interactions for CI use
+	// add a CLI option to override the label
+}
+const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
+
 async function main() {
+	console.log( `Running git pull origin ${ BRANCH } --rebase...` );
+	spawnSync( 'git', ['pull', 'origin', BRANCH, '--rebase'], {
+		cwd: process.cwd(),
+		env: process.env,
+		stdio: 'pipe',
+		encoding: 'utf-8',
+	} );
+
 	const PRs = await fetchPRs();
 	console.log( 'Trying to cherry-pick one by one...' );
-	const [successes, failures] = cherryPickAll( PRs );
-	report( successes, failures );
+	const results = cherryPickAll( PRs );
+	const successes = results[ 0 ].map( enrichWithGithubCommentAndUrl );
+	const failures = results[ 1 ].map( enrichWithGithubCommentAndUrl );
+
+	console.log( 'Cherry-picking finished!' );
+	reportSummaryNextSteps( successes, failures );
+
+	if ( successes.length ) {
+		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+			console.log( `Pushing to origin/${ BRANCH }` );
+			cli( 'git', ['push', 'origin', BRANCH] );
+
+			console.log( `Commenting and removing labels...` );
+			successes.forEach( commentAndRemoveLabel );
+		} else {
+			console.log( "Cherry-picked PRs with copy-able comments:" );
+			successes.forEach( reportSuccessManual );
+		}
+	}
+	if ( failures.length ) {
+		console.log( "PRs that could not be cherry-picked automatically:" );
+		failures.forEach( reportFailure );
+	}
+	console.log( `Done!` );
+}
+
+function cli( command, args ) {
+	const result = spawnSync( command, args );
+	if ( result.status !== 0 ) {
+		throw new Error( result.stderr?.toString()?.trim() );
+	}
+	return result.stdout.toString().trim();
 }
 
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
-		'/search/issues?q=is:pr state:closed sort:updated label:"Backport to WP Beta/RC" repo:WordPress/gutenberg',
+		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`,
 	);
 	const PRs = items.map( ( { id, number, title } ) => ( { id, number, title } ) );
 	console.log( 'Found the following PRs to cherry-pick: ' );
@@ -67,11 +120,6 @@ function cherryPickAll( PRs ) {
 			break;
 		}
 	}
-	console.log( 'Cherry-picking finished!' );
-	console.log( 'Summary:' );
-	console.log( indent( `✅  ${ allSuccesses.length } PRs got cherry-picked cleanly` ) );
-	console.log( indent( `${ remainingPRs.length > 0 ? '❌' : '✅' }  ${ remainingPRs.length } PRs failed` ) );
-	console.log( '' );
 	return [allSuccesses, remainingPRs];
 }
 
@@ -127,49 +175,70 @@ function cherryPickOne( commit ) {
 	return commitHashOutput.stdout.toString().trim();
 }
 
-function report( successes, failures ) {
-	const branch = getCurrentBranch();
-	console.log( "Next steps:" );
-	let n = 1;
-	if ( successes.length ) {
-		console.log( indent( `${ n ++ }. Push this branch` ) );
-		console.log( indent( `${ n ++ }. Go to each of the cherry-picked Pull Requests` ) );
-		console.log( indent( `${ n ++ }. Remove the Backport to WP Beta/RC label` ) );
-		console.log( indent( `${ n ++ }. Request a backport to wordpress-develop if required` ) );
-		console.log( indent( `${ n ++ }. Comment, say that PR just got cherry-picked` ) );
-	}
-	if ( failures.length ) {
-		console.log( indent( `${ n ++ }. Manually cherry-pick the PRs that failed` ) );
-	}
+function reportSummaryNextSteps( successes, failures ) {
+	console.log( 'Summary:' );
+	console.log( indent( `✅  ${ successes.length } PRs got cherry-picked cleanly` ) );
+	console.log(
+		indent( `${ failures.length > 0 ? '❌' : '✅' }  ${ failures.length } PRs failed` ) );
 	console.log( '' );
-	if ( successes.length ) {
-		console.log( "Cherry-picked PRs with copy-able comments:" );
-		for ( const { number, title, cherryPickHash } of successes ) {
-			console.log( indent( `https://github.com/WordPress/gutenberg/pull/${ number } ` ) );
-			console.log( indent( `#${ number } ${ title }` ) );
-			console.log( '' );
-			console.log(
-				indent(
-					`I just cherry-picked this PR to the ${ branch } branch to get it included in the next release: ${ cherryPickHash }` ) );
-			console.log( '' );
-		}
-		// gh pr comment:
-		// https://cli.github.com/manual/gh_pr_comment
-		// Also remove the label
+
+	const nextSteps = [];
+	if ( successes.length && !AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+		nextSteps.push( 'Push this branch' );
+		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
+		nextSteps.push( 'Remove the Backport to WP Beta/RC label' );
+		nextSteps.push( 'Request a backport to wordpress-develop if required' );
+		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
 	if ( failures.length ) {
-		console.log( "PRs that could not be cherry-picked automatically:" );
-		console.log( '' );
-		for ( const { number, title, mergeCommitHash, error } of failures ) {
-			console.log( indent( `https://github.com/WordPress/gutenberg/pulls/${ number } ` ) );
-			console.log( indent( `#${ number } ${ title }` ) );
-			console.log( indent( `git cherry-pick ${ mergeCommitHash }`, 6 ) );
-			console.log( indent( `failed with:`, 6 ) );
-			console.log( indent( `${ error }`, 6 ) );
-			console.log( '' );
-		}
+		nextSteps.push( 'Manually cherry-pick the PRs that failed' );
 	}
-	console.log( `Done!` );
+	if ( nextSteps.length ) {
+		console.log( "Next steps:" );
+		for ( let i = 0; i < nextSteps.length; i ++ ) {
+			console.log( indent( `${ i + 1 }. ${ nextSteps[ i ] }` ) );
+		}
+		console.log( '' );
+	}
+}
+
+function commentAndRemoveLabel( pr ) {
+	const { number, comment } = pr;
+	try {
+		cli( 'gh', ['pr', 'comment', number, comment] );
+		cli( 'gh', ['pr', 'edit', number, '--remove-label', LABEL] );
+		console.log( `✅ ${ number }: ${ comment }` );
+	} catch ( e ) {
+		console.log( `❌ ${ number }. ${ comment } ` );
+		console.log( indent( 'Error: ' ) );
+		console.error( e );
+		console.log( indent( 'You will need to manually process this PR: ' ) );
+		reportSuccessManual( pr );
+	}
+}
+
+function reportSuccessManual( { number, comment, url } ) {
+	console.log( indent( url ) );
+	console.log( indent( `#${ number } ${ title }` ) );
+	console.log( indent( comment ) );
+	console.log( '' );
+}
+
+function reportFailure( { number, mergeCommitHash, url } ) {
+	console.log( indent( url ) );
+	console.log( indent( `#${ number } ${ title }` ) );
+	console.log( indent( `git cherry-pick ${ mergeCommitHash }`, 6 ) );
+	console.log( indent( `failed with:`, 6 ) );
+	console.log( indent( `${ error }`, 6 ) );
+	console.log( '' );
+}
+
+function enrichWithGithubCommentAndUrl( pr ) {
+	return {
+		...pr,
+		url: `https://github.com/WordPress/gutenberg/pull/${ pr.number } `,
+		comment: `I just cherry-picked this PR to the ${ BRANCH } branch to get it included in the next release: ${ pr.cherryPickHash }`,
+	};
 }
 
 function getCurrentBranch() {
