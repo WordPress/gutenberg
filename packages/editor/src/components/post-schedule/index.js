@@ -3,7 +3,7 @@
  */
 import { __experimentalGetSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { DateTimePicker } from '@wordpress/components';
+import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
 import { useRef, useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -21,7 +21,7 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 	).toISOString();
 }
 
-export default function PostSchedule() {
+export default function PostSchedule( { onClose } ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -82,13 +82,14 @@ export default function PostSchedule() {
 	}
 
 	return (
-		<DateTimePicker
+		<PublishDateTimePicker
 			ref={ ref }
 			currentDate={ postDate }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 			events={ events }
 			onMonthPreviewed={ setPreviewedMonth }
+			onClose={ onClose }
 		/>
 	);
 }

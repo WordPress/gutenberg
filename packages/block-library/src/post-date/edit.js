@@ -18,13 +18,13 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalDateFormatPicker as DateFormatPicker,
+	__experimentalPublishDateTimePicker as PublishDateTimePicker,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
 	ToggleControl,
-	DateTimePicker,
 	PanelBody,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -101,13 +101,14 @@ export default function PostDateEdit( {
 					<ToolbarGroup>
 						<Dropdown
 							popoverProps={ { anchorRef: timeRef.current } }
-							renderContent={ () => (
-								<DateTimePicker
+							renderContent={ ( { onClose } ) => (
+								<PublishDateTimePicker
 									currentDate={ date }
 									onChange={ setDate }
 									is12Hour={ is12HourFormat(
 										siteTimeFormat
 									) }
+									onClose={ onClose }
 								/>
 							) }
 							renderToggle={ ( { isOpen, onToggle } ) => {
