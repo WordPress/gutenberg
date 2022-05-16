@@ -145,7 +145,7 @@ function report( successes, failures ) {
 	if ( successes.length ) {
 		console.log( "Cherry-picked PRs with copy-able comments:" );
 		for ( const { number, title, cherryPickHash } of successes ) {
-			console.log( indent( `https://github.com/WordPress/gutenberg/pulls/${ number } ` ) );
+			console.log( indent( `https://github.com/WordPress/gutenberg/pull/${ number } ` ) );
 			console.log( indent( `#${ number } ${ title }` ) );
 			console.log( '' );
 			console.log(
@@ -153,6 +153,9 @@ function report( successes, failures ) {
 					`I just cherry-picked this PR to the ${ branch } branch to get it included in the next release: ${ cherryPickHash }` ) );
 			console.log( '' );
 		}
+		// gh pr comment:
+		// https://cli.github.com/manual/gh_pr_comment
+		// Also remove the label
 	}
 	if ( failures.length ) {
 		console.log( "PRs that could not be cherry-picked automatically:" );
