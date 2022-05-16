@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { useDisabled } from '@wordpress/compose';
 import { createContext } from '@wordpress/element';
 
 /**

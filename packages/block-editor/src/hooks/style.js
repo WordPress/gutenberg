@@ -1,18 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	first,
-	forEach,
-	get,
-	has,
-	isEmpty,
-	isString,
-	kebabCase,
-	map,
-	omit,
-	startsWith,
-} from 'lodash';
+import { get, has, isEmpty, kebabCase, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -58,7 +47,7 @@ const VARIABLE_REFERENCE_PREFIX = 'var:';
 const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
 function compileStyleValue( uncompiledValue ) {
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -82,13 +71,13 @@ export function getInlineStyles( styles = {} ) {
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
 		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== first( path ) ) {
+		if ( has( styles, path ) && 'elements' !== path?.[ 0 ] ) {
 			// Checking if style value is a string allows for shorthand css
 			// option and backwards compatibility for border radius support.
 			const styleValue = get( styles, path );
 
 			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
-				if ( !! subPaths && ! isString( styleValue ) ) {
+				if ( !! subPaths && typeof styleValue !== 'string' ) {
 					Object.entries( subPaths ).forEach( ( entry ) => {
 						const [ name, subPath ] = entry;
 						const value = get( styleValue, [ subPath ] );
@@ -120,24 +109,25 @@ export function getInlineStyles( styles = {} ) {
 }
 
 function compileElementsStyles( selector, elements = {} ) {
-	return map( elements, ( styles, element ) => {
-		const elementStyles = getInlineStyles( styles );
-		if ( ! isEmpty( elementStyles ) ) {
-			// The .editor-styles-wrapper selector is required on elements styles. As it is
-			// added to all other editor styles, not providing it causes reset and global
-			// styles to override element styles because of higher specificity.
-			return [
-				`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
-				...map(
-					elementStyles,
-					( value, property ) =>
-						`\t${ kebabCase( property ) }: ${ value };`
-				),
-				'}',
-			].join( '\n' );
-		}
-		return '';
-	} ).join( '\n' );
+	return Object.entries( elements )
+		.map( ( [ element, styles ] ) => {
+			const elementStyles = getInlineStyles( styles );
+			if ( ! isEmpty( elementStyles ) ) {
+				// The .editor-styles-wrapper selector is required on elements styles. As it is
+				// added to all other editor styles, not providing it causes reset and global
+				// styles to override element styles because of higher specificity.
+				return [
+					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
+					...Object.entries( elementStyles ).map(
+						( [ cssProperty, value ] ) =>
+							`\t${ kebabCase( cssProperty ) }: ${ value };`
+					),
+					'}',
+				].join( '\n' );
+			}
+			return '';
+		} )
+		.join( '\n' );
 }
 
 /**
@@ -235,8 +225,7 @@ export function addSaveProps(
 	}
 
 	let { style } = attributes;
-
-	forEach( skipPaths, ( path, indicator ) => {
+	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization = getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {

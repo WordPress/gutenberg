@@ -47,6 +47,13 @@ export type BorderBoxControlProps = ColorProps &
 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
 		 */
 		value: AnyBorder;
+		/**
+		 * Start opting into the larger default height that will become the
+		 * default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next36pxDefaultSize?: boolean;
 	};
 
 export type LinkedButtonProps = {
@@ -62,6 +69,13 @@ export type LinkedButtonProps = {
 	 * `BorderBoxControl`.
 	 */
 	onClick: () => void;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type VisualizerProps = {
@@ -71,6 +85,13 @@ export type VisualizerProps = {
 	 * color, style, and width.
 	 */
 	value?: Borders;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };
 
 export type SplitControlsProps = ColorProps & {
@@ -95,4 +116,11 @@ export type SplitControlsProps = ColorProps & {
 	 * color, style, and width.
 	 */
 	value?: Borders;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 };

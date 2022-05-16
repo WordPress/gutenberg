@@ -59,10 +59,48 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
  * Registers the `core/post-terms` block on the server.
  */
 function register_block_core_post_terms() {
+	$taxonomies = get_taxonomies(
+		array(
+			'public'       => true,
+			'show_in_rest' => true,
+		),
+		'objects'
+	);
+
+	// Split the available taxonomies to `built_in` and custom ones,
+	// in order to prioritize the `built_in` taxonomies at the
+	// search results.
+	$built_ins         = array();
+	$custom_variations = array();
+
+	// Create and register the eligible taxonomies variations.
+	foreach ( $taxonomies as $taxonomy ) {
+		$variation = array(
+			'name'        => $taxonomy->name,
+			'title'       => $taxonomy->label,
+			/* translators: %s: taxonomy's label */
+			'description' => sprintf( __( 'Display the assigned taxonomy: %s' ), $taxonomy->label ),
+			'attributes'  => array(
+				'term' => $taxonomy->name,
+			),
+			'isActive'    => array( 'term' ),
+		);
+		// Set the category variation as the default one.
+		if ( 'category' === $taxonomy->name ) {
+			$variation['isDefault'] = true;
+		}
+		if ( $taxonomy->_builtin ) {
+			$built_ins[] = $variation;
+		} else {
+			$custom_variations[] = $variation;
+		}
+	}
+
 	register_block_type_from_metadata(
 		__DIR__ . '/post-terms',
 		array(
 			'render_callback' => 'render_block_core_post_terms',
+			'variations'      => array_merge( $built_ins, $custom_variations ),
 		)
 	);
 }

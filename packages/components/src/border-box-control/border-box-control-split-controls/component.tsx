@@ -29,6 +29,7 @@ const BorderBoxControlSplitControls = (
 		value,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
 
@@ -40,11 +41,15 @@ const BorderBoxControlSplitControls = (
 		isCompact: true,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize,
 	};
 
 	return (
 		<Grid { ...otherProps } ref={ forwardedRef } gap={ 4 }>
-			<BorderBoxControlVisualizer value={ value } />
+			<BorderBoxControlVisualizer
+				value={ value }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
+			/>
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision={ true }

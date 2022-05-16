@@ -16,7 +16,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { useDisabled } from '@wordpress/compose';
 import { createInterpolateElement } from '@wordpress/element';
 
 /**
@@ -173,9 +173,9 @@ export default function PostCommentsEdit( {
 
 										<div className="comment-metadata">
 											<a href="#top">
-												<time dateTime="2000-01-01T00:00:00+00:00">
+												<time dateTime="2000-01-01T12:00:00+00:00">
 													{ __(
-														'January 1, 2000 at 00:00 am'
+														'January 1, 2000 at 12:00 am'
 													) }
 												</time>
 											</a>{ ' ' }

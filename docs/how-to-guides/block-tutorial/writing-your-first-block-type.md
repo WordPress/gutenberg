@@ -42,10 +42,10 @@ Create a basic `block.json` file there:
 ```json
 {
 	"apiVersion": 2,
-	"name": "gutenberg-examples/example-01-basic-esnext",
 	"title": "Example: Basic (ESNext)",
-	"icon": "universal-access-alt",
+	"name": "gutenberg-examples/example-01-basic-esnext",
 	"category": "layout",
+	"icon": "universal-access-alt",
 	"editorScript": "file:./build/index.js"
 }
 ```

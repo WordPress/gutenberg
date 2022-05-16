@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * @typedef IHasNameAndId
@@ -45,6 +51,22 @@ export const getEntitiesInfo = ( entities ) => {
 		entities,
 		...mapping,
 	};
+};
+
+/**
+ * Helper util to map records to add a `name` prop from a
+ * provided path, in order to handle all entities in the same
+ * fashion(implementing`IHasNameAndId` interface).
+ *
+ * @param {Object[]} entities The array of entities.
+ * @param {string}   path     The path to map a `name` property from the entity.
+ * @return {IHasNameAndId[]} An array of enitities that now implement the `IHasNameAndId` interface.
+ */
+export const mapToIHasNameAndId = ( entities, path ) => {
+	return ( entities || [] ).map( ( entity ) => ( {
+		...entity,
+		name: decodeEntities( get( entity, path ) ),
+	} ) );
 };
 
 /**

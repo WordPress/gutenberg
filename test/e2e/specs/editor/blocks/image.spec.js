@@ -23,16 +23,16 @@ test.describe( 'Image', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { pageUtils } ) => {
-		await pageUtils.createNewPost();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'can be inserted', async ( { page, pageUtils, imageBlockUtils } ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+	test( 'can be inserted', async ( { editor, page, imageBlockUtils } ) => {
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -52,15 +52,15 @@ test.describe( 'Image', () => {
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
-		expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+		expect( await editor.getEditedPostContent() ).toMatch( regex );
 	} );
 
 	test( 'should replace, reset size, and keep selection', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -83,11 +83,11 @@ test.describe( 'Image', () => {
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 			);
-			expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+			expect( await editor.getEditedPostContent() ).toMatch( regex );
 		}
 
 		{
-			await pageUtils.openDocumentSettingsSidebar();
+			await editor.openDocumentSettingsSidebar();
 			await page.click(
 				'role=group[name="Image size presets"i] >> role=button[name="25%"i]'
 			);
@@ -101,11 +101,11 @@ test.describe( 'Image', () => {
 <!-- /wp:image -->`
 			);
 
-			expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+			expect( await editor.getEditedPostContent() ).toMatch( regex );
 		}
 
 		{
-			await pageUtils.showBlockToolbar();
+			await editor.showBlockToolbar();
 			await page.click( 'role=button[name="Replace"i]' );
 
 			const replacedFilename = await imageBlockUtils.upload(
@@ -127,7 +127,7 @@ test.describe( 'Image', () => {
 <figure class="wp-block-image size-full"><img src="[^"]+\\/${ replacedFilename }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 			);
-			expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+			expect( await editor.getEditedPostContent() ).toMatch( regex );
 		}
 
 		{
@@ -137,16 +137,16 @@ test.describe( 'Image', () => {
 			await image.click();
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await pageUtils.getEditedPostContent() ).toBe( '' );
+			expect( await editor.getEditedPostContent() ).toBe( '' );
 		}
 	} );
 
 	test( 'should place caret at end of caption after merging empty paragraph', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -169,11 +169,11 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'should allow soft line breaks in caption', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -197,11 +197,12 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'should have keyboard navigable toolbar for caption', async ( {
+		editor,
 		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -234,11 +235,11 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'should drag and drop files into media placeholder', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -276,12 +277,13 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'allows zooming using the crop tools', async ( {
+		editor,
 		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
 		// Insert the block, upload a file and crop.
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -299,8 +301,8 @@ test.describe( 'Image', () => {
 		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
 
 		// Zoom in to twice the amount using the zoom input.
-		await pageUtils.clickBlockToolbarButton( 'Crop' );
-		await pageUtils.clickBlockToolbarButton( 'Zoom' );
+		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Zoom' );
 		await expect(
 			page.locator( 'role=slider[name="Zoom"i]' )
 		).toBeFocused();
@@ -313,7 +315,7 @@ test.describe( 'Image', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( '200' );
 		await page.keyboard.press( 'Escape' );
-		await pageUtils.clickBlockToolbarButton( 'Apply' );
+		await editor.clickBlockToolbarButton( 'Apply' );
 
 		// Wait for the cropping tools to disappear.
 		await expect(
@@ -333,12 +335,12 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'allows changing aspect ratio using the crop tools', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
 		// Insert the block, upload a file and crop.
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -356,12 +358,12 @@ test.describe( 'Image', () => {
 		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
 
 		// Zoom in to twice the amount using the zoom input.
-		await pageUtils.clickBlockToolbarButton( 'Crop' );
-		await pageUtils.clickBlockToolbarButton( 'Aspect Ratio' );
+		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
 		await page.click(
 			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="16:10"i]'
 		);
-		await pageUtils.clickBlockToolbarButton( 'Apply' );
+		await editor.clickBlockToolbarButton( 'Apply' );
 
 		// Wait for the cropping tools to disappear.
 		await expect(
@@ -381,12 +383,12 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'allows rotating using the crop tools', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
 		// Insert the block, upload a file and crop.
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -403,9 +405,9 @@ test.describe( 'Image', () => {
 		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
 
 		// Rotate the image.
-		await pageUtils.clickBlockToolbarButton( 'Crop' );
-		await pageUtils.clickBlockToolbarButton( 'Rotate' );
-		await pageUtils.clickBlockToolbarButton( 'Apply' );
+		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Rotate' );
+		await editor.clickBlockToolbarButton( 'Apply' );
 
 		// Wait for the cropping tools to disappear.
 		await expect(
@@ -422,11 +424,11 @@ test.describe( 'Image', () => {
 	} );
 
 	test( 'Should reset dimensions on change URL', async ( {
+		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -444,7 +446,7 @@ test.describe( 'Image', () => {
 			);
 
 			// Resize the Uploaded Image.
-			await pageUtils.openDocumentSettingsSidebar();
+			await editor.openDocumentSettingsSidebar();
 			await page.click(
 				'role=group[name="Image size presets"i] >> role=button[name="25%"i]'
 			);
@@ -456,14 +458,14 @@ test.describe( 'Image', () => {
 			);
 
 			// Check if dimensions are changed.
-			expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+			expect( await editor.getEditedPostContent() ).toMatch( regex );
 		}
 
 		{
 			const imageUrl = '/wp-includes/images/w-logo-blue.png';
 
 			// Replace uploaded image with an URL.
-			await pageUtils.clickBlockToolbarButton( 'Replace' );
+			await editor.clickBlockToolbarButton( 'Replace' );
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
@@ -476,16 +478,17 @@ test.describe( 'Image', () => {
 			);
 
 			// Check if dimensions are reset.
-			expect( await pageUtils.getEditedPostContent() ).toMatch( regex );
+			expect( await editor.getEditedPostContent() ).toMatch( regex );
 		}
 	} );
 
 	test( 'should undo without broken temporary state', async ( {
+		editor,
 		page,
 		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = page.locator(
 			'role=document[name="Block: Image"i]'
@@ -502,8 +505,7 @@ test.describe( 'Image', () => {
 
 		// Expect an empty image block (placeholder) rather than one with a
 		// broken temporary URL.
-		expect( await pageUtils.getEditedPostContent() )
-			.toBe( `<!-- wp:image -->
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->` );
 	} );

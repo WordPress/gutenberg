@@ -2,26 +2,18 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.heading );
-		let headingBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.heading,
-			1,
-			{
-				useWaitForVisible: true,
-			}
+		let headingBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.heading
 		);
-		if ( isAndroid() ) {
-			await headingBlockElement.click();
-		}
-		await editorPage.sendTextToHeadingBlock(
+
+		await editorPage.typeTextToTextBlock(
 			headingBlockElement,
-			testData.heading,
-			false
+			testData.heading
 		);
 
 		await editorPage.addNewBlock( blockNames.paragraph );
@@ -29,7 +21,7 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
@@ -39,7 +31,7 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			3
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
@@ -49,7 +41,7 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.heading,
 			4
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			headingBlockElement,
 			testData.heading
 		);
@@ -59,9 +51,12 @@ describe( 'Gutenberg Editor tests', () => {
 			blockNames.paragraph,
 			5
 		);
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
+
+		// Assert that even though there are 5 blocks, there should only be 3 paragraph blocks
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 3 );
 	} );
 } );

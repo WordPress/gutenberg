@@ -21,7 +21,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __experimentalUseDisabled as useDisabled } from '@wordpress/compose';
+import { useDisabled } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';

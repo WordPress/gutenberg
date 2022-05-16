@@ -54,6 +54,7 @@ const BorderControl = (
 		withSlider,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -81,6 +82,7 @@ const BorderControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__next36pxDefaultSize={ __next36pxDefaultSize }
 					/>
 					<UnitControl
 						className={ widthControlClassName }

@@ -464,48 +464,102 @@ const waitForMediaLibrary = async ( driver ) => {
 	await waitForVisible( driver, locator );
 };
 
-const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
-	const maxIteration = 25;
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25
+ * @param {number} iteration - Default value is 0
+ * @return {string} - Returns the first element found, empty string if not found
+ */
+const waitForVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		throw new Error(
+		// if element not found, print error and return empty string
+		// eslint-disable-next-line no-console
+		console.error(
 			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
 		);
+		return '';
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
 		await driver.sleep( timeout );
 	}
 
-	const locator = await driver.elementsByXPath( elementLocator );
-	if ( locator.length !== 1 ) {
+	const element = await driver.elementsByXPath( elementLocator );
+	if ( element.length !== 1 ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, iteration + 1 );
+		return waitForVisible(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
 	}
-	return locator[ 0 ];
+
+	return element[ 0 ];
+};
+
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @return {boolean} - Returns true if element is found, false otherwise
+ */
+const isElementVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		maxIteration
+	);
+
+	// if there is no element, return false
+	if ( ! element ) {
+		return false;
+	}
+
+	return true;
+};
+
+// Only for Android
+const waitIfAndroid = async () => {
+	if ( isAndroid() ) {
+		await editorPage.driver.sleep( 1000 );
+	}
 };
 
 module.exports = {
 	backspace,
-	timer,
-	setupDriver,
-	isLocalEnvironment,
-	isAndroid,
-	typeString,
-	clickMiddleOfElement,
 	clickBeginningOfElement,
+	clickMiddleOfElement,
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	isElementVisible,
+	isLocalEnvironment,
 	longPressMiddleOfElement,
-	tapSelectAllAboveElement,
+	setupDriver,
+	stopDriver,
+	swipeDown,
+	swipeFromTo,
+	swipeUp,
 	tapCopyAboveElement,
 	tapPasteAboveElement,
-	swipeDown,
-	swipeUp,
-	swipeFromTo,
-	stopDriver,
+	tapSelectAllAboveElement,
+	timer,
 	toggleHtmlMode,
 	toggleOrientation,
-	doubleTap,
-	isEditorVisible,
+	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
+	waitIfAndroid,
 };

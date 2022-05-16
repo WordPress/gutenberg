@@ -114,7 +114,7 @@ export async function initializeEditor( props, { component } = {} ) {
 
 export * from '@testing-library/react-native';
 
-// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE.
+// Custom implementation of the waitFor utility to prevent the issue: https://github.com/callstack/react-native-testing-library/issues/379.
 export function waitFor(
 	cb,
 	{ timeout, interval } = { timeout: 1000, interval: 50 }

@@ -71,7 +71,7 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align
 -	**Attributes:** month, year
 
-## Categories
+## Categories List
 
 Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 

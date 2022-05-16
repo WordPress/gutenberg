@@ -275,6 +275,8 @@ class MediaTextEdit extends Component {
 		const widthString = `${ temporaryMediaWidth }%`;
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
+		const hasMedia =
+			mediaType === MEDIA_TYPE_IMAGE || mediaType === MEDIA_TYPE_VIDEO;
 
 		const innerBlockContainerStyle = [
 			{ width: innerBlockWidthString },
@@ -344,7 +346,7 @@ class MediaTextEdit extends Component {
 			<>
 				{ mediaType === MEDIA_TYPE_IMAGE && this.getControls() }
 				<BlockControls>
-					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
+					{ hasMedia && (
 						<ToolbarGroup>
 							<Button
 								label={ __( 'Edit media' ) }
