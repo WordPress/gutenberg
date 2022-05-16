@@ -131,25 +131,25 @@ const SiteLogo = ( {
 	}
 
 	const filename = getFilename( url );
-	let defaultedAlt;
+	let defaultAlt;
 
 	if ( alt ) {
-		defaultedAlt = alt;
+		defaultAlt = alt;
 	} else if ( filename ) {
-		defaultedAlt = sprintf(
+		defaultAlt = sprintf(
 			/* translators: %s: file name */
 			__( 'This image has an empty alt attribute; its file name is %s' ),
 			filename
 		);
 	} else {
-		defaultedAlt = __( 'This image has an empty alt attribute' );
+		defaultAlt = __( 'This image has an empty alt attribute' );
 	}
 
 	const img = (
 		<img
 			className="custom-logo"
 			src={ logoUrl }
-			alt={ defaultedAlt }
+			alt={ defaultAlt }
 			onLoad={ ( event ) => {
 				setNaturalSize(
 					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
