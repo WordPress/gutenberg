@@ -1278,7 +1278,10 @@ export default compose( [
 			? flatColorPalettes( colorPalettes )
 			: settings?.colors;
 
+		const justAProp = { qwe: 123 };
+
 		return {
+			justAProp,
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
