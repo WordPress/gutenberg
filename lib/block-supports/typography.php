@@ -311,7 +311,7 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 		return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
 	}
 
-	// Only min font size is available: max().
+	// Only minimum font size is available: max().
 	if ( $minimum_font_size_raw ) {
 		// Coerce units for ratio calculation.
 		$minimum_font_size      = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
@@ -331,7 +331,7 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 		return "max($min_size, calc($min_ratio * 1vw))";
 	}
 
-	// Only min font size is available: min().
+	// Only maximum font size is available: min().
 	if ( $maximum_font_size_raw ) {
 		// Coerce units for ratio calculation.
 		$maximum_font_size      = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, 'rem' );
