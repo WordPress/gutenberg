@@ -31,6 +31,7 @@ export const TimeWrapper = styled.div`
 
 const baseField = css`
 	height: 36px;
+	z-index: 1;
 
 	// TODO: how to use input-style__neutral() mixin?
 	box-shadow: 0 0 0 transparent;
@@ -40,6 +41,18 @@ const baseField = css`
 	@media ( prefers-reduced-motion: reduce ) {
 		transition-duration: 0s;
 		transition-delay: 0s;
+	}
+
+	&:focus {
+		// TODO: how to use input-style__focus() mixin?
+		&&& {
+			border-color: var( --wp-admin-theme-color );
+		}
+		box-shadow: 0 0 0
+			calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
+			var( --wp-admin-theme-color );
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 `;
 
