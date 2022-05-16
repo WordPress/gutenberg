@@ -97,7 +97,6 @@ export const PanelColorGradientSettingsInner = ( {
 		>
 			<ColorGradientSettingsDropdown
 				settings={ settings }
-				__experimentalIsItemGroup={ false }
 				panelId={ panelId }
 				{ ...{
 					colors,
