@@ -44,7 +44,11 @@ npm ci
 
 ### CocoaPods
 
-[CocoaPods](https://guides.cocoapods.org/using/getting-started.html) is needed to fetch React and third-party dependencies:
+[CocoaPods](https://guides.cocoapods.org/using/getting-started.html) is required to fetch React and third-party dependencies. The steps to install it vary depending on how Ruby is managed on your machine.
+
+#### System Ruby
+
+If you're using the default Ruby available with MacOS, you'll need to use the `sudo` command to install gems like Cocoapods:
 
 ```
 sudo gem install cocoapods
@@ -56,6 +60,12 @@ Note, Mac M1 is not directly compatible with Cocoapods. If you encounter issues,
 sudo arch -x86_64 gem install ffi
 arch -x86_64 pod install
 ```
+
+#### Ruby Manager
+
+It may not be necessary to manually install Cocoapods if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance. 
+
+[`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app). 
 
 ### Set up Xcode
 
