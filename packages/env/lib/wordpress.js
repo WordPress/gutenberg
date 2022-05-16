@@ -68,7 +68,7 @@ async function configureWordPress( environment, config, spinner ) {
 		if ( null === value ) {
 			continue;
 		}
-		
+
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
