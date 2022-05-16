@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { Image as RNImage, View, TouchableWithoutFeedback } from 'react-native';
+import {
+	ActivityIndicator,
+	Image as RNImage,
+	TouchableWithoutFeedback,
+	View,
+} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 
 /**
@@ -45,7 +50,7 @@ import {
 	blockSettingsScreens,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { getProtocol, hasQueryArg } from '@wordpress/url';
+import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -470,22 +475,36 @@ export class ImageEdit extends Component {
 			setAttributes,
 		} = this.props;
 
-		// Use RN's Image.getSize to determine if URL is a valid image
-		RNImage.getSize(
-			newURL,
-			( width, height ) => {
-				setAttributes( {
-					url: newURL,
-					id: undefined,
-					width,
-					height,
-					sizeSlug: imageDefaultSize,
-				} );
-			},
-			() => {
-				createErrorNotice( __( 'Invalid URL. Image file not found.' ) );
-			}
-		);
+		if ( isURL( newURL ) ) {
+			this.setState( {
+				isFetchingImage: true,
+			} );
+
+			// Use RN's Image.getSize to determine if URL is a valid image
+			RNImage.getSize(
+				newURL,
+				( width, height ) => {
+					setAttributes( {
+						url: newURL,
+						id: undefined,
+						width,
+						height,
+						sizeSlug: imageDefaultSize,
+					} );
+					this.setState( {
+						isFetchingImage: false,
+					} );
+				},
+				() => {
+					createErrorNotice( __( 'Image file not found.' ) );
+					this.setState( {
+						isFetchingImage: false,
+					} );
+				}
+			);
+		} else {
+			createErrorNotice( __( 'Invalid URL.' ) );
+		}
 	}
 
 	onFocusCaption() {
@@ -638,7 +657,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, isFetchingImage } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -813,6 +832,13 @@ export class ImageEdit extends Component {
 							} ) => {
 								return (
 									<View style={ imageContainerStyles }>
+										{ isFetchingImage && (
+											<View
+												style={ styles.image__loading }
+											>
+												<ActivityIndicator animating />
+											</View>
+										) }
 										<Image
 											align={
 												align && alignToFlex[ align ]
