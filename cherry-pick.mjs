@@ -31,9 +31,7 @@ async function main() {
 
 	const PRs = await fetchPRs();
 	console.log( 'Trying to cherry-pick one by one...' );
-	const results = cherryPickAll( PRs );
-	const successes = results[ 0 ].map( enrichWithGithubCommentAndUrl );
-	const failures = results[ 1 ].map( enrichWithGithubCommentAndUrl );
+	const [successes, failures] = cherryPickAll( PRs );
 
 	console.log( 'Cherry-picking finished!' );
 	reportSummaryNextSteps( successes, failures );
@@ -44,7 +42,7 @@ async function main() {
 			cli( 'git', ['push', 'origin', BRANCH] );
 
 			console.log( `Commenting and removing labels...` );
-			successes.forEach( commentAndRemoveLabel );
+			successes.forEach( GHcommentAndRemoveLabel );
 		} else {
 			console.log( "Cherry-picked PRs with copy-able comments:" );
 			successes.forEach( reportSuccessManual );
@@ -202,8 +200,9 @@ function reportSummaryNextSteps( successes, failures ) {
 	}
 }
 
-function commentAndRemoveLabel( pr ) {
-	const { number, comment } = pr;
+function GHcommentAndRemoveLabel( pr ) {
+	const { number, cherryPickHash } = pr;
+	const comment = prComment( cherryPickHash );
 	try {
 		cli( 'gh', ['pr', 'comment', number, comment] );
 		cli( 'gh', ['pr', 'edit', number, '--remove-label', LABEL] );
@@ -217,15 +216,15 @@ function commentAndRemoveLabel( pr ) {
 	}
 }
 
-function reportSuccessManual( { number, comment, url } ) {
-	console.log( indent( url ) );
+function reportSuccessManual( { number, cherryPickHash } ) {
+	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
-	console.log( indent( comment ) );
+	console.log( indent( prComment( cherryPickHash ) ) );
 	console.log( '' );
 }
 
-function reportFailure( { number, mergeCommitHash, url } ) {
-	console.log( indent( url ) );
+function reportFailure( { number, mergeCommitHash } ) {
+	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
 	console.log( indent( `git cherry-pick ${ mergeCommitHash }`, 6 ) );
 	console.log( indent( `failed with:`, 6 ) );
@@ -233,12 +232,12 @@ function reportFailure( { number, mergeCommitHash, url } ) {
 	console.log( '' );
 }
 
-function enrichWithGithubCommentAndUrl( pr ) {
-	return {
-		...pr,
-		url: `https://github.com/WordPress/gutenberg/pull/${ pr.number } `,
-		comment: `I just cherry-picked this PR to the ${ BRANCH } branch to get it included in the next release: ${ pr.cherryPickHash }`,
-	};
+function prUrl( number ) {
+	return `https://github.com/WordPress/gutenberg/pull/${ number } `;
+}
+
+function prComment( cherryPickHash ) {
+	return `I just cherry-picked this PR to the ${ BRANCH } branch to get it included in the next release: ${ cherryPickHash }`;
 }
 
 function getCurrentBranch() {
