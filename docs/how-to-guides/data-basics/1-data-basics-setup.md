@@ -43,35 +43,35 @@ window.addEventListener(
 	background: #FFF;
 	height: 1000px;
 }
-#my-first-gutenberg-app {
-	max-width: 500px;
-}
-#my-first-gutenberg-app ul,
-#my-first-gutenberg-app ul li {
-	list-style-type: disc;
-}
-#my-first-gutenberg-app .spinner-in-button {
+button .spinner-in-button {
 	width: 15px;
 	height: 15px;
 	margin-top: 0;
 	margin-bottom: 0;
 	margin-left: 0;
 }
-#my-first-gutenberg-app .form-buttons {
+.form-buttons {
 	display: flex;
 }
 .my-gutenberg-form .form-buttons {
 	margin-top: 20px;
 	margin-left: 1px;
 }
-#my-first-gutenberg-app .form-error {
+.form-error {
 	color: #cc1818;
 }
-#my-first-gutenberg-app .form-buttons button {
+.form-buttons button {
 	margin-right: 4px;
 }
-#my-first-gutenberg-app .form-buttons .components-spinner {
+.form-buttons .components-spinner {
 	margin-top: 0;
+}
+#my-first-gutenberg-app {
+	max-width: 500px;
+}
+#my-first-gutenberg-app ul,
+#my-first-gutenberg-app ul li {
+	list-style-type: disc;
 }
 #my-first-gutenberg-app ul {
 	padding-left: 20px;

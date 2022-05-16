@@ -54,7 +54,7 @@ function PagesList( { hasResolved, pages } ) {
 
 This is how the PagesList should look like now:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/edit-button.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
 ### Step 2: Wire the button to a delete action
 
@@ -117,7 +117,8 @@ const DeletePageButton = ({ pageId }) => {
 ```
 
 Here's how it looks like in action:
-...
+
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
 
 ### Step 4: Handle errors
 
@@ -157,7 +158,7 @@ const DeletePageButton = ({ pageId }) => {
 }
 ```
 
-Great! `DeletePageButton` is now fully aware of errors.
+Great! `DeletePageButton` is now fully aware of errors (even if `alert` is not the prettiest way to communicate them).
 
 Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do it is to set the `id` to `-1`::
 
@@ -172,7 +173,7 @@ export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 
 Once you refresh the page and click any `Delete` button, you should see the following error message:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-error.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/alert-error.png)
 
 Fantastic! We can now **remove the `pageId = pageId * -1;` line** and move on to the next step.
 
@@ -214,9 +215,9 @@ function MyFirstApp() {
 }
 ```
 
-Here's what it looks like in action:
+Once you apply the change above, the pages will disappear from the list right after the user clicks the _Delete_ button.
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/edit-form/form-inactive.png)
+And that's it!
 
 ### Wiring it all together
 
