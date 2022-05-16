@@ -10,7 +10,15 @@
 	min-width: 0;
 }
 
+.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings,
+.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings > div:not( :first-of-type ) {
+	display: block;
+}
+
+.block-editor-tools-panel-color-gradient-settings__item
+
 .block-editor-panel-color-gradient-settings {
+
 	.block-editor-panel-color-gradient-settings__panel-title {
 		display: flex;
 		gap: $grid-unit-10;
@@ -97,6 +105,7 @@
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
 	&.first {
+		margin-top: $grid-unit-30;
 		border-top-left-radius: 2px;
 		border-top-right-radius: 2px;
 		border-top: 1px solid rgba(0, 0, 0, 0.1);

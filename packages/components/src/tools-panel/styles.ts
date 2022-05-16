@@ -54,7 +54,8 @@ export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
 };
 
 export const ToolsPanelHiddenInnerWrapper = css`
-	> div:not( :first-of-type ) {
+	/* Required to meet specificity requirements */
+	&&& > div:not( :first-of-type ) {
 		display: none;
 	}
 `;
