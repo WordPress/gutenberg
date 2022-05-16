@@ -1,7 +1,9 @@
 export const MAX_FETCHED_TERMS = 100;
+export const MAX_SUGGESTED_POSTS = 20;
 export const DEFAULTS_POSTS_PER_PAGE = 3;
 
 export default {
 	MAX_FETCHED_TERMS,
+	MAX_SUGGESTED_POSTS,
 	DEFAULTS_POSTS_PER_PAGE,
 };

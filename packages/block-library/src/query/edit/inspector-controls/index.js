@@ -27,6 +27,7 @@ import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import TaxonomyControls from './taxonomy-controls';
+import ExcludePostsControl from './exclude-posts-control';
 import { usePostTypes } from '../../utils';
 
 function useIsPostTypeHierarchical( postType ) {
@@ -54,6 +55,7 @@ export default function QueryInspectorControls( {
 		order,
 		orderBy,
 		author: authorIds,
+		exclude: postIds,
 		postType,
 		sticky,
 		inherit,
@@ -168,6 +170,11 @@ export default function QueryInspectorControls( {
 				<PanelBody title={ __( 'Filters' ) }>
 					<TaxonomyControls onChange={ setQuery } query={ query } />
 					<AuthorControl value={ authorIds } onChange={ setQuery } />
+					<ExcludePostsControl
+						query={ query }
+						value={ postIds }
+						onChange={ setQuery }
+					/>
 					<TextControl
 						label={ __( 'Keyword' ) }
 						value={ querySearch }
