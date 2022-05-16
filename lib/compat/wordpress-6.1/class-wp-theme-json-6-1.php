@@ -280,25 +280,20 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				// These rules are duplicated in use-global-styles-output.js.
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 
-				$block_rules .= '.wp-site-blocks,
-				.wp-block-group.alignfull,
-				.wp-block-group.has-background,
-				.wp-block-columns.alignfull.has-background,
-				.wp-block-cover.alignfull
+				$block_rules .= '.wp-site-blocks
 				{ padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 
 				$block_rules .= '.wp-site-blocks .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: unset; }';
+				$block_rules .= '.alignfull .alignfull { margin-right: 0; margin-left: 0; }';
 
 				// Alignfull blocks in the block editor that are direct children of post content should also get negative margins.
 				if ( is_callable( 'get_current_screen' ) && get_current_screen()->is_block_editor() ) {
 					$block_rules .= 'body > .is-root-container,
-					.edit-post-visual-editor__post-title-wrapper,
-					.is-root-container .wp-block.alignfull > .wp-block-group,
-					.is-root-container .wp-block.alignfull > .wp-block-columns.has-background,
-					.is-root-container .wp-block.alignfull > .wp-block-cover
+					.edit-post-visual-editor__post-title-wrapper
 					{ padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 
 					$block_rules .= '.is-root-container .wp-block.alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); max-width: unset; width: unset; }';
+					$block_rules .= '.wp-block.alignfull .wp-block.alignfull { margin-right: 0; margin-left: 0; }';
 				}
 			}
 
