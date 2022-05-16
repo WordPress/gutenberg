@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 13.2.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix the position of the block inserter in between blocks ([40919](https://github.com/WordPress/gutenberg/pull/40919)) 
+
+
 = 13.2.0 =
 
 ## Changelog
