@@ -32,8 +32,8 @@ async function main() {
 	const PRs = await fetchPRs();
 	console.log( 'Trying to cherry-pick one by one...' );
 	const [successes, failures] = cherryPickAll( PRs );
-
 	console.log( 'Cherry-picking finished!' );
+
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
