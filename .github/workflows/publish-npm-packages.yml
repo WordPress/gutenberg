@@ -3,9 +3,17 @@ name: Publish npm packages
 on:
     workflow_dispatch:
         inputs:
-            wp_version:
-                description: 'WordPress major version'
+            release_type:
+                description: 'Release type'
                 required: true
+                type: choice
+                default: 'development'
+                options:
+                    - development
+                    - bugfix
+                    - wp
+            wp_version:
+                description: 'WordPress major version (`wp` only)'
                 type: string
 
 # Cancels all previous workflow runs for pull requests that have not completed.
@@ -16,8 +24,8 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    wp-release:
-        name: WordPress major bugfix release
+    release:
+        name: Release - ${{ github.event.inputs.release_type }}
         runs-on: ubuntu-latest
         environment: WordPress packages
         steps:
@@ -47,7 +55,26 @@ jobs:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
 
-            - name: Publish packages to npm ("wp/${{ github.event.inputs.wp_version }}" dist-tag)
+            - name: Publish development packages to npm ("next" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'development' }}
+              run: |
+                  cd main
+                  npm ci
+                  ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish packages to npm with bug fixes ("latest" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'bugfix' }}
+              run: |
+                  cd main
+                  npm ci
+                  ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish packages to npm for WP major ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd main
                   npm ci
