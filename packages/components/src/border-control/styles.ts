@@ -170,8 +170,16 @@ export const colorIndicatorWrapper = (
 	`;
 };
 
+export const borderControlPopover = css`
+	/* Remove padding from content, this will be re-added via inner elements*/
+	&& .components-popover__content {
+		padding: 0;
+		width: 264px;
+	}
+`;
+
 export const borderControlPopoverControls = css`
-	width: 264px;
+	padding: ${ space( 2 ) };
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;

@@ -66,6 +66,10 @@ export function useBorderControlDropdown(
 		);
 	}, [ border, cx, __next36pxDefaultSize ] );
 
+	const popoverClassName = useMemo( () => {
+		return cx( styles.borderControlPopover );
+	}, [ cx ] );
+
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );
 	}, [ cx ] );
@@ -88,6 +92,7 @@ export function useBorderControlDropdown(
 		onColorChange,
 		onStyleChange,
 		onReset,
+		popoverClassName,
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
