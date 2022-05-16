@@ -19,6 +19,7 @@ import {
 	useSetting,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
+	__experimentalUseBorderProps as useBorderProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -96,6 +97,8 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 	} = attributes;
+
+	const borderProps = useBorderProps( attributes );
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
@@ -326,53 +329,61 @@ function CoverEdit( {
 					showHandle={ isSelected }
 				/>
 
-				<span
-					aria-hidden="true"
+				<div
 					className={ classnames(
-						'wp-block-cover__background',
-						dimRatioToClass( dimRatio ),
-						{
-							[ overlayColor.class ]: overlayColor.class,
-							'has-background-dim': dimRatio !== undefined,
-							// For backwards compatibility. Former versions of the Cover Block applied
-							// `.wp-block-cover__gradient-background` in the presence of
-							// media, a gradient and a dim.
-							'wp-block-cover__gradient-background':
-								url && gradientValue && dimRatio !== 0,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
+						'block-library-cover__border-wrapper',
+						borderProps.className
 					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
-				/>
+					style={ { ...borderProps.style } }
+				>
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ { backgroundImage: gradientValue, ...bgStyle } }
+					/>
 
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ mediaElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
+					{ url && isImageBackground && isImgElement && (
+						<img
+							ref={ mediaElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) }
+					{ url && isVideoBackground && (
+						<video
+							ref={ mediaElement }
+							className="wp-block-cover__video-background"
+							autoPlay
+							muted
+							loop
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) }
+					{ isUploadingMedia && <Spinner /> }
+					<CoverPlaceholder
+						disableMediaButtons
+						onSelectMedia={ onSelectMedia }
+						onError={ onUploadError }
 					/>
-				) }
-				{ url && isVideoBackground && (
-					<video
-						ref={ mediaElement }
-						className="wp-block-cover__video-background"
-						autoPlay
-						muted
-						loop
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
-				{ isUploadingMedia && <Spinner /> }
-				<CoverPlaceholder
-					disableMediaButtons
-					onSelectMedia={ onSelectMedia }
-					onError={ onUploadError }
-				/>
-				<div { ...innerBlocksProps } />
+					<div { ...innerBlocksProps } />
+				</div>
 			</div>
 		</>
 	);
