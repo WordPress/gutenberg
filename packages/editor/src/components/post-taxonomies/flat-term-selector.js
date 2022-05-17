@@ -177,10 +177,10 @@ function FlatTermSelector( { slug } ) {
 	// while core data makes REST API requests.
 	useEffect( () => {
 		if ( hasResolvedTerms ) {
-			const newValues = terms.map( ( term ) =>
-				unescapeString( term.name )
-			);
-
+			const newValues = ( Array.isArray( terms )
+				? terms
+				: []
+			).map( ( term ) => unescapeString( term.name ) );
 			setValues( newValues );
 		}
 	}, [ terms, hasResolvedTerms ] );
