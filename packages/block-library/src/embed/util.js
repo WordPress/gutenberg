@@ -153,6 +153,21 @@ export const createUpgradedEmbedBlock = (
 };
 
 /**
+ * Determine if the block already has an aspect ratio class applied.
+ *
+ * @param {string} existingClassNames Existing block classes.
+ * @return {boolean} True or false if the classnames contain an aspect ratio class.
+ */
+export const hasAspectRatioClass = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		return false;
+	}
+	return ASPECT_RATIOS.some( ( { className } ) =>
+		existingClassNames.includes( className )
+	);
+};
+
+/**
  * Removes all previously set aspect ratio related classes and return the rest
  * existing class names.
  *
@@ -311,6 +326,14 @@ export const getMergedAttributesWithPreview = (
 	ignorePreviousClassName = false
 ) => {
 	const { allowResponsive, className } = currentAttributes;
+
+	// Aspect ratio classes are removed when the embed URL is updated.
+	// If the embed already has an aspect ratio class, that means the URL has not changed.
+	// Which also means no need to regenerate it.
+	if ( hasAspectRatioClass( className ) ) {
+		return currentAttributes;
+	}
+
 	return {
 		...currentAttributes,
 		...getAttributesFromPreview(

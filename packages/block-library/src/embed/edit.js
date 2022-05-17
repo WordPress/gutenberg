@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
@@ -188,8 +189,14 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
+						// If the embed URL was changed, we need to reset the aspect ratio class.
+						// To do this we have to remove the existing ratio class so it can be recalculated.
+						const blockClass = removeAspectRatioClasses(
+							attributes.className
+						);
+
 						setIsEditingURL( false );
-						setAttributes( { url } );
+						setAttributes( { url, className: blockClass } );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
