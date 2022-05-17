@@ -41,18 +41,6 @@ describe( 'InputControl', () => {
 		} );
 	} );
 
-	describe( 'Ensurance of focus for number inputs', () => {
-		it( 'should focus its input on mousedown events', () => {
-			const spy = jest.fn();
-			render( <InputControl type="number" onFocus={ spy } /> );
-
-			const input = getInput();
-			fireEvent.mouseDown( input );
-
-			expect( spy ).toHaveBeenCalledTimes( 1 );
-		} );
-	} );
-
 	describe( 'Value', () => {
 		it( 'should update value onChange', () => {
 			const spy = jest.fn();
