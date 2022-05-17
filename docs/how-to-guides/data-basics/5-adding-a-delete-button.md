@@ -72,7 +72,7 @@ const promise = wp.data.dispatch( 'core' ).deleteEntityRecord( 'postType', 'page
 // promise gets resolved or rejected when the API request succeeds or fails.
 ```
 
-Once the REST API request is finished, you will notice one of the pages disappeared from the list. This is because that list is populated by using `useSelect()` and the `select( coreDataStore ).getEntityRecords( 'postType', 'page' )` selector. Anytime the underlying data changes, the list gets re-rendered with fresh data. That's pretty convenient!
+Once the REST API request is finished, you will notice one of the pages has disappeared from the list. This is because that list is populated by using `useSelect()` and the `select( coreDataStore ).getEntityRecords( 'postType', 'page' )` selector. Anytime the underlying data changes, the list gets re-rendered with fresh data. That's pretty convenient!
 
 Let's dispatch that action when `DeletePageButton` is clicked:
 
@@ -90,9 +90,9 @@ const DeletePageButton = ({ pageId }) => {
 
 ### Step 3: Add visual feedback
 
-It may take a few moments for the REST API request to finish after the _Delete_ button is clicked. Let's communicate that with a `<Spinner />` component in a similar fashion as we did in the previous parts of this tutorial.
+It may take a few moments for the REST API request to finish after clicking the _Delete_ button. Let's communicate that with a `<Spinner />` component in a similar fashion as we did in the previous parts of this tutorial.
 
-We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in the part 3: it returns `true` or `false` and never issues any HTTP requests:
+We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in [part 3](/docs/how-to-guides/data-basics/3-building-an-edit-form.md): it returns `true` or `false` and never issues any HTTP requests:
 
 ```js
 const DeletePageButton = ({ pageId }) => {
@@ -116,13 +116,13 @@ const DeletePageButton = ({ pageId }) => {
 }
 ```
 
-Here's how it looks like in action:
+Here's what it looks like in action:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
 
 ### Step 4: Handle errors
 
-We optimistically assumed that a *delete* operation would always succeed. Unfortunately, under the hood it is a REST API request that can fail in many ways:
+We optimistically assumed that a *delete* operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
 
 * The website can be down
 * The update may be invalid
@@ -179,9 +179,9 @@ Fantastic! We can now **remove the `pageId = pageId * -1;` line** and move on to
 
 ### Step 5: Optionally, hide the deleted items immediately
 
-You may prefer to just hide the pages immediately after user clicks the _Delete_ button instead of displaying the spinner. One way to do it is by leveraging the `isDeletingEntityRecord` selector.
+You may prefer to hide the pages immediately after the user clicks the _Delete_ button instead of displaying the spinner. One way to do it is by leveraging the `isDeletingEntityRecord` selector.
 
-`isDeletingEntityRecord` never issues any HTTP requests. Instead, it return a true or false depending on the current entity record state.
+`isDeletingEntityRecord` never issues any HTTP requests. Instead, it returns `true` or `false` depending on the current entity record state.
 
 Here's how we could use it in `MyFirstApp`:
 
@@ -221,7 +221,7 @@ And that's it!
 
 ### Wiring it all together
 
-All the pieces are in place, great! Here’s all the changes we've made in this chapter grouped together:
+All the pieces are in place, great! Here’s all the changes we've made in this chapter:
 
 ```js
 import { useDispatch } from '@wordpress/data';
