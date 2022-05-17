@@ -14,7 +14,7 @@ import {
 	useState,
 	useRef,
 } from '@wordpress/element';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	ExternalLink,
 	MenuItem,
@@ -54,16 +54,15 @@ import useClientWidth from '../image/use-client-width';
  * Module constants
  */
 import { MIN_SIZE } from '../image/constants';
-import { getFilename } from '@wordpress/url';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
+	alt,
 	attributes: {
-		url = '',
+		blockAlt,
 		align,
-		alt,
 		width,
 		height,
 		isLink,
@@ -127,22 +126,13 @@ const SiteLogo = ( {
 	}
 
 	function updateAlt( newAlt ) {
-		setAttributes( { alt: newAlt } );
+		setAttributes( { blockAlt: newAlt } );
 	}
 
-	const filename = getFilename( url );
-	let defaultAlt;
+	let defaultAlt = alt;
 
-	if ( alt ) {
-		defaultAlt = alt;
-	} else if ( filename ) {
-		defaultAlt = sprintf(
-			/* translators: %s: file name */
-			__( 'This image has an empty alt attribute; its file name is %s' ),
-			filename
-		);
-	} else {
-		defaultAlt = __( 'This image has an empty alt attribute' );
+	if ( blockAlt ) {
+		defaultAlt = blockAlt;
 	}
 
 	const img = (
@@ -323,7 +313,7 @@ const SiteLogo = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextareaControl
 						label={ __( 'Alt text (alternative text)' ) }
-						value={ alt }
+						value={ defaultAlt }
 						onChange={ updateAlt }
 						help={
 							<>

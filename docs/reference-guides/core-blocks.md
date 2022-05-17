@@ -735,7 +735,7 @@ Display a graphic to represent this site. Update the block, and the changes appl
 -	**Name:** core/site-logo
 -	**Category:** theme
 -	**Supports:** align, color (~~background~~, ~~text~~), ~~alignWide~~, ~~html~~
--	**Attributes:** alt, isLink, linkTarget, shouldSyncIcon, width
+-	**Attributes:** alt, blockAlt, isLink, linkTarget, shouldSyncIcon, width
 
 ## Site Tagline
 

@@ -14,6 +14,9 @@
 			"attribute": "alt",
 			"default": ""
 		},
+		"blockAlt": {
+			"type": "string"
+		},
 		"width": {
 			"type": "number"
 		},
