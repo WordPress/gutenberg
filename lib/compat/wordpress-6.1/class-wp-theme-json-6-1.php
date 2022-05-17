@@ -284,7 +284,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				{ padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 
 				$block_rules .= '.wp-site-blocks .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: unset; }';
-				$block_rules .= '.alignfull .alignfull { margin-right: 0; margin-left: 0; }';
 
 				// Alignfull blocks in the block editor that are direct children of post content should also get negative margins.
 				if ( is_callable( 'get_current_screen' ) && get_current_screen()->is_block_editor() ) {
@@ -293,7 +292,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					{ padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 
 					$block_rules .= '.is-root-container .wp-block.alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); max-width: unset; width: unset; }';
-					$block_rules .= '.wp-block.alignfull .wp-block.alignfull { margin-right: 0; margin-left: 0; }';
 				}
 			}
 

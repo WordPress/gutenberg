@@ -79,6 +79,10 @@
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
 
+.wp-block-columns.alignfull.has-background {
+	padding-right: var(--wp--style--root--padding-right);
+	padding-left: var(--wp--style--root--padding-left);
+}
 
 .wp-block-column {
 	flex-grow: 1;
