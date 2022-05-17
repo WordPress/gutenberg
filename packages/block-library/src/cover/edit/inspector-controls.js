@@ -21,8 +21,9 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSetting,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -138,6 +139,9 @@ export default function CoverInspectorControls( {
 			: [ coverRef.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
+
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
 		<>
 			<InspectorControls>
@@ -220,20 +224,47 @@ export default function CoverInspectorControls( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelColorGradientSettings
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				<ColorGradientSettingsDropdown
 					__experimentalHasMultipleOrigins
+					__experimentalIsItemGroup={ false }
 					__experimentalIsRenderedInSidebar
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
 					settings={ [
 						{
 							colorValue: overlayColor.color,
 							gradientValue,
+							label: __( 'Overlay' ),
 							onColorChange: setOverlayColor,
 							onGradientChange: setGradient,
-							label: __( 'Color' ),
+							isShownByDefault: true,
+							hasValue: () =>
+								!! overlayColor.color || !! gradientValue,
+							onDeselect: () => {
+								setOverlayColor( undefined );
+								setGradient( undefined );
+							},
+							resetAllFilter: () => ( {
+								overlayColor: undefined,
+								customOverlayColor: undefined,
+								gradient: undefined,
+								customGradient: undefined,
+							} ),
 						},
 					] }
+					panelId={ clientId }
+					enableAlpha={ true }
+					{ ...colorGradientSettings }
+				/>
+				<ToolsPanelItem
+					hasValue={ () => !! dimRatio }
+					label={ __( 'Opacity' ) }
+					onDeselect={ () =>
+						setAttributes( { dimRatio: undefined } )
+					}
+					resetAllFilter={ () => ( { dimRatio: undefined } ) }
+					isShownByDefault={ true }
+					panelId={ clientId }
 				>
 					<RangeControl
 						label={ __( 'Opacity' ) }
@@ -248,7 +279,7 @@ export default function CoverInspectorControls( {
 						step={ 10 }
 						required
 					/>
-				</PanelColorGradientSettings>
+				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="dimensions">
 				<ToolsPanelItem
