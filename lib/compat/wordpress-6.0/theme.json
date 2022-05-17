@@ -186,7 +186,7 @@
 			"text": true
 		},
 		"spacing": {
-			"blockGap": null,
+			"blockGap": true,
 			"margin": false,
 			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
@@ -240,6 +240,13 @@
 		}
 	},
 	"styles": {
-		"spacing": { "blockGap": "24px" }
+		"spacing": { "blockGap": "24px" },
+		"blocks": {
+			"core/columns": {
+				"spacing": {
+					"blockGap": "2em"
+				}
+			}
+		}
 	}
 }
