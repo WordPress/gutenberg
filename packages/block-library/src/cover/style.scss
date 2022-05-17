@@ -13,8 +13,6 @@
 	box-sizing: border-box;
 
 	&.alignfull {
-		margin-right: var(--wp--style--root--padding-right, 1em);
-		margin-left: var(--wp--style--root--padding-left, 1em);
 		padding-right: var(--wp--style--root--padding-right, 1em);
 		padding-left: var(--wp--style--root--padding-left, 1em);
 	}

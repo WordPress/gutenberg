@@ -279,10 +279,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( $use_root_vars ) {
 				// These rules are duplicated in use-global-styles-output.js.
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
-
-				$block_rules .= '.wp-site-blocks
-				{ padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-
+				$block_rules .= '.wp-site-blocks { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 				$block_rules .= '.wp-site-blocks .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: unset; }';
 
 				// Alignfull blocks in the block editor that are direct children of post content should also get negative margins.
