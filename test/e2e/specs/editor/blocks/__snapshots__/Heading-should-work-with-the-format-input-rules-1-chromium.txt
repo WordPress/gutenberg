@@ -1,0 +1,3 @@
+<!-- wp:heading -->
+<h2><code>code</code></h2>
+<!-- /wp:heading -->

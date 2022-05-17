@@ -1,0 +1,3 @@
+<!-- wp:heading {"textColor":"luminous-vivid-orange"} -->
+<h2 class="has-luminous-vivid-orange-color has-text-color">Heading</h2>
+<!-- /wp:heading -->
