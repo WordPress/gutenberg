@@ -51,6 +51,7 @@ export default function PostTextEditor() {
 		editPost( { content: newValue } );
 		setValue( newValue );
 		setIsDirty( true );
+		valueRef.current = newValue;
 	};
 
 	/**
@@ -66,15 +67,13 @@ export default function PostTextEditor() {
 		}
 	};
 
-	useEffect( () => {
-		valueRef.current = value;
-	}, [ value ] );
-
 	// Ensure changes aren't lost when component unmounts.
 	useEffect( () => {
 		return () => {
-			const blocks = parse( valueRef.current );
-			resetEditorBlocks( blocks );
+			if ( valueRef.current ) {
+				const blocks = parse( valueRef.current );
+				resetEditorBlocks( blocks );
+			}
 		};
 	}, [] );
 
