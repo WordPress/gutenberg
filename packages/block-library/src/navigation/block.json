@@ -41,6 +41,14 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"menuAnimation": {
+			"type": "string",
+			"default": "default"
+		},
+		"overlayMenuWidth": {
+			"type": "number",
+			"default": 33
+		},
 		"hasIcon": {
 			"type": "boolean",
 			"default": true

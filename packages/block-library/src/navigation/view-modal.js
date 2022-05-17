@@ -28,10 +28,16 @@ function navigationToggleModal( modal ) {
 }
 
 window.addEventListener( 'load', () => {
+	const hasSlideAnimation = !! document.querySelector(
+		`.wp-block-navigation__responsive-container.has-slide-animation`
+	);
 	MicroModal.init( {
 		onShow: navigationToggleModal,
 		onClose: navigationToggleModal,
 		openClass: 'is-menu-open',
+		awaitOpenAnimation: hasSlideAnimation,
+		awaitCloseAnimation: hasSlideAnimation,
+		debugMode: true,
 	} );
 
 	// Close modal automatically on clicking anchor links inside modal.

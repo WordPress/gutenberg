@@ -7,36 +7,37 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	useState,
+	Platform,
+	useCallback,
 	useEffect,
 	useRef,
-	useCallback,
-	Platform,
+	useState,
 } from '@wordpress/element';
 import {
-	InspectorControls,
-	BlockControls,
-	useBlockProps,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	store as blockEditorStore,
-	withColors,
-	PanelColorSettings,
+	BlockControls,
 	ContrastChecker,
 	getColorClassName,
+	InspectorControls,
+	PanelColorSettings,
+	store as blockEditorStore,
+	useBlockProps,
 	Warning,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	withColors,
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
-	PanelBody,
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ToolbarGroup,
 	Button,
+	PanelBody,
+	RangeControl,
 	Spinner,
+	ToggleControl,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -126,6 +127,8 @@ function Navigation( {
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
+		menuAnimation,
+		overlayMenuWidth,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -733,6 +736,34 @@ function Navigation( {
 									label={ __( 'Always' ) }
 								/>
 							</ToggleGroupControl>
+							{ overlayMenu === 'always' && (
+								<>
+									<h3>{ __( 'Menu Animation' ) }</h3>
+									<ToggleGroupControl
+										label={ __( 'Menu Animation' ) }
+										value={ menuAnimation }
+										help={ __(
+											'Add animation when opening the overlay menu.'
+										) }
+										onChange={ ( value ) =>
+											setAttributes( {
+												menuAnimation: value,
+											} )
+										}
+										isBlock
+										hideLabelFromVision
+									>
+										<ToggleGroupControlOption
+											value="default"
+											label={ __( 'Default' ) }
+										/>
+										<ToggleGroupControlOption
+											value="slide"
+											label={ __( 'Slide' ) }
+										/>
+									</ToggleGroupControl>
+								</>
+							) }
 							{ hasSubmenus && (
 								<>
 									<h3>{ __( 'Submenus' ) }</h3>
@@ -763,6 +794,19 @@ function Navigation( {
 									/>
 								</>
 							) }
+						</PanelBody>
+					) }
+					{ overlayMenu === 'always' && menuAnimation === 'slide' && (
+						<PanelBody title={ __( 'Slide Options' ) } initialOpen>
+							<RangeControl
+								label={ __( 'Overlay Menu Width %' ) }
+								value={ overlayMenuWidth }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenuWidth: value } )
+								}
+								min={ 0 }
+								max={ 100 }
+							/>
 						</PanelBody>
 					) }
 					{ hasColorSettings && (

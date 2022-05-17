@@ -679,3 +679,46 @@ button.wp-block-navigation-item__content {
 html.has-modal-open {
 	overflow: hidden;
 }
+.has-modal-open {
+	.drawer-cover {
+		display: block;
+	}
+}
+.drawer-cover {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	background-color: rgba(0, 0, 0, 0.8);
+	display: none;
+}
+
+@keyframes mmslideIn {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes mmslideOut {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-100%);
+	}
+}
+
+.has-slide-animation {
+	&.wp-block-navigation__responsive-container[aria-hidden="false"] {
+		animation: mmslideIn 0.4s cubic-bezier(0, 0, 0.2, 1);
+	}
+	&.wp-block-navigation__responsive-container[aria-hidden="true"] {
+		animation: mmslideOut 0.4s cubic-bezier(0, 0, 0.2, 1);
+	}
+}
+

@@ -529,6 +529,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// Manually add block support text decoration as CSS class.
 	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
 	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
+	$slide_animate         = isset( $attributes['menuAnimation'] ) && 'slide' === $attributes['menuAnimation'];
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
@@ -603,18 +604,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'wp-block-navigation__responsive-container',
 		$is_hidden_by_default ? 'hidden-by-default' : '',
 		implode( ' ', $colors['overlay_css_classes'] ),
+		$slide_animate ? 'has-slide-animation' : '',
 	);
 	$open_button_classes          = array(
 		'wp-block-navigation__responsive-container-open',
 		$is_hidden_by_default ? 'always-shown' : '',
 	);
 
-	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-	$toggle_button_content     = $should_display_icon_label ? $toggle_button_icon : 'Menu';
-
+	$toggle_button_icon          = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
+	$should_display_icon_label   = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
+	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : 'Menu';
+	$custom_width_style          = isset( $attributes['overlayMenuWidth'] ) && $slide_animate ? sprintf( 'width: %1s%%;', $attributes['overlayMenuWidth'] ) : '';
 	$responsive_container_markup = sprintf(
 		'<button aria-haspopup="true" aria-label="%3$s" class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
+			%10$s
 			<div class="%5$s" style="%7$s" id="%1$s">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s">
@@ -631,9 +634,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		__( 'Close menu' ), // Close button label.
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
-		safecss_filter_attr( $colors['overlay_inline_styles'] ),
+		safecss_filter_attr( $colors['overlay_inline_styles'] . $custom_width_style ),
 		__( 'Menu' ),
-		$toggle_button_content
+		$toggle_button_content,
+		$slide_animate ? '<div class="drawer-cover"></div>' : ''
 	);
 
 	return sprintf(
