@@ -7,11 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	Button,
 	ColorIndicator,
 	Dropdown,
 	FlexItem,
 	__experimentalHStack as HStack,
-	__experimentalItem as Item,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
@@ -45,6 +45,9 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 			{ ...props }
 			className="block-editor-tools-panel-color-gradient-settings__item"
 			panelId={ panelId }
+			// Pass resetAllFilter if supplied due to rendering via SlotFill
+			// into parent ToolsPanel.
+			resetAllFilter={ setting.resetAllFilter }
 		>
 			{ children }
 		</ToolsPanelItem>
@@ -70,16 +73,16 @@ const renderToggle = ( settings ) => ( { onToggle, isOpen } ) => {
 	const toggleProps = {
 		onClick: onToggle,
 		className: classnames(
-			'block-editor-tools-panel-color-gradient-settings__dropdown',
+			'block-editor-panel-color-gradient-settings__dropdown',
 			{ 'is-open': isOpen }
 		),
 		'aria-expanded': isOpen,
 	};
 
 	return (
-		<Item { ...toggleProps }>
+		<Button { ...toggleProps }>
 			<LabeledColorIndicator colorValue={ colorValue } label={ label } />
-		</Item>
+		</Button>
 	);
 };
 

@@ -6,12 +6,11 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
-import { __ } from '@wordpress/i18n';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -63,24 +62,24 @@ export default function ColorPanel( {
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	return (
-		<InspectorControls>
-			<PanelColorGradientSettings
+		<InspectorControls __experimentalGroup="color">
+			<ColorGradientSettingsDropdown
 				enableAlpha={ enableAlpha }
+				panelId={ clientId }
 				settings={ settings }
+				__experimentalIsItemGroup={ false }
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 				{ ...colorGradientSettings }
-				title={ __( 'Color' ) }
-			>
-				{ enableContrastChecking && (
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-						enableAlphaChecker={ enableAlpha }
-						linkColor={ detectedLinkColor }
-					/>
-				) }
-			</PanelColorGradientSettings>
+			/>
+			{ enableContrastChecking && (
+				<ContrastChecker
+					backgroundColor={ detectedBackgroundColor }
+					textColor={ detectedColor }
+					enableAlphaChecker={ enableAlpha }
+					linkColor={ detectedLinkColor }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

@@ -77,6 +77,60 @@ const hasTextColorSupport = ( blockType ) => {
 };
 
 /**
+ * Clears a single color property from a style object.
+ *
+ * @param {Array}  path  Path to color property to clear within styles object.
+ * @param {Object} style Block attributes style object.
+ * @return {Object} Styles with the color property omitted.
+ */
+const clearColorFromStyles = ( path, style ) =>
+	cleanEmptyObject( immutableSet( style, path, undefined ) );
+
+/**
+ * Clears text color related properties from supplied attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Update block attributes with text color properties omitted.
+ */
+const resetAllTextFilter = ( attributes ) => ( {
+	textColor: undefined,
+	style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
+} );
+
+/**
+ * Clears link color related properties from supplied attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Update block attributes with link color properties omitted.
+ */
+const resetAllLinkFilter = ( attributes ) => ( {
+	style: clearColorFromStyles(
+		[ 'elements', 'link', 'color', 'text' ],
+		attributes.style
+	),
+} );
+
+/**
+ * Clears all background color related properties including gradients from
+ * supplied block attributes.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Object} Block attributes with background and gradient omitted.
+ */
+const clearBackgroundAndGradient = ( attributes ) => ( {
+	backgroundColor: undefined,
+	gradient: undefined,
+	style: {
+		...attributes.style,
+		color: {
+			...attributes.style?.color,
+			background: undefined,
+			gradient: undefined,
+		},
+	},
+} );
+
+/**
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
  *
@@ -414,6 +468,7 @@ export function ColorEdit( props ) {
 									style?.color?.text
 								).color,
 								isShownByDefault: defaultColorControls?.text,
+								resetAllFilter: resetAllTextFilter,
 							},
 					  ]
 					: [] ),
@@ -435,6 +490,7 @@ export function ColorEdit( props ) {
 									: undefined,
 								isShownByDefault:
 									defaultColorControls?.background,
+								resetAllFilter: clearBackgroundAndGradient,
 							},
 					  ]
 					: [] ),
@@ -450,6 +506,7 @@ export function ColorEdit( props ) {
 								clearable: !! style?.elements?.link?.color
 									?.text,
 								isShownByDefault: defaultColorControls?.link,
+								resetAllFilter: resetAllLinkFilter,
 							},
 					  ]
 					: [] ),

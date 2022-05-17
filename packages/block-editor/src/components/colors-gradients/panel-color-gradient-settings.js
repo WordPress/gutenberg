@@ -43,7 +43,7 @@ export const PanelColorGradientSettingsInner = ( {
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 } ) => {
-	const panelId = useInstanceId( PanelColorGradientSettingsInner )
+	const panelId = useInstanceId( PanelColorGradientSettingsInner );
 	const { batch } = useRegistry();
 	if (
 		isEmpty( colors ) &&
@@ -90,8 +90,6 @@ export const PanelColorGradientSettingsInner = ( {
 				} );
 			} }
 			panelId={ panelId }
-			hasInnerWrapper={ true }
-			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 		>
