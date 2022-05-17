@@ -12,6 +12,17 @@ function DownloadableBlocksNoResults() {
 				icon={ blockDefault }
 			/>
 			<p>{ __( 'No results found.' ) }</p>
+			<p>Interested in creating your own block?</p>
+			<p>
+				<a
+					href="https://developer.wordpress.org/block-editor/"
+					rel="noreferrer noopener"
+					target="_blank"
+				>
+					Get started here
+				</a>
+				.
+			</p>
 		</div>
 	);
 }
