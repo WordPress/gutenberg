@@ -68,8 +68,18 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
+			'.some-selector { color: #cccccc; background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }'
 		);
+	} );
+
+	it( 'should parse preset values (use for elements.link.color.text)', () => {
+		expect(
+			generate( {
+				color: {
+					text: 'var:preset|color|ham-sandwich',
+				},
+			} )
+		).toEqual( 'color: var(--wp--preset--color--ham-sandwich);' );
 	} );
 } );
 
@@ -179,11 +189,6 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'paddingBottom',
 				value: '5px',
-			},
-			{
-				key: 'fontFamily',
-				selector: '.some-selector',
-				value: "'Helvetica Neue',sans-serif",
 			},
 			{
 				key: 'fontSize',

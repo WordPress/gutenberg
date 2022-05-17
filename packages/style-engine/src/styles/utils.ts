@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, upperFirst } from 'lodash';
+import { get, upperFirst } from 'lodash';
 
 /**
  * Internal dependencies
@@ -89,29 +89,6 @@ export function generateBoxRules(
 	}
 
 	return rules;
-}
-
-/**
- * Returns a slug from a style value following the pattern `var:preset|styleContext|slug`.
- *
- * @param  styleValue   A raw style value.
- * @param  styleContext A style context to parse
- *
- * @return generated styles.
- */
-export function getSlugFromPreset(
-	styleValue: string | number | undefined,
-	styleContext: string
-): string | null {
-	if ( typeof styleValue !== 'string' ) {
-		return null;
-	}
-
-	const presetValues = styleValue.split(
-		`${ VARIABLE_REFERENCE_PREFIX }preset${ VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE }${ styleContext }${ VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE }`
-	);
-
-	return presetValues[ 1 ] ? kebabCase( presetValues[ 1 ] ) : null;
 }
 
 /**
