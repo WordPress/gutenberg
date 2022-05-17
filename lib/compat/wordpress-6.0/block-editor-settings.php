@@ -193,5 +193,3 @@ function gutenberg_get_block_editor_settings( $settings ) {
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', PHP_INT_MAX );
-
-add_filter( 'should_add_block_patterns_to_editor_settings', '__return_true' );

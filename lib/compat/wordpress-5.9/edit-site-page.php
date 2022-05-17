@@ -122,17 +122,9 @@ function gutenberg_edit_site_init( $hook ) {
 		'__unstableHomeTemplate'   => gutenberg_resolve_home_template(),
 	);
 
-	/**
-	 * Filter to enable adding non-REST block patterns to editor settings.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param bool $should_add_to_settings
-	 */
-	if ( apply_filters( 'should_add_block_patterns_to_editor_settings', false ) ) {
-		$custom_settings['__experimentalBlockPatterns']          = WP_Block_Patterns_Registry::get_instance()->get_all_registered( true );
-		$custom_settings['__experimentalBlockPatternCategories'] = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered( true );
-	}
+	// Add additional back-compat patterns registered by `current_screen` et al.
+	$custom_settings['__experimentalAdditionalBlockPatterns']          = WP_Block_Patterns_Registry::get_instance()->get_all_registered( true );
+	$custom_settings['__experimentalAdditionalBlockPatternCategories'] = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered( true );
 
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.

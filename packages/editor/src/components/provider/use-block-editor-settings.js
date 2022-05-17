@@ -62,8 +62,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	}, [] );
 
 	const {
-		__experimentalBlockPatterns: settingsBlockPatterns,
-		__experimentalBlockPatternCategories: settingsBlockPatternCategories,
+		__experimentalAdditionalBlockPatterns: settingsBlockPatterns,
+		__experimentalAdditionalBlockPatternCategories: settingsBlockPatternCategories,
 	} = settings;
 
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(

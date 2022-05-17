@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { unionBy } from 'lodash';
+import { omit, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,8 +69,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	);
 
 	const {
-		__experimentalBlockPatterns: settingsBlockPatterns,
-		__experimentalBlockPatternCategories: settingsBlockPatternCategories,
+		__experimentalAdditionalBlockPatterns: settingsBlockPatterns,
+		__experimentalAdditionalBlockPatternCategories: settingsBlockPatternCategories,
 	} = storedSettings;
 
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
@@ -100,7 +100,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 	const settings = useMemo(
 		() => ( {
-			...storedSettings,
+			...omit( storedSettings, [
+				'__experimentalAdditionalBlockPatterns',
+				'__experimentalAdditionalBlockPatternCategories',
+			] ),
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		} ),
