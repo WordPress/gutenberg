@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 apply plugin: "com.android.application"
 apply from: "../../../react-native-bridge/android/extractPackageVersion.gradle"
 
@@ -96,11 +98,6 @@ apply from: "../../../../node_modules/react-native/react.gradle"
 def enableSeparateBuildPerCPUArchitecture = false
 
 /**
- * Run Proguard to shrink the Java bytecode in release builds.
- */
-def enableProguardInReleaseBuilds = false
-
-/**
  * Whether to enable the Hermes VM.
  *
  * This should be set on project.ext.react and mirrored here.  If it is not set
@@ -145,8 +142,14 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+
+        benchmark {
+            initWith release
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
         }
     }
     // applicationVariants are e.g. debug, release
@@ -169,10 +172,18 @@ android {
     }
 }
 
+def bridgeVersion = "v${readVersion('../../../react-native-bridge/package.json')}"
 dependencies {
-    implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+    debugImplementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
     })
+    releaseImplementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+        exclude group: 'org.wordpress', module: 'utils'
+    })
+    benchmarkImplementation("org.wordpress-mobile.gutenberg-mobile:react-native-gutenberg-bridge:$bridgeVersion", {
+        exclude group: 'org.wordpress', module: 'utils'
+    })
+
     implementation 'androidx.appcompat:appcompat:1.2.0'
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
@@ -192,7 +203,7 @@ dependencies {
     implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
-    
+
     implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
@@ -204,4 +215,25 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.implementation
     into 'libs'
+}
+
+def readVersion(pathToJson) {
+    def json = new JsonSlurper().parse file(pathToJson)
+    return json.get('version')
+}
+
+project.afterEvaluate {
+    task benchmarkWarning {
+        description 'Warns that we are not using the local version of react-native-bridge in benchmark builds'
+        doLast {
+            def message =
+                    "\n******\n"+
+                    "This is a benchmark build, so we're building using the react-native-bridge's " +
+                    "v${bridgeVersion} artifact instead of your local source code!" +
+                    "\n******\n"
+            logger.warn message
+        }
+    }
+
+    preBenchmarkBuild.dependsOn benchmarkWarning
 }

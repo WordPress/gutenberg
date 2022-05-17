@@ -80,7 +80,8 @@ data class GutenbergProps @JvmOverloads constructor(
                     content?.let { putString(PROP_INITIAL_DATA, it) }
                 }
 
-        private const val PROP_INITIAL_DATA = "initialData"
+        // Exposed for use in demo app
+        const val PROP_INITIAL_DATA = "initialData"
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"

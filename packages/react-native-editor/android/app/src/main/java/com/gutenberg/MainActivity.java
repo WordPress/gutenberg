@@ -1,6 +1,7 @@
 package com.gutenberg;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -14,6 +15,8 @@ import org.wordpress.mobile.WPAndroidGlue.GutenbergProps;
 import java.util.Locale;
 
 public class MainActivity extends ReactActivity {
+
+    public static final String BUNDLE_INITIAL_CONTENT = "bundle_initial_data";
 
     /**
      * Returns the name of the main component registered from JavaScript.
@@ -36,6 +39,18 @@ public class MainActivity extends ReactActivity {
             @Override
             protected Bundle getLaunchOptions() {
                 Bundle bundle = new Bundle();
+
+                Bundle extras = getIntent().getExtras();
+                if (extras != null) {
+                    String initialContent = extras.getString(BUNDLE_INITIAL_CONTENT);
+                    if (initialContent != null) {
+                        Log.d("MainActivity", "setting initial content: " + initialContent);
+
+                        // FIXME once the GutenbergProps.PROP_INITIAL_DATA is public in a released
+                        // build, switch the key from being a raw string to using that constant
+                        bundle.putString("initialData", initialContent);
+                    }
+                }
 
                 // Add locale
                 String languageString = Locale.getDefault().toString();
