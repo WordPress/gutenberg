@@ -168,7 +168,7 @@ export class BlockList extends Component {
 			<BlockListItemCell
 				children={ children }
 				clientId={ item }
-				listOnLayout={ onLayout }
+				onLayout={ onLayout }
 				rootClientId={ rootClientId }
 			/>
 		);
