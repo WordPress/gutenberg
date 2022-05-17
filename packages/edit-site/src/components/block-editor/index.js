@@ -68,10 +68,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		[ setIsInserterOpen ]
 	);
 
-	const {
-		__experimentalAdditionalBlockPatterns: settingsBlockPatterns,
-		__experimentalAdditionalBlockPatternCategories: settingsBlockPatternCategories,
-	} = storedSettings;
+	const settingsBlockPatterns =
+		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		storedSettings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
 
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {

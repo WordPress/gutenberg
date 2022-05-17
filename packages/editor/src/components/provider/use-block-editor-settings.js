@@ -61,10 +61,12 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		};
 	}, [] );
 
-	const {
-		__experimentalAdditionalBlockPatterns: settingsBlockPatterns,
-		__experimentalAdditionalBlockPatternCategories: settingsBlockPatternCategories,
-	} = settings;
+	const settingsBlockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		settings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		settings.__experimentalBlockPatternCategories; // WP 5.9
 
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
