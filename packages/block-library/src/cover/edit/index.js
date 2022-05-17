@@ -43,7 +43,7 @@ import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
-import ResizableCover from './resizeable-cover';
+import ResizableCover from './resizable-cover';
 
 extend( [ namesPlugin ] );
 
