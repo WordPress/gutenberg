@@ -4,15 +4,7 @@
 import moment from 'moment';
 import type { Moment } from 'moment';
 import { noop } from 'lodash';
-
-// `react-dates` doesn't tree-shake correctly, so we import from the individual
-// component here.
-// @ts-expect-error TypeScript won't find any type declarations at
-// `react-dates/lib/components/DayPickerSingleDateController` as they're located
-// at `react-dates`.
-import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
-import type { DayPickerSingleDateController } from 'react-dates';
-const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
+import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 
 /**
  * WordPress dependencies
@@ -71,18 +63,15 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
 	}, [ events.length ] );
 
-	return <Day hasEvents={ !! events?.length }>{ day.format( 'D' ) }</Day>;
-
-	// return (
-	// 	<div
-	// 		ref={ ref }
-	// 		className={ classnames( 'components-datetime__date__day', {
-	// 			'has-events': events?.length,
-	// 		} ) }
-	// 	>
-	// 		{ day.format( 'D' ) }
-	// 	</div>
-	// );
+	return (
+		<Day
+			ref={ ref }
+			className="components-datetime__date__day"
+			hasEvents={ !! events?.length }
+		>
+			{ day.format( 'D' ) }
+		</Day>
+	);
 }
 
 function DatePicker( {
@@ -164,7 +153,7 @@ function DatePicker( {
 
 	return (
 		<div className="components-datetime__date" ref={ nodeRef }>
-			<TypedDayPickerSingleDateController
+			<DayPickerSingleDateController
 				date={ momentDate }
 				daySize={ 30 }
 				horizontalMonthPadding={ 0 }
@@ -199,7 +188,6 @@ function DatePicker( {
 						{ month.format( 'YYYY' ) }
 					</>
 				) }
-				// @ts-ignore The react-dates typings are missing this prop.
 				renderNavPrevButton={ ( { ariaLabel, ...props } ) => (
 					<Button
 						className={ cx( prevNavButton ) }
@@ -209,7 +197,6 @@ function DatePicker( {
 						{ ...props }
 					/>
 				) }
-				// @ts-ignore The react-dates typings are missing this prop.
 				renderNavNextButton={ ( { ariaLabel, ...props } ) => (
 					<Button
 						className={ cx( nextNavButton ) }
@@ -219,6 +206,7 @@ function DatePicker( {
 						{ ...props }
 					/>
 				) }
+				initialVisibleMonth={ null }
 				onFocusChange={ noop }
 			/>
 		</div>

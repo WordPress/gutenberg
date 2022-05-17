@@ -1,6 +1,6 @@
 @import "./datepicker.scss";
 
-// Styles that overrides the calendar styling provided by react-dates goes here.
+// Styles that overrides the calendar styling provided by react-dates go here.
 // Everything else goes in styles.ts.
 
 .components-datetime__date {
@@ -72,70 +72,3 @@
 		}
 	}
 }
-
-// .components-datetime__date {
-// 	// Override external DatePicker styles.
-// 	.DayPickerNavigation_leftButton__horizontalDefault {
-// 		/*!rtl:begin:ignore*/
-// 		left: 13px;
-// 		/*!rtl:end:ignore*/
-// 	}
-
-// 	.CalendarMonth_caption {
-// 		font-size: $default-font-size;
-// 	}
-
-// 	// Seperate borders so that border respect border radius
-// 	.CalendarMonth_table {
-// 		border-collapse: separate;
-// 		border-spacing: 2px;
-// 	}
-
-// 	.CalendarDay {
-// 		font-size: $default-font-size;
-// 		border: none;
-// 		border-radius: $radius-round;
-// 		text-align: center;
-
-// 		&:focus {
-// 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
-// 			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
-// 		}
-// 	}
-
-// 	.CalendarDay__selected {
-// 		background: var(--wp-admin-theme-color);
-// 		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
-
-// 		&:hover {
-// 			background: var(--wp-admin-theme-color-darker-20);
-// 		}
-
-// 		&:focus {
-// 			box-shadow: inset 0 0 0 $border-width $white;
-// 		}
-// 	}
-
-// 	.DayPickerNavigation_button__horizontalDefault {
-// 		padding: 2px 8px;
-// 		border: none;
-
-// 		svg {
-// 			fill: var(--wp-admin-theme-color);
-// 		}
-
-// 		&:focus {
-// 			@include input-style__focus();
-// 		}
-// 	}
-
-// 	.DayPicker_weekHeader {
-// 		top: 50px;
-
-// 		.DayPicker_weekHeader_ul {
-// 			margin: 1px;
-// 			padding-left: 0;
-// 			padding-right: 0;
-// 		}
-// 	}
-// }

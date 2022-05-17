@@ -173,11 +173,12 @@ export function TimePicker( {
 	}
 
 	const dayField = (
-		// <div className="components-datetime__time-field components-datetime__time-field-day">
 		<UpdateOnBlurAsIntegerField
-			className={ cx( dayFieldStyles ) }
+			className={ cx(
+				'components-datetime__time-field-day-input',
+				dayFieldStyles
+			) }
 			aria-label={ __( 'Day' ) }
-			// className="components-datetime__time-field-day-input"
 			type="number"
 			// The correct function to call in moment.js is "date" not "day".
 			name="date"
@@ -187,16 +188,16 @@ export function TimePicker( {
 			max={ 31 }
 			onUpdate={ update( 'date' ) }
 		/>
-		// </div>
 	);
 
 	const monthField = (
-		// <div className="components-datetime__time-field components-datetime__time-field-month">
 		<UpdateOnBlurAsIntegerField
 			as="select"
-			className={ cx( monthFieldStyles ) }
+			className={ cx(
+				'components-datetime__time-field-month-select',
+				monthFieldStyles
+			) }
 			aria-label={ __( 'Month' ) }
-			// className="components-datetime__time-field-month-select"
 			name="month"
 			value={ month }
 			// The value starts from 0, so we have to -1 when setting month.
@@ -215,33 +216,21 @@ export function TimePicker( {
 			<option value="11">{ __( 'November' ) }</option>
 			<option value="12">{ __( 'December' ) }</option>
 		</UpdateOnBlurAsIntegerField>
-		// </div>
 	);
 
-	// const dayMonthFormat = is12Hour ? (
-	// 	<>
-	// 		{ monthFormat }
-	// 		{ dayFormat }
-	// 	</>
-	// ) : (
-	// 	<>
-	// 		{ dayFormat }
-	// 		{ monthFormat }
-	// 	</>
-	// );
-
-	// TODO:
-	// - add back classNames (how many do we need for BC?)
-	// - audit the original CSS to see I didn't miss any important styles
-
 	return (
-		<Wrapper>
+		<Wrapper className="components-datetime__time">
 			<Fieldset>
-				<Legend>{ __( 'Time' ) }</Legend>
-				<HStack>
-					<TimeWrapper>
+				<Legend className="components-datetime__time-legend">
+					{ __( 'Time' ) }
+				</Legend>
+				<HStack className="components-datetime__time-wrapper">
+					<TimeWrapper className="components-datetime__time-field components-datetime__time-field-time">
 						<UpdateOnBlurAsIntegerField
-							className={ cx( hoursField ) }
+							className={ cx(
+								'components-datetime__time-field-hours-input',
+								hoursField
+							) }
 							aria-label={ __( 'Hours' ) }
 							type="number"
 							name="hours"
@@ -251,9 +240,17 @@ export function TimePicker( {
 							value={ hours }
 							onUpdate={ update( 'hours' ) }
 						/>
-						<TimeSeparator aria-hidden="true">:</TimeSeparator>
+						<TimeSeparator
+							className="components-datetime__time-separator"
+							aria-hidden="true"
+						>
+							:
+						</TimeSeparator>
 						<UpdateOnBlurAsIntegerField
-							className={ cx( minutesField ) }
+							className={ cx(
+								'components-datetime__time-field-minutes-input',
+								minutesField
+							) }
 							aria-label={ __( 'Minutes' ) }
 							type="number"
 							name="minutes"
@@ -265,8 +262,9 @@ export function TimePicker( {
 						/>
 					</TimeWrapper>
 					{ is12Hour && (
-						<ButtonGroup>
+						<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 							<Button
+								className="components-datetime__time-am-button"
 								variant={
 									am === 'AM' ? 'primary' : 'secondary'
 								}
@@ -275,6 +273,7 @@ export function TimePicker( {
 								{ __( 'AM' ) }
 							</Button>
 							<Button
+								className="components-datetime__time-pm-button"
 								variant={
 									am === 'PM' ? 'primary' : 'secondary'
 								}
@@ -289,8 +288,10 @@ export function TimePicker( {
 				</HStack>
 			</Fieldset>
 			<Fieldset>
-				<Legend>{ __( 'Date' ) }</Legend>
-				<HStack>
+				<Legend className="components-datetime__time-legend">
+					{ __( 'Date' ) }
+				</Legend>
+				<HStack className="components-datetime__time-wrapper">
 					{ is12Hour ? (
 						<>
 							{ monthField }
@@ -303,7 +304,10 @@ export function TimePicker( {
 						</>
 					) }
 					<UpdateOnBlurAsIntegerField
-						className={ cx( yearField ) }
+						className={ cx(
+							'components-datetime__time-field-year-input',
+							yearField
+						) }
 						aria-label={ __( 'Year' ) }
 						type="number"
 						name="year"
@@ -317,95 +321,6 @@ export function TimePicker( {
 			</Fieldset>
 		</Wrapper>
 	);
-
-	// return (
-	// 	<div className={ classnames( 'components-datetime__time' ) }>
-	// 		<fieldset>
-	// 			<legend className="components-datetime__time-legend invisible">
-	// 				{ __( 'Date' ) }
-	// 			</legend>
-	// 			<div className="components-datetime__time-wrapper">
-	// 				{ dayMonthFormat }
-
-	// 				<div className="components-datetime__time-field components-datetime__time-field-year">
-	// 					<UpdateOnBlurAsIntegerField
-	// 						aria-label={ __( 'Year' ) }
-	// 						className="components-datetime__time-field-year-input"
-	// 						type="number"
-	// 						name="year"
-	// 						step={ 1 }
-	// 						min={ 0 }
-	// 						max={ 9999 }
-	// 						value={ year }
-	// 						onUpdate={ update( 'year' ) }
-	// 					/>
-	// 				</div>
-	// 			</div>
-	// 		</fieldset>
-
-	// 		<fieldset>
-	// 			<legend className="components-datetime__time-legend invisible">
-	// 				{ __( 'Time' ) }
-	// 			</legend>
-	// 			<div className="components-datetime__time-wrapper">
-	// 				<div className="components-datetime__time-field components-datetime__time-field-time">
-	// 					<UpdateOnBlurAsIntegerField
-	// 						aria-label={ __( 'Hours' ) }
-	// 						className="components-datetime__time-field-hours-input"
-	// 						type="number"
-	// 						name="hours"
-	// 						step={ 1 }
-	// 						min={ is12Hour ? 1 : 0 }
-	// 						max={ is12Hour ? 12 : 23 }
-	// 						value={ hours }
-	// 						onUpdate={ update( 'hours' ) }
-	// 					/>
-	// 					<span
-	// 						className="components-datetime__time-separator"
-	// 						aria-hidden="true"
-	// 					>
-	// 						:
-	// 					</span>
-	// 					<UpdateOnBlurAsIntegerField
-	// 						aria-label={ __( 'Minutes' ) }
-	// 						className="components-datetime__time-field-minutes-input"
-	// 						type="number"
-	// 						name="minutes"
-	// 						step={ 1 }
-	// 						min={ 0 }
-	// 						max={ 59 }
-	// 						value={ minutes }
-	// 						onUpdate={ update( 'minutes' ) }
-	// 					/>
-	// 				</div>
-	// 				{ is12Hour && (
-	// 					<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
-	// 						<Button
-	// 							variant={
-	// 								am === 'AM' ? 'primary' : 'secondary'
-	// 							}
-	// 							onClick={ updateAmPm( 'AM' ) }
-	// 							className="components-datetime__time-am-button"
-	// 						>
-	// 							{ __( 'AM' ) }
-	// 						</Button>
-	// 						<Button
-	// 							variant={
-	// 								am === 'PM' ? 'primary' : 'secondary'
-	// 							}
-	// 							onClick={ updateAmPm( 'PM' ) }
-	// 							className="components-datetime__time-pm-button"
-	// 						>
-	// 							{ __( 'PM' ) }
-	// 						</Button>
-	// 					</ButtonGroup>
-	// 				) }
-
-	// 				<TimeZone />
-	// 			</div>
-	// 		</fieldset>
-	// 	</div>
-	// );
 }
 
 export default TimePicker;

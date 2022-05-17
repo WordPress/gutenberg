@@ -4,14 +4,10 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
-// Styles that overrides the calendar styling provided by react-dates goes in
+// Styles that overrides the calendar styling provided by react-dates go in
 // style.scss. Everything else goes here.
 
-type DayProps = {
-	hasEvents: boolean;
-};
-
-export const Day = styled.div< DayProps >`
+export const Day = styled.div< { hasEvents: boolean } >`
 	align-content: center;
 	display: flex;
 	flex-direction: column;

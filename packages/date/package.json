@@ -27,7 +27,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"moment": "^2.22.1",
+		"moment": "^2.26.0",
 		"moment-timezone": "^0.5.31"
 	},
 	"publishConfig": {

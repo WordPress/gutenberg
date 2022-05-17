@@ -66,7 +66,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
-		"moment": "^2.22.1"
+		"moment": "^2.26.0"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",

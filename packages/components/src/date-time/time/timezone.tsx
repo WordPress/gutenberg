@@ -39,8 +39,9 @@ const TimeZone = () => {
 
 	return (
 		<Tooltip position="top center" text={ timezoneDetail }>
-			{ /* <div className="components-datetime__timezone">{ zoneAbbr }</div> */ }
-			<StyledComponent>{ zoneAbbr }</StyledComponent>
+			<StyledComponent className="components-datetime__timezone">
+				{ zoneAbbr }
+			</StyledComponent>
 		</Tooltip>
 	);
 };
