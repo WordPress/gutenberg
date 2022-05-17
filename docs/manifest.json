@@ -198,6 +198,12 @@
 		"parent": "data-basics"
 	},
 	{
+		"title": "Part 4: Building a _Create page_ form",
+		"slug": "4-building-a-create-page-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
+		"parent": "data-basics"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
