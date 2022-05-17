@@ -2,6 +2,7 @@
  * External dependencies
  */
 import fetch from 'node-fetch';
+import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
@@ -11,17 +12,15 @@ const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', ['auth', 'status'] )
 	?.stderr
 	?.toString()
 	.includes( '✓ Logged in to github.com as' );
-if ( !GITHUB_CLI_AVAILABLE ) {
-	// communicate the situation
-	// ask the user whether to proceed
-	// add a CLI option to explicitly disable the automatic GitHub handling
-	// add a CLI option to disable user interactions for CI use
-	// add a CLI option to override the label
-}
+
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 
 async function main() {
-	console.log( `Running git pull origin ${ BRANCH } --rebase...` );
+	if ( !GITHUB_CLI_AVAILABLE ) {
+		await reportGhUnavailable();
+	}
+
+	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
 	spawnSync( 'git', ['pull', 'origin', BRANCH, '--rebase'], {
 		cwd: process.cwd(),
 		env: process.env,
@@ -241,7 +240,34 @@ function prComment( cherryPickHash ) {
 }
 
 function getCurrentBranch() {
-	return spawnSync( 'git', ['rev-parse', '--abbrev-ref', 'HEAD'] ).stdout.toString();
+	return spawnSync( 'git', ['rev-parse', '--abbrev-ref', 'HEAD'] ).stdout.toString().trim();
+}
+
+async function reportGhUnavailable() {
+	console.log( 'Github CLI is not setup. This script will not be able to automatically' );
+	console.log( 'comment on the processed PRs and remove the backport label from them.' );
+	console.log( 'Instead, you will see a detailed list of next steps to perform manually.' );
+	console.log( '' );
+	console.log(
+		'To enable automatic handling, install the `gh` utility from https://cli.github.com/' );
+	console.log( '' );
+
+	const rl = readline.createInterface( {
+		input: process.stdin,
+		output: process.stdout,
+	} );
+
+	const question = ( prompt ) => new Promise( ( resolve ) => rl.question( prompt, resolve ) );
+	do {
+		const answer = await question( 'Do you want to proceed? (Y/n)' );
+		if ( !answer || answer === 'Y' ) {
+			break;
+		}
+		if ( answer === 'n' ) {
+			process.exit( 0 );
+		}
+	} while ( true );
+	rl.close();
 }
 
 main();
