@@ -16,11 +16,18 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
  * @param {number|null}            props.value    Incoming value.
  * @param {number}                 props.max      Maximum valid value.
  * @param {number}                 props.min      Minimum valid value.
+ * @param {(event: Event) => void} props.onBlur   Callback for blur events.
  * @param {(next: number) => void} props.onChange Callback for changes.
  *
  * @return {Object} Assorted props for the input.
  */
-export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
+export function useUnimpededRangedNumberEntry( {
+	max,
+	min,
+	onBlur,
+	onChange,
+	value,
+} ) {
 	const ref = useRef();
 	const isDiverging = useRef( false );
 	/** @type {import('../input-control/types').InputChangeCallback}*/
@@ -31,6 +38,10 @@ export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
 			next = Math.max( min, Math.min( max, next ) );
 		}
 		onChange( next );
+	};
+	const blurHandler = ( event ) => {
+		isDiverging.current = false;
+		onBlur?.( event );
 	};
 	// When the value entered in the input is out of range then a clamped value
 	// is sent through onChange and that goes on to update the input. In such
@@ -48,7 +59,14 @@ export function useUnimpededRangedNumberEntry( { max, min, onChange, value } ) {
 		}
 	}, [ value ] );
 
-	return { max, min, ref, value, onChange: changeHandler };
+	return {
+		max,
+		min,
+		ref,
+		value,
+		onBlur: blurHandler,
+		onChange: changeHandler,
+	};
 }
 
 /**

@@ -139,14 +139,13 @@ function RangeControl(
 				isResetPendent.current = true;
 			}
 		},
+		onBlur: () => {
+			if ( isResetPendent.current ) {
+				handleOnReset();
+				isResetPendent.current = false;
+			}
+		},
 	} );
-
-	const handleOnInputNumberBlur = () => {
-		if ( isResetPendent.current ) {
-			handleOnReset();
-			isResetPendent.current = false;
-		}
-	};
 
 	const handleOnReset = () => {
 		const resetValue = parseFloat( resetFallbackValue );
@@ -269,7 +268,6 @@ function RangeControl(
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
-						onBlur={ handleOnInputNumberBlur }
 						shiftStep={ shiftStep }
 						step={ step }
 						{ ...someNumberInputProps }
