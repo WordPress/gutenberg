@@ -130,9 +130,7 @@ function CoverEdit( {
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
-		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
-			type: 'snackbar',
-		} );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	const mediaElement = useRef();

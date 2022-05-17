@@ -118,7 +118,7 @@ function PostFeaturedImageDisplay( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
-		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	const controls = (
