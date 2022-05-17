@@ -2651,3 +2651,14 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+/**
+ * Tells if the block is visible on the canvas or not.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ * @return {boolean} True if the block is visible.
+ */
+export function isBlockVisible( state, clientId ) {
+	return state.blocks.visibility?.[ clientId ] ?? true;
+}

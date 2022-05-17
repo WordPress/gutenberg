@@ -606,6 +606,7 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
+			visibility: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
@@ -1137,6 +1138,17 @@ export const blocks = flow(
 				[ clientId ]: hasControlledInnerBlocks,
 			};
 		}
+		return state;
+	},
+
+	visibility( state = {}, action ) {
+		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
+			return {
+				...state,
+				[ action.clientId ]: action.isVisible,
+			};
+		}
+
 		return state;
 	},
 } );

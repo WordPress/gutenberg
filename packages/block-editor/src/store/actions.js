@@ -1603,3 +1603,17 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Action that sets whether a block has controlled inner blocks.
+ *
+ * @param {string}  clientId  The block's clientId.
+ * @param {boolean} isVisible True if the block's is visible on the canvas.
+ */
+export function setBlockVisibility( clientId, isVisible ) {
+	return {
+		type: 'SET_BLOCK_VISIBILITY',
+		isVisible,
+		clientId,
+	};
+}

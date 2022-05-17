@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import {
+	AsyncModeProvider,
+	useSelect,
+	useDispatch,
+	useRegistry,
+} from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import { createContext, useState, useMemo } from '@wordpress/element';
 
@@ -48,6 +53,24 @@ function Root( { className, ...settings } ) {
 		},
 		[]
 	);
+	const registry = useRegistry();
+	const { setBlockVisibility } = useDispatch( blockEditorStore );
+	const intersectionObserver = useMemo( () => {
+		const { IntersectionObserver: Observer } = window;
+
+		if ( ! Observer ) {
+			return;
+		}
+
+		return new Observer( ( entries ) => {
+			registry.batch( () => {
+				for ( const entry of entries ) {
+					const clientId = entry.target.getAttribute( 'data-block' );
+					setBlockVisibility( clientId, entry.isIntersecting );
+				}
+			} );
+		} );
+	}, [] );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			ref: useMergeRefs( [
@@ -65,7 +88,9 @@ function Root( { className, ...settings } ) {
 	);
 	return (
 		<elementContext.Provider value={ element }>
-			<div { ...innerBlocksProps } />
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				<div { ...innerBlocksProps } />
+			</IntersectionObserver.Provider>
 		</elementContext.Provider>
 	);
 }
@@ -83,6 +108,30 @@ export default function BlockList( settings ) {
 
 BlockList.__unstableElementContext = elementContext;
 
+function Item( { rootClientId, isSelected, clientId } ) {
+	const isVisible = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).isBlockVisible( clientId );
+		},
+		[ clientId ]
+	);
+
+	return (
+		<AsyncModeProvider
+			value={
+				// Only provide data asynchronously if the block is
+				// not visible and not selected.
+				! isVisible && ! isSelected
+			}
+		>
+			<BlockListBlock
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+			/>
+		</AsyncModeProvider>
+	);
+}
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -90,26 +139,6 @@ function Items( {
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
-	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
-	const intersectionObserver = useMemo( () => {
-		const { IntersectionObserver: Observer } = window;
-
-		if ( ! Observer ) {
-			return;
-		}
-
-		return new Observer( ( entries ) => {
-			setIntersectingBlocks( ( oldIntersectingBlocks ) => {
-				const newIntersectingBlocks = new Set( oldIntersectingBlocks );
-				for ( const entry of entries ) {
-					const clientId = entry.target.getAttribute( 'data-block' );
-					const action = entry.isIntersecting ? 'add' : 'delete';
-					newIntersectingBlocks[ action ]( clientId );
-				}
-				return newIntersectingBlocks;
-			} );
-		} );
-	}, [ setIntersectingBlocks ] );
 	const { order, selectedBlocks } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getSelectedBlockClientIds } = select(
@@ -125,24 +154,14 @@ function Items( {
 
 	return (
 		<LayoutProvider value={ layout }>
-			<IntersectionObserver.Provider value={ intersectionObserver }>
-				{ order.map( ( clientId ) => (
-					<AsyncModeProvider
-						key={ clientId }
-						value={
-							// Only provide data asynchronously if the block is
-							// not visible and not selected.
-							! intersectingBlocks.has( clientId ) &&
-							! selectedBlocks.includes( clientId )
-						}
-					>
-						<BlockListBlock
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-						/>
-					</AsyncModeProvider>
-				) ) }
-			</IntersectionObserver.Provider>
+			{ order.map( ( clientId ) => (
+				<Item
+					key={ clientId }
+					clientId={ clientId }
+					isSelected={ selectedBlocks.includes( clientId ) }
+					rootClientId={ rootClientId }
+				/>
+			) ) }
 			{ order.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
