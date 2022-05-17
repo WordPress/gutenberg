@@ -28,7 +28,7 @@ export default function PublishDateTimePicker( {
 					variant="tertiary"
 					onClick={ () => onChange?.( null ) }
 				>
-					{ __( 'Reset' ) }
+					{ __( 'Now' ) }
 				</Button>
 				<Button
 					isSmall
