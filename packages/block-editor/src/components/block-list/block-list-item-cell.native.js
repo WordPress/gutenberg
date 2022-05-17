@@ -13,7 +13,12 @@ import { useEffect, useCallback } from '@wordpress/element';
  */
 import { useBlockListContext } from './block-list-context';
 
-function BlockListItemCell( { children, clientId, rootClientId } ) {
+function BlockListItemCell( {
+	children,
+	clientId,
+	rootClientId,
+	listOnLayout,
+} ) {
 	const { blocksLayouts, updateBlocksLayouts } = useBlockListContext();
 
 	useEffect( () => {
@@ -26,14 +31,21 @@ function BlockListItemCell( { children, clientId, rootClientId } ) {
 	}, [] );
 
 	const onLayout = useCallback(
-		( { nativeEvent: { layout } } ) => {
+		( event ) => {
+			const {
+				nativeEvent: { layout },
+			} = event;
 			updateBlocksLayouts( blocksLayouts, {
 				clientId,
 				rootClientId,
 				...layout,
 			} );
+
+			if ( listOnLayout ) {
+				listOnLayout( event );
+			}
 		},
-		[ clientId, rootClientId, updateBlocksLayouts ]
+		[ clientId, rootClientId, updateBlocksLayouts, listOnLayout ]
 	);
 
 	return <View onLayout={ onLayout }>{ children }</View>;
