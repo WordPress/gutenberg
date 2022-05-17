@@ -112,6 +112,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
+	const hasBlocks = blocks.length !== 0;
 
 	const NavMenuSidebarToggle = () => (
 		<ToolbarGroup>
@@ -186,7 +187,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					<BlockList
 						className="edit-site-block-editor__block-list wp-site-blocks"
 						__experimentalLayout={ LAYOUT }
-						renderAppender={ isTemplatePart ? false : undefined }
+						renderAppender={
+							isTemplatePart && hasBlocks ? false : undefined
+						}
 					/>
 				</ResizableEditor>
 				<__unstableBlockSettingsMenuFirstItem>
