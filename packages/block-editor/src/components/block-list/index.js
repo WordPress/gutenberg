@@ -115,17 +115,17 @@ function Items( {
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, hiddenBlocks } = useSelect(
+	const { order, selectedBlocks, visibleBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
 				getSelectedBlockClientIds,
-				__unstableGetHiddenBlocks,
+				__unstableGetVisibleBlocks,
 			} = select( blockEditorStore );
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),
-				hiddenBlocks: __unstableGetHiddenBlocks(),
+				visibleBlocks: __unstableGetVisibleBlocks(),
 			};
 		},
 		[ rootClientId ]
@@ -139,7 +139,7 @@ function Items( {
 					value={
 						// Only provide data asynchronously if the block is
 						// not visible and not selected.
-						hiddenBlocks.has( clientId ) &&
+						! visibleBlocks.has( clientId ) &&
 						! selectedBlocks.includes( clientId )
 					}
 				>
