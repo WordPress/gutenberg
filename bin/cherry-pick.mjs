@@ -21,12 +21,10 @@ async function main() {
 	}
 
 	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
-	spawnSync( 'git', ['pull', 'origin', BRANCH, '--rebase'], {
-		cwd: process.cwd(),
-		env: process.env,
-		stdio: 'pipe',
-		encoding: 'utf-8',
-	} );
+	cli( 'git', ['pull', 'origin', BRANCH, '--rebase'], true );
+
+	console.log( `$ git fetch origin trunk...` );
+	cli( 'git', ['fetch', 'origin', 'trunk'], true );
 
 	const PRs = await fetchPRs();
 	console.log( 'Trying to cherry-pick one by one...' );
@@ -54,8 +52,14 @@ async function main() {
 	console.log( `Done!` );
 }
 
-function cli( command, args ) {
-	const result = spawnSync( command, args );
+function cli( command, args, pipe = false ) {
+	const pipeOptions = {
+		cwd: process.cwd(),
+		env: process.env,
+		stdio: 'pipe',
+		encoding: 'utf-8',
+	};
+	const result = spawnSync( command, args, ...( pipe ? pipeOptions : [] ) );
 	if ( result.status !== 0 ) {
 		throw new Error( result.stderr?.toString()?.trim() );
 	}
@@ -215,14 +219,14 @@ function GHcommentAndRemoveLabel( pr ) {
 	}
 }
 
-function reportSuccessManual( { number, cherryPickHash } ) {
+function reportSuccessManual( { number, title, cherryPickHash } ) {
 	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
 	console.log( indent( prComment( cherryPickHash ) ) );
 	console.log( '' );
 }
 
-function reportFailure( { number, mergeCommitHash } ) {
+function reportFailure( { number, title, error, mergeCommitHash } ) {
 	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
 	console.log( indent( `git cherry-pick ${ mergeCommitHash }`, 6 ) );
