@@ -10,9 +10,11 @@
 	min-width: 0;
 }
 
-.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings,
-.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings > div:not( :first-of-type ) {
-	display: block;
+.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
+	&,
+	& > div:not(:first-of-type) {
+		display: block;
+	}
 }
 
 .block-editor-panel-color-gradient-settings {

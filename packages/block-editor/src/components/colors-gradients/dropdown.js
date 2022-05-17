@@ -104,13 +104,6 @@ export default function ColorGradientSettingsDropdown( {
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
-	const dropdownClassName = __experimentalIsItemGroup
-		? 'block-editor-panel-color-gradient-settings__dropdown'
-		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
-
-	const dropdownClassName = __experimentalIsItemGroup
-		? 'block-editor-panel-color-gradient-settings__dropdown'
-		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
 	let popoverProps;
 	if ( __experimentalIsRenderedInSidebar ) {
 		popoverProps = {
