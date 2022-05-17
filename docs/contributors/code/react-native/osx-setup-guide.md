@@ -63,7 +63,7 @@ arch -x86_64 pod install
 
 #### Ruby Manager
 
-It may not be necessary to manually install Cocoapods if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance. 
+It may not be necessary to manually install Cocoapods or the `ffi` package if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance. 
 
 [`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app). 
 
