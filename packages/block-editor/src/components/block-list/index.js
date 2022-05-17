@@ -108,30 +108,6 @@ export default function BlockList( settings ) {
 
 BlockList.__unstableElementContext = elementContext;
 
-function Item( { rootClientId, isSelected, clientId } ) {
-	const isVisible = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).isBlockVisible( clientId );
-		},
-		[ clientId ]
-	);
-
-	return (
-		<AsyncModeProvider
-			value={
-				// Only provide data asynchronously if the block is
-				// not visible and not selected.
-				! isVisible && ! isSelected
-			}
-		>
-			<BlockListBlock
-				rootClientId={ rootClientId }
-				clientId={ clientId }
-			/>
-		</AsyncModeProvider>
-	);
-}
-
 function Items( {
 	placeholder,
 	rootClientId,
@@ -139,14 +115,17 @@ function Items( {
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks } = useSelect(
+	const { order, selectedBlocks, hiddenBlocks } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockOrder,
+				getSelectedBlockClientIds,
+				__unstableGetHiddenBlocks,
+			} = select( blockEditorStore );
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),
+				hiddenBlocks: __unstableGetHiddenBlocks(),
 			};
 		},
 		[ rootClientId ]
@@ -155,12 +134,20 @@ function Items( {
 	return (
 		<LayoutProvider value={ layout }>
 			{ order.map( ( clientId ) => (
-				<Item
+				<AsyncModeProvider
 					key={ clientId }
-					clientId={ clientId }
-					isSelected={ selectedBlocks.includes( clientId ) }
-					rootClientId={ rootClientId }
-				/>
+					value={
+						// Only provide data asynchronously if the block is
+						// not visible and not selected.
+						hiddenBlocks.has( clientId ) &&
+						! selectedBlocks.includes( clientId )
+					}
+				>
+					<BlockListBlock
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+					/>
+				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
 			<BlockListAppender

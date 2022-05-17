@@ -2662,3 +2662,20 @@ export function wasBlockJustInserted( state, clientId, source ) {
 export function isBlockVisible( state, clientId ) {
 	return state.blocks.visibility?.[ clientId ] ?? true;
 }
+
+/**
+ * Returns the list of all hidden blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {[string]} List of hidden blocks.
+ */
+export const __unstableGetHiddenBlocks = createSelector(
+	( state ) => {
+		return new Set(
+			Object.keys( state.blocks.visibility ).filter(
+				( key ) => ! state.blocks.visibility[ key ]
+			)
+		);
+	},
+	( state ) => [ state.blocks.visibility ]
+);
