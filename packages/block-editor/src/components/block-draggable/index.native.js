@@ -83,7 +83,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const { left, right } = useSafeAreaInsets();
 	const { width } = useSafeAreaFrame();
 	const safeAreaOffset = left + right;
-	const maxWidth = width - safeAreaOffset;
+	const contentWidth = width - safeAreaOffset;
 	animatedScrollRef( scrollRef );
 
 	const scroll = {
@@ -210,7 +210,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		const chipOffset = chip.width.value / 2;
 		const translateX = ! isRTL
 			? chip.x.value - chipOffset
-			: -( maxWidth - ( chip.x.value + chipOffset ) );
+			: -( contentWidth - ( chip.x.value + chipOffset ) );
 
 		return {
 			transform: [
