@@ -225,11 +225,9 @@ class EditorPage {
 	// Set html editor content explicitly.
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
-
 		const base64String = Buffer.from( html ).toString( 'base64' );
 
 		await this.driver.setClipboard( base64String, 'plaintext' );
-
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 
 		if ( isAndroid() ) {
@@ -239,14 +237,15 @@ class EditorPage {
 			await htmlContentView.type( html );
 		} else {
 			await htmlContentView.click();
+
 			await doubleTap( this.driver, htmlContentView );
 			// Sometimes double tap is not enough for paste menu to appear, so we also long press.
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 
-			const pasteButton = this.driver.elementByXPath(
+			const pasteButton = await waitForVisible(
+				this.driver,
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
 			);
-
 			await pasteButton.click();
 		}
 
@@ -546,7 +545,12 @@ class EditorPage {
 			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
 			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
 
-		return await isElementVisible( this.driver, slashInserterLocator, 5 );
+		return await isElementVisible(
+			this.driver,
+			slashInserterLocator,
+			1,
+			5
+		);
 	}
 
 	// =========================

@@ -419,24 +419,30 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
-		const showHtmlButton = await driver.elementByXPath(
-			showHtmlButtonXpath
-		);
-		await showHtmlButton.click();
+
+		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else {
-		const menuButton = await driver.elementByAccessibilityId( '...' );
-		await menuButton.click();
-		let toggleHtmlButton;
 		if ( toggleOn ) {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch to HTML'
+			await clickIfClickable(
+				driver,
+				'//XCUIElementTypeButton[@name="..."]'
 			);
-		} else {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch To Visual'
+			await clickIfClickable(
+				driver,
+				'//XCUIElementTypeButton[@name="Switch to HTML"]'
 			);
 		}
-		await toggleHtmlButton.click();
+
+		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
+		await driver.sleep( 3000 );
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
+		);
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch To Visual"]'
+		);
 	}
 };
 
@@ -536,6 +542,38 @@ const isElementVisible = async (
 	return true;
 };
 
+const clickIfClickable = async (
+	driver,
+	elementLocator,
+	length = 1,
+	maxIteration = 10,
+	iteration = 0
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		length,
+		maxIteration,
+		iteration
+	);
+
+	try {
+		await element.click();
+	} catch ( error ) {
+		if ( iteration >= maxIteration ) {
+			// eslint-disable-next-line no-console
+			console.error( `Not clickable after "${ iteration }" tries` );
+		}
+		return clickIfClickable(
+			driver,
+			elementLocator,
+			length,
+			maxIteration,
+			iteration + 1
+		);
+	}
+};
+
 // Only for Android
 const waitIfAndroid = async () => {
 	if ( isAndroid() ) {
@@ -546,6 +584,7 @@ const waitIfAndroid = async () => {
 module.exports = {
 	backspace,
 	clickBeginningOfElement,
+	clickIfClickable,
 	clickMiddleOfElement,
 	doubleTap,
 	isAndroid,
