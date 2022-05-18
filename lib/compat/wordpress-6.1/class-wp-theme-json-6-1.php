@@ -15,7 +15,7 @@
  * @access private
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
-	const ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
+	const __experimental_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
 
 	const ELEMENTS = array(
 		'link'   => 'a',
