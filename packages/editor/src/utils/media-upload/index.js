@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 
 /**
@@ -35,20 +35,38 @@ export default function mediaUpload( {
 	onFileChange,
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( editorStore );
+	const { lockPostSaving, unlockPostSaving } = dispatch( editorStore );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
+	const cacheKeyID = uniqueId();
+	const cacheKey = `image-upload-${ cacheKeyID }`;
+	let postSaveLocked = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange,
+		onFileChange: ( file ) => {
+			const remainingUploads = file.filter( ( f ) => ! f.id );
+			if ( ! postSaveLocked && remainingUploads ) {
+				lockPostSaving( cacheKey );
+				postSaveLocked = true;
+			} else {
+				unlockPostSaving( cacheKey );
+				postSaveLocked = false;
+			}
+			onFileChange( file );
+		},
 		additionalData: {
 			post: getCurrentPostId(),
 			...additionalData,
 		},
 		maxUploadFileSize,
-		onError: ( { message } ) => onError( message ),
+		onError: ( { message } ) => {
+			unlockPostSaving( cacheKey );
+			postSaveLocked = false;
+			onError( message );
+		},
 		wpAllowedMimeTypes,
 	} );
 }

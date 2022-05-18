@@ -9,7 +9,7 @@ import { get, has, omit, pick } from 'lodash';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withNotices } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -21,7 +21,6 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -140,8 +139,6 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	const { lockPostSaving, unlockPostSaving } = useDispatch( editorStore );
-
 	// A callback passed to MediaUpload,
 	// fired when the media modal closes.
 	function onCloseModal() {
@@ -186,7 +183,6 @@ export function ImageEdit( {
 			url: undefined,
 		} );
 		setTemporaryURL( undefined );
-		unlockPostSaving( 'image-upload' );
 	}
 
 	function onSelectImage( media ) {
@@ -204,7 +200,6 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
-			lockPostSaving( 'image-upload' );
 			return;
 		}
 
@@ -280,7 +275,6 @@ export function ImageEdit( {
 			...additionalAttributes,
 			linkDestination,
 		} );
-		unlockPostSaving( 'image-upload' );
 	}
 
 	function onSelectURL( newURL ) {
