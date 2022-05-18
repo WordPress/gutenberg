@@ -155,7 +155,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$declaration_block = array_reduce(
 				$declarations,
 				function ( $carry, $element ) use ( $selector ) {
-					if ( $selector === static::ROOT_BLOCK_SELECTOR && isset( static::ROOT_PROPERTIES_METADATA[ $element['name'] ] ) ) {
+					if ( static::ROOT_BLOCK_SELECTOR === $selector && isset( static::ROOT_PROPERTIES_METADATA[ $element['name'] ] ) ) {
 						$carry        .= "\t" . static::ROOT_PROPERTIES_METADATA[ $element['name'] ] . ': ' . $element['value'] . ";\n";
 						return $carry .= "\t" . $element['name'] . ': var(' . static::ROOT_PROPERTIES_METADATA[ $element['name'] ] . ");\n";
 					}
@@ -167,7 +167,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$declaration_block = array_reduce(
 				$declarations,
 				function ( $carry, $element ) use ( $selector ) {
-					if ( $selector === static::ROOT_BLOCK_SELECTOR && isset( static::ROOT_PROPERTIES_METADATA[ $element['name'] ] ) ) {
+					if ( static::ROOT_BLOCK_SELECTOR === $selector && isset( static::ROOT_PROPERTIES_METADATA[ $element['name'] ] ) ) {
 						$carry        .= static::ROOT_PROPERTIES_METADATA[ $element['name'] ] . ': ' . $element['value'] . ';';
 						return $carry .= $element['name'] . ': var(' . static::ROOT_PROPERTIES_METADATA[ $element['name'] ] . ');';
 					}

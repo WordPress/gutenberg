@@ -174,7 +174,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 		$used_layout = $default_layout;
 	}
-	$used_layout['fullWidthShouldStretch'] = isset( $default_layout['fullWidthShouldStretch'] ) && true === $default_layout['fullWidthShouldStretch'] && isset( $block['attrs']['align'] ) && $block['attrs']['align'] === 'full';
+	$used_layout['fullWidthShouldStretch'] = isset( $default_layout['fullWidthShouldStretch'] ) && true === $default_layout['fullWidthShouldStretch'] && isset( $block['attrs']['align'] ) && 'full' === $block['attrs']['align'];
 
 	$class_name = wp_unique_id( 'wp-container-' );
 
