@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.7.0 (2022-05-18)
+
 ### New Features
 
 -   Stabilized the `useEntityRecord` and `useEntityRecords` hooks ([#40162](https://github.com/WordPress/gutenberg/pull/40162))

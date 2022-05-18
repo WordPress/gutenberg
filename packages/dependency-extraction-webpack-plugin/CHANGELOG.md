@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.5.0 (2022-05-18)
+
 ### Bug Fix
 
 -   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).
