@@ -20,7 +20,7 @@ test.describe( 'Heading', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### 3' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -30,7 +30,7 @@ test.describe( 'Heading', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
@@ -42,7 +42,7 @@ test.describe( 'Heading', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## 1. H' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -52,7 +52,7 @@ test.describe( 'Heading', () => {
 		page,
 		editor,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## `code`' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -88,7 +88,7 @@ test.describe( 'Heading', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '### Heading' );
 
 		await editor.openDocumentSettingsSidebar();
@@ -118,7 +118,7 @@ test.describe( 'Heading', () => {
 	} );
 
 	test( 'should correctly apply named colors', async ( { page, editor } ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '## Heading' );
 
 		// Click the text color picker.
