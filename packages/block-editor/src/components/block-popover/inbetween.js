@@ -107,6 +107,8 @@ function BlockPopoverInbetween( {
 					left: previousRect ? previousRect.right : nextRect.right,
 					right: previousRect ? previousRect.left : nextRect.left,
 					bottom: nextRect ? nextRect.top : previousRect.bottom,
+					height: 0,
+					width: 0,
 					ownerDocument,
 				};
 			}
@@ -116,6 +118,8 @@ function BlockPopoverInbetween( {
 				left: previousRect ? previousRect.left : nextRect.left,
 				right: previousRect ? previousRect.right : nextRect.right,
 				bottom: nextRect ? nextRect.top : previousRect.bottom,
+				height: 0,
+				width: 0,
 				ownerDocument,
 			};
 		}
@@ -126,6 +130,8 @@ function BlockPopoverInbetween( {
 				left: previousRect ? previousRect.left : nextRect.right,
 				right: nextRect ? nextRect.right : previousRect.left,
 				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+				height: 0,
+				width: 0,
 				ownerDocument,
 			};
 		}
@@ -135,6 +141,8 @@ function BlockPopoverInbetween( {
 			left: previousRect ? previousRect.right : nextRect.left,
 			right: nextRect ? nextRect.left : previousRect.right,
 			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+			height: 0,
+			width: 0,
 			ownerDocument,
 		};
 	}, [ previousElement, nextElement ] );
@@ -155,7 +163,6 @@ function BlockPopoverInbetween( {
 	return (
 		<Popover
 			ref={ popoverScrollRef }
-			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }

@@ -59,25 +59,7 @@
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	& > div {
-		width: $sidebar-width;
-	}
-}
-
-@include break-medium() {
-	.block-editor-panel-color-gradient-settings__dropdown-content {
-		.components-popover__content {
-			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
-		}
-
-		&.is-from-top .components-popover__content {
-			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
-		}
-
-		&.is-from-bottom .components-popover__content {
-			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
-		}
-	}
+	width: $sidebar-width;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown:last-child > div {
