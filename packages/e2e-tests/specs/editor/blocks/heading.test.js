@@ -86,10 +86,14 @@ describe( 'Heading', () => {
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
-		await page.keyboard.type( '0782f6' );
-		await page.click( 'h3[data-type="core/heading"]' );
-		await page.waitForXPath( '//button//span[contains(text(), "0782f6")]' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		await page.keyboard.type( '4b7f4d' );
+		await page.waitForXPath( '//button//span[contains(text(), "4b7f4d")]' );
+		await page.click( '.wp-block-post-title' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
+		<h3 class=\\"has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
+		<!-- /wp:heading -->"
+	` );
 	} );
 
 	it( 'should correctly apply named colors', async () => {

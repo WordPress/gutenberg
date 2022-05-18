@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "13.2.0-rc.1",
+	"version": "13.3.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -86,7 +86,7 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@actions/core": "1.4.0",
+		"@actions/core": "1.8.0",
 		"@actions/github": "5.0.0",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -122,6 +122,7 @@
 		"@types/npm-package-arg": "6.1.1",
 		"@types/prettier": "2.4.4",
 		"@types/qs": "6.9.7",
+		"@types/react-dates": "17.1.10",
 		"@types/requestidlecallback": "0.3.4",
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
@@ -164,7 +165,7 @@
 		"benchmark": "2.1.4",
 		"browserslist": "4.17.6",
 		"chalk": "4.1.1",
-		"commander": "4.1.0",
+		"commander": "9.2.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "10.2.0",
 		"core-js-builder": "3.19.1",
@@ -190,7 +191,7 @@
 		"jest-watch-typeahead": "1.0.0",
 		"jsdom": "16.7.0",
 		"lerna": "3.22.1",
-		"lint-staged": "9.2.5",
+		"lint-staged": "10.0.1",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.66.2",
@@ -211,6 +212,7 @@
 		"react-refresh": "0.10.0",
 		"react-test-renderer": "17.0.2",
 		"redux": "4.1.2",
+		"resize-observer-polyfill": "1.5.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
 		"sass": "1.35.2",
@@ -300,19 +302,21 @@
 		"prepare": "husky install"
 	},
 	"lint-staged": {
+		"*.{js,json,ts,tsx,yml,yaml}": [
+			"wp-scripts format"
+		],
+		"*.{js,ts,tsx}": [
+			"wp-scripts lint-js"
+		],
+		"*.scss": [
+			"wp-scripts lint-style"
+		],
 		"package-lock.json": [
 			"npm run lint-lockfile",
 			"node ./bin/check-latest-npm.js"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
-		],
-		"*.scss": [
-			"wp-scripts lint-style"
-		],
-		"*.{js,ts,tsx,yml}": [
-			"wp-scripts format",
-			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"

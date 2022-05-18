@@ -29,6 +29,7 @@
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"jest-matcher-utils": "^27.4.2",

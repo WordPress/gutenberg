@@ -13,6 +13,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 import { store as viewportStore } from '@wordpress/viewport';
@@ -64,7 +65,23 @@ export function reinitializeEditor( target, settings ) {
 			keepCaretInsideBlock: false,
 			welcomeGuide: true,
 			welcomeGuideStyles: true,
+			shouldListViewOpenByDefault: false,
 		} );
+
+		// Check if the block list view should be open by default.
+		if (
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			)
+		) {
+			dispatch( editSiteStore ).setIsListViewOpened( true );
+		}
+
+		dispatch( interfaceStore ).setDefaultComplementaryArea(
+			'core/edit-site',
+			'edit-site/template'
+		);
 
 		dispatch( editSiteStore ).updateSettings( settings );
 

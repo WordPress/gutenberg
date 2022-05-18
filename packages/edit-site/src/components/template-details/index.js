@@ -50,6 +50,9 @@ export default function TemplateDetails( { template, onClose } ) {
 		postId: undefined,
 	} );
 
+	// Only user-created and non-default templates can change the name.
+	const canEditTitle = template.is_custom && ! template.has_theme_file;
+
 	if ( ! template ) {
 		return null;
 	}
@@ -62,7 +65,7 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<div className="edit-site-template-details">
 			<div className="edit-site-template-details__group">
-				{ template.is_custom ? (
+				{ canEditTitle ? (
 					<EditTemplateTitle template={ template } />
 				) : (
 					<Heading

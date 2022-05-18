@@ -10,17 +10,11 @@ import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
-	PlainText,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
-import {
-	PanelBody,
-	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -31,20 +25,12 @@ import { addQueryArgs } from '@wordpress/url';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function Edit( {
-	attributes: {
-		textAlign,
-		singleCommentLabel,
-		multipleCommentsLabel,
-		showPostTitle,
-		showCommentsCount,
-		level,
-	},
+	attributes: { textAlign, showPostTitle, showCommentsCount, level },
 	setAttributes,
 	context: { postType, postId },
 } ) {
 	const TagName = 'h' + level;
 	const [ commentsCount, setCommentsCount ] = useState();
-	const [ editingMode, setEditingMode ] = useState( 'plural' );
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps( {
@@ -100,22 +86,6 @@ export default function Edit( {
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				{ isSiteEditor && (
-					<ToggleGroupControl
-						label={ __( 'Editing mode' ) }
-						onChange={ setEditingMode }
-						value={ editingMode }
-					>
-						<ToggleGroupControlOption
-							label={ __( 'Singular' ) }
-							value="singular"
-						/>
-						<ToggleGroupControlOption
-							label={ __( 'Plural' ) }
-							value="plural"
-						/>
-					</ToggleGroupControl>
-				) }
 				<ToggleControl
 					label={ __( 'Show post title' ) }
 					checked={ showPostTitle }
@@ -136,78 +106,52 @@ export default function Edit( {
 
 	const postTitle = isSiteEditor ? __( '"Post Title"' ) : `"${ rawTitle }"`;
 
-	const singlePlaceholder = showPostTitle
-		? __( 'One response to ' )
-		: __( 'One response' );
-
-	const singlePlaceholderNoCount = showPostTitle
-		? __( 'Response to ' )
-		: __( 'Response' );
-
-	const multiplePlaceholder = showPostTitle
-		? __( 'responses to ' )
-		: __( 'responses' );
-
-	const multiplePlaceholderNoCount = showPostTitle
-		? __( 'Responses to ' )
-		: __( 'Responses' );
+	let placeholder;
+	if ( showCommentsCount && commentsCount !== undefined ) {
+		if ( showPostTitle ) {
+			if ( commentsCount === 1 ) {
+				/* translators: %s: Post title. */
+				placeholder = sprintf( __( 'One response to %s' ), postTitle );
+			} else {
+				placeholder = sprintf(
+					/* translators: 1: Number of comments, 2: Post title. */
+					_n(
+						'%1$s response to %2$s',
+						'%1$s responses to %2$s',
+						commentsCount
+					),
+					commentsCount,
+					postTitle
+				);
+			}
+		} else if ( commentsCount === 1 ) {
+			placeholder = __( 'One response' );
+		} else {
+			placeholder = sprintf(
+				/* translators: %s: Number of comments. */
+				_n( '%s responses', '%s responses', commentsCount ),
+				commentsCount
+			);
+		}
+	} else if ( showPostTitle ) {
+		if ( commentsCount === 1 ) {
+			/* translators: %s: Post title. */
+			placeholder = sprintf( __( 'Response to %s' ), postTitle );
+		} else {
+			/* translators: %s: Post title. */
+			placeholder = sprintf( __( 'Responses to %s' ), postTitle );
+		}
+	} else if ( commentsCount === 1 ) {
+		placeholder = __( 'Response' );
+	} else {
+		placeholder = __( 'Responses' );
+	}
 
 	return (
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			<TagName { ...blockProps }>
-				{ editingMode === 'singular' || commentsCount === 1 ? (
-					<>
-						<PlainText
-							__experimentalVersion={ 2 }
-							tagName="span"
-							aria-label={
-								showCommentsCount
-									? singlePlaceholder
-									: singlePlaceholderNoCount
-							}
-							placeholder={
-								showCommentsCount
-									? singlePlaceholder
-									: singlePlaceholderNoCount
-							}
-							value={ singleCommentLabel }
-							onChange={ ( newLabel ) =>
-								setAttributes( {
-									singleCommentLabel: newLabel,
-								} )
-							}
-						/>
-						{ showPostTitle ? postTitle : null }
-					</>
-				) : (
-					<>
-						{ showCommentsCount ? commentsCount : null }
-						<PlainText
-							__experimentalVersion={ 2 }
-							tagName="span"
-							aria-label={
-								showCommentsCount
-									? ` ${ multiplePlaceholder }`
-									: multiplePlaceholderNoCount
-							}
-							placeholder={
-								showCommentsCount
-									? ` ${ multiplePlaceholder }`
-									: multiplePlaceholderNoCount
-							}
-							value={ multipleCommentsLabel }
-							onChange={ ( newLabel ) =>
-								setAttributes( {
-									multipleCommentsLabel: newLabel,
-								} )
-							}
-						/>
-						{ showPostTitle ? postTitle : null }
-					</>
-				) }
-			</TagName>
+			<TagName { ...blockProps }>{ placeholder }</TagName>
 		</>
 	);
 }

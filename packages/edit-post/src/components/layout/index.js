@@ -181,6 +181,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
 		}
+
 		return null;
 	};
 

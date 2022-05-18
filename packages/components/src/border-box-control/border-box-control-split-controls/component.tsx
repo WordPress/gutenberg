@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,12 +27,23 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		onChange,
-		popoverClassNames,
+		popoverPlacement,
+		popoverOffset,
 		value,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
+	const containerRef = useRef();
+	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+	const popoverProps = popoverPlacement
+		? {
+				placement: popoverPlacement,
+				offset: popoverOffset,
+				anchorRef: containerRef,
+		  }
+		: undefined;
 
 	const sharedBorderControlProps = {
 		colors,
@@ -40,17 +53,21 @@ const BorderBoxControlSplitControls = (
 		isCompact: true,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
+		__next36pxDefaultSize,
 	};
 
 	return (
-		<Grid { ...otherProps } ref={ forwardedRef } gap={ 4 }>
-			<BorderBoxControlVisualizer value={ value } />
+		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+			<BorderBoxControlVisualizer
+				value={ value }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
+			/>
 			<BorderControl
 				className={ centeredClassName }
 				hideLabelFromVision={ true }
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
-				popoverContentClassName={ popoverClassNames?.top }
+				__unstablePopoverProps={ popoverProps }
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
@@ -58,7 +75,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
-				popoverContentClassName={ popoverClassNames?.left }
+				__unstablePopoverProps={ popoverProps }
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
@@ -66,7 +83,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
-				popoverContentClassName={ popoverClassNames?.right }
+				__unstablePopoverProps={ popoverProps }
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
@@ -75,7 +92,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision={ true }
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
-				popoverContentClassName={ popoverClassNames?.bottom }
+				__unstablePopoverProps={ popoverProps }
 				value={ value?.bottom }
 				{ ...sharedBorderControlProps }
 			/>

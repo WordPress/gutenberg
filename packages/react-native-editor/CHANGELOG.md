@@ -11,8 +11,14 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+
+## 1.76.0
+
 -   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
 -   [**] [Cover block] Improve color contrast between background and text [#40691]
+-   [*] [Gallery block] Fix broken "Link To" settings and add "Image Size" settings [#40947]
+-   [***] Add drag & drop blocks feature [#40424]
 
 ## 1.75.0
 

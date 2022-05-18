@@ -198,7 +198,7 @@ export function setSettings( dateSettings ) {
 /**
  * Returns the currently defined date settings.
  *
- * @return {Object} Settings, including locale data.
+ * @return {DateSettings} Settings, including locale data.
  */
 export function __experimentalGetSettings() {
 	return settings;

@@ -2149,7 +2149,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestSucceed( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request has failed', () => {
+		it( 'should return false if the post save request has failed', () => {
 			const state = {
 				saving: {
 					successful: false,
@@ -2171,7 +2171,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestFail( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request is successful', () => {
+		it( 'should return false if the post save request is successful', () => {
 			const state = {
 				saving: {
 					error: false,

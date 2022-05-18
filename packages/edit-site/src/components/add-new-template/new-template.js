@@ -37,10 +37,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useHistory } from '../routes';
+import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	'single-post',
+	'single',
 	'page',
 	'index',
 	'archive',
@@ -55,7 +56,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	'single-post': post,
+	single: post,
 	page,
 	archive,
 	search,
@@ -86,6 +87,7 @@ export default function NewTemplate( { postType } ) {
 	);
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -105,6 +107,9 @@ export default function NewTemplate( { postType } ) {
 				},
 				{ throwOnError: true }
 			);
+
+			// Set template before navigating away to avoid initial stale value.
+			setTemplate( template.id, template.slug );
 
 			// Navigate to the created template editor.
 			history.push( {

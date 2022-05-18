@@ -10,7 +10,7 @@ import {
 	getColorObjectByAttributeValues,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -115,7 +115,7 @@ function PullQuoteEdit( props ) {
 							textAlign={ textAlign ?? 'center' }
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
-									createBlock( 'core/paragraph' )
+									createBlock( getDefaultBlockName() )
 								)
 							}
 						/>

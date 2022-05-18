@@ -59,25 +59,7 @@
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	& > div {
-		width: $sidebar-width;
-	}
-}
-
-@include break-medium() {
-	.block-editor-panel-color-gradient-settings__dropdown-content {
-		.components-popover__content {
-			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
-		}
-
-		&.is-from-top .components-popover__content {
-			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
-		}
-
-		&.is-from-bottom .components-popover__content {
-			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
-		}
-	}
+	width: $sidebar-width;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown:last-child > div {
@@ -87,10 +69,6 @@
 .block-editor-panel-color-gradient-settings__item {
 	padding-top: $grid-unit-15 !important;
 	padding-bottom: $grid-unit-15 !important;
-	.block-editor-panel-color-gradient-settings__color-indicator {
-		// Show a diagonal line (crossed out) for empty swatches.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-	}
 
 	&.is-open {
 		background: $gray-100;
@@ -98,3 +76,53 @@
 	}
 }
 
+.block-editor-panel-color-gradient-settings__color-indicator {
+	// Show a diagonal line (crossed out) for empty swatches.
+	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+}
+
+/**
+* The following styles replicate the separated border of the
+* `ItemGroup` component but allows for hidden items. This is because
+* to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
+* must at least render a placeholder which would otherwise interfere
+* with the `:last-child` styles.
+*/
+.block-editor-tools-panel-color-gradient-settings__item {
+	padding: 0;
+
+	// Border styles.
+	border-left: 1px solid rgba(0, 0, 0, 0.1);
+	border-right: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+	&.first {
+		border-top-left-radius: 2px;
+		border-top-right-radius: 2px;
+		border-top: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	&.last {
+		border-bottom-left-radius: 2px;
+		border-bottom-right-radius: 2px;
+	}
+
+	> div,
+	> div > button {
+		border-radius: inherit;
+	}
+}
+
+.block-editor-tools-panel-color-gradient-settings__dropdown {
+	display: block;
+	padding: 0;
+
+	> button {
+		height: 46px;
+
+		&.is-open {
+			background: $gray-100;
+			color: var(--wp-admin-theme-color);
+		}
+	}
+}

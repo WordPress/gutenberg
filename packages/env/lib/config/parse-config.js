@@ -114,6 +114,33 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	// SSH URLs (git)
+	const supportedProtocols = [ 'ssh:', 'git+ssh:' ];
+	try {
+		const sshUrl = new URL( sourceString );
+		if ( supportedProtocols.includes( sshUrl.protocol ) ) {
+			const pathElements = sshUrl.pathname
+				.split( '/' )
+				.filter( ( e ) => !! e );
+			const basename = pathElements
+				.slice( -1 )[ 0 ]
+				.replace( /\.git/, '' );
+			const workingPath = path.resolve(
+				workDirectoryPath,
+				...pathElements.slice( 0, -1 ),
+				basename
+			);
+			return {
+				type: 'git',
+				url: sshUrl.href.split( '#' )[ 0 ],
+				ref: sshUrl.hash.slice( 1 ) || 'master',
+				path: workingPath,
+				clonePath: workingPath,
+				basename,
+			};
+		}
+	} catch ( err ) {}
+
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);

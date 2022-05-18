@@ -4,14 +4,18 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useInstanceId,
+	usePrevious,
+	useResizeObserver,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,7 +53,7 @@ function ToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [ resizeListener, sizes ] = useResizeObserver();
 	const baseId = useInstanceId(
 		ToggleGroupControl,
 		'toggle-group-control'
