@@ -10,7 +10,7 @@ test.describe( 'HTML block', () => {
 
 	test( 'can be created by typing "/html"', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/html' );
 		await page.waitForSelector( 'role=option[name="Custom HTML"i]' );
 		await page.keyboard.press( 'Enter' );
