@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { ResizableBox } from '@wordpress/components';
+import { useMemo, useState } from '@wordpress/element';
+import { __experimentalResizableBoxPopover as ResizableBoxPopover } from '@wordpress/block-editor';
 
 const RESIZABLE_BOX_ENABLE_OPTION = {
 	top: false,
@@ -20,17 +20,25 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 	topLeft: false,
 };
 
-export default function ResizableCover( {
+export default function ResizableCoverPopover( {
 	className,
-	onResizeStart,
+	height,
+	minHeight,
 	onResize,
+	onResizeStart,
 	onResizeStop,
+	width,
 	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
+	const dimensions = useMemo(
+		() => ( { height, minHeight, width } ),
+		[ minHeight, height, width ]
+	);
 
 	return (
-		<ResizableBox
+		<ResizableBoxPopover
+			__unstableRefreshSize={ dimensions }
 			className={ classnames( className, {
 				'is-resizing': isResizing,
 			} ) }

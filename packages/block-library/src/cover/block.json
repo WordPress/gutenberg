@@ -94,6 +94,18 @@
 				"blockGap": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"text": true,

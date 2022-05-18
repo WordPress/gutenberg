@@ -11,6 +11,7 @@
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
 	/*rtl:raw: direction: ltr; */
+	overflow: hidden;
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
