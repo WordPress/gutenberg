@@ -43,8 +43,9 @@
 				// As with mobile styles, this must be important since the Column
 				// assigns its own width as an inline style, which should take effect
 				// starting at `break-medium`.
+				// Note: if the columns block has a style.spacing.blockGap value of > var(--wp--style--block-gap, 2em) this effect will not show.
+				// What would make this particular definition more robust is if we could do the following dynamically: ( var(--wp--style--block-gap, 2em) + style.spacing.blockGap )
 				flex-basis: calc(50% - calc(var(--wp--style--block-gap, 2em) / 2)) !important;
-				flex-grow: 1;
 			}
 		}
 
