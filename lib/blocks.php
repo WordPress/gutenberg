@@ -370,11 +370,6 @@ if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 			return $settings;
 		}
 
-		// Bail early if not a frontend request.
-		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-			return $settings;
-		}
-
 		// Bail early if the block doesn't have a "style" defined.
 		if ( empty( $settings['style'] ) ) {
 			return $settings;
