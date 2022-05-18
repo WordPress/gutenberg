@@ -43,7 +43,7 @@ window.addEventListener(
 	background: #FFF;
 	height: 1000px;
 }
-button .spinner-in-button {
+button .components-spinner {
 	width: 15px;
 	height: 15px;
 	margin-top: 0;

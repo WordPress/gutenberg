@@ -107,7 +107,7 @@ const DeletePageButton = ({ pageId }) => {
 		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting }>
 			{ isDeleting ? (
 				<>
-					<Spinner className="spinner-in-button" />
+					<Spinner />
 					Deleting...
 				</>
 			) : 'Delete' }
@@ -318,7 +318,7 @@ function DeletePageButton( { pageId } ) {
 		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting }>
 			{ isDeleting ? (
 				<>
-					<Spinner className="spinner-in-button" />
+					<Spinner />
 					Deleting...
 				</>
 			) : 'Delete' }
