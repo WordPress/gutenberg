@@ -30,10 +30,22 @@
 	}
 
 	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
-		@media (max-width: #{ ($break-medium - 1) }) {
+		@media (max-width: #{ ($break-small - 1) }) {
 			// Responsiveness: Show at most one columns on mobile. This must be
 			// important since the Column assigns its own width as an inline style.
 			flex-basis: 100% !important;
+		}
+
+		// Between mobile and large viewports (tablet), allow 2 columns.
+		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+			// Only add two column styling if there are two or more columns
+			&:not(:only-child) {
+				// As with mobile styles, this must be important since the Column
+				// assigns its own width as an inline style, which should take effect
+				// starting at `break-medium`.
+				flex-basis: calc(50% - calc(var(--wp--style--block-gap, 2em) / 2)) !important;
+				flex-grow: 1;
+			}
 		}
 
 		// At large viewports, show all columns horizontally.
