@@ -28,6 +28,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color', 'background' ],
 		requiresOptOut: true,
+		useEngine: true,
 	},
 	borderColor: {
 		value: [ 'border', 'color' ],
@@ -103,6 +104,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'text' ],
 		support: [ 'color', 'text' ],
 		requiresOptOut: true,
+		useEngine: true,
 	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
@@ -119,18 +121,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
 		support: [ 'typography', 'fontSize' ],
+		useEngine: true,
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
 		support: [ 'typography', '__experimentalFontStyle' ],
+		useEngine: true,
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
+		useEngine: true,
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'typography', 'lineHeight' ],
+		useEngine: true,
 	},
 	margin: {
 		value: [ 'spacing', 'margin' ],
@@ -157,14 +163,17 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
+		useEngine: true,
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
 		support: [ 'typography', '__experimentalTextTransform' ],
+		useEngine: true,
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
 	},
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],
