@@ -10,7 +10,7 @@ test.describe( 'Heading', () => {
 	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
 		'.components-color-picker button[aria-label="Show detailed inputs"]';
 	const COLOR_INPUT_FIELD_SELECTOR =
-		'.components-color-picker .components-input-control__input ';
+		'.components-color-picker .components-input-control__input';
 
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
