@@ -68,7 +68,6 @@ export default function SearchEdit( {
 		label,
 		showLabel,
 		placeholder,
-		query,
 		width,
 		widthUnit,
 		align,
@@ -234,15 +233,6 @@ export default function SearchEdit( {
 						setAttributes( { placeholder: event.target.value } )
 					}
 				/>
-				{ !! query &&
-					Object.keys( query ).map( ( key ) => (
-						<input
-							key={ key }
-							type="hidden"
-							name={ key }
-							value={ query[ key ] }
-						/>
-					) ) }
 			</>
 		);
 	};
