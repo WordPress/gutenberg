@@ -98,7 +98,13 @@ function BlockPopoverInbetween( {
 			width,
 			height: previousRect ? previousRect.height : nextRect.height,
 		};
-	}, [ previousElement, nextElement, isVertical, positionRecompute ] );
+	}, [
+		previousElement,
+		nextElement,
+		isVertical,
+		positionRecompute,
+		isVisible,
+	] );
 
 	const getAnchorRect = useCallback( () => {
 		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
@@ -159,7 +165,7 @@ function BlockPopoverInbetween( {
 			width: 0,
 			ownerDocument,
 		};
-	}, [ previousElement, nextElement, positionRecompute ] );
+	}, [ previousElement, nextElement, positionRecompute, isVisible ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 

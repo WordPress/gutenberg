@@ -6,6 +6,9 @@
 	// like the popover is impacted by the block gap margin.
 	margin: 0 !important;
 
+	// Allow clicking through the toolbar holder.
+	pointer-events: none;
+
 	.components-popover__content {
 		margin: 0 !important;
 		min-width: auto;
@@ -16,8 +19,6 @@
 		box-shadow: none;
 		overflow-y: visible;
 
-		// Allow clicking through the toolbar holder.
-		pointer-events: none;
 		> div > * {
 			pointer-events: all;
 		}
