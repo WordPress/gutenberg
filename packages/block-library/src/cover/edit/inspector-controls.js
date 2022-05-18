@@ -228,7 +228,6 @@ export default function CoverInspectorControls( {
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
 					__experimentalHasMultipleOrigins
-					__experimentalIsItemGroup={ false }
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
@@ -238,12 +237,6 @@ export default function CoverInspectorControls( {
 							onColorChange: setOverlayColor,
 							onGradientChange: setGradient,
 							isShownByDefault: true,
-							hasValue: () =>
-								!! overlayColor.color || !! gradientValue,
-							onDeselect: () => {
-								setOverlayColor( undefined );
-								setGradient( undefined );
-							},
 							resetAllFilter: () => ( {
 								overlayColor: undefined,
 								customOverlayColor: undefined,
@@ -263,7 +256,7 @@ export default function CoverInspectorControls( {
 						setAttributes( { dimRatio: undefined } )
 					}
 					resetAllFilter={ () => ( { dimRatio: undefined } ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<RangeControl
