@@ -30,7 +30,7 @@ export type HigherOrderComponent< HOCProps extends Record< string, any > > = <
  *
  * @return Component class with generated display name assigned.
  */
-function createHigherOrderComponent<
+export function createHigherOrderComponent<
 	HOCProps extends Record< string, any > = {}
 >( mapComponent: HigherOrderComponent< HOCProps >, modifierName: string ) {
 	return < InnerProps extends HOCProps >(
@@ -44,5 +44,3 @@ function createHigherOrderComponent<
 		return Outer;
 	};
 }
-
-export default createHigherOrderComponent;
