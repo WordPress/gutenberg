@@ -236,7 +236,7 @@ export const updateNavigationLinkBlockAttributes = (
 
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
 
-	const label = decodeEntities( title ) || originalLabel || normalizedURL;
+	const label = title || originalLabel || normalizedURL;
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -793,7 +793,9 @@ export default function NavigationLinkEdit( {
 											<span>
 												{
 													/* Trim to avoid trailing white space when the placeholder text is not present */
-													`${ label } ${ placeholderText }`.trim()
+													`${ decodeEntities(
+														label
+													) } ${ placeholderText }`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">
