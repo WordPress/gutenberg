@@ -14,7 +14,6 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 		// Render in popover.
 		return (
 			<Popover
-				noArrow
 				position="top center"
 				focusOnMount={ false }
 				anchorRef={ anchorRef }

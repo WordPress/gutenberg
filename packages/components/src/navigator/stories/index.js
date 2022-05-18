@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { HStack } from '../../h-stack';
-import { Flyout } from '../../flyout';
+import { Popover } from '../../popover';
 import { useCx } from '../../utils/hooks/use-cx';
 import {
 	NavigatorProvider,
@@ -54,17 +54,13 @@ const MyNavigation = () => {
 								Navigate to screen with sticky content.
 							</NavigatorButton>
 
-							<Flyout
-								trigger={
-									<Button variant="primary">
-										Open test dialog
-									</Button>
-								}
-								placement="bottom-start"
-							>
-								<CardHeader>Go</CardHeader>
-								<CardBody>Stuff</CardBody>
-							</Flyout>
+							<Button variant="primary">
+								Open test dialog
+								<Popover>
+									<CardHeader>Go</CardHeader>
+									<CardBody>Stuff</CardBody>
+								</Popover>
+							</Button>
 						</HStack>
 					</CardBody>
 				</Card>

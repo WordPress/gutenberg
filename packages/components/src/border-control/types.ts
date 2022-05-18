@@ -81,10 +81,9 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
-		 * A custom CSS class name to be assigned to the border control's
-		 * dropdown popover content.
+		 * An internal prop used to control the visibility of the dropdown.
 		 */
-		popoverContentClassName?: string;
+		__unstablePopoverProps?: Record< string, unknown >;
 		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`
@@ -131,10 +130,9 @@ export type DropdownProps = ColorProps & {
 	 */
 	border?: Border;
 	/**
-	 * A custom CSS class name to be assigned to the border control's
-	 * dropdown popover content.
+	 * An internal prop used to control the visibility of the dropdown.
 	 */
-	contentClassName?: string;
+	__unstablePopoverProps?: Record< string, unknown >;
 	/**
 	 * This controls whether to render border style options.
 	 *
