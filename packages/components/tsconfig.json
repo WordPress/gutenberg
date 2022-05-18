@@ -54,7 +54,6 @@
 		"src/dropdown-menu/**/*",
 		"src/elevation/**/*",
 		"src/flex/**/*",
-		"src/flyout/**/*",
 		"src/form-group/**/*",
 		"src/grid/**/*",
 		"src/h-stack/**/*",

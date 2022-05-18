@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
 import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { HStack } from '../../h-stack';
-import { Popover } from '../../popover';
+import Dropdown from '../../dropdown';
 import { useCx } from '../../utils/hooks/use-cx';
 import {
 	NavigatorProvider,
@@ -54,13 +54,23 @@ const MyNavigation = () => {
 								Navigate to screen with sticky content.
 							</NavigatorButton>
 
-							<Button variant="primary">
-								Open test dialog
-								<Popover>
-									<CardHeader>Go</CardHeader>
-									<CardBody>Stuff</CardBody>
-								</Popover>
-							</Button>
+							<Dropdown
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<Button
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+										variant="primary"
+									>
+										Open test dialog
+									</Button>
+								) }
+								renderContent={ () => (
+									<Card>
+										<CardHeader>Go</CardHeader>
+										<CardBody>Stuff</CardBody>
+									</Card>
+								) }
+							/>
 						</HStack>
 					</CardBody>
 				</Card>

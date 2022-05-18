@@ -21,7 +21,7 @@ import { useCx } from '../../utils';
 import { ItemGroup, Item } from '..';
 import Button from '../../button';
 import { FlexItem, FlexBlock } from '../../flex';
-import { Flyout } from '../../flyout';
+import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import Icon from '../../icon';
 import { Text } from '../../text';
@@ -90,23 +90,27 @@ export const _default = () => {
 };
 
 export const dropdown = () => (
-	<Flyout
-		style={ { width: '350px' } }
-		trigger={ <Button>Open Popover</Button> }
-	>
-		<ItemGroup style={ { padding: 4 } }>
-			<Item>Code is Poetry (no click handlers)</Item>
-			<Item onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-			<Item onClick={ () => alert( 'WordPress.org' ) }>
-				Code is Poetry — Click me!
-			</Item>
-		</ItemGroup>
-	</Flyout>
+	<Dropdown
+		renderToggle={ ( { isOpen, onToggle } ) => (
+			<Button onClick={ onToggle } aria-expanded={ isOpen }>
+				Open Popover
+			</Button>
+		) }
+		renderContent={ () => (
+			<ItemGroup style={ { minWidth: 350, padding: 4 } }>
+				<Item>Code is Poetry (no click handlers)</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+				<Item onClick={ () => alert( 'WordPress.org' ) }>
+					Code is Poetry — Click me!
+				</Item>
+			</ItemGroup>
+		) }
+	/>
 );
 
 const SimpleColorSwatch = ( { color, style } ) => (
