@@ -186,6 +186,9 @@ You may prefer to hide the pages immediately after the user clicks the _Delete_ 
 Here's how we could use it in `MyFirstApp`:
 
 ```js
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+
 function MyFirstApp() {
 	const [searchTerm, setSearchTerm] = useState( '' );
 	const { pages, hasResolved } = useSelect(
@@ -224,8 +227,8 @@ And that's it!
 All the pieces are in place, great! Here’s all the changes we've made in this chapter:
 
 ```js
-import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
 import { Button, Modal, TextControl } from '@wordpress/components';
 
 function MyFirstApp() {
