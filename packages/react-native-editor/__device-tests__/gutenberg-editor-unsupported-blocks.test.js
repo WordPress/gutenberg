@@ -7,7 +7,7 @@ describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 	it( 'should be able to open the unsupported block web view editor', async () => {
 		await editorPage.setHtmlContent( testData.unsupportedBlockHtml );
 
-		const firstVisibleBlock = await editorPage.getFirstBlockVisible();
+		const firstVisibleBlock = await editorPage.getUnsupportedBlockVisible();
 		await firstVisibleBlock.click();
 
 		const helpButton = await editorPage.getUnsupportedBlockHelpButton();
@@ -16,8 +16,7 @@ describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 		const editButton = await editorPage.getUnsupportedBlockBottomSheetEditButton();
 		await editButton.click();
 
-		await expect(
-			editorPage.getUnsupportedBlockWebView()
-		).resolves.toBeTruthy();
+		const webView = await editorPage.getUnsupportedBlockWebView();
+		await expect( webView ).toBeTruthy();
 	} );
 } );

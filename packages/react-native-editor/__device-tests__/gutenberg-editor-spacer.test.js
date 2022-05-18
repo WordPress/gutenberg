@@ -8,8 +8,7 @@ describe( 'Gutenberg Editor Spacer Block test', () => {
 		await editorPage.addNewBlock( blockNames.spacer );
 		const spacerBlock = await editorPage.getBlockAtPosition(
 			blockNames.spacer,
-			1,
-			{ useWaitForVisible: true }
+			1
 		);
 
 		expect( spacerBlock ).toBeTruthy();
