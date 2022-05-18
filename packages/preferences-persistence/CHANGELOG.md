@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 (2022-05-18)
+
 ## 1.0.0 (2022-05-04)
 
 -   Initial version of the package.

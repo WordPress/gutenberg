@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2022-05-18)
+
 ### Enhancements
 
 -   Added TypeScript definitions for package consumers ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
