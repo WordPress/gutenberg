@@ -15,6 +15,7 @@ import { openPreviewPage } from './preview';
 import { selectBlockByClientId } from './select-block-by-client-id';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
+import { clickBlockAppender } from './click-block-appender';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -61,4 +62,5 @@ export class Editor {
 	saveSiteEditorEntities = saveSiteEditorEntities;
 	selectBlockByClientId = selectBlockByClientId;
 	showBlockToolbar = showBlockToolbar;
+	clickBlockAppender = clickBlockAppender;
 }
