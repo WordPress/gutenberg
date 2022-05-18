@@ -119,8 +119,8 @@ function BlockPopoverInbetween( {
 				return {
 					top: previousRect ? previousRect.bottom : nextRect.top,
 					left: previousRect ? previousRect.right : nextRect.right,
-					right: previousRect ? previousRect.left : nextRect.left,
-					bottom: nextRect ? nextRect.top : previousRect.bottom,
+					right: previousRect ? previousRect.right : nextRect.right,
+					bottom: previousRect ? previousRect.bottom : nextRect.top,
 					height: 0,
 					width: 0,
 					ownerDocument,
@@ -130,8 +130,8 @@ function BlockPopoverInbetween( {
 			return {
 				top: previousRect ? previousRect.bottom : nextRect.top,
 				left: previousRect ? previousRect.left : nextRect.left,
-				right: previousRect ? previousRect.right : nextRect.right,
-				bottom: nextRect ? nextRect.top : previousRect.bottom,
+				right: previousRect ? previousRect.left : nextRect.left,
+				bottom: previousRect ? previousRect.bottom : nextRect.top,
 				height: 0,
 				width: 0,
 				ownerDocument,
@@ -142,8 +142,8 @@ function BlockPopoverInbetween( {
 			return {
 				top: previousRect ? previousRect.top : nextRect.top,
 				left: previousRect ? previousRect.left : nextRect.right,
-				right: nextRect ? nextRect.right : previousRect.left,
-				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+				right: previousRect ? previousRect.left : nextRect.right,
+				bottom: previousRect ? previousRect.top : nextRect.top,
 				height: 0,
 				width: 0,
 				ownerDocument,
@@ -153,8 +153,8 @@ function BlockPopoverInbetween( {
 		return {
 			top: previousRect ? previousRect.top : nextRect.top,
 			left: previousRect ? previousRect.right : nextRect.left,
-			right: nextRect ? nextRect.left : previousRect.right,
-			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+			right: previousRect ? previousRect.right : nextRect.left,
+			bottom: previousRect ? previousRect.left : nextRect.right,
 			height: 0,
 			width: 0,
 			ownerDocument,
@@ -192,6 +192,7 @@ function BlockPopoverInbetween( {
 				props.className
 			) }
 			__unstableForcePosition
+			placement="bottom-start"
 		>
 			<div
 				className="block-editor-block-popover__inbetween-container"
