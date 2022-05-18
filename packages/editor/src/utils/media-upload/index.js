@@ -37,8 +37,8 @@ export default function mediaUpload( {
 	const { getCurrentPostId, getEditorSettings } = select( editorStore );
 	const { lockPostSaving, unlockPostSaving } = dispatch( editorStore );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	const cacheKeyID = uniqueId();
-	const cacheKey = `image-upload-${ cacheKeyID }`;
+	const locakKeyID = uniqueId();
+	const lockKey = `image-upload-${ locakKeyID }`;
 	let postSaveLocked = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
@@ -49,10 +49,10 @@ export default function mediaUpload( {
 		onFileChange: ( file ) => {
 			const remainingUploads = file.filter( ( f ) => ! f.id );
 			if ( ! postSaveLocked && remainingUploads ) {
-				lockPostSaving( cacheKey );
+				lockPostSaving( lockKey );
 				postSaveLocked = true;
 			} else {
-				unlockPostSaving( cacheKey );
+				unlockPostSaving( lockKey );
 				postSaveLocked = false;
 			}
 			onFileChange( file );
@@ -63,7 +63,7 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			unlockPostSaving( cacheKey );
+			unlockPostSaving( lockKey );
 			postSaveLocked = false;
 			onError( message );
 		},
