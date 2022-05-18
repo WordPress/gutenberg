@@ -16,7 +16,10 @@ test.describe( 'Post Title block', () => {
 		await page.locator( 'role=textbox[name="Add title"i]' ).focus();
 		await page.keyboard.type( 'Just tweaking the post title' );
 
-		await editor.saveDraft();
+		// Save the post draft and reload.
+		await page.waitForSelector( '.editor-post-save-draft' );
+		await page.click( '.editor-post-save-draft' );
+		await page.waitForSelector( '.components-snackbar' );
 		await page.reload();
 
 		const titleBlock = page.locator( '[data-type="core/post-title"]' );

@@ -15,7 +15,6 @@ import { openPreviewPage } from './preview';
 import { selectBlockByClientId } from './select-block-by-client-id';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
-import { saveDraft } from './save-draft';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -62,5 +61,4 @@ export class Editor {
 	saveSiteEditorEntities = saveSiteEditorEntities;
 	selectBlockByClientId = selectBlockByClientId;
 	showBlockToolbar = showBlockToolbar;
-	saveDraft = saveDraft;
 }
