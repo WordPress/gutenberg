@@ -162,12 +162,13 @@ export class BlockList extends Component {
 		return this.extraData;
 	}
 
-	getCellRendererComponent( { children, item } ) {
+	getCellRendererComponent( { children, item, onLayout } ) {
 		const { rootClientId } = this.props;
 		return (
 			<BlockListItemCell
 				children={ children }
 				clientId={ item }
+				onLayout={ onLayout }
 				rootClientId={ rootClientId }
 			/>
 		);
