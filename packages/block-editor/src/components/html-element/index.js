@@ -34,7 +34,7 @@ const htmlElementMessages = {
  * @param {Object}   props                Component props.
  * @param {Function} props.onChange       Callback to handle onChange.
  * @param {Object}   props.tagNameOptions Tagnames to be used in the select control.
- * @param {Object}   props.selectedValue  Selected tag value.
+ * @param {string}   props.selectedValue  Selected tag value.
  *
  * @return {WPElement}                    Control for selecting the block tagname.
  */
