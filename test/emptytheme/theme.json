@@ -7,14 +7,19 @@
 			"wideSize": "1100px"
 		}
 	},
-	"styles" : {
+	"styles": {
 		"spacing": {
 			"blockGap": "44px"
 		},
 		"blocks": {
 			"core/group": {
 				"spacing": {
-				"blockGap": "133px"
+					"blockGap": "133px"
+				}
+			},
+			"core/columns": {
+				"spacing": {
+					"blockGap": "2em"
 				}
 			}
 		}
