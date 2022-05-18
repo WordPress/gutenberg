@@ -117,10 +117,7 @@ test.describe( 'Heading', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test.only( 'should correctly apply named colors', async ( {
-		page,
-		editor,
-	} ) => {
+	test( 'should correctly apply named colors', async ( { page, editor } ) => {
 		await editor.clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
 
