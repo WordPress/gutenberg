@@ -211,13 +211,13 @@ function LinkControl( {
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
-	function stopEditing() {
+	const stopEditing = () => {
 		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
 		setIsEditingLink( false );
-	}
+	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
