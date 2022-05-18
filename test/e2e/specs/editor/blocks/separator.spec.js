@@ -12,7 +12,7 @@ test.describe( 'Separator', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '---' );
 		await page.keyboard.press( 'Enter' );
 
