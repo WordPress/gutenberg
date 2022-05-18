@@ -187,7 +187,7 @@ const v11 = {
 		},
 		reusable: false,
 		spacing: {
-			__expeimentalSkipSerialization: true,
+			__experimentalSkipSerialization: true,
 			padding: [ 'horizontal', 'vertical' ],
 			__experimentalDefaultControls: {
 				padding: true,
