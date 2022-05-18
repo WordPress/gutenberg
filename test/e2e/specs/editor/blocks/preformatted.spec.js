@@ -34,7 +34,7 @@ test.describe( 'Preformatted', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
