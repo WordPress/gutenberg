@@ -56,6 +56,7 @@ export {
 	ImageEditingProvider as __experimentalImageEditingProvider,
 } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
+export { default as HtmlElementControl } from './html-element';
 export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,

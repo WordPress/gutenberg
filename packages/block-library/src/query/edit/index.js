@@ -14,13 +14,9 @@ import {
 	useInnerBlocksProps,
 	__experimentalGetMatchingVariation as getMatchingVariation,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
+	HtmlElementControl,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	SelectControl,
-	Placeholder,
-	Modal,
-} from '@wordpress/components';
+import { Button, Placeholder, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -116,15 +112,14 @@ export function QueryContent( {
 				/>
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
-				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
+				<HtmlElementControl
+					tagNameOptions={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					value={ TagName }
+					selectedValue={ TagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}

@@ -4,7 +4,7 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, HtmlElementControl } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 export function TemplatePartAdvancedControls( {
@@ -65,9 +65,8 @@ export function TemplatePartAdvancedControls( {
 					/>
 				</>
 			) }
-			<SelectControl
-				label={ __( 'HTML element' ) }
-				options={ [
+			<HtmlElementControl
+				tagNameOptions={ [
 					{
 						label: sprintf(
 							/* translators: %s: HTML tag based on area. */
@@ -84,7 +83,7 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<footer>', value: 'footer' },
 					{ label: '<div>', value: 'div' },
 				] }
-				value={ tagName || '' }
+				selectedValue={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
 		</InspectorControls>
