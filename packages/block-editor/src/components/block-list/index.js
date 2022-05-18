@@ -6,12 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	AsyncModeProvider,
-	useSelect,
-	useDispatch,
-	useRegistry,
-} from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import { createContext, useState, useMemo } from '@wordpress/element';
 
@@ -53,7 +48,6 @@ function Root( { className, ...settings } ) {
 		},
 		[]
 	);
-	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -63,12 +57,12 @@ function Root( { className, ...settings } ) {
 		}
 
 		return new Observer( ( entries ) => {
-			registry.batch( () => {
-				for ( const entry of entries ) {
-					const clientId = entry.target.getAttribute( 'data-block' );
-					setBlockVisibility( clientId, entry.isIntersecting );
-				}
-			} );
+			const updates = {};
+			for ( const entry of entries ) {
+				const clientId = entry.target.getAttribute( 'data-block' );
+				updates[ clientId ] = entry.isIntersecting;
+			}
+			setBlockVisibility( updates );
 		} );
 	}, [] );
 	const innerBlocksProps = useInnerBlocksProps(

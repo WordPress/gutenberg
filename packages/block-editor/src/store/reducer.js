@@ -1145,7 +1145,7 @@ export const blocks = flow(
 		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
 			return {
 				...state,
-				[ action.clientId ]: action.isVisible,
+				...action.updates,
 			};
 		}
 

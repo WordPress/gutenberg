@@ -1475,8 +1475,7 @@ Action that sets whether a block has controlled inner blocks.
 
 _Parameters_
 
--   _clientId_ `string`: The block's clientId.
--   _isVisible_ `boolean`: True if the block's is visible on the canvas.
+-   _updates_ `Record<string,boolean>`: The block's clientId.
 
 ### setHasControlledInnerBlocks
 
