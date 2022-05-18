@@ -473,6 +473,21 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### HtmlElementControl
+
+Control for selecting the block tagname.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.onChange_ `Function`: Callback to handle onChange.
+-   _props.tagNameOptions_ `Object`: Tagnames to be used in the select control.
+-   _props.selectedValue_ `string`: Selected tag value.
+
+_Returns_
+
+-   `WPElement`: Control for selecting the block tagname.
+
 ### InnerBlocks
 
 _Related_
