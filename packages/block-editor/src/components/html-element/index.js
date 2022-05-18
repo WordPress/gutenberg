@@ -28,6 +28,17 @@ const htmlElementMessages = {
 	),
 };
 
+const DEFAULT_OPTIONS = [
+	{ label: '<div>', value: 'div' },
+	{ label: '<header>', value: 'header' },
+	{ label: '<main>', value: 'main' },
+	{ label: '<section>', value: 'section' },
+	{ label: '<article>', value: 'article' },
+	{ label: '<aside>', value: 'aside' },
+	{ label: '<footer>', value: 'footer' },
+	{ label: '<nav>', value: 'nav' },
+];
+
 /**
  * Control for selecting the block tagname.
  *
@@ -38,34 +49,16 @@ const htmlElementMessages = {
  *
  * @return {WPElement}                    Control for selecting the block tagname.
  */
+
 export default function HtmlElementControl( {
 	onChange,
-	tagNameOptions,
+	tagNameOptions = DEFAULT_OPTIONS,
 	selectedValue,
 } ) {
-	// Default tag name options
-	let options = [
-		{ label: '<div>', value: 'div' },
-		{ label: '<header>', value: 'header' },
-		{ label: '<main>', value: 'main' },
-		{ label: '<section>', value: 'section' },
-		{ label: '<article>', value: 'article' },
-		{ label: '<aside>', value: 'aside' },
-		{ label: '<footer>', value: 'footer' },
-		{ label: '<nav>', value: 'nav' },
-	];
-
-	if ( tagNameOptions ) {
-		options = tagNameOptions.map( ( { label, value } ) => ( {
-			label,
-			value,
-		} ) );
-	}
-
 	return (
 		<SelectControl
 			label={ __( 'HTML element' ) }
-			options={ options }
+			options={ tagNameOptions }
 			value={ selectedValue }
 			onChange={ onChange }
 			help={ htmlElementMessages[ selectedValue ] }

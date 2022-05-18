@@ -48,21 +48,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		}
 	);
 
-	const tagNames = [
-		{ label: __( 'Default (<div>)' ), value: 'div' },
-		{ label: '<header>', value: 'header' },
-		{ label: '<main>', value: 'main' },
-		{ label: '<section>', value: 'section' },
-		{ label: '<article>', value: 'article' },
-		{ label: '<aside>', value: 'aside' },
-		{ label: '<footer>', value: 'footer' },
-	];
-
 	return (
 		<>
 			<InspectorControls __experimentalGroup="advanced">
 				<HtmlElementControl
-					tagNameOptions={ tagNames }
 					selectedValue={ TagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
