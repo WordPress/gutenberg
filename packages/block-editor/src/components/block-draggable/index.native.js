@@ -2,6 +2,10 @@
  * External dependencies
  */
 import { AccessibilityInfo } from 'react-native';
+import {
+	useSafeAreaInsets,
+	useSafeAreaFrame,
+} from 'react-native-safe-area-context';
 import Animated, {
 	runOnJS,
 	runOnUI,
@@ -11,7 +15,6 @@ import Animated, {
 	withDelay,
 	withTiming,
 	ZoomInEasyDown,
-	ZoomOutEasyDown,
 } from 'react-native-reanimated';
 
 /**
@@ -61,10 +64,11 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
  *
  * @param {Object}      props          Component props.
  * @param {JSX.Element} props.children Children to be rendered.
+ * @param {boolean}     props.isRTL    Check if current locale is RTL.
  *
  * @return {Function} Render function that passes `onScroll` event handler.
  */
-const BlockDraggableWrapper = ( { children } ) => {
+const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const [ draggedBlockIcon, setDraggedBlockIcon ] = useState();
 
 	const {
@@ -75,6 +79,10 @@ const BlockDraggableWrapper = ( { children } ) => {
 
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
+	const { left, right } = useSafeAreaInsets();
+	const { width } = useSafeAreaFrame();
+	const safeAreaOffset = left + right;
+	const contentWidth = width - safeAreaOffset;
 	animatedScrollRef( scrollRef );
 
 	const scroll = {
@@ -198,9 +206,16 @@ const BlockDraggableWrapper = ( { children } ) => {
 	};
 
 	const chipDynamicStyles = useAnimatedStyle( () => {
+		const chipOffset = chip.width.value / 2;
+		const translateX = ! isRTL
+			? chip.x.value - chipOffset
+			: -( contentWidth - ( chip.x.value + chipOffset ) );
+
 		return {
 			transform: [
-				{ translateX: chip.x.value - chip.width.value / 2 },
+				{
+					translateX,
+				},
 				{
 					translateY:
 						chip.y.value -
@@ -214,6 +229,34 @@ const BlockDraggableWrapper = ( { children } ) => {
 		chipDynamicStyles,
 		styles[ 'draggable-chip__wrapper' ],
 	];
+
+	const exitingAnimation = ( { currentHeight, currentWidth } ) => {
+		'worklet';
+		const translateX = ! isRTL ? 0 : currentWidth * -1;
+		const duration = 150;
+		const animations = {
+			transform: [
+				{
+					translateY: withTiming( currentHeight, {
+						duration,
+					} ),
+				},
+				{
+					translateX: withTiming( translateX, {
+						duration,
+					} ),
+				},
+				{ scale: withTiming( 0, { duration } ) },
+			],
+		};
+		const initialValues = {
+			transform: [ { translateY: 0 }, { translateX }, { scale: 1 } ],
+		};
+		return {
+			initialValues,
+			animations,
+		};
+	};
 
 	return (
 		<>
@@ -238,7 +281,7 @@ const BlockDraggableWrapper = ( { children } ) => {
 				{ draggedBlockIcon && (
 					<Animated.View
 						entering={ ZoomInEasyDown.duration( 200 ) }
-						exiting={ ZoomOutEasyDown.duration( 150 ) }
+						exiting={ exitingAnimation }
 					>
 						<DraggableChip icon={ draggedBlockIcon } />
 					</Animated.View>
