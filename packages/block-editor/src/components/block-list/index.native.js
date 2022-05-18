@@ -190,7 +190,7 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { isRootList } = this.props;
+		const { isRootList, isRTL } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks.
 		const blockList = isRootList ? (
 			<BlockListProvider
@@ -199,7 +199,7 @@ export class BlockList extends Component {
 					scrollRef: this.scrollViewRef,
 				} }
 			>
-				<BlockDraggableWrapper>
+				<BlockDraggableWrapper isRTL={ isRTL }>
 					{ ( { onScroll } ) => this.renderList( { onScroll } ) }
 				</BlockDraggableWrapper>
 			</BlockListProvider>
@@ -439,6 +439,8 @@ export default compose( [
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
+			const isRTL = getSettings().isRTL;
+
 			return {
 				blockClientIds,
 				blockCount,
@@ -449,6 +451,7 @@ export default compose( [
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
 				maxWidth,
+				isRTL,
 			};
 		}
 	),
