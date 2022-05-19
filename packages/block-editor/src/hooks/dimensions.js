@@ -172,10 +172,12 @@ export function useCustomSides( blockName, feature ) {
 		return;
 	}
 
+	// Return if the setting is an array of sides (e.g. `[ 'top', 'bottom' ]`).
 	if ( Array.isArray( support[ feature ] ) ) {
 		return support[ feature ];
 	}
 
+	// Finally, attempt to return `.sides` if the setting is an object.
 	if ( support[ feature ]?.sides ) {
 		return support[ feature ].sides;
 	}
