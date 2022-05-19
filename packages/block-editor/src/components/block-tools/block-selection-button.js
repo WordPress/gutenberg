@@ -279,6 +279,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						onKeyDown={ onKeyDown }
 						label={ label }
 						className="block-selection-button_select-button"
+						showTooltip={ false }
 					>
 						<BlockTitle
 							clientId={ clientId }
