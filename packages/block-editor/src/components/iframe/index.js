@@ -196,7 +196,7 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 			copiedStylesElement.textContent = '';
 
 			const styles = window.getComputedStyle( node.ownerDocument.body );
-			const newBackgroundStyles = Object.values( styles )
+			let newBackgroundStyles = Object.values( styles )
 				.filter( ( propertyName ) => {
 					return propertyName.indexOf( 'background' ) === 0;
 				} )
@@ -208,6 +208,14 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 				)
 				.join( '' );
 
+			const backgroundColor = styles.getPropertyValue(
+				'background-color'
+			);
+			const hasTransparentBackground =
+				! backgroundColor || backgroundColor === 'rgba(0, 0, 0, 0)';
+			newBackgroundStyles += hasTransparentBackground
+				? 'background-color: white;'
+				: '';
 			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode > .wp-block ) { ${ newBackgroundStyles } }`;
 			bodyStyleElement.innerHTML =
 				'body { background: #2f2f2f !important; }';
