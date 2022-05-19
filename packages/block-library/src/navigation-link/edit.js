@@ -601,7 +601,7 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			type: postType,
-			title: page.title.rendered,
+			title: page.title.raw,
 			url: page.link,
 			kind: 'post-type',
 		};
