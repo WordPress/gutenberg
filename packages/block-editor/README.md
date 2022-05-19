@@ -481,8 +481,8 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.onChange_ `Function`: Callback to handle onChange.
--   _props.tagNameOptions_ `Object`: Tagnames to be used in the select control.
--   _props.selectedValue_ `string`: Selected tag value.
+-   _props.options_ `Object`: Tagnames to be used in the select control.
+-   _props.value_ `string`: Selected tag value.
 
 _Returns_
 
