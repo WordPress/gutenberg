@@ -1221,6 +1221,7 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
 					<>
