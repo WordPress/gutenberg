@@ -52,7 +52,7 @@ const defaultRenderToggle = ( {
 	};
 	const expandedModeViewText = (
 		<Text style={ styles[ 'inserter-menu__add-block-button-text' ] }>
-			{ __( 'Add Blocks' ) }
+			{ __( 'Add blocks' ) }
 		</Text>
 	);
 
@@ -67,7 +67,7 @@ const defaultRenderToggle = ( {
 			extraProps={ {
 				hint: __( 'Double tap to add a block' ),
 				// testID is present to disambiguate this element for native UI tests. It's not
-				// usually required for components. See: https://git.io/JeQ7G.
+				// usually required for components. See: https://github.com/WordPress/gutenberg/pull/18832#issuecomment-561411389.
 				testID: 'add-block-button',
 				onLongPress,
 			} }

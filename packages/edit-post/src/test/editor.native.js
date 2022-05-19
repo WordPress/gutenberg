@@ -25,7 +25,14 @@ const unsupportedBlock = `
 <!-- /wp:notablock -->
 `;
 
-jest.useFakeTimers( 'legacy' );
+beforeAll( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterAll( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 describe( 'Editor', () => {
 	beforeAll( () => {

@@ -125,7 +125,8 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	return null;
 }
 
-// Remove WordPress core filter to avoid rendering duplicate elements stylesheet.
+// Remove WordPress core filters to avoid rendering duplicate elements stylesheet & attaching classes twice.
 remove_filter( 'render_block', 'wp_render_elements_support', 10, 2 );
+remove_filter( 'pre_render_block', 'wp_render_elements_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_elements_support', 10, 2 );
 add_filter( 'pre_render_block', 'gutenberg_render_elements_support_styles', 10, 2 );

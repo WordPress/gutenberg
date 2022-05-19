@@ -70,28 +70,30 @@ function PostAuthorEdit( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ ! isDescendentOfQueryLoop && !! authors?.length && (
-						<SelectControl
-							label={ __( 'Author' ) }
-							value={ authorId }
-							options={ authors.map( ( { id, name } ) => {
-								return {
-									value: id,
-									label: name,
-								};
-							} ) }
-							onChange={ ( nextAuthorId ) => {
-								editEntityRecord(
-									'postType',
-									postType,
-									postId,
-									{
-										author: nextAuthorId,
-									}
-								);
-							} }
-						/>
-					) }
+					{ !! postId &&
+						! isDescendentOfQueryLoop &&
+						!! authors?.length && (
+							<SelectControl
+								label={ __( 'Author' ) }
+								value={ authorId }
+								options={ authors.map( ( { id, name } ) => {
+									return {
+										value: id,
+										label: name,
+									};
+								} ) }
+								onChange={ ( nextAuthorId ) => {
+									editEntityRecord(
+										'postType',
+										postType,
+										postId,
+										{
+											author: nextAuthorId,
+										}
+									);
+								} }
+							/>
+						) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }

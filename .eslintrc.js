@@ -249,14 +249,19 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'CallExpression[callee.name="$"]',
+						selector: 'CallExpression[callee.property.name="$"]',
 						message:
 							'`$` is discouraged, please use `locator` instead',
 					},
 					{
-						selector: 'CallExpression[callee.name="$$"]',
+						selector: 'CallExpression[callee.property.name="$$"]',
 						message:
 							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
 					},
 				],
 			},

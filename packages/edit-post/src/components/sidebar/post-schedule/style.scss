@@ -13,8 +13,8 @@
 	text-align: right;
 }
 
-// Zero out a blanket padding that is set on the popover component.
+// Zero out a blanket padding that is set on the dropdown component.
 // The datetime component has its own padding.
-.edit-post-post-schedule__dialog .components-popover__content > div {
+.edit-post-post-schedule__dialog .components-popover__content {
 	padding: 0;
 }

@@ -71,7 +71,7 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align
 -	**Attributes:** month, year
 
-## Categories
+## Categories List
 
 Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
@@ -170,6 +170,15 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
+## Comments
+
+An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
+
+-	**Name:** core/comments-query-loop
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
+-	**Attributes:** tagName
+
 ## Comments Pagination
 
 Displays a paginated navigation to next/previous set of comments, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination))
@@ -206,15 +215,6 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
-## Comments Query Loop
-
-An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
-
--	**Name:** core/comments-query-loop
--	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
-
 ## Comments Title
 
 Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
@@ -222,7 +222,7 @@ Displays a title with the number of comments ([Source](https://github.com/WordPr
 -	**Name:** core/comments-title
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** level, multipleCommentsLabel, showCommentsCount, showPostTitle, singleCommentLabel, textAlign
+-	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
@@ -395,15 +395,6 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 -	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
-## Navigation Area
-
-Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-area))
-
--	**Name:** core/navigation-area
--	**Category:** theme
--	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** area
-
 ## Custom Link
 
 Add a page, link, or another item to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-link))
@@ -487,7 +478,7 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Post Comment (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
 -	**Category:** theme
@@ -496,7 +487,7 @@ This block is deprecated. Please use the Comments Query Loop block instead. ([So
 
 ## Post Comments (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
@@ -591,7 +582,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Name:** core/post-terms
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, term, textAlign
+-	**Attributes:** prefix, separator, suffix, term, textAlign
 
 ## Post Title
 
@@ -717,7 +708,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), color (background, gradients, text), ~~html~~
--	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 
@@ -725,7 +716,7 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~), spacing (margin)
 -	**Attributes:** opacity
 
 ## Shortcode
@@ -807,7 +798,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** core/table-of-contents
 -	**Category:** layout
 -	**Supports:** ~~html~~
--	**Attributes:** onlyIncludeCurrentPage
+-	**Attributes:** headings, onlyIncludeCurrentPage
 
 ## Tag Cloud
 

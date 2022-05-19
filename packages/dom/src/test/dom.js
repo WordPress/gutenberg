@@ -5,7 +5,6 @@ import {
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
-	isNumberInput,
 	removeInvalidHTML,
 	isEmpty,
 } from '../dom';
@@ -125,6 +124,8 @@ describe( 'DOM', () => {
 			'range',
 			'reset',
 			'submit',
+			'email',
+			'time',
 		];
 
 		/**
@@ -132,13 +133,7 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [
-			'text',
-			'password',
-			'search',
-			'url',
-			'email',
-		];
+		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
@@ -162,21 +157,6 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe(
 				true
 			);
-		} );
-
-		it( 'should return false for empty input element of type number', () => {
-			const input = document.createElement( 'input' );
-			input.type = 'number';
-
-			expect( isNumberInput( input ) ).toBe( false );
-		} );
-
-		it( 'should return true for an input element of type number', () => {
-			const input = document.createElement( 'input' );
-			input.type = 'number';
-			input.valueAsNumber = 23;
-
-			expect( isNumberInput( input ) ).toBe( true );
 		} );
 
 		it( 'should return true for a contenteditable element', () => {

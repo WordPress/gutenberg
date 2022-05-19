@@ -33,4 +33,36 @@ window.addEventListener( 'load', () => {
 		onClose: navigationToggleModal,
 		openClass: 'is-menu-open',
 	} );
+
+	// Close modal automatically on clicking anchor links inside modal.
+	const navigationLinks = document.querySelectorAll(
+		'.wp-block-navigation-item__content'
+	);
+
+	navigationLinks.forEach( function ( link ) {
+		// Ignore non-anchor links and anchor links which open on a new tab.
+		if (
+			! link.getAttribute( 'href' )?.startsWith( '#' ) ||
+			link.attributes?.target === '_blank'
+		) {
+			return;
+		}
+
+		// Find the specific parent modal for this link
+		// since .close() won't work without an ID if there are
+		// multiple navigation menus in a post/page.
+		const modal = link.closest(
+			'.wp-block-navigation__responsive-container'
+		);
+		const modalId = modal?.getAttribute( 'id' );
+
+		link.addEventListener( 'click', () => {
+			// check if modal exists and is open before trying to close it
+			// otherwise Micromodal will toggle the `has-modal-open` class
+			// on the html tag which prevents scrolling
+			if ( modalId && modal.classList.contains( 'has-modal-open' ) ) {
+				MicroModal.close( modalId );
+			}
+		} );
+	} );
 } );

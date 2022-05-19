@@ -24,7 +24,8 @@
 				"exclude": [],
 				"sticky": "",
 				"inherit": true,
-				"taxQuery": null
+				"taxQuery": null,
+				"parents": []
 			}
 		},
 		"tagName": {

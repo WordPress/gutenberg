@@ -102,7 +102,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -123,7 +123,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -143,7 +143,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -163,7 +163,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -183,7 +183,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -205,7 +205,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			gutenberg_render_block_core_navigation_link(
+			render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -225,7 +225,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				gutenberg_render_block_core_navigation_link(
+				render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block

@@ -38,9 +38,9 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}   name     A string identifying the plugin.Must be
- *                            unique across all registered plugins.
- * @param {WPPlugin} settings The settings for this plugin.
+ * @param {string}                 name     A string identifying the plugin.Must be
+ *                                          unique across all registered plugins.
+ * @param {Omit<WPPlugin, 'name'>} settings The settings for this plugin.
  *
  * @example
  * ```js

@@ -12,7 +12,7 @@ import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );
@@ -24,28 +24,28 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	return (
 		<ItemGroup>
 			{ hasTypographyPanel && (
-				<NavigationButton
+				<NavigationButtonAsItem
 					icon={ typography }
 					path={ parentMenu + '/typography' }
 				>
 					{ __( 'Typography' ) }
-				</NavigationButton>
+				</NavigationButtonAsItem>
 			) }
 			{ hasColorPanel && (
-				<NavigationButton
+				<NavigationButtonAsItem
 					icon={ color }
 					path={ parentMenu + '/colors' }
 				>
 					{ __( 'Colors' ) }
-				</NavigationButton>
+				</NavigationButtonAsItem>
 			) }
 			{ hasLayoutPanel && (
-				<NavigationButton
+				<NavigationButtonAsItem
 					icon={ layout }
 					path={ parentMenu + '/layout' }
 				>
 					{ __( 'Layout' ) }
-				</NavigationButton>
+				</NavigationButtonAsItem>
 			) }
 		</ItemGroup>
 	);

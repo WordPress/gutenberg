@@ -16,6 +16,14 @@
 		"separator": {
 			"type": "string",
 			"default": ", "
+		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

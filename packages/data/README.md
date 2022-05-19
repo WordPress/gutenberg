@@ -662,6 +662,20 @@ _Parameters_
 
 -   _listener_ `Function`: Callback function.
 
+### suspendSelect
+
+Given the name of a registered store, returns an object containing the store's
+selectors pre-bound to state so that you only need to supply additional arguments,
+and modified so that they throw promises in case the selector is not resolved yet.
+
+_Parameters_
+
+-   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+
+_Returns_
+
+-   `Object`: Object containing the store's suspense-wrapped selectors.
+
 ### use
 
 Extends a registry to inherit functionality provided by a given plugin. A
@@ -826,6 +840,20 @@ _Parameters_
 _Returns_
 
 -   `Function`: A custom react hook.
+
+### useSuspenseSelect
+
+A variant of the `useSelect` hook that has the same API, but will throw a
+suspense Promise if any of the called selectors is in an unresolved state.
+
+_Parameters_
+
+-   _mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
+-   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
+
+_Returns_
+
+-   `Object`: Data object returned by the `mapSelect` function.
 
 ### withDispatch
 

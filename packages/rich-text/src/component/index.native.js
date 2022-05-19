@@ -51,6 +51,15 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
+// The flattened color palettes array is memoized to ensure that the same array instance is
+// returned for the colors palettes. This value might be used as a prop, so having the same
+// instance will prevent unnecessary re-renders of the RichText component.
+const flatColorPalettes = memize( ( colorsPalettes ) => [
+	...( colorsPalettes?.theme || [] ),
+	...( colorsPalettes?.custom || [] ),
+	...( colorsPalettes?.default || [] ),
+] );
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -1039,6 +1048,8 @@ export class RichText extends Component {
 			accessibilityLabel,
 			disableEditingMenu = false,
 			baseGlobalStyles,
+			selectionStart,
+			selectionEnd,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1065,12 +1076,14 @@ export class RichText extends Component {
 			defaultTextDecorationColor
 		);
 
+		const currentSelectionStart = selectionStart ?? 0;
+		const currentSelectionEnd = selectionEnd ?? 0;
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
 			selection = {
-				start: this.props.selectionStart,
-				end: this.props.selectionEnd,
+				start: currentSelectionStart,
+				end: currentSelectionEnd,
 			};
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
@@ -1086,12 +1099,11 @@ export class RichText extends Component {
 						brBeforeParaMatches[ 0 ].match( /br/g ) || []
 					).length;
 					if ( count > 0 ) {
-						let newSelectionStart =
-							this.props.selectionStart - count;
+						let newSelectionStart = currentSelectionStart - count;
 						if ( newSelectionStart < 0 ) {
 							newSelectionStart = 0;
 						}
-						let newSelectionEnd = this.props.selectionEnd - count;
+						let newSelectionEnd = currentSelectionEnd - count;
 						if ( newSelectionEnd < 0 ) {
 							newSelectionEnd = 0;
 						}
@@ -1260,14 +1272,10 @@ export default compose( [
 
 		const settings = getSettings();
 		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
-		const colorsPalettes = settings?.__experimentalFeatures?.color?.palette;
-		const allColorsPalette = [
-			...( colorsPalettes?.theme || [] ),
-			...( colorsPalettes?.custom || [] ),
-			...( colorsPalettes?.default || [] ),
-		];
-		const colorPalette = colorsPalettes
-			? allColorsPalette
+
+		const colorPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette = colorPalettes
+			? flatColorPalettes( colorPalettes )
 			: settings?.colors;
 
 		return {

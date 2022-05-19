@@ -144,16 +144,6 @@ export const rootEntitiesConfig = [
 		key: 'name',
 	},
 	{
-		name: 'navigationArea',
-		kind: 'root',
-		baseURL: '/wp/v2/block-navigation-areas',
-		baseURLParams: { context: 'edit' },
-		plural: 'navigationAreas',
-		label: __( 'Navigation Area' ),
-		key: 'name',
-		getTitle: ( record ) => record?.description,
-	},
-	{
 		label: __( 'Global Styles' ),
 		name: 'globalStyles',
 		kind: 'root',

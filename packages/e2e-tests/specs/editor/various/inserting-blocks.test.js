@@ -299,7 +299,7 @@ describe( 'Inserting blocks', () => {
 		await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 		await page.focus( INSERTER_SEARCH_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'a' );
-		const searchTerm = 'Heading';
+		const searchTerm = 'Verse';
 		await page.keyboard.type( searchTerm );
 		const browseAll = await page.waitForXPath(
 			'//button[text()="Browse all"]'

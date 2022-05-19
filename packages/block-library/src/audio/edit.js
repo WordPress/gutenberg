@@ -29,7 +29,7 @@ import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -62,13 +62,8 @@ function AudioEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						noticeOperations.createErrorNotice( e );
-					},
+					onFileChange: ( [ media ] ) => onSelectAudio( media ),
+					onError: ( e ) => onUploadError( e ),
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -213,7 +208,9 @@ function AudioEdit( {
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

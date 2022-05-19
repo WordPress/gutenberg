@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -128,7 +128,9 @@ export default function QuoteEdit( {
 						}
 						className="wp-block-quote__citation"
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
 					/>

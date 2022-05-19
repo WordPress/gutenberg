@@ -2050,23 +2050,25 @@ export const getInserterItems = createSelector(
  *
  * Items are returned ordered descendingly by their 'frecency'.
  *
- * @param    {Object}  state        Editor state.
- * @param    {?string} rootClientId Optional root client ID of block list.
+ * @param    {Object}          state        Editor state.
+ * @param    {Object|Object[]} blocks       Block object or array objects.
+ * @param    {?string}         rootClientId Optional root client ID of block list.
  *
  * @return {WPEditorTransformItem[]} Items that appear in inserter.
  *
  * @typedef {Object} WPEditorTransformItem
- * @property {string}  id           Unique identifier for the item.
- * @property {string}  name         The type of block to create.
- * @property {string}  title        Title of the item, as it appears in the inserter.
- * @property {string}  icon         Dashicon for the item, as it appears in the inserter.
- * @property {boolean} isDisabled   Whether or not the user should be prevented from inserting
- *                                  this item.
- * @property {number}  frecency     Heuristic that combines frequency and recency.
+ * @property {string}          id           Unique identifier for the item.
+ * @property {string}          name         The type of block to create.
+ * @property {string}          title        Title of the item, as it appears in the inserter.
+ * @property {string}          icon         Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}         isDisabled   Whether or not the user should be prevented from inserting
+ *                                          this item.
+ * @property {number}          frecency     Heuristic that combines frequency and recency.
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const [ sourceBlock ] = blocks;
+		const normalizedBlocks = castArray( blocks );
+		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -2088,11 +2090,11 @@ export const getBlockTransformItems = createSelector(
 			isDisabled: false,
 			name: '*',
 			title: __( 'Unwrap' ),
-			icon: itemsByName[ sourceBlock.name ]?.icon,
+			icon: itemsByName[ sourceBlock?.name ]?.icon,
 		};
 
 		const possibleTransforms = getPossibleBlockTransformations(
-			blocks
+			normalizedBlocks
 		).reduce( ( accumulator, block ) => {
 			if ( block === '*' ) {
 				accumulator.push( itemsByName[ '*' ] );
@@ -2649,3 +2651,31 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+/**
+ * Tells if the block is visible on the canvas or not.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ * @return {boolean} True if the block is visible.
+ */
+export function isBlockVisible( state, clientId ) {
+	return state.blocks.visibility?.[ clientId ] ?? true;
+}
+
+/**
+ * Returns the list of all hidden blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {[string]} List of hidden blocks.
+ */
+export const __unstableGetVisibleBlocks = createSelector(
+	( state ) => {
+		return new Set(
+			Object.keys( state.blocks.visibility ).filter(
+				( key ) => state.blocks.visibility[ key ]
+			)
+		);
+	},
+	( state ) => [ state.blocks.visibility ]
+);

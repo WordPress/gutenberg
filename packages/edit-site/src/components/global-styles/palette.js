@@ -16,7 +16,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 import { useSetting } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 
@@ -58,7 +58,7 @@ function Palette( { name } ) {
 		<VStack spacing={ 3 }>
 			<Subtitle>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButton path={ screenPath }>
+				<NavigationButtonAsItem path={ screenPath }>
 					<HStack
 						direction={
 							colors.length === 0 ? 'row-reverse' : 'row'
@@ -73,7 +73,7 @@ function Palette( { name } ) {
 						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
-				</NavigationButton>
+				</NavigationButtonAsItem>
 			</ItemGroup>
 		</VStack>
 	);

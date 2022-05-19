@@ -25,7 +25,7 @@ const MyImageSizeControl = () => {
 			imageHeight={ imageHeight }
 		/>
 	);
-} );
+}
 ```
 
 ## Props

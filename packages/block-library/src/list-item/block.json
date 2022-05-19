@@ -1,6 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
+	"__experimental": "list-v2",
 	"name": "core/list-item",
 	"title": "List item",
 	"category": "text",
@@ -14,7 +15,7 @@
 		"content": {
 			"type": "string",
 			"source": "html",
-    		"selector": "li",
+			"selector": "li",
 			"default": "",
 			"__experimentalRole": "content"
 		}

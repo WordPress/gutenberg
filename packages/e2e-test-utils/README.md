@@ -687,6 +687,10 @@ _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
 
+### resetPreferences
+
+Clears all user meta preferences.
+
 ### saveDraft
 
 Saves the post as a draft, resolving once the request is complete (once the

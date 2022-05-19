@@ -3093,6 +3093,23 @@ describe( 'selectors', () => {
 				] )
 			);
 		} );
+		it( 'should support single block object', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const block = { name: 'core/with-tranforms-a' };
+			const items = getBlockTransformItems( state, block );
+			expect( items ).toHaveLength( 2 );
+		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = {
 				blocks: {

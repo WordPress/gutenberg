@@ -119,6 +119,9 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 		if ( ! empty( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
 		}
+		if ( ! empty( $block->context['query']['parents'] ) && is_post_type_hierarchical( $query['post_type'] ) ) {
+			$query['post_parent__in'] = array_filter( array_map( 'intval', $block->context['query']['parents'] ) );
+		}
 	}
 	return $query;
 }
@@ -144,6 +147,16 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 			'no_found_rows' => false,
 		);
 
+		if ( is_user_logged_in() ) {
+			$comment_args['include_unapproved'] = array( get_current_user_id() );
+		} else {
+			$unapproved_email = wp_get_unapproved_comment_author_email();
+
+			if ( $unapproved_email ) {
+				$comment_args['include_unapproved'] = array( $unapproved_email );
+			}
+		}
+
 		if ( ! empty( $block->context['postId'] ) ) {
 			$comment_args['post_id'] = (int) $block->context['postId'];
 		}
@@ -166,7 +179,10 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 				} elseif ( 'oldest' === $default_page ) {
 					$comment_args['paged'] = 1;
 				} elseif ( 'newest' === $default_page ) {
-					$comment_args['paged'] = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					$max_num_pages = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					if ( 0 !== $max_num_pages ) {
+						$comment_args['paged'] = $max_num_pages;
+					}
 				}
 				// Set the `cpage` query var to ensure the previous and next pagination links are correct
 				// when inheriting the Discussion Settings.
@@ -284,7 +300,7 @@ add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable'
  */
 function gutenberg_register_lock_attribute( $args ) {
 	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) ) {
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
 		$args['attributes'] = array();
 	}
 
