@@ -616,7 +616,16 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			type: postType,
-			// Consistent with https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
+			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
+			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
+			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
+			// e.g.
+			// - title.raw = "Yes & No"
+			// - title.rendered = "Yes &#038; No"
+			// - decodeEntities( title.rendered ) = "Yes & No"
+			// See:
+			// - https://github.com/WordPress/gutenberg/pull/41063
+			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
 			title: decodeEntities( page.title.rendered ),
 			url: page.link,
 			kind: 'post-type',
