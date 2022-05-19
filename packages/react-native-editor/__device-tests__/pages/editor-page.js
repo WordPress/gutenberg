@@ -15,6 +15,7 @@ const {
 	toggleHtmlMode,
 	typeString,
 	waitForVisible,
+	clickIfClickable,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -616,22 +617,14 @@ class EditorPage {
 	}
 
 	async replaceMediaImage() {
-		await waitForVisible(
+		await clickIfClickable(
 			this.driver,
-			'(//XCUIElementTypeButton[@name="Edit image"])'
+			'(//XCUIElementTypeButton[@name="Edit image"])[1]'
 		);
-
-		// There are multiple "Edit image" buttons layered on the screen, this is to get the right button
-		const editImageButtons = await this.driver.elementsByAccessibilityId(
-			'Edit image'
-		);
-		await editImageButtons[ editImageButtons.length - 1 ].click();
-
-		const replaceButton = await waitForVisible(
+		await clickIfClickable(
 			this.driver,
 			'//XCUIElementTypeButton[@name="Replace"]'
 		);
-		await replaceButton.click();
 	}
 
 	// =========================

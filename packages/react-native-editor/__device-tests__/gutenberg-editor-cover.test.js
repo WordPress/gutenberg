@@ -44,11 +44,6 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			await editorPage.openBlockSettings( coverBlock );
 			await editorPage.clickAddMediaFromCoverBlock();
 			await editorPage.chooseMediaLibrary();
-
-			const settingsButton = await coverBlock.elementByAccessibilityId(
-				'Open Settings'
-			);
-			await settingsButton.click();
 			await editorPage.replaceMediaImage();
 
 			// First modal should no longer be presented.
