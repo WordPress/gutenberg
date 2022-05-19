@@ -9,6 +9,7 @@ import { View, Text } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { PlainText } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,6 +43,15 @@ export function ShortcodeEdit( props ) {
 		styles.placeholderDark
 	);
 
+	const maxWidth =
+		blockWidth -
+		shortcodeContainerStyle.paddingLeft +
+		shortcodeContainerStyle.paddingRight;
+
+	const onChange = useCallback( ( text ) => setAttributes( { text } ), [
+		setAttributes,
+	] );
+
 	return (
 		<View>
 			<Text style={ titleStyle }>{ __( 'Shortcode' ) }</Text>
@@ -50,21 +60,13 @@ export function ShortcodeEdit( props ) {
 					__experimentalVersion={ 2 }
 					value={ attributes.text }
 					style={ shortcodeStyle }
-					onChange={ ( text ) => setAttributes( { text } ) }
+					onChange={ onChange }
 					placeholder={ __( 'Add a shortcode…' ) }
-					aria-label={ __( 'Shortcode' ) }
 					isSelected={ props.isSelected }
 					onFocus={ onFocus }
 					onBlur={ onBlur }
 					placeholderTextColor={ placeholderStyle.color }
-					maxWidth={
-						blockWidth -
-						styles.blockShortcodeContainer.paddingLeft +
-						styles.blockShortcodeContainer.paddingRight
-					}
-					// TODO: Add autocorrect and autocomplete options
-					// autoCorrect={ false }
-					// autoComplete="off"
+					maxWidth={ maxWidth }
 					disableAutocorrection
 				/>
 			</View>
