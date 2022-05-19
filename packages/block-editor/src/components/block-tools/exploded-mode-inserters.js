@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,9 +12,24 @@ import { store as blockEditorStore } from '../../store';
 import Inserter from '../inserter';
 
 function ExplodedModeInserters( { __unstableContentRef } ) {
+	const [ isReady, setIsReady ] = useState( false );
 	const blockOrder = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockOrder();
 	}, [] );
+
+	// Deffer the initial rendering to avoid the jumps due to the animation.
+	useEffect( () => {
+		const timeout = setTimeout( () => {
+			setIsReady( true );
+		}, 500 );
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [] );
+
+	if ( ! isReady ) {
+		return null;
+	}
 
 	return blockOrder.map( ( clientId, index ) => {
 		if ( index === blockOrder.length - 1 ) {
