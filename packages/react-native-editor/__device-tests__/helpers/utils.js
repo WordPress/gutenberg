@@ -471,7 +471,6 @@ const waitForMediaLibrary = async ( driver ) => {
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} length - The number of elements returned, default value is 1. Uncommon blocks may return more than 1.
  * @param {number} maxIteration - Default value is 25
  * @param {number} iteration - Default value is 0
  * @return {string} - Returns the first element found, empty string if not found
@@ -479,7 +478,6 @@ const waitForMediaLibrary = async ( driver ) => {
 const waitForVisible = async (
 	driver,
 	elementLocator,
-	length = 1,
 	maxIteration = 25,
 	iteration = 0
 ) => {
@@ -498,12 +496,11 @@ const waitForVisible = async (
 	}
 
 	const element = await driver.elementsByXPath( elementLocator );
-	if ( element.length !== length ) {
+	if ( element.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(
 			driver,
 			elementLocator,
-			length,
 			maxIteration,
 			iteration + 1
 		);
@@ -515,20 +512,17 @@ const waitForVisible = async (
 /**
  * @param {string} driver
  * @param {string} elementLocator
- * @param {number} length - The number of elements returned, default value is 1. Uncommon blocks may return more than 1.
  * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
  * @return {boolean} - Returns true if element is found, false otherwise
  */
 const isElementVisible = async (
 	driver,
 	elementLocator,
-	length = 1,
 	maxIteration = 25
 ) => {
 	const element = await waitForVisible(
 		driver,
 		elementLocator,
-		length,
 		maxIteration
 	);
 
@@ -543,14 +537,12 @@ const isElementVisible = async (
 const clickIfClickable = async (
 	driver,
 	elementLocator,
-	length = 1,
 	maxIteration = 10,
 	iteration = 0
 ) => {
 	const element = await waitForVisible(
 		driver,
 		elementLocator,
-		length,
 		maxIteration,
 		iteration
 	);
@@ -565,7 +557,6 @@ const clickIfClickable = async (
 		return clickIfClickable(
 			driver,
 			elementLocator,
-			length,
 			maxIteration,
 			iteration + 1
 		);

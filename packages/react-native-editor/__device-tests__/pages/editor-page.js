@@ -753,12 +753,7 @@ class EditorPage {
 	async getColumnsBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 
-		const expectedLength = isAndroid() ? 12 : 6;
-		return await waitForVisible(
-			this.driver,
-			firstBlockLocator,
-			expectedLength
-		);
+		return await waitForVisible( this.driver, firstBlockLocator );
 	}
 
 	// =============================
@@ -768,14 +763,7 @@ class EditorPage {
 	async getUnsupportedBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 
-		// Unsupported blocks does not return length === 1 like other blocks
-		// Not sure how this is derived but this is the combination that works for unsupported blocks
-		const expectedLength = isAndroid() ? 2 : 6;
-		return await waitForVisible(
-			this.driver,
-			firstBlockLocator,
-			expectedLength
-		);
+		return await waitForVisible( this.driver, firstBlockLocator );
 	}
 
 	async getUnsupportedBlockHelpButton() {
@@ -784,12 +772,7 @@ class EditorPage {
 			? '//android.widget.Button[@content-desc="Help button, Tap here to show help"]'
 			: `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
 
-		const expectedLength = isAndroid() ? 2 : 1;
-		return await waitForVisible(
-			this.driver,
-			blockLocator,
-			expectedLength
-		);
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	async getUnsupportedBlockBottomSheetEditButton() {
@@ -806,12 +789,7 @@ class EditorPage {
 			? '//android.webkit.WebView'
 			: '//XCUIElementTypeWebView';
 
-		const expectedLength = isAndroid() ? 1 : 3;
-		return await waitForVisible(
-			this.driver,
-			blockLocator,
-			expectedLength
-		);
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	async stopDriver() {
