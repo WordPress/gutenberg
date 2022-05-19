@@ -13,8 +13,6 @@
  * @return string The search block markup.
  */
 function render_block_core_search( $attributes ) {
-	static $instance_id = 0;
-
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -27,7 +25,7 @@ function render_block_core_search( $attributes ) {
 		)
 	);
 
-	$input_id            = 'wp-block-search__input-' . ++$instance_id;
+	$input_id            = wp_unique_id( 'wp-block-search__input-' );
 	$classnames          = classnames_for_block_core_search( $attributes );
 	$show_label          = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button     = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
@@ -65,7 +63,7 @@ function render_block_core_search( $attributes ) {
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( $input_classes ),
-			esc_attr( get_search_query() ),
+			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
 		);
