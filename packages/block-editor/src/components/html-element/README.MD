@@ -29,7 +29,7 @@ An array of tag names and labels. Should be of the format:
 [
 	{ label: __( 'Default (<div>)' ), value: 'div' },
 	{ label: '<header>', value: 'header' },
-	...
+	/* ... */
 ]
 ```
 
