@@ -28,14 +28,13 @@
 			}
 		},
 		"spacing": {
-			"blockGap": true,
+			"blockGap": {
+				"default": "2em"
+			},
 			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"padding": true
-			},
-			"__experimentalDefaultValues": {
-				"blockGap": "2em"
 			}
 		},
 		"__experimentalLayout": {

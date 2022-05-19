@@ -162,7 +162,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {Object} Sides supporting custom margin.
+ * @return {string[]} Sides supporting custom margin.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
@@ -172,7 +172,13 @@ export function useCustomSides( blockName, feature ) {
 		return;
 	}
 
-	return support[ feature ];
+	if ( Array.isArray( support[ feature ] ) ) {
+		return support[ feature ];
+	}
+
+	if ( support[ feature ]?.sides ) {
+		return support[ feature ].sides;
+	}
 }
 
 /**

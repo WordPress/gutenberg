@@ -113,8 +113,8 @@ export default {
 		const fallbackValue =
 			getBlockSupport( blockName, [
 				'spacing',
-				'__experimentalDefaultValues',
 				'blockGap',
+				'default',
 			] ) || '0.5em';
 
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
