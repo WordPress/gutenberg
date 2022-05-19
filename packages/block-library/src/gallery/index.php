@@ -53,7 +53,7 @@ function block_core_gallery_render( $attributes, $content ) {
 			$gap[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 		}
 	} else {
-		$gap = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
+		$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
 	}
 
 	$class   = wp_unique_id( 'wp-block-gallery-' );
