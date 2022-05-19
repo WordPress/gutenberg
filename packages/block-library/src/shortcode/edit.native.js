@@ -23,10 +23,15 @@ export function ShortcodeEdit( props ) {
 		onFocus,
 		onBlur,
 		getStylesFromColorScheme,
+		blockWidth,
 	} = props;
 	const titleStyle = getStylesFromColorScheme(
 		styles.blockTitle,
 		styles.blockTitleDark
+	);
+	const shortcodeContainerStyle = getStylesFromColorScheme(
+		styles.blockShortcodeContainer,
+		styles.blockShortcodeContainerDark
 	);
 	const shortcodeStyle = getStylesFromColorScheme(
 		styles.blockShortcode,
@@ -40,21 +45,28 @@ export function ShortcodeEdit( props ) {
 	return (
 		<View>
 			<Text style={ titleStyle }>{ __( 'Shortcode' ) }</Text>
-			<PlainText
-				value={ attributes.text }
-				style={ shortcodeStyle }
-				multiline={ true }
-				underlineColorAndroid="transparent"
-				onChange={ ( text ) => setAttributes( { text } ) }
-				placeholder={ __( 'Add a shortcode…' ) }
-				aria-label={ __( 'Shortcode' ) }
-				isSelected={ props.isSelected }
-				onFocus={ onFocus }
-				onBlur={ onBlur }
-				autoCorrect={ false }
-				autoComplete="off"
-				placeholderTextColor={ placeholderStyle.color }
-			/>
+			<View style={ shortcodeContainerStyle }>
+				<PlainText
+					__experimentalVersion={ 2 }
+					value={ attributes.text }
+					style={ shortcodeStyle }
+					onChange={ ( text ) => setAttributes( { text } ) }
+					placeholder={ __( 'Add a shortcode…' ) }
+					aria-label={ __( 'Shortcode' ) }
+					isSelected={ props.isSelected }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
+					placeholderTextColor={ placeholderStyle.color }
+					maxWidth={
+						blockWidth -
+						styles.blockShortcodeContainer.paddingLeft +
+						styles.blockShortcodeContainer.paddingRight
+					}
+					// TODO: Add autocorrect and autocomplete options
+					// autoCorrect={ false }
+					// autoComplete="off"
+				/>
+			</View>
 		</View>
 	);
 }
