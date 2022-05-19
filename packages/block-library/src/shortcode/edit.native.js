@@ -65,6 +65,7 @@ export function ShortcodeEdit( props ) {
 					// TODO: Add autocorrect and autocomplete options
 					// autoCorrect={ false }
 					// autoComplete="off"
+					disableAutocorrection
 				/>
 			</View>
 		</View>
