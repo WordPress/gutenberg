@@ -82,7 +82,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @param {Function} listener   Listener function
 	 * @param {Function} changeTest Test function to call.
 	 */
-	 function subscribeOnChange( listener, changeTest ) {
+	function subscribeOnChange( listener, changeTest ) {
 		let watching = false;
 		const unsubscribe = subscribe( () => {
 			if ( ! watching && changeTest() ) {
