@@ -6,9 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
 		'.block-editor-panel-color-gradient-settings__dropdown';
-	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
+	const CUSTOM_COLOR_BUTTON_X_SELECTOR =
+		'role=combobox[name=Custom color picker.]';
 	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
-		'.components-color-picker button[aria-label="Show detailed inputs"]';
+		'role=button[name=Show detailed inputs]';
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-picker .components-input-control__input';
 
@@ -102,9 +103,8 @@ test.describe( 'Heading', () => {
 
 		// Set the new text color.
 		await customTextColorButton.click();
-		await page.click( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR );
-		await page.locator( COLOR_INPUT_FIELD_SELECTOR );
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
+		await page.locator( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR ).click();
+		await page.locator( COLOR_INPUT_FIELD_SELECTOR ).click();
 
 		await pageUtils.pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '0782f6' );
@@ -112,7 +112,7 @@ test.describe( 'Heading', () => {
 		// Click back on the color picker.
 		await page.locator( COLOR_ITEM_SELECTOR ).first().click();
 
-		await page.click( 'h3[data-type="core/heading"]' );
+		await page.locator( 'h3[data-type="core/heading"]' ).click();
 		await page.waitForXPath( '//button//span[contains(text(), "0782f6")]' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -127,7 +127,7 @@ test.describe( 'Heading', () => {
 		await page
 			.locator( '[aria-label="Color\\: Luminous vivid orange"]' )
 			.click();
-		await page.click( 'h2[data-type="core/heading"]' );
+		await page.locator( 'h2[data-type="core/heading"]' ).click();
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
