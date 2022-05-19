@@ -124,7 +124,6 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 				searchBlock,
 				'Button inside'
 			);
-
 			await editorPage.isSearchSettingsVisible();
 			await editorPage.dismissBottomSheet();
 
@@ -143,7 +142,6 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 				searchBlock,
 				'No button'
 			);
-
 			await editorPage.isSearchSettingsVisible();
 			await editorPage.dismissBottomSheet();
 
