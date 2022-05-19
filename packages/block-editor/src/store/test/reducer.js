@@ -290,6 +290,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -371,6 +372,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -519,6 +521,7 @@ describe( 'state', () => {
 						[ newChildBlockId3 ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
 				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
@@ -627,6 +630,7 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
 				// The block object of the parent should be updated.
@@ -648,6 +652,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: {},
 				controlledInnerBlocks: {},
+				visibility: {},
 			} );
 		} );
 

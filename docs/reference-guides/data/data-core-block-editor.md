@@ -976,6 +976,19 @@ _Returns_
 
 -   `boolean`: Is Valid.
 
+### isBlockVisible
+
+Tells if the block is visible on the canvas or not.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `Object`: Client Id of the block.
+
+_Returns_
+
+-   `boolean`: True if the block is visible.
+
 ### isBlockWithinSelection
 
 Returns true if the block corresponding to the specified client ID is
@@ -1455,6 +1468,14 @@ Action that enables or disables the block moving mode.
 _Parameters_
 
 -   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
+
+### setBlockVisibility
+
+Action that sets whether a block has controlled inner blocks.
+
+_Parameters_
+
+-   _updates_ `Record<string,boolean>`: The block's clientId.
 
 ### setHasControlledInnerBlocks
 

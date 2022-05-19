@@ -2651,3 +2651,31 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+/**
+ * Tells if the block is visible on the canvas or not.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ * @return {boolean} True if the block is visible.
+ */
+export function isBlockVisible( state, clientId ) {
+	return state.blocks.visibility?.[ clientId ] ?? true;
+}
+
+/**
+ * Returns the list of all hidden blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {[string]} List of hidden blocks.
+ */
+export const __unstableGetVisibleBlocks = createSelector(
+	( state ) => {
+		return new Set(
+			Object.keys( state.blocks.visibility ).filter(
+				( key ) => state.blocks.visibility[ key ]
+			)
+		);
+	},
+	( state ) => [ state.blocks.visibility ]
+);
