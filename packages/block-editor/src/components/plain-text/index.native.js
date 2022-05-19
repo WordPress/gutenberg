@@ -82,7 +82,7 @@ export default class PlainText extends Component {
 		};
 	}
 
-	replaceLineBreaks( value ) {
+	replaceLineBreakTags( value ) {
 		return value?.replace( RegExp( '<br>', 'gim' ), '\n' );
 	}
 
@@ -93,7 +93,9 @@ export default class PlainText extends Component {
 
 	onChangeRichText( value ) {
 		const { onChange } = this.props;
-		onChange( this.replaceLineBreaks( value ) );
+		// The <br> tags have to be replaced with new line characters
+		// as the content of plain text shouldn't contain HTML tags.
+		onChange( this.replaceLineBreakTags( value ) );
 	}
 
 	render() {
