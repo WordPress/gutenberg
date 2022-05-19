@@ -817,9 +817,10 @@ export default function NavigationLinkEdit( {
 										<>
 											<span>
 												{
-													// Some attributes are stored in an escaped form due to the escaping model
-													// having become inverted.
-													// Unescape is used here to "recover" the escaped characters.
+													// Some attributes are stored in an escaped form. It's a legacy issue.
+													// Ideally they would be stored in a raw, unescaped form.
+													// Unescape is used here to "recover" the escaped characters
+													// so they display without encoding.
 													// See `updateNavigationLinkBlockAttributes` for more details.
 													`${ unescape(
 														label
