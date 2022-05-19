@@ -240,6 +240,15 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 
+	// Unfortunately this causes the escaping model to be inverted.
+	// The escaped content is stored in the block attributes (and ultimately in the database),
+	// and then the raw data is "recovered" when outputting into the DOM.
+	// It would be preferable to store the **raw** data in the block attributes and escape it in JS.
+	// Why? Because there isn't one way to escape data. Depending on the context, you need to do
+	// different transforms. It doesn't make sense to me to choose one of them for the purposes of storage.
+	// See also:
+	// - https://github.com/WordPress/gutenberg/pull/41063
+	// - https://github.com/WordPress/gutenberg/pull/18617.
 	const label = escapeTitle
 		? escape( title )
 		: originalLabel || escape( normalizedURL );
@@ -799,7 +808,10 @@ export default function NavigationLinkEdit( {
 										<>
 											<span>
 												{
-													/* Trim to avoid trailing white space when the placeholder text is not present */
+													// Some attributes are stored in an escaped form due to the escaping model
+													// having become inverted.
+													// Unescape is used here to "recover" the escaped characters.
+													// See `updateNavigationLinkBlockAttributes` for more details.
 													`${ unescape(
 														label
 													) } ${ placeholderText }`.trim()
