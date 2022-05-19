@@ -11,7 +11,6 @@ import {
 	store as blockEditorStore,
 	HtmlElementControl,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
