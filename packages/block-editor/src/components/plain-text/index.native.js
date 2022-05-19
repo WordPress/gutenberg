@@ -135,8 +135,7 @@ export default class PlainText extends Component {
 					{ ...forcePlainTextProps }
 					{ ...fontProps }
 					identifier="content"
-					tagName="p"
-					tagsToEliminate={ [ 'p' ] }
+					tagName="pre"
 					style={ style }
 					onChange={ this.onChangeRichText }
 					unstableOnFocus={ onFocus }
