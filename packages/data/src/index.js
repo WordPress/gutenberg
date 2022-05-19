@@ -172,6 +172,8 @@ export const dispatch = defaultRegistry.dispatch;
  */
 export const subscribe = defaultRegistry.subscribe;
 
+export const subscribeOnChange = defaultRegistry.subscribeOnChange;
+
 /**
  * Registers a generic store instance.
  *

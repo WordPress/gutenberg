@@ -76,6 +76,26 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	};
 
 	/**
+	 * Subscribe to a state change. Starts watch when the test function returns
+	 * true, then calls the listener when test function returns false.
+	 *
+	 * @param {Function} listener   Listener function
+	 * @param {Function} changeTest Test function to call.
+	 */
+	 function subscribeOnChange( listener, changeTest ) {
+		let watching = false;
+		const unsubscribe = subscribe( () => {
+			if ( ! watching && changeTest() ) {
+				watching = true;
+			}
+			if ( watching && ! changeTest() ) {
+				unsubscribe();
+				listener();
+			}
+		} );
+	}
+
+	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
 	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
@@ -300,6 +320,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
+		subscribeOnChange,
 		resolveSelect,
 		suspendSelect,
 		dispatch,
