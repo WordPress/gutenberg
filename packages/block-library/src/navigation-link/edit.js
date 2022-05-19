@@ -33,7 +33,6 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 import {
 	Fragment,
 	useState,
@@ -793,9 +792,7 @@ export default function NavigationLinkEdit( {
 											<span>
 												{
 													/* Trim to avoid trailing white space when the placeholder text is not present */
-													`${ decodeEntities(
-														label
-													) } ${ placeholderText }`.trim()
+													`${ label } ${ placeholderText }`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">
