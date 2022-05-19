@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 4.7.0 (2022-05-18)
+
+### Enhancement
+-   Added SSH protocol support for git sources
+
 ## 4.2.0 (2022-01-27)
 
 ### Enhancement

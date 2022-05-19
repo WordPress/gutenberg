@@ -43,7 +43,7 @@ import useCoverIsDark from './use-cover-is-dark';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
-import ResizableCover from './resizeable-cover';
+import ResizableCover from './resizable-cover';
 
 extend( [ namesPlugin ] );
 
@@ -130,9 +130,7 @@ function CoverEdit( {
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
-		createErrorNotice( Array.isArray( message ) ? message[ 2 ] : message, {
-			type: 'snackbar',
-		} );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	const mediaElement = useRef();

@@ -1603,3 +1603,15 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Action that sets whether a block has controlled inner blocks.
+ *
+ * @param {Record<string,boolean>} updates The block's clientId.
+ */
+export function setBlockVisibility( updates ) {
+	return {
+		type: 'SET_BLOCK_VISIBILITY',
+		updates,
+	};
+}

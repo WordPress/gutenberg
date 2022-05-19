@@ -80,7 +80,26 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 	);
 }
 
-function DatePicker( {
+/**
+ * DatePicker is a React component that renders a calendar for date selection.
+ *
+ * ```jsx
+ * import { DatePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyDatePicker = () => {
+ *   const [ date, setDate ] = useState( new Date() );
+ *
+ *   return (
+ *     <DatePicker
+ *       currentDate={ date }
+ *       onChange={ ( newDate ) => setDate( newDate ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export function DatePicker( {
 	currentDate,
 	onChange,
 	events,

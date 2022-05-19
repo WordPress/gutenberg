@@ -177,7 +177,7 @@ function FlatTermSelector( { slug } ) {
 	// while core data makes REST API requests.
 	useEffect( () => {
 		if ( hasResolvedTerms ) {
-			const newValues = terms.map( ( term ) =>
+			const newValues = ( terms ?? [] ).map( ( term ) =>
 				unescapeString( term.name )
 			);
 
@@ -202,7 +202,10 @@ function FlatTermSelector( { slug } ) {
 	}
 
 	function onChange( termNames ) {
-		const availableTerms = [ ...terms, ...( searchResults ?? [] ) ];
+		const availableTerms = [
+			...( terms ?? [] ),
+			...( searchResults ?? [] ),
+		];
 		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>

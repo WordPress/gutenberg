@@ -31,12 +31,12 @@ export default function Dropdown( props ) {
 	const {
 		renderContent,
 		renderToggle,
-		position = 'bottom right',
 		className,
 		contentClassName,
 		expandOnMobile,
 		headerTitle,
 		focusOnMount,
+		position,
 		popoverProps,
 		onClose,
 		onToggle,
@@ -82,6 +82,10 @@ export default function Dropdown( props ) {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
+	const hasAnchorRef =
+		!! popoverProps?.anchorRef ||
+		!! popoverProps?.getAnchorRect ||
+		!! popoverProps?.anchorRect;
 
 	return (
 		<div
@@ -101,10 +105,11 @@ export default function Dropdown( props ) {
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
+					// This value is used to ensure that the dropdowns
+					// align with the editor header by default.
+					offset={ 13 }
+					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
 					{ ...popoverProps }
-					anchorRef={
-						popoverProps?.anchorRef ?? containerRef.current
-					}
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,

@@ -43,7 +43,7 @@ const BorderControl = (
 		onSliderChange,
 		onWidthChange,
 		placeholder,
-		popoverContentClassName,
+		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
 		sliderClassName,
@@ -69,7 +69,7 @@ const BorderControl = (
 					<BorderControlDropdown
 						border={ border }
 						colors={ colors }
-						contentClassName={ popoverContentClassName }
+						__unstablePopoverProps={ __unstablePopoverProps }
 						disableCustomColors={ disableCustomColors }
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }

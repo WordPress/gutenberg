@@ -29,11 +29,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.pastePlainText
 		);
@@ -59,9 +56,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement2.click();
-		}
 
 		// Paste into second paragraph block.
 		await longPressMiddleOfElement(
@@ -83,9 +77,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
 		// Copy content to clipboard.
 		await longPressMiddleOfElement(
@@ -108,9 +99,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement2.click();
-		}
 
 		// Paste into second paragraph block.
 		await longPressMiddleOfElement(

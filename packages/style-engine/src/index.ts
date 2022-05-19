@@ -24,6 +24,16 @@ import { styleDefinitions } from './styles';
  */
 export function generate( style: Style, options: StyleOptions ): string {
 	const rules = getCSSRules( style, options );
+
+	// If no selector is provided, treat generated rules as inline styles to be returned as a single string.
+	if ( ! options?.selector ) {
+		const inlineRules: string[] = [];
+		rules.forEach( ( rule ) => {
+			inlineRules.push( `${ kebabCase( rule.key ) }: ${ rule.value };` );
+		} );
+		return inlineRules.join( ' ' );
+	}
+
 	const groupedRules = groupBy( rules, 'selector' );
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
@@ -57,7 +67,9 @@ export function getCSSRules(
 ): GeneratedCSSRule[] {
 	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
-		rules.push( ...definition.generate( style, options ) );
+		if ( typeof definition.generate === 'function' ) {
+			rules.push( ...definition.generate( style, options ) );
+		}
 	} );
 
 	return rules;
