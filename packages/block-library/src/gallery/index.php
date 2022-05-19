@@ -66,13 +66,19 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
-	$gap_value = $gap ? $gap : 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
+	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
+	$gap_value    = $gap ? $gap : $fallback_gap;
+	$gap_column   = $gap_value;
 
 	if ( is_array( $gap_value ) ) {
-		$gap_value = isset( $gap_value['left'] ) ? $gap_value['left'] : '0.5em';
+		$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap;
+		$gap_column = isset( $gap_value['left'] ) ? $gap_value['left'] : $fallback_gap;
+		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 	}
 
-	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_value . '; gap: ' . $gap_value . '}';
+	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
+	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+
 	// Ideally styles should be loaded in the head, but blocks may be parsed
 	// after that, so loading in the footer for now.
 	// See https://core.trac.wordpress.org/ticket/53494.
