@@ -145,12 +145,12 @@ class EditorPage {
 
 	async getFirstBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
-		const elements = await this.driver.elementsByXPath( firstBlockLocator );
-		return elements[ 0 ];
+		return await waitForVisible( this.driver, firstBlockLocator );
 	}
 
 	async getLastBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		await waitForVisible( this.driver, firstBlockLocator );
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ elements.length - 1 ];
 	}
