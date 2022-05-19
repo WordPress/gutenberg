@@ -42,26 +42,26 @@ const DEFAULT_OPTIONS = [
 /**
  * Control for selecting the block tagname.
  *
- * @param {Object}   props                Component props.
- * @param {Function} props.onChange       Callback to handle onChange.
- * @param {Object}   props.tagNameOptions Tagnames to be used in the select control.
- * @param {string}   props.selectedValue  Selected tag value.
+ * @param {Object}   props          Component props.
+ * @param {Function} props.onChange Callback to handle onChange.
+ * @param {Object}   props.options  Tagnames to be used in the select control.
+ * @param {string}   props.value    Selected tag value.
  *
- * @return {WPElement}                    Control for selecting the block tagname.
+ * @return {WPElement}              Control for selecting the block tagname.
  */
 
 export default function HtmlElementControl( {
 	onChange,
-	tagNameOptions = DEFAULT_OPTIONS,
-	selectedValue,
+	options = DEFAULT_OPTIONS,
+	value,
 } ) {
 	return (
 		<SelectControl
 			label={ __( 'HTML element' ) }
-			options={ tagNameOptions }
-			value={ selectedValue }
+			options={ options }
+			value={ value }
 			onChange={ onChange }
-			help={ htmlElementMessages[ selectedValue ] }
+			help={ htmlElementMessages[ value ] }
 		/>
 	);
 }

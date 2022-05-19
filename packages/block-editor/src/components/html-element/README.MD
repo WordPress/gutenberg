@@ -9,7 +9,7 @@ import { HtmlElementControl } from '@wordpress/block-editor';
 
 const Example = () => (
 	<HtmlElementControl
-		selectedValue={ TagName }
+		value={ TagName }
 		onChange={ ( value ) =>
 			setAttributes( { tagName: value } )
 		}
@@ -21,7 +21,7 @@ const Example = () => (
 
 The component accepts the following props:
 
-### tagNameOptions
+### options
 
 An array of tag names and labels. Should be of the format:
 
@@ -29,7 +29,7 @@ An array of tag names and labels. Should be of the format:
 [
 	{ label: __( 'Default (<div>)' ), value: 'div' },
 	{ label: '<header>', value: 'header' },
-	/* ... */
+	...
 ]
 ```
 
@@ -42,18 +42,18 @@ Default:
 
 ```js
 [
-		{ label: '<div>', value: 'div' },
-		{ label: '<header>', value: 'header' },
-		{ label: '<main>', value: 'main' },
-		{ label: '<section>', value: 'section' },
-		{ label: '<article>', value: 'article' },
-		{ label: '<aside>', value: 'aside' },
-		{ label: '<footer>', value: 'footer' },
-		{ label: '<nav>', value: 'nav' },
-	];
+	{ label: '<div>', value: 'div' },
+	{ label: '<header>', value: 'header' },
+	{ label: '<main>', value: 'main' },
+	{ label: '<section>', value: 'section' },
+	{ label: '<article>', value: 'article' },
+	{ label: '<aside>', value: 'aside' },
+	{ label: '<footer>', value: 'footer' },
+	{ label: '<nav>', value: 'nav' },
+];
 ```
 
-### selectedValue
+### value
 
 The selected value from the select list.
 

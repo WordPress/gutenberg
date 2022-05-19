@@ -66,7 +66,7 @@ export function TemplatePartAdvancedControls( {
 				</>
 			) }
 			<HtmlElementControl
-				tagNameOptions={ [
+				options={ [
 					{
 						label: sprintf(
 							/* translators: %s: HTML tag based on area. */
@@ -83,7 +83,7 @@ export function TemplatePartAdvancedControls( {
 					{ label: '<footer>', value: 'footer' },
 					{ label: '<div>', value: 'div' },
 				] }
-				selectedValue={ tagName || '' }
+				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
 		</InspectorControls>

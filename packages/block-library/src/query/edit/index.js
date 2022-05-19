@@ -113,13 +113,13 @@ export function QueryContent( {
 			</BlockControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<HtmlElementControl
-					tagNameOptions={ [
+					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<main>', value: 'main' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					selectedValue={ TagName }
+					value={ TagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}

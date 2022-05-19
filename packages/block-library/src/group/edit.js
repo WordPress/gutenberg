@@ -51,7 +51,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		<>
 			<InspectorControls __experimentalGroup="advanced">
 				<HtmlElementControl
-					selectedValue={ TagName }
+					value={ TagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}

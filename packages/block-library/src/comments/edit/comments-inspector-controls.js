@@ -12,12 +12,12 @@ export default function CommentsInspectorControls( {
 		<InspectorControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<HtmlElementControl
-					tagNameOptions={ [
+					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<section>', value: 'section' },
 						{ label: '<aside>', value: 'aside' },
 					] }
-					selectedValue={ TagName }
+					value={ TagName }
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
