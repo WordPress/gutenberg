@@ -409,9 +409,9 @@ if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 				if ( false === strpos( $block_content, $class_name ) ) {
 					continue;
 				}
-				$file = $block_path . "/style-part-{$class_name}.css";
-				if ( is_rtl() && file_exists( $block_path . "/style-part-{$class_name}-rtl.css" ) ) {
-					$file = $block_path . "/style-part-{$class_name}-rtl.css";
+				$file = $block_path . "/styles/{$class_name}.css";
+				if ( is_rtl() && file_exists( $block_path . "/styles/{$class_name}-rtl.css" ) ) {
+					$file = $block_path . "/styles/{$class_name}-rtl.css";
 				}
 				wp_add_inline_style( $handle, file_get_contents( $file ) );
 			}
