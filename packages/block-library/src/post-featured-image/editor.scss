@@ -48,7 +48,7 @@
 			bottom: 0;
 			left: 0;
 			border: $border-width dashed currentColor;
-			opacity: 0.3;
+			opacity: 0.4;
 			pointer-events: none;
 
 			// Inherit border radius from style variations.
@@ -93,7 +93,7 @@
 			height: 100%;
 			stroke: currentColor;
 			stroke-dasharray: 3;
-			opacity: 0.3;
+			opacity: 0.4;
 		}
 
 		// Show default placeholder height when not resized.
@@ -126,13 +126,5 @@ div[data-type="core/post-featured-image"] {
 		max-width: 100%;
 		height: auto;
 		display: block;
-	}
-}
-
-.block-library-post-featured-image-dimension-controls {
-	margin-bottom: $grid-unit-10;
-
-	&.scale-control-is-visible {
-		margin-bottom: $grid-unit-20;
 	}
 }

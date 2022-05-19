@@ -14,7 +14,7 @@ export {
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
-export { default as __experimentalBlockContentOverlay } from './block-content-overlay';
+export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
 export {
 	default as BlockControls,
@@ -33,7 +33,6 @@ export {
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
 export { default as __experimentalBorderRadiusControl } from './border-radius-control';
-export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
 	ButtonBlockerAppender,
@@ -42,6 +41,7 @@ export {
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as __experimentalDateFormatPicker } from './date-format-picker';
 export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
@@ -49,6 +49,7 @@ export { default as __experimentalLetterSpacingControl } from './letter-spacing-
 export { default as __experimentalTextDecorationControl } from './text-decoration-control';
 export { default as __experimentalTextTransformControl } from './text-transform-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
+export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export {
 	default as __experimentalImageEditor,
@@ -96,6 +97,8 @@ export { default as withColorContext } from './color-palette/with-color-context'
  */
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
+export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
@@ -104,7 +107,10 @@ export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
-export { default as BlockPreview } from './block-preview';
+export {
+	default as BlockPreview,
+	useBlockPreview as __experimentalUseBlockPreview,
+} from './block-preview';
 export {
 	default as BlockSelectionClearer,
 	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
@@ -130,7 +136,6 @@ export {
 	useTypingObserver as __unstableUseTypingObserver,
 	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
 } from './observe-typing';
-export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export {
 	default as Typewriter,
@@ -138,10 +143,10 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
-export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 
 /*
  * State Related Components

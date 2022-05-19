@@ -200,7 +200,7 @@ describe( 'Taxonomies', () => {
 			return;
 		}
 
-		// At the start there are no tag tokens
+		// At the start there are no tag tokens.
 		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );

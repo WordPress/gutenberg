@@ -14,9 +14,10 @@ import { toggleMoreMenu } from './toggle-more-menu';
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await toggleMoreMenu();
+	await toggleMoreMenu( 'open' );
 	const moreMenuContainerSelector =
-		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';
+		'//*[contains(concat(" ", @class, " "), " interface-more-menu-dropdown__content ")]';
+
 	const elementToClick = first(
 		await page.$x(
 			`${ moreMenuContainerSelector }//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ buttonLabel }")]`

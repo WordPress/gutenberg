@@ -44,7 +44,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 
 	Dimensions.addEventListener( 'change', setIsMatching );
 
-	// Set initial values
+	// Set initial values.
 	setIsMatching();
 };
 

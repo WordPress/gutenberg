@@ -30,7 +30,7 @@ There are a number of [components available](/docs/reference-guides/packages/pac
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc.
 
-To use the `RichText` component, and using ES5 code, remember to add `wp-editor` to the dependency array of registered script handles when calling `wp_register_script`.
+To use the `RichText` component, and using ES5 code, remember to add `wp-block-editor` to the dependency array of registered script handles when calling `wp_register_script`.
 
 ```php
 // automatically load dependencies and version
@@ -53,7 +53,7 @@ Because `RichText` allows for nested nodes, you'll most often use it in conjunct
 Here is the complete block definition for Example 03.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -108,7 +108,7 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, blockEditor, element ) {

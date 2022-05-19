@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -11,9 +10,9 @@ import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useHeading, HeadingProps } from './hook';
 
-function Heading(
+function UnconnectedHeading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useHeading( props );
 
@@ -25,13 +24,13 @@ function Heading(
  *
  * @example
  * ```jsx
- * import { Heading } from `@wordpress/components`
+ * import { __experimentalHeading as Heading } from "@wordpress/components";
  *
  * function Example() {
  *   return <Heading>Code is Poetry</Heading>;
  * }
  * ```
  */
-const ConnectedHeading = contextConnect( Heading, 'Heading' );
+export const Heading = contextConnect( UnconnectedHeading, 'Heading' );
 
-export default ConnectedHeading;
+export default Heading;

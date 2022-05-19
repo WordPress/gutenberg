@@ -17,9 +17,15 @@ import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
+	serializeRawBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useDispatch,
+	useSelect,
+} from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
@@ -69,6 +75,7 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
+	block: { __unstableBlockSource },
 	mode,
 	isLocked,
 	canRemove,
@@ -86,6 +93,10 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().supportsLayout;
+	}, [] );
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -119,10 +130,19 @@ function BlockListBlock( {
 		);
 	}
 
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
+	const isAligned =
+		wrapperProps &&
+		!! wrapperProps[ 'data-align' ] &&
+		! themeSupportsLayout;
 
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
+	// This is only kept for classic themes that don't support layout
+	// Historically we used to rely on extra divs and data-align to
+	// provide the alignments styles in the editor.
+	// Due to the differences between frontend and backend, we migrated
+	// to the layout feature, and we're now aligning the markup of frontend
+	// and backend.
 	if ( isAligned ) {
 		blockEdit = (
 			<div
@@ -137,7 +157,9 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
-		const saveContent = getSaveContent( blockType, attributes );
+		const saveContent = __unstableBlockSource
+			? serializeRawBlock( __unstableBlockSource )
+			: getSaveContent( blockType, attributes );
 
 		block = (
 			<Block className="has-warning">
@@ -164,7 +186,13 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		className,
+		className:
+			wrapperProps?.[ 'data-align' ] && themeSupportsLayout
+				? classnames(
+						className,
+						`align${ wrapperProps[ 'data-align' ] }`
+				  )
+				: className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 		isAligned,
 	};
@@ -259,7 +287,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
 			const { getBlockIndex } = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
@@ -306,7 +334,7 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
-	// block is sometimes not mounted at the right time, causing it be undefined
+	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
 	ifCondition( ( { block } ) => !! block ),

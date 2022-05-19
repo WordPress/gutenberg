@@ -1,6 +1,8 @@
-// Provide a minimum of overflow handling.
+// Provide a minimum of overflow handling and ensure the code markup inherits
+// the font-family set on pre.
 .wp-block-code code {
 	display: block;
-	white-space: pre-wrap;
+	font-family: inherit;
 	overflow-wrap: break-word;
+	white-space: pre-wrap;
 }

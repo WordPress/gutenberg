@@ -1,0 +1,11 @@
+.edit-site-new-template-dropdown {
+	.components-dropdown-menu__toggle {
+		padding: 6px 12px;
+	}
+
+	.edit-site-new-template-dropdown__popover {
+		@include break-small() {
+			min-width: 300px;
+		}
+	}
+}

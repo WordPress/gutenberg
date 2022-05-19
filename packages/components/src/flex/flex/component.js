@@ -8,7 +8,7 @@ import { View } from '../../view';
 
 /**
  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                                forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
  */
 function Flex( props, forwardedRef ) {
 	const { children, isColumn, ...otherProps } = useFlex( props );

@@ -105,7 +105,7 @@ export default function useText( props ) {
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.black } )
+				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );
 		}
 
@@ -126,6 +126,7 @@ export default function useText( props ) {
 		align,
 		className,
 		color,
+		cx,
 		display,
 		isBlock,
 		isCaption,

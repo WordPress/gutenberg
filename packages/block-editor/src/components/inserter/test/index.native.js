@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
  */
 import { Inserter } from '../index';
-import '../../..'; // Ensure store dependencies are imported via root.
 
 const getStylesFromColorScheme = () => {
 	return { color: 'white' };
@@ -15,13 +14,10 @@ const getStylesFromColorScheme = () => {
 
 describe( 'Inserter', () => {
 	it( 'button contains the testID "add-block-button"', () => {
-		const testRenderer = renderer.create(
+		const screen = render(
 			<Inserter getStylesFromColorScheme={ getStylesFromColorScheme } />
 		);
-		const testInstance = testRenderer.root;
 
-		expect( () => {
-			testInstance.findByProps( { testID: 'add-block-button' } );
-		} ).not.toThrow();
+		expect( screen.getByTestId( 'add-block-button' ) ).toBeTruthy();
 	} );
 } );

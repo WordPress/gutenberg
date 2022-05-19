@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid } from './helpers/utils';
+import { isAndroid, waitForVisible } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Cover Block test', () => {
@@ -10,7 +10,9 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
 		const coverBlock = await editorPage.getBlockAtPosition(
-			blockNames.cover
+			blockNames.cover,
+			1,
+			{ useWaitForVisible: true }
 		);
 
 		// Temporarily this test is skipped on Android,due to the inconsistency of the results,
@@ -20,7 +22,7 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			const { height } = await coverBlock.getSize();
 			// Height is set to 20rem, where 1rem is 16.
 			// There is also block's vertical padding equal 32.
-			// Finally, the total height should be 20 * 16 + 32 = 352
+			// Finally, the total height should be 20 * 16 + 32 = 352.
 			expect( height ).toBe( 352 );
 		}
 		/* eslint-enable jest/no-conditional-expect */
@@ -31,24 +33,26 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 	} );
 
 	// Testing this for iOS on a device is valuable to ensure that it properly
-	// handles opening multiple modals, as only one can be open at a time
+	// handles opening multiple modals, as only one can be open at a time.
 	it( 'allows modifying media from within block settings', async () => {
 		await editorPage.setHtmlContent( testData.coverHeightWithRemUnit );
 
 		const coverBlock = await editorPage.getBlockAtPosition(
-			blockNames.cover
+			blockNames.cover,
+			1,
+			{ useWaitForVisible: true }
 		);
 		await coverBlock.click();
 
 		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
-			// Open block settings
+			// Open block settings.
 			const settingsButton = await editorPage.driver.elementByAccessibilityId(
 				'Open Settings'
 			);
 			await settingsButton.click();
 
-			// Add initial media via button within bottom sheet
+			// Add initial media via button within bottom sheet.
 			const mediaSection = await editorPage.driver.elementByAccessibilityId(
 				'Media Add image or video'
 			);
@@ -57,29 +61,45 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			);
 			await addMediaButton.click();
 			await editorPage.chooseMediaLibrary();
+			await editorPage.driver.sleep( 2000 ); // Await media load.
 
-			// Edit media within block settings
-			await settingsButton.click();
-			await editorPage.driver.sleep( 2000 ); // Await media load
-			const editImageButton = await editorPage.driver.elementsByAccessibilityId(
-				'Edit image'
+			// Get Edit image button of block
+			const editImageButtonLocator =
+				'//XCUIElementTypeButton[@name="Edit image"][@enabled="true"]';
+			const blockEditImageButton = await waitForVisible(
+				editorPage.driver,
+				editImageButtonLocator
 			);
-			await editImageButton[ editImageButton.length - 1 ].click();
 
-			// Replace image
+			// Edit media within block settings.
+			await settingsButton.click();
+			await editorPage.driver.sleep( 2000 ); // Await media load.
+
+			// Get Edit image button of block settings.
+			// NOTE: Since we have multiple Edit image buttons at this
+			// point, we have to filter them to obtain the correct one.
+			const settingsEditImageButtons = await editorPage.driver.elementsByXPath(
+				editImageButtonLocator
+			);
+			const settingsEditImageButton = settingsEditImageButtons.find(
+				( element ) => element.value !== blockEditImageButton.value
+			);
+			await settingsEditImageButton.click();
+
+			// Replace image.
 			const replaceButton = await editorPage.driver.elementByAccessibilityId(
 				'Replace'
 			);
 			await replaceButton.click();
 
-			// First modal should no longer be presented
+			// First modal should no longer be presented.
 			const replaceButtons = await editorPage.driver.elementsByAccessibilityId(
 				'Replace'
 			);
 			// eslint-disable-next-line jest/no-conditional-expect
 			expect( replaceButtons.length ).toBe( 0 );
 
-			// Select different media
+			// Select different media.
 			await editorPage.chooseMediaLibrary();
 		}
 

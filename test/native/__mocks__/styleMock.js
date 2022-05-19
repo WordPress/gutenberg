@@ -1,5 +1,5 @@
 module.exports = {
-	//Mock block paragraph style with minimum height
+	// Mock block paragraph style with minimum height.
 	blockText: {
 		minHeight: 50,
 	},
@@ -152,5 +152,14 @@ module.exports = {
 	},
 	'components-autocomplete': {
 		height: 100,
+	},
+	addMediaButton: {
+		color: 'white',
+	},
+	'header-toolbar__container': {
+		height: 44,
+	},
+	'dropping-insertion-point': {
+		height: 3,
 	},
 };

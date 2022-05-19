@@ -85,7 +85,7 @@ Value change handler, called with the updated value if the user selects a new li
 <LinkControl
 	onChange={ ( nextValue ) => {
 		console.log( `The selected item URL: ${ nextValue.url }.` );
-	}
+	} }
 />
 ```
 
@@ -114,7 +114,7 @@ Controls the query parameters used to search for suggestions. For example, to li
 
 ```jsx
 <LinkControl
-	suggestionQuery={ {
+	suggestionsQuery={ {
 		type: 'post',
 		subtype: 'page',
 	} }

@@ -93,6 +93,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	return (
 		<CompositeItem
+			__experimentalIsFocusable
 			role="option"
 			as={ Button }
 			{ ...composite }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -24,8 +24,8 @@ describe( 'Block Mover Picker', () => {
 			rootClientId: '',
 			isStackedHorizontally: true,
 		};
-		const wrapper = shallow( <BlockMover { ...props } /> );
-		expect( wrapper ).toBeTruthy();
+		const screen = render( <BlockMover { ...props } /> );
+		expect( screen.container ).toBeTruthy();
 	} );
 
 	it( 'should match snapshot', () => {
@@ -43,7 +43,7 @@ describe( 'Block Mover Picker', () => {
 			rootClientId: '',
 			isStackedHorizontally: true,
 		};
-		const wrapper = shallow( <BlockMover { ...props } /> );
-		expect( wrapper ).toMatchSnapshot();
+		const screen = render( <BlockMover { ...props } /> );
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 } );

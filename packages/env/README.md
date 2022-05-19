@@ -51,7 +51,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-# You must add another dash to pass the "update" flag to wp-env
+# You must add another double dash to pass the "update" flag to wp-env
 $ npm run wp-env start -- --update
 ```
 
@@ -203,6 +203,14 @@ wp-env start
 wp-env start --xdebug=profile,trace,debug
 ```
 
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
+
+```sh
+npm run wp-env start -- --xdebug
+```
+
+If you forget about that, the `--xdebug` parameter will be passed to NPM instead of the `wp-env start` command and it will be ignored.
+
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 
 _Since we are only installing Xdebug 3, Xdebug is only supported for PHP versions greater than or equal to 7.2 (the default). Xdebug won't be installed if `phpVersion` is set to a legacy version._
@@ -215,15 +223,17 @@ You should only have to translate `port` and `pathMappings` to the format used b
 
 ```json
 {
-	"name": "Listen for XDebug",
-	"type": "php",
-	"request": "launch",
-	"port": 9003,
-	"pathMappings": {
-		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
-	}
+  "name": "Listen for XDebug",
+  "type": "php",
+  "request": "launch",
+  "port": 9003,
+  "pathMappings": {
+    "/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
+  }
 }
 ```
+
+After you create a `.vscode/launch.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
 
 Once your IDEs Xdebug settings have been enabled, you should just have to launch the debugger, put a breakpoint on any line of PHP code, and then refresh your browser!
 
@@ -286,6 +296,24 @@ Positionals:
 ```
 
 ### `wp-env run [container] [command]`
+
+The run command can be used to open shell sessions or invoke WP-CLI commands.
+
+<div class="callout callout-alert">
+To run a WP-CLI command that includes optional arguments, enclose the WP-CLI command in quotation marks; otherwise, the optional arguments are ignored. This is because flags are normally passed to `wp-env` itself, meaning that the flags are not considered part of the argument that specifies the WP-CLI command. With quotation marks, `wp-env` considers everything inside quotation marks the WP-CLI command argument.
+
+For example, to list cron schedules with optional arguments that specify the fields returned and the format of the output:
+
+```sh
+wp-env run cli "wp cron schedule list --fields=name --format=csv"
+```
+
+Without the quotation marks, WP-CLI lists the schedule in its default format, ignoring the `fields` and `format` arguments.
+</div>
+
+Note that quotation marks are not required for a WP-CLI command that excludes optional arguments, although it does not hurt to include them. For example, the following command syntaxes return identical results: `wp-env run cli "wp cron schedule list"` or `wp-env run cli wp cron schedule list`.
+
+For more information about all the available commands, see [WP-CLI Commands](https://developer.wordpress.org/cli/commands/).
 
 ```sh
 wp-env run <container> [command..]
@@ -353,7 +381,7 @@ wp> ^C
 #### Installing a plugin or theme on the development instance
 
 ```sh
-wp-env run cli plugin install custom-post-type-ui
+wp-env run cli wp plugin install custom-post-type-ui
 
 Creating 500cd328b649d63e882d5c4695871d04_cli_run ... done
 Installing Custom Post Type UI (1.9.2)
@@ -400,6 +428,18 @@ Options:
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
+### `wp-env install-path`
+
+Outputs the absolute path to the WordPress environment files.
+
+Example:
+
+```sh
+$ wp-env install-path
+
+/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
@@ -420,12 +460,13 @@ _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PO
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
-| Type              | Format                        | Example(s)                                               |
-| ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`   |
-| ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
+| Type              | Format                                       | Example(s)                                               |
+| ----------------- | -------------------------------------------- | -------------------------------------------------------- |
+| Relative path     | `.<path>\|~<path>`                           | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`                  | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| GitHub repository | `<owner>/<repo>[#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, if no branch is provided wp-env will fall back to the repos default branch |
+| SSH repository    | `ssh://user@host/<owner>/<repo>.git[#<ref>]` | `"ssh://git@github.com/WordPress/WordPress.git"`         |
+| ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
@@ -433,22 +474,22 @@ Additionally, the key `env` is available to override any of the above options on
 
 ```json
 {
-	"plugins": [ "." ],
-	"config": {
-		"KEY_1": true,
-		"KEY_2": false
-	},
-	"env": {
-		"development": {
-			"themes": [ "./one-theme" ]
-		},
-		"tests": {
-			"config": {
-				"KEY_1": false
-			},
-			"port": 3000
-		}
-	}
+  "plugins": ["."],
+  "config": {
+    "KEY_1": true,
+    "KEY_2": false
+  },
+  "env": {
+    "development": {
+      "themes": ["./one-theme"]
+    },
+    "tests": {
+      "config": {
+        "KEY_1": false
+      },
+      "port": 3000
+    }
+  }
 }
 ```
 
@@ -489,19 +530,19 @@ This is useful for plugin development.
 
 ```json
 {
-	"core": null,
-	"plugins": [ "." ]
+  "core": null,
+  "plugins": ["."]
 }
 ```
 
-#### Latest development WordPress + current directory as a plugin
+### Latest development WordPress + current directory as a plugin
 
-This is useful for plugin development when upstream Core changes need to be tested.
+This is useful for plugin development when upstream Core changes need to be tested. This can also be set via the environment variable `WP_ENV_CORE`.
 
 ```json
 {
-	"core": "WordPress/WordPress#master",
-	"plugins": [ "." ]
+  "core": "WordPress/WordPress#master",
+  "plugins": ["."]
 }
 ```
 
@@ -513,8 +554,8 @@ If you are running a _build_ of `wordpress-develop`, point `core` to the `build`
 
 ```json
 {
-	"core": "../wordpress-develop/build",
-	"plugins": [ "." ]
+  "core": "../wordpress-develop/build",
+  "plugins": ["."]
 }
 ```
 
@@ -522,8 +563,8 @@ If you are running `wordpress-develop` in a dev mode (e.g. the watch command `de
 
 ```json
 {
-	"core": "../wordpress-develop/src",
-	"plugins": [ "." ]
+  "core": "../wordpress-develop/src",
+  "plugins": ["."]
 }
 ```
 
@@ -533,9 +574,9 @@ This is useful for integration testing: that is, testing how old versions of Wor
 
 ```json
 {
-	"core": "WordPress/WordPress#5.2.0",
-	"plugins": [ "WordPress/wp-lazy-loading", "WordPress/classic-editor" ],
-	"themes": [ "WordPress/theme-experiments" ]
+  "core": "WordPress/WordPress#5.2.0",
+  "plugins": ["WordPress/wp-lazy-loading", "WordPress/classic-editor"],
+  "themes": ["WordPress/theme-experiments"]
 }
 ```
 
@@ -545,12 +586,12 @@ You can add mu-plugins via the mapping config. The mapping config also allows yo
 
 ```json
 {
-	"plugins": [ "." ],
-	"mappings": {
-		"wp-content/mu-plugins": "./path/to/local/mu-plugins",
-		"wp-content/themes": "./path/to/local/themes",
-		"wp-content/themes/specific-theme": "./path/to/local/theme-1"
-	}
+  "plugins": ["."],
+  "mappings": {
+    "wp-content/mu-plugins": "./path/to/local/mu-plugins",
+    "wp-content/themes": "./path/to/local/themes",
+    "wp-content/themes/specific-theme": "./path/to/local/theme-1"
+  }
 }
 ```
 
@@ -560,10 +601,10 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 
 ```json
 {
-	"plugins": [ "." ],
-	"mappings": {
-		"wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
-	}
+  "plugins": ["."],
+  "mappings": {
+    "wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
+  }
 }
 ```
 
@@ -573,12 +614,12 @@ If you need a plugin active in one environment but not the other, you can use `e
 
 ```json
 {
-	"plugins": [ "." ],
-	"env": {
-		"tests": {
-			"plugins": [ ".", "path/to/test/plugin" ]
-		}
-	}
+  "plugins": ["."],
+  "env": {
+    "tests": {
+      "plugins": [".", "path/to/test/plugin"]
+    }
+  }
 }
 ```
 
@@ -588,13 +629,13 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 
 ```json
 {
-	"plugins": [ "." ],
-	"port": 4013,
-	"env": {
-		"tests": {
-			"port": 4012
-		}
-	}
+  "plugins": ["."],
+  "port": 4013,
+  "env": {
+    "tests": {
+      "port": 4012
+    }
+  }
 }
 ```
 
@@ -604,9 +645,15 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 
 ```json
 {
-	"phpVersion": "7.2",
-	"plugins": [ "." ]
+  "phpVersion": "7.2",
+  "plugins": ["."]
 }
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

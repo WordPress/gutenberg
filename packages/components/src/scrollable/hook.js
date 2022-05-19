@@ -36,7 +36,7 @@ export function useScrollable( props ) {
 				scrollDirection === 'auto' && styles.scrollAuto,
 				className
 			),
-		[ className, scrollDirection, smoothScroll ]
+		[ className, cx, scrollDirection, smoothScroll ]
 	);
 
 	return { ...otherProps, className: classes };

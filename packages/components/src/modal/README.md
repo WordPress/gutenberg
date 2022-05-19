@@ -255,6 +255,16 @@ This property when set to `true` will render a full screen modal.
 -   Required: No
 -   Default: `false`
 
+#### __experimentalHideHeader
+
+When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
+
+*Warning*: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
+
 ## Related components
 
 -   To notify a user with a message of medium importance, use `Notice`.

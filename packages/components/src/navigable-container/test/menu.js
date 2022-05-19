@@ -75,7 +75,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -129,7 +129,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -185,7 +185,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -239,7 +239,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -284,7 +284,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown( getByRole( 'menu' ), keyCode );
 			expect( currentIndex ).toBe( expectedActiveIndex );

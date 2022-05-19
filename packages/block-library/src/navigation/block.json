@@ -8,7 +8,7 @@
 	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
-		"navigationMenuId": {
+		"ref": {
 			"type": "number"
 		},
 		"textColor": {
@@ -41,6 +41,10 @@
 			"type": "string",
 			"default": "mobile"
 		},
+		"hasIcon": {
+			"type": "boolean",
+			"default": true
+		},
 		"__unstableLocation": {
 			"type": "string"
 		},
@@ -55,9 +59,12 @@
 		},
 		"customOverlayTextColor": {
 			"type": "string"
+		},
+		"maxNestingLevel": {
+			"type": "number",
+			"default": 5
 		}
 	},
-	"usesContext": [ "navigationArea" ],
 	"providesContext": {
 		"textColor": "textColor",
 		"customTextColor": "customTextColor",
@@ -72,7 +79,8 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"openSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
-		"orientation": "orientation"
+		"orientation": "orientation",
+		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
@@ -87,6 +95,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
+			"__experimentalSkipSerialization": [ "textDecoration" ],
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -101,13 +110,13 @@
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
+			"allowVerticalAlignment": false,
 			"default": {
-				"type": "flex",
-				"setCascadingProperties": true
+				"type": "flex"
 			}
 		}
 	},
-	"viewScript": "file:./view.min.js",
+	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

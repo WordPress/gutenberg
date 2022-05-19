@@ -92,7 +92,11 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",

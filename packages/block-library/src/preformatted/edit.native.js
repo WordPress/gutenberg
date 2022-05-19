@@ -12,7 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-export function PreformattedEdit( props ) {
+export default function PreformattedEdit( props ) {
 	const { style } = props;
 
 	const textBaseStyle = usePreferredColorSchemeStyle(
@@ -28,10 +28,12 @@ export function PreformattedEdit( props ) {
 		...( style?.fontSize && { fontSize: style.fontSize } ),
 		...( style?.color && { color: style.color } ),
 	};
+	const hasBaseColors =
+		style?.baseColors && Object.entries( style.baseColors ).length !== 0;
 	const containerStyles = [
 		wpBlockPreformatted,
 		style?.backgroundColor && { backgroundColor: style.backgroundColor },
-		style?.baseColors &&
+		hasBaseColors &&
 			! style?.backgroundColor &&
 			styles[ 'wp-block-preformatted__no-background' ],
 	];
@@ -46,5 +48,3 @@ export function PreformattedEdit( props ) {
 		</View>
 	);
 }
-
-export default PreformattedEdit;

@@ -57,12 +57,14 @@ export default function DefaultStylePicker( { blockName } ) {
 
 	return (
 		onUpdatePreferredStyleVariations && (
-			<SelectControl
-				options={ selectOptions }
-				value={ preferredStyle || '' }
-				label={ __( 'Default Style' ) }
-				onChange={ selectOnChange }
-			/>
+			<div className="default-style-picker__default-switcher">
+				<SelectControl
+					options={ selectOptions }
+					value={ preferredStyle || '' }
+					label={ __( 'Default Style' ) }
+					onChange={ selectOnChange }
+				/>
+			</div>
 		)
 	);
 }

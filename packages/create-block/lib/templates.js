@@ -19,13 +19,13 @@ const CLIError = require( './cli-error' );
 const { info } = require( './log' );
 const prompts = require( './prompts' );
 
-const predefinedBlockTemplates = {
+const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'es5-example',
-			title: 'ES5 Example',
+			slug: 'example-static-es5',
+			title: 'Example Static (ES5)',
 			description:
-				'Example block written with ES5 standard and no JSX – no build step required.',
+				'Example static block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
@@ -34,23 +34,17 @@ const predefinedBlockTemplates = {
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 	},
-	esnext: {
+	static: {
 		defaultValues: {
-			slug: 'esnext-example',
-			title: 'ESNext Example',
+			slug: 'example-static',
+			title: 'Example Static',
 			description:
-				'Example block written with ESNext standard and JSX support – build step required.',
+				'Example static block scaffolded with Create Block tool.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
 			},
-			npmDependencies: [
-				'@wordpress/block-editor',
-				'@wordpress/blocks',
-				'@wordpress/i18n',
-			],
 		},
-		templatesPath: join( __dirname, 'templates', 'esnext' ),
 	},
 };
 
@@ -103,25 +97,46 @@ const externalTemplateExists = async ( templateName ) => {
 };
 
 const configToTemplate = async ( {
-	assetsPath,
+	pluginTemplatesPath,
+	blockTemplatesPath,
 	defaultValues = {},
-	templatesPath,
+	assetsPath,
+	...deprecated
 } ) => {
-	if ( ! isObject( defaultValues ) || ! templatesPath ) {
+	if ( ! isObject( defaultValues ) ) {
 		throw new CLIError( 'Template found but invalid definition provided.' );
 	}
 
+	if ( deprecated.templatesPath ) {
+		pluginTemplatesPath = deprecated.templatesPath;
+		defaultValues = {
+			folderName: '.',
+			editorScript: 'file:./build/index.js',
+			editorStyle: 'file:./build/index.css',
+			style: 'file:./build/style-index.css',
+			...defaultValues,
+		};
+	} else {
+		pluginTemplatesPath =
+			pluginTemplatesPath || join( __dirname, 'templates', 'plugin' );
+		blockTemplatesPath =
+			blockTemplatesPath || join( __dirname, 'templates', 'block' );
+	}
+
 	return {
+		blockOutputTemplates: blockTemplatesPath
+			? await getOutputTemplates( blockTemplatesPath )
+			: {},
 		defaultValues,
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
-		outputTemplates: await getOutputTemplates( templatesPath ),
+		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
 	};
 };
 
-const getBlockTemplate = async ( templateName ) => {
-	if ( predefinedBlockTemplates[ templateName ] ) {
+const getPluginTemplate = async ( templateName ) => {
+	if ( predefinedPluginTemplates[ templateName ] ) {
 		return await configToTemplate(
-			predefinedBlockTemplates[ templateName ]
+			predefinedPluginTemplates[ templateName ]
 		);
 	}
 
@@ -142,8 +157,8 @@ const getBlockTemplate = async ( templateName ) => {
 
 	if ( ! ( await externalTemplateExists( templateName ) ) ) {
 		throw new CLIError(
-			`Invalid block template type name: "${ templateName }". Allowed values: ` +
-				Object.keys( predefinedBlockTemplates )
+			`Invalid plugin template type name: "${ templateName }". Allowed values: ` +
+				Object.keys( predefinedPluginTemplates )
 					.map( ( name ) => `"${ name }"` )
 					.join( ', ' ) +
 				', or an existing npm package name.'
@@ -173,7 +188,7 @@ const getBlockTemplate = async ( templateName ) => {
 			throw error;
 		} else {
 			throw new CLIError(
-				`Invalid block template downloaded. Error: ${ error.message }`
+				`Invalid plugin template downloaded. Error: ${ error.message }`
 			);
 		}
 	} finally {
@@ -183,7 +198,7 @@ const getBlockTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( blockTemplate ) => {
+const getDefaultValues = ( pluginTemplate ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
@@ -194,18 +209,20 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		customScripts: {},
 		wpEnv: false,
 		npmDependencies: [],
-		editorScript: 'file:./build/index.js',
-		editorStyle: 'file:./build/index.css',
-		style: 'file:./build/style-index.css',
-		...blockTemplate.defaultValues,
+		folderName: './src',
+		editorScript: 'file:./index.js',
+		editorStyle: 'file:./index.css',
+		style: 'file:./style-index.css',
+		...pluginTemplate.defaultValues,
 	};
 };
 
-const getPrompts = ( blockTemplate ) => {
-	const defaultValues = getDefaultValues( blockTemplate );
-	return Object.keys( prompts ).map( ( promptName ) => {
+const getPrompts = ( pluginTemplate, keys ) => {
+	const defaultValues = getDefaultValues( pluginTemplate );
+	return keys.map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
@@ -214,7 +231,7 @@ const getPrompts = ( blockTemplate ) => {
 };
 
 module.exports = {
-	getBlockTemplate,
+	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
 };

@@ -21,16 +21,14 @@ import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
 import { Text } from '../text';
 import LinkedButton from './linked-button';
-import Visualizer from './visualizer';
 import {
 	Root,
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { parseUnit } from '../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	DEFAULT_VISUALIZER_VALUES,
 	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
@@ -50,7 +48,6 @@ export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
-	onChangeShowVisualizer = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
@@ -79,10 +76,10 @@ export default function BoxControl( {
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
 	const [ selectedUnits, setSelectedUnits ] = useState( {
-		top: parseUnit( valuesProp?.top )[ 1 ],
-		right: parseUnit( valuesProp?.right )[ 1 ],
-		bottom: parseUnit( valuesProp?.bottom )[ 1 ],
-		left: parseUnit( valuesProp?.left )[ 1 ],
+		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
+		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
+		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
+		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
 	} );
 
 	const id = useUniqueId( idProp );
@@ -103,14 +100,6 @@ export default function BoxControl( {
 		setIsDirty( true );
 	};
 
-	const handleOnHoverOn = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
-	const handleOnHoverOff = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
@@ -122,8 +111,6 @@ export default function BoxControl( {
 		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
-		onHoverOn: handleOnHoverOn,
-		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
 		selectedUnits,
@@ -189,5 +176,3 @@ export default function BoxControl( {
 		</Root>
 	);
 }
-
-BoxControl.__Visualizer = Visualizer;

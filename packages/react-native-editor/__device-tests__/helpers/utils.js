@@ -15,15 +15,15 @@ const AppiumLocal = require( './appium-local' );
 // eslint-disable-next-line import/no-extraneous-dependencies
 const _ = require( 'underscore' );
 
-// Platform setup
+// Platform setup.
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 
-// Environment setup, local environment or Sauce Labs
+// Environment setup, local environment or Sauce Labs.
 const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 
-// Local App Paths
+// Local App Paths.
 const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
@@ -34,7 +34,7 @@ const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
-const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
+const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs.
 let appiumProcess;
 
 const backspace = '\u0008';
@@ -68,7 +68,7 @@ const getIOSPlatformVersions = () => {
 		);
 };
 
-// Initialises the driver and desired capabilities for appium
+// Initialises the driver and desired capabilities for appium.
 const setupDriver = async () => {
 	const branch = process.env.CIRCLE_BRANCH || '';
 	const safeBranchName = branch.replace( /\//g, '-' );
@@ -108,14 +108,14 @@ const setupDriver = async () => {
 					androidVersion
 				);
 			} catch ( error ) {
-				// ignore error
+				// Ignore error.
 			}
 		} else {
-			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
+			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
 		desiredCaps = _.clone( iosServer );
-		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
+		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
 			desiredCaps = _.clone( iosLocal );
 
@@ -156,9 +156,6 @@ const setupDriver = async () => {
 	// Display the driver status
 	// eslint-disable-next-line no-console
 	console.log( status );
-
-	await driver.setImplicitWaitTimeout( 5000 );
-	await timer( 5000 );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
@@ -205,7 +202,7 @@ const typeString = async ( driver, element, str, clear ) => {
 
 const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		//await element.clear(); This was not working correctly on iOS so need a custom implementation
+		// await element.clear(); This was not working correctly on iOS so need a custom implementation
 		await clearTextBox( driver, element );
 	}
 	await element.type( str );
@@ -235,7 +232,7 @@ const typeStringAndroid = async (
 	driver,
 	element,
 	str,
-	clear = true // see comment above for why it is defaulted to true
+	clear = true // See comment above for why it is defaulted to true.
 ) => {
 	if ( str in strToKeycode ) {
 		return await driver.pressKeycode( strToKeycode[ str ] );
@@ -295,7 +292,7 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	await action.perform();
 };
 
-// Clicks in the top left of an element
+// Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
@@ -304,7 +301,7 @@ const clickBeginningOfElement = async ( driver, element ) => {
 	await action.perform();
 };
 
-// long press to activate context menu
+// Long press to activate context menu.
 const longPressMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
@@ -318,7 +315,7 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	await action.perform();
 };
 
-// press "Select All" in floating context menu
+// Press "Select All" in floating context menu.
 const tapSelectAllAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
@@ -329,7 +326,7 @@ const tapSelectAllAboveElement = async ( driver, element ) => {
 	await action.perform();
 };
 
-// press "Copy" in floating context menu
+// Press "Copy" in floating context menu.
 const tapCopyAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
@@ -342,7 +339,7 @@ const tapCopyAboveElement = async ( driver, element ) => {
 	await action.perform();
 };
 
-// press "Paste" in floating context menu
+// Press "Paste" in floating context menu.
 const tapPasteAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
@@ -354,7 +351,7 @@ const tapPasteAboveElement = async ( driver, element ) => {
 };
 
 // Starts from the middle of the screen or the element(if specified)
-// and swipes upwards
+// and swipes upwards.
 const swipeUp = async (
 	driver,
 	element = undefined,
@@ -417,7 +414,7 @@ const swipeDown = async ( driver, delay = 3000 ) => {
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		// Hit the "Menu" key
+		// Hit the "Menu" key.
 		await driver.pressKeycode( 82 );
 
 		const showHtmlButtonXpath =
@@ -452,24 +449,117 @@ const toggleOrientation = async ( driver ) => {
 	}
 };
 
+const isEditorVisible = async ( driver ) => {
+	const postTitleLocator = isAndroid()
+		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
+		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
+
+	await waitForVisible( driver, postTitleLocator );
+};
+
+const waitForMediaLibrary = async ( driver ) => {
+	const accessibilityIdXPathAttrib = isAndroid() ? 'content-desc' : 'name';
+	const accessibilityId = 'WordPress Media Library';
+	const locator = `//*[@${ accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
+	await waitForVisible( driver, locator );
+};
+
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25
+ * @param {number} iteration - Default value is 0
+ * @return {string} - Returns the first element found, empty string if not found
+ */
+const waitForVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
+	const timeout = 1000;
+
+	if ( iteration >= maxIteration ) {
+		// if element not found, print error and return empty string
+		// eslint-disable-next-line no-console
+		console.error(
+			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
+		);
+		return '';
+	} else if ( iteration !== 0 ) {
+		// wait before trying to locate element again
+		await driver.sleep( timeout );
+	}
+
+	const element = await driver.elementsByXPath( elementLocator );
+	if ( element.length !== 1 ) {
+		// if locator is not visible, try again
+		return waitForVisible(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
+	}
+
+	return element[ 0 ];
+};
+
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @return {boolean} - Returns true if element is found, false otherwise
+ */
+const isElementVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		maxIteration
+	);
+
+	// if there is no element, return false
+	if ( ! element ) {
+		return false;
+	}
+
+	return true;
+};
+
+// Only for Android
+const waitIfAndroid = async () => {
+	if ( isAndroid() ) {
+		await editorPage.driver.sleep( 1000 );
+	}
+};
+
 module.exports = {
 	backspace,
-	timer,
-	setupDriver,
-	isLocalEnvironment,
-	isAndroid,
-	typeString,
-	clickMiddleOfElement,
 	clickBeginningOfElement,
+	clickMiddleOfElement,
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	isElementVisible,
+	isLocalEnvironment,
 	longPressMiddleOfElement,
-	tapSelectAllAboveElement,
+	setupDriver,
+	stopDriver,
+	swipeDown,
+	swipeFromTo,
+	swipeUp,
 	tapCopyAboveElement,
 	tapPasteAboveElement,
-	swipeDown,
-	swipeUp,
-	swipeFromTo,
-	stopDriver,
+	tapSelectAllAboveElement,
+	timer,
 	toggleHtmlMode,
 	toggleOrientation,
-	doubleTap,
+	typeString,
+	waitForMediaLibrary,
+	waitForVisible,
+	waitIfAndroid,
 };

@@ -5,7 +5,6 @@ import { useRef, useEffect } from '@wordpress/element';
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { MutableRefObject, RefCallback } from 'react';
 
 type Ref< T > = MutableRefObject< T | null > | RefCallback< T | null >;

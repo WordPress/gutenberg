@@ -1,4 +1,4 @@
-# Metadata
+# Metadata in block.json
 
 Starting in WordPress 5.8 release, we encourage using the `block.json` metadata file as the canonical way to register block types. Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
@@ -56,7 +56,7 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/tutorials/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
 
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
@@ -172,7 +172,9 @@ The name for a block is a unique string that identifies a block. Names have to b
 { "title": "Heading" }
 ```
 
-This is the display title for your block, which can be translated with our translation functions. The block inserter will show this name.
+This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor.
+
+**Note:** To keep your block titles readable and accessible in the UI, try to avoid very long titles.
 
 ### Category
 
@@ -212,6 +214,20 @@ An implementation should expect and tolerate unknown categories, providing some 
 ```
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
+### Ancestor
+
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `ancestor`
+-   Since: `WordPress 6.0.0`
+
+```json
+{ "ancestor": [ "my-block/product" ] }
+```
+
+The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparrison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
 ### Icon
 
@@ -407,7 +423,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -420,7 +436,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -433,21 +449,23 @@ Block type frontend and editor script definition. It will be enqueued both in th
 
 ### View Script
 
--   Type: `WPDefinedAsset` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `viewScript`
 -   Since: `WordPress 5.9.0`
 
 ```json
-{ "script": "file:./build/view.js" }
+{ "viewScript": "file:./build/view.js" }
 ```
 
 Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
 
+_Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
+
 ### Editor Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorStyle`
@@ -462,7 +480,7 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 
 ### Style
 
--   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#WPDefinedAsset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `style`

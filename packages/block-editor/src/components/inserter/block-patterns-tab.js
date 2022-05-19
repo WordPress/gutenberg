@@ -106,7 +106,7 @@ function BlockPatternsTabs( {
 		[ allCategories ]
 	);
 
-	// Remove any empty categories
+	// Remove any empty categories.
 	const populatedCategories = useMemo( () => {
 		const categories = allCategories
 			.filter( ( category ) =>
@@ -144,23 +144,19 @@ function BlockPatternsTabs( {
 
 	return (
 		<>
+			<PatternInserterPanel
+				selectedCategory={ patternCategory }
+				patternCategories={ populatedCategories }
+				onClickCategory={ onClickCategory }
+				openPatternExplorer={ () => setShowPatternsExplorer( true ) }
+			/>
 			{ ! showPatternsExplorer && (
-				<>
-					<PatternInserterPanel
-						selectedCategory={ patternCategory }
-						patternCategories={ populatedCategories }
-						onClickCategory={ onClickCategory }
-						openPatternExplorer={ () =>
-							setShowPatternsExplorer( true )
-						}
-					/>
-					<BlockPatternsCategory
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-						selectedCategory={ patternCategory }
-						populatedCategories={ populatedCategories }
-					/>
-				</>
+				<BlockPatternsCategory
+					rootClientId={ rootClientId }
+					onInsert={ onInsert }
+					selectedCategory={ patternCategory }
+					populatedCategories={ populatedCategories }
+				/>
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal

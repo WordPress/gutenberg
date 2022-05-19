@@ -9,7 +9,7 @@ The `Autocomplete` component found in `@wordpress/block-editor` applies this fil
 Here is an example of using the `editor.Autocomplete.completers` filter to add an acronym completer. You can find full documentation for the autocompleter interface with the `Autocomplete` component in the `@wordpress/components` package.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 // Our completer
@@ -46,7 +46,7 @@ wp.hooks.addFilter(
 );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 // Our completer

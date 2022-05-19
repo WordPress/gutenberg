@@ -94,3 +94,10 @@ Callback which is called at the end of drag operations.
 -   Required: No
 
 Callback which is called at the start of drag operations.
+
+### `resolvePoint`
+
+-   Type: `Function`
+-   Required: No
+
+Function which is called before internal updates to the value state. It receives the upcoming value and may return a modified one.

@@ -143,7 +143,7 @@ export default function Draggable( {
 			y = elementTopOffset - clonePadding;
 			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
-			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze.
 			Array.from(
 				clone.querySelectorAll( 'iframe' )
 			).forEach( ( child ) => child.parentNode.removeChild( child ) );
@@ -162,7 +162,7 @@ export default function Draggable( {
 		 * @param {import('react').DragEvent<Element>} e
 		 */
 		function over( e ) {
-			//Skip doing any work if mouse has not moved.
+			// Skip doing any work if mouse has not moved.
 			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
 				return;
 			}
@@ -199,7 +199,7 @@ export default function Draggable( {
 		}
 
 		cleanup.current = () => {
-			// Remove drag clone
+			// Remove drag clone.
 			if ( cloneWrapper && cloneWrapper.parentNode ) {
 				cloneWrapper.parentNode.removeChild( cloneWrapper );
 			}

@@ -155,7 +155,7 @@ export default function ServerSideRender( props ) {
 
 	useEffect( () => {
 		// Don't debounce the first fetch. This ensures that the first render
-		// shows data as soon as possible
+		// shows data as soon as possible.
 		if ( prevProps === undefined ) {
 			fetchData();
 		} else if ( ! isEqual( prevProps, props ) ) {
@@ -182,14 +182,6 @@ export default function ServerSideRender( props ) {
 	const hasEmptyResponse = response === '';
 	const hasError = response?.error;
 
-	if ( hasEmptyResponse || ! hasResponse ) {
-		return <EmptyResponsePlaceholder { ...props } />;
-	}
-
-	if ( hasError ) {
-		return <ErrorResponsePlaceholder response={ response } { ...props } />;
-	}
-
 	if ( isLoading ) {
 		return (
 			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
@@ -198,6 +190,14 @@ export default function ServerSideRender( props ) {
 				) }
 			</LoadingResponsePlaceholder>
 		);
+	}
+
+	if ( hasEmptyResponse || ! hasResponse ) {
+		return <EmptyResponsePlaceholder { ...props } />;
+	}
+
+	if ( hasError ) {
+		return <ErrorResponsePlaceholder response={ response } { ...props } />;
 	}
 
 	return <RawHTML className={ className }>{ response }</RawHTML>;

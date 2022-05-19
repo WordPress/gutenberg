@@ -30,6 +30,7 @@
 	"supports": {
 		"anchor": true,
 		"__experimentalSlashInserter": true,
+		"__experimentalOnEnter": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -41,6 +42,14 @@
 				"fontSize": true,
 				"fontAppearance": true
 			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"styles": [
@@ -49,8 +58,7 @@
 			"label": "Default",
 			"isDefault": true
 		},
-		{ "name": "plain", "label": "Plain" },
-		{ "name": "large", "label": "Large" }
+		{ "name": "plain", "label": "Plain" }
 	],
 	"editorStyle": "wp-block-quote-editor",
 	"style": "wp-block-quote"

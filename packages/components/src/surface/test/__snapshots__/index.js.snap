@@ -6,8 +6,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-k1ws5-View-Surface-getBorders-primary em57xhy0"
-+   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+-   class="components-surface css-pt58n0-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-soe81k-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -21,8 +21,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-gi9sau-View-Surface-getBorders-primary em57xhy0"
-+   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+-   class="components-surface css-1vckp4o-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-soe81k-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -36,8 +36,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-1lwskr8-View-Surface-getBorders-primary em57xhy0"
-+   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+-   class="components-surface css-sw9dzi-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-soe81k-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -51,8 +51,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-sdy6q1-View-Surface-getBorders-primary em57xhy0"
-+   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+-   class="components-surface css-123k66h-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-soe81k-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -63,7 +63,7 @@ Snapshot Diff:
 exports[`props should render correctly 1`] = `
 .emotion-0 {
   background-color: #fff;
-  color: #000;
+  color: #1e1e1e;
   position: relative;
 }
 
@@ -82,8 +82,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-jkj9zl-View-Surface-getBorders-secondary em57xhy0"
-+   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
+-   class="components-surface css-1m2pafr-View-Surface-getBorders-secondary em57xhy0"
++   class="components-surface css-soe81k-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >

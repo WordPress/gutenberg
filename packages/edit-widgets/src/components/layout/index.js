@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -15,6 +18,20 @@ import UnsavedChangesWarning from './unsaved-changes-warning';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout( { blockEditorSettings, onError } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
 	return (
 		<ErrorBoundary onError={ onError }>
 			<WidgetAreasBlockEditorProvider
@@ -23,7 +40,7 @@ function Layout( { blockEditorSettings, onError } ) {
 				<Interface blockEditorSettings={ blockEditorSettings } />
 				<Sidebar />
 				<Popover.Slot />
-				<PluginArea />
+				<PluginArea onError={ onPluginAreaError } />
 				<UnsavedChangesWarning />
 				<WelcomeGuide />
 			</WidgetAreasBlockEditorProvider>

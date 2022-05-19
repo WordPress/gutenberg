@@ -5,7 +5,7 @@ import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 
 const FormatToolbarContainer = () => {
-	// Render regular toolbar
+	// Render regular toolbar.
 	return (
 		<BlockControls group="inline">
 			<FormatToolbar />

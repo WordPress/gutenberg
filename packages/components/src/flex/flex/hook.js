@@ -126,6 +126,7 @@ export function useFlex( props ) {
 	}, [
 		align,
 		className,
+		cx,
 		direction,
 		expanded,
 		gap,

@@ -126,4 +126,13 @@
 		display: block;
 		margin-bottom: $grid-unit-30;
 	}
+
+	&.hide-header {
+		margin-top: 0;
+		padding-top: $grid-unit-30;
+
+		&::before {
+			content: none;
+		}
+	}
 }

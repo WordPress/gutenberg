@@ -38,6 +38,7 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -49,7 +50,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
@@ -59,7 +60,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
 			const blockMovingMode = hasBlockMovingClientId();
 			return {
@@ -90,6 +91,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 		speak( label );
 	}, [ label ] );
+	const blockElement = useBlockElement( clientId );
 
 	const {
 		hasBlockMovingClientId,
@@ -100,6 +102,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
+		isNavigationMode,
 	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
@@ -157,7 +160,10 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-
+		if ( isEscape && isNavigationMode() ) {
+			clearSelectedBlock();
+			event.preventDefault();
+		}
 		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
 			event.preventDefault();
@@ -165,14 +171,8 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 			const sourceRoot = getBlockRootClientId( startingBlockClientId );
 			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex(
-				startingBlockClientId,
-				sourceRoot
-			);
-			let destinationBlockIndex = getBlockIndex(
-				selectedBlockClientId,
-				destRoot
-			);
+			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
+			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
 			if (
 				sourceBlockIndex < destinationBlockIndex &&
 				sourceRoot === destRoot
@@ -196,7 +196,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+					nextTabbable = blockElement;
+					do {
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					} while (
+						nextTabbable &&
+						blockElement.contains( nextTabbable )
+					);
 
 					if ( ! nextTabbable ) {
 						nextTabbable =
@@ -256,9 +262,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						onClick={ () => setNavigationMode( false ) }
 						onKeyDown={ onKeyDown }
 						label={ label }
+						showTooltip={ false }
 						className="block-selection-button_select-button"
 					>
-						<BlockTitle clientId={ clientId } />
+						<BlockTitle
+							clientId={ clientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 				</FlexItem>
 			</Flex>

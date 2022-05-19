@@ -14,6 +14,8 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import useSetting from '../components/use-setting';
 import { appendSelectors } from './utils';
+import { getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { shouldSkipSerialization } from '../hooks/utils';
 
 export default {
 	name: 'default',
@@ -105,56 +107,77 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
+	save: function DefaultLayoutStyle( {
+		selector,
+		layout = {},
+		style,
+		blockName,
+	} ) {
 		const { contentSize, wideSize } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapStyleValue = getGapBoxControlValueFromStyle(
+			style?.spacing?.blockGap
+		);
+		// If a block's block.json skips serialization for spacing or
+		// spacing.blockGap, don't apply the user-defined value to the styles.
+		const blockGapValue =
+			blockGapStyleValue?.top &&
+			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
+				? blockGapStyleValue?.top
+				: 'var( --wp--style--block-gap )';
 
-		let style =
+		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> *' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-
-					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
+					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
+					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
 				`
 				: '';
 
-		style += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
+		output += `
+			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
-				margin-right: 2em;
+				margin-inline-start: 0;
+				margin-inline-end: 2em;
 			}
-
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
-				margin-left: 2em;
+				margin-inline-start: 2em;
+				margin-inline-end: 0;
 			}
 
+			${ appendSelectors( selector, '> .aligncenter' ) } {
+				margin-left: auto !important;
+				margin-right: auto !important;
+			}
 		`;
 
 		if ( hasBlockGapStylesSupport ) {
-			style += `
+			output += `
 				${ appendSelectors( selector, '> *' ) } {
-					margin-top: 0;
-					margin-bottom: 0;
+					margin-block-start: 0;
+					margin-block-end: 0;
 				}
 				${ appendSelectors( selector, '> * + *' ) } {
-					margin-top: var( --wp--style--block-gap );
+					margin-block-start: ${ blockGapValue };
 				}
 			`;
 		}
 
-		return <style>{ style }</style>;
+		return <style>{ output }</style>;
 	},
 	getOrientation() {
 		return 'vertical';

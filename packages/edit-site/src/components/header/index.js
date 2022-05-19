@@ -11,7 +11,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,7 +19,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import NavigationLink from './navigation-link';
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
@@ -27,7 +26,6 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
-import MainDashboardButton from '../main-dashboard-button';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -36,6 +34,7 @@ const preventDefault = ( event ) => {
 export default function Header( {
 	openEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
+	showIconLabels,
 } ) {
 	const inserterButton = useRef();
 	const {
@@ -47,7 +46,7 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
-		newMenuSidebar,
+		isVisualMode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -55,7 +54,7 @@ export default function Header( {
 			getEditedPostId,
 			isInserterOpened,
 			isListViewOpened,
-			getSettings,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
@@ -79,7 +78,7 @@ export default function Header( {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-site/toggle-list-view'
 			),
-			newMenuSidebar: getSettings().__experimentalNewMenuSidebar,
+			isVisualMode: getEditorMode() === 'visual',
 		};
 	}, [] );
 
@@ -93,7 +92,7 @@ export default function Header( {
 
 	const openInserter = useCallback( () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button closes the inserter popover.
 			inserterButton.current.focus();
 		} else {
 			setIsInserterOpened( true );
@@ -110,18 +109,13 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				{ newMenuSidebar && (
-					<MainDashboardButton.Slot>
-						<NavigationLink />
-					</MainDashboardButton.Slot>
-				) }
-
 				<div className="edit-site-header__toolbar">
 					<Button
 						ref={ inserterButton }
 						variant="primary"
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
+						disabled={ ! isVisualMode }
 						onMouseDown={ preventDefault }
 						onClick={ openInserter }
 						icon={ plus }
@@ -129,14 +123,21 @@ export default function Header( {
 							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
-					/>
+					>
+						{ showIconLabels &&
+							( ! isInserterOpen ? __( 'Add' ) : __( 'Close' ) ) }
+					</Button>
 					{ isLargeViewport && (
 						<>
-							<ToolSelector />
+							<ToolbarItem
+								as={ ToolSelector }
+								disabled={ ! isVisualMode }
+							/>
 							<UndoButton />
 							<RedoButton />
 							<Button
 								className="edit-site-header-toolbar__list-view-toggle"
+								disabled={ ! isVisualMode }
 								icon={ listView }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
@@ -158,6 +159,7 @@ export default function Header( {
 							: 'template'
 					}
 					isLoaded={ isLoaded }
+					showIconLabels={ showIconLabels }
 				>
 					{ ( { onClose } ) => (
 						<TemplateDetails

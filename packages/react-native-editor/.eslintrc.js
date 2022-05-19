@@ -67,4 +67,12 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ '**/*.js' ],
+			rules: {
+				'import/no-unresolved': 'off',
+			},
+		},
+	],
 };

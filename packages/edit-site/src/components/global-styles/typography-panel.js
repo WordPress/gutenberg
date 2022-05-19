@@ -7,7 +7,11 @@ import {
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 } from '@wordpress/block-editor';
-import { PanelBody, FontSizePicker } from '@wordpress/components';
+import {
+	PanelBody,
+	FontSizePicker,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -54,8 +58,10 @@ function useHasLetterSpacingControl( name ) {
 	);
 }
 
-export default function TypographyPanel( { name } ) {
+export default function TypographyPanel( { name, element } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
+	const prefix =
+		element === 'text' || ! element ? '' : `elements.${ element }.`;
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
@@ -73,30 +79,58 @@ export default function TypographyPanel( { name } ) {
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
 
 	const [ fontFamily, setFontFamily ] = useStyle(
-		'typography.fontFamily',
+		prefix + 'typography.fontFamily',
 		name
 	);
-	const [ fontSize, setFontSize ] = useStyle( 'typography.fontSize', name );
+	const [ fontSize, setFontSize ] = useStyle(
+		prefix + 'typography.fontSize',
+		name
+	);
 
 	const [ fontStyle, setFontStyle ] = useStyle(
-		'typography.fontStyle',
+		prefix + 'typography.fontStyle',
 		name
 	);
 	const [ fontWeight, setFontWeight ] = useStyle(
-		'typography.fontWeight',
+		prefix + 'typography.fontWeight',
 		name
 	);
 	const [ lineHeight, setLineHeight ] = useStyle(
-		'typography.lineHeight',
+		prefix + 'typography.lineHeight',
 		name
 	);
 	const [ letterSpacing, setLetterSpacing ] = useStyle(
-		'typography.letterSpacing',
+		prefix + 'typography.letterSpacing',
 		name
 	);
+	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
+	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
+	const [ color ] = useStyle( prefix + 'color.text', name );
+	const extraStyles =
+		element === 'link'
+			? {
+					textDecoration: 'underline',
+			  }
+			: {};
 
 	return (
 		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
+			<div
+				className="edit-site-typography-panel__preview"
+				style={ {
+					fontFamily: fontFamily ?? 'serif',
+					background: gradientValue ?? backgroundColor,
+					color,
+					fontSize,
+					fontStyle,
+					fontWeight,
+					letterSpacing,
+					...extraStyles,
+				} }
+			>
+				Aa
+			</div>
+
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
@@ -113,10 +147,13 @@ export default function TypographyPanel( { name } ) {
 				/>
 			) }
 			{ hasLineHeightEnabled && (
-				<LineHeightControl
-					value={ lineHeight }
-					onChange={ setLineHeight }
-				/>
+				<Spacer marginBottom={ 6 }>
+					<LineHeightControl
+						__nextHasNoMarginBottom={ true }
+						value={ lineHeight }
+						onChange={ setLineHeight }
+					/>
+				</Spacer>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl

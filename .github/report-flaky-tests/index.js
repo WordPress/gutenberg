@@ -29,13 +29,15 @@ const metaData = {
 ( async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
 	const label = core.getInput( 'label', { required: true } );
-	const artifactName = core.getInput( 'artifact-name', { required: true } );
+	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
+		required: true,
+	} );
 
 	const octokit = github.getOctokit( token );
 
 	const flakyTests = await downloadReportFromArtifact(
 		octokit,
-		artifactName
+		artifactNamePrefix
 	);
 
 	if ( ! flakyTests ) {
@@ -46,6 +48,7 @@ const metaData = {
 
 	for ( const flakyTest of flakyTests ) {
 		const {
+			runner: testRunner = 'jest-circus',
 			title: testTitle,
 			path: testPath,
 			results: testResults,
@@ -58,12 +61,13 @@ const metaData = {
 		let issue;
 
 		if ( reportedIssue ) {
-			let body = reportedIssue.body;
+			const body = reportedIssue.body;
 			const meta = metaData.get( body );
 
 			if ( isTrunk ) {
 				const headCommit = github.context.sha;
 				const baseCommit = meta.baseCommit || github.context.sha;
+				meta.baseCommit = baseCommit;
 
 				try {
 					const { data } = await octokit.rest.repos.compareCommits( {
@@ -84,23 +88,69 @@ const metaData = {
 				}
 			}
 
-			// Reconstruct the body with the description + previous errors + new error.
-			body =
-				renderIssueDescription( { meta, testTitle, testPath } ) +
-				body.slice(
-					body.indexOf( TEST_RESULTS_LIST.open ),
-					body.indexOf( TEST_RESULTS_LIST.close )
-				) +
-				[
-					renderTestErrorMessage( { testPath, testResults } ),
-					TEST_RESULTS_LIST.close,
-				].join( '\n' );
+			let testResultsList =
+				body.includes( TEST_RESULTS_LIST.open ) &&
+				body.includes( TEST_RESULTS_LIST.close )
+					? body
+							.slice(
+								body.indexOf( TEST_RESULTS_LIST.open ) +
+									TEST_RESULTS_LIST.open.length,
+								body.indexOf( TEST_RESULTS_LIST.close )
+							)
+							/**
+							 * Split the text from:
+							 * ```
+							 * <!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->
+							 * ...
+							 * <!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->
+							 * <!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->
+							 * ```
+							 *
+							 * into:
+							 * ```
+							 * [
+							 *   '<!-- __TEST_RESULT__ --> Test result 1 <!-- /__TEST_RESULT__ -->',
+							 *   '<!-- __TEST_RESULT__ --> Test result 2 <!-- /__TEST_RESULT__ -->',
+							 *   '<!-- __TEST_RESULT__ --> Test result 3 <!-- /__TEST_RESULT__ -->',
+							 * ]
+							 * ```
+							 */
+							.split(
+								new RegExp(
+									`(?<=${ TEST_RESULT.close })\n+(?:\.\.\.\n+)?(?=${ TEST_RESULT.open })`
+								)
+							)
+					: [];
+			// GitHub issues has character limits on issue's body,
+			// so we only preserve the first and the 9 latest results.
+			if ( testResultsList.length > 10 ) {
+				testResultsList = [
+					testResultsList[ 0 ],
+					'...',
+					...testResultsList.slice( -9 ),
+				];
+			}
+
+			// Concat the test results list with the latest test results.
+			const formattedTestResults = [
+				...testResultsList,
+				formatTestResults( {
+					testRunner,
+					testPath,
+					testResults,
+				} ),
+			].join( '\n' );
 
 			const response = await octokit.rest.issues.update( {
 				...github.context.repo,
 				issue_number: reportedIssue.number,
 				state: 'open',
-				body,
+				body: renderIssueBody( {
+					meta,
+					testTitle,
+					testPath,
+					formattedTestResults,
+				} ),
 			} );
 
 			issue = response.data;
@@ -123,7 +173,7 @@ const metaData = {
 					meta,
 					testTitle,
 					testPath,
-					testResults,
+					formattedTestResults: formatTestResults( testResults ),
 				} ),
 				labels: [ label ],
 			} );
@@ -147,7 +197,7 @@ async function fetchAllIssuesLabeledFlaky( octokit, label ) {
 	return issues;
 }
 
-async function downloadReportFromArtifact( octokit, artifactName ) {
+async function downloadReportFromArtifact( octokit, artifactNamePrefix ) {
 	const {
 		data: { artifacts },
 	} = await octokit.rest.actions.listWorkflowRunArtifacts( {
@@ -155,8 +205,8 @@ async function downloadReportFromArtifact( octokit, artifactName ) {
 		run_id: github.context.payload.workflow_run.id,
 	} );
 
-	const matchArtifact = artifacts.find(
-		( artifact ) => artifact.name === artifactName
+	const matchArtifact = artifacts.find( ( artifact ) =>
+		artifact.name.startsWith( artifactNamePrefix )
 	);
 
 	if ( ! matchArtifact ) {
@@ -187,14 +237,12 @@ function getIssueTitle( testTitle ) {
 	return `[Flaky Test] ${ testTitle }`;
 }
 
-function renderIssueBody( { meta, testTitle, testPath, testResults } ) {
-	return (
-		renderIssueDescription( { meta, testTitle, testPath } ) +
-		renderTestResults( { testPath, testResults } )
-	);
-}
-
-function renderIssueDescription( { meta, testTitle, testPath } ) {
+function renderIssueBody( {
+	meta,
+	testTitle,
+	testPath,
+	formattedTestResults,
+} ) {
 	return `${ metaData.render( meta ) }
 **Flaky test detected. This is an auto-generated issue by GitHub Actions. Please do NOT edit this manually.**
 
@@ -208,17 +256,40 @@ ${ testTitle }
 \`${ meta.failedTimes } / ${ meta.totalCommits + meta.failedTimes }\` runs
 
 ## Errors
-`;
-}
-
-function renderTestResults( { testPath, testResults } ) {
-	return `${ TEST_RESULTS_LIST.open }
-${ renderTestErrorMessage( { testPath, testResults } ) }
+${ TEST_RESULTS_LIST.open }
+${ formattedTestResults }
 ${ TEST_RESULTS_LIST.close }
 `;
 }
 
-function renderTestErrorMessage( { testPath, testResults } ) {
+function formatTestErrorMessage( { testRunner, testResults, testPath } ) {
+	switch ( testRunner ) {
+		case '@playwright/test': {
+			// Could do a slightly better formatting than this.
+			return stripAnsi(
+				testResults.map( ( result ) => result.error.stack ).join( '\n' )
+			);
+		}
+		case 'jest-circus':
+		default: {
+			return stripAnsi(
+				formatResultsErrors(
+					testResults,
+					{
+						rootDir: path.join(
+							process.cwd(),
+							'packages/e2e-tests'
+						),
+					},
+					{},
+					testPath
+				)
+			);
+		}
+	}
+}
+
+function formatTestResults( { testRunner, testPath, testResults } ) {
 	const date = new Date().toISOString();
 	// It will look something like this without formatting:
 	// ▶ [2021-08-31T16:15:19.875Z] Test passed after 2 failed attempts on trunk
@@ -231,14 +302,7 @@ function renderTestErrorMessage( { testPath, testResults } ) {
 </summary>
 
 \`\`\`
-${ stripAnsi(
-	formatResultsErrors(
-		testResults,
-		{ rootDir: path.join( process.cwd(), 'packages/e2e-tests' ) },
-		{},
-		testPath
-	)
-) }
+${ formatTestErrorMessage( { testRunner, testPath, testResults } ) }
 \`\`\`
 </details>${ TEST_RESULT.close }`;
 }
@@ -264,6 +328,7 @@ function stripAnsi( string ) {
 				'(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))',
 			].join( '|' ),
 			'g'
-		)
+		),
+		''
 	);
 }

@@ -198,6 +198,7 @@ function getFixes( fixer, context, callNode ) {
 module.exports = {
 	meta: {
 		type: 'problem',
+		hasSuggestions: true,
 		schema: [],
 		messages: {
 			doNotUseStringLiteral: `Do not use string literals ( '{{ argument }}' ) for accessing @wordpress/data stores. Pass the store definition instead`,

@@ -127,6 +127,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'bad_request',
 				message: 'Bad Request',
@@ -142,6 +143,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -160,6 +162,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
@@ -171,6 +174,7 @@ describe( 'apiFetch', () => {
 		window.fetch.mockReturnValue( Promise.reject() );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( {
 				code: 'fetch_error',
 				message: 'You are probably offline.',
@@ -213,6 +217,7 @@ describe( 'apiFetch', () => {
 		);
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			// eslint-disable-next-line jest/no-conditional-expect
 			expect( body ).toEqual( null );
 		} );
 	} );
@@ -242,6 +247,7 @@ describe( 'apiFetch', () => {
 
 		return apiFetch( { path: '/random', parse: false } ).catch(
 			( response ) => {
+				// eslint-disable-next-line jest/no-conditional-expect
 				expect( response ).toEqual( {
 					status: 400,
 				} );

@@ -15,6 +15,7 @@ export default function DefaultSidebar( {
 	closeLabel,
 	header,
 	headerClassName,
+	panelClassName,
 } ) {
 	return (
 		<>
@@ -27,6 +28,7 @@ export default function DefaultSidebar( {
 				closeLabel={ closeLabel }
 				header={ header }
 				headerClassName={ headerClassName }
+				panelClassName={ panelClassName }
 			>
 				{ children }
 			</ComplementaryArea>

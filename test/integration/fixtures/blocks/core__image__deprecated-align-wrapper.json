@@ -1,0 +1,23 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"align": "left",
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"id": 13,
+			"width": 358,
+			"height": 164,
+			"linkDestination": "none",
+			"sizeSlug": "large",
+			"style": {
+				"border": {
+					"radius": "10px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

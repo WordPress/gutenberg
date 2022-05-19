@@ -3,7 +3,7 @@
  */
 import { get, find, isString } from 'lodash';
 
-/* Supporting data */
+/* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [
@@ -50,6 +50,12 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
+		path: [ 'color', 'duotone' ],
+		cssVarInfix: 'duotone',
+		valueFunc: ( { slug } ) => `url( '#wp-duotone-${ slug }' )`,
+		classes: [],
+	},
+	{
 		path: [ 'typography', 'fontSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
@@ -90,7 +96,7 @@ function findInPresetsBy(
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
 		if ( presetByOrigin ) {
 			// Preset origins ordered by priority.
-			const origins = [ 'user', 'theme', 'core' ];
+			const origins = [ 'custom', 'theme', 'default' ];
 			for ( const origin of origins ) {
 				const presets = presetByOrigin[ origin ];
 				if ( presets ) {
@@ -103,7 +109,7 @@ function findInPresetsBy(
 						if ( presetProperty === 'slug' ) {
 							return presetObject;
 						}
-						// if there is a highest priority preset with the same slug but different value the preset we found was overwritten and should be ignored.
+						// If there is a highest priority preset with the same slug but different value the preset we found was overwritten and should be ignored.
 						const highestPresetObjectWithSameSlug = findInPresetsBy(
 							features,
 							blockName,

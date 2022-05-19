@@ -73,7 +73,7 @@ export async function uploadMedia( {
 	onFileChange,
 	wpAllowedMimeTypes = null,
 } ) {
-	// Cast filesList to array
+	// Cast filesList to array.
 	const files = [ ...filesList ];
 
 	const filesSet = [];
@@ -83,7 +83,7 @@ export async function uploadMedia( {
 		onFileChange( compact( filesSet ) );
 	};
 
-	// Allowed type specified by consumer
+	// Allowed type specified by consumer.
 	const isAllowedType = ( fileType ) => {
 		if ( ! allowedTypes ) {
 			return true;
@@ -98,21 +98,10 @@ export async function uploadMedia( {
 		} );
 	};
 
-	// Allowed types for the current WP_User
+	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
-	};
-
-	// Build the error message including the filename
-	const triggerError = ( error ) => {
-		error.message = [
-			<strong key="filename">{ error.file.name }</strong>,
-			': ',
-			error.message,
-		];
-
-		onError( error );
 	};
 
 	const validFiles = [];
@@ -125,10 +114,14 @@ export async function uploadMedia( {
 			mediaFile.type &&
 			! isAllowedMimeTypeForUser( mediaFile.type )
 		) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __(
-					'Sorry, you are not allowed to upload this file type.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: Sorry, you are not allowed to upload this file type.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -138,20 +131,28 @@ export async function uploadMedia( {
 		// Check if the block supports this mime type.
 		// Defer to the server when type not detected.
 		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
-				message: __( 'Sorry, this file type is not supported here.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: Sorry, this file type is not supported here.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;
 		}
 
-		// verify if file is greater than the maximum file upload size allowed for the site.
+		// Verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			triggerError( {
+			onError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: __(
-					'This file exceeds the maximum upload size for this site.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: This file exceeds the maximum upload size for this site.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -160,9 +161,13 @@ export async function uploadMedia( {
 
 		// Don't allow empty files to be uploaded.
 		if ( mediaFile.size <= 0 ) {
-			triggerError( {
+			onError( {
 				code: 'EMPTY_FILE',
-				message: __( 'This file is empty.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: This file is empty.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -171,7 +176,7 @@ export async function uploadMedia( {
 		validFiles.push( mediaFile );
 
 		// Set temporary URL to create placeholder media file, this is replaced
-		// with final file from media gallery when upload is `done` below
+		// with final file from media gallery when upload is `done` below.
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 	}
@@ -220,7 +225,7 @@ export async function uploadMedia( {
  * @return {Promise} Media Object Promise.
  */
 function createMediaFromFile( file, additionalData ) {
-	// Create upload payload
+	// Create upload payload.
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	forEach( additionalData, ( value, key ) => data.append( key, value ) );

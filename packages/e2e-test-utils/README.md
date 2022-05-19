@@ -4,6 +4,8 @@ End-To-End (E2E) test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
+
 ## Installation
 
 Install the module
@@ -107,6 +109,14 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
+### clickSiteEditorMenuItem
+
+Searches for an item in the navigation panel with the label provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
 ### closeGlobalBlockInserter
 
 Undocumented declaration.
@@ -114,6 +124,10 @@ Undocumented declaration.
 ### closeListView
 
 Closes list view
+
+### closeSiteEditorNavigationPanel
+
+Closes the site editor navigation panel if open
 
 ### createEmbeddingMatcher
 
@@ -160,6 +174,15 @@ _Parameters_
 -   _object.content_ `[string]`: Content of the new post.
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
+
+### createReusableBlock
+
+Creates a simple reusable block with a paragraph block.
+
+_Parameters_
+
+-   _content_ `string`: Paragraph block's content
+-   _title_ `title`: Reusable block's name.
 
 ### createURL
 
@@ -214,6 +237,14 @@ _Parameters_
 
 Delete all menus using the REST API
 
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.
@@ -248,6 +279,10 @@ Disable auto-accepting any dialogs.
 ### disablePrePublishChecks
 
 Disables Pre-publish checks.
+
+### disableSiteEditorWelcomeGuide
+
+Skips the welcome guide popping up to first time users of the site editor
 
 ### dragAndResize
 
@@ -355,6 +390,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with current post content markup.
 
+### getCurrentSiteEditorContent
+
+Returns a promise which resolves with the edited post content (HTML string).
+
+_Returns_
+
+-   `Promise<string>`: Promise resolving with post content markup.
+
 ### getEditedPostContent
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -362,6 +405,30 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
+
+### getOption
+
+Returns a site option, from the options admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+
+_Returns_
+
+-   `string`: The value of the option.
 
 ### getPageError
 
@@ -377,6 +444,18 @@ _Related_
 _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
+
+### getSiteEditorMenuItem
+
+Searches for an item in the site editor navigation menu with the provided label.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
+_Returns_
+
+-   `Promise<?ElementHandle>`: The menu item handle or `null`
 
 ### hasBlockSwitcher
 
@@ -468,6 +547,17 @@ _Returns_
 
 Undocumented declaration.
 
+### isSiteEditorRoot
+
+Returns `true` if in the site editor navigation root
+
+Checks whether the “Back to dashboard” button is visible. If
+not in the root, a “Back” button would be visible instead.
+
+_Returns_
+
+-   `Promise<boolean>`: Whether it currently is the navigation root or not
+
 ### isThemeInstalled
 
 Checks whether a theme exists on the site.
@@ -504,6 +594,14 @@ _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
 
+### navigateSiteEditorBack
+
+Navigates the site editor back
+
+### navigateSiteEditorBackToRoot
+
+Goes back until it gets to the root
+
 ### openDocumentSettingsSidebar
 
 Clicks on the button in the header which opens Document Settings sidebar when it is closed.
@@ -511,6 +609,14 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 ### openGlobalBlockInserter
 
 Opens the global block inserter.
+
+### openGlobalStylesPanel
+
+Opens a global styles panel.
+
+_Parameters_
+
+-   _panelName_ `string`: Name of the panel that is going to be opened.
 
 ### openListView
 
@@ -528,9 +634,17 @@ _Returns_
 
 -   `Page`: preview page.
 
+### openPreviousGlobalStylesPanel
+
+Opens the previous global styles panel.
+
 ### openPublishPanel
 
 Opens the publish panel.
+
+### openSiteEditorNavigationPanel
+
+Opens the site editor navigation panel if closed
 
 ### openTypographyToolsPanelMenu
 
@@ -572,6 +686,10 @@ resolving once the request is complete (once a notice is displayed).
 _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
+
+### resetPreferences
+
+Clears all user meta preferences.
 
 ### saveDraft
 
@@ -633,6 +751,19 @@ _Parameters_
 -   _$1.plainText_ `string`: Plain text to set.
 -   _$1.html_ `string`: HTML to set.
 
+### setOption
+
+Sets a site option, from the options-general admin page.
+
+_Parameters_
+
+-   _setting_ `string`: The option, used to get the option by id.
+-   _value_ `string`: The value to set the option to.
+
+_Returns_
+
+-   `string`: The previous value of the option.
+
 ### setPostContent
 
 Sets code editor content
@@ -681,6 +812,14 @@ _Parameters_
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
 
+### siteEditorNavigateSequence
+
+Navigates through a sequence of links in the site editor navigation panel
+
+_Parameters_
+
+-   _labels_ `string[] | string`: Labels to navigate through
+
 ### switchEditorModeTo
 
 Switches editor mode.
@@ -703,9 +842,17 @@ running the tests as (if we're not already that user).
 
 Toggles the global inserter.
 
+### toggleGlobalStyles
+
+Toggles the global styles sidebar (opens it if closed and closes it if open).
+
 ### toggleMoreMenu
 
 Toggles the More Menu.
+
+_Parameters_
+
+-   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
 
 ### toggleOfflineMode
 
@@ -728,6 +875,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 
@@ -758,6 +913,21 @@ _Parameters_
 
 -   _adminPath_ `string`: String to be serialized as pathname.
 -   _query_ `string`: String to be serialized as query portion of URL.
+
+### visitSiteEditor
+
+Visits the Site Editor main page
+
+By default, it also skips the welcome guide. The option can be disabled if need be.
+
+_Related_
+
+-   disableSiteEditorWelcomeGuide
+
+_Parameters_
+
+-   _query_ `string`: String to be serialized as query portion of URL.
+-   _skipWelcomeGuide_ `[boolean]`: Whether to skip the welcome guide as part of the navigation.
 
 ### waitForWindowDimensions
 
@@ -800,4 +970,10 @@ _Returns_
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

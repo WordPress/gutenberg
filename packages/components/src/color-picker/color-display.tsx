@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import { Flex, FlexItem } from '../flex';
 import { Tooltip } from '../ui/tooltip';
 import type { ColorType } from './types';
 import { space } from '../ui/utils/space';
+import { COLORS } from '../utils/colors-values';
 
 interface ColorDisplayProps {
 	color: Colord;
@@ -41,7 +42,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
 		{ values.map( ( [ value, abbreviation ] ) => {
 			return (
 				<FlexItem key={ abbreviation } isBlock display="flex">
-					<Text color="blue">{ abbreviation }</Text>
+					<Text color={ COLORS.ui.theme }>{ abbreviation }</Text>
 					<Text>{ value }</Text>
 				</FlexItem>
 			);
@@ -84,7 +85,7 @@ const HexDisplay = ( { color }: DisplayProps ) => {
 	const colorWithoutHash = color.toHex().slice( 1 ).toUpperCase();
 	return (
 		<FlexItem>
-			<Text color="blue">#</Text>
+			<Text color={ COLORS.ui.theme }>#</Text>
 			<Text>{ colorWithoutHash }</Text>
 		</FlexItem>
 	);
@@ -138,7 +139,7 @@ export const ColorDisplay = ( {
 		}
 	);
 	useEffect( () => {
-		// clear copyTimer on component unmount.
+		// Clear copyTimer on component unmount.
 		return () => {
 			if ( copyTimer.current ) {
 				clearTimeout( copyTimer.current );

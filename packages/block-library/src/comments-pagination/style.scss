@@ -1,0 +1,38 @@
+$pagination-margin: 0.5em;
+.wp-block-comments-pagination {
+	// Increased specificity to override blocks default margin.
+	> .wp-block-comments-pagination-next,
+	> .wp-block-comments-pagination-previous,
+	> .wp-block-comments-pagination-numbers {
+		/*rtl:ignore*/
+		margin-right: $pagination-margin;
+		margin-bottom: $pagination-margin;
+
+		&:last-child {
+			/*rtl:ignore*/
+			margin-right: 0;
+		}
+	}
+	.wp-block-comments-pagination-previous-arrow {
+		margin-right: 1ch;
+		display: inline-block; // Needed so that the transform works.
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+	.wp-block-comments-pagination-next-arrow {
+		margin-left: 1ch;
+		display: inline-block; // Needed so that the transform works.
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+
+	&.aligncenter {
+		justify-content: center;
+	}
+}

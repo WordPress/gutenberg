@@ -30,9 +30,9 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 		const { volumes } = dockerConfig.services.wordpress;
 		expect( volumes ).toEqual( [
-			'wordpress:/var/www/html', // WordPress root
-			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root
-			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin
+			'wordpress:/var/www/html', // WordPress root.
+			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root.
+			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin.
 		] );
 	} );
 

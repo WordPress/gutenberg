@@ -20,7 +20,12 @@ exports[`File block renders file error state without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      Object {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -30,6 +35,7 @@ exports[`File block renders file error state without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
@@ -95,6 +101,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -105,11 +112,9 @@ exports[`File block renders file error state without crashing 1`] = `
       <View>
         Svg
         <TextInput
-          allowFontScaling={true}
           editable={false}
           fontFamily="serif"
           onChange={[Function]}
-          rejectResponderTermination={true}
           scrollEnabled={false}
           style={
             Array [
@@ -119,7 +124,6 @@ exports[`File block renders file error state without crashing 1`] = `
               undefined,
             ]
           }
-          underlineColorAndroid="transparent"
           value="Error"
         />
       </View>
@@ -191,6 +195,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }
@@ -223,7 +228,12 @@ exports[`File block renders file without crashing 1`] = `
     }
   />
   <View
-    accessible={true}
+    accessibilityState={
+      Object {
+        "disabled": false,
+      }
+    }
+    accessible={false}
     focusable={true}
     onClick={[Function]}
     onLayout={[Function]}
@@ -233,6 +243,7 @@ exports[`File block renders file without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
+    testID="file-edit-container"
   >
     <Text
       onTextLayout={[Function]}
@@ -298,6 +309,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>File name</p>",
             }
           }
@@ -373,6 +385,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "<p>Download</p>",
             }
           }

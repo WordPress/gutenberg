@@ -18,15 +18,15 @@ describe( 'props', () => {
 		expect( base.container.firstChild ).toMatchSnapshot();
 	} );
 
-	test( 'should render marginTop', () => {
-		const { container } = render( <Divider marginTop={ 5 } /> );
+	test( 'should render marginStart', () => {
+		const { container } = render( <Divider marginStart={ 5 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
 	} );
 
-	test( 'should render marginBottom', () => {
-		const { container } = render( <Divider marginBottom={ 5 } /> );
+	test( 'should render marginEnd', () => {
+		const { container } = render( <Divider marginEnd={ 5 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);

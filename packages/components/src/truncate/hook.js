@@ -59,7 +59,7 @@ export default function useTruncate( props ) {
 			shouldTruncate && !! numberOfLines && sx.numberOfLines,
 			className
 		);
-	}, [ className, numberOfLines, shouldTruncate ] );
+	}, [ className, cx, numberOfLines, shouldTruncate ] );
 
 	return { ...otherProps, className: classes, children: truncatedContent };
 }

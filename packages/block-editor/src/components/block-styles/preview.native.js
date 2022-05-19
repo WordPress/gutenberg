@@ -32,17 +32,20 @@ function StylePreview( { onPress, isActive, style, url } ) {
 
 	function onLayout() {
 		const columnsNum =
-			// To indicate scroll availabilty, there is a need to display additional half the column
+			// To indicate scroll availabilty, there is a need to display additional half the column.
 			Math.floor( BottomSheet.getWidth() / MAX_ITEM_WIDTH ) + HALF_COLUMN;
 		setItemWidth( BottomSheet.getWidth() / columnsNum );
 	}
 
 	useEffect( () => {
 		onLayout();
-		Dimensions.addEventListener( 'change', onLayout );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onLayout
+		);
 
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 

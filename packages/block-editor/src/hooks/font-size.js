@@ -15,7 +15,12 @@ import {
 	getFontSizeObjectByValue,
 	FontSizePicker,
 } from '../components/font-sizes';
-import { cleanEmptyObject } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import {
+	cleanEmptyObject,
+	transformStyles,
+	shouldSkipSerialization,
+} from './utils';
 import useSetting from '../components/use-setting';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
@@ -60,10 +65,7 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport(
-			blockType,
-			'typography.__experimentalSkipSerialization'
-		)
+		shouldSkipSerialization( blockType, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' )
 	) {
 		return props;
 	}
@@ -223,9 +225,10 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 		// and does have a class to extract the font size from.
 		if (
 			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			hasBlockSupport(
+			shouldSkipSerialization(
 				blockName,
-				'typography.__experimentalSkipSerialization'
+				TYPOGRAPHY_SUPPORT_KEY,
+				'fontSize'
 			) ||
 			! fontSize ||
 			style?.typography?.fontSize
@@ -255,6 +258,28 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 	'withFontSizeInlineStyles'
 );
 
+const MIGRATION_PATHS = {
+	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
+};
+
+export function addTransforms( result, source, index, results ) {
+	const destinationBlockType = result.name;
+	const activeSupports = {
+		fontSize: hasBlockSupport(
+			destinationBlockType,
+			FONT_SIZE_SUPPORT_KEY
+		),
+	};
+	return transformStyles(
+		activeSupports,
+		MIGRATION_PATHS,
+		result,
+		source,
+		index,
+		results
+	);
+}
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
@@ -273,4 +298,10 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/font-size/with-font-size-inline-styles',
 	withFontSizeInlineStyles
+);
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/font-size/addTransforms',
+	addTransforms
 );

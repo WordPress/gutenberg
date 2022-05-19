@@ -5,5 +5,5 @@
  */
 export default function isHTMLInputElement( node ) {
 	/* eslint-enable jsdoc/valid-types */
-	return !! node && node.nodeName === 'INPUT';
+	return node?.nodeName === 'INPUT';
 }

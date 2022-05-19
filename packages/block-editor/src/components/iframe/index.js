@@ -10,7 +10,6 @@ import {
 	useState,
 	createPortal,
 	forwardRef,
-	useEffect,
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
@@ -34,65 +33,66 @@ const BLOCK_PREFIX = 'wp-block';
  *
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
- *
- * @param {Document} doc The document to append cloned stylesheets to.
  */
-function styleSheetsCompat( doc ) {
-	// Search the document for stylesheets targetting the editor canvas.
-	Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-		try {
-			// May fail for external styles.
-			// eslint-disable-next-line no-unused-expressions
-			styleSheet.cssRules;
-		} catch ( e ) {
-			return;
-		}
-
-		const { ownerNode, cssRules } = styleSheet;
-
-		if ( ! cssRules ) {
-			return;
-		}
-
-		// Generally, ignore inline styles. We add inline styles belonging to a
-		// stylesheet later, which may or may not match the selectors.
-		if ( ownerNode.tagName !== 'LINK' ) {
-			return;
-		}
-
-		// Don't try to add the reset styles, which were removed as a dependency
-		// from `edit-blocks` for the iframe since we don't need to reset admin
-		// styles.
-		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-			return;
-		}
-
-		const isMatch = Array.from( cssRules ).find(
-			( { selectorText } ) =>
-				selectorText &&
-				( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-					selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-		);
-
-		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Stylesheet ${ ownerNode.id } was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
-				ownerNode.outerHTML
-			);
-			doc.head.appendChild( ownerNode.cloneNode( true ) );
-
-			// Add inline styles belonging to the stylesheet.
-			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
-			const inlineCssElement = document.getElementById( inlineCssId );
-
-			if ( inlineCssElement ) {
-				doc.head.appendChild( inlineCssElement.cloneNode( true ) );
+function useStylesCompatibility() {
+	return useRefEffect( ( node ) => {
+		// Search the document for stylesheets targetting the editor canvas.
+		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+			try {
+				// May fail for external styles.
+				// eslint-disable-next-line no-unused-expressions
+				styleSheet.cssRules;
+			} catch ( e ) {
+				return;
 			}
-		}
-	} );
+
+			const { ownerNode, cssRules } = styleSheet;
+
+			if ( ! cssRules ) {
+				return;
+			}
+
+			// Generally, ignore inline styles. We add inline styles belonging to a
+			// stylesheet later, which may or may not match the selectors.
+			if ( ownerNode.tagName !== 'LINK' ) {
+				return;
+			}
+
+			// Don't try to add the reset styles, which were removed as a dependency
+			// from `edit-blocks` for the iframe since we don't need to reset admin
+			// styles.
+			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+				return;
+			}
+
+			const isMatch = Array.from( cssRules ).find(
+				( { selectorText } ) =>
+					selectorText &&
+					( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
+						selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+			);
+
+			if (
+				isMatch &&
+				! node.ownerDocument.getElementById( ownerNode.id )
+			) {
+				// Display warning once we have a way to add style dependencies to the editor.
+				// See: https://github.com/WordPress/gutenberg/pull/37466.
+				node.appendChild( ownerNode.cloneNode( true ) );
+
+				// Add inline styles belonging to the stylesheet.
+				const inlineCssId = ownerNode.id.replace(
+					'-css',
+					'-inline-css'
+				);
+				const inlineCssElement = document.getElementById( inlineCssId );
+
+				if ( inlineCssElement ) {
+					node.appendChild( inlineCssElement.cloneNode( true ) );
+				}
+			}
+		} );
+	}, [] );
 }
 
 /**
@@ -164,12 +164,15 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
+function Iframe(
+	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	ref
+) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const styles = useParsedAssets( window.__editorAssets?.styles );
-	const scripts = useParsedAssets( window.__editorAssets?.scripts );
+	const styles = useParsedAssets( assets?.styles );
+	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const setRef = useRefEffect( ( node ) => {
@@ -192,6 +195,7 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 				Array.from( ownerDocument.body.classList ).filter(
 					( name ) =>
 						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
 						name === 'wp-embed-responsive'
 				)
 			);
@@ -203,14 +207,10 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 			return true;
 		}
 
-		if ( setDocumentIfReady() ) {
-			return;
-		}
+		// Document set with srcDoc is not immediately ready.
+		node.addEventListener( 'load', setDocumentIfReady );
 
-		// Document is not immediately loaded in Firefox.
-		node.addEventListener( 'load', () => {
-			setDocumentIfReady();
-		} );
+		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
 	const headRef = useRefEffect( ( element ) => {
 		scripts
@@ -226,12 +226,7 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 			} );
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
-
-	useEffect( () => {
-		if ( iframeDocument ) {
-			styleSheetsCompat( iframeDocument );
-		}
-	}, [ iframeDocument ] );
+	const styleCompatibilityRef = useStylesCompatibility();
 
 	head = (
 		<>
@@ -264,6 +259,8 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
+				// Correct doctype is required to enable rendering in standards mode
+				srcDoc="<!doctype html>"
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
@@ -277,6 +274,15 @@ function Iframe( { contentRef, children, head, tabIndex = 0, ...props }, ref ) {
 									...bodyClasses
 								) }
 							>
+								{ /*
+								 * This is a wrapper for the extra styles and scripts
+								 * rendered imperatively by cloning the parent,
+								 * it's important that this div's content remains uncontrolled.
+								 */ }
+								<div
+									style={ { display: 'none' } }
+									ref={ styleCompatibilityRef }
+								/>
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>

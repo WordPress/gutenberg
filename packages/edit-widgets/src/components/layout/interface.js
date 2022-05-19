@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -54,9 +55,10 @@ function Interface( { blockEditorSettings } ) {
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
 			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
-			hasBlockBreadCrumbsEnabled: select(
-				interfaceStore
-			).isFeatureActive( 'core/edit-widgets', 'showBlockBreadcrumbs' ),
+			hasBlockBreadCrumbsEnabled: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'showBlockBreadcrumbs'
+			),
 			previousShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations(
@@ -83,20 +85,32 @@ function Interface( { blockEditorSettings } ) {
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
+	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
+
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
+			labels={ {
+				...interfaceLabels,
+				secondarySidebar: secondarySidebarLabel,
+			} }
 			header={ <Header /> }
-			secondarySidebar={ <SecondarySidebar /> }
+			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />
 				)
 			}
 			content={
-				<WidgetAreasBlockEditorContent
-					blockEditorSettings={ blockEditorSettings }
-				/>
+				<>
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+					<BlockStyles.Slot scope="core/block-inspector" />
+				</>
 			}
 			footer={
 				hasBlockBreadCrumbsEnabled &&

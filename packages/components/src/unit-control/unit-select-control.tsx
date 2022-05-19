@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
 import type { ChangeEvent } from 'react';
 
 /**
@@ -17,13 +15,13 @@ import type { UnitSelectControlProps } from './types';
 export default function UnitSelectControl( {
 	className,
 	isUnitSelectTabbable: isTabbable = true,
-	onChange = noop,
+	onChange,
 	size = 'default',
 	unit = 'px',
 	units = CSS_UNITS,
 	...props
 }: WordPressComponentProps< UnitSelectControlProps, 'select', false > ) {
-	if ( ! units || ! hasUnits( units ) || units?.length === 1 ) {
+	if ( ! hasUnits( units ) || units?.length === 1 ) {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"
@@ -38,7 +36,7 @@ export default function UnitSelectControl( {
 		const { value: unitValue } = event.target;
 		const data = units.find( ( option ) => option.value === unitValue );
 
-		onChange( unitValue, { event, data } );
+		onChange?.( unitValue, { event, data } );
 	};
 
 	const classes = classnames( 'components-unit-control__select', className );

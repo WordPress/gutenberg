@@ -40,6 +40,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-6 {
+  display: inline-block;
+  margin-bottom: calc(4px * 2);
+}
+
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -56,12 +61,61 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   justify-content: space-between;
 }
 
-.emotion-6>*+*:not( marquee ) {
+.emotion-8>*+*:not( marquee ) {
   margin-top: calc(4px * 3);
 }
 
-.emotion-6>* {
+.emotion-8>* {
   min-height: 0;
+}
+
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-10>*+*:not( marquee ) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-10>* {
+  min-width: 0;
+}
+
+.emotion-13 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-15 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
 }
 
 <div
@@ -70,7 +124,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   <div
     className="components-base-control__field emotion-2 emotion-3"
   >
-    <fieldset>
+    <fieldset
+      className="block-editor-color-gradient-control__fieldset"
+    >
       <div
         className="components-flex components-h-stack components-v-stack emotion-4 emotion-5"
         data-wp-c16t={true}
@@ -81,14 +137,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             className="block-editor-color-gradient-control__color-indicator"
           >
             <span
-              className="components-base-control__label"
+              className="components-base-control__label emotion-6 emotion-7"
             >
               Test Color
             </span>
           </div>
         </legend>
         <div
-          className="components-flex components-h-stack components-v-stack emotion-6 emotion-5"
+          className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
           data-wp-c16t={true}
           data-wp-component="VStack"
         >
@@ -99,16 +155,32 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             <button
               aria-expanded={false}
               aria-haspopup="true"
-              aria-label="Custom color picker"
-              className="components-color-palette__custom-color"
+              aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+              className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+              data-wp-c16t={true}
+              data-wp-component="Flex"
               onClick={[Function]}
               style={
                 Object {
                   "background": "#f00",
+                  "color": "#000",
                 }
               }
             >
-              #f00
+              <span
+                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="FlexItem"
+              >
+                red
+              </span>
+              <span
+                className="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
+                data-wp-c16t={true}
+                data-wp-component="FlexItem"
+              >
+                f00
+              </span>
             </button>
           </div>
           <div
@@ -144,7 +216,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                   fill="#000"
                   focusable={false}
                   height={24}
-                  role="img"
                   viewBox="0 0 24 24"
                   width={24}
                   xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +231,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             >
               <button
                 aria-describedby={null}
-                className="components-button components-circular-option-picker__clear is-secondary is-small"
+                className="components-button components-circular-option-picker__clear is-tertiary"
                 onClick={[Function]}
                 type="button"
               >

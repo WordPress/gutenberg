@@ -9,7 +9,7 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-/** @typedef {import('./types').WPDataStore} WPDataStore */
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -19,7 +19,10 @@ export {
 	RegistryConsumer,
 	useRegistry,
 } from './components/registry-provider';
-export { default as useSelect } from './components/use-select';
+export {
+	default as useSelect,
+	useSuspenseSelect,
+} from './components/use-select';
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
@@ -77,12 +80,12 @@ export { plugins };
 export { combineReducers };
 
 /**
- * Given the name or definition of a registered store, returns an object of the store's selectors.
+ * Given the name or descriptor of a registered store, returns an object of the store's selectors.
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- *                                                   or the store definition.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ *                                                       or the store descriptor.
  *
  * @example
  * ```js
@@ -101,8 +104,8 @@ export const select = defaultRegistry.select;
  * and modified so that they return promises that resolve to their eventual values,
  * after any resolvers have ran.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- *                                                   or the store definition.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ *                                                       or the store descriptor.
  *
  * @example
  * ```js
@@ -116,14 +119,26 @@ export const select = defaultRegistry.select;
 export const resolveSelect = defaultRegistry.resolveSelect;
 
 /**
+ * Given the name of a registered store, returns an object containing the store's
+ * selectors pre-bound to state so that you only need to supply additional arguments,
+ * and modified so that they throw promises in case the selector is not resolved yet.
+ *
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ *                                                       or the store descriptor.
+ *
+ * @return {Object} Object containing the store's suspense-wrapped selectors.
+ */
+export const suspendSelect = defaultRegistry.suspendSelect;
+
+/**
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
  * Note: Action creators returned by the dispatch will return a promise when
  * they are called.
  *
- * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
- *                                                   or the store definition.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ *                                                       or the store descriptor.
  *
  * @example
  * ```js
@@ -162,7 +177,7 @@ export const subscribe = defaultRegistry.subscribe;
  *
  * @deprecated Use `register( storeDescriptor )` instead.
  *
- * @param {string} name Store registry name.
+ * @param {string} name  Store registry name.
  * @param {Object} store Store instance (`{ getSelectors, getActions, subscribe }`).
  */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
@@ -189,7 +204,7 @@ export const registerStore = defaultRegistry.registerStore;
 export const use = defaultRegistry.use;
 
 /**
- * Registers a standard `@wordpress/data` store definition.
+ * Registers a standard `@wordpress/data` store descriptor.
  *
  * @example
  * ```js
@@ -204,6 +219,6 @@ export const use = defaultRegistry.use;
  * register( store );
  * ```
  *
- * @param {WPDataStore} store Store definition.
+ * @param {StoreDescriptor} store Store descriptor.
  */
 export const register = defaultRegistry.register;

@@ -14,7 +14,9 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
-import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+
+/** @typedef {import('./types').AnyFunction} AnyFunction */
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -105,10 +107,10 @@ export function taxonomies( state = [], action ) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentTheme( state = undefined, action ) {
 	switch ( action.type ) {
@@ -122,10 +124,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -139,10 +141,10 @@ export function currentGlobalStylesId( state = undefined, action ) {
 /**
  * Reducer managing the theme base global styles.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
 export function themeBaseGlobalStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -150,6 +152,26 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 			return {
 				...state,
 				[ action.stylesheet ]: action.globalStyles,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles variations.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleVariations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
+			return {
+				...state,
+				[ action.stylesheet ]: action.variations,
 			};
 	}
 
@@ -165,7 +187,7 @@ export function themeBaseGlobalStyles( state = {}, action ) {
  *
  * @param {Object} entityConfig Entity config.
  *
- * @return {Function} Reducer.
+ * @return {AnyFunction} Reducer.
  */
 function entity( entityConfig ) {
 	return flowRight( [
@@ -315,7 +337,7 @@ function entity( entityConfig ) {
  *
  * @return {Object} Updated state.
  */
-export function entitiesConfig( state = defaultEntities, action ) {
+export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
 			return [ ...state, ...action.entities ];
@@ -335,7 +357,7 @@ export function entitiesConfig( state = defaultEntities, action ) {
 export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
-	// Generates a dynamic reducer for the entities
+	// Generates a dynamic reducer for the entities.
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
 		const entitiesByKind = groupBy( newConfig, 'kind' );
@@ -360,10 +382,10 @@ export const entities = ( state = {}, action ) => {
 		);
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const newData = entitiesDataReducer( state.records, action );
 
 	if (
-		newData === state.data &&
+		newData === state.records &&
 		newConfig === state.config &&
 		entitiesDataReducer === state.reducer
 	) {
@@ -372,22 +394,38 @@ export const entities = ( state = {}, action ) => {
 
 	return {
 		reducer: entitiesDataReducer,
-		data: newData,
+		records: newData,
 		config: newConfig,
 	};
 };
 
 /**
+ * @typedef {Object} UndoStateMeta
+ *
+ * @property {number} offset          Where in the undo stack we are.
+ * @property {Object} [flattenedUndo] Flattened form of undo stack.
+ */
+
+/** @typedef {Array<Object> & UndoStateMeta} UndoState */
+
+/**
+ * @type {UndoState}
+ *
+ * @todo Given how we use this we might want to make a custom class for it.
+ */
+const UNDO_INITIAL_STATE = Object.assign( [], { offset: 0 } );
+
+/** @type {Object} */
+let lastEditAction;
+
+/**
  * Reducer keeping track of entity edit undo history.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {UndoState} state  Current state.
+ * @param {Object}    action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {UndoState} Updated state.
  */
-const UNDO_INITIAL_STATE = [];
-UNDO_INITIAL_STATE.offset = 0;
-let lastEditAction;
 export function undo( state = UNDO_INITIAL_STATE, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -419,8 +457,11 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 				}
 			}
 
+			/** @type {UndoState} */
 			let nextState;
+
 			if ( isUndoOrRedo ) {
+				// @ts-ignore we might consider using Object.assign({}, state)
 				nextState = [ ...state ];
 				nextState.offset =
 					state.offset + ( action.meta.isUndo ? -1 : 1 );
@@ -431,7 +472,16 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					// to continue as if we were creating an explicit undo level. This
 					// will result in an extra undo level being appended with the flattened
 					// undo values.
+					// We also have to take into account if the `lastEditAction` had opted out
+					// of being tracked in undo history, like the action that persists the latest
+					// content right before saving. In that case we have to update the `lastEditAction`
+					// to avoid returning early before applying the existing flattened undos.
 					isCreateUndoLevel = true;
+					if ( ! lastEditAction.meta.undo ) {
+						lastEditAction.meta.undo = {
+							edits: {},
+						};
+					}
 					action = lastEditAction;
 				} else {
 					return nextState;
@@ -451,6 +501,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 					( key ) => ! action.transientEdits[ key ]
 				)
 			) {
+				// @ts-ignore we might consider using Object.assign({}, state)
 				nextState = [ ...state ];
 				nextState.flattenedUndo = {
 					...state.flattenedUndo,
@@ -462,6 +513,7 @@ export function undo( state = UNDO_INITIAL_STATE, action ) {
 
 			// Clear potential redos, because this only supports linear history.
 			nextState =
+				// @ts-ignore this needs additional cleanup, probably involving code-level changes
 				nextState || state.slice( 0, state.offset || undefined );
 			nextState.offset = nextState.offset || 0;
 			nextState.pop();
@@ -563,12 +615,31 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
+export function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
+export function blockPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
+			return action.categories;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	taxonomies,
 	entities,
@@ -576,4 +647,6 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	blockPatterns,
+	blockPatternCategories,
 } );

@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/pullquote",
 		"isValid": true,
 		"attributes": {
@@ -13,7 +12,6 @@
 				}
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-pullquote\" style=\"border-color:#cd2653\"><blockquote class=\"has-text-color has-secondary-color\"><p>pullquote</p></blockquote></figure>"
+		"innerBlocks": []
 	}
 ]

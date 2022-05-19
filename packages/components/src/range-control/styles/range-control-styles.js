@@ -58,7 +58,7 @@ export const BeforeIconWrapper = styled.span`
 export const AfterIconWrapper = styled.span`
 	margin-top: ${ railHeight }px;
 
-	${ rtl( { marginLeft: 16 } ) }
+	${ rtl( { marginLeft: 6 } ) }
 `;
 
 const railBackgroundColor = ( { disabled, railColor } ) => {
@@ -292,7 +292,7 @@ export const Tooltip = styled.span`
 `;
 
 // @todo: Refactor RangeControl with latest HStack configuration
-// @wordpress/components/ui/hstack
+// @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
 	box-sizing: border-box;
 	display: inline-block;

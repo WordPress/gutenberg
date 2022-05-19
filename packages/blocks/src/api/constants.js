@@ -15,7 +15,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
-	//kept for back-compatibility purposes.
+	// Kept for back-compatibility purposes.
 	'--wp--style--color--link': {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
@@ -28,6 +28,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color', 'background' ],
 		requiresOptOut: true,
+		useEngine: true,
 	},
 	borderColor: {
 		value: [ 'border', 'color' ],
@@ -51,10 +52,63 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'border', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
 	},
+	borderTopColor: {
+		value: [ 'border', 'top', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderTopStyle: {
+		value: [ 'border', 'top', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderTopWidth: {
+		value: [ 'border', 'top', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderRightColor: {
+		value: [ 'border', 'right', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderRightStyle: {
+		value: [ 'border', 'right', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderRightWidth: {
+		value: [ 'border', 'right', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderBottomColor: {
+		value: [ 'border', 'bottom', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderBottomStyle: {
+		value: [ 'border', 'bottom', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderBottomWidth: {
+		value: [ 'border', 'bottom', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
+	borderLeftColor: {
+		value: [ 'border', 'left', 'color' ],
+		support: [ '__experimentalBorder', 'color' ],
+	},
+	borderLeftStyle: {
+		value: [ 'border', 'left', 'style' ],
+		support: [ '__experimentalBorder', 'style' ],
+	},
+	borderLeftWidth: {
+		value: [ 'border', 'left', 'width' ],
+		support: [ '__experimentalBorder', 'width' ],
+	},
 	color: {
 		value: [ 'color', 'text' ],
 		support: [ 'color', 'text' ],
 		requiresOptOut: true,
+		useEngine: true,
+	},
+	filter: {
+		value: [ 'filter', 'duotone' ],
+		support: [ 'color', '__experimentalDuotone' ],
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
@@ -67,18 +121,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
 		support: [ 'typography', 'fontSize' ],
+		useEngine: true,
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
 		support: [ 'typography', '__experimentalFontStyle' ],
+		useEngine: true,
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
+		useEngine: true,
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'typography', 'lineHeight' ],
+		useEngine: true,
 	},
 	margin: {
 		value: [ 'spacing', 'margin' ],
@@ -89,6 +147,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			marginBottom: 'bottom',
 			marginLeft: 'left',
 		},
+		useEngine: true,
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
@@ -99,18 +158,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			paddingBottom: 'bottom',
 			paddingLeft: 'left',
 		},
+		useEngine: true,
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
+		useEngine: true,
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
 		support: [ 'typography', '__experimentalTextTransform' ],
+		useEngine: true,
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
 	},
 	'--wp--style--block-gap': {
 		value: [ 'spacing', 'blockGap' ],

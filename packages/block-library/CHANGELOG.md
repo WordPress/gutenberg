@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+## 7.6.0 (2022-05-18)
+
+### Enhancement
+
+-   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+
+## 7.5.0 (2022-05-04)
+
+## 7.4.0 (2022-04-21)
+
+## 7.3.0 (2022-04-08)
+
+## 7.2.0 (2022-03-23)
+
+### Bug Fix
+
+-   Table block: Fix deprecation eligibility to prevent loss of named (color palette) background color ([#39445](https://github.com/WordPress/gutenberg/pull/39445)).
+
+### Enhancement
+
+-   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
+
+## 7.1.0 (2022-03-11)
+
+## 7.0.0 (2022-02-10)
+
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fix
+
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
+-   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 6.1.0 (2022-01-27)
+
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
 
 ## 6.0.0 (2021-09-09)

@@ -1,15 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { __, isRTL } from '@wordpress/i18n';
 
 export default function Edit( {
 	attributes,
 	context: { commentId },
 	setAttributes,
+	isSelected,
 } ) {
 	const { height, width } = attributes;
 
@@ -31,7 +38,13 @@ export default function Edit( {
 	const minSize = sizes ? sizes[ 0 ] : 24;
 	const maxSize = sizes ? sizes[ sizes.length - 1 ] : 96;
 	const blockProps = useBlockProps();
+	const spacingProps = useSpacingProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
+	const { avatarURL } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings;
+	} );
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -53,12 +66,13 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const displayAvatar = avatarUrls ? (
+	const resizableAvatar = (
 		<ResizableBox
 			size={ {
 				width,
 				height,
 			} }
+			showHandle={ isSelected }
 			onResizeStop={ ( event, direction, elt, delta ) => {
 				setAttributes( {
 					height: parseInt( height + delta.height, 10 ),
@@ -76,21 +90,19 @@ export default function Edit( {
 			maxWidth={ maxSizeBuffer }
 		>
 			<img
-				src={ avatarUrls[ avatarUrls.length - 1 ] }
+				src={
+					avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : avatarURL
+				}
 				alt={ `${ authorName } ${ __( 'Avatar' ) }` }
 				{ ...blockProps }
 			/>
 		</ResizableBox>
-	) : (
-		<p { ...blockProps }>
-			{ _x( 'Comment Author Avatar', 'block title' ) }
-		</p>
 	);
 
 	return (
 		<>
 			{ inspectorControls }
-			<div>{ displayAvatar }</div>
+			<div { ...spacingProps }>{ resizableAvatar }</div>
 		</>
 	);
 }

@@ -39,10 +39,14 @@ export default function DropZoneComponent( {
 			const files = getFilesFromDataTransfer( event.dataTransfer );
 			const html = event.dataTransfer.getData( 'text/html' );
 
-			if ( files.length && onFilesDrop ) {
-				onFilesDrop( files );
-			} else if ( html && onHTMLDrop ) {
+			/**
+			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+			 * The order of the checks is important to recognise the HTML drop.
+			 */
+			if ( html && onHTMLDrop ) {
 				onHTMLDrop( html );
+			} else if ( files.length && onFilesDrop ) {
+				onFilesDrop( files );
 			} else if ( onDrop ) {
 				onDrop( event );
 			}
@@ -52,15 +56,19 @@ export default function DropZoneComponent( {
 
 			let _type = 'default';
 
-			if (
+			/**
+			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+			 * The order of the checks is important to recognise the HTML drop.
+			 */
+			if ( includes( event.dataTransfer.types, 'text/html' ) ) {
+				_type = 'html';
+			} else if (
 				// Check for the types because sometimes the files themselves
 				// are only available on drop.
 				includes( event.dataTransfer.types, 'Files' ) ||
 				getFilesFromDataTransfer( event.dataTransfer ).length > 0
 			) {
 				_type = 'file';
-			} else if ( includes( event.dataTransfer.types, 'text/html' ) ) {
-				_type = 'html';
 			}
 
 			setType( _type );

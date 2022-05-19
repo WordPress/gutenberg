@@ -86,17 +86,15 @@ describe( 'Post Editor Performance', () => {
 	beforeEach( async () => {
 		// Disable auto-save to avoid impacting the metrics.
 		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/edit-post' )
-				.__experimentalUpdateLocalAutosaveInterval( 100000000000 );
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.updateEditorSettings( { autosaveInterval: 100000000000 } );
+			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				autosaveInterval: 100000000000,
+				localAutosaveInterval: 100000000000,
+			} );
 		} );
 	} );
 
 	it( 'Loading', async () => {
-		// Measuring loading time
+		// Measuring loading time.
 		let i = 5;
 		while ( i-- ) {
 			await page.reload();
@@ -120,7 +118,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Typing', async () => {
-		// Measuring typing performance
+		// Measuring typing performance.
 		await insertBlock( 'Paragraph' );
 		let i = 20;
 		await page.tracing.start( {
@@ -158,7 +156,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Selecting blocks', async () => {
-		// Measuring block selection performance
+		// Measuring block selection performance.
 		await createNewPost();
 		await page.evaluate( () => {
 			const { createBlock } = window.wp.blocks;
@@ -188,7 +186,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Opening persistent list view', async () => {
-		// Measure time to open inserter
+		// Measure time to open inserter.
 		await page.waitForSelector( '.edit-post-layout' );
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
@@ -208,7 +206,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Opening the inserter', async () => {
-		// Measure time to open inserter
+		// Measure time to open inserter.
 		await page.waitForSelector( '.edit-post-layout' );
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
@@ -228,7 +226,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
-		// Measure time to search the inserter and get results
+		// Measure time to search the inserter and get results.
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
@@ -263,7 +261,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Hovering Inserter Items', async () => {
-		// Measure inserter hover performance
+		// Measure inserter hover performance.
 		const paragraphBlockItem =
 			'.block-editor-inserter__menu .editor-block-list-item-paragraph';
 		const headingBlockItem =

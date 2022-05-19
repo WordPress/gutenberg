@@ -12,16 +12,13 @@ import { __, _x } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { MoreMenuDropdown, MoreMenuFeatureToggle } from '@wordpress/interface';
+import { MoreMenuDropdown } from '@wordpress/interface';
+import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-
-const POPOVER_PROPS = {
-	className: 'customize-widgets-more-menu__content',
-};
 
 export default function MoreMenu() {
 	const [
@@ -38,17 +35,13 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown
-				as={ ToolbarDropdownMenu }
-				className="customize-widgets-more-menu"
-				popoverProps={ POPOVER_PROPS }
-			>
+			<MoreMenuDropdown as={ ToolbarDropdownMenu }>
 				{ () => (
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/customize-widgets"
-								feature="fixedToolbar"
+								name="fixedToolbar"
 								label={ __( 'Top toolbar' ) }
 								info={ __(
 									'Access all block and document tools in a single place'
@@ -70,9 +63,9 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/customize-widgets"
-								feature="welcomeGuide"
+								name="welcomeGuide"
 								label={ __( 'Welcome Guide' ) }
 							/>
 							<MenuItem
@@ -94,9 +87,9 @@ export default function MoreMenu() {
 							</MenuItem>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/customize-widgets"
-								feature="keepCaretInsideBlock"
+								name="keepCaretInsideBlock"
 								label={ __(
 									'Contain text cursor inside block'
 								) }

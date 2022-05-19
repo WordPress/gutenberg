@@ -12,7 +12,7 @@ export default {
 	title: 'Components/ColorIndicator',
 	component: ColorIndicator,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -27,7 +27,7 @@ export const ALIGNMENT_LABEL = {
 	'bottom right': __( 'Bottom Right' ),
 };
 
-// Transforms GRID into a flat Array of values
+// Transforms GRID into a flat Array of values.
 export const ALIGNMENTS = flattenDeep( GRID );
 
 /**

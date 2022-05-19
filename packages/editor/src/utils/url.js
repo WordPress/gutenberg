@@ -1,26 +1,8 @@
 /**
- * External dependencies
- */
-import { deburr, trim } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Returns the URL of a WPAdmin Page.
- *
- * TODO: This should be moved to a module less specific to the editor.
- *
- * @param {string} page  Page to navigate to.
- * @param {Object} query Query Args.
- *
- * @return {string} WPAdmin URL.
- */
-export function getWPAdminURL( page, query ) {
-	return addQueryArgs( page, query );
-}
+import { cleanForSlug as urlCleanForSlug } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Performs some basic cleanup of a string for use as a post slug
@@ -39,14 +21,10 @@ export function getWPAdminURL( page, query ) {
  * @return {string} Processed string
  */
 export function cleanForSlug( string ) {
-	if ( ! string ) {
-		return '';
-	}
-	return trim(
-		deburr( string )
-			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
-			.toLowerCase(),
-		'-'
-	);
+	deprecated( 'wp.editor.cleanForSlug', {
+		since: '12.7',
+		plugin: 'Gutenberg',
+		alternative: 'wp.url.cleanForSlug',
+	} );
+	return urlCleanForSlug( string );
 }

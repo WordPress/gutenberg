@@ -19,6 +19,7 @@ import {
 } from './gap';
 import {
 	MarginEdit,
+	MarginVisualizer,
 	hasMarginSupport,
 	hasMarginValue,
 	resetMargin,
@@ -26,6 +27,7 @@ import {
 } from './margin';
 import {
 	PaddingEdit,
+	PaddingVisualizer,
 	hasPaddingSupport,
 	hasPaddingValue,
 	resetPadding,
@@ -71,44 +73,48 @@ export function DimensionsPanel( props ) {
 	} );
 
 	return (
-		<InspectorControls __experimentalGroup="dimensions">
-			{ ! isPaddingDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasPaddingValue( props ) }
-					label={ __( 'Padding' ) }
-					onDeselect={ () => resetPadding( props ) }
-					resetAllFilter={ createResetAllFilter( 'padding' ) }
-					isShownByDefault={ defaultSpacingControls?.padding }
-					panelId={ props.clientId }
-				>
-					<PaddingEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isMarginDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasMarginValue( props ) }
-					label={ __( 'Margin' ) }
-					onDeselect={ () => resetMargin( props ) }
-					resetAllFilter={ createResetAllFilter( 'margin' ) }
-					isShownByDefault={ defaultSpacingControls?.margin }
-					panelId={ props.clientId }
-				>
-					<MarginEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isGapDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasGapValue( props ) }
-					label={ __( 'Block spacing' ) }
-					onDeselect={ () => resetGap( props ) }
-					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
-					isShownByDefault={ defaultSpacingControls?.blockGap }
-					panelId={ props.clientId }
-				>
-					<GapEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-		</InspectorControls>
+		<>
+			<InspectorControls __experimentalGroup="dimensions">
+				{ ! isPaddingDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasPaddingValue( props ) }
+						label={ __( 'Padding' ) }
+						onDeselect={ () => resetPadding( props ) }
+						resetAllFilter={ createResetAllFilter( 'padding' ) }
+						isShownByDefault={ defaultSpacingControls?.padding }
+						panelId={ props.clientId }
+					>
+						<PaddingEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isMarginDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasMarginValue( props ) }
+						label={ __( 'Margin' ) }
+						onDeselect={ () => resetMargin( props ) }
+						resetAllFilter={ createResetAllFilter( 'margin' ) }
+						isShownByDefault={ defaultSpacingControls?.margin }
+						panelId={ props.clientId }
+					>
+						<MarginEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isGapDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasGapValue( props ) }
+						label={ __( 'Block spacing' ) }
+						onDeselect={ () => resetGap( props ) }
+						resetAllFilter={ createResetAllFilter( 'blockGap' ) }
+						isShownByDefault={ defaultSpacingControls?.blockGap }
+						panelId={ props.clientId }
+					>
+						<GapEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
+			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
+			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+		</>
 	);
 }
 

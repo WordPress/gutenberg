@@ -29,6 +29,11 @@ export default function EditTemplateTitle() {
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings } = useDispatch( editorStore );
 
+	// Only user-created and non-default templates can change the name.
+	if ( ! template.is_custom || template.has_theme_file ) {
+		return null;
+	}
+
 	let templateTitle = __( 'Default' );
 	if ( template?.title ) {
 		templateTitle = template.title;
@@ -37,31 +42,33 @@ export default function EditTemplateTitle() {
 	}
 
 	return (
-		<TextControl
-			label={ __( 'Title' ) }
-			value={ templateTitle }
-			help={ __(
-				'Give the template a title that indicates its purpose, e.g. "Full Width".'
-			) }
-			onChange={ ( newTitle ) => {
-				const settings = getEditorSettings();
-				const newAvailableTemplates = mapValues(
-					settings.availableTemplates,
-					( existingTitle, id ) => {
-						if ( id !== template.slug ) {
-							return existingTitle;
+		<div className="edit-site-template-details__group">
+			<TextControl
+				label={ __( 'Title' ) }
+				value={ templateTitle }
+				help={ __(
+					'Give the template a title that indicates its purpose, e.g. "Full Width".'
+				) }
+				onChange={ ( newTitle ) => {
+					const settings = getEditorSettings();
+					const newAvailableTemplates = mapValues(
+						settings.availableTemplates,
+						( existingTitle, id ) => {
+							if ( id !== template.slug ) {
+								return existingTitle;
+							}
+							return newTitle;
 						}
-						return newTitle;
-					}
-				);
-				updateEditorSettings( {
-					...settings,
-					availableTemplates: newAvailableTemplates,
-				} );
-				editEntityRecord( 'postType', 'wp_template', template.id, {
-					title: newTitle,
-				} );
-			} }
-		/>
+					);
+					updateEditorSettings( {
+						...settings,
+						availableTemplates: newAvailableTemplates,
+					} );
+					editEntityRecord( 'postType', 'wp_template', template.id, {
+						title: newTitle,
+					} );
+				} }
+			/>
+		</div>
 	);
 }

@@ -41,13 +41,15 @@
 		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
 
-	.comment-form-comment textarea {
-		display: block;
-		box-sizing: border-box;
-		width: 100%;
+	.comment-form {
+		textarea,
+		input:not([type="submit"]):not([type="checkbox"]) {
+			display: block;
+			box-sizing: border-box;
+			width: 100%;
+		}
 	}
 
-	.comment-form-comment,
 	.comment-form-author,
 	.comment-form-email,
 	.comment-form-url {
@@ -63,6 +65,14 @@
 
 		#wp-comment-cookies-consent {
 			margin-top: 0.35em;
+		}
+	}
+
+	.comment-reply-title {
+		margin-bottom: 0;
+		:where(small) {
+			font-size: var(--wp--preset--font-size--medium, smaller);
+			margin-left: 0.5em;
 		}
 	}
 }

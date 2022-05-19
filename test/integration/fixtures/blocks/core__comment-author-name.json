@@ -1,13 +1,12 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comment-author-name",
 		"isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self"
+			"isLink": true,
+			"linkTarget": "_self",
+			"fontSize": "small"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

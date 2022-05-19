@@ -42,13 +42,13 @@ export default function FocalPointPickerControls( {
 		<ControlWrapper className="focal-point-picker__controls">
 			<UnitControl
 				label={ __( 'Left' ) }
-				value={ valueX }
+				value={ [ valueX, '%' ].join( '' ) }
 				onChange={ ( next ) => handleChange( next, 'x' ) }
 				dragDirection="e"
 			/>
 			<UnitControl
 				label={ __( 'Top' ) }
-				value={ valueY }
+				value={ [ valueY, '%' ].join( '' ) }
 				onChange={ ( next ) => handleChange( next, 'y' ) }
 				dragDirection="s"
 			/>
@@ -63,7 +63,6 @@ function UnitControl( props ) {
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }
-			unit="%"
 			units={ [ { value: '%', label: '%' } ] }
 			{ ...props }
 		/>

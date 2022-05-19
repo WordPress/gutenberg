@@ -11,7 +11,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { BASE, G2, UI } from '../../utils/colors-values';
+import { COLORS } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
 import { Heading } from '../../heading';
@@ -155,18 +155,18 @@ export const ItemBaseUI = styled.li`
 	}
 
 	&.is-active {
-		background-color: ${ UI.theme };
-		color: ${ BASE.white };
+		background-color: ${ COLORS.ui.theme };
+		color: ${ COLORS.white };
 
 		> button,
 		> a {
-			color: ${ BASE.white };
+			color: ${ COLORS.white };
 			opacity: 1;
 		}
 	}
 
 	> svg path {
-		color: ${ G2.lightGray.ui };
+		color: ${ COLORS.gray[ 600 ] };
 	}
 `;
 
@@ -182,6 +182,11 @@ export const ItemUI = styled.div`
 	width: 100%;
 	color: inherit;
 	opacity: 0.7;
+`;
+
+export const ItemIconUI = styled.span`
+	display: flex;
+	margin-right: ${ space( 2 ) };
 `;
 
 export const ItemBadgeUI = styled.span`

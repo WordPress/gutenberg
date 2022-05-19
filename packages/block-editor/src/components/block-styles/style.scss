@@ -1,14 +1,12 @@
+.block-editor-block-styles + .default-style-picker__default-switcher {
+	margin-top: $grid-unit-20;
+}
+
 .block-editor-block-styles__preview-panel {
 	display: none;
 	position: absolute;
 	right: $grid-unit-20;
-	top: $grid-unit-20;
-	border: $border-width solid $gray-300;
-	border-radius: $radius-block-ui;
-	background: $white;
-	width: 300px;
 	left: auto;
-	overflow: hidden;
 	// Same layer as the sidebar from which it's triggered.
 	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 

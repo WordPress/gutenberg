@@ -3,8 +3,7 @@
  */
 import { noop } from 'lodash';
 import classNames from 'classnames';
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -26,7 +25,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export function InputControl(
+export function UnforwardedInputControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
@@ -46,7 +45,7 @@ export function InputControl(
 		value,
 		...props
 	}: InputControlProps,
-	ref: Ref< HTMLInputElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -89,6 +88,26 @@ export function InputControl(
 	);
 }
 
-const ForwardedComponent = forwardRef( InputControl );
+/**
+ * InputControl components let users enter and edit text. This is an experimental component
+ * intended to (in time) merge with or replace `TextControl`.
+ *
+ * ```jsx
+ * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/compose';
+ *
+ * const Example = () => {
+ *   const [ value, setValue ] = useState( '' );
+ *
+ *   return (
+ *  	<InputControl
+ *  		value={ value }
+ *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+ *  	/>
+ *   );
+ * };
+ * ```
+ */
+export const InputControl = forwardRef( UnforwardedInputControl );
 
-export default ForwardedComponent;
+export default InputControl;

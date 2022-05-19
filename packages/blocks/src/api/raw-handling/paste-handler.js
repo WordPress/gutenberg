@@ -25,6 +25,7 @@ import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
+import divNormaliser from './div-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
 import markdownConverter from './markdown-converter';
@@ -192,6 +193,7 @@ export function pasteHandler( {
 				iframeRemover,
 				figureContentReducer,
 				blockquoteNormaliser,
+				divNormaliser,
 			];
 
 			const schema = {

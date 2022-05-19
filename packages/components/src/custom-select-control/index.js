@@ -9,6 +9,8 @@ import classnames from 'classnames';
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -54,6 +56,8 @@ const stateReducer = (
 	}
 };
 export default function CustomSelectControl( {
+	/** Start opting into the larger default height that will become the default size in a future version. */
+	__next36pxDefaultSize = false,
 	className,
 	hideLabelFromVision,
 	label,
@@ -98,6 +102,15 @@ export default function CustomSelectControl( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 	} );
+
+	const onKeyDownHandler = useCallback(
+		( e ) => {
+			e.stopPropagation();
+			menuProps?.onKeyDown?.( e );
+		},
+		[ menuProps ]
+	);
+
 	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
@@ -130,18 +143,28 @@ export default function CustomSelectControl( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
+					className: classnames(
+						'components-custom-select-control__button',
+						{ 'is-next-36px-default-size': __next36pxDefaultSize }
+					),
+					isSmall: ! __next36pxDefaultSize,
 					describedBy: getDescribedBy(),
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
+					className={ classnames(
+						'components-custom-select-control__button-icon',
+						{
+							'is-next-36px-default-size': __next36pxDefaultSize,
+						}
+					) }
+					size={ 18 }
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
@@ -157,6 +180,7 @@ export default function CustomSelectControl( {
 										'is-highlighted':
 											index === highlightedIndex,
 										'has-hint': !! item.__experimentalHint,
+										'is-next-36px-default-size': __next36pxDefaultSize,
 									}
 								),
 								style: item.style,

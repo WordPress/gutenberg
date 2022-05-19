@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -9,13 +8,11 @@
 			"overlayMenu": "mobile",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
 				"orientation": "horizontal"
 			}
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/navigation-link",
 				"isValid": true,
 				"attributes": {
@@ -23,10 +20,8 @@
 					"opensInNewTab": false,
 					"url": "https://www.wordpress.org/"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": ""
+		]
 	}
 ]

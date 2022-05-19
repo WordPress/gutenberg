@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, includes, union } from 'lodash';
+import { find, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,20 +57,19 @@ export default function PostFormat() {
 			return {
 				postFormat: _postFormat ?? 'standard',
 				suggestedFormat: getSuggestedPostFormat(),
-				// Ensure current format is always in the set.
-				// The current format may not be a format supported by the theme.
-				supportedFormats: union(
-					[ _postFormat ],
-					get( themeSupports, [ 'formats' ], [] )
-				),
+				supportedFormats: themeSupports.formats,
 			};
 		},
 		[]
 	);
 
-	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
-	);
+	const formats = POST_FORMATS.filter( ( format ) => {
+		// Ensure current format is always in the set.
+		// The current format may not be a format supported by the theme.
+		return (
+			includes( supportedFormats, format.id ) || postFormat === format.id
+		);
+	} );
 	const suggestion = find(
 		formats,
 		( format ) => format.id === suggestedFormat

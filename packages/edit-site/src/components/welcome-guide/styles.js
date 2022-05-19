@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -12,14 +14,32 @@ import WelcomeGuideImage from './image';
 import { store as editSiteStore } from '../../store';
 
 export default function WelcomeGuideStyles() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggle } = useDispatch( preferencesStore );
+
+	const { isActive, isStylesOpen } = useSelect( ( select ) => {
+		const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			editSiteStore.name
+		);
+
+		return {
+			isActive: !! select( preferencesStore ).get(
+				'core/edit-site',
+				'welcomeGuideStyles'
+			),
+			isStylesOpen: sidebar === 'edit-site/global-styles',
+		};
+	}, [] );
+
+	if ( ! isActive || ! isStylesOpen ) {
+		return null;
+	}
 
 	return (
 		<Guide
 			className="edit-site-welcome-guide"
 			contentLabel={ __( 'Welcome to styles' ) }
 			finishButtonText={ __( 'Get Started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuideStyles' ) }
+			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuideStyles' ) }
 			pages={ [
 				{
 					image: (
@@ -99,7 +119,7 @@ export default function WelcomeGuideStyles() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/support/article/wordpress-editor/'
+										'https://wordpress.org/support/article/styles-overview/'
 									) }
 								>
 									{ __(

@@ -54,6 +54,7 @@ export function useSurface( props ) {
 		borderRight,
 		borderTop,
 		className,
+		cx,
 		variant,
 	] );
 

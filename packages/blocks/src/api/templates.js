@@ -108,13 +108,24 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				attributes
 			);
 
-			const [
+			let [
 				blockName,
 				blockAttributes,
 			] = convertLegacyBlockNameAndAttributes(
 				name,
 				normalizedAttributes
 			);
+
+			// If a Block is undefined at this point, use the core/missing block as
+			// a placeholder for a better user experience.
+			if ( undefined === getBlockType( blockName ) ) {
+				blockAttributes = {
+					originalName: name,
+					originalContent: '',
+					originalUndelimitedContent: '',
+				};
+				blockName = 'core/missing';
+			}
 
 			return createBlock(
 				blockName,

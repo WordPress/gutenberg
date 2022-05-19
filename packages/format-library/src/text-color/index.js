@@ -17,6 +17,8 @@ import { removeFormat } from '@wordpress/rich-text';
  */
 import { default as InlineColorUI, getActiveColors } from './inline';
 
+export const transparentValue = 'rgba(0, 0, 0, 0)';
+
 const name = 'core/text-color';
 const title = __( 'Highlight' );
 
@@ -30,7 +32,7 @@ function getComputedStyleProperty( element, property ) {
 
 	if (
 		property === 'background-color' &&
-		value === 'rgba(0, 0, 0, 0)' &&
+		value === transparentValue &&
 		element.parentElement
 	) {
 		return getComputedStyleProperty( element.parentElement, property );
@@ -47,7 +49,7 @@ function fillComputedColors( element, { color, backgroundColor } ) {
 	return {
 		color: color || getComputedStyleProperty( element, 'color' ),
 		backgroundColor:
-			backgroundColor === 'rgba(0, 0, 0, 0)'
+			backgroundColor === transparentValue
 				? getComputedStyleProperty( element, 'background-color' )
 				: backgroundColor,
 	};
@@ -95,7 +97,7 @@ function TextColorEdit( {
 					/>
 				}
 				title={ title }
-				// If has no colors to choose but a color is active remove the color onClick
+				// If has no colors to choose but a color is active remove the color onClick.
 				onClick={
 					hasColorsToChoose
 						? enableIsAddingColor
@@ -137,9 +139,9 @@ export const textColor = {
 	 */
 	__unstableFilterAttributeValue( key, value ) {
 		if ( key !== 'style' ) return value;
-		// We should not add a background-color if it's already set
+		// We should not add a background-color if it's already set.
 		if ( value && value.includes( 'background-color' ) ) return value;
-		const addedCSS = [ 'background-color', 'rgba(0, 0, 0, 0)' ].join( ':' );
+		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
 		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
 		// rules will already include a `;`.
 		return value ? [ addedCSS, value ].join( ';' ) : addedCSS;

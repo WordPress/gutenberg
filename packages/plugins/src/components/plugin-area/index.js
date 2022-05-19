@@ -14,6 +14,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { PluginContextProvider } from '../plugin-context';
+import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
 
 /**
@@ -114,7 +115,12 @@ class PluginArea extends Component {
 						key={ context.name }
 						value={ context }
 					>
-						<Plugin />
+						<PluginErrorBoundary
+							name={ context.name }
+							onError={ this.props.onError }
+						>
+							<Plugin />
+						</PluginErrorBoundary>
 					</PluginContextProvider>
 				) ) }
 			</div>

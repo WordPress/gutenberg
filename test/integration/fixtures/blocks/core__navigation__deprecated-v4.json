@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
@@ -10,11 +9,9 @@
 			"fontFamily": "cambria-georgia",
 			"layout": {
 				"type": "flex",
-				"justifyContent": "left",
 				"orientation": "horizontal"
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

@@ -18,7 +18,9 @@
 	}
 
 	&.aligncenter {
-		display: table;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
 	}
 
 	// Style variations

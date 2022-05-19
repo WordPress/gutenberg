@@ -7,23 +7,20 @@ import { every, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, ColorIndicator } from '@wordpress/components';
-import { sprintf, __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import {
+	__experimentalSpacer as Spacer,
+	__experimentalToolsPanel as ToolsPanel,
+} from '@wordpress/components';
+import { useRegistry } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import ColorGradientControl from './control';
-import { getColorObjectByColorValue } from '../colors';
-import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
+import ColorGradientSettingsDropdown from './dropdown';
 import useSetting from '../use-setting';
-
-// translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
-const colorIndicatorAriaLabel = __( '(%s: color %s)' );
-
-// translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
-const gradientIndicatorAriaLabel = __( '(%s: gradient %s)' );
+import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
+import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -31,55 +28,6 @@ const colorsAndGradientKeys = [
 	'gradients',
 	'disableCustomGradients',
 ];
-
-const Indicators = ( { colors, gradients, settings } ) => {
-	return settings.map(
-		(
-			{
-				colorValue,
-				gradientValue,
-				label,
-				colors: availableColors,
-				gradients: availableGradients,
-			},
-			index
-		) => {
-			if ( ! colorValue && ! gradientValue ) {
-				return null;
-			}
-			let ariaLabel;
-			if ( colorValue ) {
-				const colorObject = getColorObjectByColorValue(
-					availableColors || colors,
-					colorValue
-				);
-				ariaLabel = sprintf(
-					colorIndicatorAriaLabel,
-					label.toLowerCase(),
-					( colorObject && colorObject.name ) || colorValue
-				);
-			} else {
-				const gradientObject = __experimentalGetGradientObjectByGradientValue(
-					availableGradients || gradients,
-					colorValue
-				);
-				ariaLabel = sprintf(
-					gradientIndicatorAriaLabel,
-					label.toLowerCase(),
-					( gradientObject && gradientObject.name ) || gradientValue
-				);
-			}
-
-			return (
-				<ColorIndicator
-					key={ index }
-					colorValue={ colorValue || gradientValue }
-					aria-label={ ariaLabel }
-				/>
-			);
-		}
-	);
-};
 
 export const PanelColorGradientSettingsInner = ( {
 	className,
@@ -92,8 +40,11 @@ export const PanelColorGradientSettingsInner = ( {
 	title,
 	showTitle = true,
 	__experimentalHasMultipleOrigins,
-	...props
+	__experimentalIsRenderedInSidebar,
+	enableAlpha,
 } ) => {
+	const panelId = useInstanceId( PanelColorGradientSettingsInner );
+	const { batch } = useRegistry();
 	if (
 		isEmpty( colors ) &&
 		isEmpty( gradients ) &&
@@ -113,51 +64,56 @@ export const PanelColorGradientSettingsInner = ( {
 		return null;
 	}
 
-	const titleElement = (
-		<span className="block-editor-panel-color-gradient-settings__panel-title">
-			{ title }
-			<Indicators
-				colors={ colors }
-				gradients={ gradients }
-				settings={ settings }
-			/>
-		</span>
-	);
-
 	return (
-		<PanelBody
+		<ToolsPanel
 			className={ classnames(
 				'block-editor-panel-color-gradient-settings',
 				className
 			) }
-			title={ showTitle ? titleElement : undefined }
-			{ ...props }
+			label={ showTitle ? title : undefined }
+			resetAll={ () => {
+				batch( () => {
+					settings.forEach(
+						( {
+							colorValue,
+							gradientValue,
+							onColorChange,
+							onGradientChange,
+						} ) => {
+							if ( colorValue ) {
+								onColorChange();
+							} else if ( gradientValue ) {
+								onGradientChange();
+							}
+						}
+					);
+				} );
+			} }
+			panelId={ panelId }
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 		>
-			{ settings.map( ( setting, index ) => (
-				<ColorGradientControl
-					showTitle={ showTitle }
-					key={ index }
-					{ ...{
-						colors,
-						gradients,
-						disableCustomColors,
-						disableCustomGradients,
-						__experimentalHasMultipleOrigins,
-						...setting,
-					} }
-				/>
-			) ) }
-			{ children }
-		</PanelBody>
+			<ColorGradientSettingsDropdown
+				settings={ settings }
+				panelId={ panelId }
+				{ ...{
+					colors,
+					gradients,
+					disableCustomColors,
+					disableCustomGradients,
+					__experimentalHasMultipleOrigins,
+					__experimentalIsRenderedInSidebar,
+					enableAlpha,
+				} }
+			/>
+			{ !! children && (
+				<>
+					<Spacer marginY={ 4 } /> { children }
+				</>
+			) }
+		</ToolsPanel>
 	);
 };
-
-function useCommonSingleMultipleSelects() {
-	return {
-		disableCustomColors: ! useSetting( 'color.custom' ),
-		disableCustomGradients: ! useSetting( 'color.customGradient' ),
-	};
-}
 
 const PanelColorGradientSettingsSingleSelect = ( props ) => {
 	const colorGradientSettings = useCommonSingleMultipleSelects();
@@ -171,65 +127,7 @@ const PanelColorGradientSettingsSingleSelect = ( props ) => {
 };
 
 const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	const userColors = useSetting( 'color.palette.user' );
-	const themeColors = useSetting( 'color.palette.theme' );
-	const coreColors = useSetting( 'color.palette.core' );
-	const shouldDisplayCoreColors = useSetting( 'color.corePalette' );
-
-	colorGradientSettings.colors = useMemo( () => {
-		const result = [];
-		if ( shouldDisplayCoreColors && coreColors && coreColors.length ) {
-			result.push( {
-				name: __( 'Core' ),
-				colors: coreColors,
-			} );
-		}
-		if ( themeColors && themeColors.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				colors: themeColors,
-			} );
-		}
-		if ( userColors && userColors.length ) {
-			result.push( {
-				name: __( 'User' ),
-				colors: userColors,
-			} );
-		}
-		return result;
-	}, [ coreColors, themeColors, userColors ] );
-
-	const userGradients = useSetting( 'color.gradients.user' );
-	const themeGradients = useSetting( 'color.gradients.theme' );
-	const coreGradients = useSetting( 'color.gradients.core' );
-	const shouldDisplayCoreGradients = useSetting( 'color.coreGradients' );
-	colorGradientSettings.gradients = useMemo( () => {
-		const result = [];
-		if (
-			shouldDisplayCoreGradients &&
-			coreGradients &&
-			coreGradients.length
-		) {
-			result.push( {
-				name: __( 'Core' ),
-				gradients: coreGradients,
-			} );
-		}
-		if ( themeGradients && themeGradients.length ) {
-			result.push( {
-				name: __( 'Theme' ),
-				gradients: themeGradients,
-			} );
-		}
-		if ( userGradients && userGradients.length ) {
-			result.push( {
-				name: __( 'User' ),
-				gradients: userGradients,
-			} );
-		}
-		return result;
-	}, [ userGradients, themeGradients, coreGradients ] );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }

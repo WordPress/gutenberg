@@ -9,7 +9,6 @@ import classnames from 'classnames';
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	Button,
 	__experimentalText as Text,
@@ -34,6 +33,11 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 		</Fill>
 	);
 }
+
+// Top position (in px) of the Block Styles container
+// relative to the editor pane.
+// The value is the equivalent of the container's right position.
+const DEFAULT_POSITION_TOP = 16;
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
@@ -60,7 +64,8 @@ function BlockStyles( {
 		const scrollContainer = document.querySelector(
 			'.interface-interface-skeleton__content'
 		);
-		setContainerScrollTop( scrollContainer.scrollTop + 16 );
+		const scrollTop = scrollContainer?.scrollTop || 0;
+		setContainerScrollTop( scrollTop + DEFAULT_POSITION_TOP );
 	}, [ hoveredStyle ] );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
@@ -107,18 +112,8 @@ function BlockStyles( {
 							onFocus={ () => styleItemHandler( style ) }
 							onMouseLeave={ () => styleItemHandler( null ) }
 							onBlur={ () => styleItemHandler( null ) }
-							onKeyDown={ ( event ) => {
-								if (
-									ENTER === event.keyCode ||
-									SPACE === event.keyCode
-								) {
-									event.preventDefault();
-									onSelectStylePreview( style );
-								}
-							} }
 							onClick={ () => onSelectStylePreview( style ) }
-							role="button"
-							tabIndex="0"
+							aria-current={ activeStyle.name === style.name }
 						>
 							<Text
 								as="span"

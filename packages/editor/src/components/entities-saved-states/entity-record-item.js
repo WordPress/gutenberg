@@ -7,6 +7,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -35,7 +36,7 @@ export default function EntityRecordItem( {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
-	// Handle templates that might use default descriptive titles
+	// Handle templates that might use default descriptive titles.
 	const entityRecordTitle = useSelect(
 		( select ) => {
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
@@ -77,7 +78,10 @@ export default function EntityRecordItem( {
 		<PanelRow>
 			<CheckboxControl
 				label={
-					<strong>{ entityRecordTitle || __( 'Untitled' ) }</strong>
+					<strong>
+						{ decodeEntities( entityRecordTitle ) ||
+							__( 'Untitled' ) }
+					</strong>
 				}
 				checked={ checked }
 				onChange={ onChange }

@@ -22,7 +22,6 @@ import {
 	blocks,
 	isTyping,
 	draggedBlocks,
-	isCaretWithinFormattedText,
 	selection,
 	initialPosition,
 	isMultiSelecting,
@@ -291,6 +290,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -372,6 +372,7 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -520,6 +521,7 @@ describe( 'state', () => {
 						[ newChildBlockId3 ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
 				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
@@ -628,9 +630,10 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
+					visibility: {},
 				} );
 
-				// the block object of the parent should be updated
+				// The block object of the parent should be updated.
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
 				);
@@ -649,6 +652,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: {},
 				controlledInnerBlocks: {},
+				visibility: {},
 			} );
 		} );
 
@@ -2050,6 +2054,41 @@ describe( 'state', () => {
 					expect( state.isIgnoredChange ).toBe( true );
 				} );
 			} );
+
+			describe( 'controlledInnerBlocks', () => {
+				it( 'should remove the content of the block if it switches from controlled to uncontrolled or opposite', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [
+									{
+										clientId: 'child',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							},
+						],
+					} );
+
+					const state = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					// The previous content of the block should be removed
+					expect( state.byClientId.child ).toBeUndefined();
+					expect( state.tree.child ).toBeUndefined();
+					expect( state.tree.chicken.innerBlocks ).toEqual( [] );
+				} );
+			} );
 		} );
 	} );
 
@@ -2125,24 +2164,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isCaretWithinFormattedText()', () => {
-		it( 'should set the flag to true', () => {
-			const state = isCaretWithinFormattedText( false, {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( true );
-		} );
-
-		it( 'should set the flag to false', () => {
-			const state = isCaretWithinFormattedText( true, {
-				type: 'EXIT_FORMATTED_TEXT',
-			} );
-
-			expect( state ).toBe( false );
-		} );
-	} );
-
 	describe( 'initialPosition()', () => {
 		it( 'should return with block clientId as selected', () => {
 			const state = initialPosition( undefined, {
@@ -2151,6 +2172,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( -1 );
+		} );
+
+		it( 'should allow setting null value in multi selection', () => {
+			const state = initialPosition( undefined, {
+				type: 'MULTI_SELECT',
+				initialPosition: null,
+			} );
+
+			expect( state ).toBe( null );
 		} );
 	} );
 

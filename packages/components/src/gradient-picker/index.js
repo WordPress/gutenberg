@@ -106,13 +106,16 @@ export default function GradientPicker( {
 	clearable = true,
 	disableCustomGradients = false,
 	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
 } ) {
 	const clearGradient = useCallback( () => onChange( undefined ), [
 		onChange,
 	] );
-	const Component = __experimentalHasMultipleOrigins
-		? MultipleOrigin
-		: SingleOrigin;
+	const Component =
+		__experimentalHasMultipleOrigins && gradients?.length
+			? MultipleOrigin
+			: SingleOrigin;
+
 	return (
 		<Component
 			className={ className }
@@ -122,7 +125,8 @@ export default function GradientPicker( {
 			onChange={ onChange }
 			value={ value }
 			actions={
-				clearable && (
+				clearable &&
+				( gradients?.length || ! disableCustomGradients ) && (
 					<CircularOptionPicker.ButtonAction
 						onClick={ clearGradient }
 					>
@@ -133,6 +137,9 @@ export default function GradientPicker( {
 			content={
 				! disableCustomGradients && (
 					<CustomGradientPicker
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
 						value={ value }
 						onChange={ onChange }
 					/>

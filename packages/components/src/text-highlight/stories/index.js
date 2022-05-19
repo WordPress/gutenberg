@@ -12,7 +12,7 @@ export default {
 	title: 'Components/TextHighlight',
 	component: TextHighlight,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

@@ -4,7 +4,7 @@
 	"name": "core/post-author",
 	"title": "Post Author",
 	"category": "theme",
-	"description": "Add the author of this post.",
+	"description": "Display post author details such as name, avatar, and bio.",
 	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
@@ -46,7 +46,11 @@
 		"color": {
 			"gradients": true,
 			"link": true,
-			"__experimentalDuotone": ".wp-block-post-author__avatar img"
+			"__experimentalDuotone": ".wp-block-post-author__avatar img",
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-author-editor",
