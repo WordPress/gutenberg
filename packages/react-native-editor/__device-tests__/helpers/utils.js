@@ -421,18 +421,16 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
+	} else if ( ! isAndroid() && toggleOn ) {
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
+		);
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch to HTML"]'
+		);
 	} else {
-		if ( toggleOn ) {
-			await clickIfClickable(
-				driver,
-				'//XCUIElementTypeButton[@name="..."]'
-			);
-			await clickIfClickable(
-				driver,
-				'//XCUIElementTypeButton[@name="Switch to HTML"]'
-			);
-		}
-
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
 		await driver.sleep( 3000 );
 		await clickIfClickable(
