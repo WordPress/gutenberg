@@ -28,8 +28,8 @@ export default function GapStyles( { blockGap, clientId } ) {
 	}
 
 	const gap = `#block-${ clientId } {
-		--wp--style--unstable-gallery-gap: ${ column || fallbackValue };
-		gap: ${ gapValue || fallbackValue }
+		--wp--style--unstable-gallery-gap: ${ column };
+		gap: ${ gapValue }
 	}`;
 
 	const GapStyle = () => {
