@@ -185,7 +185,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 	}
 
-	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', 'default' ), '0.5em' );
+	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
 
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.

@@ -114,7 +114,7 @@ export default {
 			getBlockSupport( blockName, [
 				'spacing',
 				'blockGap',
-				'default',
+				'__experimentalDefault',
 			] ) || '0.5em';
 
 		const hasBlockGapStylesSupport = blockGapSupport !== null;

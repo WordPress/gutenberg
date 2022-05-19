@@ -29,7 +29,7 @@
 		},
 		"spacing": {
 			"blockGap": {
-				"default": "2em"
+				"__experimentalDefault": "2em"
 			},
 			"margin": [ "top", "bottom" ],
 			"padding": true,
