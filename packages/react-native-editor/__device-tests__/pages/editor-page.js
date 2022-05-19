@@ -566,20 +566,17 @@ class EditorPage {
 	) {
 		// iOS needs a few extra steps to get the text element
 		if ( ! isAndroid() ) {
-			// Wait for and click the list in the correct position
-			let listBlock = await waitForVisible(
+			// Click the list in the correct position
+			await clickIfClickable(
 				this.driver,
 				`(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[1]`
 			);
-			await listBlock.click();
 
 			const listBlockLocator = options.isEmptyBlock
 				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
 				: `//XCUIElementTypeButton[contains(@name, "List")]`;
 
-			// Wait for and click the list to get the text element
-			listBlock = await waitForVisible( this.driver, listBlockLocator );
-			await listBlock.click();
+			await clickIfClickable( this.driver, listBlockLocator );
 		}
 
 		const listBlockTextLocatorIOS = options.isEmptyBlock
