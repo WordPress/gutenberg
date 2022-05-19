@@ -33,13 +33,14 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources Plugins to load in the environment.
- * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
- * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {?WPSource}                        coreSource    The WordPress installation to load in the environment.
+ * @property {WPSource[]}                       pluginSources Plugins to load in the environment.
+ * @property {WPSource[]}                       themeSources  Themes to load in the environment.
+ * @property {number}                           port          The port to use.
+ * @property {Object}                           config        Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>}        mappings      Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string}                           phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {Object.<string, WPServiceScript>} scripts       Scripts that can be executed in the environment.
  */
 
 /**
@@ -51,6 +52,14 @@ const md5 = require( '../md5' );
  * @property {?string}             url      The URL to the source download if the source type is not local.
  * @property {?string}             ref      The git ref for the source if the source type is 'git'.
  * @property {string}              basename Name that identifies the WordPress installation, plugin or theme.
+ */
+
+/**
+ * A script that can be executed in an environment.
+ *
+ * @typedef WPServiceScript
+ * @property {string}  script The script to execute.
+ * @property {?string} cwd    The working directory that the script should be ran in.
  */
 
 /**
@@ -94,6 +103,7 @@ module.exports = async function readConfig( configPath ) {
 				port: 8889,
 			},
 		},
+		scripts: {},
 	};
 
 	// The specified base configuration from .wp-env.json or from the local

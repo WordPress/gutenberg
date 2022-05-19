@@ -83,6 +83,39 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	if ( typeof config.scripts !== 'object' ) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }scripts" must be an object.`
+		);
+	}
+
+	for ( const [ command, definition ] of Object.entries( config.scripts ) ) {
+		if (
+			! definition ||
+			! (
+				typeof definition === 'string' || typeof definition === 'object'
+			)
+		) {
+			throw new ValidationError(
+				`Invalid .wp-env.json: "${ envPrefix }scripts.${ command }" must be a string or an object.`
+			);
+		}
+
+		if ( typeof definition === 'object' ) {
+			if ( typeof definition.script !== 'string' ) {
+				throw new ValidationError(
+					`Invalid .wp-env.json: "${ envPrefix }scripts.${ command }.script" must be a string.`
+				);
+			}
+
+			if ( definition.cwd && typeof definition.cwd !== 'string' ) {
+				throw new ValidationError(
+					`Invalid .wp-env.json: "${ envPrefix }scripts.${ command }.cwd" must be a string.`
+				);
+			}
+		}
+	}
+
 	return config;
 }
 

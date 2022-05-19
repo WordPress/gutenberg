@@ -55,6 +55,18 @@ module.exports = function parseConfig( config, options ) {
 			},
 			{}
 		),
+		scripts: Object.entries( config.scripts ).reduce(
+			( result, [ command, script ] ) => {
+				if ( typeof script === 'string' ) {
+					result[ command ] = { script };
+				} else {
+					result[ command ] = script;
+				}
+
+				return result;
+			},
+			{}
+		),
 	};
 };
 

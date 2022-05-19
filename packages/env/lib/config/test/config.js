@@ -747,6 +747,182 @@ describe( 'readConfig', () => {
 		} );
 	} );
 
+	describe( 'scripts parsing', () => {
+		it( 'should throw an error if scripts is not an object', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( { scripts: 'test' } ) )
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain(
+					'"scripts" must be an object'
+				);
+			}
+		} );
+
+		it( 'should throw an error if a script is not a string or an object', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: { test: false },
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain(
+					'"scripts.test" must be a string or an object'
+				);
+			}
+		} );
+
+		it( "should throw an error if a script's script is invalid", async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: {
+							test: {
+								script: null,
+							},
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain(
+					'"scripts.test.script" must be a string'
+				);
+			}
+		} );
+
+		it( "should throw an error if a script's cwd is invalid", async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: {
+							test: {
+								script: 'test',
+								cwd: 123,
+							},
+						},
+					} )
+				)
+			);
+			expect.assertions( 2 );
+			try {
+				await readConfig( '.wp-env.json' );
+			} catch ( error ) {
+				expect( error ).toBeInstanceOf( ValidationError );
+				expect( error.message ).toContain(
+					'"scripts.test.cwd" must be a string'
+				);
+			}
+		} );
+
+		it( 'should parse string', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: {
+							test: 'test',
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.scripts ).toMatchObject( {
+				test: { script: 'test' },
+			} );
+			expect( config.env.tests.scripts ).toMatchObject( {
+				test: { script: 'test' },
+			} );
+		} );
+
+		it( 'should parse object', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: {
+							test: {
+								script: 'test',
+								cwd: 'wp-content/plugins',
+							},
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.scripts ).toMatchObject( {
+				test: {
+					script: 'test',
+					cwd: 'wp-content/plugins',
+				},
+			} );
+			expect( config.env.tests.scripts ).toMatchObject( {
+				test: {
+					script: 'test',
+					cwd: 'wp-content/plugins',
+				},
+			} );
+		} );
+
+		it( 'should override less specific scripts with more specific scripts', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						scripts: {
+							test: {
+								script: 'test1',
+								cwd: 'wp-content/plugins1',
+							},
+						},
+						env: {
+							development: {
+								scripts: {
+									test: {
+										script: 'test2',
+										cwd: 'wp-content/plugins2',
+									},
+								},
+							},
+							tests: {
+								scripts: {
+									test: {
+										script: 'test3',
+										cwd: 'wp-content/plugins3',
+									},
+								},
+							},
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			expect( config.env.development.scripts ).toMatchObject( {
+				test: {
+					script: 'test2',
+					cwd: 'wp-content/plugins2',
+				},
+			} );
+			expect( config.env.tests.scripts ).toMatchObject( {
+				test: {
+					script: 'test3',
+					cwd: 'wp-content/plugins3',
+				},
+			} );
+		} );
+	} );
+
 	describe( 'port number parsing', () => {
 		it( 'should throw a validaton error if the ports are not numbers', async () => {
 			expect.assertions( 10 );
