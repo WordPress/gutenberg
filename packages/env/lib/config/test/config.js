@@ -395,7 +395,7 @@ describe( 'readConfig', () => {
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
-						ref: 'master',
+						ref: undefined,
 						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},

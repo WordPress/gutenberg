@@ -464,7 +464,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 | ----------------- | -------------------------------------------- | -------------------------------------------------------- |
 | Relative path     | `.<path>\|~<path>`                           | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
 | Absolute path     | `/<path>\|<letter>:\<path>`                  | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`   |
+| GitHub repository | `<owner>/<repo>[#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, if no branch is provided wp-env will fall back to the repos default branch |
 | SSH repository    | `ssh://user@host/<owner>/<repo>.git[#<ref>]` | `"ssh://git@github.com/WordPress/WordPress.git"`         |
 | ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
