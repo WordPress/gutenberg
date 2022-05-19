@@ -1,4 +1,9 @@
 <?php
+/**
+ * Server-side rendering of the `core/columns` block.
+ *
+ * @package WordPress
+ */
 
 /**
  * Adds a style tag for the --wp--style--unstable-columns-gap var.
