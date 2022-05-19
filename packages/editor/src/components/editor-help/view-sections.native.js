@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, Image } from 'react-native';
+import { Text, Image, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -28,15 +28,22 @@ export const HelpDetailBodyText = ( { text } ) => {
 	);
 };
 
-export const HelpDetailSectionHeadingText = ( { text } ) => {
-	const headingStyle = usePreferredColorSchemeStyle(
-		styles.helpDetailSectionHeading,
-		styles.helpDetailSectionHeadingDark
+export const HelpDetailSectionHeadingText = ( { text, badge } ) => {
+	const headingTextStyle = usePreferredColorSchemeStyle(
+		styles.helpDetailSectionHeadingText,
+		styles.helpDetailSectionHeadingTextDark
 	);
 	return (
-		<Text accessibilityRole="header" selectable style={ headingStyle }>
-			{ text }
-		</Text>
+		<View style={ styles.helpDetailSectionHeading }>
+			{ badge && <HelpDetailBadge text={ badge } /> }
+			<Text
+				accessibilityRole="header"
+				selectable
+				style={ headingTextStyle }
+			>
+				{ text }
+			</Text>
+		</View>
 	);
 };
 
@@ -60,5 +67,13 @@ export const HelpDetailImage = ( {
 			}
 			style={ imageStyle }
 		/>
+	);
+};
+
+const HelpDetailBadge = ( { text } ) => {
+	return (
+		<View style={ styles.helpDetailBadgeContainer }>
+			<Text style={ styles.helpDetailBadgeText }>{ text }</Text>
+		</View>
 	);
 };
