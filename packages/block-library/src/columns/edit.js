@@ -30,6 +30,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ import {
 	getRedistributedColumnWidths,
 	toWidthPrecision,
 } from './utils';
+import GapStyles from './gap-styles';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -92,6 +94,12 @@ function ColumnsEditContainer( {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
