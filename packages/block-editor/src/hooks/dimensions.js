@@ -153,7 +153,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
 };
 
 /**
- * Custom hook to retrieve which padding/margin is supported
+ * Custom hook to retrieve which padding/margin/blockGap is supported
  * e.g. top, right, bottom or left.
  *
  * Sides are opted into by default. It is only if a specific side is set to
@@ -162,7 +162,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {string[]} Sides supporting custom margin.
+ * @return {?string[]} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
