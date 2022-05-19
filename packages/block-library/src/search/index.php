@@ -65,7 +65,7 @@ function render_block_core_search( $attributes ) {
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( $input_classes ),
-			esc_attr( get_search_query() ),
+			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
 		);
