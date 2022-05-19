@@ -760,12 +760,10 @@ export class ImageEdit extends Component {
 			return (
 				<View style={ styles.content }>
 					{ isFetchingImage && (
-						<View
-							style={ styles.image__loading }
-						>
+						<View style={ styles.image__loading }>
 							<ActivityIndicator animating />
 						</View>
-					) }	
+					) }
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
