@@ -62,7 +62,6 @@ export function ShortcodeEdit( props ) {
 					style={ shortcodeStyle }
 					onChange={ onChange }
 					placeholder={ __( 'Add a shortcode…' ) }
-					isSelected={ props.isSelected }
 					onFocus={ onFocus }
 					onBlur={ onBlur }
 					placeholderTextColor={ placeholderStyle.color }
