@@ -47,14 +47,12 @@ const getAbsolutePosition = ( element ) => {
  * @param {boolean} $1.adjustScrolling          Adjust the scroll position to the current block.
  * @param {boolean} $1.enableAnimation          Enable/Disable animation.
  * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {*}       $1.scale                    Scale of the element
  */
 function useMovingAnimation( {
 	isSelected,
 	adjustScrolling,
 	enableAnimation,
 	triggerAnimationOnChange,
-	scale = 1,
 } ) {
 	const ref = useRef();
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
@@ -111,14 +109,13 @@ function useMovingAnimation( {
 			return;
 		}
 
-		ref.current.style.transform = `scale( ${ scale } )`;
+		ref.current.style.transform = undefined;
 		const destination = getAbsolutePosition( ref.current );
 
 		triggerAnimation();
 		setTransform( {
 			x: Math.round( previous.left - destination.left ),
 			y: Math.round( previous.top - destination.top ),
-			scale,
 		} );
 	}, [ triggerAnimationOnChange ] );
 
@@ -126,14 +123,14 @@ function useMovingAnimation( {
 		if ( ! ref.current ) {
 			return;
 		}
-		let { x, y, scale: currentScale } = value;
+		let { x, y } = value;
 		x = Math.round( x );
 		y = Math.round( y );
-		const finishedMoving = x === 0 && y === 0 && currentScale === scale;
+		const finishedMoving = x === 0 && y === 0;
 		ref.current.style.transformOrigin = 'center center';
 		ref.current.style.transform = finishedMoving
-			? `scale( ${ scale } )`
-			: `translate3d(${ x }px,${ y }px,0) scale(${ currentScale })`;
+			? undefined
+			: `translate3d(${ x }px,${ y }px,0)`;
 		ref.current.style.zIndex = isSelected ? '1' : '';
 
 		preserveScrollPosition();
@@ -148,7 +145,6 @@ function useMovingAnimation( {
 		to: {
 			x: 0,
 			y: 0,
-			scale,
 		},
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },

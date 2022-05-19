@@ -216,7 +216,7 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 			newBackgroundStyles += hasTransparentBackground
 				? 'background-color: white;'
 				: '';
-			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode > .wp-block ) { ${ newBackgroundStyles } }`;
+			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode ) { ${ newBackgroundStyles } }`;
 			bodyStyleElement.innerHTML =
 				'body { background: #2f2f2f !important; }';
 
