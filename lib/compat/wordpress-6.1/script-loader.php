@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-function remove_block_nodes_from_theme_json( $nodes ) {
+function filter_out_block_nodes( $nodes ) {
 	return array_filter( $nodes, function( $node, $key ) {
 		return ! in_array( 'blocks', $node['path'] );
 	}, ARRAY_FILTER_USE_BOTH );
@@ -37,7 +37,7 @@ function gutenberg_enqueue_global_styles() {
 	}
 
 	if ( $separate_assets ) {
-		add_filter( 'gutenberg_get_style_nodes', 'remove_block_nodes_from_theme_json' );
+		add_filter( 'gutenberg_get_style_nodes', 'filter_out_block_nodes' );
 		// add each block as an inline css.
 		wp_add_global_styles_for_blocks();
 	}
