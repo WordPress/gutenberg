@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,7 @@ import {
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -232,10 +233,16 @@ export const updateNavigationLinkBlockAttributes = (
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-
+	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const escapeTitle =
+		title !== '' &&
+		normalizedTitle !== normalizedURL &&
+		originalLabel !== title;
 
-	const label = title || originalLabel || normalizedURL;
+	const label = escapeTitle
+		? escape( title )
+		: originalLabel || escape( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -600,7 +607,8 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			type: postType,
-			title: page.title.raw,
+			// Consistent with https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
+			title: decodeEntities( page.title.rendered ),
 			url: page.link,
 			kind: 'post-type',
 		};
@@ -736,7 +744,7 @@ export default function NavigationLinkEdit( {
 										ref={ ref }
 										identifier="label"
 										className="wp-block-navigation-item__label"
-										value={ escape( label ) }
+										value={ label }
 										onChange={ ( labelValue ) =>
 											setAttributes( {
 												label: labelValue,
@@ -792,7 +800,9 @@ export default function NavigationLinkEdit( {
 											<span>
 												{
 													/* Trim to avoid trailing white space when the placeholder text is not present */
-													`${ label } ${ placeholderText }`.trim()
+													`${ unescape(
+														label
+													) } ${ placeholderText }`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">
