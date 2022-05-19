@@ -1,0 +1,5 @@
+rootProject.name = 'gutenberg'
+
+includeBuild("../../react-native-bridge/android")
+
+include ':app'

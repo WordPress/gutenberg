@@ -1,0 +1,40 @@
+.sliderIOS {
+	flex-grow: 1;
+	min-height: $grid-unit-60;
+}
+
+.sliderAndroid {
+	flex-grow: 1;
+	min-height: $grid-unit-60;
+	margin-left: -6px;
+}
+
+.isSelected {
+	border-width: 2px;
+	border-color: $blue-wordpress;
+}
+
+.container {
+	flex-direction: row;
+	align-items: center;
+}
+
+.cellContainerStyles {
+	margin-top: 13px;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.containerIOS {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.containerAndroid {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.valueStyle {
+	height: 0;
+}

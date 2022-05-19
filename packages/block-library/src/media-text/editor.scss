@@ -1,0 +1,36 @@
+.wp-block-media-text__media {
+	position: relative;
+
+	&.is-transient img {
+		opacity: 0.3;
+	}
+
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+}
+
+.wp-block-media-text .__resizable_base__ {
+	grid-column: 1 / span 2;
+	grid-row: 2;
+}
+
+.wp-block-media-text .editor-media-container__resizer {
+	// The resizer sets a inline width but as we are using a grid layout,
+	// we set the width on container.
+	width: 100% !important;
+}
+
+.wp-block-media-text.is-image-fill .editor-media-container__resizer {
+	// The resizer sets an inline height but for the image fill we set it to full height.
+	height: 100% !important;
+}
+
+.wp-block-media-text > .block-editor-block-list__layout > .block-editor-block-list__block {
+	max-width: unset;
+}

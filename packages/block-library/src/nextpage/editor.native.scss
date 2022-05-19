@@ -1,0 +1,21 @@
+// @format
+
+.nextpageLine {
+	background-color: $gray-lighten-20;
+	height: 2;
+}
+
+.nextpageLineDark {
+	background-color: $gray-50;
+}
+
+.nextpageText {
+	color: $gray;
+	text-decoration-style: solid;
+	text-transform: uppercase;
+}
+
+.nextpageTextDark {
+	color: $gray-20;
+}
+

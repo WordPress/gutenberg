@@ -1,0 +1,34 @@
+@import "path/to/foo";
+
+@function fooBar {
+
+	@return 1;
+}
+
+@mixin foo {
+
+	@content;
+}
+
+$map: (
+	"foo": 1,
+	"bar": 2,
+	"baz": 3
+);
+
+@if $foo == block {
+	display: block;
+} @else {
+	display: inline-block;
+}
+
+// stylelint-disable no-invalid-position-at-import-rule
+@import "../some/url";
+@import "../another/url";
+// stylelint-enable no-invalid-position-at-import-rule
+
+b {
+
+	@include foo;
+	@include bar;
+}

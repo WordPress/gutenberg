@@ -1,0 +1,319 @@
+//Bottom Sheet
+
+.bottomModal {
+	justify-content: flex-end;
+	margin: 0;
+	align-items: center;
+}
+
+.dragIndicator {
+	background-color: $light-gray-400;
+	height: 4px;
+	width: 36px;
+	margin: auto;
+	margin-top: 6px;
+	margin-bottom: 6px;
+	border-radius: 2px;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.header {
+	flex-shrink: 1;
+}
+
+.emptyHeader {
+	margin-top: $grid-unit-20 * 0.5;
+}
+
+.background {
+	background-color: $modal-background;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+	width: 100%;
+	max-width: 512;
+	padding-bottom: 0;
+}
+
+.backgroundDark {
+	background-color: $modal-background-dark;
+}
+
+.backgroundFullScreen {
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+	padding-top: 8;
+}
+
+.content {
+	padding: 0 16px 0 16px;
+}
+
+.scrollableContent {
+	padding-bottom: 20px;
+}
+
+// Button
+
+.buttonText {
+	font-size: 18px;
+	padding: 5px;
+}
+
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
+// Cell
+
+.cellContainer {
+	flex-direction: row;
+	min-height: 48;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.clipToBounds {
+	overflow: hidden;
+}
+
+.cellSeparator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+}
+
+.cellSeparatorDark {
+	background-color: $gray-70;
+}
+
+.cellRowContainer {
+	flex-direction: row;
+	align-items: center;
+	flex-shrink: 1;
+}
+
+.cellRowIcon {
+	flex-shrink: 0;
+}
+
+.cellLabel {
+	font-size: 17px;
+	color: $gray-dark;
+	margin-right: 12px;
+	flex-shrink: 1;
+}
+
+.cellLabelCentered {
+	font-size: 17px;
+	color: $gray-dark;
+	flex: 1;
+	text-align: center;
+}
+
+.cellLabelLeftAlignNoIcon {
+	font-size: 17px;
+	color: $gray-dark;
+	flex: 1;
+	margin-left: 0;
+}
+
+.cellValue {
+	font-size: 17px;
+	color: $gray-dark;
+	text-align: right;
+	flex: 1;
+}
+
+.cellTextDark {
+	color: $white;
+}
+
+.cellValueRTL {
+	text-align: left;
+}
+
+.icon {
+	color: $toolbar-button;
+}
+
+.iconDark {
+	color: #c3c4c7;
+}
+
+// Footer Message Cell
+
+.footerMessageCell {
+	font-size: 12px;
+	color: $gray;
+	flex: 1;
+}
+
+// Color Cell
+
+.colorCircle {
+	width: 2 * $grid-unit-20;
+	height: 2 * $grid-unit-20;
+	border-radius: $grid-unit-20;
+}
+
+// Radio Cell
+
+.selectedIcon {
+	color: $blue-50;
+}
+
+.selectedIconDark {
+	color: $blue-30;
+}
+
+// Range Text Input
+
+.textInputIOS {
+	border-right-width: 1px;
+	text-align: center;
+	border-color: $light-gray-400;
+	color: $gray-dark;
+}
+
+.textInputIOSDark {
+	border-color: $gray-70;
+	color: $white;
+}
+
+.textInputContainer {
+	flex-direction: row;
+	margin-left: $grid-unit;
+}
+
+.textInput {
+	min-height: 25px;
+	border-color: $light-gray-400;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	text-align: center;
+	color: $gray-dark;
+}
+
+.textInputDark {
+	border-color: $gray-70;
+	color: $white;
+}
+
+// Navigation Header
+
+.bottomSheetHeader {
+	align-items: center;
+	flex-direction: row;
+	height: 44px;
+	justify-content: center;
+}
+
+.bottomSheetHeaderLeft {
+	align-items: flex-start;
+	flex: 1;
+	justify-content: center;
+}
+
+.bottomSheetHeaderRight {
+	align-items: flex-end;
+	flex: 1;
+	justify-content: center;
+}
+
+.bottomSheetActionButton {
+	align-items: center;
+	flex-direction: row;
+	height: 100%;
+	justify-content: center;
+	min-width: 44px;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}
+
+.chevronLeftIcon {
+	color: $blue-50;
+	margin-left: -11px;
+}
+
+.chevronLeftIconDark {
+	color: $blue-30;
+}
+
+.bottomSheetHeaderTitle {
+	color: $light-primary;
+	text-align: center;
+	font-weight: 600;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetHeaderTitleDark {
+	color: $dark-primary;
+}
+
+.bottomSheetButtonText {
+	color: $blue-50;
+	font-size: 16px;
+}
+
+.bottomSheetButtonTextDark {
+	color: $blue-30;
+}
+
+.arrowLeftIcon {
+	color: $gray-60;
+}
+
+.arrowLeftIconDark {
+	color: $dark-secondary;
+}
+
+// used in both light and dark modes
+.placeholderColor {
+	color: #87a6bc;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
+}
+
+.flex {
+	flex: 1;
+}
+
+.cellHelpLabel {
+	font-size: $default-font-size;
+	padding-bottom: $grid-unit-15;
+}
+
+.cellHelpLabelIOS {
+	padding-bottom: $grid-unit-10;
+}
+
+.cellSubLabelText {
+	font-size: 12px;
+	color: $sub-heading;
+}
+
+.cellSubLabelTextDark {
+	color: $sub-heading-dark;
+}

@@ -1,0 +1,21 @@
+.list-reusable-blocks-import-form__label {
+	display: block;
+	margin-bottom: 10px;
+}
+
+.list-reusable-blocks-import-form__button {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	float: right;
+}
+
+.list-reusable-blocks-import-form {
+	.components-notice__content {
+		margin: 0;
+	}
+
+	.components-notice.is-dismissible {
+		padding-right: 0;
+		margin: 5px 0;
+	}
+}

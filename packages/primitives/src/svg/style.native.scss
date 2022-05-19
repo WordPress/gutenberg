@@ -1,0 +1,42 @@
+.dashicon-light,
+.components-toolbar__control-light {
+	color: $toolbar-button;
+	fill: currentColor;
+}
+
+.dashicon-dark,
+.components-toolbar__control-dark {
+	color: $gray_20;
+	fill: currentColor;
+}
+
+.dashicon-active,
+.is-pressed {
+	color: #fff;
+	fill: currentColor;
+}
+
+.dashicons-insert {
+	color: #87a6bc;
+	fill: currentColor;
+}
+
+.unsupported-icon-light {
+	color: $gray-dark;
+	fill: currentColor;
+}
+
+.unsupported-icon-dark {
+	color: $white;
+	fill: currentColor;
+}
+
+.warning-icon-light {
+	color: $gray-dark;
+	fill: currentColor;
+}
+
+.warning-icon-dark {
+	color: $white;
+	fill: currentColor;
+}

@@ -1,0 +1,30 @@
+.container {
+	align-items: center;
+}
+
+.centeredContent {
+	width: 100%;
+	max-width: 580;
+}
+
+.reversedCenteredContent {
+	flex-direction: column-reverse;
+	width: 100%;
+	max-width: 580;
+}
+
+.full {
+	max-width: 100%;
+}
+
+.wide {
+	max-width: 1054;
+}
+
+.wideMedium {
+	max-width: 770;
+}
+
+.wideLandscape {
+	max-width: 662;
+}

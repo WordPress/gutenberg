@@ -1,0 +1,29 @@
+#selector-1,
+#selector-2,
+#selector-3 {
+	background: #fff;
+	color: #000;
+}
+
+#selector-4 {
+	background: #fff;
+	color: #000;
+}
+
+h1,
+.heading-size-1 {
+	background: #fff;
+	color: #000;
+}
+
+h2,
+.heading-size-2 {
+	background: #fff;
+	color: #000;
+}
+
+h3,
+.heading-size-3 {
+	background: #fff;
+	color: #000;
+}

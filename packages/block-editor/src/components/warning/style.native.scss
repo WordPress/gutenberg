@@ -1,0 +1,47 @@
+/** @format */
+
+.container {
+	background-color: $gray-lighten-30;
+	padding-top: 24;
+	padding-bottom: 24;
+	padding-left: 8;
+	padding-right: 8;
+	border-top-left-radius: 4;
+	border-top-right-radius: 4;
+	border-bottom-left-radius: 4;
+	border-bottom-right-radius: 4;
+	align-items: center;
+	justify-content: center;
+}
+
+.containerDark {
+	background-color: $background-dark-secondary;
+}
+
+.icon {
+	width: 24px;
+	height: 24px;
+	margin-bottom: 4;
+	fill: $gray-dark;
+}
+
+.title {
+	text-align: center;
+	margin-bottom: 6;
+	font-size: 14;
+	color: $gray-dark;
+}
+
+.titleDark {
+	color: $white;
+}
+
+.message {
+	text-align: center;
+	color: $gray-text-min;
+	font-size: 12;
+}
+
+.messageDark {
+	color: $white;
+}

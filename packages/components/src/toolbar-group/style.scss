@@ -1,0 +1,86 @@
+.components-toolbar-group {
+	min-height: $block-toolbar-height;
+	border-right: $border-width solid $gray-900;
+	background-color: $white;
+	display: inline-flex;
+	flex-shrink: 0;
+	flex-wrap: wrap;
+	padding-left: $grid-unit-15 * 0.5; // 6px.
+	padding-right: $grid-unit-15 * 0.5;
+
+	// Unset for nested toolbar groups. Increase specificity.
+	& .components-toolbar-group.components-toolbar-group {
+		border-width: 0;
+		margin: 0;
+	}
+
+	line-height: 0;
+
+	// Size multiple sequential buttons to be optically balanced.
+	// Icons are 36px, as set by a 24px icon and 12px padding.
+	.components-button.components-button, // This needs specificity to override padding values inherited from the button component.
+	.components-button.has-icon.has-icon {
+		min-width: $block-toolbar-height - $grid-unit-15;
+		padding-left: $grid-unit-15 * 0.5; // 6px.
+		padding-right: $grid-unit-15 * 0.5;
+
+		svg {
+			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
+		}
+
+		&::before {
+			left: 2px;
+			right: 2px;
+		}
+	}
+}
+
+// Legacy toolbar group
+// External code references to it, so we can't change it?
+.components-toolbar {
+	min-height: $block-toolbar-height;
+	margin: 0;
+	border: $border-width solid $gray-900;
+	background-color: $white;
+	display: inline-flex;
+	flex-shrink: 0;
+	flex-wrap: wrap;
+
+	// Unset for nested toolbars. Increase specificity.
+	& .components-toolbar.components-toolbar {
+		border-width: 0;
+		margin: 0;
+	}
+}
+
+div.components-toolbar {
+	& > div {
+		// IE11 does not support `position: sticky`, or Flex very well, so use block.
+		display: block;
+		@supports (position: sticky) {
+			display: flex;
+		}
+
+		margin: 0;
+	}
+
+	& > div + div {
+		&.has-left-divider {
+			margin-left: 6px;
+			position: relative;
+			overflow: visible;
+		}
+
+		&.has-left-divider::before {
+			display: inline-block;
+			content: "";
+			box-sizing: content-box;
+			background-color: $gray-300;
+			position: absolute;
+			top: 8px;
+			left: -3px;
+			width: 1px;
+			height: $button-size - 16px;
+		}
+	}
+}

@@ -1,0 +1,110 @@
+// Editor specific styles for Social Links.
+.wp-block-social-links {
+	div.block-editor-url-input {
+		display: inline-block;
+		margin-left: $grid-unit-10;
+	}
+
+	// Unset background colors that can be inherited from Global Styles.
+	// This is a duplicate of a rule in style.scss, as it needs higher specificity in the editor.
+	// The rule can be removed if editor styles get lowered in specificity.
+	&.wp-block-social-links {
+		background: none;
+	}
+}
+
+// Prevent toolbar from jumping when selecting / hovering a link.
+.wp-social-link:hover {
+	transform: none;
+}
+
+.editor-styles-wrapper .wp-block-social-links {
+	padding: 0;
+}
+
+// Placeholder/setup state.
+.wp-block-social-links__social-placeholder {
+	display: flex;
+	opacity: 0.8;
+	list-style: none;
+
+	// Use the first link to set the height.
+	> .wp-social-link {
+		// Use !important to keep the selector simple.
+		padding-left: 0 !important;
+		margin-left: 0 !important;
+		padding-right: 0 !important;
+		margin-right: 0 !important;
+		width: 0 !important;
+		visibility: hidden;
+	}
+
+	// Wrap the remaining placeholders in a container so the plus can overlap.
+	> .wp-block-social-links__social-placeholder-icons {
+		display: flex;
+	}
+
+	.wp-social-link {
+		padding: 0.25em;
+
+		.is-style-pill-shape & {
+			padding-left: calc((2/3) * 1em);
+			padding-right: calc((2/3) * 1em);
+		}
+
+		.is-style-logos-only & {
+			padding: 0;
+		}
+	}
+
+	.wp-social-link::before {
+		content: "";
+		display: block;
+		width: 1em;
+		height: 1em;
+		border-radius: $radius-round;
+
+		.is-style-logos-only & {
+			background: currentColor;
+		}
+	}
+}
+
+// Selected placeholder state.
+.wp-block-social-links .wp-block-social-links__social-prompt {
+	min-height: $button-size-small;
+	list-style: none;
+	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
+
+	// Show as block UI.
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $button-size-small;
+	margin-top: auto;
+	margin-bottom: auto;
+	cursor: default;
+	padding-right: $grid-unit-10;
+}
+
+// Center flex items. This has an equivalent in style.scss.
+.wp-block[data-align="center"] > .wp-block-social-links {
+	justify-content: center;
+}
+
+// Improve the preview, ensure buttons are fully opaque despite being disabled.
+// @todo: Look at improving the preview component to make this unnecessary.
+.block-editor-block-preview__content .components-button:disabled {
+	opacity: 1;
+}
+
+// Unconfigured placeholder links are semitransparent.
+.wp-social-link.wp-social-link__is-incomplete {
+	opacity: 0.5;
+	@include reduce-motion("transition");
+}
+
+.wp-block-social-links .is-selected .wp-social-link__is-incomplete,
+.wp-social-link.wp-social-link__is-incomplete:hover,
+.wp-social-link.wp-social-link__is-incomplete:focus {
+	opacity: 1;
+}

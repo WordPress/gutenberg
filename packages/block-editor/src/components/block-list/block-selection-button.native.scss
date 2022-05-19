@@ -1,0 +1,34 @@
+.selectionButtonContainer {
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	padding-left: 15;
+	padding-right: 15;
+	flex-shrink: 1;
+}
+
+.selectionButtonTitle {
+	color: $white;
+	margin-left: 4;
+	flex-shrink: 1;
+}
+
+.icon {
+	color: $white;
+}
+
+.button {
+	flex-direction: row;
+	align-items: center;
+}
+
+.arrow {
+	color: $light-opacity-light-700;
+	margin-top: -4px;
+	margin-left: 4;
+	margin-right: 4;
+}
+
+.densedPaddingLeft {
+	padding-left: 5;
+}

@@ -1,0 +1,26 @@
+
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: $app-background;
+}
+
+.containerDark {
+	background-color: $app-background-dark-alt;
+}
+
+.background {
+	flex: 1;
+	background-color: $app-background;
+}
+
+.backgroundDark {
+	background-color: $app-background-dark;
+}
+
+.toolbarKeyboardAvoidingView {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+}

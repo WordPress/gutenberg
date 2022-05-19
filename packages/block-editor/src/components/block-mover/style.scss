@@ -1,0 +1,69 @@
+.block-editor-block-mover__move-button-container {
+	display: flex;
+	padding: 0;
+	border: none;
+
+	@include break-small() {
+		.block-editor-block-mover:not(.is-horizontal) & {
+			flex-direction: column;
+			width: $block-toolbar-height - $grid-unit-15;
+
+			> * {
+				height: $block-toolbar-height * 0.5;
+				width: 100%;
+				min-width: 0 !important; // overrides default button width.
+
+				// Focus style.
+				&::before {
+					height: 100%;
+					width: 100%;
+				}
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+				flex-shrink: 0;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+				flex-shrink: 0;
+			}
+		}
+
+		.block-editor-block-mover.is-horizontal & {
+			width: $block-toolbar-height;
+
+			> * {
+				width: $block-toolbar-height * 0.5;
+				min-width: 0 !important; // overrides default button width.
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				overflow: hidden;
+
+				// Focus style.
+				&::before {
+					height: 100%;
+				}
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				left: 5px;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				right: 5px;
+			}
+		}
+	}
+}
+
+.block-editor-block-mover__drag-handle {
+	@include break-small() {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		overflow: hidden;
+	}
+}

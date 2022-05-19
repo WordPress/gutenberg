@@ -1,0 +1,18 @@
+.edit-widgets-customizer-edit-widgets-initializer__content {
+	position: relative;
+	.edit-widgets-header {
+		margin-top: -16px;
+		border-top: 1px solid $gray-300;
+		background: #fff;
+		margin-left: -12px;
+		margin-right: -12px;
+	}
+	.edit-widgets-sidebar {
+		margin-left: -12px;
+		margin-right: -12px;
+		position: absolute;
+		top: 0;
+		width: calc(100% + 24px);
+		z-index: z-index(".edit-widgets-sidebar");
+	}
+}

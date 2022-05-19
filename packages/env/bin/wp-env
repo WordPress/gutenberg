@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+'use strict';
+const command = process.argv.slice( 2 );
+require( '../lib/cli' )().parse( command.length ? command : [ '--help' ] );

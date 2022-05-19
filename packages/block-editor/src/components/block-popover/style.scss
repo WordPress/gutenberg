@@ -1,0 +1,28 @@
+
+.components-popover.block-editor-block-popover {
+	z-index: z-index(".block-editor-block-popover");
+	position: absolute;
+	// Shouldn't be needed but it looks
+	// like the popover is impacted by the block gap margin.
+	margin: 0 !important;
+
+	.components-popover__content {
+		margin: 0 !important;
+		min-width: auto;
+		width: max-content;
+		background: none;
+		border: none;
+		outline: none;
+		box-shadow: none;
+		overflow-y: visible;
+
+		// Allow clicking through the toolbar holder.
+		pointer-events: none;
+
+		// Position the block toolbar.
+		> * {
+			pointer-events: all;
+		}
+	}
+}
+

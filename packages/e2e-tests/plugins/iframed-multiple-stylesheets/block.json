@@ -1,0 +1,15 @@
+{
+	"apiVersion": 2,
+	"name": "test/iframed-multiple-stylesheets",
+	"title": "Iframed Multiple Stylesheets",
+	"category": "text",
+	"icon": "smiley",
+	"description": "",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "iframed-multiple-stylesheets",
+	"editorScript": "iframed-multiple-stylesheets-editor-script",
+	"editorStyle": "file:./editor.css",
+	"style": [ "iframed-multiple-stylesheets-style", "iframed-multiple-stylesheets-style2", "file:./style3.css" ]
+}

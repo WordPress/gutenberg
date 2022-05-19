@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/list",
+		"isValid": true,
+		"attributes": {
+			"ordered": false,
+			"values": "<li>one</li><li>two</li><li>three</li>",
+			"fontFamily": "cambria-georgia"
+		},
+		"innerBlocks": []
+	}
+]

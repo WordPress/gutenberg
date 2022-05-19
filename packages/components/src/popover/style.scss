@@ -1,0 +1,71 @@
+.components-popover {
+	z-index: z-index(".components-popover");
+
+	&.is-expanded {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: z-index(".components-popover") !important;
+	}
+}
+
+.components-popover__content {
+	background: $white;
+	// Using outline instead of border to avoid impacting
+	// popover computations.
+	outline: $border-width solid $gray-400;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	box-sizing: border-box;
+	width: min-content;
+
+	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	.is-alternate & {
+		outline: $border-width solid $gray-900;
+		box-shadow: none;
+	}
+
+	.components-popover.is-expanded & {
+		position: static;
+		height: calc(100% - #{ $panel-header-height });
+		overflow-y: visible;
+		min-width: auto;
+		border: none;
+		outline: none;
+		border-top: $border-width solid $gray-900;
+	}
+}
+
+.components-popover__header {
+	align-items: center;
+	background: $white;
+	display: flex;
+	height: $panel-header-height;
+	justify-content: space-between;
+	padding: 0 8px 0 $grid-unit-20;
+}
+
+.components-popover__header-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}
+
+.components-popover__close.components-button {
+	z-index: z-index(".components-popover__close");
+}
+
+.components-popover__arrow {
+	position: absolute;
+	background: $gray-400;
+	width: 8px;
+	height: 8px;
+	transform: rotate(45deg);
+	z-index: -1;
+	.is-alternate & {
+		background: $gray-900;
+	}
+}

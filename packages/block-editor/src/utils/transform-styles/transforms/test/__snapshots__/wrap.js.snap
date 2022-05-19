@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSS selector wrap should ignore font-face selectors 1`] = `
+"@font-face {
+font-family: myFirstFont;
+src: url(sansation_light.woff);
+}"
+`;
+
+exports[`CSS selector wrap should ignore keyframes 1`] = `
+"@keyframes edit-post__fade-in-animation {
+from {
+opacity: 0;
+}
+}"
+`;
+
+exports[`CSS selector wrap should ignore selectors 1`] = `
+".my-namespace h1,
+body {
+color: red;
+}"
+`;
+
+exports[`CSS selector wrap should replace root tags 1`] = `
+".my-namespace,
+.my-namespace h1 {
+color: red;
+}"
+`;
+
+exports[`CSS selector wrap should wrap multiple selectors 1`] = `
+".my-namespace h1,
+.my-namespace h2 {
+color: red;
+}"
+`;
+
+exports[`CSS selector wrap should wrap regular selectors 1`] = `
+".my-namespace h1 {
+color: red;
+}"
+`;
+
+exports[`CSS selector wrap should replace :root selectors 1`] = `
+".my-namespace {
+--my-color: #ff0000;
+}"
+`;

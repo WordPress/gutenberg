@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/post-featured-image",
+		"isValid": true,
+		"attributes": {
+			"isLink": false,
+			"scale": "cover"
+		},
+		"innerBlocks": []
+	}
+]

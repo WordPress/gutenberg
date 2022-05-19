@@ -1,0 +1,26 @@
+/**
+ * Colors
+ */
+
+// WordPress grays.
+$black: #000;			// Use only when you truly need pure black. For UI, use $gray-900.
+$gray-900: #1e1e1e;
+$gray-800: #2f2f2f;
+$gray-700: #757575;		// Meets 4.6:1 text contrast against white.
+$gray-600: #949494;		// Meets 3:1 UI or large text contrast against white.
+$gray-400: #ccc;
+$gray-300: #ddd;		// Used for most borders.
+$gray-200: #e0e0e0;		// Used sparingly for light borders.
+$gray-100: #f0f0f0;		// Used for light gray backgrounds.
+$white: #fff;
+
+// Opacities & additional colors.
+$dark-theme-focus: $white;	// Focus color when the theme is dark.
+$dark-gray-placeholder: rgba($gray-900, 0.62);
+$medium-gray-placeholder: rgba($gray-900, 0.55);
+$light-gray-placeholder: rgba($white, 0.65);
+
+// Alert colors.
+$alert-yellow: #f0b849;
+$alert-red: #cc1818;
+$alert-green: #4ab866;

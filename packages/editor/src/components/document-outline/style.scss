@@ -1,0 +1,83 @@
+.document-outline {
+	margin: 20px 0;
+
+	ul {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.document-outline__item {
+	display: flex;
+	margin: 4px 0;
+
+	a {
+		text-decoration: none;
+	}
+
+	.document-outline__emdash::before {
+		color: $gray-300;
+		margin-right: 4px;
+	}
+
+	&.is-h2 .document-outline__emdash::before {
+		content: "—";
+	}
+
+	&.is-h3 .document-outline__emdash::before {
+		content: "——";
+	}
+
+	&.is-h4 .document-outline__emdash::before {
+		content: "———";
+	}
+
+	&.is-h5 .document-outline__emdash::before {
+		content: "————";
+	}
+
+	&.is-h6 .document-outline__emdash::before {
+		content: "—————";
+	}
+}
+
+.document-outline__button {
+	cursor: pointer;
+	background: none;
+	border: none;
+	display: flex;
+	align-items: flex-start;
+	margin: 0 0 0 -1px;
+	padding: 2px 5px 2px 1px;
+	color: $gray-900;
+	text-align: left;
+	border-radius: $radius-block-ui;
+
+	&:disabled {
+		cursor: default;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+}
+
+.document-outline__level {
+	background: $gray-300;
+	color: $gray-900;
+	border-radius: 3px;
+	font-size: $default-font-size;
+	padding: 1px 6px;
+	margin-right: 4px;
+
+	.is-invalid & {
+		background: $alert-yellow;
+	}
+}
+
+.document-outline__item-content {
+	padding: 1px 0;
+}

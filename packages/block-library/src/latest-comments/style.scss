@@ -1,0 +1,56 @@
+// Lower specificity - target list element.
+ol.wp-block-latest-comments {
+	// Removes left spacing in Customizer Widgets screen.
+	// Due to low specificity this will be safely overriden
+	// by default wp-block layout styles in the Post/Site editor
+	margin-left: 0;
+}
+
+// Higher specificity - target list via wrapper.
+.wp-block-latest-comments .wp-block-latest-comments {
+	// Remove left spacing. Higher specificity required to
+	// override default wp-block layout styles in the Post/Site editor.
+	padding-left: 0;
+}
+
+.wp-block-latest-comments__comment {
+	line-height: 1.1;
+	list-style: none;
+	margin-bottom: 1em;
+
+	.has-avatars & {
+		min-height: 2.25em;
+		list-style: none;
+
+		.wp-block-latest-comments__comment-meta,
+		.wp-block-latest-comments__comment-excerpt {
+			margin-left: 3.25em;
+		}
+	}
+
+	.has-dates &,
+	.has-excerpts & {
+		line-height: 1.5;
+	}
+}
+
+.wp-block-latest-comments__comment-excerpt p {
+	font-size: 0.875em;
+	line-height: 1.8;
+	margin: 0.36em 0 1.4em;
+}
+
+.wp-block-latest-comments__comment-date {
+	display: block;
+	font-size: 0.75em;
+}
+
+.wp-block-latest-comments .avatar,
+.wp-block-latest-comments__comment-avatar {
+	border-radius: 1.5em;
+	display: block;
+	float: left;
+	height: 2.5em;
+	margin-right: 0.75em;
+	width: 2.5em;
+}

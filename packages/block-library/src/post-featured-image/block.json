@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/post-featured-image",
+	"title": "Post Featured Image",
+	"category": "theme",
+	"description": "Display a post's featured image.",
+	"textdomain": "default",
+	"attributes": {
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
+		},
+		"scale": {
+			"type": "string",
+			"default": "cover"
+		},
+		"sizeSlug": {
+			"type": "string"
+		}
+	},
+	"usesContext": [ "postId", "postType", "queryId" ],
+	"supports": {
+		"align": [ "left", "right", "center", "wide", "full" ],
+		"color": {
+			"__experimentalDuotone": "img, .wp-block-post-featured-image__placeholder, .components-placeholder__illustration, .components-placeholder::before",
+			"text": false,
+			"background": false
+		},
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorStyle": "wp-block-post-featured-image-editor",
+	"style": "wp-block-post-featured-image"
+}

@@ -1,0 +1,25 @@
+diff --git a/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js b/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
+index 557ed5c..23dfbad 100644
+--- a/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
++++ b/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
+@@ -21,6 +21,7 @@ function scrollIntoView(elem, container, config) {
+   allowHorizontalScroll = allowHorizontalScroll === undefined ? true : allowHorizontalScroll;
+ 
+   var isWin = util.isWindow(container);
++  var isFramed = !!(isWin && container.frameElement);
+   var elemOffset = util.offset(elem);
+   var eh = util.outerHeight(elem);
+   var ew = util.outerWidth(elem);
+@@ -35,7 +36,11 @@ function scrollIntoView(elem, container, config) {
+   var ww = undefined;
+   var wh = undefined;
+ 
+-  if (isWin) {
++  if (isFramed) {
++    container = container.document.scrollingElement || container.document.body;
++  }
++
++  if (isWin || isFramed) {
+     win = container;
+     wh = util.height(win);
+     ww = util.width(win);

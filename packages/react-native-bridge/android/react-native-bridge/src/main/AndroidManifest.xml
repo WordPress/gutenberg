@@ -1,0 +1,25 @@
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.wordpress.mobile.ReactNativeGutenbergBridge">
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https"/>
+        </intent>
+    </queries>
+
+    <!-- Vibrate permission required for haptic feedback -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application>
+        <activity
+            android:name=".GutenbergWebViewActivity"
+            android:theme="@style/Base.GutenbergWebView" />
+    </application>
+
+</manifest>

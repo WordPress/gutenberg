@@ -1,0 +1,18 @@
+// This max-width is used to constrain the main editor column, it should not
+// cascade into columns.
+// We use :where to provide minimum specificity, so that intentional margins,
+// such as those of navigation menu items, override and win on specificity.
+.wp-block-columns :where(.wp-block) {
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+// Individual columns do not have top and bottom margins on the frontend.
+// So we make the editor match that.
+// We use :where to provide minimum specificity, so that intentional margins,
+// such as those configured in theme.json, override and win on specificity.
+html :where(.wp-block-column) {
+	margin-top: 0;
+	margin-bottom: 0;
+}

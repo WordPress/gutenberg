@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlignmentUI should allow custom alignment controls to be specified 1`] = `
+<ToolbarGroup
+  controls={
+    Array [
+      Object {
+        "align": "custom-left",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "My custom left",
+      },
+      Object {
+        "align": "custom-right",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+          />
+        </SVG>,
+        "isActive": true,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "My custom right",
+      },
+    ]
+  }
+  icon={
+    <SVG
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+      />
+    </SVG>
+  }
+  isCollapsed={true}
+  label="Align"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
+  toggleProps={
+    Object {
+      "describedBy": "Change text alignment",
+    }
+  }
+/>
+`;
+
+exports[`AlignmentUI should match snapshot 1`] = `
+<ToolbarGroup
+  controls={
+    Array [
+      Object {
+        "align": "left",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+          />
+        </SVG>,
+        "isActive": true,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Align text left",
+      },
+      Object {
+        "align": "center",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M16.4 4.2H7.6v1.5h8.9V4.2zM4 11.2v1.5h16v-1.5H4zm3.6 8.6h8.9v-1.5H7.6v1.5z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Align text center",
+      },
+      Object {
+        "align": "right",
+        "icon": <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M11.1 19.8H20v-1.5h-8.9v1.5zm0-15.6v1.5H20V4.2h-8.9zM4 12.8h16v-1.5H4v1.5z"
+          />
+        </SVG>,
+        "isActive": false,
+        "onClick": [Function],
+        "role": "menuitemradio",
+        "title": "Align text right",
+      },
+    ]
+  }
+  icon={
+    <SVG
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <Path
+        d="M4 19.8h8.9v-1.5H4v1.5zm8.9-15.6H4v1.5h8.9V4.2zm-8.9 7v1.5h16v-1.5H4z"
+      />
+    </SVG>
+  }
+  isCollapsed={true}
+  label="Align"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
+  toggleProps={
+    Object {
+      "describedBy": "Change text alignment",
+    }
+  }
+/>
+`;

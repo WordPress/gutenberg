@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "core/post-content",
+	"title": "Post Content",
+	"category": "theme",
+	"description": "Displays the contents of a post or page.",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType", "queryId" ],
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"__experimentalLayout": true
+	},
+	"editorStyle": "wp-block-post-content-editor"
+}

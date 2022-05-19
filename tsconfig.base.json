@@ -1,0 +1,46 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"allowSyntheticDefaultImports": true,
+		"jsx": "preserve",
+		"target": "esnext",
+		"module": "esnext",
+		"lib": [ "dom", "esnext" ],
+		"declaration": true,
+		"declarationMap": true,
+		"composite": true,
+		"emitDeclarationOnly": true,
+		"isolatedModules": true,
+
+		/* Strict Type-Checking Options */
+		"strict": true,
+
+		/* Additional Checks */
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"importsNotUsedAsValues": "error",
+
+		/* Module Resolution Options */
+		"moduleResolution": "node",
+
+		/* This needs to be false so our types are possible to consume without setting this */
+		"esModuleInterop": false,
+		"resolveJsonModule": true,
+
+		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"types": []
+	},
+	"exclude": [
+		"**/*.android.js",
+		"**/*.ios.js",
+		"**/*.native.js",
+		"**/benchmark",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
+		"**/test/**",
+		"packages/**/react-native-*/**"
+	]
+}

@@ -1,0 +1,59 @@
+// @format
+
+.content {
+	flex: 1;
+}
+
+.contentCentered {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
+
+.iconPlaceholder {
+	fill: $gray-dark;
+	width: 100%;
+	height: 100%;
+}
+
+.iconPlaceholderDark {
+	fill: $white;
+}
+
+.is-style-rounded {
+	border-radius: 9999px;
+	overflow: hidden;
+}
+
+.panelBody {
+	padding-left: 0;
+	padding-right: 0;
+	padding-bottom: $grid-unit;
+}
+
+.fixedHeight {
+	height: 150;
+	overflow: visible;
+}
+
+.featuredImagePanelTitle {
+	padding-bottom: 0;
+}
+
+.setFeaturedButtonCellContainer {
+	align-items: flex-start;
+}
+
+.setFeaturedButton {
+	text-align: left;
+	color: $blue-50;
+	padding: $grid-unit-15 0;
+}
+
+.setFeaturedButtonDark {
+	color: $blue-30;
+}
+
+.removeFeaturedButton {
+	color: $alert-red;
+}

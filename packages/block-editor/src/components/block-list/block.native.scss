@@ -1,0 +1,84 @@
+.blockHolder {
+	flex: 1 1 auto;
+}
+
+.solidBorderColor {
+	border-color: $blue-wordpress;
+}
+
+.solidBorderColorDark {
+	border-color: $blue-30;
+}
+
+.dashedBorderColor {
+	border-color: $gray;
+}
+
+.dashedBorderColorDark {
+	border-color: $gray-70;
+}
+
+.borderFullWidth {
+	left: 0;
+	right: 0;
+}
+
+.containerBorderFullWidth {
+	left: -$solid-border-space * 0.5;
+	right: -$solid-border-space * 0.5;
+}
+
+.dimmed {
+	opacity: $dimmed-opacity;
+}
+
+.blockTitle {
+	background-color: $gray;
+	padding-left: 8px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.aztec_container {
+	flex: 1;
+}
+
+.blockCode {
+	font-family: $default-monospace-font;
+}
+
+.blockText {
+	min-height: 50px;
+}
+
+.neutralToolbar {
+	margin-left: -$block-edge-to-content;
+	margin-right: -$block-edge-to-content;
+}
+
+.solidBorder {
+	position: absolute;
+	top: -$solid-border-space;
+	bottom: 0;
+	left: -$solid-border-space;
+	right: -$solid-border-space;
+	border-width: $block-selected-border-width;
+	border-radius: 4px;
+	border-style: solid;
+	z-index: 1;
+}
+
+.dashedBorder {
+	position: absolute;
+	top: -$dashed-border-space;
+	bottom: -$dashed-border-space;
+	left: -$dashed-border-space;
+	right: -$dashed-border-space;
+	border-width: $block-selected-border-width;
+	border-radius: 2px;
+	border-style: dashed;
+}
+
+.fullWidthPadding {
+	padding: $block-selected-to-content;
+}

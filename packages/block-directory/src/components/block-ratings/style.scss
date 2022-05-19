@@ -1,0 +1,15 @@
+.block-directory-block-ratings {
+
+	> span {
+		display: flex;
+	}
+
+	svg {
+		fill: $gray-900;
+		margin-left: -4px;
+	}
+
+	.block-directory-block-ratings__star-empty {
+		fill: $gray-400;
+	}
+}

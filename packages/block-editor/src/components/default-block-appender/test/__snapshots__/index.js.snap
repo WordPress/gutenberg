@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
+<div
+  className="block-editor-default-block-appender has-visible-prompt"
+  data-root-client-id=""
+>
+  <p
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    role="button"
+    tabIndex="0"
+  >
+    Type / to choose a block
+  </p>
+  <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
+    isAppender={true}
+    position="bottom right"
+  />
+</div>
+`;
+
+exports[`DefaultBlockAppender should match snapshot 1`] = `
+<div
+  className="block-editor-default-block-appender has-visible-prompt"
+  data-root-client-id=""
+>
+  <p
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    role="button"
+    tabIndex="0"
+  >
+    Type / to choose a block
+  </p>
+  <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
+    isAppender={true}
+    position="bottom right"
+  />
+</div>
+`;
+
+exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
+<div
+  className="block-editor-default-block-appender"
+  data-root-client-id=""
+>
+  <p
+    aria-label="Add default block"
+    className="block-editor-default-block-appender__content"
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    role="button"
+    tabIndex="0"
+  >
+    ﻿
+  </p>
+  <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
+    isAppender={true}
+    position="bottom right"
+  />
+</div>
+`;

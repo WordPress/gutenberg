@@ -1,0 +1,313 @@
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+const webpack = require( 'webpack' );
+// In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
+const { RawSource } = webpack.sources || require( 'webpack-sources' );
+const json2php = require( 'json2php' );
+const isWebpack4 = webpack.version.startsWith( '4.' );
+const { createHash } = webpack.util;
+
+/**
+ * Internal dependencies
+ */
+const {
+	defaultRequestToExternal,
+	defaultRequestToHandle,
+} = require( './util' );
+
+const defaultExternalizedReportFileName = 'externalized-dependencies.json';
+
+class DependencyExtractionWebpackPlugin {
+	constructor( options ) {
+		this.options = Object.assign(
+			{
+				combineAssets: false,
+				combinedOutputFile: null,
+				externalizedReport: false,
+				injectPolyfill: false,
+				outputFormat: 'php',
+				outputFilename: null,
+				useDefaults: true,
+			},
+			options
+		);
+
+		/*
+		 * Track requests that are externalized.
+		 *
+		 * Because we don't have a closed set of dependencies, we need to track what has
+		 * been externalized so we can recognize them in a later phase when the dependency
+		 * lists are generated.
+		 */
+		this.externalizedDeps = new Set();
+
+		// Offload externalization work to the ExternalsPlugin.
+		this.externalsPlugin = new webpack.ExternalsPlugin(
+			'window',
+			isWebpack4
+				? this.externalizeWpDeps.bind( this )
+				: this.externalizeWpDepsV5.bind( this )
+		);
+	}
+
+	externalizeWpDeps( _context, request, callback ) {
+		let externalRequest;
+
+		// Handle via options.requestToExternal first.
+		if ( typeof this.options.requestToExternal === 'function' ) {
+			externalRequest = this.options.requestToExternal( request );
+		}
+
+		// Cascade to default if unhandled and enabled.
+		if (
+			typeof externalRequest === 'undefined' &&
+			this.options.useDefaults
+		) {
+			externalRequest = defaultRequestToExternal( request );
+		}
+
+		if ( externalRequest ) {
+			this.externalizedDeps.add( request );
+
+			return callback( null, externalRequest );
+		}
+
+		return callback();
+	}
+
+	externalizeWpDepsV5( { context, request }, callback ) {
+		return this.externalizeWpDeps( context, request, callback );
+	}
+
+	mapRequestToDependency( request ) {
+		// Handle via options.requestToHandle first.
+		if ( typeof this.options.requestToHandle === 'function' ) {
+			const scriptDependency = this.options.requestToHandle( request );
+			if ( scriptDependency ) {
+				return scriptDependency;
+			}
+		}
+
+		// Cascade to default if enabled.
+		if ( this.options.useDefaults ) {
+			const scriptDependency = defaultRequestToHandle( request );
+			if ( scriptDependency ) {
+				return scriptDependency;
+			}
+		}
+
+		// Fall back to the request name.
+		return request;
+	}
+
+	stringify( asset ) {
+		if ( this.options.outputFormat === 'php' ) {
+			return `<?php return ${ json2php(
+				JSON.parse( JSON.stringify( asset ) )
+			) };\n`;
+		}
+
+		return JSON.stringify( asset );
+	}
+
+	apply( compiler ) {
+		this.externalsPlugin.apply( compiler );
+
+		if ( isWebpack4 ) {
+			compiler.hooks.emit.tap( this.constructor.name, ( compilation ) =>
+				this.addAssets( compilation, compiler )
+			);
+		} else {
+			compiler.hooks.thisCompilation.tap(
+				this.constructor.name,
+				( compilation ) => {
+					compilation.hooks.processAssets.tap(
+						{
+							name: this.constructor.name,
+							stage:
+								compiler.webpack.Compilation
+									.PROCESS_ASSETS_STAGE_ANALYSE,
+						},
+						() => this.addAssets( compilation, compiler )
+					);
+				}
+			);
+		}
+	}
+
+	addAssets( compilation, compiler ) {
+		const {
+			combineAssets,
+			combinedOutputFile,
+			externalizedReport,
+			injectPolyfill,
+			outputFormat,
+			outputFilename,
+		} = this.options;
+
+		// Dump actually externalized dependencies to a report file.
+		if ( externalizedReport ) {
+			const externalizedReportFile =
+				typeof externalizedReport === 'string'
+					? externalizedReport
+					: defaultExternalizedReportFileName;
+			compilation.emitAsset(
+				externalizedReportFile,
+				new RawSource(
+					JSON.stringify( Array.from( this.externalizedDeps ).sort() )
+				)
+			);
+		}
+
+		const combinedAssetsData = {};
+
+		// Process each entry point independently.
+		for ( const [
+			entrypointName,
+			entrypoint,
+		] of compilation.entrypoints.entries() ) {
+			const entrypointExternalizedWpDeps = new Set();
+			if ( injectPolyfill ) {
+				entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+			}
+
+			const processModule = ( { userRequest } ) => {
+				if ( this.externalizedDeps.has( userRequest ) ) {
+					const scriptDependency = this.mapRequestToDependency(
+						userRequest
+					);
+					entrypointExternalizedWpDeps.add( scriptDependency );
+				}
+			};
+
+			// Search for externalized modules in all chunks.
+			for ( const chunk of entrypoint.chunks ) {
+				const modulesIterable = isWebpack4
+					? chunk.modulesIterable
+					: compilation.chunkGraph.getChunkModules( chunk );
+				for ( const chunkModule of modulesIterable ) {
+					processModule( chunkModule );
+					// Loop through submodules of ConcatenatedModule.
+					if ( chunkModule.modules ) {
+						for ( const concatModule of chunkModule.modules ) {
+							processModule( concatModule );
+						}
+					}
+				}
+			}
+
+			const {
+				hashFunction,
+				hashDigest,
+				hashDigestLength,
+			} = compilation.outputOptions;
+
+			// Go through the assets and hash the sources. We can't just use
+			// `entrypointChunk.contentHash` because that's not updated when
+			// assets are minified. In practice the hash is updated by
+			// `RealContentHashPlugin` after minification, but it only modifies
+			// already-produced asset filenames and the updated hash is not
+			// available to plugins.
+			const hash = createHash( hashFunction );
+			for ( const filename of entrypoint.getFiles().sort() ) {
+				const asset = compilation.getAsset( filename );
+				hash.update( asset.source.buffer() );
+			}
+			const version = hash
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
+
+			const entrypointChunk = isWebpack4
+				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
+				: entrypoint.getEntrypointChunk();
+
+			const assetData = {
+				// Get a sorted array so we can produce a stable, stringified representation.
+				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+				version,
+			};
+
+			const assetString = this.stringify( assetData );
+			const contentHash = createHash( hashFunction )
+				.update( assetString )
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
+
+			// Determine a filename for the asset file.
+			const [ filename, query ] = entrypointName.split( '?', 2 );
+			const buildFilename = compilation.getPath(
+				compiler.options.output.filename,
+				{
+					chunk: entrypointChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash,
+				}
+			);
+
+			if ( combineAssets ) {
+				combinedAssetsData[ buildFilename ] = assetData;
+				continue;
+			}
+
+			let assetFilename;
+
+			if ( outputFilename ) {
+				assetFilename = compilation.getPath( outputFilename, {
+					chunk: entrypointChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash,
+				} );
+			} else {
+				assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+			}
+
+			// Add source and file into compilation for webpack to output.
+			compilation.assets[ assetFilename ] = new RawSource( assetString );
+			entrypointChunk.files[ isWebpack4 ? 'push' : 'add' ](
+				assetFilename
+			);
+		}
+
+		if ( combineAssets ) {
+			// Assert the `string` type for output path.
+			// The type indicates the option may be `undefined`.
+			// However, at this point in compilation, webpack has filled the options in if
+			// they were not provided.
+			const outputFolder = /** @type {{path:string}} */ ( compiler.options
+				.output ).path;
+
+			const assetsFilePath = path.resolve(
+				outputFolder,
+				combinedOutputFile ||
+					'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+			);
+			const assetsFilename = path.relative(
+				outputFolder,
+				assetsFilePath
+			);
+
+			// Add source into compilation for webpack to output.
+			compilation.assets[ assetsFilename ] = new RawSource(
+				this.stringify( combinedAssetsData )
+			);
+		}
+	}
+}
+
+function basename( name ) {
+	if ( ! name.includes( '/' ) ) {
+		return name;
+	}
+	return name.substr( name.lastIndexOf( '/' ) + 1 );
+}
+
+module.exports = DependencyExtractionWebpackPlugin;

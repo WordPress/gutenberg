@@ -1,0 +1,72 @@
+/** @format */
+.touchableArea {
+	border-radius: 8px 8px 8px 8px;
+}
+
+.disabled {
+	opacity: 0.3;
+}
+
+.modalIconWrapper {
+	width: 104px;
+	height: 64px;
+	background-color: $gray-light; //#f3f6f8
+	border-radius: 8px 8px 8px 8px;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalIconWrapperDark {
+	background-color: rgba($white, 0.07);
+}
+
+.newIndicator {
+	height: 22;
+	left: 6;
+	position: absolute;
+	top: 6;
+	width: 22;
+}
+
+.modalIcon {
+	width: 32px;
+	height: 32px;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalItemLabel {
+	background-color: transparent;
+	padding-left: 2;
+	padding-right: 2;
+	padding-top: 4;
+	padding-bottom: 0;
+	justify-content: center;
+	text-align: center;
+	font-size: 12;
+	color: $gray-dark;
+}
+
+.modalItemLabelDark {
+	color: $white;
+}
+
+.clipboardBlock {
+	background-color: transparent;
+	border-width: 1px;
+	border-color: $light-gray-400;
+}
+
+.clipboardBlockDark {
+	border-color: $gray-70;
+}
+
+.modalItem {
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	padding-left: $grid-unit-20 * 0.5;
+	padding-right: $grid-unit-20 * 0.5;
+	padding-top: 0;
+	padding-bottom: 0;
+}

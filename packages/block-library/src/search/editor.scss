@@ -1,0 +1,20 @@
+.wp-block[data-align="center"] {
+	.wp-block-search {
+		.wp-block-search__inside-wrapper {
+			margin: auto;
+		}
+	}
+}
+
+.wp-block-search {
+	.wp-block-search__button {
+		height: auto;
+		border-radius: initial;
+		display: flex;
+		align-items: center;
+	}
+
+	&__components-button-group {
+		margin-top: 10px;
+	}
+}

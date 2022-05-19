@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HTML block can be created by typing "/html" 1`] = `
+"<!-- wp:html -->
+<p>Pythagorean theorem: 
+<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>
+<!-- /wp:html -->"
+`;

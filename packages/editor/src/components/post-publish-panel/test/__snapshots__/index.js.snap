@@ -1,0 +1,197 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <ForwardRef(Button)
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
+          />
+        </SVG>
+      }
+      label="Close panel"
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <WithSelect(PostPublishPanelPostpublish)
+      focusOnMount={true}
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <CheckboxControl
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
+
+exports[`PostPublishPanel should render the post-publish panel if the post is scheduled 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <ForwardRef(Button)
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
+          />
+        </SVG>
+      }
+      label="Close panel"
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <WithSelect(PostPublishPanelPostpublish)
+      focusOnMount={true}
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <CheckboxControl
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
+
+exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <div
+      className="editor-post-publish-panel__header-publish-button"
+    >
+      <WithSelect(WithDispatch(PostPublishButton))
+        focusOnMount={true}
+        onSubmit={[Function]}
+      />
+    </div>
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        variant="secondary"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <PostPublishPanelPrepublish />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <CheckboxControl
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
+
+exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <div
+      className="editor-post-publish-panel__header-publish-button"
+    >
+      <WithSelect(WithDispatch(PostPublishButton))
+        focusOnMount={true}
+        onSubmit={[Function]}
+      />
+    </div>
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        variant="secondary"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <PostPublishPanelPrepublish />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <CheckboxControl
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
+
+exports[`PostPublishPanel should render the spinner if the post is being saved 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <div
+      className="editor-post-publish-panel__header-publish-button"
+    >
+      <WithSelect(WithDispatch(PostPublishButton))
+        focusOnMount={true}
+        onSubmit={[Function]}
+      />
+    </div>
+    <div
+      className="editor-post-publish-panel__header-cancel-button"
+    >
+      <ForwardRef(Button)
+        variant="secondary"
+      >
+        Cancel
+      </ForwardRef(Button)>
+    </div>
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <Spinner />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <CheckboxControl
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;

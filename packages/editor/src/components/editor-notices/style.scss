@@ -1,0 +1,24 @@
+// Dismissible & non-dismissible notices.
+.components-editor-notices__dismissible,
+.components-editor-notices__pinned {
+	position: relative;
+	left: 0;
+	top: 0;
+	right: 0;
+	color: $gray-900;
+
+	.components-notice {
+		box-sizing: border-box;
+		margin: 0;
+		border-bottom: $border-width solid rgba(0, 0, 0, 0.2);
+		padding: 0 $grid-unit-15;
+
+		// Min-height matches the height of a single-line notice with an action button.
+		min-height: $header-height;
+
+		// Margins ensure that the dismiss button aligns to the center of the first line of text.
+		.components-notice__dismiss {
+			margin-top: $grid-unit-15;
+		}
+	}
+}

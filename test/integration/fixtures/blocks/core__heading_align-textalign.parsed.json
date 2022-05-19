@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "center",
+			"align": "wide"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"alignwide has-text-align-center\">Text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"alignwide has-text-align-center\">Text</h2>\n"
+		]
+	}
+]
