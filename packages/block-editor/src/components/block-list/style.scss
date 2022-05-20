@@ -411,12 +411,13 @@
 
 /** Exploded mode styles **/
 .is-root-container {
-	transition: transform 0.3s;
+	transition: all 0.3s;
 }
 
 .is-root-container.is-exploded-mode {
-	transform-origin: center center;
+	transform-origin: top center;
 	transform: scale(0.8);
+	margin-top: 100px;
 }
 
 .is-root-container.is-exploded-mode > .block-list-appender {
