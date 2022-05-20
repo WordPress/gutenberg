@@ -98,12 +98,8 @@ export default function TemplatePartEdit( {
 	const areaObject = useTemplatePartArea( area );
 	const hasBlockOverlay = useBlockOverlayActive( clientId );
 	const blockProps = useBlockProps(
-		{
-			className: hasBlockOverlay
-				? 'block-editor-block-content-overlay'
-				: undefined,
-		},
-		{ __unstableIsDisabled: hasBlockOverlay }
+		{},
+		{ __unstableHasOverlay: hasBlockOverlay }
 	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;

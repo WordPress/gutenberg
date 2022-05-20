@@ -346,7 +346,6 @@ function Navigation( {
 					backgroundColor?.slug
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-				'block-editor-block-content-overlay': hasBlockOverlay,
 			} ),
 			style: {
 				color: ! textColor?.slug && textColor?.color,
@@ -354,7 +353,7 @@ function Navigation( {
 					! backgroundColor?.slug && backgroundColor?.color,
 			},
 		},
-		{ __unstableIsDisabled: hasBlockOverlay }
+		{ __unstableHasOverlay: hasBlockOverlay }
 	);
 
 	const overlayClassnames = classnames( {

@@ -54,13 +54,13 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  *                                               the ref if one is defined.
  * @param {Object}  options                      Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
- * @param {boolean} options.__unstableIsDisabled Whether the block should be disabled.
+ * @param {boolean} options.__unstableHasOverlay Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps(
 	props = {},
-	{ __unstableIsHtml, __unstableIsDisabled = false } = {}
+	{ __unstableIsHtml, __unstableHasOverlay = false } = {}
 ) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
@@ -134,9 +134,11 @@ export function useBlockProps(
 			adjustScrolling,
 			enableAnimation,
 			triggerAnimationOnChange: index,
-			scale: isExplodedMode && isRootBlock ? 0.8 : 1,
 		} ),
-		useDisabled( { isDisabled: ! __unstableIsDisabled } ),
+		useDisabled( {
+			isDisabled:
+				( isExplodedMode && isRootBlock ) || __unstableHasOverlay,
+		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -162,6 +164,8 @@ export function useBlockProps(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
+				'has-block-overlay':
+					( isExplodedMode && isRootBlock ) || __unstableHasOverlay,
 			} ),
 			className,
 			props.className,

@@ -65,11 +65,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const hasBlockOverlay = useBlockOverlayActive( clientId );
 	const blockProps = useBlockProps(
 		{
-			className: hasBlockOverlay
-				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
-				: 'block-library-block__reusable-block-container',
+			className: 'block-library-block__reusable-block-container',
 		},
-		{ __unstableIsDisabled: hasBlockOverlay }
+		{ __unstableHasOverlay: hasBlockOverlay }
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
