@@ -278,10 +278,11 @@ _Usage_
 
 ```js
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function BlockCount() {
 	const count = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockCount();
+		return select( blockEditorStore ).getBlockCount();
 	}, [] );
 
 	return count;
@@ -446,15 +447,18 @@ that supports also selecting from other registered stores.
 _Usage_
 
 ```js
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+
 const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-	return select( 'core/editor' ).getCurrentPostId();
+	return select( editorStore ).getCurrentPostId();
 } );
 
 const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	// calling another registry selector just like any other function
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).getEntityRecordEdits(
+	return select( coreStore ).getEntityRecordEdits(
 		'postType',
 		postType,
 		postId
@@ -488,7 +492,7 @@ _Usage_
 ```js
 import { dispatch } from '@wordpress/data';
 
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+dispatch( store ).setPrice( 'hammer', 9.75 );
 ```
 
 _Parameters_
@@ -612,7 +616,7 @@ _Usage_
 ```js
 import { resolveSelect } from '@wordpress/data';
 
-resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then( console.log );
+resolveSelect( store ).getPrice( 'hammer' ).then( console.log );
 ```
 
 _Parameters_
@@ -634,7 +638,7 @@ _Usage_
 ```js
 import { select } from '@wordpress/data';
 
-select( 'my-shop' ).getPrice( 'hammer' );
+select( store ).getPrice( 'hammer' );
 ```
 
 _Parameters_
@@ -720,10 +724,10 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
 	const { stockNumber } = useSelect(
-		( select ) => select( 'my-shop' ).getStockNumber(),
+		( select ) => select( store ).getStockNumber(),
 		[]
 	);
-	const { startSale } = useDispatch( 'my-shop' );
+	const { startSale } = useDispatch( store );
 	const onClick = useCallback( () => {
 		const discountPercent = stockNumber > 50 ? 10 : 20;
 		startSale( discountPercent );
@@ -799,7 +803,7 @@ import { useSelect } from '@wordpress/data';
 function HammerPriceDisplay( { currency } ) {
 	const price = useSelect(
 		( select ) => {
-			return select( 'my-shop' ).getPrice( 'hammer', currency );
+			return select( store ).getPrice( 'hammer', currency );
 		},
 		[ currency ]
 	);
@@ -830,7 +834,7 @@ function because your component won't re-render on a data change.**
 import { useSelect } from '@wordpress/data';
 
 function Paste( { children } ) {
-	const { getSettings } = useSelect( 'my-shop' );
+	const { getSettings } = useSelect( store );
 	function onPaste() {
 		// Do something with the settings.
 		const settings = getSettings();
@@ -881,7 +885,7 @@ function Button( { onClick, children } ) {
 import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( 'my-shop' );
+	const { startSale } = dispatch( store );
 	const { discountPercent } = ownProps;
 
 	return {
@@ -922,8 +926,8 @@ import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Stock number changes frequently.
-	const { getStockNumber } = select( 'my-shop' );
-	const { startSale } = dispatch( 'my-shop' );
+	const { getStockNumber } = select( store );
+	const { startSale } = dispatch( store );
 	return {
 		onClick() {
 			const discountPercent = getStockNumber() > 50 ? 10 : 20;
@@ -980,7 +984,7 @@ function PriceDisplay( { price, currency } ) {
 }
 
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
+	const { getPrice } = select( store );
 	const { currency } = ownProps;
 
 	return {
