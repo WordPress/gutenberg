@@ -65,7 +65,6 @@
 			"default": 5
 		}
 	},
-	"usesContext": [ "navigationArea" ],
 	"providesContext": {
 		"textColor": "textColor",
 		"customTextColor": "customTextColor",
@@ -111,12 +110,13 @@
 		"__experimentalLayout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
+			"allowVerticalAlignment": false,
 			"default": {
 				"type": "flex"
 			}
 		}
 	},
-	"viewScript": "file:./view.min.js",
+	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

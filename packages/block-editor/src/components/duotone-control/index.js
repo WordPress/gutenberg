@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
+import { Icon, filter } from '@wordpress/icons';
 
 function DuotoneControl( {
 	colorPalette,
@@ -41,7 +42,13 @@ function DuotoneControl( {
 						aria-expanded={ isOpen }
 						onKeyDown={ openOnArrowDown }
 						label={ __( 'Apply duotone filter' ) }
-						icon={ <DuotoneSwatch values={ value } /> }
+						icon={
+							value ? (
+								<DuotoneSwatch values={ value } />
+							) : (
+								<Icon icon={ filter } />
+							)
+						}
 					/>
 				);
 			} }

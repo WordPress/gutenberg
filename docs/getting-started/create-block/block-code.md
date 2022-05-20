@@ -30,7 +30,7 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 
 ```scss
 @font-face {
-	font-family: Gilbert;
+	font-family: Gilbert, sans-serif;
 	src: url( ../assets/gilbert-color.otf );
 	font-weight: 700;
 }

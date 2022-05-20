@@ -71,14 +71,14 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align
 -	**Attributes:** month, year
 
-## Categories
+## Categories List
 
 Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
 -	**Name:** core/categories
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showHierarchy, showOnlyTopLevel, showPostCounts
+-	**Attributes:** displayAsDropdown, showEmpty, showHierarchy, showOnlyTopLevel, showPostCounts
 
 ## Code
 
@@ -95,7 +95,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 
 -	**Name:** core/column
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, link, text), spacing (padding), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (blockGap, padding), ~~html~~, ~~reusable~~
 -	**Attributes:** allowedBlocks, templateLock, verticalAlignment, width
 
 ## Columns
@@ -107,9 +107,9 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), ~~html~~
 -	**Attributes:** isStackedOnMobile, verticalAlignment
 
-## Comment Author Avatar
+## Comment Author Avatar (deprecated)
 
-Displays the avatar of the comment's author. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
+This block is deprecated. Please use the Avatar block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
 
 -	**Name:** core/comment-author-avatar
 -	**Category:** theme
@@ -123,7 +123,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 -	**Name:** core/comment-author-name
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, linkTarget, textAlign
+-	**Attributes:** fontSize, isLink, linkTarget, textAlign
 
 ## Comment Content
 
@@ -141,7 +141,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 -	**Name:** core/comment-date
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** format, isLink
+-	**Attributes:** fontSize, format, isLink
 
 ## Comment Edit Link
 
@@ -150,7 +150,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** linkTarget, textAlign
+-	**Attributes:** fontSize, linkTarget, textAlign
 
 ## Comment Reply Link
 
@@ -159,7 +159,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** fontSize, textAlign
 
 ## Comment Template
 
@@ -169,6 +169,15 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Category:** design
 -	**Supports:** align, ~~html~~, ~~reusable~~
 -	**Attributes:** 
+
+## Comments
+
+An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
+
+-	**Name:** core/comments-query-loop
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
+-	**Attributes:** tagName
 
 ## Comments Pagination
 
@@ -206,14 +215,14 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
-## Comments Query Loop
+## Comments Title
 
-An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-query-loop))
+Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
 
--	**Name:** core/comments-query-loop
+-	**Name:** core/comments-title
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
+-	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
+-	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
@@ -262,7 +271,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 ## Group
 
-Combine blocks into a group. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
+Gather blocks in a layout container. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
 
 -	**Name:** core/group
 -	**Category:** design
@@ -386,15 +395,6 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 -	**Supports:** align (full, wide), anchor, inserter, spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, textColor
 
-## Navigation Area
-
-Define a navigation area for your theme. The navigation block associated with this area will be automatically displayed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-area))
-
--	**Name:** core/navigation-area
--	**Category:** theme
--	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** area
-
 ## Custom Link
 
 Add a page, link, or another item to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-link))
@@ -478,20 +478,20 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Post Comment (deprecated)
 
-This block is deprecated. Please use the Comments Query Loop block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
 
-## Post Comments
+## Post Comments (deprecated)
 
-Display a post's comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
+This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
 
 -	**Name:** core/post-comments
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
 -	**Attributes:** textAlign
 
 ## Post Comments Count
@@ -582,7 +582,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Name:** core/post-terms
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** separator, term, textAlign
+-	**Attributes:** prefix, separator, suffix, term, textAlign
 
 ## Post Title
 
@@ -708,7 +708,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), color (background, gradients, text), ~~html~~
--	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 
@@ -716,7 +716,7 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 -	**Name:** core/separator
 -	**Category:** design
--	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~)
+-	**Supports:** align (center, full, wide), anchor, color (background, gradients, ~~text~~), spacing (margin)
 -	**Attributes:** opacity
 
 ## Shortcode
@@ -798,7 +798,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** core/table-of-contents
 -	**Category:** layout
 -	**Supports:** ~~html~~
--	**Attributes:** onlyIncludeCurrentPage
+-	**Attributes:** headings, onlyIncludeCurrentPage
 
 ## Tag Cloud
 

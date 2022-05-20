@@ -106,7 +106,7 @@ class WP_Theme_JSON_Resolver_5_9 {
 			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return wp_translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
+		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**
@@ -190,9 +190,6 @@ class WP_Theme_JSON_Resolver_5_9 {
 				$default_gradients = true;
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
-
-			// Classic themes without a theme.json don't support global duotone.
-			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );

@@ -121,7 +121,7 @@ class WP_Webfonts {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
-	 * @return bool True if successfully registered, else false.
+	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	public function register_webfont( array $webfont ) {
 		$webfont = $this->validate_webfont( $webfont );
@@ -139,7 +139,7 @@ class WP_Webfonts {
 		}
 
 		$this->registered_webfonts[ $slug ][] = $webfont;
-		return true;
+		return $slug;
 	}
 
 	/**
@@ -152,15 +152,7 @@ class WP_Webfonts {
 		$slug = $this->get_font_slug( $font_family_name );
 
 		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
-			trigger_error(
-				sprintf(
-					/* translators: %s unique slug to identify the font family of the webfont */
-					__( 'The "%s" font family is already enqueued.', 'gutenberg' ),
-					$slug
-				)
-			);
-
-			return false;
+			return true;
 		}
 
 		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {

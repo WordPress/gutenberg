@@ -374,6 +374,56 @@ function getTypeAnnotation( typeAnnotation ) {
 }
 
 /**
+ * Extract wrapped selector functions to reach inside for parameter types.
+ *
+ * This function wasn't necessary until we started introducing more TypeScript code into
+ * the project. With parameter types fully in the JSDoc comments we always have a direct
+ * match between parameter name and the type. However, when working in TypeScript where
+ * we rely on the type annotations for the types we introduce a mismatch when wrapping
+ * functions.
+ *
+ * Example:
+ *     export const getThings = createSelector( ( state ) => state.things, ( state ) => state.version );
+ *
+ * In this example we would document `state` but its type is buried inside of `createSelector`.
+ * Because this kind of scenario is tricky to properly parse without asking TypeScript directly
+ * to give us the actual type of `getThings` we're going to special-case the known instances
+ * of selector-wrapping to extract the inner function and re-connect the parameter types
+ * with their descriptions in the JSDoc comments.
+ *
+ * If we find more wrapper functions on selectors we should add them below following the
+ * example of `createSelector` and `createRegsitrySelector`.
+ *
+ * @param {ASTNode} token Contains either a function or a call to a function-wrapper.
+ *
+ * TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
+ */
+function unwrapWrappedSelectors( token ) {
+	if ( babelTypes.isFunctionDeclaration( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isArrowFunctionExpression( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isCallExpression( token ) ) {
+		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
+		//                 \--------------------------------------------/ CallExpression.arguments[0]
+		if ( token.callee.name === 'createSelector' ) {
+			return token.arguments[ 0 ];
+		}
+
+		// createRegistrySelector( ( selector ) => ( state, queryId ) => select( 'core/queries' ).get( queryId ) );
+		//                                         \-----------------------------------------------------------/ CallExpression.arguments[0].body
+		//                         \---------------------------------------------------------------------------/ CallExpression.arguments[0]
+		if ( token.callee.name === 'createRegistrySelector' ) {
+			return token.arguments[ 0 ].body;
+		}
+	}
+}
+
+/**
  * @param {ASTNode} token
  * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
  */
@@ -392,7 +442,7 @@ function getFunctionToken( token ) {
 		resolvedToken = resolvedToken.declarations[ 0 ].init;
 	}
 
-	return resolvedToken;
+	return unwrapWrappedSelectors( resolvedToken );
 }
 
 function getFunctionNameForError( declarationToken ) {

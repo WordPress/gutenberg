@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	insertBlock,
 	clickBlockToolbarButton,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
@@ -678,30 +679,14 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
-		// Return focus after focus loss. This should be fixed.
-		await page.keyboard.press( 'Tab' );
 		// Navigate to the second cell.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		// The content should only have one tab stop.
-		await page.keyboard.press( 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Post' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Table' );
 	} );
 
-	it( 'Should unselect all blocks when hitting double escape', async () => {
+	it( 'should unselect all blocks when hitting double escape', async () => {
 		// Add demo content.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Paragraph' );
@@ -719,5 +704,34 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Escape' );
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( undefined );
+	} );
+
+	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
+	it( 'does not deselect the block when selecting text outside the editor canvas', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Random Paragraph' );
+		await openDocumentSettingsSidebar();
+		const blockDescription = await page.waitForSelector(
+			'.block-editor-block-card__description'
+		);
+		const boundingBox = await blockDescription.boundingBox();
+		const startPosition = {
+			x: boundingBox.x + 10,
+			y: boundingBox.y + 8,
+		};
+		const endPosition = {
+			x: startPosition.x + 50,
+			y: startPosition.y,
+		};
+
+		await page.mouse.move( startPosition.x, startPosition.y );
+		await page.mouse.down();
+		await page.mouse.move( endPosition.x, endPosition.y );
+		await page.mouse.up();
+
+		const selectedParagraph = await page.waitForSelector(
+			'.wp-block-paragraph.is-selected'
+		);
+		expect( selectedParagraph ).toBeDefined();
 	} );
 } );

@@ -148,6 +148,10 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
+	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
+		createSuggestion
+	);
+
 	useEffect( () => {
 		if (
 			forceIsEditingLink !== undefined &&
@@ -185,7 +189,7 @@ function LinkControl( {
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink ] );
+	}, [ isEditingLink, isCreatingPage ] );
 
 	useEffect( () => {
 		/**
@@ -216,10 +220,6 @@ function LinkControl( {
 
 		setIsEditingLink( false );
 	}
-
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
-		createSuggestion
-	);
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {

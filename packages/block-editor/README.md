@@ -598,13 +598,13 @@ _Properties_
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
+-   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
--   _\_\_experimentalGenerateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
--   _\_\_experimentalCanLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
@@ -724,6 +724,7 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
+-   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 
@@ -762,8 +763,10 @@ _Parameters_
 
 ### useSetting
 
-Hook that retrieves the editor setting.
-It works with nested objects using by finding the value at path.
+Hook that retrieves the given setting for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy.
+If none is found, it'll look it up in the block editor store.
 
 _Usage_
 

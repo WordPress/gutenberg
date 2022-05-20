@@ -68,7 +68,7 @@ npm run test-e2e:playwright
 npm run test-e2e:playwright -- --headed
 
 # Run a single test file.
-npm run test-e2e:playwright -- <path_to_test_file>
+npm run test-e2e:playwright -- <path_to_test_file> # E.g., npm run test-e2e:playwright -- site-editor/title.spec.js
 
 # Debugging
 npm run test-e2e:playwright -- --debug

@@ -26,8 +26,8 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 ];
 
@@ -249,14 +249,19 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'CallExpression[callee.name="$"]',
+						selector: 'CallExpression[callee.property.name="$"]',
 						message:
 							'`$` is discouraged, please use `locator` instead',
 					},
 					{
-						selector: 'CallExpression[callee.name="$$"]',
+						selector: 'CallExpression[callee.property.name="$$"]',
 						message:
 							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
 					},
 				],
 			},

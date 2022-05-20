@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_translate_settings_using_i18n_schema' ) ) {
+if ( ! function_exists( 'translate_settings_using_i18n_schema' ) ) {
 	/**
 	 * Translates the provided settings value using its i18n schema.
 	 *
@@ -15,7 +15,7 @@ if ( ! function_exists( 'wp_translate_settings_using_i18n_schema' ) ) {
 	 *
 	 * @return string|string[]|array[] Translated settings.
 	 */
-	function wp_translate_settings_using_i18n_schema( $i18n_schema, $settings, $textdomain ) {
+	function translate_settings_using_i18n_schema( $i18n_schema, $settings, $textdomain ) {
 		if ( empty( $i18n_schema ) || empty( $settings ) || empty( $textdomain ) ) {
 			return $settings;
 		}
@@ -27,7 +27,7 @@ if ( ! function_exists( 'wp_translate_settings_using_i18n_schema' ) ) {
 		if ( is_array( $i18n_schema ) && is_array( $settings ) ) {
 			$translated_settings = array();
 			foreach ( $settings as $value ) {
-				$translated_settings[] = wp_translate_settings_using_i18n_schema( $i18n_schema[0], $value, $textdomain );
+				$translated_settings[] = translate_settings_using_i18n_schema( $i18n_schema[0], $value, $textdomain );
 			}
 			return $translated_settings;
 		}
@@ -36,9 +36,9 @@ if ( ! function_exists( 'wp_translate_settings_using_i18n_schema' ) ) {
 			$translated_settings = array();
 			foreach ( $settings as $key => $value ) {
 				if ( isset( $i18n_schema->$key ) ) {
-					$translated_settings[ $key ] = wp_translate_settings_using_i18n_schema( $i18n_schema->$key, $value, $textdomain );
+					$translated_settings[ $key ] = translate_settings_using_i18n_schema( $i18n_schema->$key, $value, $textdomain );
 				} elseif ( isset( $i18n_schema->$group_key ) ) {
-					$translated_settings[ $key ] = wp_translate_settings_using_i18n_schema( $i18n_schema->$group_key, $value, $textdomain );
+					$translated_settings[ $key ] = translate_settings_using_i18n_schema( $i18n_schema->$group_key, $value, $textdomain );
 				} else {
 					$translated_settings[ $key ] = $value;
 				}

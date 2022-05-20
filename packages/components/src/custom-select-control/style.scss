@@ -41,8 +41,12 @@
 		height: 100%;
 		padding: 0;
 		position: absolute;
-		right: 0;
+		right: $grid-unit-10;
 		top: 0;
+
+		&:not(.is-next-36px-default-size) {
+			right: $grid-unit-05;
+		}
 	}
 }
 

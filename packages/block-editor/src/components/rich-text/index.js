@@ -36,7 +36,6 @@ import { useBlockEditContext } from '../block-edit';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
-import { useCaretInFormat } from './use-caret-in-format';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
@@ -268,7 +267,6 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -340,7 +338,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef.current }
+					anchorRef={ anchorRef }
 				/>
 			) }
 			<TagName

@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 9.0.0 (2022-05-18)
+
+### Breaking Changes
+-   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
+
+### Enhancement
+-   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
+
+## 8.4.0 (2022-05-04)
+
+## 8.3.0 (2022-04-21)
+### New Features
+
+-   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))
+
+-   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
+
+## 8.2.0 (2022-04-08)
+
 ### New Features
 
 -   Add new `row` and `copy` icons. ([#39690](https://github.com/WordPress/gutenberg/pull/39690))

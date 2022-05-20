@@ -9,9 +9,15 @@
  * Register Gutenberg bundled patterns.
  */
 function gutenberg_register_gutenberg_patterns() {
+	$pattern_category_registry = WP_Block_Pattern_Categories_Registry::get_instance();
+
 	// Register categories used for block patterns.
-	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
+	if ( ! $pattern_category_registry->is_registered( 'query' ) ) {
 		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	}
+
+	if ( ! $pattern_category_registry->is_registered( 'featured' ) ) {
+		register_block_pattern_category( 'featured', array( 'label' => __( 'Featured', 'gutenberg' ) ) );
 	}
 
 	$patterns = array(

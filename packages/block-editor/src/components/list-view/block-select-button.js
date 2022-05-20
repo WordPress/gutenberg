@@ -8,6 +8,8 @@ import classnames from 'classnames';
  */
 import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
+import { Icon, lock } from '@wordpress/icons';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -16,7 +18,7 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
-import { SPACE, ENTER } from '@wordpress/keycodes';
+import { useBlockLock } from '../block-lock';
 
 function ListViewBlockSelectButton(
 	{
@@ -33,6 +35,7 @@ function ListViewBlockSelectButton(
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const { isLocked } = useBlockLock( clientId );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -40,7 +43,7 @@ function ListViewBlockSelectButton(
 	// inside the `useOnBlockDrop` hook.
 	const onDragStartHandler = ( event ) => {
 		event.dataTransfer.clearData();
-		onDragStart( event );
+		onDragStart?.( event );
 	};
 
 	function onKeyDownHandler( event ) {
@@ -75,6 +78,11 @@ function ListViewBlockSelectButton(
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor">
 						{ blockInformation.anchor }
+					</span>
+				) }
+				{ isLocked && (
+					<span className="block-editor-list-view-block-select-button__lock">
+						<Icon icon={ lock } />
 					</span>
 				) }
 			</Button>

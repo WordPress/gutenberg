@@ -18,7 +18,11 @@ import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
 import { appendSelectors } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import useSetting from '../components/use-setting';
-import { BlockControls, JustifyContentControl } from '../components';
+import {
+	BlockControls,
+	JustifyContentControl,
+	BlockVerticalAlignmentControl,
+} from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 
 // Used with the default, horizontal flex orientation.
@@ -34,6 +38,12 @@ const alignItemsMap = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
+};
+
+const verticalAlignmentMap = {
+	top: 'flex-start',
+	center: 'center',
+	bottom: 'flex-end',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -77,6 +87,7 @@ export default {
 		if ( layoutBlockSupport?.allowSwitching ) {
 			return null;
 		}
+		const { allowVerticalAlignment = true } = layoutBlockSupport;
 		return (
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
 				<FlexLayoutJustifyContentControl
@@ -84,6 +95,14 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
+				{ allowVerticalAlignment &&
+					layout?.orientation !== 'vertical' && (
+						<FlexLayoutVerticalAlignmentControl
+							layout={ layout }
+							onChange={ onChange }
+							isToolbar
+						/>
+					) }
 			</BlockControls>
 		);
 	},
@@ -104,9 +123,12 @@ export default {
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
+		const verticalAlignment =
+			verticalAlignmentMap[ layout.verticalAlignment ] ||
+			verticalAlignmentMap.center;
 		const rowOrientation = `
 		flex-direction: row;
-		align-items: center;
+		align-items: ${ verticalAlignment };
 		justify-content: ${ justifyContent };
 		`;
 		const alignItems =
@@ -139,6 +161,63 @@ export default {
 		return [];
 	},
 };
+
+function FlexLayoutVerticalAlignmentControl( {
+	layout,
+	onChange,
+	isToolbar = false,
+} ) {
+	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+
+	const onVerticalAlignmentChange = ( value ) => {
+		onChange( {
+			...layout,
+			verticalAlignment: value,
+		} );
+	};
+	if ( isToolbar ) {
+		return (
+			<BlockVerticalAlignmentControl
+				onChange={ onVerticalAlignmentChange }
+				value={ verticalAlignment }
+			/>
+		);
+	}
+
+	const verticalAlignmentOptions = [
+		{
+			value: 'flex-start',
+			label: __( 'Align items top' ),
+		},
+		{
+			value: 'center',
+			label: __( 'Align items center' ),
+		},
+		{
+			value: 'flex-end',
+			label: __( 'Align items bottom' ),
+		},
+	];
+
+	return (
+		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
+			<legend>{ __( 'Vertical alignment' ) }</legend>
+			<div>
+				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
+					return (
+						<Button
+							key={ value }
+							label={ label }
+							icon={ icon }
+							isPressed={ verticalAlignment === value }
+							onClick={ () => onVerticalAlignmentChange( value ) }
+						/>
+					);
+				} ) }
+			</div>
+		</fieldset>
+	);
+}
 
 function FlexLayoutJustifyContentControl( {
 	layout,

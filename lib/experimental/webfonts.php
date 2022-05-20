@@ -63,11 +63,20 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 * @param array[] $webfonts Webfonts to be registered.
 	 *                        This contains an array of webfonts to be registered.
 	 *                        Each webfont is an array.
+	 * @return string[] The font family slug of the registered webfonts.
 	 */
 	function wp_register_webfonts( array $webfonts ) {
+		$registered_webfont_slugs = array();
+
 		foreach ( $webfonts as $webfont ) {
-			wp_register_webfont( $webfont );
+			$slug = wp_register_webfont( $webfont );
+
+			if ( is_string( $slug ) ) {
+				$registered_webfont_slugs[ $slug ] = true;
+			}
 		}
+
+		return array_keys( $registered_webfont_slugs );
 	}
 }
 
@@ -94,7 +103,7 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * @since 6.0.0
 	 *
 	 * @param array $webfont Webfont to be registered.
-	 * @return bool True if successfully registered, else false.
+	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	function wp_register_webfont( array $webfont ) {
 		return wp_webfonts()->register_webfont( $webfont );

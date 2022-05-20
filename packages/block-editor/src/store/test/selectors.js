@@ -54,7 +54,6 @@ const {
 	getDraggedBlockClientIds,
 	isBlockBeingDragged,
 	isAncestorBeingDragged,
-	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSelectionEnabled,
@@ -2056,24 +2055,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isCaretWithinFormattedText', () => {
-		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
-			const state = {
-				isCaretWithinFormattedText: true,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( true );
-		} );
-
-		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
-			const state = {
-				isCaretWithinFormattedText: false,
-			};
-
-			expect( isCaretWithinFormattedText( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
@@ -3111,6 +3092,23 @@ describe( 'selectors', () => {
 					} ),
 				] )
 			);
+		} );
+		it( 'should support single block object', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+					order: {},
+					parents: {},
+					cache: {},
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: {},
+			};
+			const block = { name: 'core/with-tranforms-a' };
+			const items = getBlockTransformItems( state, block );
+			expect( items ).toHaveLength( 2 );
 		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = {

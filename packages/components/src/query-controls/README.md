@@ -51,7 +51,7 @@ const MyQueryControls = () => {
 			selectedCategoryId={ category }
 			onCategoryChange={ ( newCategory ) => updateQuery( { category: newCategory } ) }
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
-				updateQuery( { numberOfItems: newCategory } )
+				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
 		/>
 	);
@@ -104,7 +104,7 @@ const MyQueryControls = () => {
 			selectedCategories={ selectedCategories }
 			onCategoryChange={ ( category ) => updateQuery( { selectedCategories: category } ) }
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
-				updateQuery( { numberOfItems: newCategory } )
+				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
 		/>
 	);

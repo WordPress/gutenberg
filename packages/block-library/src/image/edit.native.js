@@ -670,7 +670,7 @@ export class ImageEdit extends Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) } />
+				<PanelBody title={ __( 'Settings' ) } />
 				<PanelBody style={ styles.panelBody }>
 					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
@@ -757,7 +757,6 @@ export class ImageEdit extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>

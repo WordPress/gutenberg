@@ -19,10 +19,8 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-
-/* global wp */
 
 /**
  * Internal dependencies
@@ -97,7 +95,7 @@ function hasDefaultSize( image, defaultSize ) {
  * @return {boolean} Whether the image has been destroyed.
  */
 export function isMediaDestroyed( id ) {
-	const attachment = wp?.media?.attachment( id ) || {};
+	const attachment = window?.wp?.media?.attachment( id ) || {};
 	return attachment.destroyed;
 }
 
@@ -158,6 +156,14 @@ export function ImageEdit( {
 		 has been deleted.
 	*/
 	function onImageError( isReplaced = false ) {
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice(
+			sprintf(
+				/* translators: %s url or missing image */
+				__( 'Error loading image: %s' ),
+				url
+			)
+		);
 		// If the image block was not replaced with an embed,
 		// clear the attributes and trigger the placeholder.
 		if ( ! isReplaced ) {
@@ -232,7 +238,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':

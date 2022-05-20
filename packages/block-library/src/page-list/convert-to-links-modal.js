@@ -4,7 +4,7 @@
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { __experimentalUseEntityRecords as useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 

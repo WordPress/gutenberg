@@ -32,6 +32,7 @@ describe( 'Block Switcher', () => {
 				'Heading',
 				'Pullquote',
 				'Columns',
+				'Table of Contents',
 			] )
 		);
 	} );
@@ -57,6 +58,7 @@ describe( 'Block Switcher', () => {
 				'Paragraph',
 				'Pullquote',
 				'Heading',
+				'Table of Contents',
 			] )
 		);
 	} );
@@ -71,6 +73,7 @@ describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
+				'core/table-of-contents',
 			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 

@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="https://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -78,14 +79,22 @@ const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
 	);
 };
 
-const BlockColorsStyleSelector = ( { children, ...other } ) => (
-	<Dropdown
-		position="bottom right"
-		className="block-library-colors-selector"
-		contentClassName="block-library-colors-selector__popover"
-		renderToggle={ renderToggleComponent( other ) }
-		renderContent={ () => children }
-	/>
-);
+const BlockColorsStyleSelector = ( { children, ...other } ) => {
+	deprecated( `wp.blockEditor.BlockColorsStyleSelector`, {
+		alternative: 'block supports API',
+		since: '6.1',
+		version: '6.3',
+	} );
+
+	return (
+		<Dropdown
+			position="bottom right"
+			className="block-library-colors-selector"
+			contentClassName="block-library-colors-selector__popover"
+			renderToggle={ renderToggleComponent( other ) }
+			renderContent={ () => children }
+		/>
+	);
+};
 
 export default BlockColorsStyleSelector;

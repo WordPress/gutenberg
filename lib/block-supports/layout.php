@@ -11,7 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -83,6 +83,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			'center' => 'center',
 		);
 
+		$vertical_alignment_options = array(
+			'top'    => 'flex-start',
+			'center' => 'center',
+			'bottom' => 'flex-end',
+		);
+
 		if ( 'horizontal' === $layout_orientation ) {
 			$justify_content_options += array( 'space-between' => 'space-between' );
 		}
@@ -108,7 +114,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		$style .= "flex-wrap: $flex_wrap;";
 		if ( 'horizontal' === $layout_orientation ) {
-			$style .= 'align-items: center;';
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
@@ -116,6 +121,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+			}
+
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
+			} else {
+				$style .= 'align-items: center;';
 			}
 		} else {
 			$style .= 'flex-direction: column;';
@@ -142,7 +153,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
 
 	if ( ! $support_layout ) {
 		return $block_content;

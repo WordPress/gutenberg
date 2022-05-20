@@ -46,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
@@ -238,7 +237,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }

@@ -29,7 +29,7 @@
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"color": {
-			"__experimentalDuotone": "img",
+			"__experimentalDuotone": "img, .wp-block-post-featured-image__placeholder, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,
 			"background": false
 		},

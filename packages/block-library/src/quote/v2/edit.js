@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -74,6 +74,7 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 	clientId,
 	className,
+	style,
 } ) {
 	const { citation, align } = attributes;
 
@@ -88,6 +89,7 @@ export default function QuoteEdit( {
 		className: classNames( className, {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
+		...( ! isWebPlatform && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
@@ -126,8 +128,11 @@ export default function QuoteEdit( {
 						}
 						className="wp-block-quote__citation"
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
+						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
 					/>
 				) }
 			</BlockQuotation>

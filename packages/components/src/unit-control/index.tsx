@@ -88,7 +88,7 @@ function UnforwardedUnitControl(
 	);
 
 	const [ unit, setUnit ] = useControlledState< string | undefined >(
-		unitProp,
+		units.length === 1 ? units[ 0 ].value : unitProp,
 		{
 			initial: parsedUnit,
 			fallback: '',
@@ -178,10 +178,7 @@ function UnforwardedUnitControl(
 				: undefined;
 			const changeProps = { event, data };
 
-			onChangeProp?.(
-				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
-				changeProps
-			);
+			// The `onChange` callback already gets called, no need to call it explicitely.
 			onUnitChange?.( validParsedUnit, changeProps );
 
 			setUnit( validParsedUnit );

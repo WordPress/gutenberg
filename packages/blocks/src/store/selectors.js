@@ -332,7 +332,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	return (
 		isSearchMatch( blockType.title ) ||
 		some( blockType.keywords, isSearchMatch ) ||
-		isSearchMatch( blockType.category )
+		isSearchMatch( blockType.category ) ||
+		isSearchMatch( blockType.description )
 	);
 }
 

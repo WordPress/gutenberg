@@ -44,7 +44,8 @@
 	}
 }
 
-.edit-site-global-styles-header__description {
+.edit-site-global-styles-header__description,
+.edit-site-block-types-search {
 	padding: 0 $grid-unit-20;
 }
 
@@ -93,3 +94,11 @@
 	}
 }
 
+.edit-site-global-styles-icon-with-current-color {
+	fill: currentColor;
+}
+
+.edit-site-global-styles__color-indicator-wrapper {
+	// Match the height of the rest of the icons (24px).
+	height: $grid-unit * 3;
+}

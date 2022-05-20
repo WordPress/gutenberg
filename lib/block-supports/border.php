@@ -13,7 +13,7 @@
  */
 function gutenberg_register_border_support( $block_type ) {
 	// Determine if any border related features are supported.
-	$has_border_support       = gutenberg_block_has_support( $block_type, array( '__experimentalBorder' ) );
+	$has_border_support       = block_has_support( $block_type, array( '__experimentalBorder' ) );
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 
 	// Setup attributes and styles within that if needed.
@@ -38,7 +38,7 @@ function gutenberg_register_border_support( $block_type ) {
  * Adds CSS classes and inline styles for border styles to the incoming
  * attributes array. This will be applied to the block markup in the front-end.
  *
- * @param WP_Block_type $block_type       Block type.
+ * @param WP_Block_Type $block_type       Block type.
  * @param array         $block_attributes Block attributes.
  *
  * @return array Border CSS classes and inline styles.
@@ -50,6 +50,10 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	$classes = array();
 	$styles  = array();
+	$sides   = array( 'top', 'right', 'bottom', 'left' );
+
+	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
+	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
 
 	// Border radius.
 	if (
@@ -88,7 +92,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border width.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'width' ) &&
+		$has_border_width_support &&
 		isset( $block_attributes['style']['border']['width'] ) &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' )
 	) {
@@ -104,7 +108,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border color.
 	if (
-		gutenberg_has_border_feature_support( $block_type, 'color' ) &&
+		$has_border_color_support &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
 		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
@@ -122,6 +126,18 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		}
 	}
 
+	// Generate styles for individual border sides.
+	if ( $has_border_color_support || $has_border_width_support ) {
+		foreach ( $sides as $side ) {
+			$border = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), false );
+
+			if ( is_array( $border ) && ! empty( $border ) ) {
+				$split_border_styles = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
+				$styles              = array_merge( $styles, $split_border_styles );
+			}
+		}
+	}
+
 	// Collect classes and styles.
 	$attributes = array();
 
@@ -134,6 +150,56 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	}
 
 	return $attributes;
+}
+
+/**
+ * Generates longhand CSS styles for an individual side border.
+ *
+ * If some values are omitted from the border configuration, using shorthand
+ * styles would lead to `initial` values being used instead of the more
+ * desirable inherited values. This could also lead to browser inconsistencies.
+ *
+ * @param string        $side       The side the styles are being generated for.
+ * @param array         $border     Array containing border color, style, and width values.
+ * @param WP_Block_Type $block_type Block type.
+ *
+ * @return array Longhand CSS border styles for a single side.
+ */
+function gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type ) {
+	$styles = array();
+
+	if (
+		isset( $border['width'] ) &&
+		null !== $border['width'] &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' )
+	) {
+		$styles[] = sprintf( 'border-%s-width: %s;', $side, $border['width'] );
+	}
+
+	if (
+		isset( $border['style'] ) &&
+		null !== $border['style'] &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
+	) {
+		$styles[] = sprintf( 'border-%s-style: %s;', $side, $border['style'] );
+	}
+
+	$border_color = _wp_array_get( $border, array( 'color' ), null );
+
+	if (
+		$border_color &&
+		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
+	) {
+		$has_color_preset = strpos( $border_color, 'var:preset|color|' ) !== false;
+		if ( $has_color_preset ) {
+			$named_color_slug = substr( $border_color, strrpos( $border_color, '|' ) + 1 );
+			$styles []        = sprintf( 'border-%s-color: var(--wp--preset--color--%s);', $side, $named_color_slug );
+		} else {
+			$styles [] = sprintf( 'border-%s-color: %s;', $side, $border['color'] );
+		}
+	}
+
+	return $styles;
 }
 
 /**
@@ -161,7 +227,7 @@ function gutenberg_has_border_feature_support( $block_type, $feature, $default =
 
 	// Check if the specific feature has been opted into individually
 	// via nested flag under `__experimentalBorder`.
-	return gutenberg_block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
+	return block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
 }
 
 // Register the block support.

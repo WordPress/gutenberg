@@ -70,6 +70,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				<InspectorControls.Slot
 					__experimentalGroup="color"
 					label={ __( 'Color' ) }
+					className="color-block-support-panel__inner-wrapper"
 				/>
 				<InspectorControls.Slot
 					__experimentalGroup="typography"

@@ -23,6 +23,11 @@ import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
 /**
+ * Internal dependencies
+ */
+import { mapRichTextSettings } from './utils';
+
+/**
  * Action which will insert a default block insert action if there
  * are no other blocks at the root of the editor. This action should be used
  * in actions which may result in no blocks remaining in the editor (removal,
@@ -667,19 +672,6 @@ export const synchronizeTemplate = () => ( { select, dispatch } ) => {
 	dispatch.resetBlocks( updatedBlockList );
 };
 
-function mapRichTextSettings( attributeDefinition ) {
-	const {
-		multiline: multilineTag,
-		__unstableMultilineWrapperTags: multilineWrapperTags,
-		__unstablePreserveWhiteSpace: preserveWhiteSpace,
-	} = attributeDefinition;
-	return {
-		multilineTag,
-		multilineWrapperTags,
-		preserveWhiteSpace,
-	};
-}
-
 /**
  * Delete the current selection.
  *
@@ -1269,22 +1261,34 @@ export function stopDraggingBlocks() {
 /**
  * Returns an action object used in signalling that the caret has entered formatted text.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function enterFormattedText() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).enterFormattedText', {
+		since: '6.1',
+		version: '6.3',
+	} );
 	return {
-		type: 'ENTER_FORMATTED_TEXT',
+		type: 'DO_NOTHING',
 	};
 }
 
 /**
  * Returns an action object used in signalling that the user caret has exited formatted text.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function exitFormattedText() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).exitFormattedText', {
+		since: '6.1',
+		version: '6.3',
+	} );
 	return {
-		type: 'EXIT_FORMATTED_TEXT',
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1597,5 +1601,17 @@ export function setHasControlledInnerBlocks(
 		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
 		hasControlledInnerBlocks,
 		clientId,
+	};
+}
+
+/**
+ * Action that sets whether a block has controlled inner blocks.
+ *
+ * @param {Record<string,boolean>} updates The block's clientId.
+ */
+export function setBlockVisibility( updates ) {
+	return {
+		type: 'SET_BLOCK_VISIBILITY',
+		updates,
 	};
 }

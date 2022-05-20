@@ -67,4 +67,12 @@
 			margin-top: 0.35em;
 		}
 	}
+
+	.comment-reply-title {
+		margin-bottom: 0;
+		:where(small) {
+			font-size: var(--wp--preset--font-size--medium, smaller);
+			margin-left: 0.5em;
+		}
+	}
 }

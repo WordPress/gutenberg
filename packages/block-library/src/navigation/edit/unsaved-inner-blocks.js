@@ -123,7 +123,7 @@ export default function UnsavedInnerBlocks( {
 	);
 
 	// Automatically save the uncontrolled blocks.
-	useEffect( async () => {
+	useEffect( () => {
 		// The block will be disabled when used in a BlockPreview.
 		// In this case avoid automatic creation of a wp_navigation post.
 		// Otherwise the user will be spammed with lots of menus!
@@ -150,9 +150,10 @@ export default function UnsavedInnerBlocks( {
 		}
 
 		savingLock.current = true;
-		const menu = await createNavigationMenu( null, blocks );
-		onSave( menu );
-		savingLock.current = false;
+		createNavigationMenu( null, blocks ).then( ( menu ) => {
+			onSave( menu );
+			savingLock.current = false;
+		} );
 	}, [
 		isDisabled,
 		isSaving,

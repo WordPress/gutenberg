@@ -208,6 +208,13 @@ const transforms = {
 				} );
 			},
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/table-of-contents' ],
+			transform: () => {
+				return createBlock( 'core/table-of-contents' );
+			},
+		},
 	],
 };
 

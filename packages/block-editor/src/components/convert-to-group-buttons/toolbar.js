@@ -15,7 +15,7 @@ import { store as blockEditorStore } from '../../store';
 
 const layouts = {
 	group: undefined,
-	row: { type: 'flex' },
+	row: { type: 'flex', flexWrap: 'nowrap' },
 	stack: { type: 'flex', orientation: 'vertical' },
 };
 
