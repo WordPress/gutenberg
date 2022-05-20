@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Gutenberg class
+ * WP_Theme_JSON_6_1 class
  *
  * @package gutenberg
  */
@@ -15,6 +15,18 @@
  * @access private
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
+	const __EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
+
+	const ELEMENTS = array(
+		'link'   => 'a',
+		'h1'     => 'h1',
+		'h2'     => 'h2',
+		'h3'     => 'h3',
+		'h4'     => 'h4',
+		'h5'     => 'h5',
+		'h6'     => 'h6',
+		'button' => '.wp-element-button, .wp-block-button, button', // We have the .wp-block-button class so that this will target older buttons that have been serialized.
+	);
 	/**
 	 * Returns the metadata for each block.
 	 *
