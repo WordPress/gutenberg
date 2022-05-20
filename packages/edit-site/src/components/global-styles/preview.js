@@ -86,6 +86,7 @@ const StylesPreview = ( { label, isFocused } ) => {
 				<EditorStyles
 					styles={ [
 						...styles,
+						// Reset leaked styles from WP common.css.
 						{
 							css: 'body{min-width: 0;}',
 							isGlobalStyles: true,
