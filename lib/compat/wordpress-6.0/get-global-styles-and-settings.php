@@ -81,7 +81,9 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
+		! is_admin() &&
+		/** This filter is documented in wp-includes/global-styles-and-settings.php */
+		apply_filters( 'global_styles_enable_cache', true )
 	);
 	$transient_name = 'gutenberg_global_styles_' . get_stylesheet();
 	if ( $can_use_cached ) {
@@ -147,7 +149,9 @@ function gutenberg_get_global_styles_svg_filters() {
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
+		! is_admin() &&
+		/** This filter is documented in wp-includes/global-styles-and-settings.php */
+		apply_filters( 'global_styles_enable_cache', true )
 	);
 	if ( $can_use_cached ) {
 		$cached = get_transient( $transient_name );
