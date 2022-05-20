@@ -188,11 +188,15 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should return correct permissions (no permissions)', () => {
+		const menuWithNoDeletePermissions = 2;
+		const requestedMenu = 1;
+		const requestedMenuData = [`navigationMenu${requestedMenu}`];
+		
 		setRecords( registry, navigationMenus );
 		// Note the ref refers to a different record
-		setDeletePermission( registry, 2, true );
-		expect( useNavigationMenu( 1 ) ).toEqual( {
-			navigationMenu: navigationMenu1,
+		setDeletePermission( registry, menuWithNoDeletePermissions, true );
+		expect( useNavigationMenu( requestedMenu ) ).toEqual( {
+			navigationMenu: requestedMenuData,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenu: false,
