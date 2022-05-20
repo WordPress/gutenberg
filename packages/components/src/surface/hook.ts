@@ -9,11 +9,12 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
+import type { SurfaceProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- */
-export function useSurface( props ) {
+export function useSurface(
+	props: WordPressComponentProps< SurfaceProps, 'div' >
+) {
 	const {
 		backgroundSize = 12,
 		borderBottom = false,
@@ -28,14 +29,14 @@ export function useSurface( props ) {
 	const cx = useCx();
 
 	const classes = useMemo( () => {
-		const sx = {};
-
-		sx.borders = styles.getBorders( {
-			borderBottom,
-			borderLeft,
-			borderRight,
-			borderTop,
-		} );
+		const sx = {
+			borders: styles.getBorders( {
+				borderBottom,
+				borderLeft,
+				borderRight,
+				borderTop,
+			} ),
+		};
 
 		return cx(
 			styles.Surface,
