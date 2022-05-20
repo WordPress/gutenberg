@@ -5,10 +5,23 @@
  * @package gutenberg
  */
 
+/**
+ * This applies a filter to the list of style nodes that comes from `get_style_nodes` in WP_Theme_JSON.
+ * This particular filter removes all of the blocks from the array.
+ *
+ * @since 6.1
+ *
+ * @param array $nodes The nodes to filter.
+ * @return array A filtered array of style nodes.
+ */
 function filter_out_block_nodes( $nodes ) {
-	return array_filter( $nodes, function( $node, $key ) {
-		return ! in_array( 'blocks', $node['path'] );
-	}, ARRAY_FILTER_USE_BOTH );
+	return array_filter(
+		$nodes,
+		function( $node ) {
+			return ! in_array( 'blocks', $node['path'], true );
+		},
+		ARRAY_FILTER_USE_BOTH
+	);
 }
 
 /**
