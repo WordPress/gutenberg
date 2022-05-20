@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useRefEffect, useLatestRef } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -24,8 +23,8 @@ export function useOnEnter( props ) {
 		getBlock,
 		getNextBlockClientId,
 	} = useSelect( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
+	const propsRef = useLatestRef( props );
+
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
