@@ -483,12 +483,12 @@ export class ImageEdit extends Component {
 			// Use RN's Image.getSize to determine if URL is a valid image
 			RNImage.getSize(
 				newURL,
-				( width, height ) => {
+				() => {
 					setAttributes( {
 						url: newURL,
 						id: undefined,
-						width,
-						height,
+						width: undefined,
+						height: undefined,
 						sizeSlug: imageDefaultSize,
 					} );
 					this.setState( {
@@ -535,7 +535,7 @@ export class ImageEdit extends Component {
 			<View style={ styles.image__loading }>
 				<ActivityIndicator animating />
 			</View>
-		)
+		);
 	}
 
 	getWidth() {
@@ -841,7 +841,8 @@ export class ImageEdit extends Component {
 							} ) => {
 								return (
 									<View style={ imageContainerStyles }>
-										{ isFetchingImage && this.showLoadingIndicator() }
+										{ isFetchingImage &&
+											this.showLoadingIndicator() }
 										<Image
 											align={
 												align && alignToFlex[ align ]
