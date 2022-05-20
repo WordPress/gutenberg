@@ -316,11 +316,7 @@ class EditorPage {
 				? '//android.widget.Button[@content-desc="Add Block Before"]'
 				: '//XCUIElementTypeButton[@name="Add Block Before"]';
 
-			const addBlockBeforeButton = await waitForVisible(
-				this.driver,
-				addBlockBeforeButtonLocator
-			);
-			await addBlockBeforeButton.click();
+			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
 		} else {
 			await addButton.click();
 		}
