@@ -55,14 +55,18 @@
 		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-paragraph-editor",
-	"style": "wp-block-paragraph",
-	"styledClasses": [
-		"has-background",
-		"has-drop-cap",
-		"has-text-color",
-		"is-large-text",
-		"is-larger-text",
-		"is-regular-text",
-		"is-small-text"
+	"style": [
+		{
+			"handle": "wp-block-paragraph",
+			"parts": [
+				"has-background",
+				"has-drop-cap",
+				"has-text-color",
+				"is-large-text",
+				"is-larger-text",
+				"is-regular-text",
+				"is-small-text"
+			]
+		}
 	]
 }

@@ -353,43 +353,40 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 	/**
 	 * Inlines tree-shaked CSS for blocks, instead of a single file.
-	 * Filters the settings determined from the block type metadata.
 	 *
-	 * @param array $settings Array of determined settings for registering a block type.
 	 * @param array $metadata Metadata provided for registering a block type.
 	 */
-	function wp_maybe_inline_block_style_parts( $settings, $metadata ) {
+	function wp_maybe_inline_block_style_parts( $metadata ) {
+
+		// Bail early if style is empty or not an array.
+		if ( ! isset( $metadata['style'] ) || ! is_array( $metadata['style'] ) ) {
+			return $metadata;
+		}
+
+		// Compile an array of style-parts.
+		$styled_parts = array();
+		foreach ( $metadata['style'] as $key => $style ) {
+			// Skip item if "parts" and "style" are not set, or empty.
+			if ( empty( $style['parts'] ) || empty( $style['handle'] ) ) {
+				continue;
+			}
+
+			// Add the stylesheet to the array to be used below.
+			$styled_parts[ $style['handle'] ] = $style['parts'];
+
+			// Convert $metadata['style'] to an array removing the "parts" and "handle" keys.
+			$metadata['style'][ $key ] = $style['handle'];
+		}
 
 		// Bail early if wp_should_load_separate_core_block_assets() is false.
 		if ( ! wp_should_load_separate_core_block_assets() ) {
-			return $settings;
+			return $metadata;
 		}
 
-		// Bail early if `styledClasses` is not set.
-		if ( empty( $metadata['styledClasses'] ) ) {
-			return $settings;
+		// Bail early if there are no styled parts.
+		if ( empty( $styled_parts ) ) {
+			return $metadata;
 		}
-
-		// Bail early if the block doesn't have a "style" defined.
-		if ( empty( $settings['style'] ) ) {
-			return $settings;
-		}
-
-		// Get the stylesheet handle.
-		$handle = $settings['style'];
-
-		global $wp_styles;
-		// Remove the default style. We'll be adding style-parts depending on the block content.
-		$wp_styles->registered[ $handle ]->src = '';
-		// Get the block's folder path which will be later used to get the individual files.
-		// Use the folder-path of the style.css file if available, otherwise fallback to the block.json parent folder.
-		$block_path = dirname( $metadata['file'] );
-		if ( ! empty( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$block_path = dirname( $wp_styles->registered[ $handle ]->extra['path'] );
-		}
-
-		// Unset the default style's path to prevent inlining the whole file.
-		unset( $wp_styles->registered[ $handle ]->extra['path'] );
 
 		/**
 		 * Callback to add the style-parts to the block.
@@ -398,30 +395,66 @@ if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 		 * @param  array  $block         Block object.
 		 * @return string                Filtered block content.
 		 */
-		$callback = static function( $block_content, $block ) use ( $handle, $block_path, $metadata ) {
+		$callback = static function( $block_content, $block ) use ( $metadata, $styled_parts ) {
 			// Check that we're on the right block.
 			if ( $block['blockName'] !== $metadata['name'] ) {
 				return $block_content;
 			}
 
+			// Use a static variable to avoid adding the same part more than once.
+			static $style_parts_added = array();
+			if ( ! isset( $style_parts_added[ $block['blockName'] ] ) ) {
+				$style_parts_added[ $block['blockName'] ] = array();
+			}
+
 			// Add inline styles for the class-names that exist in the content.
-			foreach ( $metadata['styledClasses'] as $class_name ) {
-				if ( false === strpos( $block_content, $class_name ) ) {
-					continue;
+			foreach ( $styled_parts as $handle => $styled_parts ) {
+
+				global $wp_styles;
+				// Remove the default style. We'll be adding style-parts depending on the block content.
+				$wp_styles->registered[ $handle ]->src = '';
+				// Get the block's folder path which will be later used to get the individual files.
+				// Use the folder-path of the style.css file if available, otherwise fallback to the block.json parent folder.
+				$block_path = dirname( $metadata['file'] );
+				if ( ! empty( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
+					$block_path = dirname( $wp_styles->registered[ $handle ]->extra['path'] );
 				}
-				$file = $block_path . "/styles/{$class_name}.css";
-				if ( is_rtl() && file_exists( $block_path . "/styles/{$class_name}-rtl.css" ) ) {
-					$file = $block_path . "/styles/{$class_name}-rtl.css";
+
+				// Unset the default style's path to prevent inlining the whole file.
+				unset( $wp_styles->registered[ $handle ]->extra['path'] );
+
+				// Add the style-parts to the block.
+				foreach ( $styled_parts as $part ) {
+
+					// Make sure this part has not already been added.
+					if ( in_array( $part, $style_parts_added[ $block['blockName'] ], true ) ) {
+						continue;
+					}
+
+					// Skip item if the block does not contain the defined string.
+					if ( false === strpos( $block_content, $part ) ) {
+						continue;
+					}
+
+					$file = $block_path . "/styles/{$part}.css";
+					if ( is_rtl() && file_exists( $block_path . "/styles/{$part}-rtl.css" ) ) {
+						$file = $block_path . "/styles/{$part}-rtl.css";
+					}
+					wp_add_inline_style( $handle, file_get_contents( $file ) );
+
+					// Add the part to the array of added parts.
+					$style_parts_added[ $block['blockName'] ][] = $part;
 				}
-				wp_add_inline_style( $handle, file_get_contents( $file ) );
 			}
 			return $block_content;
 		};
-
-		// Add the callback to the block's render callback.
 		add_filter( 'render_block', $callback, 10, 2 );
 
-		return $settings;
+		return $metadata;
 	}
 }
-add_filter( 'block_type_metadata_settings', 'wp_maybe_inline_block_style_parts', 10, 2 );
+/*
+ * Add the filter. Using a priority of 1 ensures that this filter runs before others,
+ * so the "style" metadata can be properly formatted for subsequent filters.
+ */
+add_filter( 'block_type_metadata', 'wp_maybe_inline_block_style_parts', 1, 2 );
