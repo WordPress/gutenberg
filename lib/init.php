@@ -30,20 +30,6 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	// The navigation editor menu item is temporarily removed by hardcoding `false` here.
-	// See https://github.com/WordPress/gutenberg/pull/40878 for more info.
-	if ( false && get_option( 'gutenberg-experiments' ) ) {
-		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
-			add_submenu_page(
-				'gutenberg',
-				__( 'Navigation (beta)', 'gutenberg' ),
-				__( 'Navigation (beta)', 'gutenberg' ),
-				'edit_theme_options',
-				'gutenberg-navigation',
-				'gutenberg_navigation_page'
-			);
-		}
-	}
 	if ( current_user_can( 'edit_posts' ) ) {
 		add_submenu_page(
 			'gutenberg',
