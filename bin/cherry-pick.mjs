@@ -59,7 +59,7 @@ function cli( command, args, pipe = false ) {
 		stdio: 'pipe',
 		encoding: 'utf-8',
 	};
-	const result = spawnSync( command, args, ...( pipe ? pipeOptions : [] ) );
+	const result = spawnSync( command, args, ...( pipe ? [ pipeOptions ] : [] ) );
 	if ( result.status !== 0 ) {
 		throw new Error( result.stderr?.toString()?.trim() );
 	}
@@ -207,7 +207,7 @@ function GHcommentAndRemoveLabel( pr ) {
 	const { number, cherryPickHash } = pr;
 	const comment = prComment( cherryPickHash );
 	try {
-		cli( 'gh', ['pr', 'comment', number, comment] );
+		cli( 'gh', ['pr', 'comment', number, '--body', comment] );
 		cli( 'gh', ['pr', 'edit', number, '--remove-label', LABEL] );
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
