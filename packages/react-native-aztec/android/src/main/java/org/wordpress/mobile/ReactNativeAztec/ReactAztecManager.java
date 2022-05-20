@@ -13,6 +13,7 @@ import androidx.core.util.Consumer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -615,6 +616,16 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = "deleteEnter", defaultBoolean = false)
     public void setShouldDeleteEnter(final ReactAztecText view, boolean shouldDeleteEnter) {
         view.shouldDeleteEnter = shouldDeleteEnter;
+    }
+
+    @ReactProp(name = "disableAutocorrection", defaultBoolean = false)
+    public void disableAutocorrection(final ReactAztecText view, boolean disable) {
+        if (disable) {
+            view.setInputType((view.getInputType() & ~InputType.TYPE_TEXT_FLAG_AUTO_CORRECT) | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        }
+        else {
+            view.setInputType((view.getInputType() & ~InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        }
     }
 
     @Override
