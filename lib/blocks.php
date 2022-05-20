@@ -453,8 +453,6 @@ if ( ! function_exists( 'wp_maybe_inline_block_style_parts' ) ) {
 		return $metadata;
 	}
 }
-/*
- * Add the filter. Using a priority of 1 ensures that this filter runs before others,
- * so the "style" metadata can be properly formatted for subsequent filters.
- */
+// Add the filter. Using a priority of 1 ensures that this filter runs before others,
+// so the "style" metadata can be properly formatted for subsequent filters.
 add_filter( 'block_type_metadata', 'wp_maybe_inline_block_style_parts', 1, 2 );
