@@ -17,6 +17,12 @@
 		"customTextColor": {
 			"type": "string"
 		},
+		"linkColor": {
+			"type": "string"
+		},
+		"customLinkColor": {
+			"type": "string"
+		},
 		"rgbTextColor": {
 			"type": "string"
 		},
@@ -68,6 +74,8 @@
 	"providesContext": {
 		"textColor": "textColor",
 		"customTextColor": "customTextColor",
+		"linkColor": "linkColor",
+		"customLinkColor": "customLinkColor",
 		"backgroundColor": "backgroundColor",
 		"customBackgroundColor": "customBackgroundColor",
 		"overlayTextColor": "overlayTextColor",

@@ -105,6 +105,8 @@ function Navigation( {
 	setBackgroundColor,
 	textColor,
 	setTextColor,
+	linkColor,
+	setLinkColor,
 	overlayBackgroundColor,
 	setOverlayBackgroundColor,
 	overlayTextColor,
@@ -339,6 +341,11 @@ function Navigation( {
 					'color',
 					textColor?.slug
 				) ]: !! textColor?.slug,
+				'has-link-color': !! linkColor.color || !! linkColor?.class,
+				[ getColorClassName(
+					'color',
+					linkColor?.slug
+				) ]: !! linkColor?.slug,
 				'has-background':
 					!! backgroundColor.color || backgroundColor.class,
 				[ getColorClassName(
@@ -661,6 +668,11 @@ function Navigation( {
 							label: __( 'Text' ),
 						},
 						{
+							value: linkColor?.color,
+							onChange: setLinkColor,
+							label: __( 'Link' ),
+						},
+						{
 							value: backgroundColor.color,
 							onChange: setBackgroundColor,
 							label: __( 'Background' ),
@@ -874,6 +886,7 @@ function Navigation( {
 
 export default withColors(
 	{ textColor: 'color' },
+	{ linkColor: 'color' },
 	{ backgroundColor: 'color' },
 	{ overlayBackgroundColor: 'color' },
 	{ overlayTextColor: 'color' }
