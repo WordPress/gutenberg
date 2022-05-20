@@ -43,7 +43,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import { isExternalImage, isMediaDestroyed } from './edit';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
@@ -72,14 +72,12 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
-	onCloseModal,
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
 	containerRef,
 	context,
 	clientId,
-	onImageLoadError,
 } ) {
 	const imageRef = useRef();
 	const captionRef = useRef();
@@ -218,16 +216,11 @@ export default function Image( {
 	}
 
 	function onImageError() {
-		// Check if there's an embed block that handles this URL, e.g., instagram URL.
-		// See: https://github.com/WordPress/gutenberg/pull/11472
+		// Check if there's an embed block that handles this URL.
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		const shouldReplace = undefined !== embedBlock;
-
-		if ( shouldReplace ) {
+		if ( undefined !== embedBlock ) {
 			onReplace( embedBlock );
 		}
-
-		onImageLoadError( shouldReplace );
 	}
 
 	function onSetHref( props ) {
@@ -299,9 +292,6 @@ export default function Image( {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
 		}
-		if ( isSelected && isMediaDestroyed( id ) ) {
-			onImageLoadError();
-		}
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
@@ -365,7 +355,6 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onCloseModal={ onCloseModal }
 					/>
 				</BlockControls>
 			) }
