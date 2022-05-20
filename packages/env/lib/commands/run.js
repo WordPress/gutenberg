@@ -23,7 +23,13 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 	// Shows a contextual tip for the given command.
 	showCommandTips( container, command, spinner );
 
-	await spawnDockerComposeRunCommand( config, container, command, spinner );
+	await spawnDockerComposeRunCommand(
+		config,
+		container,
+		'',
+		command,
+		spinner
+	);
 
 	spinner.text = `Ran \`${ command }\` in '${ container }'.`;
 };

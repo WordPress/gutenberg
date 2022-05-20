@@ -10,14 +10,16 @@ const { spawn } = require( 'child_process' );
 /**
  * Runs an arbitrary command on the given Docker container.
  *
- * @param {Config}   config    The wp-env configuration.
- * @param {string}   container The Docker container to run the command on.
- * @param {string[]} command   The command to run.
- * @param {Object}   spinner   A CLI spinner which indicates progress.
+ * @param {Config}   config     The wp-env configuration.
+ * @param {string}   container  The Docker container to run the command on.
+ * @param {string}   workingDir The working directory that the command should be executed in.
+ * @param {string[]} command    The command to run.
+ * @param {Object}   spinner    A CLI spinner which indicates progress.
  */
 module.exports = function spawnDockerComposeRunCommand(
 	config,
 	container,
+	workingDir,
 	command,
 	spinner
 ) {
@@ -25,6 +27,8 @@ module.exports = function spawnDockerComposeRunCommand(
 		'-f',
 		config.dockerComposeConfigPath,
 		'run',
+		'-w',
+		workingDir,
 		'--rm',
 		container,
 		...command,

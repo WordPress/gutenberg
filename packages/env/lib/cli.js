@@ -92,6 +92,10 @@ module.exports = function cli() {
 		default: false,
 	} );
 
+	// Make sure any unknown arguments are passed to the command as arguments.
+	// This allows options to be passed to "run" and "exec" without being quoted.
+	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
+
 	yargs.command(
 		'start',
 		wpGreen(
@@ -171,7 +175,7 @@ module.exports = function cli() {
 				describe: 'The container to run the command on.',
 			} );
 			args.positional( 'command', {
-				type: 'string',
+				type: 'array',
 				describe: 'The command to run.',
 			} );
 		},
@@ -189,6 +193,33 @@ module.exports = function cli() {
 		'$0 run tests-cli bash',
 		'Open a bash session in the WordPress tests instance.'
 	);
+
+	yargs.command(
+		'exec <environment> <script> [script-args...]',
+		'Runs the selected script in a given environment. All arguments after the script param are passed along.',
+		( args ) => {
+			args.positional( 'environment', {
+				type: 'string',
+				describe: 'Which environment to execute the script in.',
+				choices: [ 'development', 'tests' ],
+			} );
+			args.positional( 'script', {
+				type: 'string',
+				describe: 'Which script to execute.',
+			} );
+			args.positional( 'script-args', {
+				type: 'array',
+				describe: 'The arguments to be passed to the script.',
+				default: [],
+			} );
+		},
+		withSpinner( env.exec )
+	);
+	yargs.example(
+		'$0 exec tests test:unit --filter=packages',
+		'Runs the script defined for `test:unit` in the tests environment with the `--filter=packages` argument.'
+	);
+
 	yargs.command(
 		'destroy',
 		wpRed(
