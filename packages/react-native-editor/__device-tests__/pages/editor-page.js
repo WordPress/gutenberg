@@ -544,12 +544,7 @@ class EditorPage {
 			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
 			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
 
-		return await isElementVisible(
-			this.driver,
-			slashInserterLocator,
-			1,
-			5
-		);
+		return await isElementVisible( this.driver, slashInserterLocator, 5 );
 	}
 
 	// =========================
@@ -699,6 +694,7 @@ class EditorPage {
 		await this.openBlockSettings( block );
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
 		const hideSearchHeadingToggle = await waitForVisible(
 			this.driver,
@@ -712,6 +708,7 @@ class EditorPage {
 		await this.openBlockSettings( block );
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
 		let optionMenuButton = await waitForVisible( this.driver, locator );
 		await optionMenuButton.click();
@@ -729,6 +726,7 @@ class EditorPage {
 		await this.openBlockSettings( block );
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
 		const useIconButton = await waitForVisible( this.driver, locator );
 

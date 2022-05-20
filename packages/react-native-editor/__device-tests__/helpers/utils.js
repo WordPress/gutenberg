@@ -553,7 +553,9 @@ const clickIfClickable = async (
 	} catch ( error ) {
 		if ( iteration >= maxIteration ) {
 			// eslint-disable-next-line no-console
-			console.error( `Not clickable after "${ iteration }" tries` );
+			console.error(
+				`Element still not clickable after "${ iteration }" retries`
+			);
 		}
 		return clickIfClickable(
 			driver,
