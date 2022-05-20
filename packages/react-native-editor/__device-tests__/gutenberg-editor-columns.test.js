@@ -10,7 +10,7 @@ describe( 'Gutenberg Editor Columns Block test', () => {
 			testData.columnsWithDifferentUnitsHtml
 		);
 
-		const columnsBlock = await editorPage.getColumnsBlockVisible();
+		const columnsBlock = await editorPage.getFirstBlockVisible();
 		await columnsBlock.click();
 
 		expect( columnsBlock ).toBeTruthy();

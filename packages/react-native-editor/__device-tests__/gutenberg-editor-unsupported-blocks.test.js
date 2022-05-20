@@ -7,7 +7,7 @@ describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 	it( 'should be able to open the unsupported block web view editor', async () => {
 		await editorPage.setHtmlContent( testData.unsupportedBlockHtml );
 
-		const firstVisibleBlock = await editorPage.getUnsupportedBlockVisible();
+		const firstVisibleBlock = await editorPage.getFirstBlockVisible();
 		await firstVisibleBlock.click();
 
 		const helpButton = await editorPage.getUnsupportedBlockHelpButton();

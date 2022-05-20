@@ -741,29 +741,13 @@ class EditorPage {
 	}
 
 	// =============================
-	// Columns Block functions
-	// =============================
-
-	async getColumnsBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
-
-		return await waitForVisible( this.driver, firstBlockLocator );
-	}
-
-	// =============================
 	// Unsupported Block functions
 	// =============================
-
-	async getUnsupportedBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
-
-		return await waitForVisible( this.driver, firstBlockLocator );
-	}
 
 	async getUnsupportedBlockHelpButton() {
 		const accessibilityId = 'Help button';
 		const blockLocator = isAndroid()
-			? '//android.widget.Button[@content-desc="Help button, Tap here to show help"]'
+			? `//android.widget.Button[starts-with(@content-desc, "${ accessibilityId }")]`
 			: `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
 
 		return await waitForVisible( this.driver, blockLocator );
@@ -772,7 +756,7 @@ class EditorPage {
 	async getUnsupportedBlockBottomSheetEditButton() {
 		const accessibilityId = 'Edit using web editor';
 		const blockLocator = isAndroid()
-			? '//android.widget.Button[@content-desc="Edit using web editor"]'
+			? `//android.widget.Button[@content-desc="${ accessibilityId }"]`
 			: `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
 
 		return await waitForVisible( this.driver, blockLocator );
