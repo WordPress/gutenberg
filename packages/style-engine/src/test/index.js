@@ -8,7 +8,23 @@ describe( 'generate', () => {
 		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
-	it( 'should generate spacing styles', () => {
+	it( 'should generate inline styles where there is no selector', () => {
+		expect(
+			generate( {
+				spacing: { padding: '10px', margin: '12px' },
+				color: {
+					text: '#f1f1f1',
+					background: '#222222',
+					gradient:
+						'linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%)',
+				},
+			} )
+		).toEqual(
+			'color: #f1f1f1; background: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(143,47,47) 49%,rgb(155,81,224) 100%); background-color: #222222; margin: 12px; padding: 10px;'
+		);
+	} );
+
+	it( 'should generate styles with an optional selector', () => {
 		expect(
 			generate(
 				{
@@ -23,6 +39,10 @@ describe( 'generate', () => {
 		expect(
 			generate(
 				{
+					color: {
+						text: '#cccccc',
+						background: '#111111',
+					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
 						margin: {
@@ -32,14 +52,34 @@ describe( 'generate', () => {
 							left: '14px',
 						},
 					},
+					typography: {
+						fontSize: '2.2rem',
+						fontStyle: 'italic',
+						fontWeight: '800',
+						fontFamily: "'Helvetica Neue',sans-serif",
+						lineHeight: '3.3',
+						textDecoration: 'line-through',
+						letterSpacing: '12px',
+						textTransform: 'uppercase',
+					},
 				},
 				{
 					selector: '.some-selector',
 				}
 			)
 		).toEqual(
-			'.some-selector { margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; }'
+			'.some-selector { color: #cccccc; background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }'
 		);
+	} );
+
+	it( 'should parse preset values (use for elements.link.color.text)', () => {
+		expect(
+			generate( {
+				color: {
+					text: 'var:preset|color|ham-sandwich',
+				},
+			} )
+		).toEqual( 'color: var(--wp--preset--color--ham-sandwich);' );
 	} );
 } );
 
@@ -96,9 +136,23 @@ describe( 'getCSSRules', () => {
 		expect(
 			getCSSRules(
 				{
+					color: {
+						text: '#dddddd',
+						background: '#555555',
+					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
 						margin: { right: '2em', left: '1vw' },
+					},
+					typography: {
+						fontSize: '2.2rem',
+						fontStyle: 'italic',
+						fontWeight: '800',
+						fontFamily: "'Helvetica Neue',sans-serif",
+						lineHeight: '3.3',
+						textDecoration: 'line-through',
+						letterSpacing: '12px',
+						textTransform: 'uppercase',
 					},
 				},
 				{
@@ -106,6 +160,16 @@ describe( 'getCSSRules', () => {
 				}
 			)
 		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'color',
+				value: '#dddddd',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundColor',
+				value: '#555555',
+			},
 			{
 				selector: '.some-selector',
 				key: 'marginRight',
@@ -125,6 +189,41 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'paddingBottom',
 				value: '5px',
+			},
+			{
+				key: 'fontSize',
+				selector: '.some-selector',
+				value: '2.2rem',
+			},
+			{
+				key: 'fontStyle',
+				selector: '.some-selector',
+				value: 'italic',
+			},
+			{
+				key: 'fontWeight',
+				selector: '.some-selector',
+				value: '800',
+			},
+			{
+				key: 'letterSpacing',
+				selector: '.some-selector',
+				value: '12px',
+			},
+			{
+				key: 'lineHeight',
+				selector: '.some-selector',
+				value: '3.3',
+			},
+			{
+				key: 'textDecoration',
+				selector: '.some-selector',
+				value: 'line-through',
+			},
+			{
+				key: 'textTransform',
+				selector: '.some-selector',
+				value: 'uppercase',
 			},
 		] );
 	} );

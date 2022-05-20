@@ -104,17 +104,6 @@ export async function uploadMedia( {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
 
-	// Build the error message including the filename.
-	const triggerError = ( error ) => {
-		error.message = [
-			<strong key="filename">{ error.file.name }</strong>,
-			': ',
-			error.message,
-		];
-
-		onError( error );
-	};
-
 	const validFiles = [];
 
 	for ( const mediaFile of files ) {
@@ -125,10 +114,14 @@ export async function uploadMedia( {
 			mediaFile.type &&
 			! isAllowedMimeTypeForUser( mediaFile.type )
 		) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __(
-					'Sorry, you are not allowed to upload this file type.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: Sorry, you are not allowed to upload this file type.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -138,9 +131,13 @@ export async function uploadMedia( {
 		// Check if the block supports this mime type.
 		// Defer to the server when type not detected.
 		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
-				message: __( 'Sorry, this file type is not supported here.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: Sorry, this file type is not supported here.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -148,10 +145,14 @@ export async function uploadMedia( {
 
 		// Verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			triggerError( {
+			onError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: __(
-					'This file exceeds the maximum upload size for this site.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: This file exceeds the maximum upload size for this site.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -160,9 +161,13 @@ export async function uploadMedia( {
 
 		// Don't allow empty files to be uploaded.
 		if ( mediaFile.size <= 0 ) {
-			triggerError( {
+			onError( {
 				code: 'EMPTY_FILE',
-				message: __( 'This file is empty.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: This file is empty.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;

@@ -338,7 +338,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef.current }
+					anchorRef={ anchorRef }
 				/>
 			) }
 			<TagName

@@ -204,10 +204,11 @@ function GalleryEdit( props ) {
 				: undefined;
 		}
 		return {
-			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
+			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
+			caption: imageAttributes.caption,
 			sizeSlug,
 		};
 	}

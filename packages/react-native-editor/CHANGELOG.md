@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
 
 ## 1.76.0
 
