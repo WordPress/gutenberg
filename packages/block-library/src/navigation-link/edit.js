@@ -815,7 +815,11 @@ export default function NavigationLinkEdit( {
 										text={ tooltipText }
 									>
 										<>
-											<span>
+											<span
+												aria-label={ __(
+													'Navigation link text'
+												) }
+											>
 												{
 													// Some attributes are stored in an escaped form. It's a legacy issue.
 													// Ideally they would be stored in a raw, unescaped form.
