@@ -11,7 +11,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -79,10 +79,25 @@ const StylesPreview = ( { label, isFocused } ) => {
 		)
 		.slice( 0, 2 );
 
+	// Reset leaked styles from WP common.css.
+	const editorStyles = useMemo( () => {
+		if ( styles ) {
+			return [
+				...styles,
+				{
+					css: 'body{min-width: 0;}',
+					isGlobalStyles: true,
+				},
+			];
+		}
+
+		return styles;
+	}, [ styles ] );
+
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
-			head={ <EditorStyles styles={ styles } /> }
+			head={ <EditorStyles styles={ editorStyles } /> }
 			style={ {
 				height: normalizedHeight * ratio,
 				visibility: ! width ? 'hidden' : 'visible',
