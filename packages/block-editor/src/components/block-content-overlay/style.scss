@@ -16,10 +16,8 @@
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
-}
 
-.block-editor-block-list__block.has-block-overlay .block-editor-block-list__block::before {
-	display: none;
-	content: none;
-	z-index: -1;
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
 }
