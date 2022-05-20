@@ -19,12 +19,7 @@ import type { CheckboxControlProps } from '../types';
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
-	return (
-		<BaseCheckboxControl
-			onChange={ noop }
-			{ ...props }
-		/>
-	);
+	return <BaseCheckboxControl onChange={ noop } { ...props } />;
 };
 
 const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
@@ -64,13 +59,24 @@ describe( 'CheckboxControl', () => {
 			expect( label ).toBeTruthy();
 		} );
 
-		it( 'should render an indeterminate icon', () => {
-			const { container } = render( <CheckboxControl indeterminate /> );
+		it( 'should render a checkbox in an indeterminate state', () => {
+			render( <CheckboxControl indeterminate /> );
+			expect( getInput() ).toHaveProperty( 'indeterminate', true );
+		} );
 
-			const indeterminateIcon = container.getElementsByClassName(
-				'components-checkbox-control__indeterminate'
+		it( 'should render the indeterminate icon when in the indeterminate state', () => {
+			const { container: containerDefault } = render(
+				<CheckboxControl />
 			);
-			expect( indeterminateIcon.length ).toBe( 1 );
+
+			const { container: containerIndeterminate } = render(
+				<CheckboxControl indeterminate />
+			);
+
+			// Expect the diff snapshot to be mostly about the indeterminate icon
+			expect( containerDefault ).toMatchDiffSnapshot(
+				containerIndeterminate
+			);
 		} );
 	} );
 
