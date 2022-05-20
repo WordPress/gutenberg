@@ -491,8 +491,9 @@ _Usage_
 
 ```js
 import { dispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-dispatch( store ).setPrice( 'hammer', 9.75 );
+dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
 _Parameters_
@@ -615,8 +616,9 @@ _Usage_
 
 ```js
 import { resolveSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-resolveSelect( store ).getPrice( 'hammer' ).then( console.log );
+resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 ```
 
 _Parameters_
@@ -637,8 +639,9 @@ _Usage_
 
 ```js
 import { select } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-select( store ).getPrice( 'hammer' );
+select( myCustomStore ).getPrice( 'hammer' );
 ```
 
 _Parameters_
@@ -713,6 +716,7 @@ action.
 ```jsx
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
 	return (
@@ -724,10 +728,10 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
 	const { stockNumber } = useSelect(
-		( select ) => select( store ).getStockNumber(),
+		( select ) => select( myCustomStore ).getStockNumber(),
 		[]
 	);
-	const { startSale } = useDispatch( store );
+	const { startSale } = useDispatch( myCustomStore );
 	const onClick = useCallback( () => {
 		const discountPercent = stockNumber > 50 ? 10 : 20;
 		startSale( discountPercent );
@@ -799,11 +803,12 @@ _Usage_
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function HammerPriceDisplay( { currency } ) {
 	const price = useSelect(
 		( select ) => {
-			return select( store ).getPrice( 'hammer', currency );
+			return select( myCustomStore ).getPrice( 'hammer', currency );
 		},
 		[ currency ]
 	);
@@ -832,9 +837,10 @@ function because your component won't re-render on a data change.**
 
 ```js
 import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Paste( { children } ) {
-	const { getSettings } = useSelect( store );
+	const { getSettings } = useSelect( myCustomStore );
 	function onPaste() {
 		// Do something with the settings.
 		const settings = getSettings();
@@ -883,9 +889,10 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-	const { startSale } = dispatch( store );
+	const { startSale } = dispatch( myCustomStore );
 	const { discountPercent } = ownProps;
 
 	return {
@@ -923,11 +930,12 @@ function Button( { onClick, children } ) {
 }
 
 import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Stock number changes frequently.
-	const { getStockNumber } = select( store );
-	const { startSale } = dispatch( store );
+	const { getStockNumber } = select( myCustomStore );
+	const { startSale } = dispatch( myCustomStore );
 	return {
 		onClick() {
 			const discountPercent = getStockNumber() > 50 ? 10 : 20;
@@ -975,6 +983,7 @@ _Usage_
 
 ```js
 import { withSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
@@ -984,7 +993,7 @@ function PriceDisplay( { price, currency } ) {
 }
 
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( store );
+	const { getPrice } = select( myCustomStore );
 	const { currency } = ownProps;
 
 	return {

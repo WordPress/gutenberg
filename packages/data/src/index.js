@@ -90,8 +90,9 @@ export { combineReducers };
  * @example
  * ```js
  * import { select } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * select( 'my-shop' ).getPrice( 'hammer' );
+ * select( myCustomStore ).getPrice( 'hammer' );
  * ```
  *
  * @return {Object} Object containing the store's selectors.
@@ -110,8 +111,9 @@ export const select = defaultRegistry.select;
  * @example
  * ```js
  * import { resolveSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+ * resolveSelect( myCustomStore ).getPrice( 'hammer' ).then(console.log)
  * ```
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
@@ -143,8 +145,9 @@ export const suspendSelect = defaultRegistry.suspendSelect;
  * @example
  * ```js
  * import { dispatch } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
- * dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+ * dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
  * ```
  * @return {Object} Object containing the action creators.
  */
