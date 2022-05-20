@@ -23,7 +23,7 @@
 		"node": ">=14",
 		"npm": ">=6.9"
 	},
-	"main": "index.js",
+	"main": "build/index.js",
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",

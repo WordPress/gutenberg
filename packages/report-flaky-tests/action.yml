@@ -14,4 +14,4 @@ inputs:
         default: 'flaky-tests-report'
 runs:
     using: 'node12'
-    main: 'index.js'
+    main: 'build/index.js'

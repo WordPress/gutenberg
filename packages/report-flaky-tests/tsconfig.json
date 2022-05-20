@@ -1,0 +1,15 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"module": "CommonJS",
+		"declarationDir": "build-types",
+		"rootDir": "lib",
+		"types": [ "jest" ],
+		"outDir": "build",
+		"noEmit": false,
+		"emitDeclarationOnly": false,
+		"sourceMap": true,
+	},
+	"include": [ "lib/**/*" ],
+	"exclude": [ "lib/__tests__/**/*", "lib/__fixtures__/**/*" ]
+}

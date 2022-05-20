@@ -126,6 +126,7 @@
 		"@types/requestidlecallback": "0.3.4",
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
+		"@types/unzipper": "0.10.5",
 		"@types/uuid": "8.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",

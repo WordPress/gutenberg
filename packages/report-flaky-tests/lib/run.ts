@@ -26,7 +26,7 @@ const metaData = {
 	},
 };
 
-( async function run() {
+async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
 	const label = core.getInput( 'label', { required: true } );
 	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
@@ -183,9 +183,7 @@ const metaData = {
 
 		core.info( `Reported flaky test to ${ issue.html_url }` );
 	}
-} )().catch( ( err ) => {
-	core.error( err );
-} );
+}
 
 async function fetchAllIssuesLabeledFlaky( octokit, label ) {
 	const issues = await octokit.paginate( 'GET /repos/{owner}/{repo}/issues', {
@@ -332,3 +330,5 @@ function stripAnsi( string ) {
 		''
 	);
 }
+
+export { run };
