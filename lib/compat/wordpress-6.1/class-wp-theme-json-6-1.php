@@ -137,6 +137,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json ) );
 
+		// This filter allows us to modify the output of WP_Theme_JSON so that we can do things like loading block CSS independently.
 		return apply_filters( 'gutenberg_get_style_nodes', $nodes );
 	}
 
