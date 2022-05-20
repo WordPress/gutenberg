@@ -44,8 +44,8 @@ module.exports = async function run( {
 	}
 
 	// Figure out the working directory for the command to be executed in.
-	let workingDir = typeof execScript.cwd === 'string' ? execScript.cwd : '';
-	if ( ! workingDir.startsWith( '/' ) ) {
+	let workingDir = execScript.cwd;
+	if ( workingDir && ! workingDir.startsWith( '/' ) ) {
 		workingDir = '/var/www/html/' + workingDir;
 	}
 

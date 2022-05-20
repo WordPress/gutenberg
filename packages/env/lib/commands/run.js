@@ -26,7 +26,7 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 	await spawnDockerComposeRunCommand(
 		config,
 		container,
-		'',
+		null,
 		command,
 		spinner
 	);
