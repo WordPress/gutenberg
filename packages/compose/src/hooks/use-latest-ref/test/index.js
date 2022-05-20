@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useLatestRef } from '..';
+import useLatestRef from '../';
 
 function debounce( callback, timeout = 0 ) {
 	let timeoutId = 0;

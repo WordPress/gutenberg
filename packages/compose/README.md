@@ -340,6 +340,23 @@ _Parameters_
 -   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
+### useLatestRef
+
+Creates a reference for a prop. This is useful for preserving dependency
+memoization for hooks like useCallback.
+
+_Related_
+
+-   <https://codesandbox.io/s/uselatestref-mlj3i?file=/src/App.tsx>
+
+_Parameters_
+
+-   _value_ `T`: The value to reference
+
+_Returns_
+
+-   `RefObject< T >`: The prop reference.
+
 ### useMediaQuery
 
 Runs a media query and returns its value when it changes.
