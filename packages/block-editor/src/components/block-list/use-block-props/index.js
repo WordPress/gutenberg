@@ -136,8 +136,10 @@ export function useBlockProps(
 			triggerAnimationOnChange: index,
 		} ),
 		useDisabled( {
-			isDisabled:
-				( isExplodedMode && isRootBlock ) || __unstableHasOverlay,
+			isDisabled: ! (
+				( isExplodedMode && isRootBlock ) ||
+				__unstableHasOverlay
+			),
 		} ),
 	] );
 
