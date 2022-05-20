@@ -153,6 +153,24 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	}
 
+	// Link color.
+	$has_named_link_color  = array_key_exists( 'linkColor', $attributes );
+	$has_custom_link_color = array_key_exists( 'customLinkColor', $attributes );
+
+	// If has link color.
+	if ( $has_custom_link_color || $has_named_link_color ) {
+		// Add has-text-color class.
+		$colors['css_classes'][] = 'has-link-color';
+	}
+
+	if ( $has_named_link_color ) {
+		// Add the color class.
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['linkColor'] );
+	} elseif ( $has_custom_link_color ) {
+		// Add the custom color inline style.
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customLinkColor'] );
+	}
+
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
 	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
