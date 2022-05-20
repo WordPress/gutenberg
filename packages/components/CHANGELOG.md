@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug fix
+
+-   `BoxControl` and `BorderBoxControl`: Ensure Unlink tooltip position stays within the viewport. ([#41176](https://github.com/WordPress/gutenberg/pull/41176))
+
 ## 19.11.0 (2022-05-18)
 
 ### Enhancements
