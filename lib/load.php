@@ -123,6 +123,8 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
+require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
 
 // Experimental features.
