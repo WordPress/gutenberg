@@ -538,7 +538,7 @@ const isElementVisible = async (
 const clickIfClickable = async (
 	driver,
 	elementLocator,
-	maxIteration = 10,
+	maxIteration = 25,
 	iteration = 0
 ) => {
 	const element = await waitForVisible(
@@ -556,7 +556,9 @@ const clickIfClickable = async (
 			console.error(
 				`Element still not clickable after "${ iteration }" retries`
 			);
+			return '';
 		}
+
 		return clickIfClickable(
 			driver,
 			elementLocator,
