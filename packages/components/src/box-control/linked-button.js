@@ -14,7 +14,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
 
 	return (
-		<Tooltip text={ label }>
+		<Tooltip text={ label } position="bottom left">
 			<span>
 				<Button
 					{ ...props }

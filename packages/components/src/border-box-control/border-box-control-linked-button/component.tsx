@@ -27,7 +27,7 @@ const BorderBoxControlLinkedButton = (
 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
 
 	return (
-		<Tooltip text={ label }>
+		<Tooltip text={ label } position="bottom left">
 			<View className={ className }>
 				<Button
 					{ ...buttonProps }

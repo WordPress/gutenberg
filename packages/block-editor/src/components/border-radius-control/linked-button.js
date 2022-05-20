@@ -9,7 +9,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 	const label = isLinked ? __( 'Unlink Radii' ) : __( 'Link Radii' );
 
 	return (
-		<Tooltip text={ label }>
+		<Tooltip text={ label } position="bottom left">
 			<Button
 				{ ...props }
 				className="component-border-radius-control__linked-button"
