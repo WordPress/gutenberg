@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { CONFIG, COLORS } from '../utils';
-import type { SurfaceVariant } from './types';
+import type { SurfaceVariant, SurfaceProps } from './types';
 
 export const Surface = css`
 	background-color: ${ CONFIG.surfaceColor };
@@ -24,12 +24,10 @@ export function getBorders( {
 	borderLeft,
 	borderRight,
 	borderTop,
-}: {
-	borderBottom: boolean;
-	borderLeft: boolean;
-	borderRight: boolean;
-	borderTop: boolean;
-} ) {
+}: Pick<
+	SurfaceProps,
+	'borderBottom' | 'borderLeft' | 'borderRight' | 'borderTop'
+> ) {
 	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
 
 	return css( {
