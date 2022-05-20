@@ -80,8 +80,9 @@ export { plugins };
 export { combineReducers };
 
 /**
- * Given the name or descriptor of a registered store, returns an object of the store's selectors.
- * The selector functions are been pre-bound to pass the current state automatically.
+ * Given a store descriptor (also supports legacy calling convention accepting the name of a
+ * registered store), returns an object of the store's selectors. The selector functions are
+ * been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
  * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
@@ -100,10 +101,10 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 
 /**
- * Given the name of a registered store, returns an object containing the store's
- * selectors pre-bound to state so that you only need to supply additional arguments,
- * and modified so that they return promises that resolve to their eventual values,
- * after any resolvers have ran.
+ * Given a store descriptor (also supports legacy calling convention accepting the name of a
+ * registered store), returns an object containing the store's selectors pre-bound to state
+ * so that you only need to supply additional arguments, and modified so that they return promises
+ * that resolve to their eventual values, after any resolvers have ran.
  *
  * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
  *                                                       or the store descriptor.
@@ -121,9 +122,10 @@ export const select = defaultRegistry.select;
 export const resolveSelect = defaultRegistry.resolveSelect;
 
 /**
- * Given the name of a registered store, returns an object containing the store's
- * selectors pre-bound to state so that you only need to supply additional arguments,
- * and modified so that they throw promises in case the selector is not resolved yet.
+ * Given a store descriptor (also supports legacy calling convention accepting the name of a
+ * registered store), returns an object containing the store's selectors pre-bound to state so
+ * that you only need to supply additional arguments, and modified so that they throw promises
+ * in case the selector is not resolved yet.
  *
  * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
  *                                                       or the store descriptor.
@@ -133,7 +135,8 @@ export const resolveSelect = defaultRegistry.resolveSelect;
 export const suspendSelect = defaultRegistry.suspendSelect;
 
 /**
- * Given the name of a registered store, returns an object of the store's action creators.
+ * Given a store descriptor (also supports legacy calling convention accepting the name of a
+ * registered store), returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
  * Note: Action creators returned by the dispatch will return a promise when
