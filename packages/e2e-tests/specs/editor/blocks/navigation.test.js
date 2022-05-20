@@ -1345,13 +1345,6 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
-
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
@@ -1368,13 +1361,6 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);
-
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
-			expect( console ).toHaveErrored();
 		} );
 	} );
 
