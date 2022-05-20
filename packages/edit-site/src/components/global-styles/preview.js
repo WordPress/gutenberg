@@ -82,7 +82,17 @@ const StylesPreview = ( { label, isFocused } ) => {
 	return (
 		<Iframe
 			className="edit-site-global-styles-preview__iframe"
-			head={ <EditorStyles styles={ styles } /> }
+			head={
+				<EditorStyles
+					styles={ [
+						...styles,
+						{
+							css: 'body{min-width: 0;}',
+							isGlobalStyles: true,
+						},
+					] }
+				/>
+			}
 			style={ {
 				height: normalizedHeight * ratio,
 				visibility: ! width ? 'hidden' : 'visible',
