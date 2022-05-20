@@ -16,14 +16,13 @@ import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
-const getInput = () => screen.getByTestId( 'checkbox' );
+const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
 	return (
 		<BaseCheckboxControl
 			onChange={ noop }
 			{ ...props }
-			data-testid="checkbox"
 		/>
 	);
 };
@@ -37,7 +36,6 @@ const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
 				setChecked( value );
 				onChange( value );
 			} }
-			data-testid="checkbox"
 		/>
 	);
 };
