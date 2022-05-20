@@ -530,6 +530,14 @@ export class ImageEdit extends Component {
 		);
 	}
 
+	showLoadingIndicator() {
+		return (
+			<View style={ styles.image__loading }>
+				<ActivityIndicator animating />
+			</View>
+		)
+	}
+
 	getWidth() {
 		const { attributes } = this.props;
 		const { align, width } = attributes;
@@ -759,11 +767,7 @@ export class ImageEdit extends Component {
 		if ( ! url ) {
 			return (
 				<View style={ styles.content }>
-					{ isFetchingImage && (
-						<View style={ styles.image__loading }>
-							<ActivityIndicator animating />
-						</View>
-					) }
+					{ isFetchingImage && this.showLoadingIndicator() }
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
@@ -837,13 +841,7 @@ export class ImageEdit extends Component {
 							} ) => {
 								return (
 									<View style={ imageContainerStyles }>
-										{ isFetchingImage && (
-											<View
-												style={ styles.image__loading }
-											>
-												<ActivityIndicator animating />
-											</View>
-										) }
+										{ isFetchingImage && this.showLoadingIndicator() }
 										<Image
 											align={
 												align && alignToFlex[ align ]
