@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { noop } from 'lodash';
 
 /**
@@ -27,12 +28,15 @@ const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
 	);
 };
 
-const ControlledCheckboxControl = () => {
+const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
 	const [ isChecked, setChecked ] = useState( false );
 	return (
 		<BaseCheckboxControl
 			checked={ isChecked }
-			onChange={ setChecked }
+			onChange={ ( value ) => {
+				setChecked( value );
+				onChange( value );
+			} }
 			data-testid="checkbox"
 		/>
 	);
@@ -73,15 +77,29 @@ describe( 'CheckboxControl', () => {
 	} );
 
 	describe( 'Value', () => {
-		it( 'should flip the checked property when clicked', () => {
-			render( <ControlledCheckboxControl /> );
-			expect( getInput() ).toHaveProperty( 'checked', false );
+		it( 'should flip the checked property when clicked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-			fireEvent.click( getInput() );
-			expect( getInput() ).toHaveProperty( 'checked', true );
+			let state = false;
+			const setState = jest.fn(
+				( nextState: boolean ) => ( state = nextState )
+			);
 
-			fireEvent.click( getInput() );
-			expect( getInput() ).toHaveProperty( 'checked', false );
+			render( <ControlledCheckboxControl onChange={ setState } /> );
+
+			const input = getInput();
+
+			await user.click( input );
+			expect( input ).toHaveProperty( 'checked', true );
+			expect( state ).toBe( true );
+
+			await user.click( input );
+			expect( input ).toHaveProperty( 'checked', false );
+			expect( state ).toBe( false );
+
+			expect( setState ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 } );
