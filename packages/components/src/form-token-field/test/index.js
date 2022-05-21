@@ -10,7 +10,6 @@ import ReactDOM from 'react-dom';
  */
 import fixtures from './lib/fixtures';
 import TokenFieldWrapper from './lib/token-field-wrapper';
-import TokenInput from '../token-input';
 
 /**
  * Module variables
@@ -106,8 +105,6 @@ describe( 'FormTokenField', () => {
 				wrapper,
 				'components-form-token-field__input'
 			);
-		textInputComponent = () =>
-			TestUtils.findRenderedComponentWithType( wrapper, TokenInput );
 		/* eslint-enable react/no-find-dom-node */
 		TestUtils.Simulate.focus( textInputElement() );
 	}

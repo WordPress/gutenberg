@@ -74,8 +74,8 @@ class FormTokenField extends Component {
 
 	componentDidUpdate( prevProps ) {
 		// Make sure to focus the input when the isActive state is true.
-		if ( this.state.isActive && ! this.input.hasFocus() ) {
-			this.input.focus();
+		if ( this.state.isActive && ! this.hasFocus() ) {
+			this.focus();
 		}
 
 		const { suggestions, value } = this.props;
@@ -99,6 +99,14 @@ class FormTokenField extends Component {
 		};
 	}
 
+	focus() {
+		this.input.focus();
+	}
+
+	hasFocus() {
+		return this.input === this.input.ownerDocument.activeElement;
+	}
+
 	bindInput( ref ) {
 		this.input = ref;
 	}
@@ -110,7 +118,7 @@ class FormTokenField extends Component {
 	onFocus( event ) {
 		const { __experimentalExpandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
-		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
+		if ( this.hasFocus() || event.target === this.tokensAndInput ) {
 			this.setState( {
 				isActive: true,
 				isExpanded:
@@ -213,7 +221,7 @@ class FormTokenField extends Component {
 
 	onTokenClickRemove( event ) {
 		this.deleteToken( event.value );
-		this.input.focus();
+		this.focus();
 	}
 
 	onSuggestionHovered( suggestion ) {
@@ -251,7 +259,7 @@ class FormTokenField extends Component {
 
 	handleDeleteKey( deleteToken ) {
 		let preventDefault = false;
-		if ( this.input.hasFocus() && this.isInputEmpty() ) {
+		if ( this.hasFocus() && this.isInputEmpty() ) {
 			deleteToken();
 			preventDefault = true;
 		}
@@ -427,7 +435,7 @@ class FormTokenField extends Component {
 		} );
 
 		if ( this.state.isActive ) {
-			this.input.focus();
+			this.focus();
 		}
 	}
 
