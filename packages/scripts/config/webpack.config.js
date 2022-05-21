@@ -236,14 +236,24 @@ const config = {
 					context: process.env.WP_SRC_DIRECTORY,
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
 						if ( basename( absoluteFrom ) === 'block.json' ) {
 							const blockJson = JSON.parse( content.toString() );
 							[ 'viewScript', 'script', 'editorScript' ].forEach(
 								( key ) => {
-									if ( blockJson[ key ] ) {
-										blockJson[ key ] = blockJson[
-											key
-										].replace( /\.(j|t)sx?$/, '.js' );
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] = blockJson[ key ].map(
+											convertExtension
+										);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
 									}
 								}
 							);
