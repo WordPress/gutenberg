@@ -105,6 +105,9 @@ describe( 'FormTokenField', () => {
 				wrapper,
 				'components-form-token-field__input'
 			);
+
+		textInputComponent = () =>
+			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
 		/* eslint-enable react/no-find-dom-node */
 		TestUtils.Simulate.focus( textInputElement() );
 	}
@@ -318,7 +321,7 @@ describe( 'FormTokenField', () => {
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 			const textNode = textInputComponent();
-			expect( textNode.props.value ).toBe( '' );
+			expect( textNode.value ).toBe( '' );
 		} );
 
 		it( 'should not allow adding blank tokens with Enter', () => {
