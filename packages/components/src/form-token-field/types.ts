@@ -14,8 +14,6 @@ export interface SuggestionsListProps< T = Suggestion > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string;
-	setTimeout: ( fn: () => void, delay: number ) => number;
-	clearTimeout: ( id: number ) => void;
 }
 
 export interface TokenProps< T = Suggestion > {

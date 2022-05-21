@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,7 +21,7 @@ const handleMouseDown = ( e ) => {
 	e.preventDefault();
 };
 
-export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
+export function SuggestionsList( {
 	selectedIndex,
 	scrollIntoView,
 	match = '',
@@ -30,7 +30,6 @@ export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
 	suggestions = [],
 	displayTransform,
 	instanceId,
-	setTimeout,
 }: SuggestionsListProps ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
@@ -38,6 +37,9 @@ export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
+			const { ownerDocument } = listNode;
+			const { defaultView } = ownerDocument;
+			let id;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
@@ -47,10 +49,16 @@ export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
 				scrollView( listNode.children[ selectedIndex ], listNode, {
 					onlyScrollIfNeeded: true,
 				} );
-				setTimeout( () => {
+				id = defaultView.setTimeout( () => {
 					setScrollingIntoView( false );
 				}, 100 );
 			}
+
+			return () => {
+				if ( id !== undefined ) {
+					defaultView.clearTimeout( id );
+				}
+			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
@@ -146,6 +154,6 @@ export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
 			} ) }
 		</ul>
 	);
-} );
+}
 
 export default SuggestionsList;
