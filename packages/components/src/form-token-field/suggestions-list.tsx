@@ -100,10 +100,6 @@ export function SuggestionsList( {
 		};
 	};
 
-	// We set `tabIndex` here because otherwise Firefox sets focus on this
-	// div when tabbing off of the input in `TokenField` -- not really sure
-	// why, since usually a div isn't focusable by default
-	// TODO does this still apply now that it's a <ul> and not a <div>?
 	return (
 		<ul
 			ref={ listRef }
