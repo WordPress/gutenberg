@@ -11,27 +11,30 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
 
-const emptyList = Object.freeze( [] );
+/**
+ * Internal dependencies
+ */
+import type { SuggestionsListProps } from './types';
 
 const handleMouseDown = ( e ) => {
 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 	e.preventDefault();
 };
 
-function SuggestionsList( {
+export const SuggestionsList = withSafeTimeout( function SuggestionsList( {
 	selectedIndex,
 	scrollIntoView,
 	match = '',
 	onHover,
 	onSelect,
-	suggestions = emptyList,
+	suggestions = [],
 	displayTransform,
 	instanceId,
 	setTimeout,
-} ) {
+}: SuggestionsListProps ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
-	const listRef = useRefEffect(
+	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
@@ -116,8 +119,9 @@ function SuggestionsList( {
 						role="option"
 						className={ className }
 						key={
-							suggestion?.value
-								? suggestion.value
+							typeof suggestion === 'object' &&
+							'value' in suggestion
+								? suggestion?.value
 								: displayTransform( suggestion )
 						}
 						onMouseDown={ handleMouseDown }
@@ -142,6 +146,6 @@ function SuggestionsList( {
 			} ) }
 		</ul>
 	);
-}
+} );
 
-export default withSafeTimeout( SuggestionsList );
+export default SuggestionsList;
