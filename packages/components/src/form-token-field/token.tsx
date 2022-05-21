@@ -16,6 +16,7 @@ import { closeSmall } from '@wordpress/icons';
  */
 import Button from '../button';
 import { VisuallyHidden } from '../visually-hidden';
+import { TokenProps } from './types';
 
 export default function Token( {
 	value,
@@ -30,7 +31,7 @@ export default function Token( {
 	messages,
 	termPosition,
 	termsCount,
-} ) {
+}: TokenProps ) {
 	const instanceId = useInstanceId( Token );
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
