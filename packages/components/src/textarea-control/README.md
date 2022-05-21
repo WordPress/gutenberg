@@ -100,47 +100,41 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### label
+#### `label`: `string`
 
 If this property is added, a label will be generated using label property as the content.
 
--   Type: `String`
 -   Required: No
 
-#### hideLabelFromVision
+#### `hideLabelFromVision`: `boolean`
 
 If true, the label will only be visible to screen readers.
 
--   Type: `Boolean`
 -   Required: No
 
-#### help
+#### `help`: `string`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
 -   Required: No
 
-#### rows
+#### `rows`: `number`
 
-The number of rows the textarea should contain. Defaults to four.
+The number of rows the textarea should contain.
 
--   Type: `String`
 -   Required: No
 -   Default: 4
 
-#### value
+#### `value`: `string`
 
 The current value of the textarea.
 
--   Type: `String`
 -   Required: Yes
 
-#### onChange
+#### `onChange`: `( value: string ) => void`
 
 A function that receives the new value of the textarea each time it changes.
 
--   Type: `function`
 -   Required: Yes
 
 ## Related components
