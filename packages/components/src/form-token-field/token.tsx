@@ -16,7 +16,7 @@ import { closeSmall } from '@wordpress/icons';
  */
 import Button from '../button';
 import { VisuallyHidden } from '../visually-hidden';
-import { TokenProps } from './types';
+import type { TokenProps } from './types';
 
 export default function Token( {
 	value,
