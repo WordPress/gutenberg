@@ -32,9 +32,11 @@ export function UnForwardedTokenInput(
 	const size = value ? value.length + 1 : 0;
 
 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
-		onChange( {
-			value: event.target.value,
-		} );
+		if ( onChange ) {
+			onChange( {
+				value: event.target.value,
+			} );
+		}
 	};
 
 	return (
