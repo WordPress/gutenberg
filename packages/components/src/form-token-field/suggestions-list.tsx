@@ -15,7 +15,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import type { SuggestionsListProps, Suggestion } from './types';
+import type { SuggestionsListProps } from './types';
 
 const { setTimeout, clearTimeout } = window;
 
@@ -24,16 +24,16 @@ const handleMouseDown: MouseEventHandler = ( e ) => {
 	e.preventDefault();
 };
 
-export function SuggestionsList( {
+export function SuggestionsList< T extends string | { value: string } >( {
 	selectedIndex,
 	scrollIntoView,
-	match = '',
+	match,
 	onHover,
 	onSelect,
 	suggestions = [],
 	displayTransform,
 	instanceId,
-}: SuggestionsListProps ) {
+}: SuggestionsListProps< T > ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
 	const listRef = useRefEffect< HTMLUListElement >(
@@ -68,7 +68,7 @@ export function SuggestionsList( {
 		[ selectedIndex, scrollIntoView ]
 	);
 
-	const handleHover = ( suggestion: Suggestion ) => {
+	const handleHover = ( suggestion: T ) => {
 		return () => {
 			if ( ! scrollingIntoView ) {
 				onHover?.( suggestion );
@@ -76,30 +76,33 @@ export function SuggestionsList( {
 		};
 	};
 
-	const handleClick = ( suggestion: Suggestion ) => {
+	const handleClick = ( suggestion: T ) => {
 		return () => {
 			onSelect?.( suggestion );
 		};
 	};
 
-	const computeSuggestionMatch = ( suggestion: Suggestion ) => {
-		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
+	const computeSuggestionMatch = ( suggestion: T ) => {
+		const matchText = displayTransform( match ).toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}
 
-		suggestion = displayTransform( suggestion );
-		const indexOfMatch = suggestion
+		const transformedSuggestion = displayTransform( suggestion );
+		const indexOfMatch = transformedSuggestion
 			.toLocaleLowerCase()
 			.indexOf( matchText );
 
 		return {
-			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
-			suggestionMatch: suggestion.substring(
+			suggestionBeforeMatch: transformedSuggestion.substring(
+				0,
+				indexOfMatch
+			),
+			suggestionMatch: transformedSuggestion.substring(
 				indexOfMatch,
 				indexOfMatch + matchText.length
 			),
-			suggestionAfterMatch: suggestion.substring(
+			suggestionAfterMatch: transformedSuggestion.substring(
 				indexOfMatch + matchText.length
 			),
 		};

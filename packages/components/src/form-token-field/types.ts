@@ -3,8 +3,6 @@
  */
 import type { MouseEventHandler } from 'react';
 
-export type Suggestion = string | { value: string };
-
 type Messages = {
 	added: string;
 	removed: string;
@@ -12,15 +10,13 @@ type Messages = {
 	__experimentalInvalid: string;
 };
 
-type Token = string;
-
 export interface FormTokenFieldProps {
 	suggestions?: string[];
 	maxSuggestions?: number;
-	value?: Suggestion[];
-	displayTransform?: ( suggestion: Suggestion ) => string;
-	saveTransform?: ( token: Token ) => string;
-	onChange?: ( tokens: Token[] ) => void;
+	value?: string[];
+	displayTransform?: ( suggestion: string ) => string;
+	saveTransform?: ( token: string ) => string;
+	onChange?: ( tokens: string[] ) => void;
 	onInputChange?: ( input: string ) => void;
 	onFocus?: ( event: FocusEvent ) => void;
 	isBorderless?: boolean;
@@ -28,14 +24,14 @@ export interface FormTokenFieldProps {
 	tokenizeOnSpace?: boolean;
 	messages?: Messages;
 	__experimentalExpandOnFocus?: boolean;
-	__experimentalValidateInput?: ( token: Token ) => boolean;
+	__experimentalValidateInput?: ( token: string ) => boolean;
 	__experimentalShowHowTo?: boolean;
 }
 
-export interface SuggestionsListProps< T = Suggestion > {
+export interface SuggestionsListProps< T = string | { value: string } > {
 	selectedIndex: number;
 	scrollIntoView: boolean;
-	match: string;
+	match: T;
 	onHover: ( suggestion: T ) => void;
 	onSelect: ( suggestion: T ) => void;
 	suggestions: T[];
@@ -43,11 +39,11 @@ export interface SuggestionsListProps< T = Suggestion > {
 	instanceId: string;
 }
 
-export interface TokenProps< T = Suggestion > {
+export interface TokenProps {
 	value: string;
 	status: 'error' | 'success' | 'validating';
 	title: string;
-	displayTransform: ( value: T ) => string;
+	displayTransform: ( value: string ) => string;
 	isBorderless: boolean;
 	disabled: boolean;
 	onClickRemove: ( { value }: { value: string } ) => void;
