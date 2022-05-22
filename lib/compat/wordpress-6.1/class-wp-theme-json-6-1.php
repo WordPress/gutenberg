@@ -119,9 +119,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @since 5.8.0
 	 *
 	 * @param array $theme_json     The tree to extract style nodes from.
+	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
-	protected static function get_style_nodes( $theme_json ) {
+	protected static function get_style_nodes( $theme_json, $selectors = array()  ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -217,7 +218,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 *
 	 * @param array $block_metadata Meta data about the block to get styles for.
 	 *
-	 * @return array Styles for the block.
+	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
 		$node         = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
