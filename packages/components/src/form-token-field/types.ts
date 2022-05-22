@@ -3,7 +3,34 @@
  */
 import type { MouseEventHandler } from 'react';
 
-type Suggestion = string | { value: string };
+export type Suggestion = string | { value: string };
+
+type Messages = {
+	added: string;
+	removed: string;
+	remove: string;
+	__experimentalInvalid: string;
+};
+
+type Token = string;
+
+export interface FormTokenFieldProps {
+	suggestions?: string[];
+	maxSuggestions?: number;
+	value?: Suggestion[];
+	displayTransform?: ( suggestion: Suggestion ) => string;
+	saveTransform?: ( token: Token ) => string;
+	onChange?: ( tokens: Token[] ) => void;
+	onInputChange?: ( input: string ) => void;
+	onFocus?: ( event: FocusEvent ) => void;
+	isBorderless?: boolean;
+	disabled?: boolean;
+	tokenizeOnSpace?: boolean;
+	messages?: Messages;
+	__experimentalExpandOnFocus?: boolean;
+	__experimentalValidateInput?: ( token: Token ) => boolean;
+	__experimentalShowHowTo?: boolean;
+}
 
 export interface SuggestionsListProps< T = Suggestion > {
 	selectedIndex: number;
@@ -26,9 +53,7 @@ export interface TokenProps< T = Suggestion > {
 	onClickRemove: ( { value }: { value: string } ) => void;
 	onMouseEnter: MouseEventHandler< HTMLSpanElement >;
 	onMouseLeave: MouseEventHandler< HTMLSpanElement >;
-	messages: {
-		remove: string;
-	};
+	messages: Messages;
 	termPosition: number;
 	termsCount: number;
 }
@@ -37,6 +62,6 @@ export interface TokenInputProps {
 	isExpanded: boolean;
 	instanceId: string;
 	selectedSuggestionIndex: number;
-	onChange: ( { value: string } ) => void;
+	onChange?: ( { value }: { value: string } ) => void;
 	value: string;
 }

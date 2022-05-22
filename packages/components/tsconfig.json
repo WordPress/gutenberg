@@ -6,6 +6,7 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
+			"dom-scroll-into-view",
 			"jest",
 			"@testing-library/jest-dom",
 			"snapshot-diff",
@@ -55,6 +56,7 @@
 		"src/elevation/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/form-token-field/**/*",
 		"src/grid/**/*",
 		"src/h-stack/**/*",
 		"src/heading/**/*",

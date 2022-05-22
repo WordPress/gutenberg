@@ -4,6 +4,7 @@
 import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
+import type { MouseEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -14,9 +15,11 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import type { SuggestionsListProps } from './types';
+import type { SuggestionsListProps, Suggestion } from './types';
 
-const handleMouseDown = ( e ) => {
+const { setTimeout, clearTimeout } = window;
+
+const handleMouseDown: MouseEventHandler = ( e ) => {
 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 	e.preventDefault();
 };
@@ -37,33 +40,35 @@ export function SuggestionsList( {
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
-			const { ownerDocument } = listNode;
-			const { defaultView } = ownerDocument;
-			let id;
+			let id: number;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
 				listNode.children[ selectedIndex ]
 			) {
 				setScrollingIntoView( true );
-				scrollView( listNode.children[ selectedIndex ], listNode, {
-					onlyScrollIfNeeded: true,
-				} );
-				id = defaultView.setTimeout( () => {
+				scrollView(
+					listNode.children[ selectedIndex ] as HTMLLIElement,
+					listNode,
+					{
+						onlyScrollIfNeeded: true,
+					}
+				);
+				id = setTimeout( () => {
 					setScrollingIntoView( false );
 				}, 100 );
 			}
 
 			return () => {
 				if ( id !== undefined ) {
-					defaultView.clearTimeout( id );
+					clearTimeout( id );
 				}
 			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
 
-	const handleHover = ( suggestion ) => {
+	const handleHover = ( suggestion: Suggestion ) => {
 		return () => {
 			if ( ! scrollingIntoView ) {
 				onHover?.( suggestion );
@@ -71,13 +76,13 @@ export function SuggestionsList( {
 		};
 	};
 
-	const handleClick = ( suggestion ) => {
+	const handleClick = ( suggestion: Suggestion ) => {
 		return () => {
 			onSelect?.( suggestion );
 		};
 	};
 
-	const computeSuggestionMatch = ( suggestion ) => {
+	const computeSuggestionMatch = ( suggestion: Suggestion ) => {
 		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;

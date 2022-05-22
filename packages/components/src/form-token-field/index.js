@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * External dependencies
  */
@@ -39,6 +40,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
+// @ts-ignore
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {
