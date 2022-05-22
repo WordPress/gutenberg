@@ -20,7 +20,7 @@ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useDebounce, useInstanceId } from '@wordpress/compose';
+import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import {
 	BACKSPACE,
@@ -42,15 +42,6 @@ import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
-
-const initialState = {
-	incompleteTokenValue: '',
-	inputOffsetFromEnd: 0,
-	isActive: false,
-	isExpanded: false,
-	selectedSuggestionIndex: -1,
-	selectedSuggestionScroll: false,
-};
 
 export function FormTokenField( props: FormTokenFieldProps ) {
 	const {
@@ -84,19 +75,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	const instanceId = useInstanceId( FormTokenField );
 
-	const [ state, setState ] = useState( initialState );
-	const {
-		incompleteTokenValue,
-		inputOffsetFromEnd,
-		isActive,
-		isExpanded,
-		selectedSuggestionIndex,
-		selectedSuggestionScroll,
-	} = state;
+	const [ incompleteTokenValue, setIncompleteTokenValue ] = useState( '' );
+	const [ inputOffsetFromEnd, setInputOffsetFromEnd ] = useState( 0 );
+	const [ isActive, setIsActive ] = useState( false );
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] = useState(
+		-1
+	);
+	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] = useState(
+		false
+	);
 
 	const debouncedSpeak = useDebounce( speak, 500 );
-
-	const prevSuggestions = useRef< string[] >();
+	const prevSuggestions = usePrevious< string[] >( suggestions );
 	const input = useRef< HTMLInputElement >( null );
 	const tokensAndInput = useRef< HTMLInputElement >( null );
 
@@ -105,27 +96,24 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( isActive && ! hasFocus() ) {
 			focus();
 		}
+	}, [ isActive ] );
 
+	useEffect( () => {
 		const suggestionsDidUpdate = ! isShallowEqual(
 			suggestions,
-			prevSuggestions
+			prevSuggestions || []
 		);
 
 		updateSuggestions( suggestionsDidUpdate );
-
-		prevSuggestions.current = suggestions;
-	}, [ isActive, suggestions, value ] );
+	}, [ suggestions ] );
 
 	useEffect( () => {
 		updateSuggestions();
 	}, [ incompleteTokenValue ] );
 
 	if ( disabled && isActive ) {
-		setState( {
-			...state,
-			isActive: false,
-			incompleteTokenValue: '',
-		} );
+		setIsActive( false );
+		setIncompleteTokenValue( '' );
 	}
 
 	function focus() {
@@ -139,21 +127,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function onFocusEventHandler( event: FocusEvent ) {
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( hasFocus() || event.target === tokensAndInput.current ) {
-			setState( {
-				...state,
-				isActive: true,
-				isExpanded: __experimentalExpandOnFocus || isExpanded,
-			} );
+			setIsActive( true );
+			setIsExpanded( __experimentalExpandOnFocus || isExpanded );
 		} else {
 			/*
 			 * Otherwise, focus is on one of the token "remove" buttons and we
 			 * set the isActive state to false to prevent the input to be
 			 * re-focused, see componentDidUpdate().
 			 */
-			setState( {
-				...state,
-				isActive: false,
-			} );
+			setIsActive( false );
 		}
 
 		if ( 'function' === typeof onFocus ) {
@@ -163,12 +145,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	function onBlur() {
 		if ( inputHasValidValue() ) {
-			setState( {
-				...state,
-				isActive: false,
-			} );
+			setIsActive( false );
 		} else {
-			setState( initialState );
+			setIncompleteTokenValue( '' );
+			setInputOffsetFromEnd( 0 );
+			setIsActive( false );
+			setIsExpanded( false );
+			setSelectedSuggestionIndex( -1 );
+			setSelectedSuggestionScroll( false );
 		}
 	}
 
@@ -251,11 +235,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const index = getMatchingSuggestions().indexOf( suggestion );
 
 		if ( index >= 0 ) {
-			setState( {
-				...state,
-				selectedSuggestionIndex: index,
-				selectedSuggestionScroll: false,
-			} );
+			setSelectedSuggestionIndex( index );
+			setSelectedSuggestionScroll( false );
 		}
 	}
 
@@ -272,8 +253,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( items.length > 1 ) {
 			addNewTokens( items.slice( 0, -1 ) );
 		}
-
-		setState( { ...state, incompleteTokenValue: tokenValue } );
+		setIncompleteTokenValue( tokenValue );
 		onInputChange( tokenValue );
 	}
 
@@ -308,51 +288,48 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function handleUpArrowKey() {
-		setState( ( prevState ) => ( {
-			...state,
-			selectedSuggestionIndex:
-				( prevState.selectedSuggestionIndex === 0
+		setSelectedSuggestionIndex( ( index ) => {
+			return (
+				( index === 0
 					? getMatchingSuggestions(
-							prevState.incompleteTokenValue,
+							incompleteTokenValue,
 							suggestions,
 							value,
 							maxSuggestions,
 							saveTransform
 					  ).length
-					: prevState.selectedSuggestionIndex ) - 1,
-			selectedSuggestionScroll: true,
-		} ) );
+					: index ) - 1
+			);
+		} );
+		setSelectedSuggestionScroll( true );
 
 		return true; // PreventDefault.
 	}
 
 	function handleDownArrowKey() {
-		setState( ( prevState ) => ( {
-			...state,
-			selectedSuggestionIndex:
-				( prevState.selectedSuggestionIndex + 1 ) %
+		setSelectedSuggestionIndex( ( index ) => {
+			return (
+				( index + 1 ) %
 				getMatchingSuggestions(
-					prevState.incompleteTokenValue,
+					incompleteTokenValue,
 					suggestions,
 					value,
 					maxSuggestions,
 					saveTransform
-				).length,
-			selectedSuggestionScroll: true,
-		} ) );
+				).length
+			);
+		} );
 
+		setSelectedSuggestionScroll( true );
 		return true; // PreventDefault.
 	}
 
 	function handleEscapeKey( event: KeyboardEvent ) {
 		if ( event.target instanceof HTMLInputElement ) {
-			setState( {
-				...state,
-				incompleteTokenValue: event.target.value,
-				isExpanded: false,
-				selectedSuggestionIndex: -1,
-				selectedSuggestionScroll: false,
-			} );
+			setIncompleteTokenValue( event.target.value );
+			setIsExpanded( false );
+			setSelectedSuggestionIndex( -1 );
+			setSelectedSuggestionScroll( false );
 		}
 
 		return true; // PreventDefault.
@@ -367,27 +344,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function moveInputToIndex( index: number ) {
-		setState( () => ( {
-			...state,
-			inputOffsetFromEnd: value.length - Math.max( index, -1 ) - 1,
-		} ) );
+		setInputOffsetFromEnd( value.length - Math.max( index, -1 ) - 1 );
 	}
 
 	function moveInputBeforePreviousToken() {
-		setState( ( prevState ) => ( {
-			...state,
-			inputOffsetFromEnd: Math.min(
-				prevState.inputOffsetFromEnd + 1,
-				value.length
-			),
-		} ) );
+		setInputOffsetFromEnd( ( prevInputOffsetFromEnd ) => {
+			return Math.min( prevInputOffsetFromEnd + 1, value.length );
+		} );
 	}
 
 	function moveInputAfterNextToken() {
-		setState( ( prevState ) => ( {
-			...state,
-			inputOffsetFromEnd: Math.max( prevState.inputOffsetFromEnd - 1, 0 ),
-		} ) );
+		setInputOffsetFromEnd( ( prevInputOffsetFromEnd ) => {
+			return Math.max( prevInputOffsetFromEnd - 1, 0 );
+		} );
 	}
 
 	function deleteTokenBeforeInput() {
@@ -446,13 +415,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		addNewTokens( [ token ] );
 		speak( messages.added, 'assertive' );
 
-		setState( {
-			...state,
-			incompleteTokenValue: '',
-			selectedSuggestionIndex: -1,
-			selectedSuggestionScroll: false,
-			isExpanded: ! __experimentalExpandOnFocus,
-		} );
+		setIncompleteTokenValue( '' );
+		setSelectedSuggestionIndex( -1 );
+		setSelectedSuggestionScroll( false );
+		setIsExpanded( ! __experimentalExpandOnFocus );
 
 		if ( isActive ) {
 			focus();
@@ -547,18 +513,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		);
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
-		const newState = {
-			...state,
-			isExpanded:
-				__experimentalExpandOnFocus ||
-				( inputHasMinimumChars && hasMatchingSuggestions ),
-		};
-		if ( resetSelectedSuggestion ) {
-			newState.selectedSuggestionIndex = -1;
-			newState.selectedSuggestionScroll = false;
-		}
+		setIsExpanded(
+			__experimentalExpandOnFocus ||
+				( inputHasMinimumChars && hasMatchingSuggestions )
+		);
 
-		setState( newState );
+		if ( resetSelectedSuggestion ) {
+			setSelectedSuggestionIndex( -1 );
+			setSelectedSuggestionScroll( false );
+		}
 
 		if ( inputHasMinimumChars ) {
 			const message = hasMatchingSuggestions
