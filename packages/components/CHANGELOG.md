@@ -6,6 +6,10 @@
 
 -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
 
+### Bug fix
+
+-   `BorderBoxControl`: fix some layout misalignments, especially for RTL users ([#41254](https://github.com/WordPress/gutenberg/pull/41254)).
+
 ## 19.11.0 (2022-05-18)
 
 ### Enhancements
