@@ -29,7 +29,7 @@ export function useBorderBoxControlVisualizer(
 			styles.BorderBoxControlVisualizer( value, __next36pxDefaultSize ),
 			className
 		);
-	}, [ className, value, __next36pxDefaultSize, rtl.watch() ] );
+	}, [ cx, className, value, __next36pxDefaultSize, rtl.watch() ] );
 
 	return { ...otherProps, className: classes, value };
 }

@@ -24,11 +24,11 @@ export function useBorderBoxControlSplitControls(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.BorderBoxControlSplitControls, className );
-	}, [ className, rtl.watch() ] );
+	}, [ cx, className, rtl.watch() ] );
 
 	const centeredClassName = useMemo( () => {
 		return cx( styles.CenteredBorderControl, className );
-	}, [] );
+	}, [ cx, className ] );
 
 	const rightAlignedClassName = useMemo( () => {
 		return cx( styles.RightBorderControl, className );
