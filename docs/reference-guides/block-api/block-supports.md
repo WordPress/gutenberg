@@ -540,7 +540,7 @@ supports: {
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
-    -   `blockGap`: type `boolean` or `array` or `string`, default value `false`
+    -   `blockGap`: type `boolean` or `array` or `object`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
@@ -588,12 +588,14 @@ supports: {
 
 `blockGap` values are primarily used alongside the `gap` CSS property, which is tied to a block's flexbox layout. The layout styles define a fallback gap value, which all blocks receive if they haven't yet been given a value.
 
-Often this global fallback value is not appropriate for specific blocks. To customize the fallback `blockGap` value for a specific block, the `blockGap` property also accepts a `string`, which should be a `number + unit` value for the `gap` CSS property. 
+Often this global fallback value is not appropriate for specific blocks. To customize the fallback `blockGap` value for a specific block, the `blockGap` property also accepts an object with a `__experimentalDefault`  property, the value of which is a `string` and is used as the default `gap` CSS value.
 
 ```js
 supports: {
     spacing: {
-        blockGap: '2em', // Enables blockGap support and also provides a default, per-block fallback value for layout purposes.
+        blockGap: {
+            __experimentalDefault: '2em' // Enables blockGap support and also provides a default, per-block fallback value of `2em` for layout purposes.
+        }
     }
 }
 ```
