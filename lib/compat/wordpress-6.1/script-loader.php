@@ -19,6 +19,9 @@
  * @return array A filtered array of style nodes.
  */
 function filter_out_block_nodes( $nodes ) {
+	if ( ! is_array( $nodes ) ) {
+		return array();
+	}
 	return array_filter(
 		$nodes,
 		function( $node ) {
