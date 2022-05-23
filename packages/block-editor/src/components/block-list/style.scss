@@ -410,16 +410,16 @@
 }
 
 /** Zoom Out mode styles **/
-.is-root-container {
+.block-editor-iframe__body {
 	transition: all 0.3s;
 }
 
-.is-root-container.is-zoom-out-mode {
+.block-editor-iframe__body.is-zoom-out-mode {
 	transform-origin: top center;
 	transform: scale(0.8);
 	margin-top: 100px;
 }
 
-.is-root-container.is-zoom-out-mode > .block-list-appender {
+.block-editor-iframe__body.is-zoom-out-mode > .block-list-appender {
 	display: none;
 }

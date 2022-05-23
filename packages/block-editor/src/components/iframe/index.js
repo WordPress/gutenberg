@@ -166,69 +166,6 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function useZoomOutModeBackgroundStyles( isZoomOutMode, deps = [] ) {
-	return useRefEffect(
-		( node ) => {
-			if ( ! isZoomOutMode ) {
-				return;
-			}
-
-			let bodyStyleElement = node.querySelector(
-				'#body-reset-background'
-			);
-			if ( ! bodyStyleElement ) {
-				bodyStyleElement = node.ownerDocument.createElement( 'style' );
-				bodyStyleElement.id = 'body-reset-background';
-				node.prepend( bodyStyleElement );
-			}
-			bodyStyleElement.textContent = '';
-
-			let copiedStylesElement = node.querySelector(
-				'#body-background-copied-styles'
-			);
-			if ( ! copiedStylesElement ) {
-				copiedStylesElement = node.ownerDocument.createElement(
-					'style'
-				);
-				copiedStylesElement.id = 'body-background-copied-styles';
-				node.prepend( copiedStylesElement );
-			}
-			copiedStylesElement.textContent = '';
-
-			const styles = window.getComputedStyle( node.ownerDocument.body );
-			let newBackgroundStyles = Object.values( styles )
-				.filter( ( propertyName ) => {
-					return propertyName.indexOf( 'background' ) === 0;
-				} )
-				.map(
-					( propertyName ) =>
-						`${ propertyName }:${ styles.getPropertyValue(
-							propertyName
-						) };`
-				)
-				.join( '' );
-
-			const backgroundColor = styles.getPropertyValue(
-				'background-color'
-			);
-			const hasTransparentBackground =
-				! backgroundColor || backgroundColor === 'rgba(0, 0, 0, 0)';
-			newBackgroundStyles += hasTransparentBackground
-				? 'background-color: white;'
-				: '';
-			copiedStylesElement.innerHTML = `:where( .is-root-container.is-zoom-out-mode ) { ${ newBackgroundStyles } }`;
-			bodyStyleElement.innerHTML =
-				'body { background: #2f2f2f !important; }';
-
-			return () => {
-				bodyStyleElement.textContent = '';
-				copiedStylesElement.textContent = '';
-			};
-		},
-		[ ...deps, isZoomOutMode ]
-	);
-}
-
 function Iframe(
 	{ contentRef, children, head, tabIndex = 0, assets, ...props },
 	ref
@@ -273,7 +210,7 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
-
+			contentDocument.documentElement.style.backgroundColor = '#2f2f2f';
 			return true;
 		}
 
@@ -283,26 +220,19 @@ function Iframe(
 		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
 
-	const headBackgroundStylesRef = useZoomOutModeBackgroundStyles(
-		isZoomOutMode,
-		[ head ]
-	);
-	const headRef = useMergeRefs( [
-		useRefEffect( ( element ) => {
-			scripts
-				.reduce(
-					( promise, script ) =>
-						promise.then( () => loadScript( element, script ) ),
-					Promise.resolve()
-				)
-				.finally( () => {
-					// When script are loaded, re-render blocks to allow them
-					// to initialise.
-					forceRender();
-				} );
-		}, [] ),
-		headBackgroundStylesRef,
-	] );
+	const headRef = useRefEffect( ( element ) => {
+		scripts
+			.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( element, script ) ),
+				Promise.resolve()
+			)
+			.finally( () => {
+				// When script are loaded, re-render blocks to allow them
+				// to initialise.
+				forceRender();
+			} );
+	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 	const styleCompatibilityRef = useStylesCompatibility();
 
@@ -348,8 +278,12 @@ function Iframe(
 							<body
 								ref={ bodyRef }
 								className={ classnames(
+									'block-editor-iframe__body',
 									BODY_CLASS_NAME,
-									...bodyClasses
+									...bodyClasses,
+									{
+										'is-zoom-out-mode': isZoomOutMode,
+									}
 								) }
 							>
 								{ /*

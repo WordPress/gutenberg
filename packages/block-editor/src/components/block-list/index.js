@@ -76,7 +76,6 @@ function Root( { className, ...settings } ) {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
-				'is-zoom-out-mode': editorMode === 'zoom-out',
 			} ),
 		},
 		settings
