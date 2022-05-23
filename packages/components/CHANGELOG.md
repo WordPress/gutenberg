@@ -2,16 +2,24 @@
 
 ## Unreleased
 
+## 19.11.0 (2022-05-18)
+
 ### Enhancements
 
--   `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
+-   `BorderControl` now only displays the reset button in its popover when selections have already been made. ([#40917](https://github.com/WordPress/gutenberg/pull/40917))
 -   `BorderControl` & `BorderBoxControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40920](https://github.com/WordPress/gutenberg/pull/40920)).
--   `BorderControl` improved focus and border radius styling for component. [#40951](https://github.com/WordPress/gutenberg/pull/40951)
+-   `BorderControl` improved focus and border radius styling for component. ([#40951](https://github.com/WordPress/gutenberg/pull/40951))
+-   Improve focused `CircularOptionPicker` styling ([#40990](https://github.com/WordPress/gutenberg/pull/40990))
+-   `BorderControl`: Make border color consistent with other controls  ([#40921](https://github.com/WordPress/gutenberg/pull/40921))
+-   `SelectControl`: Remove `lineHeight` setting to fix issue with font descenders being cut off ([#40985](https://github.com/WordPress/gutenberg/pull/40985))
 
 ### Internal
 
 -   `DateTimePicker`: Convert to TypeScript ([#40775](https://github.com/WordPress/gutenberg/pull/40775)).
 -   `DateTimePicker`: Convert unit tests to TypeScript ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
+-   `CheckboxControl`: Convert to TypeScript ([#40915](https://github.com/WordPress/gutenberg/pull/40915)).
+-   `ButtonGroup`: Convert to TypeScript ([#41007](https://github.com/WordPress/gutenberg/pull/41007)).
+-   `Popover`: refactor component to use the `floating-ui` library internally ([#40740](https://github.com/WordPress/gutenberg/pull/40740)).
 
 ## 19.10.0 (2022-05-04)
 
@@ -28,15 +36,15 @@
 -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
 -   `SelectControl`: Improved TypeScript support ([#40737](https://github.com/WordPress/gutenberg/pull/40737)).
 -   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
--    Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+-   Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
 
 ### Bug Fix
 
--    The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
--    Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
--    UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
--    `UnitControl`: show unit label when units prop has only one unit. ([#40784](https://github.com/WordPress/gutenberg/pull/40784))
--    `AnglePickerControl`: Fix closing of gradient popover when the angle control is clicked. ([#40735](https://github.com/WordPress/gutenberg/pull/40735))
+-   The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+-   Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
+-   UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
+-   `UnitControl`: show unit label when units prop has only one unit. ([#40784](https://github.com/WordPress/gutenberg/pull/40784))
+-   `AnglePickerControl`: Fix closing of gradient popover when the angle control is clicked. ([#40735](https://github.com/WordPress/gutenberg/pull/40735))
 
 ### Internal
 

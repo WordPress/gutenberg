@@ -20,21 +20,54 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 
 ### test
 
-The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `pageUtils` and the `requestUtils` fixtures.
+The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `admin`, `pageUtils` and the `requestUtils` fixtures.
 
 ### expect
 
 The Playwright/Jest's [expect](https://jestjs.io/docs/expect) function.
 
-### PageUtils
+### Admin
 
-Create a page utils instance of the current page.
+End to end test utilities for WordPress admin's user interface.
 
 ```js
-const pageUtils = new PageUtils( page );
+const admin = new Admin( { page, pageUtils } );
+await admin.visitAdminPage( 'options-general.php' );
+```
+
+### Editor
+
+End to end test utilities for the WordPress Block Editor.
+
+To use these utilities, instantiate them within each test file:
+```js
+test.use( {
+	editor: async ( { page }, use ) => {
+		await use( new Editor( { page, hasIframe: true } ) );
+	},
+} );
+```
+
+The `hasIframe` property denotes whether the editor canvas uses an Iframe, as the site editor currently does. Omit this for non-iframe editors.
+
+Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
+
+```js
+await editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+```
+
+### PageUtils
+
+Generic Playwright utilities for interacting with web pages.
+
+```js
+const pageUtils = new PageUtils( { page } );
+await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 ```
 
 ### RequestUtils
+
+Playwright utilities for interacting with the WordPress REST API.
 
 Create a request utils instance.
 

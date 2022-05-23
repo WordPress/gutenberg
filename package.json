@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "13.2.0-rc.2",
+	"version": "13.3.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -86,7 +86,7 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@actions/core": "1.4.0",
+		"@actions/core": "1.8.0",
 		"@actions/github": "5.0.0",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -191,7 +191,7 @@
 		"jest-watch-typeahead": "1.0.0",
 		"jsdom": "16.7.0",
 		"lerna": "3.22.1",
-		"lint-staged": "9.2.5",
+		"lint-staged": "10.0.1",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.66.2",
@@ -302,19 +302,21 @@
 		"prepare": "husky install"
 	},
 	"lint-staged": {
+		"*.{js,json,ts,tsx,yml,yaml}": [
+			"wp-scripts format"
+		],
+		"*.{js,ts,tsx}": [
+			"wp-scripts lint-js"
+		],
+		"*.scss": [
+			"wp-scripts lint-style"
+		],
 		"package-lock.json": [
 			"npm run lint-lockfile",
 			"node ./bin/check-latest-npm.js"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
-		],
-		"*.scss": [
-			"wp-scripts lint-style"
-		],
-		"*.{js,ts,tsx,yml}": [
-			"wp-scripts format",
-			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"

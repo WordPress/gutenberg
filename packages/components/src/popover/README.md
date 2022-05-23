@@ -59,13 +59,17 @@ Set this prop to `false` to disable focus changing entirely. This should only be
 -   Required: No
 -   Default: `"firstElement"`
 
-### position
+### placement
 
-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+The direction in which the popover should open relative to its parent node or anchor node. 
+
+The available base placements are 'top', 'right', 'bottom', 'left'.
+
+Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
 
 -   Type: `String`
 -   Required: No
--   Default: `"bottom right"`
+-   Default: `"bottom-start"`
 
 ### children
 
@@ -137,9 +141,3 @@ If you need the `DOMRect` object i.e., the position of popover to be calculated 
 
 -   Type: `Function`
 -   Required: No
-
-## Methods
-
-### refresh
-
-Calling `refresh()` will force the Popover to recalculate its size and position. This is useful when a DOM change causes the anchor node to change position.

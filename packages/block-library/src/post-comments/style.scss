@@ -1,4 +1,22 @@
 .wp-block-post-comments {
+	/* utility classes */
+	.alignleft {
+		float: left;
+	}
+
+	.alignright {
+		float: right;
+	}
+	/* end utility classes */
+
+	.navigation {
+		&::after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+	}
+
 	.commentlist {
 		clear: both;
 		list-style: none;

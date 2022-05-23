@@ -3,31 +3,39 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import {
+	useFloating,
+	flip,
+	shift,
+	autoUpdate,
+	arrow,
+	offset as offsetMiddleware,
+	limitShift,
+	size,
+} from '@floating-ui/react-dom';
 
 /**
  * WordPress dependencies
  */
 import {
 	useRef,
-	useState,
 	useLayoutEffect,
 	forwardRef,
 	createContext,
 	useContext,
+	useMemo,
 } from '@wordpress/element';
-import { getRectangleFromRange } from '@wordpress/dom';
 import {
 	useViewportMatch,
-	useResizeObserver,
 	useMergeRefs,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -42,405 +50,156 @@ const SLOT_NAME = 'Popover';
 
 const slotNameContext = createContext();
 
-function computeAnchorRect(
-	anchorRefFallback,
-	anchorRect,
-	getAnchorRect,
-	anchorRef = false,
-	container
-) {
-	if ( anchorRect ) {
-		return anchorRect;
-	}
+const positionToPlacement = ( position ) => {
+	const [ x, y, z ] = position.split( ' ' );
 
-	if ( getAnchorRect ) {
-		if ( ! anchorRefFallback.current ) {
-			return;
+	if ( [ 'top', 'bottom' ].includes( x ) ) {
+		let suffix = '';
+		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+			suffix = '-start';
+		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+			suffix = '-end';
 		}
-
-		const rect = getAnchorRect( anchorRefFallback.current );
-		return offsetIframe(
-			rect,
-			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
-			container
-		);
+		return x + suffix;
 	}
 
-	if ( anchorRef !== false ) {
-		if (
-			! anchorRef ||
-			! window.Range ||
-			! window.Element ||
-			! window.DOMRect
-		) {
-			return;
+	return y;
+};
+
+const placementToAnimationOrigin = ( placement ) => {
+	const [ a, b ] = placement.split( '-' );
+
+	let x, y;
+	if ( a === 'top' || a === 'bottom' ) {
+		x = a === 'top' ? 'bottom' : 'top';
+		y = 'middle';
+		if ( b === 'start' ) {
+			y = 'left';
+		} else if ( b === 'end' ) {
+			y = 'right';
 		}
+	}
 
-		// Duck-type to check if `anchorRef` is an instance of Range
-		// `anchorRef instanceof window.Range` checks will break across document boundaries
-		// such as in an iframe.
-		if ( typeof anchorRef?.cloneRange === 'function' ) {
-			return offsetIframe(
-				getRectangleFromRange( anchorRef ),
-				anchorRef.endContainer.ownerDocument,
-				container
-			);
+	if ( a === 'left' || a === 'right' ) {
+		x = 'center';
+		y = a === 'left' ? 'right' : 'left';
+		if ( b === 'start' ) {
+			x = 'top';
+		} else if ( b === 'end' ) {
+			x = 'bottom';
 		}
-
-		// Duck-type to check if `anchorRef` is an instance of Element
-		// `anchorRef instanceof window.Element` checks will break across document boundaries
-		// such as in an iframe.
-		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
-			const rect = offsetIframe(
-				anchorRef.getBoundingClientRect(),
-				anchorRef.ownerDocument,
-				container
-			);
-
-			return rect;
-		}
-
-		const { top, bottom } = anchorRef;
-		const topRect = top.getBoundingClientRect();
-		const bottomRect = bottom.getBoundingClientRect();
-
-		return offsetIframe(
-			new window.DOMRect(
-				topRect.left,
-				topRect.top,
-				topRect.width,
-				bottomRect.bottom - topRect.top
-			),
-			top.ownerDocument,
-			container
-		);
 	}
 
-	if ( ! anchorRefFallback.current ) {
-		return;
-	}
-
-	const { parentNode } = anchorRefFallback.current;
-
-	return offsetIframe(
-		parentNode.getBoundingClientRect(),
-		parentNode.ownerDocument,
-		container
-	);
-}
-
-/**
- * Sets or removes an element attribute.
- *
- * @param {Element} element The element to modify.
- * @param {string}  name    The attribute name to set or remove.
- * @param {?string} value   The value to set. A falsy value will remove the
- *                          attribute.
- */
-function setAttribute( element, name, value ) {
-	if ( ! value ) {
-		if ( element.hasAttribute( name ) ) {
-			element.removeAttribute( name );
-		}
-	} else if ( element.getAttribute( name ) !== value ) {
-		element.setAttribute( name, value );
-	}
-}
-
-/**
- * Sets or removes an element style property.
- *
- * @param {Element} element  The element to modify.
- * @param {string}  property The property to set or remove.
- * @param {?string} value    The value to set. A falsy value will remove the
- *                           property.
- */
-function setStyle( element, property, value = '' ) {
-	if ( element.style[ property ] !== value ) {
-		element.style[ property ] = value;
-	}
-}
-
-/**
- * Sets or removes an element class.
- *
- * @param {Element} element The element to modify.
- * @param {string}  name    The class to set or remove.
- * @param {boolean} toggle  True to set the class, false to remove.
- */
-function setClass( element, name, toggle ) {
-	if ( toggle ) {
-		if ( ! element.classList.contains( name ) ) {
-			element.classList.add( name );
-		}
-	} else if ( element.classList.contains( name ) ) {
-		element.classList.remove( name );
-	}
-}
-
-function getAnchorDocument( anchor ) {
-	if ( ! anchor ) {
-		return;
-	}
-
-	if ( anchor.endContainer ) {
-		return anchor.endContainer.ownerDocument;
-	}
-
-	if ( anchor.top ) {
-		return anchor.top.ownerDocument;
-	}
-
-	return anchor.ownerDocument;
-}
+	return x + ' ' + y;
+};
 
 const Popover = (
 	{
+		range,
+		animate = true,
 		headerTitle,
 		onClose,
 		children,
 		className,
 		noArrow = true,
 		isAlternate,
-		// Disable reason: We generate the `...contentProps` rest as remainder
-		// of props which aren't explicitly handled by this component.
-		/* eslint-disable no-unused-vars */
-		position = 'bottom right',
-		range,
+		position,
+		placement = 'bottom-start',
+		offset,
 		focusOnMount = 'firstElement',
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
 		expandOnMobile,
-		animate = true,
 		onFocusOutside,
-		__unstableStickyBoundaryElement,
 		__unstableSlotName = SLOT_NAME,
 		__unstableObserveElement,
-		__unstableBoundaryParent,
 		__unstableForcePosition,
-		__unstableForceXAlignment,
-		__unstableEditorCanvasWrapper,
-		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
 	ref
 ) => {
-	const anchorRefFallback = useRef( null );
-	const contentRef = useRef( null );
-	const containerRef = useRef();
+	if ( range ) {
+		deprecated( 'range prop in Popover component', {
+			since: '6.1',
+			version: '6.3',
+		} );
+	}
+
+	const arrowRef = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ animateOrigin, setAnimateOrigin ] = useState();
+	const isExpanded = expandOnMobile && isMobileViewport;
+	const hasArrow = ! isExpanded && ! noArrow;
+	const usedPlacement = position
+		? positionToPlacement( position )
+		: placement;
+
+	/**
+	 * Offsets the the position of the popover when the anchor is inside an iframe.
+	 */
+	const frameOffset = useMemo( () => {
+		let ownerDocument = document;
+		if ( anchorRef?.top ) {
+			ownerDocument = anchorRef?.top.ownerDocument;
+		} else if ( anchorRef?.startContainer ) {
+			ownerDocument = anchorRef.startContainer.ownerDocument;
+		} else if ( anchorRef?.current ) {
+			ownerDocument = anchorRef.current.ownerDocument;
+		} else if ( anchorRef ) {
+			// This one should be deprecated.
+			ownerDocument = anchorRef.ownerDocument;
+		} else if ( anchorRect && anchorRect?.ownerDocument ) {
+			ownerDocument = anchorRect.ownerDocument;
+		} else if ( getAnchorRect ) {
+			ownerDocument = getAnchorRect()?.ownerDocument ?? document;
+		}
+
+		const { defaultView } = ownerDocument;
+		const { frameElement } = defaultView;
+
+		if ( ! frameElement || ownerDocument === document ) {
+			return undefined;
+		}
+
+		const iframeRect = frameElement.getBoundingClientRect();
+		return {
+			name: 'iframeOffset',
+			fn( { x, y } ) {
+				return {
+					x: x + iframeRect.left,
+					y: y + iframeRect.top,
+				};
+			},
+		};
+	}, [ anchorRef, anchorRect, getAnchorRect ] );
+
+	const middlewares = [
+		frameOffset,
+		offset ? offsetMiddleware( offset ) : undefined,
+		__unstableForcePosition ? undefined : flip(),
+		__unstableForcePosition
+			? undefined
+			: size( {
+					apply( { width, height } ) {
+						if ( ! refs.floating.current ) return;
+
+						Object.assign( refs.floating.current.firstChild.style, {
+							maxWidth: `${ width }px`,
+							maxHeight: `${ height }px`,
+							overflow: 'auto',
+						} );
+					},
+			  } ),
+		,
+		shift( {
+			crossAxis: true,
+			limiter: limitShift(),
+		} ),
+		hasArrow ? arrow( { element: arrowRef } ) : undefined,
+	].filter( ( m ) => !! m );
+	const anchorRefFallback = useRef( null );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
-	const isExpanded = expandOnMobile && isMobileViewport;
-	const [ containerResizeListener, contentSize ] = useResizeObserver();
-	noArrow = isExpanded || noArrow;
-
-	useLayoutEffect( () => {
-		if ( isExpanded ) {
-			setClass( containerRef.current, 'is-without-arrow', noArrow );
-			setClass( containerRef.current, 'is-alternate', isAlternate );
-			setAttribute( containerRef.current, 'data-x-axis' );
-			setAttribute( containerRef.current, 'data-y-axis' );
-			setStyle( containerRef.current, 'top' );
-			setStyle( containerRef.current, 'left' );
-			setStyle( contentRef.current, 'maxHeight' );
-			setStyle( contentRef.current, 'maxWidth' );
-			return;
-		}
-
-		const refresh = () => {
-			if ( ! containerRef.current || ! contentRef.current ) {
-				return;
-			}
-
-			let anchor = computeAnchorRect(
-				anchorRefFallback,
-				anchorRect,
-				getAnchorRect,
-				anchorRef,
-				containerRef.current
-			);
-
-			if ( ! anchor ) {
-				return;
-			}
-
-			const { offsetParent, ownerDocument } = containerRef.current;
-
-			let relativeOffsetTop = 0;
-
-			// If there is a positioned ancestor element that is not the body,
-			// subtract the position from the anchor rect. If the position of
-			// the popover is fixed, the offset parent is null or the body
-			// element, in which case the position is relative to the viewport.
-			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
-			if ( offsetParent && offsetParent !== ownerDocument.body ) {
-				const offsetParentRect = offsetParent.getBoundingClientRect();
-
-				relativeOffsetTop = offsetParentRect.top;
-				anchor = new window.DOMRect(
-					anchor.left - offsetParentRect.left,
-					anchor.top - offsetParentRect.top,
-					anchor.width,
-					anchor.height
-				);
-			}
-
-			let boundaryElement;
-			if ( __unstableBoundaryParent ) {
-				boundaryElement = containerRef.current.parentElement;
-			}
-
-			const usedContentSize = ! contentSize.height
-				? contentRef.current.getBoundingClientRect()
-				: contentSize;
-
-			const {
-				popoverTop,
-				popoverLeft,
-				xAxis,
-				yAxis,
-				contentHeight,
-				contentWidth,
-			} = computePopoverPosition(
-				anchor,
-				usedContentSize,
-				position,
-				__unstableStickyBoundaryElement,
-				containerRef.current,
-				relativeOffsetTop,
-				boundaryElement,
-				__unstableForcePosition,
-				__unstableForceXAlignment,
-				__unstableEditorCanvasWrapper
-			);
-
-			if (
-				typeof popoverTop === 'number' &&
-				typeof popoverLeft === 'number'
-			) {
-				setStyle( containerRef.current, 'top', popoverTop + 'px' );
-				setStyle( containerRef.current, 'left', popoverLeft + 'px' );
-			}
-
-			setClass(
-				containerRef.current,
-				'is-without-arrow',
-				noArrow || ( xAxis === 'center' && yAxis === 'middle' )
-			);
-			setClass( containerRef.current, 'is-alternate', isAlternate );
-			setAttribute( containerRef.current, 'data-x-axis', xAxis );
-			setAttribute( containerRef.current, 'data-y-axis', yAxis );
-			setStyle(
-				contentRef.current,
-				'maxHeight',
-				typeof contentHeight === 'number' ? contentHeight + 'px' : ''
-			);
-			setStyle(
-				contentRef.current,
-				'maxWidth',
-				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
-			);
-
-			// Compute the animation position.
-			const yAxisMapping = {
-				top: 'bottom',
-				bottom: 'top',
-			};
-			const xAxisMapping = {
-				left: 'right',
-				right: 'left',
-			};
-			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
-			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
-
-			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
-		};
-
-		refresh();
-
-		const { ownerDocument } = containerRef.current;
-		const { defaultView } = ownerDocument;
-
-		/*
-		 * There are sometimes we need to reposition or resize the popover that
-		 * are not handled by the resize/scroll window events (i.e. CSS changes
-		 * in the layout that changes the position of the anchor).
-		 *
-		 * For these situations, we refresh the popover every 0.5s
-		 */
-		const intervalHandle = defaultView.setInterval( refresh, 500 );
-
-		let rafId;
-
-		const refreshOnAnimationFrame = () => {
-			defaultView.cancelAnimationFrame( rafId );
-			rafId = defaultView.requestAnimationFrame( refresh );
-		};
-
-		// Sometimes a click trigger a layout change that affects the popover
-		// position. This is an opportunity to immediately refresh rather than
-		// at the interval.
-		defaultView.addEventListener( 'click', refreshOnAnimationFrame );
-		defaultView.addEventListener( 'resize', refresh );
-		defaultView.addEventListener( 'scroll', refresh, true );
-
-		const anchorDocument = getAnchorDocument( anchorRef );
-
-		// If the anchor is within an iframe, the popover position also needs
-		// to refrest when the iframe content is scrolled or resized.
-		if ( anchorDocument && anchorDocument !== ownerDocument ) {
-			anchorDocument.defaultView.addEventListener( 'resize', refresh );
-			anchorDocument.defaultView.addEventListener(
-				'scroll',
-				refresh,
-				true
-			);
-		}
-
-		let observer;
-
-		if ( __unstableObserveElement ) {
-			observer = new defaultView.MutationObserver( refresh );
-			observer.observe( __unstableObserveElement, { attributes: true } );
-		}
-
-		return () => {
-			defaultView.clearInterval( intervalHandle );
-			defaultView.removeEventListener( 'resize', refresh );
-			defaultView.removeEventListener( 'scroll', refresh, true );
-			defaultView.removeEventListener( 'click', refreshOnAnimationFrame );
-			defaultView.cancelAnimationFrame( rafId );
-
-			if ( anchorDocument && anchorDocument !== ownerDocument ) {
-				anchorDocument.defaultView?.removeEventListener(
-					'resize',
-					refresh
-				);
-				anchorDocument.defaultView?.removeEventListener(
-					'scroll',
-					refresh,
-					true
-				);
-			}
-
-			if ( observer ) {
-				observer.disconnect();
-			}
-		};
-	}, [
-		isExpanded,
-		anchorRect,
-		getAnchorRect,
-		anchorRef,
-		position,
-		contentSize,
-		__unstableStickyBoundaryElement,
-		__unstableObserveElement,
-		__unstableBoundaryParent,
-	] );
 
 	const onDialogClose = ( type, event ) => {
 		// Ideally the popover should have just a single onClose prop and
@@ -458,14 +217,104 @@ const Popover = (
 		onClose: onDialogClose,
 	} );
 
-	const mergedRefs = useMergeRefs( [ containerRef, dialogRef, ref ] );
+	const {
+		x,
+		y,
+		reference,
+		floating,
+		strategy,
+		refs,
+		update,
+		placement: placementData,
+		middlewareData: { arrow: arrowData = {} },
+	} = useFloating( {
+		placement: usedPlacement,
+		middleware: middlewares,
+	} );
+	const staticSide = {
+		top: 'bottom',
+		right: 'left',
+		bottom: 'top',
+		left: 'right',
+	}[ placementData.split( '-' )[ 0 ] ];
+	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
+
+	// Updates references
+	useLayoutEffect( () => {
+		// No ref or position have been passed
+		let usedRef;
+		if ( anchorRef?.top ) {
+			usedRef = {
+				getBoundingClientRect() {
+					const topRect = anchorRef.top.getBoundingClientRect();
+					const bottomRect = anchorRef.bottom.getBoundingClientRect();
+					return new window.DOMRect(
+						topRect.x,
+						topRect.y,
+						topRect.width,
+						bottomRect.bottom - topRect.top
+					);
+				},
+			};
+		} else if ( anchorRef?.current ) {
+			usedRef = anchorRef.current;
+		} else if ( anchorRef ) {
+			usedRef = anchorRef;
+		} else if ( anchorRect ) {
+			usedRef = {
+				getBoundingClientRect() {
+					return anchorRect;
+				},
+			};
+		} else if ( getAnchorRect ) {
+			usedRef = {
+				getBoundingClientRect() {
+					const rect = getAnchorRect();
+					return {
+						...rect,
+						x: rect.x ?? rect.left,
+						y: rect.y ?? rect.top,
+						height: rect.height ?? rect.bottom - rect.top,
+						width: rect.width ?? rect.right - rect.left,
+					};
+				},
+			};
+		} else if ( anchorRefFallback.current ) {
+			usedRef = anchorRefFallback.current;
+		}
+
+		if ( ! usedRef ) {
+			return;
+		}
+
+		reference( usedRef );
+
+		if ( ! refs.floating.current ) {
+			return;
+		}
+
+		return autoUpdate( usedRef, refs.floating.current, update );
+	}, [ anchorRef, anchorRect, getAnchorRect ] );
+
+	// This is only needed for a smoth transition when moving blocks.
+	useLayoutEffect( () => {
+		if ( ! __unstableObserveElement ) {
+			return;
+		}
+		const observer = new window.MutationObserver( update );
+		observer.observe( __unstableObserveElement, { attributes: true } );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ __unstableObserveElement ] );
 
 	/** @type {false | string} */
 	const animateClassName =
-		Boolean( animate && animateOrigin ) &&
+		!! animate &&
 		getAnimateClassName( {
 			type: 'appear',
-			origin: animateOrigin,
+			origin: placementToAnimationOrigin( placementData ),
 		} );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
@@ -481,7 +330,6 @@ const Popover = (
 				animateClassName,
 				{
 					'is-expanded': isExpanded,
-					'is-without-arrow': noArrow,
 					'is-alternate': isAlternate,
 				}
 			) }
@@ -489,6 +337,15 @@ const Popover = (
 			ref={ mergedRefs }
 			{ ...dialogProps }
 			tabIndex="-1"
+			style={
+				isExpanded
+					? undefined
+					: {
+							position: strategy,
+							left: Number.isNaN( x ) ? 0 : x,
+							top: Number.isNaN( y ) ? 0 : y,
+					  }
+			}
 		>
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
@@ -503,12 +360,26 @@ const Popover = (
 					/>
 				</div>
 			) }
-			<div ref={ contentRef } className="components-popover__content">
-				<div style={ { position: 'relative' } }>
-					{ containerResizeListener }
-					{ children }
-				</div>
-			</div>
+			<div className="components-popover__content">{ children }</div>
+			{ hasArrow && (
+				<div
+					className="components-popover__arrow"
+					ref={ arrowRef }
+					style={ {
+						left:
+							! arrowData?.x || Number.isNaN( arrowData?.x )
+								? 0
+								: arrowData.x,
+						top:
+							! arrowData?.y || Number.isNaN( arrowData?.y )
+								? 0
+								: arrowData.y,
+						right: undefined,
+						bottom: undefined,
+						[ staticSide ]: '-4px',
+					} }
+				/>
+			) }
 		</div>
 	);
 

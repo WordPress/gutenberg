@@ -269,17 +269,8 @@ export function BorderPanel( props ) {
 						colors={ colors }
 						enableAlpha={ true }
 						onChange={ onBorderChange }
-						popoverClassNames={ {
-							linked: 'block-editor__border-box-control__popover',
-							top:
-								'block-editor__border-box-control__popover-top',
-							right:
-								'block-editor__border-box-control__popover-right',
-							bottom:
-								'block-editor__border-box-control__popover-bottom',
-							left:
-								'block-editor__border-box-control__popover-left',
-						} }
+						popoverPlacement="left-start"
+						popoverOffset={ 40 }
 						showStyle={ isStyleSupported }
 						value={ hydratedBorder }
 						__experimentalHasMultipleOrigins={ true }
