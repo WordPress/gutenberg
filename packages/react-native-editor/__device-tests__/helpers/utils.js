@@ -311,7 +311,7 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	const y = location.y + size.height / 2;
 	action.press( { x, y } );
 	// Setting to wait a bit longer because this is failing more frequently on the CI
-	action.wait( 3500 );
+	action.wait( 5000 );
 	action.release();
 	await action.perform();
 };
