@@ -9,7 +9,6 @@ import * as core from '@actions/core';
  * Internal dependencies
  */
 import { stripAnsi } from './strip-ansi';
-import { TEST_RESULTS_LIST, TEST_RESULT, metaData } from './constants';
 import type { MetaData, FlakyTestResult } from './types';
 
 type ParsedTestResult = {
@@ -18,6 +17,31 @@ type ParsedTestResult = {
 	runURL: string;
 	headBranch: string;
 	errorMessage?: string;
+};
+
+const TEST_RESULTS_LIST = {
+	open: `<!-- __TEST_RESULTS_LIST__ -->`,
+	close: `<!-- /__TEST_RESULTS_LIST__ -->`,
+};
+const TEST_RESULT = {
+	open: '<!-- __TEST_RESULT__ -->',
+	close: '<!-- /__TEST_RESULT__ -->',
+};
+
+const metaData = {
+	render: ( json: MetaData ) =>
+		`<!-- __META_DATA__:${ JSON.stringify( json ) } -->`,
+	get: ( str: string ): MetaData | undefined => {
+		const matched = str.match( /<!-- __META_DATA__:(.*) -->/ );
+		try {
+			if ( matched ) {
+				return JSON.parse( matched[ 1 ] );
+			}
+		} catch ( error ) {
+			// Ignore errors.
+		}
+		return undefined;
+	},
 };
 
 const TEST_LOG_REGEX = new RegExp(

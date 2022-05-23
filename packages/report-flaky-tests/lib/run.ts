@@ -87,22 +87,20 @@ async function run() {
 						return;
 					}
 
-					const closedTime = new Date(
-						reportedIssue.closed_at
-					).getTime();
-					const latestAncestorTime = new Date(
-						latestAncestorDate
-					).getTime();
-
 					// The issue is closed after the latest base commit on trunk,
 					// which means the branch/PR/commit is outdated and the flaky test
 					// has probably already been fixed. Skip reporting the outdated flaky tests.
-					if ( closedTime >= latestAncestorTime ) {
+					if (
+						new Date( reportedIssue.closed_at ) >=
+						new Date( latestAncestorDate )
+					) {
 						return;
 					}
-				} catch ( err ) {
+				} catch ( error ) {
 					// It might be a deleted commit or something else.
-					core.error( err as Error );
+					core.error(
+						error instanceof Error ? error : String( error )
+					);
 					return;
 				}
 			}

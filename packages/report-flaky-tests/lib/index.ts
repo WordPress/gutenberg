@@ -9,5 +9,5 @@ import * as core from '@actions/core';
 import { run } from './run';
 
 run().catch( ( error ) => {
-	core.error( error as Error );
+	core.error( error instanceof Error ? error : String( error ) );
 } );
