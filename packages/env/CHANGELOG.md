@@ -1,6 +1,8 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Enhancement
+-   Removed the need for quotation marks when passing options to `wp-env run`.
 
 ## 4.7.0 (2022-05-18)
 
