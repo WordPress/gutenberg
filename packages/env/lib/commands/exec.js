@@ -51,9 +51,15 @@ module.exports = async function run( {
 
 	// We're going to run the script in the seelcted container.
 	const container = environment === 'tests' ? 'tests-wordpress' : 'wordpress';
-	const spawnCommand = [ execScript.script, ...scriptArgs ];
+	const spawnCommand = execScript.script + ' ' + scriptArgs.join( ' ' );
 
-	spinner.info( `Starting script "${ script }" in "${ environment }".` );
+	if ( debug ) {
+		spinner.info(
+			`Starting script "${ script }" in "${ environment }" with command "${ spawnCommand }".`
+		);
+	} else {
+		spinner.info( `Starting script "${ script }" in "${ environment }".` );
+	}
 
 	await spawnDockerComposeRunCommand(
 		config,

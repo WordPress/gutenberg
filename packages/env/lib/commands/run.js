@@ -20,6 +20,9 @@ const spawnDockerComposeRunCommand = require( '../spawn-docker-compose-run-comma
 module.exports = async function run( { container, command, spinner, debug } ) {
 	const config = await initConfig( { spinner, debug } );
 
+	// Join the command together into a single string for consistency.
+	command = command.join( ' ' );
+
 	// Shows a contextual tip for the given command.
 	showCommandTips( container, command, spinner );
 
@@ -39,13 +42,11 @@ module.exports = async function run( { container, command, spinner, debug } ) {
  * bash) may have weird behavior (exit with ctrl-d instead of ctrl-c or ctrl-z),
  * so we want the user to have that information without having to ask someone.
  *
- * @param {string}   container The container the command will be run on.
- * @param {string[]} command   The command for which to show a tip.
- * @param {Object}   spinner   A spinner object to show progress.
+ * @param {string} container The container the command will be run on.
+ * @param {string} command   The command for which to show a tip.
+ * @param {Object} spinner   A spinner object to show progress.
  */
 function showCommandTips( container, command, spinner ) {
-	command = command.join( ' ' );
-
 	if ( ! command.length ) {
 		return;
 	}

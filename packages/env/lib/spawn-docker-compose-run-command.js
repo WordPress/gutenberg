@@ -13,7 +13,7 @@ const { spawn } = require( 'child_process' );
  * @param {Config}      config     The wp-env configuration.
  * @param {string}      container  The Docker container to run the command on.
  * @param {string|null} workingDir The working directory that the command should be executed in.
- * @param {string[]}    command    The command to run.
+ * @param {string}      command    The command to run.
  * @param {Object}      spinner    A CLI spinner which indicates progress.
  */
 module.exports = function spawnDockerComposeRunCommand(
@@ -32,7 +32,7 @@ module.exports = function spawnDockerComposeRunCommand(
 	}
 
 	// Finish building the command.
-	composeCommand.push( '--rm', container, ...command );
+	composeCommand.push( '--rm', container, ...command.split( ' ' ) );
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
