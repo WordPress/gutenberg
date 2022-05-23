@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
+
 ## 19.11.0 (2022-05-18)
 
 ### Enhancements
