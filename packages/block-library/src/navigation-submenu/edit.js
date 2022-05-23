@@ -153,10 +153,14 @@ function getColors( context, isSubMenu ) {
 	const {
 		textColor,
 		customTextColor,
+		linkColor,
+		customLinkColor,
 		backgroundColor,
 		customBackgroundColor,
 		overlayTextColor,
 		customOverlayTextColor,
+		overlayLinkColor,
+		customOverlayLinkColor,
 		overlayBackgroundColor,
 		customOverlayBackgroundColor,
 		style,
@@ -174,6 +178,16 @@ function getColors( context, isSubMenu ) {
 		colors.textColor = textColor;
 	} else if ( !! style?.color?.text ) {
 		colors.customTextColor = style.color.text;
+	}
+
+	if ( isSubMenu && !! customOverlayLinkColor ) {
+		colors.customLinkColor = customOverlayLinkColor;
+	} else if ( isSubMenu && !! overlayLinkColor ) {
+		colors.linkColor = overlayLinkColor;
+	} else if ( !! customLinkColor ) {
+		colors.customLinkColor = customLinkColor;
+	} else if ( !! linkColor ) {
+		colors.linkColor = linkColor;
 	}
 
 	if ( isSubMenu && !! customOverlayBackgroundColor ) {
@@ -461,6 +475,8 @@ export default function NavigationSubmenuEdit( {
 	const {
 		textColor,
 		customTextColor,
+		linkColor,
+		customLinkColor,
 		backgroundColor,
 		customBackgroundColor,
 	} = getColors( context, ! isTopLevelItem );
@@ -480,6 +496,8 @@ export default function NavigationSubmenuEdit( {
 			'has-child': hasChildren,
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
+			'has-link-color': !! linkColor || !! customLinkColor,
+			[ getColorClassName( 'color', linkColor ) ]: !! linkColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
 			[ getColorClassName(
 				'background-color',
@@ -510,6 +528,11 @@ export default function NavigationSubmenuEdit( {
 					innerBlocksColors.customTextColor
 				),
 				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+				'has-link-color': !! (
+					innerBlocksColors.linkColor ||
+					innerBlocksColors.customLinkColor
+				),
+				[ `has-${ innerBlocksColors.linkColor }-color` ]: !! innerBlocksColors.linkColor,
 				'has-background': !! (
 					innerBlocksColors.backgroundColor ||
 					innerBlocksColors.customBackgroundColor
@@ -517,7 +540,9 @@ export default function NavigationSubmenuEdit( {
 				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
 			} ),
 			style: {
-				color: innerBlocksColors.customTextColor,
+				color:
+					innerBlocksColors.customLinkColor ||
+					innerBlocksColors.customTextColor,
 				backgroundColor: innerBlocksColors.customBackgroundColor,
 			},
 		},

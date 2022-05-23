@@ -111,6 +111,8 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
+	overlayLinkColor,
+	setOverlayLinkColor,
 
 	// These props are used by the navigation editor to override specific
 	// navigation block settings.
@@ -371,6 +373,12 @@ function Navigation( {
 			'color',
 			overlayTextColor?.slug
 		) ]: !! overlayTextColor?.slug,
+		'has-link-color':
+			!! overlayLinkColor.color || !! overlayLinkColor?.class,
+		[ getColorClassName(
+			'color',
+			overlayLinkColor?.slug
+		) ]: !! overlayLinkColor?.slug,
 		'has-background':
 			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
 		[ getColorClassName(
@@ -683,6 +691,11 @@ function Navigation( {
 							label: __( 'Submenu & overlay text' ),
 						},
 						{
+							value: overlayLinkColor.color,
+							onChange: setOverlayLinkColor,
+							label: __( 'Submenu & overlay link' ),
+						},
+						{
 							value: overlayBackgroundColor.color,
 							onChange: setOverlayBackgroundColor,
 							label: __( 'Submenu & overlay background' ),
@@ -889,5 +902,6 @@ export default withColors(
 	{ linkColor: 'color' },
 	{ backgroundColor: 'color' },
 	{ overlayBackgroundColor: 'color' },
-	{ overlayTextColor: 'color' }
+	{ overlayTextColor: 'color' },
+	{ overlayLinkColor: 'color' }
 )( Navigation );

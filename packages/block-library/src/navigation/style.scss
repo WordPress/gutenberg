@@ -414,8 +414,19 @@ button.wp-block-navigation-item__content {
 		// submenus have a default background color, this feature has regressed
 		// several times, so care needs to be taken.
 		background-color: #fff;
-		color: #000;
+
 		border: 1px solid rgba(0, 0, 0, 0.15);
+	}
+}
+
+// Only set the fallback color of submenu text if the fallback background is active
+// and we don't have a custom link or text color set. This ensures colors can
+// cascade from parent Nav block settings down into submenus without being overidden
+// by hardcoded CSS whilst still ensuring that default background and text color are
+// still provided when no values are set.
+.wp-block-navigation:not(.has-link-color):not(.has-text-color):not(.has-background) {
+	.wp-block-navigation__submenu-container {
+		color: #000;
 	}
 }
 
@@ -682,4 +693,9 @@ button.wp-block-navigation-item__content {
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
+}
+
+// Ensure that submenu links (<a>) will inherit from  "Overlay and Submenu link" setting.
+.wp-block-navigation__submenu-container.has-link-color .wp-block-navigation-item__content {
+	color: inherit;
 }
