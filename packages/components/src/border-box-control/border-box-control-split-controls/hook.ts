@@ -23,7 +23,7 @@ export function useBorderBoxControlSplitControls(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderBoxControlSplitControls, className );
+		return cx( styles.borderBoxControlSplitControls(), className );
 	}, [ cx, className, rtl.watch() ] );
 
 	const centeredClassName = useMemo( () => {
@@ -31,7 +31,7 @@ export function useBorderBoxControlSplitControls(
 	}, [ cx, className ] );
 
 	const rightAlignedClassName = useMemo( () => {
-		return cx( styles.RightBorderControl, className );
+		return cx( styles.rightBorderControl(), className );
 	}, [ cx, className, rtl.watch() ] );
 
 	return {

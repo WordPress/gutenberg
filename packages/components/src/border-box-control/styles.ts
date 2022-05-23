@@ -43,7 +43,7 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
 };
 
-export const BorderBoxControlVisualizer = (
+export const borderBoxControlVisualizer = (
 	borders?: Borders,
 	__next36pxDefaultSize?: boolean
 ) => {
@@ -64,7 +64,7 @@ export const BorderBoxControlVisualizer = (
 	`;
 };
 
-export const BorderBoxControlSplitControls = css`
+export const borderBoxControlSplitControls = () => css`
 	position: relative;
 	flex: 1;
 	${ rtl( { marginRight: space( 3 ) }, { marginLeft: space( 3 ) } )() }
@@ -75,6 +75,6 @@ export const CenteredBorderControl = css`
 	margin: 0 auto;
 `;
 
-export const RightBorderControl = css`
+export const rightBorderControl = () => css`
 	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
 `;

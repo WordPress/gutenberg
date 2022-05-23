@@ -26,7 +26,7 @@ export function useBorderBoxControlVisualizer(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx(
-			styles.BorderBoxControlVisualizer( value, __next36pxDefaultSize ),
+			styles.borderBoxControlVisualizer( value, __next36pxDefaultSize ),
 			className
 		);
 	}, [ cx, className, value, __next36pxDefaultSize, rtl.watch() ] );
