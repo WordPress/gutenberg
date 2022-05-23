@@ -57,3 +57,14 @@
 .removeFeaturedButton {
 	color: $alert-red;
 }
+
+.image__loading {
+	align-items: center;
+	background-color: rgba(10, 10, 10, 0.5);
+	flex: 1;
+	height: 100%;
+	justify-content: center;
+	position: absolute;
+	width: 100%;
+	z-index: 1;
+}
