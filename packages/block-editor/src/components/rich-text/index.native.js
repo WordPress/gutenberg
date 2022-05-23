@@ -111,6 +111,8 @@ function RichTextWrapper(
 		maxWidth,
 		onBlur,
 		setRef,
+		disableSuggestions,
+		disableAutocorrection,
 		...props
 	},
 	forwardedRef
@@ -125,7 +127,6 @@ function RichTextWrapper(
 	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
-			isCaretWithinFormattedText,
 			getSelectionStart,
 			getSelectionEnd,
 			getSettings,
@@ -163,7 +164,6 @@ function RichTextWrapper(
 		}
 
 		return {
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
@@ -177,7 +177,6 @@ function RichTextWrapper(
 	// retrieved from the store on merge.
 	// To do: fix this somehow.
 	const {
-		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,
 		isSelected,
@@ -600,7 +599,6 @@ function RichTextWrapper(
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
 			__unstableMultilineTag={ multilineTag }
-			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
 			__unstableOnEnterFormattedText={ enterFormattedText }
 			__unstableOnExitFormattedText={ exitFormattedText }
 			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
@@ -639,6 +637,8 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
+			disableSuggestions={ disableSuggestions }
+			disableAutocorrection={ disableAutocorrection }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.

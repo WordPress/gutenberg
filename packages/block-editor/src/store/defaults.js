@@ -160,7 +160,6 @@ export const SETTINGS_DEFAULTS = {
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__experimentalSpotlightEntityBlocks: [],
 	__unstableGalleryWithImageBlocks: false,
 
 	generateAnchors: false,

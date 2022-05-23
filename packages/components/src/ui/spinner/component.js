@@ -21,7 +21,7 @@ import { COLORS } from '../../utils/colors-values';
  */
 function Spinner( props, forwardedRef ) {
 	const {
-		color = COLORS.black,
+		color = COLORS.gray[ 900 ],
 		size = BASE_SIZE,
 		...otherProps
 	} = useContextSystem( props, 'Spinner' );

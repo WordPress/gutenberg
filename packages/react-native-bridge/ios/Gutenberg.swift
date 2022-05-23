@@ -204,6 +204,10 @@ public class Gutenberg: UIResponder {
             settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
         }
 
+        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
+            settingsUpdates["quoteBlockV2"] = quoteBlockV2
+        }
+
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
         }

@@ -115,7 +115,7 @@ Update `src/editor.scss` to:
 
 ```scss
 .wp-block-create-block-gutenpride input[type='text'] {
-	font-family: Gilbert;
+	font-family: Gilbert, sans-serif;
 	font-size: 64px;
 	color: inherit;
 	background: inherit;

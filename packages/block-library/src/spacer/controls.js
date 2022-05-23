@@ -15,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { MIN_SPACER_SIZE } from './edit';
+import { MIN_SPACER_SIZE } from './constants';
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
@@ -75,7 +75,7 @@ export default function SpacerControls( {
 } ) {
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Spacer settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				{ orientation === 'horizontal' && (
 					<DimensionInput
 						label={ __( 'Width' ) }

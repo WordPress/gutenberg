@@ -19,7 +19,6 @@ jobs:
         strategy:
             matrix:
                 native-test-name: [gutenberg-editor-initial-html]
-                node: ['14']
 
         steps:
             - name: checkout
@@ -33,9 +32,9 @@ jobs:
                   cache: 'gradle'
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - run: npm ci
@@ -49,7 +48,7 @@ jobs:
             - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e # v2.19.1
               with:
                   api-level: 28
-                  emulator-build: 7425822 # https://git.io/JE3jX
+                  emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
                   profile: pixel_xl
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 

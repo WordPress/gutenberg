@@ -11,6 +11,37 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+
+## 1.76.1
+
+-   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
+-   [*] Fix Drag & Drop Chip positioning issue with RTL languages [#41053]
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
+-   [**] Fix drag mode not being enabled when long-pressing over Shortcode block [#41155]
+
+## 1.76.0
+
+-   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
+-   [**] [Cover block] Improve color contrast between background and text [#40691]
+-   [*] [Gallery block] Fix broken "Link To" settings and add "Image Size" settings [#40947]
+-   [***] Add drag & drop blocks feature [#40424]
+
+## 1.75.0
+
+-   [*] [Latest Posts block] Add featured image settings [#39257]
+-   [*] Prevent incorrect notices displaying when switching between HTML-Visual mode quickly [#40415]
+-   [*] [Embed block] Fix inline preview cut-off when editing URL [#35326]
+-   [*] [iOS] Prevent gaps shown around floating toolbar when using external keyboard [#40266]
+
+## 1.74.1
+
+-   [**] RichText - Set a default value for selection values [#40581]
+
+## 1.74.0
+
+-   [**] [Quote block] Adds support for V2 behind a feature flag [#40133]
+-   [**] Update "add block" button's style in default editor view. [#39726]
 -   [*] Remove banner error notification on upload failure [#39694]
 
 ## 1.73.1

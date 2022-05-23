@@ -1,14 +1,10 @@
 /**
- * WordPress dependencies
- */
-import { Icon } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../ui/context';
 import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+import Icon from '../../icon';
 
 export default function ToggleGroupControlOptionIcon(
 	props: WordPressComponentProps<

@@ -22,7 +22,7 @@ import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import ScreenHeader from './header';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -61,12 +61,12 @@ function BlockMenuItem( { block } ) {
 	}
 
 	return (
-		<NavigationButton path={ '/blocks/' + block.name }>
+		<NavigationButtonAsItem path={ '/blocks/' + block.name }>
 			<HStack justify="flex-start">
 				<BlockIcon icon={ block.icon } />
 				<FlexItem>{ block.title }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 

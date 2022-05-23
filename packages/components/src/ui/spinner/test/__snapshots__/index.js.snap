@@ -12,7 +12,7 @@ Snapshot Diff:
       <div
         class="css-tada40-BarsView e1s9yo7h0"
 -       style="color: blue;"
-+       style="color: rgb(0, 0, 0);"
++       style="color: rgb(30, 30, 30);"
       >
         <div
           class="InnerBar1"
@@ -193,7 +193,7 @@ exports[`props should render correctly 1`] = `
   >
     <div
       class="emotion-4 emotion-5"
-      style="color: rgb(0, 0, 0);"
+      style="color: rgb(30, 30, 30);"
     >
       <div
         class="InnerBar1"
@@ -258,6 +258,6 @@ Snapshot Diff:
     >
       <div
         class="css-tada40-BarsView e1s9yo7h0"
-        style="color: rgb(0, 0, 0);"
+        style="color: rgb(30, 30, 30);"
       >
 `;

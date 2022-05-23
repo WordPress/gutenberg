@@ -28,12 +28,12 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 	);
 }
 
-function NavigationButton( props ) {
+function NavigationButtonAsItem( props ) {
 	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
 }
 
-function NavigationBackButton( props ) {
+function NavigationBackButtonAsItem( props ) {
 	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
 }
 
-export { NavigationButton, NavigationBackButton };
+export { NavigationButtonAsItem, NavigationBackButtonAsItem };

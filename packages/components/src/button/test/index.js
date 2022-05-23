@@ -164,13 +164,28 @@ describe( 'Button', () => {
 			expect( buttonDescription ).toBe( 'Description text' );
 		} );
 
-		it( 'should populate tooltip with describedBy content', () => {
+		it( 'should populate tooltip with label content for buttons without visible labels (no children)', () => {
 			const buttonTooltip = shallow(
 				<Button
 					describedBy="Description text"
 					label="Label"
 					icon={ plusCircle }
 				/>
+			).find( 'Tooltip' );
+
+			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Label' );
+		} );
+
+		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', () => {
+			const buttonTooltip = shallow(
+				<Button
+					label="Label"
+					describedBy="Description text"
+					icon={ plusCircle }
+					showTooltip
+				>
+					Children
+				</Button>
 			).find( 'Tooltip' );
 
 			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Description text' );

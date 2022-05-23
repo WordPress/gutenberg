@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	store as coreStore,
-	__experimentalUseEntityRecords as useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,

@@ -11,10 +11,15 @@ import { useState, useReducer } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { createRegistry } from '../../../registry';
-import { createRegistrySelector } from '../../../factory';
-import { RegistryProvider } from '../../registry-provider';
-import useSelect from '../index';
+import {
+	createRegistry,
+	createRegistrySelector,
+	RegistryProvider,
+	AsyncModeProvider,
+} from '../../..';
+import useSelect from '..';
+
+jest.useRealTimers();
 
 describe( 'useSelect', () => {
 	let registry;
@@ -111,6 +116,71 @@ describe( 'useSelect', () => {
 
 		// Ensure expected state was rendered.
 		expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 'bar' );
+	} );
+
+	it( 'avoid calling nested listener after unmounted', async () => {
+		registry.registerStore( 'toggler', {
+			reducer: ( state = false, action ) =>
+				action.type === 'TOGGLE' ? ! state : state,
+			actions: {
+				toggle: () => ( { type: 'TOGGLE' } ),
+			},
+			selectors: {
+				get: ( state ) => state,
+			},
+		} );
+
+		const mapSelect = ( select ) => select( 'toggler' ).get();
+
+		const mapSelectChild = jest.fn( mapSelect );
+		function Child() {
+			const show = useSelect( mapSelectChild, [] );
+			return show ? 'yes' : 'no';
+		}
+
+		const mapSelectParent = jest.fn( mapSelect );
+		function Parent() {
+			const show = useSelect( mapSelectParent, [] );
+			return show ? <Child /> : 'none';
+		}
+
+		const rendered = render(
+			<RegistryProvider value={ registry }>
+				<Parent />
+			</RegistryProvider>
+		);
+
+		// Initial render renders only parent and subscribes the parent to store.
+		expect( rendered.getByText( 'none' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 0 );
+
+		// act() does batched updates internally, i.e., any scheduled setStates or effects
+		// will be executed only after the dispatch finishes. But we want to opt out of
+		// batched updates here. We want all the setStates to be done synchronously, as the
+		// store listeners are called. The async/await code is a trick to do it: do the
+		// dispatch in a different event loop tick, where the batched updates are no longer active.
+		await act( async () => {
+			await Promise.resolve();
+			registry.dispatch( 'toggler' ).toggle();
+		} );
+
+		// Child was rendered and subscribed to the store, as the _second_ subscription.
+		expect( rendered.getByText( 'yes' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+
+		await act( async () => {
+			await Promise.resolve();
+			registry.dispatch( 'toggler' ).toggle();
+		} );
+
+		// Check that child was unmounted without any extra state update being performed on it.
+		// I.e., `mapSelectChild` was never called again, and no "state update on an unmounted
+		// component" warning was triggered.
+		expect( rendered.getByText( 'none' ) ).toBeInTheDocument();
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 4 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
@@ -712,6 +782,318 @@ describe( 'useSelect', () => {
 			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
 
 			expect( () => rendered.unmount() ).not.toThrow();
+		} );
+	} );
+
+	describe( 'async mode', () => {
+		function registerCounterStore( reg, initialCount = 0 ) {
+			reg.registerStore( 'counter', {
+				reducer: ( state = initialCount, action ) => {
+					if ( action.type === 'INCREMENT' ) {
+						return state + 1;
+					}
+					return state;
+				},
+				actions: {
+					inc: () => ( { type: 'INCREMENT' } ),
+				},
+				selectors: {
+					get: ( state ) => state,
+				},
+			} );
+		}
+
+		beforeEach( () => {
+			registerCounterStore( registry );
+		} );
+
+		it( 'renders with async mode', async () => {
+			const selectSpy = jest.fn( ( select ) =>
+				select( 'counter' ).get()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const rendered = render(
+				<AsyncModeProvider value={ true }>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			// initial render + missed update catcher in subscribing effect
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+
+			// Ensure expected state was rendered.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// still not called right after increment
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			expect( await rendered.findByText( 1 ) ).toBeInTheDocument();
+
+			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		// Tests render queue fixes done in https://github.com/WordPress/gutenberg/pull/19286
+		it( 'catches updates while switching from async to sync', () => {
+			const selectSpy = jest.fn( ( select ) =>
+				select( 'counter' ).get()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const App = ( { async } ) => (
+				<AsyncModeProvider value={ async }>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const rendered = render( <App async={ true } /> );
+
+			// Ensure expected state was rendered.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			// Schedules an async update of the component.
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// Ensure the async update wasn't processed yet.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			// Switch from async mode to sync.
+			rendered.rerender( <App async={ false } /> );
+
+			// Ensure the async update was flushed during the rerender.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
+
+			// initial render + subscription check + rerender with isAsync=false
+			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+			// initial render + rerender with isAsync=false
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'cancels scheduled updates when mapSelect function changes', async () => {
+			const selectA = jest.fn(
+				( select ) => 'a:' + select( 'counter' ).get()
+			);
+			const selectB = jest.fn(
+				( select ) => 'b:' + select( 'counter' ).get()
+			);
+
+			const TestComponent = jest.fn( ( { variant } ) => {
+				const count = useSelect( variant === 'a' ? selectA : selectB, [
+					variant,
+				] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const App = ( { variant } ) => (
+				<AsyncModeProvider value={ true }>
+					<RegistryProvider value={ registry }>
+						<TestComponent variant={ variant } />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const rendered = render( <App variant="a" /> );
+
+			// Ensure expected state was rendered.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 'a:0' );
+
+			// Schedules an async update of the component.
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// Ensure the async update wasn't processed yet.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 'a:0' );
+
+			// Rerender with a prop change that causes dependency change.
+			rendered.rerender( <App variant="b" /> );
+
+			// Ensure the async update was flushed (cancelled) during the rerender.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 'b:1' );
+
+			// Give the async update time to run in case it wasn't cancelled
+			await new Promise( setImmediate );
+
+			expect( selectA ).toHaveBeenCalledTimes( 2 );
+			expect( selectB ).toHaveBeenCalledTimes( 2 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'cancels scheduled updates when unmounting', async () => {
+			const selectSpy = jest.fn( ( select ) =>
+				select( 'counter' ).get()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const App = () => (
+				<AsyncModeProvider value={ true }>
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const rendered = render( <App /> );
+
+			// Ensure expected state was rendered.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			// Schedules an async update of the component.
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			// Ensure the async update wasn't processed yet.
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			// Unmount
+			rendered.unmount();
+
+			// Give the async update time to run in case it wasn't cancelled
+			await new Promise( setImmediate );
+
+			// only the initial render, no state updates
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'cancels scheduled updates when registry changes', async () => {
+			const registry2 = createRegistry();
+			registerCounterStore( registry2, 100 );
+
+			const selectSpy = jest.fn( ( select ) =>
+				select( 'counter' ).get()
+			);
+
+			const TestComponent = jest.fn( () => {
+				const count = useSelect( selectSpy, [] );
+				return <div role="status">{ count }</div>;
+			} );
+
+			const App = ( { reg } ) => (
+				<AsyncModeProvider value={ true }>
+					<RegistryProvider value={ reg }>
+						<TestComponent />
+					</RegistryProvider>
+				</AsyncModeProvider>
+			);
+
+			const rendered = render( <App reg={ registry } /> );
+
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			act( () => {
+				registry.dispatch( 'counter' ).inc();
+			} );
+
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 0 );
+
+			rendered.rerender( <App reg={ registry2 } /> );
+
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 100 );
+
+			// Give the async update time to run in case it wasn't cancelled
+			await new Promise( setImmediate );
+
+			// initial render + registry change rerender, no state updates
+			expect( selectSpy ).toHaveBeenCalledTimes( 4 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		} );
+	} );
+
+	describe( 'usage without dependencies array', () => {
+		function registerStore( name, initial ) {
+			registry.registerStore( name, {
+				reducer: ( s = initial, a ) => ( a.type === 'inc' ? s + 1 : s ),
+				actions: { inc: () => ( { type: 'inc' } ) },
+				selectors: { get: ( s ) => s },
+			} );
+		}
+
+		it( 'does not memoize the callback when there are no deps', () => {
+			registerStore( 'store', 1 );
+
+			const Status = ( { multiple } ) => {
+				const count = useSelect(
+					( select ) => select( 'store' ).get() * multiple
+				);
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { multiple } ) => (
+				<RegistryProvider value={ registry }>
+					<Status multiple={ multiple } />
+				</RegistryProvider>
+			);
+
+			const rendered = render( <App multiple={ 1 } /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
+
+			// Check that the most recent value of `multiple` is used to render:
+			// the old callback wasn't memoized and there is no stale closure problem.
+			rendered.rerender( <App multiple={ 2 } /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 2 );
+		} );
+
+		it( 'subscribes only stores used by the initial callback', () => {
+			registerStore( 'counter-1', 1 );
+			registerStore( 'counter-2', 10 );
+
+			const Status = ( { store } ) => {
+				const count = useSelect( ( select ) => select( store ).get() );
+				return <div role="status">{ count }</div>;
+			};
+
+			const App = ( { store } ) => (
+				<RegistryProvider value={ registry }>
+					<Status store={ store } />
+				</RegistryProvider>
+			);
+
+			// initial render with counter-1
+			const rendered = render( <App store="counter-1" /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 1 );
+
+			// update from counter-1
+			act( () => {
+				registry.dispatch( 'counter-1' ).inc();
+			} );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 2 );
+
+			// rerender with counter-2
+			rendered.rerender( <App store="counter-2" /> );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 10 );
+
+			// update from counter-2 is ignored because component is subcribed only to counter-1
+			act( () => {
+				registry.dispatch( 'counter-2' ).inc();
+			} );
+			expect( rendered.getByRole( 'status' ) ).toHaveTextContent( 10 );
 		} );
 	} );
 } );

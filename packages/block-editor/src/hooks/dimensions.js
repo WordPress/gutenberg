@@ -19,6 +19,7 @@ import {
 } from './gap';
 import {
 	MarginEdit,
+	MarginVisualizer,
 	hasMarginSupport,
 	hasMarginValue,
 	resetMargin,
@@ -26,6 +27,7 @@ import {
 } from './margin';
 import {
 	PaddingEdit,
+	PaddingVisualizer,
 	hasPaddingSupport,
 	hasPaddingValue,
 	resetPadding,
@@ -71,44 +73,48 @@ export function DimensionsPanel( props ) {
 	} );
 
 	return (
-		<InspectorControls __experimentalGroup="dimensions">
-			{ ! isPaddingDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasPaddingValue( props ) }
-					label={ __( 'Padding' ) }
-					onDeselect={ () => resetPadding( props ) }
-					resetAllFilter={ createResetAllFilter( 'padding' ) }
-					isShownByDefault={ defaultSpacingControls?.padding }
-					panelId={ props.clientId }
-				>
-					<PaddingEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isMarginDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasMarginValue( props ) }
-					label={ __( 'Margin' ) }
-					onDeselect={ () => resetMargin( props ) }
-					resetAllFilter={ createResetAllFilter( 'margin' ) }
-					isShownByDefault={ defaultSpacingControls?.margin }
-					panelId={ props.clientId }
-				>
-					<MarginEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-			{ ! isGapDisabled && (
-				<ToolsPanelItem
-					hasValue={ () => hasGapValue( props ) }
-					label={ __( 'Block spacing' ) }
-					onDeselect={ () => resetGap( props ) }
-					resetAllFilter={ createResetAllFilter( 'blockGap' ) }
-					isShownByDefault={ defaultSpacingControls?.blockGap }
-					panelId={ props.clientId }
-				>
-					<GapEdit { ...props } />
-				</ToolsPanelItem>
-			) }
-		</InspectorControls>
+		<>
+			<InspectorControls __experimentalGroup="dimensions">
+				{ ! isPaddingDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasPaddingValue( props ) }
+						label={ __( 'Padding' ) }
+						onDeselect={ () => resetPadding( props ) }
+						resetAllFilter={ createResetAllFilter( 'padding' ) }
+						isShownByDefault={ defaultSpacingControls?.padding }
+						panelId={ props.clientId }
+					>
+						<PaddingEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isMarginDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasMarginValue( props ) }
+						label={ __( 'Margin' ) }
+						onDeselect={ () => resetMargin( props ) }
+						resetAllFilter={ createResetAllFilter( 'margin' ) }
+						isShownByDefault={ defaultSpacingControls?.margin }
+						panelId={ props.clientId }
+					>
+						<MarginEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isGapDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasGapValue( props ) }
+						label={ __( 'Block spacing' ) }
+						onDeselect={ () => resetGap( props ) }
+						resetAllFilter={ createResetAllFilter( 'blockGap' ) }
+						isShownByDefault={ defaultSpacingControls?.blockGap }
+						panelId={ props.clientId }
+					>
+						<GapEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
+			{ ! isPaddingDisabled && <PaddingVisualizer { ...props } /> }
+			{ ! isMarginDisabled && <MarginVisualizer { ...props } /> }
+		</>
 	);
 }
 
@@ -147,7 +153,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
 };
 
 /**
- * Custom hook to retrieve which padding/margin is supported
+ * Custom hook to retrieve which padding/margin/blockGap is supported
  * e.g. top, right, bottom or left.
  *
  * Sides are opted into by default. It is only if a specific side is set to
@@ -156,7 +162,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {Object} Sides supporting custom margin.
+ * @return {?string[]} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
@@ -166,7 +172,15 @@ export function useCustomSides( blockName, feature ) {
 		return;
 	}
 
-	return support[ feature ];
+	// Return if the setting is an array of sides (e.g. `[ 'top', 'bottom' ]`).
+	if ( Array.isArray( support[ feature ] ) ) {
+		return support[ feature ];
+	}
+
+	// Finally, attempt to return `.sides` if the setting is an object.
+	if ( support[ feature ]?.sides ) {
+		return support[ feature ].sides;
+	}
 }
 
 /**

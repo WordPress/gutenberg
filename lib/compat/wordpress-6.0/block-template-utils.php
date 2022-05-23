@@ -8,17 +8,17 @@
  */
 
 /**
- * Filters theme directories that should be ignored during export.
+ * Filters theme files and folders that should be ignored during export.
  *
  * @since 6.0.0
  *
  * @param string $path The path of the file in the theme.
- * @return Bool Whether this file is in an ignored directory.
+ * @return Bool Whether this file or directory is ignored.
  */
 function gutenberg_is_theme_directory_ignored( $path ) {
-	$directories_to_ignore = array( '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
-	foreach ( $directories_to_ignore as $directory ) {
-		if ( strpos( $path, $directory ) === 0 ) {
+	$ignore_list = array( '.DS_Store', '.svn', '.git', '.hg', '.bzr', 'node_modules', 'vendor' );
+	foreach ( $ignore_list as $ignored ) {
+		if ( strpos( $path, $ignored ) === 0 ) {
 			return true;
 		}
 	}

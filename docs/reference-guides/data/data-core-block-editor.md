@@ -428,6 +428,7 @@ Items are returned ordered descendingly by their 'frecency'.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
+-   _blocks_ `Object|Object[]`: Block object or array objects.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -975,6 +976,19 @@ _Returns_
 
 -   `boolean`: Is Valid.
 
+### isBlockVisible
+
+Tells if the block is visible on the canvas or not.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `Object`: Client Id of the block.
+
+_Returns_
+
+-   `boolean`: True if the block is visible.
+
 ### isBlockWithinSelection
 
 Returns true if the block corresponding to the specified client ID is
@@ -993,11 +1007,9 @@ _Returns_
 
 ### isCaretWithinFormattedText
 
+> **Deprecated**
+
 Returns true if the caret is within formatted text, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -1149,6 +1161,8 @@ _Parameters_
 
 ### enterFormattedText
 
+> **Deprecated**
+
 Returns an action object used in signalling that the caret has entered formatted text.
 
 _Returns_
@@ -1156,6 +1170,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### exitFormattedText
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 
@@ -1452,6 +1468,14 @@ Action that enables or disables the block moving mode.
 _Parameters_
 
 -   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
+
+### setBlockVisibility
+
+Action that sets whether given blocks are visible on the canvas.
+
+_Parameters_
+
+-   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
 
 ### setHasControlledInnerBlocks
 

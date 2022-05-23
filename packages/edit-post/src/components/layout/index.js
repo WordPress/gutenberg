@@ -51,7 +51,6 @@ import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -171,6 +170,10 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
 			return <InserterSidebar />;
@@ -178,6 +181,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
 		}
+
 		return null;
 	};
 
@@ -205,7 +209,10 @@ function Layout( { styles } ) {
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				className={ className }
-				labels={ interfaceLabels }
+				labels={ {
+					...interfaceLabels,
+					secondarySidebar: secondarySidebarLabel,
+				} }
 				header={
 					<Header
 						setEntitiesSavedStatesCallback={

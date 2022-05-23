@@ -1,0 +1,11 @@
+<!-- wp:paragraph -->
+<p>Copy - collapsed selection</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Copy - collapsed selection</p>
+<!-- /wp:paragraph -->

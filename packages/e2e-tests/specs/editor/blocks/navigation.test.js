@@ -807,6 +807,58 @@ describe( 'Navigation', () => {
 		);
 	} );
 
+	it( 'correctly decodes special characters in the created Page title for display', async () => {
+		await createNewPost();
+		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
+
+		// Wait for URL input to be focused
+		// Insert name for the new page.
+		const pageTitle = 'This & That & Some < other > chars';
+		const input = await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+		await input.type( pageTitle );
+
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
+		const createPageButton = await page.waitForSelector(
+			'.block-editor-link-control__search-create'
+		);
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
+		);
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
+
+		await waitForBlock( 'Navigation' );
+
+		const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+		const linkText = await innerLinkBlock.$eval(
+			'[aria-label="Navigation link text"]',
+			( element ) => {
+				return element.innerText;
+			}
+		);
+
+		expect( linkText ).toContain( pageTitle );
+
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
+	} );
+
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
 		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await createNewPost();
@@ -1428,6 +1480,44 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
 			);
+		} );
+
+		it( 'should always focus select menu button after item selection', async () => {
+			// Create some navigation menus to work with.
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			// Create new post.
+			await createNewPost();
+
+			// Insert new block and wait for the insert to complete.
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Change menus via the select menu toolbar button.
+			const selectMenuDropdown = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await selectMenuDropdown.click();
+			const exampleNavigationOption = await page.waitForXPath(
+				'//span[contains(text(), "Second Example Navigation")]'
+			);
+			await exampleNavigationOption.click();
+
+			// Once the options are closed, does select menu button receive focus?
+			const selectMenuDropdown2 = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await expect( selectMenuDropdown2 ).toHaveFocus();
 		} );
 	} );
 } );
