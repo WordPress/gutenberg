@@ -4,6 +4,11 @@
 import { isEmpty, get } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
+/**
  * Internal dependencies
  */
 import { NEW_TAB_REL } from './constants';
@@ -71,4 +76,22 @@ export function getImageSizeAttributes( image, size ) {
 	}
 
 	return {};
+}
+
+/**
+ * Performs a GET request on an image file to confirm whether it has been deleted from the database.
+ *
+ * @param {number=} mediaId The id of the image.
+ * @return {Promise} Media Object Promise.
+ */
+export async function isMediaFileDeleted( mediaId ) {
+	try {
+		const response = await apiFetch( {
+			path: `/wp/v2/media/${ mediaId }`,
+		} );
+		const isMediaFileAvailable = response && response?.id === mediaId;
+		return ! isMediaFileAvailable;
+	} catch ( err ) {
+		return true;
+	}
 }

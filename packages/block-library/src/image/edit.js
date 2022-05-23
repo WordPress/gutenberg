@@ -26,6 +26,7 @@ import { image as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import Image from './image';
+import { isMediaFileDeleted } from './utils';
 
 /**
  * Module constants
@@ -85,6 +86,20 @@ function hasDefaultSize( image, defaultSize ) {
 	);
 }
 
+/**
+ * Checks if a media attachment object has been "destroyed",
+ * that is, removed from the media library. The core Media Library
+ * adds a `destroyed` property to a deleted attachment object in the media collection.
+ *
+ * @param {number} id The attachment id.
+ *
+ * @return {boolean} Whether the image has been destroyed.
+ */
+export function isMediaDestroyed( id ) {
+	const attachment = window?.wp?.media?.attachment( id ) || {};
+	return attachment.destroyed;
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -124,6 +139,48 @@ export function ImageEdit( {
 		const { getSettings } = select( blockEditorStore );
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
+
+	// A callback passed to MediaUpload,
+	// fired when the media modal closes.
+	function onCloseModal() {
+		if ( isMediaDestroyed( attributes?.id ) ) {
+			setAttributes( {
+				url: undefined,
+				id: undefined,
+			} );
+		}
+	}
+
+	/*
+		 Runs an error callback if the image does not load.
+		 If the error callback is triggered, we infer that that image
+		 has been deleted.
+	*/
+	function onImageError( isReplaced = false ) {
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice(
+			sprintf(
+				/* translators: %s url or missing image */
+				__( 'Error loading image: %s' ),
+				url
+			)
+		);
+
+		// If the image block was not replaced with an embed,
+		// and it's not an external image,
+		// and it's been deleted from the database,
+		// clear the attributes and trigger the placeholder.
+		if ( id && ! isReplaced && ! isExternalImage( id, url ) ) {
+			isMediaFileDeleted( id ).then( ( isFileDeleted ) => {
+				if ( isFileDeleted ) {
+					setAttributes( {
+						url: undefined,
+						id: undefined,
+					} );
+				}
+			} );
+		}
+	}
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -323,6 +380,8 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					onCloseModal={ onCloseModal }
+					onImageLoadError={ onImageError }
 				/>
 			) }
 			{ ! url && (
@@ -339,6 +398,7 @@ export function ImageEdit( {
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
+				onClose={ onCloseModal }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
