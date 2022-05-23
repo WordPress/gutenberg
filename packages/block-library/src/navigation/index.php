@@ -207,6 +207,24 @@ function block_core_navigation_build_css_colors( $attributes ) {
 		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
 	}
 
+	// If has overlay link color
+	$has_named_overlay_link_color  = array_key_exists( 'overlayLinkColor', $attributes );
+	$has_custom_overlay_link_color = array_key_exists( 'customOverlayLinkColor', $attributes );
+
+	// If has overlay text color.
+	if ( $has_custom_overlay_link_color || $has_named_overlay_link_color ) {
+		// Add has-text-color class.
+		$colors['overlay_css_classes'][] = 'has-link-color';
+	}
+
+	if ( $has_named_overlay_link_color ) {
+		// Add the overlay color class.
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayLinkColor'] );
+	} elseif ( $has_custom_overlay_link_color ) {
+		// Add the custom overlay color inline style.
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayLinkColor'] );
+	}
+
 	// Overlay background color.
 	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
 	$has_custom_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );

@@ -19,11 +19,18 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		'inline_styles' => '',
 	);
 
+
+
+
 	$is_sub_menu = isset( $attributes['isTopLevelItem'] ) ? ( ! $attributes['isTopLevelItem'] ) : false;
+
+
 
 	// Text color.
 	$named_text_color  = null;
 	$custom_text_color = null;
+	$named_link_color  = null;
+	$custom_link_color = null;
 
 	if ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
 		$custom_text_color = $context['customOverlayTextColor'];
@@ -37,6 +44,20 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		$custom_text_color = $context['style']['color']['text'];
 	}
 
+	if ( $is_sub_menu && array_key_exists( 'customOverlayLinkColor', $context ) ) {
+		$custom_link_color = $context['customOverlayLinkColor'];
+	} elseif ( $is_sub_menu && array_key_exists( 'overlayLinkColor', $context ) ) {
+		$named_link_color = $context['overlayLinkColor'];
+	} elseif ( array_key_exists( 'customLinkColor', $context ) ) {
+		$custom_link_color = $context['customLinkColor'];
+	} elseif ( array_key_exists( 'linkColor', $context ) ) {
+		$named_link_color = $context['linkColor'];
+	} elseif ( isset( $context['style']['color']['link'] ) ) {
+		$custom_link_color = $context['style']['color']['link'];
+	}
+
+
+
 	// If has text color.
 	if ( ! is_null( $named_text_color ) ) {
 		// Add the color class.
@@ -45,6 +66,16 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		// Add the custom color inline style.
 		$colors['css_classes'][]  = 'has-text-color';
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $custom_text_color );
+	}
+
+	// If has link color.
+	if ( ! is_null( $named_link_color ) ) {
+		// Add the color class.
+		array_push( $colors['css_classes'], 'has-link-color', sprintf( 'has-%s-color', $named_link_color ) );
+	} elseif ( ! is_null( $custom_link_color ) ) {
+		// Add the custom color inline style.
+		$colors['css_classes'][]  = 'has-link-color';
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $custom_link_color );
 	}
 
 	// Background color.
@@ -72,6 +103,9 @@ function block_core_navigation_submenu_build_css_colors( $context, $attributes )
 		$colors['css_classes'][]  = 'has-background';
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $custom_background_color );
 	}
+
+
+
 
 	return $colors;
 }
