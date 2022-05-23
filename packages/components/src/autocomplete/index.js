@@ -269,6 +269,9 @@ function useAutocomplete( {
 		event.preventDefault();
 	}
 
+	// textContent is a primitive (string), memoizing is not strictly necessary
+	// but this is a preemptive performance improvement, since the autocompleter
+	// is a potential bottleneck for the editor type metric.
 	const textContent = useMemo( () => {
 		if ( isCollapsed( record ) ) {
 			return getTextContent( slice( record, 0 ) );
