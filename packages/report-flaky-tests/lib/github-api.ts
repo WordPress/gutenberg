@@ -1,39 +1,40 @@
 /**
  * External dependencies
  */
-import * as github from '@actions/github';
+import { getOctokit } from '@actions/github';
 import * as unzipper from 'unzipper';
+import type { GitHub } from '@actions/github/lib/utils';
 
 /**
  * Internal dependencies
  */
 import type { FlakyTestResult } from './types';
 
-type Octokit = ReturnType< typeof github.getOctokit >;
+type Octokit = InstanceType< typeof GitHub >;
+
+type Repo = {
+	owner: string;
+	repo: string;
+};
 
 class GitHubAPI {
 	#octokit: Octokit;
+	#repo: Repo;
 
-	constructor( token: string ) {
-		this.#octokit = github.getOctokit( token );
-	}
-
-	get headBranch() {
-		return github.context.payload.workflow_run.head_branch;
-	}
-
-	get runURL() {
-		return github.context.payload.workflow_run.html_url;
+	constructor( token: string, repo: Repo ) {
+		this.#octokit = getOctokit( token );
+		this.#repo = repo;
 	}
 
 	async downloadReportFromArtifact(
+		runID: number,
 		artifactNamePrefix: string
 	): Promise< FlakyTestResult[] | undefined > {
 		const {
 			data: { artifacts },
 		} = await this.#octokit.rest.actions.listWorkflowRunArtifacts( {
-			...github.context.repo,
-			run_id: github.context.payload.workflow_run.id,
+			...this.#repo,
+			run_id: runID,
 		} );
 
 		const matchArtifact = artifacts.find( ( artifact ) =>
@@ -45,7 +46,7 @@ class GitHubAPI {
 		}
 
 		const download = await this.#octokit.rest.actions.downloadArtifact( {
-			...github.context.repo,
+			...this.#repo,
 			artifact_id: matchArtifact.id,
 			archive_format: 'zip',
 		} );
@@ -67,7 +68,7 @@ class GitHubAPI {
 		const issues = await this.#octokit.paginate(
 			this.#octokit.rest.issues.listForRepo,
 			{
-				...github.context.repo,
+				...this.#repo,
 				state: 'all',
 				labels: label,
 			}
@@ -78,7 +79,7 @@ class GitHubAPI {
 
 	async findMergeBaseCommit( baseCommit: string, headCommit: string ) {
 		const { data } = await this.#octokit.rest.repos.compareCommits( {
-			...github.context.repo,
+			...this.#repo,
 			base: baseCommit,
 			head: headCommit,
 			per_page: 1,
@@ -99,7 +100,7 @@ class GitHubAPI {
 		}
 	) {
 		const { data } = await this.#octokit.rest.issues.update( {
-			...github.context.repo,
+			...this.#repo,
 			...params,
 		} );
 
@@ -118,7 +119,7 @@ class GitHubAPI {
 		}
 	) {
 		const { data } = await this.#octokit.rest.issues.create( {
-			...github.context.repo,
+			...this.#repo,
 			...params,
 		} );
 

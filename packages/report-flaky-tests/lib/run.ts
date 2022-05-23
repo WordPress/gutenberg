@@ -3,6 +3,7 @@
  */
 import * as github from '@actions/github';
 import * as core from '@actions/core';
+import type { WorkflowRunCompletedEvent } from '@octokit/webhooks-types';
 
 /**
  * Internal dependencies
@@ -16,14 +17,26 @@ import {
 } from './markdown';
 
 async function run() {
+	if (
+		github.context.eventName !== 'workflow_run' ||
+		github.context.payload.action !== 'completed'
+	) {
+		return;
+	}
+
 	const token = core.getInput( 'repo-token', { required: true } );
 	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
 		required: true,
 	} );
 
-	const api = new GitHubAPI( token );
+	const api = new GitHubAPI( token, github.context.repo );
+	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+	const {
+		workflow_run: { head_branch: headBranch, html_url: runURL, id: runID },
+	} = github.context.payload as WorkflowRunCompletedEvent;
 
 	const flakyTests = await api.downloadReportFromArtifact(
+		runID,
 		artifactNamePrefix
 	);
 
@@ -49,8 +62,8 @@ async function run() {
 		const currentFormattedTestResults = formatTestResults( {
 			date: new Date(),
 			failedTimes: flakyTest.results.length,
-			headBranch: api.headBranch,
-			runURL: api.runURL,
+			headBranch,
+			runURL,
 			// Always output the latest test results' stacks.
 			errorMessage: formatTestErrorMessage( flakyTest ),
 		} );

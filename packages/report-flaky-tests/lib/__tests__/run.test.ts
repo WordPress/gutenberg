@@ -10,6 +10,24 @@ import { run } from '../run';
 
 jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
 
+jest.mock( '@actions/github', () => ( {
+	context: {
+		repo: {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+		},
+		eventName: 'workflow_run',
+		payload: {
+			action: 'completed',
+			workflow_run: {
+				html_url: 'runURL',
+				head_branch: 'headBranch',
+				id: 100,
+			},
+		},
+	},
+} ) );
+
 jest.mock( '@actions/core', () => ( {
 	error: jest.fn(),
 	info: jest.fn(),
@@ -17,8 +35,6 @@ jest.mock( '@actions/core', () => ( {
 } ) );
 
 const mockAPI = {
-	headBranch: 'headBranch',
-	runURL: 'runURL',
 	downloadReportFromArtifact: jest.fn(),
 	fetchAllIssuesLabeledFlaky: jest.fn(),
 	findMergeBaseCommit: jest.fn(),
