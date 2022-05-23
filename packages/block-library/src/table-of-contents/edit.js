@@ -187,7 +187,13 @@ export default function TableOfContentsEdit( {
 							headingAttributes.anchor !== '';
 
 						_latestHeadings.push( {
-							content: stripHTML( headingAttributes.content ),
+							// Convert line breaks to spaces, and get rid of HTML tags in the headings.
+							content: stripHTML(
+								headingAttributes.content.replace(
+									/(<br *\/?>)+/g,
+									' '
+								)
+							),
 							level: headingAttributes.level,
 							link: canBeLinked
 								? `${ headingPageLink }#${ headingAttributes.anchor }`

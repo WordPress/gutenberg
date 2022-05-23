@@ -39,6 +39,7 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
+export const OPTION_WORDPRESS_MEDIA_LIBRARY = __( 'WordPress Media Library' );
 
 const URL_MEDIA_SOURCE = 'URL';
 
@@ -78,6 +79,8 @@ export class MediaUpload extends Component {
 	}
 
 	getAllSources() {
+		const { onSelectURL } = this.props;
+
 		const cameraImageSource = {
 			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
@@ -124,16 +127,17 @@ export class MediaUpload extends Component {
 			id: URL_MEDIA_SOURCE,
 			value: URL_MEDIA_SOURCE,
 			label: __( 'Insert from URL' ),
-			types: [ MEDIA_TYPE_AUDIO ],
+			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE ],
 			icon: globe,
 		};
 
+		// Only include `urlSource` option if `onSelectURL` prop is present, in order to match the web behavior.
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
-			urlSource,
+			...( onSelectURL ? [ urlSource ] : [] ),
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );

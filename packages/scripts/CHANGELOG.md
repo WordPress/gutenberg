@@ -7,6 +7,7 @@
 ### New Feature
 
 -   Enable by default code formatting for JSON files in the `format` command ([#40994](https://github.com/WordPress/gutenberg/pull/40994)). You can opt-out of this behavior by providing a custom file matcher, example: `wp-scripts format src/**/*.js`.
+-   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
 
 ### Bug Fixes
 

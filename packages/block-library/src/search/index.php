@@ -13,8 +13,6 @@
  * @return string The search block markup.
  */
 function render_block_core_search( $attributes ) {
-	static $instance_id = 0;
-
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -27,7 +25,7 @@ function render_block_core_search( $attributes ) {
 		)
 	);
 
-	$input_id            = 'wp-block-search__input-' . ++$instance_id;
+	$input_id            = wp_unique_id( 'wp-block-search__input-' );
 	$classnames          = classnames_for_block_core_search( $attributes );
 	$show_label          = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button     = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
@@ -65,7 +63,7 @@ function render_block_core_search( $attributes ) {
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( $input_classes ),
-			esc_attr( get_search_query() ),
+			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
 		);
@@ -102,6 +100,9 @@ function render_block_core_search( $attributes ) {
 					<path d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"></path>
 				</svg>';
 		}
+
+		// Include the button element class.
+		$button_classes .= ' ' . WP_Theme_JSON_GUTENBERG::__EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME;
 
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
