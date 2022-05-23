@@ -22,9 +22,12 @@ export function useBorderBoxControlSplitControls(
 
 	// Generate class names.
 	const cx = useCx();
+	const rtlWatchResult = rtl.watch();
 	const classes = useMemo( () => {
 		return cx( styles.borderBoxControlSplitControls(), className );
-	}, [ cx, className, rtl.watch() ] );
+		// rtlWatchResult is needed to refresh styles when the writing direction changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ cx, className, rtlWatchResult ] );
 
 	const centeredClassName = useMemo( () => {
 		return cx( styles.CenteredBorderControl, className );
@@ -32,7 +35,9 @@ export function useBorderBoxControlSplitControls(
 
 	const rightAlignedClassName = useMemo( () => {
 		return cx( styles.rightBorderControl(), className );
-	}, [ cx, className, rtl.watch() ] );
+		// rtlWatchResult is needed to refresh styles when the writing direction changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ cx, className, rtlWatchResult ] );
 
 	return {
 		...otherProps,
