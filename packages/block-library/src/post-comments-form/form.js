@@ -27,7 +27,7 @@ const CommentsForm = () => {
 					<input
 						name="submit"
 						type="submit"
-						className="submit wp-block-button__link"
+						className="submit wp-block-button__link wp-element-button"
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }
 					/>
