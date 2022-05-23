@@ -65,7 +65,7 @@ class GitHubAPI {
 
 	async fetchAllIssuesLabeledFlaky( label: string ) {
 		const issues = await this.#octokit.paginate(
-			this.#octokit.rest.issues.list,
+			this.#octokit.rest.issues.listForRepo,
 			{
 				...github.context.repo,
 				state: 'all',
