@@ -221,6 +221,7 @@ function mergeWpServiceConfigs( configs ) {
 		...Object.assign( {}, ...configs ),
 		config: mergeNestedObjs( 'config' ),
 		mappings: mergeNestedObjs( 'mappings' ),
+		scripts: mergeNestedObjs( 'scripts' ),
 	};
 
 	delete mergedConfig.env;
