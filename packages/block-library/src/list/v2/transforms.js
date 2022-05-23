@@ -9,6 +9,32 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 
+/**
+ * Internal dependencies
+ */
+import { createListBlockFromDOMElement } from './migrate';
+
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
+	};
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
+
 const transforms = {
 	from: [
 		{
@@ -82,6 +108,15 @@ const transforms = {
 				);
 			},
 		} ) ),
+		{
+			type: 'raw',
+			selector: 'ol,ul',
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
+			transform: createListBlockFromDOMElement,
+		},
 	],
 	to: [
 		...[ 'core/paragraph', 'core/heading' ].map( ( block ) => ( {

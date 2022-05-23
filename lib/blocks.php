@@ -143,7 +143,7 @@ function gutenberg_reregister_core_block_types() {
 			// to replace paths with overrides defined by the plugin.
 			$metadata = json_decode( file_get_contents( $block_json_file ), true );
 			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				return false;
+				continue;
 			}
 
 			if ( $registry->is_registered( $metadata['name'] ) ) {
@@ -156,7 +156,7 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
-				return;
+				continue;
 			}
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;

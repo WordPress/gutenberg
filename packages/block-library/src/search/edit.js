@@ -14,6 +14,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
+	__experimentalElementButtonClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -241,7 +242,8 @@ export default function SearchEdit( {
 			'wp-block-search__button',
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
-			buttonUseIcon ? 'has-icon' : undefined
+			buttonUseIcon ? 'has-icon' : undefined,
+			__experimentalElementButtonClassName
 		);
 		const buttonStyles = {
 			...colorProps.style,

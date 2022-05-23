@@ -21,15 +21,11 @@ export type UpdateOnBlurAsIntegerFieldProps = {
 	children?: ReactNode;
 };
 
-export type DateTimeString = string;
-
-export type ValidDateTimeInput = Date | string | number | null;
-
 export type TimePickerProps = {
 	/**
 	 * The initial current time the time picker should render.
 	 */
-	currentTime?: ValidDateTimeInput;
+	currentTime?: Date | string | number | null;
 
 	/**
 	 * Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is
@@ -42,7 +38,7 @@ export type TimePickerProps = {
 	 * The function called when a new time has been selected. It is passed the
 	 * time as an argument.
 	 */
-	onChange?: ( time: DateTimeString ) => void;
+	onChange?: ( time: string ) => void;
 };
 
 export type DatePickerEvent = {
@@ -71,13 +67,13 @@ export type DatePickerProps = {
 	 * The current date and time at initialization. Optionally pass in a `null`
 	 * value to specify no date is currently selected.
 	 */
-	currentDate?: ValidDateTimeInput;
+	currentDate?: Date | string | number | null;
 
 	/**
 	 * The function called when a new date has been selected. It is passed the
 	 * date as an argument.
 	 */
-	onChange?: ( date: DateTimeString ) => void;
+	onChange?: ( date: string ) => void;
 
 	/**
 	 * A callback function which receives a Date object representing a day as an
@@ -91,7 +87,7 @@ export type DatePickerProps = {
 	 * picker. The callback receives the new month date in the ISO format as an
 	 * argument.
 	 */
-	onMonthPreviewed?: ( date: DateTimeString ) => void;
+	onMonthPreviewed?: ( date: string ) => void;
 
 	/**
 	 * List of events to show in the date picker. Each event will appear as a
@@ -100,11 +96,11 @@ export type DatePickerProps = {
 	events?: DatePickerEvent[];
 };
 
-export type DateTimePickerProps = DatePickerProps &
-	TimePickerProps & {
+export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
+	Omit< TimePickerProps, 'currentTime' | 'onChange' > & {
 		/**
 		 * The function called when a new date or time has been selected. It is
 		 * passed the date and time as an argument.
 		 */
-		onChange?: ( date: DateTimeString | null ) => void;
+		onChange?: ( date: string | null ) => void;
 	};

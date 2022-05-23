@@ -6,9 +6,10 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
-import ToolsPanelColorDropdown from '../components/colors-gradients/tools-panel-color-dropdown';
 import InspectorControls from '../components/inspector-controls';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
@@ -58,16 +59,19 @@ export default function ColorPanel( {
 		setDetectedBackgroundColor( backgroundColor );
 	} );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
 		<InspectorControls __experimentalGroup="color">
-			{ settings.map( ( setting, index ) => (
-				<ToolsPanelColorDropdown
-					key={ index }
-					settings={ setting }
-					panelId={ clientId }
-					enableAlpha={ enableAlpha }
-				/>
-			) ) }
+			<ColorGradientSettingsDropdown
+				enableAlpha={ enableAlpha }
+				panelId={ clientId }
+				settings={ settings }
+				__experimentalIsItemGroup={ false }
+				__experimentalHasMultipleOrigins
+				__experimentalIsRenderedInSidebar
+				{ ...colorGradientSettings }
+			/>
 			{ enableContrastChecking && (
 				<ContrastChecker
 					backgroundColor={ detectedBackgroundColor }

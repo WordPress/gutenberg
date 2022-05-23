@@ -1050,6 +1050,7 @@ export class RichText extends Component {
 			baseGlobalStyles,
 			selectionStart,
 			selectionEnd,
+			disableSuggestions,
 		} = this.props;
 		const { currentFontSize } = this.state;
 
@@ -1220,6 +1221,7 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
 					<>
@@ -1230,11 +1232,13 @@ export class RichText extends Component {
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
-						<BlockFormatControls>
-							<ToolbarButtonWithOptions
-								options={ this.suggestionOptions() }
-							/>
-						</BlockFormatControls>
+						{ ! disableSuggestions && (
+							<BlockFormatControls>
+								<ToolbarButtonWithOptions
+									options={ this.suggestionOptions() }
+								/>
+							</BlockFormatControls>
+						) }
 					</>
 				) }
 			</View>
@@ -1249,10 +1253,17 @@ RichText.defaultProps = {
 };
 
 const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} = props;
 	const { formatTypes } = useFormatTypes( {
-		clientId: props.clientId,
-		identifier: props.identifier,
-		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;

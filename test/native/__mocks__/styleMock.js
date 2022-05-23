@@ -159,4 +159,10 @@ module.exports = {
 	'header-toolbar__container': {
 		height: 44,
 	},
+	'dropping-insertion-point': {
+		height: 3,
+	},
+	blockShortcodeContainer: {
+		padding: 12,
+	},
 };

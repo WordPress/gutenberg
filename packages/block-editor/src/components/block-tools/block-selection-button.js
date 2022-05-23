@@ -262,6 +262,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						onClick={ () => setNavigationMode( false ) }
 						onKeyDown={ onKeyDown }
 						label={ label }
+						showTooltip={ false }
 						className="block-selection-button_select-button"
 					>
 						<BlockTitle

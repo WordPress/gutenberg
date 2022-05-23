@@ -102,18 +102,18 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
-								featureName="reducedUI"
-								help={ __(
-									'Compacts options and outlines in the toolbar.'
-								) }
-								label={ __( 'Reduce the interface' ) }
-							/>
-							<EnableFeature
 								featureName="focusMode"
 								help={ __(
 									'Highlights the current block and fades other content.'
 								) }
 								label={ __( 'Spotlight mode' ) }
+							/>
+							<EnableFeature
+								featureName="showIconLabels"
+								label={ __( 'Show button text labels' ) }
+								help={ __(
+									'Show text instead of icons on buttons.'
+								) }
 							/>
 							<EnableFeature
 								featureName="showListViewByDefault"
@@ -123,9 +123,11 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Always open list view' ) }
 							/>
 							<EnableFeature
-								featureName="showIconLabels"
-								help={ __( 'Shows text instead of icons.' ) }
-								label={ __( 'Display button labels' ) }
+								featureName="reducedUI"
+								help={ __(
+									'Compacts options and outlines in the toolbar.'
+								) }
+								label={ __( 'Reduce the interface' ) }
 							/>
 							<EnableFeature
 								featureName="themeStyles"
