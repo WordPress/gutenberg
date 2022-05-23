@@ -12,6 +12,7 @@ import { useMemo } from '@wordpress/element';
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
+import { PresetDuotoneFilter } from '../../hooks/duotone';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
@@ -32,11 +33,12 @@ function AutoBlockPreview( {
 		contentResizeListener,
 		{ height: contentHeight },
 	] = useResizeObserver();
-	const { styles, assets } = useSelect( ( select ) => {
+	const { styles, assets, duotone } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
 			assets: settings.__unstableResolvedAssets,
+			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
 
@@ -55,11 +57,14 @@ function AutoBlockPreview( {
 		return styles;
 	}, [ styles ] );
 
+	const duotonePresets = useMemo( () => {
+		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
+	}, [ duotone ] );
+
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
-
 	return (
 		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
@@ -110,6 +115,12 @@ function AutoBlockPreview( {
 					} }
 				>
 					{ contentResizeListener }
+					{ duotonePresets.map( ( preset ) => (
+						<PresetDuotoneFilter
+							preset={ preset }
+							key={ preset.slug }
+						/>
+					) ) }
 					<MemoizedBlockList renderAppender={ false } />
 				</Iframe>
 			</Disabled>
