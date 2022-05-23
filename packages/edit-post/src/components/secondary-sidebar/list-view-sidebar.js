@@ -61,15 +61,11 @@ export default function ListViewSidebar() {
 					<strong id={ labelId }>{ __( 'List View' ) }</strong>
 
 					<p>
-						{ sprintf(
-							// translators: List view description. %s: Document label.
+						{ 
 							__(
-								'Manage and reorder blocks and groups of blocks used in your %s.'
-							),
-							isTemplateMode
-								? _x( 'template', 'noun' )
-								: documentLabel.toLowerCase()
-						) }
+								'Manage and reorder the blocks in this document.'
+							) 
+						}
 					</p>
 				</div>
 				<Button
