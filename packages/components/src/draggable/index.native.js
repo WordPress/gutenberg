@@ -190,8 +190,8 @@ const DraggableTrigger = ( {
 				return;
 			}
 
-			isDragging.value = true;
 			draggingId.value = id;
+			isDragging.value = true;
 			if ( onLongPress ) {
 				runOnJS( onLongPress )( id );
 			}
