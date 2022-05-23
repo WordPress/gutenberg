@@ -28,7 +28,7 @@ const MoveBlocks = () => {
 			<View style={ styles.helpDetailContainer }>
 				<HelpDetailSectionHeadingText
 					text={ __( 'Drag & drop' ) }
-					badge="NEW"
+					badge={ __( 'NEW' ) }
 				/>
 				<HelpDetailBodyText
 					text={ __(
