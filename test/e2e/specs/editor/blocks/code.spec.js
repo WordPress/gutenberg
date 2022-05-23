@@ -5,13 +5,13 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Code', () => {
-	test.beforeEach( async ( { pageUtils } ) => {
-		await pageUtils.createNewPost();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
 	test( 'can be created by three backticks and enter', async ( {
+		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '```' );
@@ -19,7 +19,7 @@ test.describe( 'Code', () => {
 		await page.keyboard.type( '<?php' );
 
 		// Check the content
-		const content = await pageUtils.getEditedPostContent();
+		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:code -->
 <pre class="wp-block-code"><code>&lt;?php</code></pre>
@@ -28,10 +28,10 @@ test.describe( 'Code', () => {
 	} );
 
 	test( 'should delete block when backspace in an empty code', async ( {
+		editor,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.insertBlock( { name: 'core/code' } );
+		await editor.insertBlock( { name: 'core/code' } );
 
 		await page.keyboard.type( 'a' );
 
@@ -39,11 +39,11 @@ test.describe( 'Code', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect code block to be deleted.
-		expect( await pageUtils.getEditedPostContent() ).toBe( '' );
+		expect( await editor.getEditedPostContent() ).toBe( '' );
 	} );
 
-	test( 'should paste plain text', async ( { page, pageUtils } ) => {
-		await pageUtils.insertBlock( { name: 'core/code' } );
+	test( 'should paste plain text', async ( { editor, page, pageUtils } ) => {
+		await editor.insertBlock( { name: 'core/code' } );
 
 		// Test to see if HTML and white space is kept.
 		await pageUtils.setClipboardData( { plainText: '<img />\n\t<br>' } );
@@ -51,7 +51,7 @@ test.describe( 'Code', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 
 		// Check the content
-		const content = await pageUtils.getEditedPostContent();
+		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:code -->
 <pre class="wp-block-code"><code>&lt;img />
