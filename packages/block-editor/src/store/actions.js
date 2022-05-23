@@ -1441,8 +1441,8 @@ export const setNavigationMode = ( isNavigationMode = true ) => ( {
  * @param {string} mode Editor mode
  */
 export const __unstableSetEditorMode = ( mode ) => ( { dispatch, select } ) => {
-	// When switching to exploded mode, we need to select to parent block
-	if ( mode === 'exploded' ) {
+	// When switching to zoom-out mode, we need to select to parent block
+	if ( mode === 'zoom-out' ) {
 		const firstSelectedClientId = select.getBlockSelectionStart();
 		if ( firstSelectedClientId ) {
 			dispatch.selectBlock(
@@ -1465,8 +1465,8 @@ export const __unstableSetEditorMode = ( mode ) => ( { dispatch, select } ) => {
 				'You are currently in edit mode. To return to the navigation mode, press Escape.'
 			)
 		);
-	} else if ( mode === 'exploded' ) {
-		speak( __( 'You are currently in exploded mode.' ) );
+	} else if ( mode === 'zoom-out' ) {
+		speak( __( 'You are currently in zoom-out mode.' ) );
 	}
 };
 

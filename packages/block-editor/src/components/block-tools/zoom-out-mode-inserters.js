@@ -11,7 +11,7 @@ import BlockPopoverInbetween from '../block-popover/inbetween';
 import { store as blockEditorStore } from '../../store';
 import Inserter from '../inserter';
 
-function ExplodedModeInserters( { __unstableContentRef } ) {
+function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
 	const blockOrder = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockOrder();
@@ -54,4 +54,4 @@ function ExplodedModeInserters( { __unstableContentRef } ) {
 	} );
 }
 
-export default ExplodedModeInserters;
+export default ZoomOutModeInserters;

@@ -81,7 +81,7 @@ function SelectedBlockPopover( {
 	const showEmptyBlockSideInserter =
 		! isTyping && ! editorMode === 'edit' && isEmptyDefaultBlock;
 	const shouldShowBreadcrumb =
-		editorMode === 'navigation' || editorMode === 'exploded';
+		editorMode === 'navigation' || editorMode === 'zoom-out';
 	const shouldShowContextualToolbar =
 		editorMode === 'edit' &&
 		! hasFixedToolbar &&

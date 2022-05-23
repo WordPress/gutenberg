@@ -236,7 +236,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		'block-editor-block-list__block-selection-button',
 		{
 			'is-block-moving-mode': !! blockMovingMode,
-			'is-exploded-mode': editorMode === 'exploded',
+			'is-zoom-out-mode': editorMode === 'zoom-out',
 		}
 	);
 
@@ -252,7 +252,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					<BlockIcon icon={ blockInformation?.icon } showColors />
 				</FlexItem>
 				<FlexItem>
-					{ editorMode === 'exploded' && (
+					{ editorMode === 'zoom-out' && (
 						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
 					) }
 					{ editorMode === 'navigation' && (

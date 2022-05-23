@@ -144,7 +144,7 @@ export default function Header( {
 								className="edit-site-header-toolbar__list-view-toggle"
 								disabled={
 									! isVisualMode &&
-									blockEditorMode === 'exploded'
+									blockEditorMode === 'zoom-out'
 								}
 								icon={ listView }
 								isPressed={ isListViewOpen }
@@ -154,17 +154,17 @@ export default function Header( {
 								shortcut={ listViewShortcut }
 							/>
 							<Button
-								className="edit-site-header-toolbar__exploded-view-toggle"
+								className="edit-site-header-toolbar__zoom-out-view-toggle"
 								icon={ stack }
-								isPressed={ blockEditorMode === 'exploded' }
+								isPressed={ blockEditorMode === 'zoom-out' }
 								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Exploded View' ) }
+								label={ __( 'Zoom-out View' ) }
 								onClick={ () => {
 									setIsListViewOpened( false );
 									__unstableSetEditorMode(
-										blockEditorMode === 'exploded'
+										blockEditorMode === 'zoom-out'
 											? 'edit'
-											: 'exploded'
+											: 'zoom-out'
 									);
 								} }
 							/>

@@ -74,7 +74,7 @@ export function useBlockProps(
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
-		isExplodedMode,
+		isZoomOutMode,
 		isRootBlock,
 	} = useSelect(
 		( select ) => {
@@ -110,7 +110,7 @@ export function useBlockProps(
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-				isExplodedMode: __unstableGetEditorMode() === 'exploded',
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 				isRootBlock: ! getBlockRootClientId( clientId ),
 			};
 		},
@@ -137,7 +137,7 @@ export function useBlockProps(
 		} ),
 		useDisabled( {
 			isDisabled: ! (
-				( isExplodedMode && isRootBlock ) ||
+				( isZoomOutMode && isRootBlock ) ||
 				__unstableHasOverlay
 			),
 		} ),
@@ -167,7 +167,7 @@ export function useBlockProps(
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
 				'has-block-overlay':
-					( isExplodedMode && isRootBlock ) || __unstableHasOverlay,
+					( isZoomOutMode && isRootBlock ) || __unstableHasOverlay,
 			} ),
 			className,
 			props.className,

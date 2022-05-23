@@ -23,7 +23,7 @@ import SelectedBlockPopover from './selected-block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
-import ExplodedModeInserters from './exploded-mode-inserters';
+import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
 /**
  * Renders block tools (the block toolbar, select/navigation mode toolbar, the
@@ -40,13 +40,13 @@ export default function BlockTools( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { hasFixedToolbar, isExplodedMode } = useSelect( ( select ) => {
+	const { hasFixedToolbar, isZoomOutMode } = useSelect( ( select ) => {
 		const { __unstableGetEditorMode, getSettings } = select(
 			blockEditorStore
 		);
 
 		return {
-			isExplodedMode: __unstableGetEditorMode() === 'exploded',
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 		};
 	}, [] );
@@ -122,17 +122,17 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isExplodedMode && (
+				{ ! isZoomOutMode && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ ! isExplodedMode &&
+				{ ! isZoomOutMode &&
 					( hasFixedToolbar || ! isLargeViewport ) && (
 						<BlockContextualToolbar isFixed />
 					) }
 				{ /* Even if the toolbar is fixed, the block popover is still
-					needed for navigation and exploded mode. */ }
+					needed for navigation and zoom-out mode. */ }
 				<SelectedBlockPopover
 					__unstableContentRef={ __unstableContentRef }
 				/>
@@ -144,8 +144,8 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isExplodedMode && (
-					<ExplodedModeInserters
+				{ isZoomOutMode && (
+					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }

@@ -32,7 +32,7 @@ export function useIsHovered() {
 		return (
 			__unstableGetEditorMode() === 'navigation' ||
 			( getSettings().outlineMode &&
-				__unstableGetEditorMode() === 'exploded' )
+				__unstableGetEditorMode() === 'zoom-out' )
 		);
 	}, [] );
 

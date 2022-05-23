@@ -166,10 +166,10 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
+function useZoomOutModeBackgroundStyles( isZoomOutMode, deps = [] ) {
 	return useRefEffect(
 		( node ) => {
-			if ( ! isExplodedMode ) {
+			if ( ! isZoomOutMode ) {
 				return;
 			}
 
@@ -216,7 +216,7 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 			newBackgroundStyles += hasTransparentBackground
 				? 'background-color: white;'
 				: '';
-			copiedStylesElement.innerHTML = `:where( .is-root-container.is-exploded-mode ) { ${ newBackgroundStyles } }`;
+			copiedStylesElement.innerHTML = `:where( .is-root-container.is-zoom-out-mode ) { ${ newBackgroundStyles } }`;
 			bodyStyleElement.innerHTML =
 				'body { background: #2f2f2f !important; }';
 
@@ -225,7 +225,7 @@ function useExplodedModeBackgroundStyles( isExplodedMode, deps = [] ) {
 				copiedStylesElement.textContent = '';
 			};
 		},
-		[ ...deps, isExplodedMode ]
+		[ ...deps, isZoomOutMode ]
 	);
 }
 
@@ -233,9 +233,9 @@ function Iframe(
 	{ contentRef, children, head, tabIndex = 0, assets, ...props },
 	ref
 ) {
-	const isExplodedMode = useSelect(
+	const isZoomOutMode = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'exploded',
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
 		[]
 	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
@@ -283,8 +283,8 @@ function Iframe(
 		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
 
-	const headBackgroundStylesRef = useExplodedModeBackgroundStyles(
-		isExplodedMode,
+	const headBackgroundStylesRef = useZoomOutModeBackgroundStyles(
+		isZoomOutMode,
 		[ head ]
 	);
 	const headRef = useMergeRefs( [
