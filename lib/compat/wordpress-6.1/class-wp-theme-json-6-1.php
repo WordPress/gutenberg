@@ -148,7 +148,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return $nodes;
 		}
 
-		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json ) );
+		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json, $selectors ) );
 
 		// This filter allows us to modify the output of WP_Theme_JSON so that we can do things like loading block CSS independently.
 		return apply_filters( 'gutenberg_get_style_nodes', $nodes );
@@ -167,11 +167,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
+	 * @param array $selectors  Optional list of selectors per block.
 	 *
 	 * @return array The block nodes in theme.json.
 	 */
-	private static function get_block_nodes( $theme_json ) {
-		$selectors = static::get_blocks_metadata();
+	private static function get_block_nodes( $theme_json, $selectors = array() ) {
+		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$nodes     = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
