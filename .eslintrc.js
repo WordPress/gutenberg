@@ -323,7 +323,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.[tj]s?(x)' ]
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'warn',
