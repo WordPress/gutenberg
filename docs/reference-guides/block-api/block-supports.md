@@ -540,6 +540,7 @@ supports: {
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
+    -   `blockGap`: type `boolean` or `array` or `string`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
@@ -561,6 +562,38 @@ supports: {
     spacing: {
         margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
         padding: true,               // Enable padding for all sides.
+    }
+}
+```
+
+Within the available block support spacing properties however, `blockGap` is a special case. As with other spacing properties, assigning a `boolean` value will determine whether the "Block spacing" UI controls display in the editor.
+
+```js
+supports: {
+    spacing: {
+        blockGap: true,  // Enables blockGap UI control.
+    }
+}
+```
+
+It also supports an `array` value that enables UI controls to adjust gap column and row values.
+
+```js
+supports: {
+    spacing: {
+        blockGap: [ 'horizontal', 'vertical' ], // Enables axial (column/row) block spacing controls
+    }
+}
+```
+
+`blockGap` values are primarily used alongside the `gap` CSS property, which is tied to a block's flexbox layout. The layout styles define a fallback gap value, which all blocks receive if they haven't yet been given a value.
+
+Often this global fallback value is not appropriate for specific blocks. To customize the fallback `blockGap` value for a specific block, the `blockGap` property also accepts a `string`, which should be a `number + unit` value for the `gap` CSS property. 
+
+```js
+supports: {
+    spacing: {
+        blockGap: '2em', // Enables blockGap support and also provides a default, per-block fallback value for layout purposes.
     }
 }
 ```
