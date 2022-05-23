@@ -118,7 +118,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param array $theme_json     The tree to extract style nodes from.
+	 * @param array $theme_json The tree to extract style nodes from.
 	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
@@ -216,7 +216,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
-	 * @param array $block_metadata Meta data about the block to get styles for.
+	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
 	 * @return string Styles for the block.
 	 */
