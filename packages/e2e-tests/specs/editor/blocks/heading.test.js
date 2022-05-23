@@ -12,8 +12,6 @@ describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
 		'.block-editor-panel-color-gradient-settings__dropdown';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
-	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
-		'.components-color-picker button[aria-label="Show detailed inputs"]';
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-picker .components-input-control__input';
 
@@ -82,7 +80,6 @@ describe( 'Heading', () => {
 		);
 
 		await customTextColorButton.click();
-		await page.click( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR );
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
