@@ -30,5 +30,14 @@ export function useBorderBoxControlSplitControls(
 		return cx( styles.CenteredBorderControl, className );
 	}, [] );
 
-	return { ...otherProps, centeredClassName, className: classes };
+	const rightAlignedClassName = useMemo( () => {
+		return cx( styles.RightBorderControl, className );
+	}, [ cx, className, rtl.watch() ] );
+
+	return {
+		...otherProps,
+		centeredClassName,
+		className: classes,
+		rightAlignedClassName,
+	};
 }
