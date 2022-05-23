@@ -36,16 +36,6 @@ export default function ListViewSidebar() {
 	const instanceId = useInstanceId( ListViewSidebar );
 	const labelId = `edit-post-editor__list-view-panel-label-${ instanceId }`;
 
-	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const postTypeLabel = select( editorStore ).getPostTypeLabel();
-
-		return {
-			// translators: Default label for the document in the list view description.
-			documentLabel: postTypeLabel || _x( 'document', 'noun' ),
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
-		};
-	}, [] );
-
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
