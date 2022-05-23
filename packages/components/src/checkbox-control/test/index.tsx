@@ -56,7 +56,7 @@ describe( 'CheckboxControl', () => {
 			render( <CheckboxControl label="Hello" /> );
 
 			const label = screen.getByText( 'Hello' );
-			expect( label ).toBeTruthy();
+			expect( label ).toBeInTheDocument();
 		} );
 
 		it( 'should render a checkbox in an indeterminate state', () => {
