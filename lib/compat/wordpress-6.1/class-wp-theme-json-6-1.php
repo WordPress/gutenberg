@@ -122,7 +122,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
-	protected static function get_style_nodes( $theme_json, $selectors = array()  ) {
+	protected static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
