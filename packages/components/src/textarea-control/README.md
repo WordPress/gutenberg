@@ -112,7 +112,7 @@ If true, the label will only be visible to screen readers.
 
 -   Required: No
 
-#### `help`: `string`
+#### `help`: `string | WPElement`
 
 If this property is added, a help text will be generated using help property as the content.
 
