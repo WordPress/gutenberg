@@ -481,8 +481,7 @@ _Returns_
 
 ### dispatch
 
-Given a store descriptor (also supports legacy calling convention accepting the name of a
-registered store), returns an object of the store's action creators.
+Given a store descriptor, returns an object of the store's action creators.
 Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
 Note: Action creators returned by the dispatch will return a promise when
@@ -499,7 +498,7 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -608,8 +607,7 @@ example.
 
 ### resolveSelect
 
-Given a store descriptor (also supports legacy calling convention accepting the name of a
-registered store), returns an object containing the store's selectors pre-bound to state
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state
 so that you only need to supply additional arguments, and modified so that they return promises
 that resolve to their eventual values, after any resolvers have ran.
 
@@ -624,7 +622,7 @@ resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -632,9 +630,8 @@ _Returns_
 
 ### select
 
-Given a store descriptor (also supports legacy calling convention accepting the name of a
-registered store), returns an object of the store's selectors. The selector functions are
-been pre-bound to pass the current state automatically.
+Given a store descriptor, returns an object of the store's selectors.
+The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
 _Usage_
@@ -648,7 +645,7 @@ select( myCustomStore ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -680,14 +677,13 @@ _Parameters_
 
 ### suspendSelect
 
-Given a store descriptor (also supports legacy calling convention accepting the name of a
-registered store), returns an object containing the store's selectors pre-bound to state so
-that you only need to supply additional arguments, and modified so that they throw promises
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state
+so that you only need to supply additional arguments, and modified so that they throw promises
 in case the selector is not resolved yet.
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
