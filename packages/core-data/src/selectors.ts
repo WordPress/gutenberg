@@ -19,6 +19,19 @@ import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 import type { Context, User, Theme, WpTemplate } from './entity-types';
+import {
+	DefaultContextOf,
+	EntityRecordOf,
+	KeyOf,
+	Kind,
+	KindOf,
+	Name,
+	NameOf,
+} from './entity-types';
+
+// createSelector isn't properly typed if I don't explicitly import these files – ideally they would
+// be merely ambient definitions that TS is aware of.
+import type {} from './rememo';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -237,13 +250,28 @@ export function getEntityConfig(
  * @return Record.
  */
 export const getEntityRecord = createSelector(
-	(
+	function <
+		R extends EntityRecordOf< K, N >,
+		C extends Context = DefaultContextOf< R >,
+		K extends Kind = KindOf< R >,
+		N extends Name = NameOf< R >,
+		/**
+		 * The requested fields. If specified, the REST API will remove from the response
+		 * any fields not on that list.
+		 */
+		Fields extends undefined | string[] = undefined
+	>(
 		state: State,
-		kind: string,
-		name: string,
-		key: RecordKey,
-		query?: EntityQuery< any >
-	): EntityRecord | undefined => {
+		kind: K,
+		name: N,
+		key: KeyOf< R >,
+		query?: EntityQuery< C, Fields >
+	):
+		| ( Fields extends undefined
+				? EntityRecordOf< K, N, C >
+				: Partial< EntityRecordOf< K, N, C > > )
+		| null
+		| undefined {
 		const queriedState = get( state.entities.records, [
 			kind,
 			name,
@@ -265,14 +293,31 @@ export const getEntityRecord = createSelector(
 
 		const item = queriedState.items[ context ]?.[ key ];
 		if ( item && query._fields ) {
-			const filteredItem = {};
+			const filteredItem = {} as Partial< EntityRecordOf< K, N, C > >;
 			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
 				const value = get( item, field );
 				set( filteredItem, field, value );
 			}
-			return filteredItem;
+			/**
+			 * TypeScript limitation:
+			 *
+			 *    Partial< EntityRecordOf< K, N, C > >
+			 *
+			 * Is not assignable to:
+			 *
+			 *    Fields extends undefined
+			 *	    ? EntityRecordOf< K, N, C >
+			 *		  : Partial< EntityRecordOf< K, N, C > >
+			 *
+			 * At this point, even though TypeScript knows that
+			 * Fields extends undefined. Unfortunately, this forces
+			 * us to use `as any`.
+			 *
+			 * For more details, visit https://github.com/microsoft/TypeScript/issues/23132
+			 */
+			return filteredItem as any;
 		}
 
 		return item;
