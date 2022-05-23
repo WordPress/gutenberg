@@ -50,8 +50,8 @@ function block_core_gallery_render( $attributes, $content ) {
 	// because we only want to match against the value, not the CSS attribute.
 	if ( is_array( $gap ) ) {
 		foreach ( $gap as $key => $value ) {
-			// Make sure $gap[ $key ] is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
-			$gap[ $key ] = is_string( $gap[ $key ] ) ? $gap[ $key ] : '';
+			// Make sure $value is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
+			$value       = is_string( $value ) ? $value : '';
 			$gap[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 		}
 	} else {
