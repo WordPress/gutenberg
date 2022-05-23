@@ -10,6 +10,9 @@
 -   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
 -   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
 
+### Bug Fix
+-   Restrict `WP_TESTS_DOMAIN` constant to just hostname rather than an entire URL (e.g. it now excludes scheme, port, etc.) ([#41039](https://github.com/WordPress/gutenberg/pull/41039)).
+
 ## 4.8.0 (2022-06-01)
 ### Enhancement
 -   Removed the need for quotation marks when passing options to `wp-env run`.
