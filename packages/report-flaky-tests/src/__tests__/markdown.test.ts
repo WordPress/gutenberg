@@ -6,7 +6,6 @@ import * as core from '@actions/core';
 /**
  * Internal dependencies
  */
-import { TEST_RESULT } from '../constants';
 import {
 	formatTestErrorMessage,
 	formatTestResults,
@@ -192,7 +191,7 @@ describe( 'parseIssueBody', () => {
 					'https://github.com/WordPress/gutenberg/actions/runs/2297863316',
 				errorMessage: 'Error:\n  Oops...\n  Oops again',
 			} ),
-			`\n${ TEST_RESULT.open }Some broken log.\nOops.\n${ TEST_RESULT.close }\n`,
+			`\n<!-- __TEST_RESULT__ -->Some broken log.\nOops.\n<!-- /__TEST_RESULT__ -->\n`,
 		];
 
 		const meta = {

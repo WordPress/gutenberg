@@ -3,13 +3,9 @@
 	"compilerOptions": {
 		"module": "CommonJS",
 		"declarationDir": "build-types",
-		"rootDir": "lib",
+		"rootDir": "src",
 		"types": [ "jest" ],
-		"outDir": "build",
-		"noEmit": false,
-		"emitDeclarationOnly": false,
-		"sourceMap": true,
 	},
-	"include": [ "lib/**/*" ],
-	"exclude": [ "lib/__tests__/**/*", "lib/__fixtures__/**/*" ]
+	"include": [ "src/**/*" ],
+	"exclude": [ "src/__tests__/**/*", "src/__fixtures__/**/*" ]
 }

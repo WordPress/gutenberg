@@ -24,6 +24,7 @@
 		"npm": ">=6.9"
 	},
 	"main": "build/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",
