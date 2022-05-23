@@ -17,7 +17,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		return select( blockEditorStore ).getBlockOrder();
 	}, [] );
 
-	// Deffer the initial rendering to avoid the jumps due to the animation.
+	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
 		const timeout = setTimeout( () => {
 			setIsReady( true );

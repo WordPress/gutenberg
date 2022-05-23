@@ -1441,7 +1441,7 @@ export const setNavigationMode = ( isNavigationMode = true ) => ( {
  * @param {string} mode Editor mode
  */
 export const __unstableSetEditorMode = ( mode ) => ( { dispatch, select } ) => {
-	// When switching to zoom-out mode, we need to select to parent block
+	// When switching to zoom-out mode, we need to select to root block
 	if ( mode === 'zoom-out' ) {
 		const firstSelectedClientId = select.getBlockSelectionStart();
 		if ( firstSelectedClientId ) {

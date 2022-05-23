@@ -1594,7 +1594,7 @@ export const blockListSettings = ( state = {}, action ) => {
  * @return {string} Updated state.
  */
 export function editorMode( state = 'edit', action ) {
-	// Let inserting block always trigger Edit mode.
+	// Let inserting block in navigation mode always trigger Edit mode.
 	if ( action.type === 'INSERT_BLOCKS' && state === 'navigation' ) {
 		return 'edit';
 	}
@@ -1615,8 +1615,6 @@ export function editorMode( state = 'edit', action ) {
  * @return {string|null} Updated state.
  */
 export function hasBlockMovingClientId( state = null, action ) {
-	// Let inserting block always trigger Edit mode.
-
 	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
 		return action.hasBlockMovingClientId;
 	}
