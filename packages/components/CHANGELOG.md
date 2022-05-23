@@ -4,10 +4,8 @@
 
 ### Internal
 
+
 -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
-
-### Internal
-
 -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
 
 ## 19.11.0 (2022-05-18)
