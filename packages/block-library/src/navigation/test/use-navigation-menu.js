@@ -31,7 +31,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	return mock;
 } );
 
-function setRecords( registry, menus ) {
+function resolveRecords( registry, menus ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.startResolution( 'getEntityRecords', [
 		'postType',
@@ -49,21 +49,21 @@ function setRecords( registry, menus ) {
 	} );
 }
 
-function setCreatePermission( registry, allowed ) {
+function resolveCreatePermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'create/navigation', allowed );
 	dispatch.startResolution( 'canUser', [ 'create', 'navigation' ] );
 	dispatch.finishResolution( 'canUser', [ 'create', 'navigation' ] );
 }
 
-function setUpdatePermission( registry, ref, allowed ) {
+function resolveUpdatePermission( registry, ref, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( `update/navigation/${ ref }`, allowed );
 	dispatch.startResolution( 'canUser', [ 'update', 'navigation', ref ] );
 	dispatch.finishResolution( 'canUser', [ 'update', 'navigation', ref ] );
 }
 
-function setDeletePermission( registry, ref, allowed ) {
+function resolveDeletePermission( registry, ref, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( `delete/navigation/${ ref }`, allowed );
 	dispatch.startResolution( 'canUser', [ 'delete', 'navigation', ref ] );
@@ -105,8 +105,8 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should return information about all menus when ref is missing', () => {
-		setRecords( registry, navigationMenus );
-		setCreatePermission( registry, true );
+		resolveRecords( registry, navigationMenus );
+		resolveCreatePermission( registry, true );
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
 			canSwitchNavigationMenu: true,
@@ -125,7 +125,7 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should also return information about a specific menu when ref is given', () => {
-		setRecords( registry, navigationMenus );
+		resolveRecords( registry, navigationMenus );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
@@ -145,9 +145,9 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should return correct permissions (create, update)', () => {
-		setRecords( registry, navigationMenus );
-		setCreatePermission( registry, true );
-		setUpdatePermission( registry, 1, true );
+		resolveRecords( registry, navigationMenus );
+		resolveCreatePermission( registry, true );
+		resolveUpdatePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
@@ -167,8 +167,8 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should return correct permissions (delete only)', () => {
-		setRecords( registry, navigationMenus );
-		setDeletePermission( registry, 1, true );
+		resolveRecords( registry, navigationMenus );
+		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
@@ -191,10 +191,10 @@ describe( 'useNavigationMenus', () => {
 		const menuWithNoDeletePermissions = 2;
 		const requestedMenu = 1;
 		const requestedMenuData = [`navigationMenu${requestedMenu}`];
-		
-		setRecords( registry, navigationMenus );
+
+		resolveRecords( registry, navigationMenus );
 		// Note the ref refers to a different record
-		setDeletePermission( registry, menuWithNoDeletePermissions, true );
+		resolveDeletePermission( registry, menuWithNoDeletePermissions, true );
 		expect( useNavigationMenu( requestedMenu ) ).toEqual( {
 			navigationMenu: requestedMenuData,
 			navigationMenus,
