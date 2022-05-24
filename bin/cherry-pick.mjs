@@ -24,6 +24,15 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
  * * Suggests next steps
  */
 async function main() {
+	console.log( `You are on branch "${BRANCH}".` );
+	console.log( `This script will:` );
+	console.log( `• Cherry-pick the merged PRs labeled as "${LABEL}" to this branch` );
+	console.log( `• Push this branch` );
+	console.log( `• Comment on each PR` );
+	console.log( `• Remove the label from each PR` );
+	console.log( `` );
+	await promptDoYouWantToProceed();
+
 	if ( !GITHUB_CLI_AVAILABLE ) {
 		await reportGhUnavailable();
 	}
@@ -372,7 +381,16 @@ async function reportGhUnavailable() {
 	console.log(
 		'To enable automatic handling, install the `gh` utility from https://cli.github.com/' );
 	console.log( '' );
+	await promptDoYouWantToProceed();
+}
 
+/**
+ * Asks a CLI prompt whether the user wants to proceed.
+ * Exits if not.
+ *
+ * @return {Promise<void>}
+ */
+async function promptDoYouWantToProceed() {
 	const rl = readline.createInterface( {
 		input: process.stdin,
 		output: process.stdout,
