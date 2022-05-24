@@ -17,11 +17,15 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 
 /**
  * The main function of this script. It:
- * * Retrieves the list of relevant PRs to cherry-pick
- * * Tries to cherry-pick them
- * * Pushes the changes comments on the successful cherry-picks
+ * * Confirms with the developer the current branch aligns with the expectations
+ * * Gets local branches in sync with the remote ones
+ * * Requests the list of PRs to cherry-pick from GitHub API (closed, label=`Backport to WP Beta/RC`)
+ * * Runs `git cherry-pick {commitHash}` for each PR
+ * * It keeps track of the failed cherry-picks and then retries them
+ * * Retrying keeps going as long as at least one cherry-pick succeeds
+ * * Pushes the local branch to `origin`
+ * * (optional) Uses the [`gh` console utility](https://cli.github.com/) to comment on the remote PRs and remove the labels
  * * Reports the results
- * * Suggests next steps
  */
 async function main() {
 	console.log( `You are on branch "${BRANCH}".` );
