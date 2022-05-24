@@ -10,9 +10,9 @@ test.describe( 'HTML block', () => {
 		// Create a Custom HTML block with the slash shortcut.
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/html' );
-		await page.locator(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Custom HTML')]`
-		);
+		await expect(
+			page.locator( 'role=option[name="Custom HTML"i][selected]' )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '<p>Pythagorean theorem: ' );
 		await page.keyboard.press( 'Enter' );
