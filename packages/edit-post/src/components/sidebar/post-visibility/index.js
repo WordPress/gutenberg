@@ -25,7 +25,7 @@ export function PostVisibility() {
 					) }
 					{ canEdit && (
 						<Dropdown
-							position="bottom right"
+							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
 							popoverProps={ {
 								// Anchor the popover to the middle of the

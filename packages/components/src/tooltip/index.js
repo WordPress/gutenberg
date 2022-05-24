@@ -32,6 +32,33 @@ export const TOOLTIP_DELAY = 700;
 
 const eventCatcher = <div className="event-catcher" />;
 
+/**
+ * Convert a position string to a placement string. This logic
+ * is borrowed from the Popover component, with one key difference:
+ *
+ * Here, the 'left' position translates to the '-start' placement and
+ * the 'right' position translates to the '-end' placement. This ensures
+ * that the ToolTip is placed at the expected left/right location.
+ *
+ * @param {string} position A position string such as 'bottom left'
+ * @return {string} A placement string such as 'bottom-start'
+ */
+const positionToPlacement = ( position ) => {
+	const [ x, y, z ] = position.split( ' ' );
+
+	if ( [ 'top', 'bottom' ].includes( x ) ) {
+		let suffix = '';
+		if ( ( !! z && z === 'left' ) || y === 'left' ) {
+			suffix = '-start';
+		} else if ( ( !! z && z === 'right' ) || y === 'right' ) {
+			suffix = '-end';
+		}
+		return x + suffix;
+	}
+
+	return y;
+};
+
 const DisabledElement = ( {
 	eventHandlers,
 	child,
@@ -67,7 +94,7 @@ const RegularElement = ( {
 const addPopoverToGrandchildren = ( {
 	grandchildren,
 	isOver,
-	position,
+	placement,
 	text,
 	shortcut,
 	anchorRef,
@@ -77,7 +104,7 @@ const addPopoverToGrandchildren = ( {
 		isOver && (
 			<Popover
 				focusOnMount={ false }
-				position={ position }
+				placement={ placement }
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
@@ -229,10 +256,12 @@ function Tooltip( props ) {
 	const { children: grandchildren, disabled } = child.props;
 	const ElementWithPopover = disabled ? DisabledElement : RegularElement;
 
+	const placement = positionToPlacement( position );
+
 	const popoverData = {
 		anchorRef: childRef,
 		isOver,
-		position,
+		placement,
 		text,
 		shortcut,
 	};
