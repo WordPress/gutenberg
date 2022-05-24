@@ -1345,6 +1345,11 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
+
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
+			expect( console ).toHaveErrored();
 		} );
 
 		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
@@ -1361,6 +1366,11 @@ describe( 'Navigation', () => {
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);
+
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
+			expect( console ).toHaveErrored();
 		} );
 	} );
 
