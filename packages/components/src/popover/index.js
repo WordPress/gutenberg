@@ -55,9 +55,9 @@ const positionToPlacement = ( position ) => {
 
 	if ( [ 'top', 'bottom' ].includes( x ) ) {
 		let suffix = '';
-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+		if ( ( !! z && z === 'left' ) || y === 'left' ) {
 			suffix = '-start';
-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+		} else if ( ( !! z && z === 'right' ) || y === 'right' ) {
 			suffix = '-end';
 		}
 		return x + suffix;
