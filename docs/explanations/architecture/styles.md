@@ -156,22 +156,21 @@ While work continues in that proposal, there's an escape hatch, an experimental 
 
 This means that the typography block support will do all of the things (create a UI control, bind the block attribute to the control, etc) except serializing the user values into the HTML markup. The classes and inline styles will not be automatically applied to the wrapper and it is the block author's responsibility to implement this in the `edit`, `save`, and `render_callback` functions. See [this issue](https://github.com/WordPress/gutenberg/issues/28913) for examples of how it was done for some blocks provided by WordPress.
 
-Note that, if `__experimentalSkipSerialization` is enabled for a group (typography, color, spacing) it affects _all_ block supports within this group (font size, line height, and font family within typography, and so on).
+Note that, if `__experimentalSkipSerialization` is enabled for a group (typography, color, spacing) it affects _all_ block supports within this group. In the example above _all_ the properties within the `typography` group will be affected (e.g. `fontSize`, `lineHeight`, `fontFamily` .etc).
 
-To enable for a single property only you may use an array to declare which properties are to be skipped. In the example below, only `fontSize` will skip serialization, leaving `lineHeight` unaffected.
+To enable for a _single_ property only, you may use an array to declare which properties are to be skipped. In the example below, only `fontSize` will skip serialization, leaving other items within the `typography` group (e.g. `lineHeight`, `fontFamily` .etc) unaffected.
 
 ```json
-
 {
-  "name": "core/paragraph",
-  "...": "...",
-  "supports": {
-	"typography": {
-		"fontSize": true,
-    "lineHeight" true,
-		"__experimentalSkipSerialization": [ "fontSize" ],
+	"name": "core/paragraph",
+	"...": "...",
+	"supports": {
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalSkipSerialization": [ "fontSize" ]
+		}
 	}
-  }
 }
 ```
 
