@@ -53,12 +53,3 @@ export const Default: ComponentStory< typeof TextareaControl > = Template.bind(
 	{}
 );
 Default.args = {};
-
-export const WithLabelAndHelpText: ComponentStory<
-	typeof TextareaControl
-> = Template.bind( {} );
-WithLabelAndHelpText.args = {
-	...Default.args,
-	label: 'Label Text',
-	help: 'Help text to explain the textarea.',
-};

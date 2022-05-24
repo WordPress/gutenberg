@@ -13,7 +13,8 @@ export type TextareaControlProps = Pick<
 	'hideLabelFromVision' | 'help' | 'label'
 > & {
 	/**
-	 * A function that receives the value of the textarea.
+	 * A function that receives the new value of the textarea each time it
+	 * changes.
 	 */
 	onChange: ( value: string ) => void;
 	/**
