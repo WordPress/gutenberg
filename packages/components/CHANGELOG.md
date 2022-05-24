@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
+
 ### Internal
 
 -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
