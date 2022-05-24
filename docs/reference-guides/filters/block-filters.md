@@ -87,6 +87,37 @@ A filter that applies to the result of a block's `save` function. This filter is
 
 The filter's callback receives an element, a block type definition object and the block attributes as arguments. It should return an element.
 
+_Example:_
+
+Wraps a cover block into an outer container.
+
+```js
+function wrapCoverBlockInContainer(element, blockType, attributes) {
+	// skip if element is undefined
+	if (!element) {
+		return;
+	}
+
+	// only apply to cover blocks
+	if ( (blockType.name !== 'core/cover') ) {
+		return element;
+	}
+
+	// return the element wrapped in a div
+	return (
+		<div className="cover-block-wrapper">
+			{ element }
+		</div>
+	);
+}
+
+wp.hooks.addFilter(
+	'blocks.getSaveElement',
+	'my-plugin/wrap-cover-block-in-container',
+	wrapCoverBlockInContainer
+);
+```
+
 #### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
