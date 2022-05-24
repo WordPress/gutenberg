@@ -49,7 +49,7 @@ module.exports = async function run( {
 		workingDir = '/var/www/html/' + workingDir;
 	}
 
-	// We're going to run the script in the seelcted container.
+	// We're going to run the script in the selected container.
 	const container = environment === 'tests' ? 'tests-wordpress' : 'wordpress';
 	const spawnCommand = execScript.script + ' ' + scriptArgs.join( ' ' );
 
