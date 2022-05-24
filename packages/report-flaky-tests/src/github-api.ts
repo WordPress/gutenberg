@@ -4,6 +4,7 @@
 import { getOctokit } from '@actions/github';
 import * as unzipper from 'unzipper';
 import type { GitHub } from '@actions/github/lib/utils';
+import type { Endpoints } from '@octokit/types';
 
 /**
  * Internal dependencies
@@ -90,14 +91,9 @@ class GitHubAPI {
 
 	async updateIssue(
 		params: Omit<
-			Exclude<
-				Parameters< Octokit[ 'rest' ][ 'issues' ][ 'update' ] >[ '0' ],
-				undefined
-			>,
-			'repo' | 'owner'
-		> & {
-			issue_number: number;
-		}
+			Endpoints[ 'PATCH /repos/{owner}/{repo}/issues/{issue_number}' ][ 'parameters' ],
+			keyof Repo
+		>
 	) {
 		const { data } = await this.#octokit.rest.issues.update( {
 			...this.#repo,
@@ -109,14 +105,9 @@ class GitHubAPI {
 
 	async createIssue(
 		params: Omit<
-			Exclude<
-				Parameters< Octokit[ 'rest' ][ 'issues' ][ 'create' ] >[ '0' ],
-				undefined
-			>,
-			'repo' | 'owner'
-		> & {
-			title: string;
-		}
+			Endpoints[ 'POST /repos/{owner}/{repo}/issues' ][ 'parameters' ],
+			keyof Repo
+		>
 	) {
 		const { data } = await this.#octokit.rest.issues.create( {
 			...this.#repo,

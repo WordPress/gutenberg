@@ -145,13 +145,7 @@ ${ errorMessage }
 
 function parseFormattedTestResults(
 	formattedTestResults: string
-): {
-	date: Date;
-	failedTimes: number;
-	runURL: string;
-	headBranch: string;
-	errorMessage?: string;
-} {
+): ParsedTestResult {
 	const matches = formattedTestResults
 		// Unify line breaks.
 		.replace( /\r\n/g, '\n' )
@@ -204,9 +198,7 @@ function parseIssueBody( body: string ) {
 			}
 		} )
 		.filter(
-			(
-				testResult
-			): testResult is ReturnType< typeof parseFormattedTestResults > =>
+			( testResult ): testResult is ParsedTestResult =>
 				testResult !== undefined
 		);
 
