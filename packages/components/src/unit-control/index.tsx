@@ -179,7 +179,7 @@ function UnforwardedUnitControl(
 			const changeProps = { event, data };
 
 			// The `onChange` callback already gets called, no need to call it explicitely.
-			onUnitChange?.( validParsedUnit, changeProps );
+			onUnitChange?.( validParsedUnit ?? '', changeProps );
 
 			setUnit( validParsedUnit );
 		}
