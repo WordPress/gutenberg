@@ -18,7 +18,9 @@ import './style.scss';
  * Internal dependencies
  */
 import Edit from './edit';
+{{^isDynamic}}
 import save from './save';
+{{/isDynamic}}
 
 /**
  * Every block starts by registering a new block type definition.
@@ -30,8 +32,10 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	 * @see ./edit.js
 	 */
 	edit: Edit,
+	{{^isDynamic}}
 	/**
 	 * @see ./save.js
 	 */
 	save,
+	{{/isDynamic}}
 } );
