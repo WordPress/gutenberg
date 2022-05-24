@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, createRegistry } from '@wordpress/data';
+import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -12,7 +12,7 @@ import useNavigationMenu from '../use-navigation-menu';
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	registry.register( coreStore)
+	registry.register( coreStore );
 
 	const navigationConfig = {
 		kind: 'postType',
@@ -144,6 +144,28 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
+	it( 'Should also return null for the menu when menu status is "draft"', () => {
+		const navigationMenuDraft = { id: 4, title: 'Menu 3', status: 'draft' };
+		const testMenus = [ ...navigationMenus, navigationMenuDraft ];
+		resolveRecords( registry, testMenus );
+		expect( useNavigationMenu( 4 ) ).toEqual( {
+			navigationMenu: null,
+			navigationMenus: testMenus,
+			canSwitchNavigationMenu: true,
+			canUserCreateNavigationMenu: false,
+			canUserDeleteNavigationMenu: false,
+			canUserUpdateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: false,
+			hasResolvedCanUserUpdateNavigationMenu: false,
+			hasResolvedNavigationMenus: true,
+			isNavigationMenuMissing: false,
+			isNavigationMenuResolved: false,
+			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingNavigationMenus: false,
+		} );
+	} );
+
 	it( 'Should return correct permissions (create, update)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
@@ -188,15 +210,14 @@ describe( 'useNavigationMenus', () => {
 	} );
 
 	it( 'Should return correct permissions (no permissions)', () => {
-		const menuWithNoDeletePermissions = 2;
-		const requestedMenu = 1;
-		const requestedMenuData = [`navigationMenu${requestedMenu}`];
-
+		const requestedMenu = navigationMenu1;
+		// Note the "delete" permission is resolved for menu 2, but we're requesting
+		// the details of menu 1.
+		resolveDeletePermission( registry, navigationMenu2, true );
 		resolveRecords( registry, navigationMenus );
-		// Note the ref refers to a different record
-		resolveDeletePermission( registry, menuWithNoDeletePermissions, true );
-		expect( useNavigationMenu( requestedMenu ) ).toEqual( {
-			navigationMenu: requestedMenuData,
+
+		expect( useNavigationMenu( requestedMenu.id ) ).toEqual( {
+			navigationMenu: requestedMenu,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenu: false,
