@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files.
+
+### Bug Fix
+
+-   Fix the issue with the block wrapper in the editor.
+
 ## 2.1.0 (2022-04-21)
 
 ### Bug Fix

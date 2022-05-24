@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files.
+
 ## 3.2.0 (2022-05-18)
 
 ### Bug Fix
