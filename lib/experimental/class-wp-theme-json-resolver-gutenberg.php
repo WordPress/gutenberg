@@ -102,15 +102,26 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
 		$config   = array( 'version' => 1 );
-		foreach( $blocks as $block_name => $block_type ) {
+		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['blockStyles'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = $block_type->supports['blockStyles'];
+				$config['styles']['blocks'][ $block_name ] = static::removeJsonComments( $block_type->supports['blockStyles'] );
 			}
 		}
 
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.
 		return new WP_Theme_JSON( $config, 'core' );
+	}
+
+	private static function removeJsonComments( $array ) {
+		unset( $array['//'] );
+		foreach ( $array as $k => $v ) {
+			if ( is_array( $v ) ) {
+				$array[ $k ] = static::removeJsonComments( $v );
+			}
+		}
+
+		return $array;
 	}
 
 	public static function get_merged_data( $origin = 'custom' ) {
@@ -122,7 +133,6 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		$result->merge( static::get_core_data() );
 		$result->merge( static::get_block_data() );
 		$result->merge( static::get_theme_data() );
-
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
