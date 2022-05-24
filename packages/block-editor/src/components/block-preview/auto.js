@@ -57,7 +57,7 @@ function AutoBlockPreview( {
 		return styles;
 	}, [ styles ] );
 
-	const duotonePresets = useMemo( () => {
+	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
 	}, [ duotone ] );
 
@@ -117,7 +117,7 @@ function AutoBlockPreview( {
 					{ contentResizeListener }
 					{
 						/* Filters need to be rendered before children to avoid Safari rendering issues. */
-						duotonePresets.map( ( preset ) => (
+						svgFilters.map( ( preset ) => (
 							<PresetDuotoneFilter
 								preset={ preset }
 								key={ preset.slug }
