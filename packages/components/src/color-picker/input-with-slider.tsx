@@ -7,6 +7,7 @@ import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
+import { useDraft } from './use-draft';
 
 interface InputWithSliderProps {
 	min: number;
@@ -25,6 +26,11 @@ export const InputWithSlider = ( {
 	onChange,
 	value,
 }: InputWithSliderProps ) => {
+	const draftHookProps = useDraft( {
+		value: `${ value }`,
+		onChange: ( nextValue ) => onChange( parseFloat( nextValue ) ),
+	} );
+
 	return (
 		<Spacer as={ HStack } spacing={ 4 }>
 			<NumberControlWrapper
@@ -32,8 +38,7 @@ export const InputWithSlider = ( {
 				max={ max }
 				label={ label }
 				hideLabelFromVision
-				value={ value }
-				onChange={ onChange }
+				{ ...draftHookProps }
 				prefix={
 					<Spacer
 						as={ Text }
