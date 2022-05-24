@@ -7,6 +7,7 @@ import { colord, Colord } from 'colord';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,15 +24,39 @@ interface HexInputProps {
 	enableAlpha: boolean;
 }
 
+type DraftState = {
+	value?: string;
+	isStale?: boolean;
+};
+
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+	const formattedValue = color.toHex().slice( 1 ).toUpperCase();
+	const refPreviousFormattedValue = useRef( formattedValue );
+	const [ draft, setDraft ] = useState< DraftState >( {} );
+	const usedValue = draft.value !== undefined ? draft.value : formattedValue;
+
+	// Determines when to discard the draft value to restore controlled status.
+	// To do so, it tracks the previous formatted value and marks the draft
+	// value as stale after each render.
+	useEffect( () => {
+		const { current: previousFormattedValue } = refPreviousFormattedValue;
+		refPreviousFormattedValue.current = formattedValue;
+		if ( draft.value !== undefined && ! draft.isStale )
+			setDraft( { ...draft, isStale: true } );
+		else if ( draft.isStale && formattedValue !== previousFormattedValue )
+			setDraft( {} );
+	}, [ formattedValue, draft.isStale, draft.value ] );
+
 	const handleChange = ( nextValue: string | undefined ) => {
 		if ( ! nextValue ) return;
-		const hexValue = nextValue.startsWith( '#' )
-			? nextValue
-			: '#' + nextValue;
-
-		onChange( colord( hexValue ) );
+		nextValue = nextValue.replace( /^#/, '' );
+		// Mutates the draft value to avoid an extra render and effect run.
+		setDraft( ( current ) =>
+			Object.assign( current, { value: nextValue, isStale: false } )
+		);
+		onChange( colord( '#' + nextValue ) );
 	};
+	const handleBlur = () => setDraft( {} );
 
 	return (
 		<ColorHexInputControl
@@ -45,7 +70,8 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 					#
 				</Spacer>
 			}
-			value={ color.toHex().slice( 1 ).toUpperCase() }
+			value={ usedValue }
+			onBlur={ handleBlur }
 			onChange={ handleChange }
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
