@@ -47,6 +47,7 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		__nextHasNoMarginBottom = false,
 		...props
 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: ForwardedRef< HTMLSelectElement >
@@ -85,7 +86,11 @@ function UnforwardedSelectControl(
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		<BaseControl help={ help } id={ id }>
+		<BaseControl
+			help={ help }
+			id={ id }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		>
 			<InputBase
 				className={ classes }
 				disabled={ disabled }
