@@ -84,3 +84,18 @@ status "Linting JavaScript files..."
 
 status "Creating a plugin zip file..."
 ../node_modules/.bin/wp-scripts plugin-zip
+
+status "Printing the current working directory..."
+pwd
+
+status "Checking if unzip command exists or not..."
+unzip --help
+
+status "Trying to unzip example-static.zip file..."
+mkdir zip-folder
+cp example-static.zip zip-folder
+cd zip-folder
+unzip example-static.zip
+
+status "Printing the content of directory..."
+ls -al
