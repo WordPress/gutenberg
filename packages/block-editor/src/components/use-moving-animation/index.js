@@ -61,7 +61,7 @@ function useMovingAnimation( {
 		0
 	);
 	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
-	const [ transform, setTransform ] = useState( { x: 0, y: 0, scale: 1 } );
+	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 	const previous = useMemo(
 		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
 		[ triggerAnimationOnChange ]
@@ -140,7 +140,6 @@ function useMovingAnimation( {
 		from: {
 			x: transform.x,
 			y: transform.y,
-			scale: transform.scale,
 		},
 		to: {
 			x: 0,
