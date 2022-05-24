@@ -34,6 +34,7 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
+import useBlockOverlayActive from '../../block-content-overlay';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -50,18 +51,14 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props                        Optional. Props to pass to the element. Must contain
- *                                               the ref if one is defined.
- * @param {Object}  options                      Options for internal use only.
+ * @param {Object}  props                    Optional. Props to pass to the element. Must contain
+ *                                           the ref if one is defined.
+ * @param {Object}  options                  Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
- * @param {boolean} options.__unstableHasOverlay Whether the block should be disabled.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps(
-	props = {},
-	{ __unstableIsHtml, __unstableHasOverlay = false } = {}
-) {
+export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
@@ -74,8 +71,6 @@ export function useBlockProps(
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
-		isZoomOutMode,
-		isRootBlock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -88,8 +83,6 @@ export function useBlockProps(
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
 				isFirstMultiSelectedBlock,
-				__unstableGetEditorMode,
-				getBlockRootClientId,
 			} = select( blockEditorStore );
 			const isSelected = isBlockSelected( clientId );
 			const isPartOfMultiSelection =
@@ -110,12 +103,11 @@ export function useBlockProps(
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-				isRootBlock: ! getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
 	);
+	const hasOverlay = useBlockOverlayActive( clientId );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -136,10 +128,7 @@ export function useBlockProps(
 			triggerAnimationOnChange: index,
 		} ),
 		useDisabled( {
-			isDisabled: ! (
-				( isZoomOutMode && isRootBlock ) ||
-				__unstableHasOverlay
-			),
+			isDisabled: ! hasOverlay,
 		} ),
 	] );
 
@@ -166,8 +155,7 @@ export function useBlockProps(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {
 				'wp-block': ! isAligned,
-				'has-block-overlay':
-					( isZoomOutMode && isRootBlock ) || __unstableHasOverlay,
+				'has-block-overlay': hasOverlay,
 			} ),
 			className,
 			props.className,

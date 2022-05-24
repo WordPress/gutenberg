@@ -1432,7 +1432,9 @@ export const __unstableMarkAutomaticChange = () => ( { dispatch } ) => {
 export const setNavigationMode = ( isNavigationMode = true ) => ( {
 	dispatch,
 } ) => {
-	dispatch.setMode( isNavigationMode ? 'navigation' : 'edit' );
+	dispatch.__unstableSetEditorMode(
+		isNavigationMode ? 'navigation' : 'edit'
+	);
 };
 
 /**

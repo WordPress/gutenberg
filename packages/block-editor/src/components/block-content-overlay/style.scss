@@ -1,4 +1,6 @@
 .block-editor-block-list__block.has-block-overlay {
+	cursor: default;
+
 	&::before {
 		content: "";
 		position: absolute;

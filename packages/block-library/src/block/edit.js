@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -62,13 +61,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			className: 'block-library-block__reusable-block-container',
-		},
-		{ __unstableHasOverlay: hasBlockOverlay }
-	);
+	const blockProps = useBlockProps( {
+		className: 'block-library-block__reusable-block-container',
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,

@@ -274,7 +274,11 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				<FlexItem>
 					<Button
 						ref={ ref }
-						onClick={ () => setNavigationMode( false ) }
+						onClick={
+							editorMode === 'edit'
+								? () => setNavigationMode( false )
+								: undefined
+						}
 						onKeyDown={ onKeyDown }
 						label={ label }
 						showTooltip={ false }

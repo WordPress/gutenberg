@@ -24,7 +24,6 @@ import {
 	ContrastChecker,
 	getColorClassName,
 	Warning,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 
@@ -321,40 +320,33 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			ref: navRef,
-			className: classnames( className, {
-				'items-justified-right': justifyContent === 'right',
-				'items-justified-space-between':
-					justifyContent === 'space-between',
-				'items-justified-left': justifyContent === 'left',
-				'items-justified-center': justifyContent === 'center',
-				'is-vertical': orientation === 'vertical',
-				'no-wrap': flexWrap === 'nowrap',
-				'is-responsive': 'never' !== overlayMenu,
-				'has-text-color': !! textColor.color || !! textColor?.class,
-				[ getColorClassName(
-					'color',
-					textColor?.slug
-				) ]: !! textColor?.slug,
-				'has-background':
-					!! backgroundColor.color || backgroundColor.class,
-				[ getColorClassName(
-					'background-color',
-					backgroundColor?.slug
-				) ]: !! backgroundColor?.slug,
-				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
-			} ),
-			style: {
-				color: ! textColor?.slug && textColor?.color,
-				backgroundColor:
-					! backgroundColor?.slug && backgroundColor?.color,
-			},
+	const blockProps = useBlockProps( {
+		ref: navRef,
+		className: classnames( className, {
+			'items-justified-right': justifyContent === 'right',
+			'items-justified-space-between': justifyContent === 'space-between',
+			'items-justified-left': justifyContent === 'left',
+			'items-justified-center': justifyContent === 'center',
+			'is-vertical': orientation === 'vertical',
+			'no-wrap': flexWrap === 'nowrap',
+			'is-responsive': 'never' !== overlayMenu,
+			'has-text-color': !! textColor.color || !! textColor?.class,
+			[ getColorClassName(
+				'color',
+				textColor?.slug
+			) ]: !! textColor?.slug,
+			'has-background': !! backgroundColor.color || backgroundColor.class,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor?.slug
+			) ]: !! backgroundColor?.slug,
+			[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
+		} ),
+		style: {
+			color: ! textColor?.slug && textColor?.color,
+			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
 		},
-		{ __unstableHasOverlay: hasBlockOverlay }
-	);
+	} );
 
 	const overlayClassnames = classnames( {
 		'has-text-color':
