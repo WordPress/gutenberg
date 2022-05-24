@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 13.2.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Blocks: Don't abort registering blocks when a missing block file is found. ([41122](https://github.com/WordPress/gutenberg/pull/41122))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@dd32
+
+
 = 13.3.0-rc.1 =
 
 

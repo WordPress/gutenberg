@@ -31,6 +31,12 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    @objc var disableAutocorrection: Bool = false {
+        didSet {
+            autocorrectionType = disableAutocorrection ? .no : .default
+        }
+    }
+
     override var textAlignment: NSTextAlignment {
         set {
             super.textAlignment = newValue

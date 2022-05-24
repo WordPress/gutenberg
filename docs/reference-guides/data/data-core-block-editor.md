@@ -1471,11 +1471,11 @@ _Parameters_
 
 ### setBlockVisibility
 
-Action that sets whether a block has controlled inner blocks.
+Action that sets whether given blocks are visible on the canvas.
 
 _Parameters_
 
--   _updates_ `Record<string,boolean>`: The block's clientId.
+-   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
 
 ### setHasControlledInnerBlocks
 

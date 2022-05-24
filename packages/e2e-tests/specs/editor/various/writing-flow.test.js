@@ -734,4 +734,23 @@ describe( 'Writing Flow', () => {
 		);
 		expect( selectedParagraph ).toBeDefined();
 	} );
+	it( 'should prevent browser default formatting on multi selection', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		// Multi select both paragraphs.
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		const paragraphs = await page.$$eval(
+			'[data-type="core/paragraph"]',
+			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
+		);
+		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
+	} );
 } );
