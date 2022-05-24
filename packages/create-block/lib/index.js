@@ -57,6 +57,7 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
+	.option( '--is-dynamic', 'makes the block dynamic' )
 	.action(
 		async (
 			slug,
@@ -68,6 +69,7 @@ program
 				title,
 				wpScripts,
 				wpEnv,
+				isDynamic,
 			}
 		) => {
 			await checkSystemRequirements( engines );
@@ -82,6 +84,7 @@ program
 						title,
 						wpScripts,
 						wpEnv,
+						isDynamic,
 					},
 					( value ) => value !== undefined
 				);
@@ -106,6 +109,7 @@ program
 					const blockPrompts = getPrompts( pluginTemplate, [
 						'slug',
 						'namespace',
+
 						'title',
 						'description',
 						'dashicon',

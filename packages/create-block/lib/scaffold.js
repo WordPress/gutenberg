@@ -42,6 +42,7 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		isDynamic,
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -81,17 +82,27 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		isDynamic,
 	};
 
+	// Filter the files based on whether this block is dynamic or not.
+	const templateList = view.isDynamic
+		? Object.keys( pluginOutputTemplates ).filter(
+				( item ) => ! item.includes( 'static' )
+		  )
+		: Object.keys( pluginOutputTemplates ).filter(
+				( item ) => ! item.includes( 'dynamic' )
+		  );
+
 	await Promise.all(
-		Object.keys( pluginOutputTemplates ).map(
-			async ( outputFile ) =>
-				await writeOutputTemplate(
-					pluginOutputTemplates[ outputFile ],
-					outputFile,
-					view
-				)
-		)
+		templateList.map( async ( outputFile ) => {
+			const file = outputFile.replace( /(-static|-dynamic)/, '' );
+			await writeOutputTemplate(
+				pluginOutputTemplates[ outputFile ],
+				file,
+				view
+			);
+		} )
 	);
 
 	await Promise.all(

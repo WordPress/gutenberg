@@ -64,8 +64,17 @@ async function initBlockJSON( {
 }
 
 module.exports = async function ( outputTemplates, view ) {
+	// Filter the files based on whether this block is dynamic or not.
+	const templateList = view.isDynamic
+		? Object.keys( outputTemplates ).filter(
+				( item ) => item !== 'save.js'
+		  )
+		: Object.keys( outputTemplates ).filter(
+				( item ) => item !== 'template.php'
+		  );
+
 	await Promise.all(
-		Object.keys( outputTemplates ).map(
+		templateList.map(
 			async ( outputFile ) =>
 				await writeOutputTemplate(
 					outputTemplates[ outputFile ],
