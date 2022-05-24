@@ -12,7 +12,7 @@ import {
 	useMemo,
 	createContext,
 	useState,
-	useEffect,
+	useLayoutEffect,
 } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
@@ -36,10 +36,6 @@ function BlockPopoverInbetween( {
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
 	const [ positionRecompute, forceRecompute ] = useState( {} );
-	useEffect( () => {
-		const intervalHandle = setInterval( forceRecompute, 500 );
-		return () => clearInterval( intervalHandle );
-	}, [] );
 
 	const { orientation, rootClientId, isVisible } = useSelect(
 		( select ) => {
@@ -60,7 +56,7 @@ function BlockPopoverInbetween( {
 					isBlockVisible( nextClientId ),
 			};
 		},
-		[ previousClientId ]
+		[ previousClientId, nextClientId ]
 	);
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
@@ -168,6 +164,31 @@ function BlockPopoverInbetween( {
 	}, [ previousElement, nextElement, positionRecompute, isVisible ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+
+	// This is only needed for a smoth transition when moving blocks.
+	useLayoutEffect( () => {
+		if ( ! previousElement ) {
+			return;
+		}
+		const observer = new window.MutationObserver( forceRecompute );
+		observer.observe( previousElement, { attributes: true } );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ previousElement ] );
+
+	useLayoutEffect( () => {
+		if ( ! nextElement ) {
+			return;
+		}
+		const observer = new window.MutationObserver( forceRecompute );
+		observer.observe( nextElement, { attributes: true } );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ nextElement ] );
 
 	if ( ! previousElement || ! nextElement || ! isVisible ) {
 		return null;
