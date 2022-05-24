@@ -707,9 +707,14 @@ export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
 
+		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
+			return EMPTY_ARRAY;
+		}
+
+		// Disable widget area selection.
 		if (
-			selectionStart.clientId === undefined ||
-			selectionEnd.clientId === undefined
+			getBlockName( state, selectionStart.clientId ) ===
+			'core/widget-area'
 		) {
 			return EMPTY_ARRAY;
 		}
@@ -725,6 +730,7 @@ export const getSelectedBlockClientIds = createSelector(
 			state,
 			selectionStart.clientId
 		);
+
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
