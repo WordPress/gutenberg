@@ -12,7 +12,7 @@ import useNavigationMenu from '../use-navigation-menu';
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	[ coreStore ].forEach( registry.register );
+	registry.register( coreStore)
 
 	const navigationConfig = {
 		kind: 'postType',
