@@ -49,7 +49,7 @@ test.describe( 'Template Part', () => {
 
 		// The template part should be visible with a block appender.
 		const templatePart = editor.canvas.locator(
-			'div[data-type="core/template-part"]'
+			'[data-type="core/template-part"]'
 		);
 		const addBlockButton = templatePart.locator(
 			'role=button[name="Add block"i]'
@@ -77,7 +77,7 @@ test.describe( 'Template Part', () => {
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.click( 'role=button[name="Choose"i]' );
 		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option >> text="header"'
+			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
 		);
 
 		// There are now two header template parts.
@@ -116,7 +116,7 @@ test.describe( 'Template Part', () => {
 
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph = editor.canvas.locator(
-			'div[data-type="core/template-part"]',
+			'[data-type="core/template-part"]',
 			{ has: paragraphBlock }
 		);
 
@@ -166,11 +166,11 @@ test.describe( 'Template Part', () => {
 
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph1 = editor.canvas.locator(
-			'div[data-type="core/template-part"]',
+			'[data-type="core/template-part"]',
 			{ has: paragraphBlock1 }
 		);
 		const templatePartWithParagraph2 = editor.canvas.locator(
-			'div[data-type="core/template-part"]',
+			'[data-type="core/template-part"]',
 			{ has: paragraphBlock2 }
 		);
 
@@ -211,7 +211,7 @@ test.describe( 'Template Part', () => {
 			`p >> text="${ paragraphText }"`
 		);
 		const templatePartWithParagraph = editor.canvas.locator(
-			'header[data-type="core/template-part"]',
+			'[data-type="core/template-part"]',
 			{ has: paragraph }
 		);
 		await expect( templatePartWithParagraph ).toBeVisible();
