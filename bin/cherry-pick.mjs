@@ -15,6 +15,14 @@ const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', ['auth', 'status'] )
 
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 
+/**
+ * The main function of this script. It:
+ * * Retrieves the list of relevant PRs to cherry-pick
+ * * Tries to cherry-pick them
+ * * Pushes the changes comments on the successful cherry-picks
+ * * Reports the results
+ * * Suggests next steps
+ */
 async function main() {
 	if ( !GITHUB_CLI_AVAILABLE ) {
 		await reportGhUnavailable();
@@ -52,6 +60,14 @@ async function main() {
 	console.log( `Done!` );
 }
 
+/**
+ * Synchronously executes a CLI command and returns the result or throws an error on failure.
+ *
+ * @param {string} command A command to execute.
+ * @param {string[]} args CLI args.
+ * @param {boolean} pipe If true, pipes the output to this process's stdout and stderr.
+ * @return {string} Command's output.
+ */
 function cli( command, args, pipe = false ) {
 	const pipeOptions = {
 		cwd: process.cwd(),
@@ -66,6 +82,11 @@ function cli( command, args, pipe = false ) {
 	return result.stdout.toString().trim();
 }
 
+/**
+ * Retrieves the details of PR we want to cherry-pick from GitHub API.
+ *
+ * @return {Promise<Object[]>} A list of relevant PR data objects.
+ */
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
 		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`,
@@ -95,6 +116,12 @@ async function fetchPRs() {
 	return PRsWithMergeCommit;
 }
 
+/**
+ * A utility functino for GET requesting GitHub API.
+ *
+ * @param {string} path The API path to request.
+ * @return {Promise<Object>} Parsed response JSON.
+ */
 async function GitHubFetch( path ) {
 	const response = await fetch(
 		'https://api.github.com' + path,
@@ -107,6 +134,15 @@ async function GitHubFetch( path ) {
 	return await response.json();
 }
 
+/**
+ * Attempts to cherry-pick given PRs using `git` CLI command.
+ *
+ * Retries failed cherry-picks if any other PR got successfully cherry-picked
+ * success since the last attempt.
+ *
+ * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
+ */
 function cherryPickAll( PRs ) {
 	let remainingPRs = [...PRs];
 	let i = 1;
@@ -124,6 +160,14 @@ function cherryPickAll( PRs ) {
 	return [allSuccesses, remainingPRs];
 }
 
+/**
+ * Attempts to cherry-pick given PRs using `git` CLI command.
+ *
+ * Processes every PR once.
+ *
+ * @param {Object[]} PRs The list of PRs to cherry-pick.
+ * @return {Array} A two-tuple containing a list of successful cherry-picks and a list of failed ones.
+ */
 function cherryPickRound( PRs ) {
 	const stack = [...PRs];
 	const successes = [];
@@ -150,8 +194,21 @@ function cherryPickRound( PRs ) {
 	return [successes, failures];
 }
 
+/**
+ * Identity function
+ *
+ * @param {*} x Input.
+ * @return {*} Input
+ */
 const identity = x => x;
 
+/**
+ * Formats a PR object in a human readable way.
+ *
+ * @param {Object} PR PR details.
+ * @param {boolean} withMergeCommitHash Should include the commit hash in the output?
+ * @return {string} Formatted text
+ */
 function prToString( { number, mergeCommitHash, title }, withMergeCommitHash = true ) {
 	return [
 		`#${ number }`,
@@ -160,11 +217,23 @@ function prToString( { number, mergeCommitHash, title }, withMergeCommitHash = t
 	].filter( identity ).join( ' – ' );
 }
 
+/**
+ * Indents a block of text with {width} spaces
+ *
+ * @param {string} text The text to indent.
+ * @param {number} width Number of spaces to use.
+ * @return {string} Indented text.
+ */
 function indent( text, width = 3 ) {
 	const indent = ' '.repeat( width );
 	return text.split( "\n" ).map( line => indent + line ).join( "\n" );
 }
 
+/**
+ * Attempts to cherry-pick a given commit into the current branch,
+ *
+ * @return {string} Branch name.
+ */
 function cherryPickOne( commit ) {
 	const result = spawnSync( 'git', ['cherry-pick', commit] );
 	const message = result.stdout.toString().trim();
@@ -176,6 +245,13 @@ function cherryPickOne( commit ) {
 	return commitHashOutput.stdout.toString().trim();
 }
 
+/**
+ * When the cherry-picking phase is over, this function outputs the stats
+ * and informs about the next steps to take.
+ *
+ * @param {Array} successes Successful cherry-picks.
+ * @param {Array} failures Failed cherry-picks.
+ */
 function reportSummaryNextSteps( successes, failures ) {
 	console.log( 'Summary:' );
 	console.log( indent( `✅  ${ successes.length } PRs got cherry-picked cleanly` ) );
@@ -203,6 +279,14 @@ function reportSummaryNextSteps( successes, failures ) {
 	}
 }
 
+/**
+ * Comment on a given PR to tell the author it's been cherry-picked into a release branch
+ * Also, removes the backport label (or any other label used to mark this PR for backporting).
+ *
+ * Uses the `gh` CLI utility.
+ *
+ * @param {Object} pr PR details.
+ */
 function GHcommentAndRemoveLabel( pr ) {
 	const { number, cherryPickHash } = pr;
 	const comment = prComment( cherryPickHash );
@@ -219,6 +303,11 @@ function GHcommentAndRemoveLabel( pr ) {
 	}
 }
 
+/**
+ * When cherry-pick succeeds, this function outputs the manual next steps to take.
+ *
+ * @param {Object} PR PR details.
+ */
 function reportSuccessManual( { number, title, cherryPickHash } ) {
 	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
@@ -226,6 +315,11 @@ function reportSuccessManual( { number, title, cherryPickHash } ) {
 	console.log( '' );
 }
 
+/**
+ * When cherry-pick fails, this function outputs the details.
+ *
+ * @param {Object} PR PR details.
+ */
 function reportFailure( { number, title, error, mergeCommitHash } ) {
 	console.log( indent( prUrl( number ) ) );
 	console.log( indent( `#${ number } ${ title }` ) );
@@ -235,18 +329,41 @@ function reportFailure( { number, title, error, mergeCommitHash } ) {
 	console.log( '' );
 }
 
+/**
+ * Returns the URL of the Gutenberg PR given its number.
+ *
+ * @return {string} PR URL.
+ */
 function prUrl( number ) {
 	return `https://github.com/WordPress/gutenberg/pull/${ number } `;
 }
 
+/**
+ * Returns the comment informing that a PR was just cherry-picked to the
+ * release branch.
+ *
+ * @param {string} cherryPickHash
+ * @return {string} Comment contents.
+ */
 function prComment( cherryPickHash ) {
 	return `I just cherry-picked this PR to the ${ BRANCH } branch to get it included in the next release: ${ cherryPickHash }`;
 }
 
+/**
+ * Returns the current git branch.
+ *
+ * @return {string} Branch name.
+ */
 function getCurrentBranch() {
 	return spawnSync( 'git', ['rev-parse', '--abbrev-ref', 'HEAD'] ).stdout.toString().trim();
 }
 
+/**
+ * Reports when the gh CLI tool is missing, describes the consequences, asks
+ * whether to proceed.
+ *
+ * @return {Promise<void>}
+ */
 async function reportGhUnavailable() {
 	console.log( 'Github CLI is not setup. This script will not be able to automatically' );
 	console.log( 'comment on the processed PRs and remove the backport label from them.' );
