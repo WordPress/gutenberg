@@ -35,7 +35,7 @@ export default function useInput() {
 				return;
 			}
 			// Prevent the browser to format something when we have multiselection.
-			if ( event?.inputType?.startsWith( 'format' ) ) {
+			if ( event.inputType?.startsWith( 'format' ) ) {
 				event.preventDefault();
 			}
 		}
