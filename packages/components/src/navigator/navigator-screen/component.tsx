@@ -63,7 +63,7 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			cx(
 				css( {
 					// Ensures horizontal overflow is visually accessible.
-					overflowX: 'auto',
+					overflowX: 'visible',
 					// In case the root has a height, it should not be exceeded.
 					maxHeight: '100%',
 				} ),
