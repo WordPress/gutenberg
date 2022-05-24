@@ -189,6 +189,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h4: 'h4',
 	h5: 'h5',
 	h6: 'h6',
+	button: '.wp-element-button, .wp-block-button__link',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
