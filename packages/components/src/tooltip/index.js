@@ -59,13 +59,12 @@ const positionToPlacement = ( position ) => {
 	return y;
 };
 
-const DisabledElement = ( {
+const getDisabledElement = ( {
 	eventHandlers,
 	child,
 	childrenWithPopover,
 	anchorRef,
 } ) => {
-	const ref = useMergeRefs( [ anchorRef, child?.ref ] );
 	return cloneElement(
 		<span className="disabled-element-wrapper">
 			{ cloneElement( eventCatcher, eventHandlers ) }
@@ -73,21 +72,20 @@ const DisabledElement = ( {
 				children: childrenWithPopover,
 			} ) }
 		</span>,
-		{ ...eventHandlers, ref }
+		{ ...eventHandlers, ref: anchorRef }
 	);
 };
 
-const RegularElement = ( {
+const getRegularElement = ( {
 	child,
 	eventHandlers,
 	childrenWithPopover,
-	anchorRef,
+	mergedRefs,
 } ) => {
-	const ref = useMergeRefs( [ anchorRef, child?.ref ] );
 	return cloneElement( child, {
 		...eventHandlers,
 		children: childrenWithPopover,
-		ref,
+		ref: mergedRefs,
 	} );
 };
 
@@ -155,6 +153,10 @@ function Tooltip( props ) {
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
 	const childRef = useRef( null );
+	const mergedChildRefs = useMergeRefs( [
+		childRef,
+		Children.toArray( children )[ 0 ]?.ref,
+	] );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior.
@@ -254,7 +256,9 @@ function Tooltip( props ) {
 
 	const child = Children.only( children );
 	const { children: grandchildren, disabled } = child.props;
-	const ElementWithPopover = disabled ? DisabledElement : RegularElement;
+	const getElementWithPopover = disabled
+		? getDisabledElement
+		: getRegularElement;
 
 	const placement = positionToPlacement( position );
 
@@ -270,14 +274,22 @@ function Tooltip( props ) {
 		...popoverData,
 	} );
 
-	return (
-		<ElementWithPopover
-			child={ child }
-			eventHandlers={ eventHandlers }
-			childrenWithPopover={ childrenWithPopover }
-			anchorRef={ childRef }
-		/>
-	);
+	// return (
+	// 	<ElementWithPopover
+	// 		child={ child }
+	// 		eventHandlers={ eventHandlers }
+	// 		childrenWithPopover={ childrenWithPopover }
+	// 		anchorRef={ childRef }
+	// 	/>
+	// );
+
+	return getElementWithPopover( {
+		child,
+		eventHandlers,
+		childrenWithPopover,
+		anchorRef: childRef,
+		mergedRefs: mergedChildRefs,
+	} );
 }
 
 export default Tooltip;
