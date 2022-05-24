@@ -115,12 +115,15 @@ function AutoBlockPreview( {
 					} }
 				>
 					{ contentResizeListener }
-					{ duotonePresets.map( ( preset ) => (
-						<PresetDuotoneFilter
-							preset={ preset }
-							key={ preset.slug }
-						/>
-					) ) }
+					{
+						/* Filters need to be rendered before children to avoid Safari rendering issues. */
+						duotonePresets.map( ( preset ) => (
+							<PresetDuotoneFilter
+								preset={ preset }
+								key={ preset.slug }
+							/>
+						) )
+					}
 					<MemoizedBlockList renderAppender={ false } />
 				</Iframe>
 			</Disabled>
