@@ -98,4 +98,37 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		return $with_theme_supports;
 	}
 
+	public static function get_block_data() {
+		$registry = WP_Block_Type_Registry::get_instance();
+		$blocks   = $registry->get_all_registered();
+		$config   = array( 'version' => 1 );
+		foreach( $blocks as $block_name => $block_type ) {
+			if ( isset( $block_type->supports['blockStyles'] ) ) {
+				$config['styles']['blocks'][ $block_name ] = $block_type->supports['blockStyles'];
+			}
+		}
+
+		// Core here means it's the lower level part of the styles chain.
+		// It can be a core or a third-party block.
+		return new WP_Theme_JSON( $config, 'core' );
+	}
+
+	public static function get_merged_data( $origin = 'custom' ) {
+		if ( is_array( $origin ) ) {
+			_deprecated_argument( __FUNCTION__, '5.9' );
+		}
+
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( static::get_core_data() );
+		$result->merge( static::get_block_data() );
+		$result->merge( static::get_theme_data() );
+
+		if ( 'custom' === $origin ) {
+			$result->merge( static::get_user_data() );
+		}
+
+		return $result;
+	}
+
+
 }
