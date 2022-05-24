@@ -76,7 +76,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin' => '111px',
 					),
 				),
-				'options'         => array( 'classnames' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css'        => 'margin: 111px;',
 					'classnames' => 'has-text-color has-texas-flood-color',
@@ -148,9 +148,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text' => 'var:preset|color|my-little-pony',
 					),
 				),
-				'options'         => array( 'selector' => '.wp-selector' ),
+				'options'         => array(
+					'selector' => '.wp-selector',
+					'css_vars' => true,
+				),
 				'expected_output' => array(
-					'css' => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
+					'css'        => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
+					'classnames' => 'has-text-color has-my-little-pony-color',
 				),
 			),
 
@@ -161,7 +165,9 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => array( 'selector' => '.wp-selector' ),
-				'expected_output' => array(),
+				'expected_output' => array(
+					'classnames' => 'has-text-color',
+				),
 			),
 
 			'valid_classnames_deduped'                     => array(
@@ -176,9 +182,22 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'fontFamily' => 'var:preset|font-family|totally-awesome',
 					),
 				),
-				'options'         => array( 'classnames' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
+				),
+			),
+
+			'valid_classnames_and_css_vars'                => array(
+				'block_styles'    => array(
+					'color' => array(
+						'text' => 'var:preset|color|teal-independents',
+					),
+				),
+				'options'         => array( 'css_vars' => true ),
+				'expected_output' => array(
+					'css'        => 'color: var(--wp--preset--color--teal-independents);',
+					'classnames' => 'has-text-color has-teal-independents-color',
 				),
 			),
 
@@ -189,7 +208,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background' => null,
 					),
 				),
-				'options'         => array( 'classnames' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css'        => 'color: #fff;',
 					'classnames' => 'has-text-color',
@@ -207,7 +226,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'padding' => 'var:preset|spacing|padding',
 					),
 				),
-				'options'         => array( 'classnames' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-background',
 				),
@@ -224,7 +243,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'classnames' => true ),
+				'options'         => array(),
 				'expected_output' => array(),
 			),
 		);

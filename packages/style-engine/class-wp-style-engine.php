@@ -154,8 +154,8 @@ class WP_Style_Engine {
 	/**
 	 * Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 	 *
-	 * @param string $style_value  A single css preset value.
-	 * @param string $property_key The CSS property that is the second element of the preset string. Used for matching.
+	 * @param string? $style_value  A single css preset value.
+	 * @param string  $property_key The CSS property that is the second element of the preset string. Used for matching.
 	 *
 	 * @return string|null The slug, or null if not found.
 	 */
@@ -257,7 +257,7 @@ class WP_Style_Engine {
 	 * @param array $options array(
 	 *     'enqueue_block_support_styles' => (boolean) Whether to register generated styles and output them together in a style block. A `selector` is required.
 	 *     'selector'                     => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'classnames'                   => (boolean) Whether to return classnames. If `true` var:? values will be parsed to return classnames instead of CSS vars. Default is `false`.
+	 *     'css_vars'                     => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -270,10 +270,10 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_rules                               = array();
-		$classnames                              = array();
-		$should_generate_classnames_from_presets = isset( $options['classnames'] ) && true === $options['classnames'];
-		$should_enqueue_block_support_styles     = isset( $options['enqueue_block_support_styles'] ) && true === $options['enqueue_block_support_styles'];
+		$css_rules                           = array();
+		$classnames                          = array();
+		$should_css_vars_from_presets        = isset( $options['css_vars'] ) && true === $options['css_vars'];
+		$should_enqueue_block_support_styles = isset( $options['enqueue_block_support_styles'] ) && true === $options['enqueue_block_support_styles'];
 
 		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
@@ -288,12 +288,8 @@ class WP_Style_Engine {
 					continue;
 				}
 
-				// Generate classnames from var:? values.
-				if ( $should_generate_classnames_from_presets ) {
-					$classnames = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				}
-
-				$css_rules = array_merge( $css_rules, static::get_css( $style_value, $style_definition, ! $should_generate_classnames_from_presets ) );
+				$classnames = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
+				$css_rules  = array_merge( $css_rules, static::get_css( $style_value, $style_definition, $should_css_vars_from_presets ) );
 			}
 		}
 

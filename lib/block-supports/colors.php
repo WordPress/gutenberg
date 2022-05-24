@@ -102,7 +102,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_generate( array( 'color' => $color_block_styles ), array( 'classnames' => true ) );
+	$styles     = gutenberg_style_engine_generate( array( 'color' => $color_block_styles ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
