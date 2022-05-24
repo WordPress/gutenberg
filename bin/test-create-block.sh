@@ -98,4 +98,4 @@ cd zip-folder
 unzip example-static.zip
 
 status "Printing the content of directory..."
-ls -al
+ls -alR
