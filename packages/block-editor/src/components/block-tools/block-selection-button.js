@@ -236,7 +236,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		'block-editor-block-list__block-selection-button',
 		{
 			'is-block-moving-mode': !! blockMovingMode,
-			'is-zoom-out-mode': editorMode === 'zoom-out',
 		}
 	);
 
