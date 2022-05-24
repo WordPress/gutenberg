@@ -84,8 +84,7 @@ export { combineReducers };
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
- * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
- *                                                       `createReduxStore`). The legacy calling
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
  *                                                       convention of passing the store name is
  *                                                       also supported.
  *
@@ -106,8 +105,7 @@ export const select = defaultRegistry.select;
  * so that you only need to supply additional arguments, and modified so that they return promises
  * that resolve to their eventual values, after any resolvers have ran.
  *
- * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
- *                                                       `createReduxStore`). The legacy calling
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
  *                                                       convention of passing the store name is
  *                                                       also supported.
  *
@@ -128,8 +126,7 @@ export const resolveSelect = defaultRegistry.resolveSelect;
  * so that you only need to supply additional arguments, and modified so that they throw promises
  * in case the selector is not resolved yet.
  *
- * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
- *                                                       `createReduxStore`). The legacy calling
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
  *                                                       convention of passing the store name is
  *                                                       also supported.
  *
@@ -144,8 +141,7 @@ export const suspendSelect = defaultRegistry.suspendSelect;
  * Note: Action creators returned by the dispatch will return a promise when
  * they are called.
  *
- * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
- *                                                       `createReduxStore`). The legacy calling
+ * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
  *                                                       convention of passing the store name is
  *                                                       also supported.
  *

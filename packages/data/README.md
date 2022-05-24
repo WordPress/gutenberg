@@ -498,7 +498,7 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -622,7 +622,7 @@ resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -645,7 +645,7 @@ select( myCustomStore ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
@@ -683,7 +683,7 @@ in case the selector is not resolved yet.
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: Store descriptor (Object returned from `createReduxStore`). The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 

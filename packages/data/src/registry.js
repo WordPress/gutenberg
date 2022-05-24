@@ -110,8 +110,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * state so that you only need to supply additional arguments, and modified so that they return
 	 * promises that resolve to their eventual values, after any resolvers have ran.
 	 *
-	 * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
-	 *                                                       `createReduxStore`). The legacy calling
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
 	 *                                                       convention of passing the store name is
 	 *                                                       also supported.
 	 *
@@ -135,8 +134,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * state so that you only need to supply additional arguments, and modified so that they throw
 	 * promises in case the selector is not resolved yet.
 	 *
-	 * @param {StoreDescriptor|string} storeNameOrDescriptor Store descriptor (Object returned from
-	 *                                                       `createReduxStore`). The legacy calling
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
 	 *                                                       convention of passing the store name is
 	 *                                                       also supported.
 	 *
