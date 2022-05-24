@@ -250,6 +250,7 @@
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"build": "npm run build:packages && wp-scripts build",
 		"changelog": "node ./bin/plugin/cli.js changelog",
+		"cherry-pick": "node ./bin/cherry-pick.mjs",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "node ./bin/check-local-changes.js",
