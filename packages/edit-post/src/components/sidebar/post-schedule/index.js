@@ -18,7 +18,7 @@ export default function PostSchedule() {
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					popoverProps={ { anchorRef } }
-					position="bottom left"
+					position="bottom right"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<PostScheduleToggle
