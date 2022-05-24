@@ -309,6 +309,55 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
+	 * Returns the stylesheet that results of processing
+	 * the theme.json structure this object represents.
+	 *
+	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
+	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
+	 *                         'styles': only the styles section in theme.json.
+	 *                         'presets': only the classes for the presets.
+	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
+	 * @return string Stylesheet.
+	 */
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
+		if ( null === $origins ) {
+			$origins = static::VALID_ORIGINS;
+		}
+
+		if ( is_string( $types ) ) {
+			// Dispatch error and map old arguments to new ones.
+			_deprecated_argument( __FUNCTION__, '5.9' );
+			if ( 'block_styles' === $types ) {
+				$types = array( 'styles', 'presets' );
+			} elseif ( 'css_variables' === $types ) {
+				$types = array( 'variables' );
+			} else {
+				$types = array( 'variables', 'styles', 'presets' );
+			}
+		}
+
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json );
+		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
+	}
+
+	/**
 	 * Builds metadata for the style nodes, which returns in the form of:
 	 *
 	 *     [
@@ -327,10 +376,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @since 5.8.0
 	 *
 	 * @param array $theme_json The tree to extract style nodes from.
-	 * @param array $selectors  List of selectors per block.
 	 * @return array
 	 */
-	protected static function get_style_nodes( $theme_json, $selectors = array() ) {
+	protected static function get_style_nodes( $theme_json ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -374,7 +422,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return $nodes;
 		}
 
-		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json, $selectors ) );
+		$nodes = array_merge( $nodes, static::get_block_nodes( $theme_json ) );
 
 		// This filter allows us to modify the output of WP_Theme_JSON so that we can do things like loading block CSS independently.
 		return apply_filters( 'gutenberg_get_style_nodes', $nodes );
@@ -393,13 +441,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
-	 * @param array $selectors  Optional list of selectors per block.
 	 *
 	 * @return array The block nodes in theme.json.
 	 */
-	private static function get_block_nodes( $theme_json, $selectors = array() ) {
-		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
+	private static function get_block_nodes( $theme_json ) {
+		$selectors = static::get_blocks_metadata();
 		$nodes     = array();
+
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
 		}
@@ -543,6 +591,62 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Removes insecure data from theme.json.
+	 *
+	 * @param array $theme_json Structure to sanitize.
+	 * @return array Sanitized structure.
+	 */
+	public static function remove_insecure_properties( $theme_json ) {
+		$sanitized = array();
+
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+
+		$valid_block_names   = array_keys( static::get_blocks_metadata() );
+		$valid_element_names = array_keys( static::ELEMENTS );
+		$theme_json          = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$style_nodes         = static::get_style_nodes( $theme_json );
+
+		foreach ( $style_nodes as $metadata ) {
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = static::remove_insecure_styles( $input );
+			if ( ! empty( $output ) ) {
+				_wp_array_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		$setting_nodes = static::get_setting_nodes( $theme_json );
+		foreach ( $setting_nodes as $metadata ) {
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = static::remove_insecure_settings( $input );
+			if ( ! empty( $output ) ) {
+				_wp_array_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		if ( empty( $sanitized['styles'] ) ) {
+			unset( $theme_json['styles'] );
+		} else {
+			$theme_json['styles'] = $sanitized['styles'];
+		}
+
+		if ( empty( $sanitized['settings'] ) ) {
+			unset( $theme_json['settings'] );
+		} else {
+			$theme_json['settings'] = $sanitized['settings'];
+		}
+
+		return $theme_json;
 	}
 
 	/**
