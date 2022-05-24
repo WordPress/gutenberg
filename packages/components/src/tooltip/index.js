@@ -13,8 +13,9 @@ import {
 	concatChildren,
 	useEffect,
 	useState,
+	useRef,
 } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,22 +32,37 @@ export const TOOLTIP_DELAY = 700;
 
 const eventCatcher = <div className="event-catcher" />;
 
-const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
-	cloneElement(
+const DisabledElement = ( {
+	eventHandlers,
+	child,
+	childrenWithPopover,
+	anchorRef,
+} ) => {
+	const ref = useMergeRefs( [ anchorRef, child?.ref ] );
+	return cloneElement(
 		<span className="disabled-element-wrapper">
 			{ cloneElement( eventCatcher, eventHandlers ) }
 			{ cloneElement( child, {
 				children: childrenWithPopover,
 			} ) }
 		</span>,
-		eventHandlers
+		{ ...eventHandlers, ref }
 	);
+};
 
-const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
-	cloneElement( child, {
+const RegularElement = ( {
+	child,
+	eventHandlers,
+	childrenWithPopover,
+	anchorRef,
+} ) => {
+	const ref = useMergeRefs( [ anchorRef, child?.ref ] );
+	return cloneElement( child, {
 		...eventHandlers,
 		children: childrenWithPopover,
+		ref,
 	} );
+};
 
 const addPopoverToGrandchildren = ( {
 	grandchildren,
@@ -54,6 +70,7 @@ const addPopoverToGrandchildren = ( {
 	position,
 	text,
 	shortcut,
+	anchorRef,
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -110,6 +127,7 @@ function Tooltip( props ) {
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+	const childRef = useRef( null );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior.
@@ -209,11 +227,10 @@ function Tooltip( props ) {
 
 	const child = Children.only( children );
 	const { children: grandchildren, disabled } = child.props;
-	const getElementWithPopover = disabled
-		? getDisabledElement
-		: getRegularElement;
+	const ElementWithPopover = disabled ? DisabledElement : RegularElement;
 
 	const popoverData = {
+		anchorRef: childRef,
 		isOver,
 		position,
 		text,
@@ -224,11 +241,14 @@ function Tooltip( props ) {
 		...popoverData,
 	} );
 
-	return getElementWithPopover( {
-		child,
-		eventHandlers,
-		childrenWithPopover,
-	} );
+	return (
+		<ElementWithPopover
+			child={ child }
+			eventHandlers={ eventHandlers }
+			childrenWithPopover={ childrenWithPopover }
+			anchorRef={ childRef }
+		/>
+	);
 }
 
 export default Tooltip;
