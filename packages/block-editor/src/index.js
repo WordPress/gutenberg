@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createExperiments } from '@wordpress/interface';
+
+/**
  * Internal dependencies
  */
 import './hooks';
@@ -17,3 +22,12 @@ export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
+
+const __experiments = createExperiments( {
+	test( name ) {
+		// eslint-disable-next-line no-console
+		console.log( `Executed with "${ name }".` );
+	},
+} );
+
+export { __experiments };

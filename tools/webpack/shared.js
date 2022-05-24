@@ -69,6 +69,7 @@ const plugins = [
 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 		'process.env.IS_GUTENBERG_PLUGIN':
 			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
+		'process.env.WP_SECRET_KEY': JSON.stringify( new Date() ),
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];

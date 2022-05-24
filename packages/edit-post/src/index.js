@@ -6,6 +6,8 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { __experiments } from '@wordpress/block-editor';
+import { secretKey } from '@wordpress/interface';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -80,6 +82,10 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const test = __experiments( 'test', secretKey );
+
+	test( 'hello world' );
+
 	// Prevent adding template part in the post editor.
 	// Only add the filter when the post editor is initialized, not imported.
 	addFilter(
