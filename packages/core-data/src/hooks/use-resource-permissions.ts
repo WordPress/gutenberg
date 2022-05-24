@@ -74,7 +74,7 @@ type ResourcePermissionsResolution< IdType > = [
  */
 export default function __experimentalUseResourcePermissions< IdType = void >(
 	resource: string,
-	id: IdType
+	id?: IdType
 ): ResourcePermissionsResolution< IdType > {
 	return useQuerySelect(
 		( resolve ) => {
