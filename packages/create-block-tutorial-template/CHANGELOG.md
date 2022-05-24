@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
+### Bug Fix
+
+-   Fix the issue with the block wrapper in the editor ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
 ## 2.1.0 (2022-04-21)
 
 ### Bug Fix

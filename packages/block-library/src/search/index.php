@@ -101,6 +101,9 @@ function render_block_core_search( $attributes ) {
 				</svg>';
 		}
 
+		// Include the button element class.
+		$button_classes .= ' ' . WP_Theme_JSON_GUTENBERG::__EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME;
+
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
 			esc_attr( $button_classes ),

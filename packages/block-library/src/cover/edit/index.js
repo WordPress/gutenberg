@@ -33,7 +33,6 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -158,11 +157,12 @@ function CoverEdit( {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: undefined ),
 		minHeight: minHeightWithUnit || undefined,
 	};
+
+	const backgroundImage = url ? `url(${ url })` : undefined;
+
+	const backgroundPosition = mediaPosition( focalPoint );
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
@@ -344,15 +344,27 @@ function CoverEdit( {
 					style={ { backgroundImage: gradientValue, ...bgStyle } }
 				/>
 
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ mediaElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
+				{ url &&
+					isImageBackground &&
+					( isImgElement ? (
+						<img
+							ref={ mediaElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) : (
+						<div
+							ref={ mediaElement }
+							role="img"
+							className={ classnames(
+								classes,
+								'wp-block-cover__image-background'
+							) }
+							style={ { backgroundImage, backgroundPosition } }
+						/>
+					) ) }
 				{ url && isVideoBackground && (
 					<video
 						ref={ mediaElement }

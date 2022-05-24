@@ -162,4 +162,7 @@ module.exports = {
 	'dropping-insertion-point': {
 		height: 3,
 	},
+	blockShortcodeContainer: {
+		padding: 12,
+	},
 };

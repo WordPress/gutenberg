@@ -13,6 +13,13 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
 
+## 1.76.1
+
+-   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
+-   [*] Fix Drag & Drop Chip positioning issue with RTL languages [#41053]
+-   [*] Add drag & drop help guide in Help & Support screen [#40961]
+-   [**] Fix drag mode not being enabled when long-pressing over Shortcode block [#41155]
+
 ## 1.76.0
 
 -   [**] [Buttons block] Fix Android-only issue related to displaying formatting buttons after closing the block settings [#40725]
