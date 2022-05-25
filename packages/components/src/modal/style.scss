@@ -65,12 +65,12 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid transparent;
-	padding: $grid-unit-20 $grid-unit-40 0;
+	padding: 0 $grid-unit-40;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height;
+	height: $header-height + $grid-unit-20;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
