@@ -400,13 +400,14 @@
 
 /** Zoom Out mode styles **/
 .block-editor-iframe__body {
+	background: $white;
 	transition: all 0.3s;
 }
 
 .block-editor-iframe__body.is-zoom-out-mode {
 	transform-origin: top center;
 	transform: scale(0.8);
-	margin-top: 100px;
+	margin-bottom: -80%;
 }
 
 .block-editor-iframe__body.is-zoom-out-mode > .block-list-appender {

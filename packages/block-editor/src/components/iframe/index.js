@@ -210,7 +210,6 @@ function Iframe(
 			contentDocument.dir = ownerDocument.dir;
 			documentElement.removeChild( contentDocument.head );
 			documentElement.removeChild( contentDocument.body );
-			contentDocument.documentElement.style.backgroundColor = '#2f2f2f';
 			return true;
 		}
 
@@ -274,7 +273,14 @@ function Iframe(
 				{ iframeDocument &&
 					createPortal(
 						<>
-							<head ref={ headRef }>{ head }</head>
+							<head ref={ headRef }>
+								{ head }
+								<style>
+									{ isZoomOutMode
+										? `html { transition: padding 0.3s; background: #2f2f2f; padding: 100px 0; }`
+										: `html { transition: padding 0.3s; }` }
+								</style>
+							</head>
 							<body
 								ref={ bodyRef }
 								className={ classnames(
