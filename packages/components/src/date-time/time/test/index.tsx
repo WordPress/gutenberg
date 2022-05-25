@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import TimePicker from '../time';
+import TimePicker from '..';
 
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {

@@ -7,7 +7,7 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import Tooltip from '../tooltip';
+import Tooltip from '../../tooltip';
 
 /**
  * Displays timezone information when user timezone is different from site

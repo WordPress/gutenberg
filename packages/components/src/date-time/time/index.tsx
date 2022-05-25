@@ -21,11 +21,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import ButtonGroup from '../button-group';
+import Button from '../../button';
+import ButtonGroup from '../../button-group';
 import TimeZone from './timezone';
-import type { WordPressComponentProps } from '../ui/context';
-import type { UpdateOnBlurAsIntegerFieldProps, TimePickerProps } from './types';
+import type { WordPressComponentProps } from '../../ui/context';
+import type {
+	UpdateOnBlurAsIntegerFieldProps,
+	TimePickerProps,
+} from '../types';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 

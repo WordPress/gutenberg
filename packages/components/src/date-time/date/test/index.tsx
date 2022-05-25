@@ -9,7 +9,7 @@ import 'react-dates/initialize';
 /**
  * Internal dependencies
  */
-import DatePicker from '../date';
+import DatePicker from '..';
 
 describe( 'DatePicker', () => {
 	it( 'should highlight the current date', () => {

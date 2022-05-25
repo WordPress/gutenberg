@@ -16,10 +16,10 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Button from '../button';
-import { default as DatePicker } from './date';
-import { default as TimePicker } from './time';
-import type { DateTimePickerProps } from './types';
+import Button from '../../button';
+import { default as DatePicker } from '../date';
+import { default as TimePicker } from '../time';
+import type { DateTimePickerProps } from '../types';
 
 export { DatePicker, TimePicker };
 
