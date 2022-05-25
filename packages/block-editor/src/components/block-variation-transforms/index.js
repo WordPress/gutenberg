@@ -121,6 +121,9 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	// Check if each variation has a unique icon.
 	const hasUniqueIcons = useMemo( () => {
 		const variationIcons = new Set();
+		if ( ! variations ) {
+			return true;
+		}
 		variations.forEach( ( variation ) => {
 			if ( variation.icon ) {
 				variationIcons.add( variation.icon );
