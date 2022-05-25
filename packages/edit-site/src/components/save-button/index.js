@@ -27,7 +27,7 @@ export default function SaveButton( {
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
-	} );
+	}, [] );
 
 	const disabled = ! isDirty || isSaving;
 

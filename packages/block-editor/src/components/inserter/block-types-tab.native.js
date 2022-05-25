@@ -9,23 +9,21 @@ import { useSelect } from '@wordpress/data';
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
-
-const NON_BLOCK_CATEGORIES = [ 'reusable' ];
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
+import { filterInserterItems } from './utils';
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
 
-	const { items } = useSelect(
+	const { blockTypes } = useSelect(
 		( select ) => {
 			const { getInserterItems } = select( blockEditorStore );
-
-			const allItems = getInserterItems( rootClientId );
-			const blockItems = allItems.filter(
-				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
+			const blockItems = filterInserterItems(
+				getInserterItems( rootClientId )
 			);
 
 			return {
-				items: clipboardBlock
+				blockTypes: clipboardBlock
 					? [ clipboardBlock, ...blockItems ]
 					: blockItems,
 			};
@@ -33,11 +31,20 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		[ rootClientId ]
 	);
 
+	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
+		blockTypes
+	);
+
+	const handleSelect = ( ...args ) => {
+		trackBlockTypeSelected( ...args );
+		onSelect( ...args );
+	};
+
 	return (
 		<BlockTypesList
 			name="Blocks"
 			items={ items }
-			onSelect={ onSelect }
+			onSelect={ handleSelect }
 			listProps={ listProps }
 		/>
 	);

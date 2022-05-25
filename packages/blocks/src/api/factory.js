@@ -12,7 +12,6 @@ import {
 	flatMap,
 	has,
 	uniq,
-	isFunction,
 	isEmpty,
 	map,
 } from 'lodash';
@@ -184,7 +183,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// Check non-wildcard transforms to ensure that transform is valid
-	// for a block selection of multiple blocks of different types
+	// for a block selection of multiple blocks of different types.
 	if (
 		! isWildcardBlockTransform( transform ) &&
 		! every( blocks, { name: firstBlockName } )
@@ -220,13 +219,8 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// If the transform has a `isMatch` function specified, check that it returns true.
-	if ( isFunction( transform.isMatch ) ) {
-		const attributes = transform.isMultiBlock
-			? blocks.map( ( block ) => block.attributes )
-			: sourceBlock.attributes;
-		if ( ! transform.isMatch( attributes ) ) {
-			return false;
-		}
+	if ( ! maybeCheckTransformIsMatch( transform, blocks ) ) {
+		return false;
 	}
 
 	if (
@@ -288,7 +282,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 
 	const sourceBlock = first( blocks );
 	const blockType = getBlockType( sourceBlock.name );
-	const transformsTo = getBlockTransforms( 'to', blockType.name );
+	const transformsTo = blockType
+		? getBlockTransforms( 'to', blockType.name )
+		: [];
 
 	// filter all 'to' transforms to find those that are possible.
 	const possibleTransforms = filter( transformsTo, ( transform ) => {
@@ -304,7 +300,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	);
 
 	// Map block names to block types.
-	return blockNames.map( ( name ) => getBlockType( name ) );
+	return blockNames.map( ( name ) =>
+		name === '*' ? name : getBlockType( name )
+	);
 };
 
 /**
@@ -453,6 +451,27 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 }
 
 /**
+ * Checks that a given transforms isMatch method passes for given source blocks.
+ *
+ * @param {Object} transform A transform object.
+ * @param {Array}  blocks    Blocks array.
+ *
+ * @return {boolean} True if given blocks are a match for the transform.
+ */
+function maybeCheckTransformIsMatch( transform, blocks ) {
+	if ( typeof transform.isMatch !== 'function' ) {
+		return true;
+	}
+	const sourceBlock = first( blocks );
+	const attributes = transform.isMultiBlock
+		? blocks.map( ( block ) => block.attributes )
+		: sourceBlock.attributes;
+	const block = transform.isMultiBlock ? blocks : sourceBlock;
+
+	return transform.isMatch( attributes, block );
+}
+
+/**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
  * @param {Array|Object} blocks Blocks array or block object.
@@ -478,7 +497,8 @@ export function switchToBlockType( blocks, name ) {
 				t.type === 'block' &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( name ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock )
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
 		findTransform(
 			transformationsFrom,
@@ -486,7 +506,8 @@ export function switchToBlockType( blocks, name ) {
 				t.type === 'block' &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks.indexOf( sourceName ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock )
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				maybeCheckTransformIsMatch( t, blocksArray )
 		);
 
 	// Stop if there is no valid transformation.
@@ -538,10 +559,9 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock = some(
-		transformationResults,
-		( result ) => result.name === name
-	);
+	const hasSwitchedBlock =
+		name === '*' ||
+		some( transformationResults, ( result ) => result.name === name );
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
@@ -549,7 +569,7 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const ret = transformationResults.map( ( result ) => {
+	const ret = transformationResults.map( ( result, index, results ) => {
 		/**
 		 * Filters an individual transform result from block transformation.
 		 * All of the original blocks are passed, since transformations are
@@ -557,11 +577,15 @@ export function switchToBlockType( blocks, name ) {
 		 *
 		 * @param {Object}   transformedBlock The transformed block.
 		 * @param {Object[]} blocks           Original blocks transformed.
+		 * @param {Object[]} index            Index of the transformed block on the array of results.
+		 * @param {Object[]} results          An array all the blocks that resulted from the transformation.
 		 */
 		return applyFilters(
 			'blocks.switchToBlockType.transformedBlock',
 			result,
-			blocks
+			blocks,
+			index,
+			results
 		);
 	} );
 

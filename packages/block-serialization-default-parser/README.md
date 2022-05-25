@@ -1,6 +1,6 @@
 # Block Serialization Default Parser
 
-This library contains the default block serialization parser implementations for WordPress documents. It provides native PHP and JavaScript parsers that implement the [specification](/docs/contributors/grammar.md) from [`@wordpress/block-serialization-spec-parser`](/packages/block-serialization-spec-parser/README.md) and which normally operates on the document stored in `post_content`.
+This library contains the default block serialization parser implementations for WordPress documents. It provides native PHP and JavaScript parsers that implement the [specification](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/grammar.md) from [`@wordpress/block-serialization-spec-parser`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-serialization-spec-parser/README.md) and which normally operates on the document stored in `post_content`.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/block-serialization-default-parser --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## API
 
@@ -151,4 +151,10 @@ Further, tokenizing with a RegExp brings an additional advantage. The parser gen
 
 However, since our "token language" of the block comment delimiters is _regular_ and _can_ be trivially matched with RegExp patterns, we can do that here and then something magical happens: we jump out of PHP or JavaScript and into a highly-optimized RegExp engine written in C or C++ on the host system. We thereby leave the virtual machine and its overhead.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

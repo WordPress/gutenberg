@@ -41,7 +41,7 @@ export const defaultSettings = {
 	spaceRegExp: /&nbsp;|&#160;/gi,
 	HTMLEntityRegExp: /&\S+?;/g,
 
-	// \u2014 = em-dash
+	// \u2014 = em-dash.
 	connectorRegExp: /--|\u2014/g,
 
 	// Characters to be removed from input text.
@@ -84,7 +84,7 @@ export const defaultSettings = {
 			 */
 			'\u2000-\u2BFF',
 
-			// Supplemental Punctuation
+			// Supplemental Punctuation.
 			'\u2E00-\u2E7F',
 			']',
 		].join( '' ),

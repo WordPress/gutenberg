@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/block-editor --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -80,11 +80,15 @@ registerCoreBlocks();
 
 ### AlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### AlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/alignment-control/README.md>
 
 ### Autocomplete
 
@@ -94,11 +98,15 @@ _Related_
 
 ### BlockAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
 
 ### BlockBreadcrumb
 
@@ -151,11 +159,15 @@ Undocumented declaration.
 
 ### BlockIcon
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-icon/README.md>
 
 ### BlockInspector
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
 ### BlockList
 
@@ -163,7 +175,9 @@ Undocumented declaration.
 
 ### BlockMover
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md>
 
 ### BlockNavigationDropdown
 
@@ -209,6 +223,10 @@ _Returns_
 
 -   `WPElement`: Element.
 
+### BlockStyles
+
+Undocumented declaration.
+
 ### BlockTitle
 
 Renders the block's configured title as a string, or empty if the title
@@ -217,21 +235,27 @@ cannot be determined.
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
+-   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
 
 _Returns_
 
--   `?string`: Block title.
+-   `JSX.Element`: Block title.
 
 ### BlockToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
 
 ### BlockTools
 
@@ -247,11 +271,15 @@ _Parameters_
 
 ### BlockVerticalAlignmentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### BlockVerticalAlignmentToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
 ### ButtonBlockAppender
 
@@ -275,11 +303,15 @@ Undocumented declaration.
 
 ### ContrastChecker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/contrast-checker/README.md>
 
 ### CopyHandler
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md>
 
 ### createCustomColorsHOC
 
@@ -317,7 +349,9 @@ Undocumented declaration.
 
 ### FontSizePicker
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
 ### getColorClassName
 
@@ -426,6 +460,19 @@ _Returns_
 
 -   `string`: Gradient value.
 
+### getPxFromCssUnit
+
+Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+
+_Parameters_
+
+-   _cssUnit_ `string`:
+-   _options_ `Object`:
+
+_Returns_
+
+-   `string`: returns the cssUnit value in a simple px format.
+
 ### InnerBlocks
 
 _Related_
@@ -438,9 +485,7 @@ Undocumented declaration.
 
 ### InspectorAdvancedControls
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md>
+Undocumented declaration.
 
 ### InspectorControls
 
@@ -450,15 +495,21 @@ _Related_
 
 ### JustifyContentControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### JustifyToolbar
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/justify-content-control/README.md>
 
 ### LineHeightControl
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
 ### MediaPlaceholder
 
@@ -468,7 +519,9 @@ _Related_
 
 ### MediaReplaceFlow
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md>
 
 ### MediaUpload
 
@@ -509,10 +562,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
-### PreserveScrollInReorder
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -549,15 +598,20 @@ _Properties_
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
+-   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+-   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
 
 ### store
 
@@ -646,7 +700,14 @@ _Returns_
 
 ### useBlockEditContext
 
-Undocumented declaration.
+The `useBlockEditContext` hook provides information about the block this hook is being used in.
+It returns an object with the `name`, `isSelected` state, and the `clientId` of the block.
+It is useful if you want to create custom hooks that need access to the current blocks clientId
+but don't want to rely on the data getting passed in as a parameter.
+
+_Returns_
+
+-   `Object`: Block edit context
 
 ### useBlockProps
 
@@ -663,15 +724,49 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
+-   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+### useCachedTruthy
+
+Keeps an up-to-date copy of the passed value and returns it. If value becomes falsy, it will return the last truthy copy.
+
+_Parameters_
+
+-   _value_ `any`:
+
+_Returns_
+
+-   `any`: value
+
+### useInnerBlocksProps
+
+This hook is used to lightly mark an element as an inner blocks wrapper
+element. Call this hook and pass the returned props to the element to mark as
+an inner blocks wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Optional. Inner blocks options.
+
 ### useSetting
 
-Hook that retrieves the editor setting.
-It works with nested objects using by finding the value at path.
+Hook that retrieves the given setting for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy.
+If none is found, it'll look it up in the block editor store.
 
 _Usage_
 
@@ -686,30 +781,6 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
-
-### validateThemeColors
-
-Given an array of theme colors checks colors for validity
-
-_Parameters_
-
--   _colors_ `Array`: The array of theme colors
-
-_Returns_
-
--   `Array`: The array of valid theme colors or the default colors
-
-### validateThemeGradients
-
-Given an array of theme gradients checks gradients for validity
-
-_Parameters_
-
--   _gradients_ `Array`: The array of theme gradients
-
-_Returns_
-
--   `Array`: The array of valid theme gradients or the default gradients
 
 ### Warning
 
@@ -769,4 +840,10 @@ _Parameters_
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -1,21 +1,20 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';
 import type { ItemGroupProps } from '../types';
 
 function ItemGroup(
-	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps< ItemGroupProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isBordered,

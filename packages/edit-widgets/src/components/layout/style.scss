@@ -12,10 +12,6 @@
 	padding-right: $grid-unit-10;
 	display: flex;
 	justify-content: flex-end;
-
-	@include break-medium() {
-		display: none;
-	}
 }
 
 .edit-widgets-layout__inserter-panel-content {

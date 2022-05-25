@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties } from 'react';
 
 /**
@@ -9,6 +8,7 @@ import type { CSSProperties } from 'react';
  */
 import type { Props as SurfaceProps } from '../surface/types';
 
+type DeprecatedSizeOptions = 'extraSmall';
 export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
 
 type SizeableProps = {
@@ -17,7 +17,7 @@ type SizeableProps = {
 	 *
 	 * @default 'medium'
 	 */
-	size?: SizeOptions;
+	size?: SizeOptions | DeprecatedSizeOptions;
 };
 
 export type Props = SurfaceProps &

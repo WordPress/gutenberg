@@ -16,8 +16,9 @@ const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter() {
-	const hasSelectedBlock = useSelect( ( select ) =>
-		select( blockEditorStore ).hasSelectedBlock()
+	const hasSelectedBlock = useSelect(
+		( select ) => select( blockEditorStore ).hasSelectedBlock(),
+		[]
 	);
 
 	return useRefEffect(

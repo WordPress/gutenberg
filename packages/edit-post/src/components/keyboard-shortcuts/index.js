@@ -131,44 +131,31 @@ function KeyboardShortcuts() {
 			);
 		},
 		{
-			bindGlobal: true,
 			isDisabled: isModeToggleDisabled,
 		}
 	);
 
-	useShortcut(
-		'core/edit-post/toggle-fullscreen',
-		() => {
-			toggleFeature( 'fullscreenMode' );
-		},
-		{
-			bindGlobal: true,
+	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
+		toggleFeature( 'fullscreenMode' );
+	} );
+
+	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+
+		if ( isEditorSidebarOpened() ) {
+			closeGeneralSidebar();
+		} else {
+			const sidebarToOpen = getBlockSelectionStart()
+				? 'edit-post/block'
+				: 'edit-post/document';
+			openGeneralSidebar( sidebarToOpen );
 		}
-	);
+	} );
 
-	useShortcut(
-		'core/edit-post/toggle-sidebar',
-		( event ) => {
-			// This shortcut has no known clashes, but use preventDefault to prevent any
-			// obscure shortcuts from triggering.
-			event.preventDefault();
-
-			if ( isEditorSidebarOpened() ) {
-				closeGeneralSidebar();
-			} else {
-				const sidebarToOpen = getBlockSelectionStart()
-					? 'edit-post/block'
-					: 'edit-post/document';
-				openGeneralSidebar( sidebarToOpen );
-			}
-		},
-		{ bindGlobal: true }
-	);
-
-	useShortcut(
-		'core/edit-post/toggle-list-view',
-		() => setIsListViewOpened( ! isListViewOpened() ),
-		{ bindGlobal: true }
+	useShortcut( 'core/edit-post/toggle-list-view', () =>
+		setIsListViewOpened( ! isListViewOpened() )
 	);
 
 	return null;

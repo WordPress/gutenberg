@@ -5,8 +5,8 @@ import {
 	createUpgradedEmbedBlock,
 	getClassNames,
 	fallback,
-	getAttributesFromPreview,
 	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
@@ -28,16 +28,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -109,21 +99,19 @@ const EmbedEdit = ( props ) => {
 	);
 
 	/**
-	 * @return {Object} Attributes derived from the preview, merged with the current attributes.
+	 * Returns the attributes derived from the preview, merged with the current attributes.
+	 *
+	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = () => {
-		const { allowResponsive, className } = attributes;
-		return {
-			...attributes,
-			...getAttributesFromPreview(
-				preview,
-				title,
-				className,
-				responsive,
-				allowResponsive
-			),
-		};
-	};
+	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+		getMergedAttributesWithPreview(
+			attributes,
+			preview,
+			title,
+			responsive,
+			ignorePreviousClassName
+		);
 
 	const toggleResponsive = () => {
 		const { allowResponsive, className } = attributes;
@@ -152,18 +140,15 @@ const EmbedEdit = ( props ) => {
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, attributesUrl ] );
 
-	// Handle incoming preview
+	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// Even though we set attributes that get derived from the preview,
-			// we don't access them directly because for the initial render,
-			// the `setAttributes` call will not have taken effect. If we're
-			// rendering responsive content, setting the responsive classes
-			// after the preview has been rendered can result in unwanted
-			// clipping or scrollbars. The `getAttributesFromPreview` function
-			// that `getMergedAttributes` uses is memoized so that we're not
-			// calculating them on every render.
-			setAttributes( getMergedAttributes() );
+			// When obtaining an incoming preview, we set the attributes derived from
+			// the preview data. In this case when getting the merged attributes,
+			// we ignore the previous classname because it might not match the expected
+			// classes by the new preview.
+			setAttributes( getMergedAttributes( true ) );
+
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
@@ -227,6 +212,7 @@ const EmbedEdit = ( props ) => {
 	// after the preview has been rendered can result in unwanted
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
+	// calculating them on every render.
 	const {
 		caption,
 		type,
@@ -242,7 +228,6 @@ const EmbedEdit = ( props ) => {
 				themeSupportsResponsive={ themeSupportsResponsive }
 				blockSupportsResponsive={ responsive }
 				allowResponsive={ allowResponsive }
-				getResponsiveHelp={ getResponsiveHelp }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>

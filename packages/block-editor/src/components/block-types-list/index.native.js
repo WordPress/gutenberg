@@ -22,16 +22,25 @@ import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
 
-export default function BlockTypesList( { name, items, onSelect, listProps } ) {
+export default function BlockTypesList( {
+	name,
+	items,
+	onSelect,
+	listProps,
+	initialNumToRender = 3,
+} ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onLayout
+		);
 		onLayout();
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 
@@ -76,12 +85,12 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 	return (
 		<FlatList
 			onLayout={ onLayout }
-			key={ `InserterUI-${ name }-${ numberOfColumns }` } //re-render when numberOfColumns changes
+			key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
 			data={ items }
-			initialNumToRender={ 3 }
+			initialNumToRender={ initialNumToRender }
 			ItemSeparatorComponent={ () => (
 				<TouchableWithoutFeedback accessible={ false }>
 					<View

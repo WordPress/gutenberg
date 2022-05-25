@@ -64,7 +64,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir > 0 && ! isLast ) {
-		// moving down
+		// Moving down.
 		const movementDirection = getMovementDirection( 'down' );
 
 		if ( movementDirection === 'down' ) {
@@ -105,7 +105,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir > 0 && isLast ) {
-		// moving down, and is the last item
+		// Moving down, and is the last item.
 		const movementDirection = getMovementDirection( 'down' );
 
 		if ( movementDirection === 'down' ) {
@@ -140,7 +140,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir < 0 && ! isFirst ) {
-		// moving up
+		// Moving up.
 		const movementDirection = getMovementDirection( 'up' );
 
 		if ( movementDirection === 'up' ) {
@@ -179,7 +179,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir < 0 && isFirst ) {
-		// moving up, and is the first item
+		// Moving up, and is the first item.
 		const movementDirection = getMovementDirection( 'up' );
 
 		if ( movementDirection === 'up' ) {

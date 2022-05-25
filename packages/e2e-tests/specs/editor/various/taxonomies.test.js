@@ -71,6 +71,10 @@ describe( 'Taxonomies', () => {
 
 		await openSidebarPanelWithTitle( 'Categories' );
 
+		await page.waitForSelector(
+			'.editor-post-taxonomies__hierarchical-terms-list'
+		);
+
 		// If the user has no permission to add a new category finish the test.
 		if ( ! ( await canCreatTermInTaxonomy( 'categories' ) ) ) {
 			return;
@@ -196,7 +200,7 @@ describe( 'Taxonomies', () => {
 			return;
 		}
 
-		// At the start there are no tag tokens
+		// At the start there are no tag tokens.
 		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );

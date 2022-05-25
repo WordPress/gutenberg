@@ -18,7 +18,7 @@ import CONFIG from '../utils/config-values';
 import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 export default function useGrid( props ) {
 	const {
@@ -71,6 +71,7 @@ export default function useGrid( props ) {
 		alignment,
 		className,
 		columnGap,
+		cx,
 		gap,
 		gridTemplateColumns,
 		gridTemplateRows,

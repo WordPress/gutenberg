@@ -17,7 +17,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { keyboardReturn } from '@wordpress/icons';
 
 /**
@@ -36,7 +35,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 		>
 			<input
 				className="block-editor-media-placeholder__url-input-field"
-				type="url"
+				type="text"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
@@ -64,7 +63,7 @@ export function MediaPlaceholder( {
 	accept,
 	addToGallery,
 	multiple = false,
-	dropZoneUIOnly,
+	handleUpload = true,
 	disableDropZone,
 	disableMediaButtons,
 	onError,
@@ -75,6 +74,9 @@ export function MediaPlaceholder( {
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
 	children,
+	mediaLibraryButton,
+	placeholder,
+	style,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -118,6 +120,9 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
+		if ( ! handleUpload ) {
+			return onSelect( files );
+		}
 		onFilesPreUpload( files );
 		let setMedia;
 		if ( multiple ) {
@@ -174,7 +179,7 @@ export function MediaPlaceholder( {
 		onFilesUpload( event.target.files );
 	};
 
-	const renderPlaceholder = ( content, onClick ) => {
+	const defaultRenderPlaceholder = ( content ) => {
 		let { instructions, title } = labels;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
@@ -240,15 +245,16 @@ export function MediaPlaceholder( {
 				instructions={ instructions }
 				className={ placeholderClassName }
 				notices={ notices }
-				onClick={ onClick }
 				onDoubleClick={ onDoubleClick }
 				preview={ mediaPreview }
+				style={ style }
 			>
 				{ content }
 				{ children }
 			</Placeholder>
 		);
 	};
+	const renderPlaceholder = placeholder ?? defaultRenderPlaceholder;
 
 	const renderDropZone = () => {
 		if ( disableDropZone ) {
@@ -301,7 +307,20 @@ export function MediaPlaceholder( {
 	};
 
 	const renderMediaUploadChecked = () => {
-		const mediaLibraryButton = (
+		const defaultButton = ( { open } ) => {
+			return (
+				<Button
+					variant="tertiary"
+					onClick={ () => {
+						open();
+					} }
+				>
+					{ __( 'Media Library' ) }
+				</Button>
+			);
+		};
+		const libraryButton = mediaLibraryButton ?? defaultButton;
+		const uploadMediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
@@ -313,18 +332,7 @@ export function MediaPlaceholder( {
 						? value.map( ( { id } ) => id )
 						: value.id
 				}
-				render={ ( { open } ) => {
-					return (
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								open();
-							} }
-						>
-							{ __( 'Media Library' ) }
-						</Button>
-					);
-				} }
+				render={ libraryButton }
 			/>
 		);
 
@@ -345,15 +353,16 @@ export function MediaPlaceholder( {
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
+										onClick={ openFileDialog }
 									>
 										{ __( 'Upload' ) }
 									</Button>
-									{ mediaLibraryButton }
+									{ uploadMediaLibraryButton }
 									{ renderUrlSelectionUI() }
 									{ renderCancelLink() }
 								</>
 							);
-							return renderPlaceholder( content, openFileDialog );
+							return renderPlaceholder( content );
 						} }
 					/>
 				</>
@@ -376,7 +385,7 @@ export function MediaPlaceholder( {
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
-					{ mediaLibraryButton }
+					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
 					{ renderCancelLink() }
 				</>
@@ -384,17 +393,10 @@ export function MediaPlaceholder( {
 			return renderPlaceholder( content );
 		}
 
-		return renderPlaceholder( mediaLibraryButton );
+		return renderPlaceholder( uploadMediaLibraryButton );
 	};
 
-	if ( dropZoneUIOnly || disableMediaButtons ) {
-		if ( dropZoneUIOnly ) {
-			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-				since: '5.4',
-				alternative: 'disableMediaButtons',
-			} );
-		}
-
+	if ( disableMediaButtons ) {
 		return <MediaUploadCheck>{ renderDropZone() }</MediaUploadCheck>;
 	}
 

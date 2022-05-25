@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Modal,
@@ -25,8 +25,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 import { createBlock, serialize } from '@wordpress/blocks';
 
-function PostTemplateActions() {
+function PostTemplateActions( { isPostsPage } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ isBusy, setIsBusy ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const { template, supportsTemplateMode, defaultTemplate } = useSelect(
 		( select ) => {
@@ -49,13 +50,72 @@ function PostTemplateActions() {
 		},
 		[]
 	);
-	const { __unstableSwitchToTemplateMode } = useDispatch( editPostStore );
+	const {
+		__unstableCreateTemplate,
+		__unstableSwitchToTemplateMode,
+	} = useDispatch( editPostStore );
 
 	if ( ! supportsTemplateMode ) {
 		return null;
 	}
 
 	const defaultTitle = __( 'Custom Template' );
+
+	async function onCreateTemplate( event ) {
+		event.preventDefault();
+
+		if ( isBusy ) {
+			return;
+		}
+
+		setIsBusy( true );
+
+		const newTemplateContent =
+			defaultTemplate ??
+			serialize( [
+				createBlock(
+					'core/group',
+					{
+						tagName: 'header',
+						layout: { inherit: true },
+					},
+					[
+						createBlock( 'core/site-title' ),
+						createBlock( 'core/site-tagline' ),
+					]
+				),
+				createBlock( 'core/separator' ),
+				createBlock(
+					'core/group',
+					{
+						tagName: 'main',
+					},
+					[
+						createBlock(
+							'core/group',
+							{
+								layout: { inherit: true },
+							},
+							[ createBlock( 'core/post-title' ) ]
+						),
+						createBlock( 'core/post-content', {
+							layout: { inherit: true },
+						} ),
+					]
+				),
+			] );
+
+		await __unstableCreateTemplate( {
+			slug: 'wp-custom-template-' + kebabCase( title || defaultTitle ),
+			content: newTemplateContent,
+			title: title || defaultTitle,
+		} );
+
+		setIsBusy( false );
+		setIsModalOpen( false );
+
+		__unstableSwitchToTemplateMode( true );
+	}
 
 	return (
 		<>
@@ -68,9 +128,17 @@ function PostTemplateActions() {
 						{ __( 'Edit' ) }
 					</Button>
 				) }
-				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
-					{ __( 'New' ) }
-				</Button>
+				{ ! isPostsPage && (
+					<Button
+						variant="link"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{
+							/* translators: button to create a new template */
+							_x( 'New', 'action' )
+						}
+					</Button>
+				) }
 			</div>
 			{ isModalOpen && (
 				<Modal
@@ -82,58 +150,7 @@ function PostTemplateActions() {
 					} }
 					overlayClassName="edit-post-template__modal"
 				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							const newTemplateContent =
-								defaultTemplate ??
-								serialize( [
-									createBlock(
-										'core/group',
-										{
-											tagName: 'header',
-											layout: { inherit: true },
-										},
-										[
-											createBlock( 'core/site-title' ),
-											createBlock( 'core/site-tagline' ),
-										]
-									),
-									createBlock( 'core/separator' ),
-									createBlock(
-										'core/group',
-										{
-											tagName: 'main',
-										},
-										[
-											createBlock(
-												'core/group',
-												{
-													layout: { inherit: true },
-												},
-												[
-													createBlock(
-														'core/post-title'
-													),
-												]
-											),
-											createBlock( 'core/post-content', {
-												layout: { inherit: true },
-											} ),
-										]
-									),
-								] );
-
-							__unstableSwitchToTemplateMode( {
-								slug:
-									'wp-custom-template-' +
-									kebabCase( title || defaultTitle ),
-								content: newTemplateContent,
-								title: title || defaultTitle,
-							} );
-							setIsModalOpen( false );
-						} }
-					>
+					<form onSubmit={ onCreateTemplate }>
 						<Flex align="flex-start" gap={ 8 }>
 							<FlexItem>
 								<TextControl
@@ -141,6 +158,7 @@ function PostTemplateActions() {
 									value={ title }
 									onChange={ setTitle }
 									placeholder={ defaultTitle }
+									disabled={ isBusy }
 									help={ __(
 										'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
 									) }
@@ -165,7 +183,12 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button variant="primary" type="submit">
+								<Button
+									variant="primary"
+									type="submit"
+									isBusy={ isBusy }
+									aria-disabled={ isBusy }
+								>
 									{ __( 'Create' ) }
 								</Button>
 							</FlexItem>

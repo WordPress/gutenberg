@@ -41,6 +41,8 @@ _Note:_ A block can render at most a single `InnerBlocks` and `InnerBlocks.Conte
 
 _Note:_ Because the save step will automatically apply props to the element returned by `save`, it is important to include the wrapping `div` in the above simple example even though we are applying no props of our own. In a real-world example, you may have your own attributes to apply to the saved markup, or sibling content adjacent to the rendered nested blocks.
 
+_Note:_ Inner blocks, by default, are not visible inside a WordPress excerpt. If you wish your block to appear then it needs to be returned from the `excerpt_allowed_wrapper_blocks` filter. More details can be found on the [filter reference page](https://developer.wordpress.org/reference/hooks/excerpt_allowed_wrapper_blocks/) page, as well as the [excerpt_remove_blocks](https://developer.wordpress.org/reference/functions/excerpt_remove_blocks/) page.
+
 ## Props
 
 ### `allowedBlocks`

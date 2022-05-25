@@ -38,15 +38,17 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					selectedBlockClientId &&
 					getBlockType( getBlockName( selectedBlockClientId ) ),
 				hasParents: parents.length,
-				showParentSelector: hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
+				showParentSelector:
+					hasBlockSupport(
+						parentBlockType,
+						'__experimentalParentSelector',
+						true
+					) && selectedBlockClientIds.length <= 1,
 			};
 		},
 		[]
 	);
+
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;

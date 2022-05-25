@@ -6,17 +6,15 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import { space } from '../ui/utils/space';
-import { useCx } from '../utils/hooks/use-cx';
+import { rtl, useCx } from '../utils';
 import type { Props } from './types';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
-export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
+export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
 	const {
 		className,
 		margin,
@@ -62,13 +60,13 @@ export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 				margin-bottom: ${ space( marginBottom ) };
 			`,
 		isDefined( marginLeft ) &&
-			css`
-				margin-left: ${ space( marginLeft ) };
-			`,
+			rtl( {
+				marginLeft: space( marginLeft ),
+			} )(),
 		isDefined( marginRight ) &&
-			css`
-				margin-right: ${ space( marginRight ) };
-			`,
+			rtl( {
+				marginRight: space( marginRight ),
+			} )(),
 		isDefined( padding ) &&
 			css`
 				padding: ${ space( padding ) };
@@ -92,13 +90,13 @@ export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 				padding-bottom: ${ space( paddingBottom ) };
 			`,
 		isDefined( paddingLeft ) &&
-			css`
-				padding-left: ${ space( paddingLeft ) };
-			`,
+			rtl( {
+				paddingLeft: space( paddingLeft ),
+			} )(),
 		isDefined( paddingRight ) &&
-			css`
-				padding-right: ${ space( paddingRight ) };
-			`,
+			rtl( {
+				paddingRight: space( paddingRight ),
+			} )(),
 		className
 	);
 

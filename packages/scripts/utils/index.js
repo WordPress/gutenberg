@@ -11,12 +11,14 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
-	getWebpackArgs,
-	hasBabelConfig,
 	getJestOverrideConfigFile,
+	getWebpackArgs,
+	getWebpackEntryPoints,
+	hasBabelConfig,
+	hasCssnanoConfig,
 	hasJestConfig,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 } = require( './config' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { getPackageProp, hasPackageProp } = require( './package' );
@@ -31,8 +33,10 @@ module.exports = {
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getWebpackArgs,
+	getWebpackEntryPoints,
 	hasArgInCLI,
 	hasBabelConfig,
+	hasCssnanoConfig,
 	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,

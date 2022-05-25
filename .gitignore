@@ -12,6 +12,7 @@ coverage
 *.log
 yarn.lock
 /artifacts
+/perf-envs
 
 .cache
 *.tsbuildinfo
@@ -28,3 +29,4 @@ test/native/junit.xml
 phpcs.xml
 phpunit.xml
 phpunit-watcher.yml
+.tool-versions

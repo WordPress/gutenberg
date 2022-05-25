@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+## 12.8.0 (2022-05-18)
+
+## 12.7.0 (2022-05-04)
+
+## 12.6.0 (2022-04-21)
+
+## 12.5.0 (2022-04-08)
+
+## 12.4.0 (2022-03-23)
+
+## 12.3.0 (2022-03-11)
+
+### Deprecations
+
+- Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
+
+## 12.2.0 (2022-02-10)
+
+### Enhancement
+
+-   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
+
+### Bug Fix
+
+-   Removed unused `@wordpress/autop`, `@wordpress/blob` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### Deprecations
+
+- the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
+
+## 12.1.0 (2022-01-27)
+
+## 12.0.0 (2021-10-12)
+
+### Breaking changes
+
+-   Removed the deprecated `resetAutosave` action ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+-   Removed the deprecated `getAutosave`, `hasAutosave` and `getBlockForSerialization` selectors ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change

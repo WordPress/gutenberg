@@ -2,8 +2,6 @@
  * Internal dependencies
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
-// eslint-disable-next-line no-duplicate-imports
-import type { HigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -22,12 +20,12 @@ import type { HigherOrderComponent } from '../../utils/create-higher-order-compo
  *
  * @return Higher-order component.
  */
-const ifCondition = < TProps, >(
+const ifCondition = < TProps extends Record< string, any > >(
 	predicate: ( props: TProps ) => boolean
-): HigherOrderComponent< TProps, TProps > =>
-	createHigherOrderComponent(
-		( WrappedComponent ) => ( props: TProps ) => {
-			if ( ! predicate( props ) ) {
+) =>
+	createHigherOrderComponent< {} >(
+		( WrappedComponent ) => ( props ) => {
+			if ( ! predicate( props as TProps ) ) {
 				return null;
 			}
 

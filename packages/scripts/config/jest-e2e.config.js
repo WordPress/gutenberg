@@ -9,26 +9,27 @@ const path = require( 'path' );
 const { hasBabelConfig } = require( '../utils' );
 
 const jestE2EConfig = {
-	testRunner: 'jest-circus/runner',
 	globalSetup: path.join( __dirname, 'jest-environment-puppeteer', 'setup' ),
 	globalTeardown: path.join(
 		__dirname,
 		'jest-environment-puppeteer',
 		'teardown'
 	),
-	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
-	setupFilesAfterEnv: [ 'expect-puppeteer' ],
-	testMatch: [ '**/specs/**/*.[jt]s', '**/?(*.)spec.[jt]s' ],
-	testPathIgnorePatterns: [ '/node_modules/' ],
 	reporters: [
 		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+		path.join( __dirname, 'jest-github-actions-reporter', 'index.js' ),
 	],
+	setupFilesAfterEnv: [ 'expect-puppeteer' ],
+	testEnvironment: path.join( __dirname, 'jest-environment-puppeteer' ),
+	testMatch: [ '**/specs/**/*.[jt]s?(x)', '**/?(*.)spec.[jt]s?(x)' ],
+	testPathIgnorePatterns: [ '/node_modules/' ],
+	testRunner: 'jest-circus/runner',
+	testTimeout: 30000,
 };
 
 if ( ! hasBabelConfig() ) {
 	jestE2EConfig.transform = {
-		'^.+\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
+		'\\.[jt]sx?$': path.join( __dirname, 'babel-transform' ),
 	};
 }
 

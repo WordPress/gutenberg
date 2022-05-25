@@ -42,6 +42,11 @@ export class AutosaveMonitor extends Component {
 			return;
 		}
 
+		if ( this.props.interval !== prevProps.interval ) {
+			clearTimeout( this.timerId );
+			this.setAutosaveTimer();
+		}
+
 		if ( ! this.props.isDirty ) {
 			this.needsAutosave = false;
 			return;

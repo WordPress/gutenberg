@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { Icon, wordpress } from '@wordpress/icons';
+import { Icon, wordpress, home } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ export function MoreExamplesStory() {
 				</NavigationGroup>
 				<NavigationGroup title="Items with Unusual Features">
 					<NavigationItem
+						icon={ home }
 						item="item-sub-menu"
 						navigateToMenu="sub-menu"
 						title="Sub-Menu with Custom Back Label"

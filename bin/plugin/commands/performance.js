@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { mapValues } = require( 'lodash' );
+const { mapValues, kebabCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -29,29 +29,47 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load          Load Time.
- * @property {number[]} type          Average type time.
- * @property {number[]} focus         Average block selection time.
- * @property {number[]} inserterOpen  Average time to open global inserter.
- * @property {number[]} inserterHover Average time to move mouse between two block item in the inserter.
+ * @property {number[]} serverResponse       Represents the time the server takes to respond.
+ * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number[]} type                 Average type time.
+ * @property {number[]} focus                Average block selection time.
+ * @property {number[]} inserterOpen         Average time to open global inserter.
+ * @property {number[]} inserterSearch       Average time to search the inserter.
+ * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen         Average time to open listView
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} load             Load Time.
- * @property {number=} type             Average type time.
- * @property {number=} minType          Minium type time.
- * @property {number=} maxType          Maximum type time.
- * @property {number=} focus            Average block selection time.
- * @property {number=} minFocus         Min block selection time.
- * @property {number=} maxFocus         Max block selection time.
- * @property {number=} inserterOpen     Average time to open global inserter.
- * @property {number=} minInserterOpen  Min time to open global inserter.
- * @property {number=} maxInserterOpen  Max time to open global inserter.
- * @property {number=} inserterHover    Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover Max time to move mouse between two block item in the inserter.
+ * @property {number=} serverResponse       Represents the time the server takes to respond.
+ * @property {number=} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                 Average type time.
+ * @property {number=} minType              Minimum type time.
+ * @property {number=} maxType              Maximum type time.
+ * @property {number=} focus                Average block selection time.
+ * @property {number=} minFocus             Min block selection time.
+ * @property {number=} maxFocus             Max block selection time.
+ * @property {number=} inserterOpen         Average time to open global inserter.
+ * @property {number=} minInserterOpen      Min time to open global inserter.
+ * @property {number=} maxInserterOpen      Max time to open global inserter.
+ * @property {number=} inserterSearch       Average time to open global inserter.
+ * @property {number=} minInserterSearch    Min time to open global inserter.
+ * @property {number=} maxInserterSearch    Max time to open global inserter.
+ * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen         Average time to open list view.
+ * @property {number=} minListViewOpen      Min time to open list view.
+ * @property {number=} maxListViewOpen      Max time to open list view.
  */
 
 /**
@@ -101,7 +119,12 @@ function formatTime( number ) {
  */
 function curateResults( results ) {
 	return {
-		load: average( results.load ),
+		serverResponse: average( results.serverResponse ),
+		firstPaint: average( results.firstPaint ),
+		domContentLoaded: average( results.domContentLoaded ),
+		loaded: average( results.loaded ),
+		firstContentfulPaint: average( results.firstContentfulPaint ),
+		firstBlock: average( results.firstBlock ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -111,9 +134,15 @@ function curateResults( results ) {
 		inserterOpen: average( results.inserterOpen ),
 		minInserterOpen: Math.min( ...results.inserterOpen ),
 		maxInserterOpen: Math.max( ...results.inserterOpen ),
+		inserterSearch: average( results.inserterSearch ),
+		minInserterSearch: Math.min( ...results.inserterSearch ),
+		maxInserterSearch: Math.max( ...results.inserterSearch ),
 		inserterHover: average( results.inserterHover ),
 		minInserterHover: Math.min( ...results.inserterHover ),
 		maxInserterHover: Math.max( ...results.inserterHover ),
+		listViewOpen: average( results.listViewOpen ),
+		minListViewOpen: Math.min( ...results.listViewOpen ),
+		maxListViewOpen: Math.max( ...results.listViewOpen ),
 	};
 }
 
@@ -184,10 +213,12 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	// 1- Preparing the tests directory.
-	log( '\n>> Preparing the tests directory' );
+	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
 	const baseDirectory = await git.clone( config.gitRepositoryURL );
-	const performanceTestDirectory = getRandomTemporaryPath();
+	const rootDirectory = getRandomTemporaryPath();
+	const performanceTestDirectory = rootDirectory + '/tests';
+	await runShellScript( 'mkdir -p ' + rootDirectory );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
@@ -207,19 +238,33 @@ async function runPerformanceTests( branches, options ) {
 		'npm install && npm run build:packages',
 		performanceTestDirectory
 	);
+	log( '    >> Creating the environment folders' );
+	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
 	// 2- Preparing the environment directories per branch.
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
 		log( '    >> Branch: ' + branch );
-		const environmentDirectory = getRandomTemporaryPath();
+		const environmentDirectory =
+			rootDirectory + '/envs/' + kebabCase( branch );
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
+		await runShellScript( 'mkdir ' + environmentDirectory );
 		await runShellScript(
-			'cp -R ' + baseDirectory + ' ' + environmentDirectory
+			'cp -R ' + baseDirectory + ' ' + environmentDirectory + '/plugin'
 		);
-		await setUpGitBranch( branch, environmentDirectory );
+		await setUpGitBranch( branch, environmentDirectory + '/plugin' );
+		await runShellScript(
+			'cp ' +
+				path.resolve(
+					performanceTestDirectory,
+					'bin/plugin/utils/.wp-env.performance.json'
+				) +
+				' ' +
+				environmentDirectory +
+				'/.wp-env.json'
+		);
 
 		if ( options.wpVersion ) {
 			// In order to match the topology of ZIP files at wp.org, remap .0
@@ -278,7 +323,7 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches
+		// Alternate three times between branches.
 		for ( let i = 0; i < 3; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
@@ -287,7 +332,7 @@ async function runPerformanceTests( branches, options ) {
 				log( '    >> Branch: ' + branch + ', Suite: ' + testSuite );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
-					'npm run wp-env start',
+					'../../tests/node_modules/.bin/wp-env start',
 					environmentDirectory
 				);
 				log( '        >> Running the test.' );
@@ -297,7 +342,7 @@ async function runPerformanceTests( branches, options ) {
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
-					'npm run wp-env stop',
+					'../../tests/node_modules/.bin/wp-env stop',
 					environmentDirectory
 				);
 			}
@@ -307,7 +352,22 @@ async function runPerformanceTests( branches, options ) {
 		for ( const branch of branches ) {
 			const medians = mapValues(
 				{
-					load: rawResults.map( ( r ) => r[ branch ].load ),
+					serverResponse: rawResults.map(
+						( r ) => r[ branch ].serverResponse
+					),
+					firstPaint: rawResults.map(
+						( r ) => r[ branch ].firstPaint
+					),
+					domContentLoaded: rawResults.map(
+						( r ) => r[ branch ].domContentLoaded
+					),
+					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
+					firstContentfulPaint: rawResults.map(
+						( r ) => r[ branch ].firstContentfulPaint
+					),
+					firstBlock: rawResults.map(
+						( r ) => r[ branch ].firstBlock
+					),
 					type: rawResults.map( ( r ) => r[ branch ].type ),
 					minType: rawResults.map( ( r ) => r[ branch ].minType ),
 					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
@@ -323,6 +383,15 @@ async function runPerformanceTests( branches, options ) {
 					maxInserterOpen: rawResults.map(
 						( r ) => r[ branch ].maxInserterOpen
 					),
+					inserterSearch: rawResults.map(
+						( r ) => r[ branch ].inserterSearch
+					),
+					minInserterSearch: rawResults.map(
+						( r ) => r[ branch ].minInserterSearch
+					),
+					maxInserterSearch: rawResults.map(
+						( r ) => r[ branch ].maxInserterSearch
+					),
 					inserterHover: rawResults.map(
 						( r ) => r[ branch ].inserterHover
 					),
@@ -331,6 +400,15 @@ async function runPerformanceTests( branches, options ) {
 					),
 					maxInserterHover: rawResults.map(
 						( r ) => r[ branch ].maxInserterHover
+					),
+					listViewOpen: rawResults.map(
+						( r ) => r[ branch ].listViewOpen
+					),
+					minListViewOpen: rawResults.map(
+						( r ) => r[ branch ].minListViewOpen
+					),
+					maxListViewOpen: rawResults.map(
+						( r ) => r[ branch ].maxListViewOpen
 					),
 				},
 				median
@@ -343,6 +421,11 @@ async function runPerformanceTests( branches, options ) {
 
 	// 5- Formatting the results.
 	log( '\n>> 🎉 Results.\n' );
+
+	log(
+		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
+	);
+
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 

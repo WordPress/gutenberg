@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -47,6 +48,7 @@ function RangeControl(
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -75,6 +77,14 @@ function RangeControl(
 		initial: initialPosition,
 	} );
 	const isResetPendent = useRef( false );
+
+	if ( step === 'any' ) {
+		// The tooltip and number input field are hidden when the step is "any"
+		// because the decimals get too lengthy to fit well.
+		showTooltipProp = false;
+		withInputField = false;
+	}
+
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -194,6 +204,7 @@ function RangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 		>
@@ -214,7 +225,6 @@ function RangeControl(
 						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }
-						isShiftStepEnabled={ isShiftStepEnabled }
 						label={ label }
 						max={ max }
 						min={ min }
@@ -224,7 +234,6 @@ function RangeControl(
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
-						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }
 					/>
@@ -245,16 +254,18 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
+							tooltipPosition="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }

@@ -8,7 +8,13 @@ import { text } from '@storybook/addon-knobs';
  */
 import TextHighlight from '../';
 
-export default { title: 'Components/TextHighlight', component: TextHighlight };
+export default {
+	title: 'Components/TextHighlight',
+	component: TextHighlight,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const textToMatch = text(

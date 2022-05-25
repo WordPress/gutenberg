@@ -5,7 +5,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Check whether the current document has selected text. This applies to ranges
- * of text in the document, and not selection inside <input> and <textarea>
+ * of text in the document, and not selection inside `<input>` and `<textarea>`
  * elements.
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.

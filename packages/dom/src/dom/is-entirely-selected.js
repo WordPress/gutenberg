@@ -65,9 +65,9 @@ export default function isEntirelySelected( element ) {
  * Check whether the contents of the element have been entirely selected.
  * Returns true if there is no possibility of selection.
  *
- * @param {HTMLElement|Node} query The element to check.
- * @param {HTMLElement} container The container that we suspect "query" may be a first or last child of.
- * @param {"firstChild"|"lastChild"} propName "firstChild" or "lastChild"
+ * @param {HTMLElement|Node}         query     The element to check.
+ * @param {HTMLElement}              container The container that we suspect "query" may be a first or last child of.
+ * @param {"firstChild"|"lastChild"} propName  "firstChild" or "lastChild"
  *
  * @return {boolean} True if query is a deep first/last child of container, false otherwise.
  */

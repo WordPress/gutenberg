@@ -24,6 +24,7 @@ import {
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { getFilename } from '@wordpress/url';
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
 
@@ -99,9 +100,7 @@ function TrackList( { tracks, onEditPress } ) {
 
 function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 	const { src = '', label = '', srcLang = '', kind = DEFAULT_KIND } = track;
-	const fileName = src.startsWith( 'blob:' )
-		? ''
-		: src.substring( src.lastIndexOf( '/' ) + 1 );
+	const fileName = src.startsWith( 'blob:' ) ? '' : getFilename( src ) || '';
 	return (
 		<NavigableMenu>
 			<div className="block-library-video-tracks-editor__single-track-editor">

@@ -2,12 +2,13 @@
 	margin-left: 0;
 	margin-right: 0;
 	a {
-		display: inline-block;
+		display: block;
 	}
 	img {
 		max-width: 100%;
 		width: 100%;
 		height: auto;
+		vertical-align: bottom;
 	}
 
 	&.alignwide img,

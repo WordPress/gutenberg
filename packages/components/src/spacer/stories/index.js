@@ -14,6 +14,9 @@ import { Spacer } from '..';
 export default {
 	component: Spacer,
 	title: 'Components (Experimental)/Spacer',
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const PROPS = [

@@ -1,11 +1,12 @@
-/*eslint no-console: ["error", { allow: ["warn"] }] */
+/* eslint no-console: ["error", { allow: ["warn"] }] */
 
 /**
  * External dependencies
  */
-import { View, Platform } from 'react-native';
-import { get, pickBy, debounce, isString } from 'lodash';
+import { View, Platform, Dimensions } from 'react-native';
+import { get, pickBy, debounce } from 'lodash';
 import memize from 'memize';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
@@ -15,7 +16,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls } from '@wordpress/block-editor';
+import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -42,6 +43,7 @@ import { toHTMLString } from '../to-html-string';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
+import { getFormatColors } from '../get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -49,13 +51,25 @@ const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
 };
 
+// The flattened color palettes array is memoized to ensure that the same array instance is
+// returned for the colors palettes. This value might be used as a prop, so having the same
+// instance will prevent unnecessary re-renders of the RichText component.
+const flatColorPalettes = memize( ( colorsPalettes ) => [
+	...( colorsPalettes?.theme || [] ),
+	...( colorsPalettes?.custom || [] ),
+	...( colorsPalettes?.default || [] ),
+] );
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
+	'core/text-color': 'mark',
 };
 
 const EMPTY_PARAGRAPH_TAGS = '<p></p>';
+const DEFAULT_FONT_SIZE = 16;
+const MIN_LINE_HEIGHT = 1;
 
 export class RichText extends Component {
 	constructor( {
@@ -93,7 +107,7 @@ export class RichText extends Component {
 			maxSize: 1,
 		} );
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
-		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
+		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
 			this
@@ -111,9 +125,6 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
-			this
-		);
 		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
 			this
 		);
@@ -124,6 +135,7 @@ export class RichText extends Component {
 			activeFormats: [],
 			selectedFormat: null,
 			height: 0,
+			currentFontSize: this.getFontSize( arguments[ 0 ] ),
 		};
 		this.needsSelectionUpdate = false;
 		this.savedContent = '';
@@ -144,13 +156,26 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { selectionStart: start, selectionEnd: end } = this.props;
+		const {
+			selectionStart: start,
+			selectionEnd: end,
+			colorPalette,
+		} = this.props;
 		const { value } = this.props;
+		const currentValue = this.formatToValue( value );
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
+		const newFormats = getFormatColors( value, formats, colorPalette );
 
-		return { formats, replacements, text, start, end, activeFormats };
+		return {
+			formats: newFormats,
+			replacements,
+			text,
+			start,
+			end,
+			activeFormats,
+		};
 	}
 
 	/**
@@ -179,7 +204,7 @@ export class RichText extends Component {
 	}
 
 	valueToFormat( value ) {
-		// remove the outer root tags
+		// Remove the outer root tags.
 		return this.removeRootTagsProduceByAztec(
 			toHTMLString( {
 				value,
@@ -277,13 +302,6 @@ export class RichText extends Component {
 			.replace( closingTagRegexp, '' );
 	}
 
-	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
-	convertFontSizeFromString( fontSize ) {
-		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
-			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
-			: fontSize;
-	}
-
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
@@ -301,7 +319,7 @@ export class RichText extends Component {
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // the onChange event always fires after the fact
+		this.firedAfterTextChanged = true; // The onChange event always fires after the fact.
 		this.onTextUpdate( event );
 		this.lastAztecEventType = 'input';
 	}
@@ -322,7 +340,7 @@ export class RichText extends Component {
 		const refresh = this.value !== formattedContent;
 		this.value = formattedContent;
 
-		// we don't want to refresh if our goal is just to create a record
+		// We don't want to refresh if our goal is just to create a record.
 		if ( refresh ) {
 			this.props.onChange( formattedContent );
 		}
@@ -348,7 +366,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		// Add stubs for conformance in downstream autocompleters logic
+		// Add stubs for conformance in downstream autocompleters logic.
 		this.customEditableOnKeyDown?.( {
 			preventDefault: () => undefined,
 			...event,
@@ -450,7 +468,7 @@ export class RichText extends Component {
 			const record = this.getRecord();
 			const text = getTextContent( record );
 			// Only respond to the trigger if the selection is on the start of text or line
-			// or if the character before is a space
+			// or if the character before is a space.
 			const useTrigger =
 				text.length === 0 ||
 				record.start === 0 ||
@@ -521,7 +539,7 @@ export class RichText extends Component {
 				.replace( /<[^>]+>/g, '' )
 				.trim();
 
-			// A URL was pasted, turn the selection into a link
+			// A URL was pasted, turn the selection into a link.
 			if ( isURL( trimmedText ) ) {
 				const linkedRecord = applyFormat( currentRecord, {
 					type: 'a',
@@ -571,7 +589,7 @@ export class RichText extends Component {
 	onBlur( event ) {
 		this.isTouched = false;
 
-		// Check if value is up to date with latest state of native AztecView
+		// Check if value is up to date with latest state of native AztecView.
 		if (
 			event.nativeEvent.text &&
 			event.nativeEvent.text !== this.props.value
@@ -596,7 +614,7 @@ export class RichText extends Component {
 		// This is a manual selection change event if onChange was not triggered just before
 		// and we did not just trigger a text update
 		// `onChange` could be the last event and could have been triggered a long time ago so
-		// this approach is not perfectly reliable
+		// this approach is not perfectly reliable.
 		const isManual =
 			this.lastAztecEventType !== 'input' &&
 			this.props.value === this.value;
@@ -626,11 +644,11 @@ export class RichText extends Component {
 		}
 
 		// `end` can be less than `start` on iOS
-		// Let's fix that here so `rich-text/slice` can work properly
+		// Let's fix that here so `rich-text/slice` can work properly.
 		const realStart = Math.min( start, end );
 		const realEnd = Math.max( start, end );
 
-		// check and dicsard stray event, where the text and selection is equal to the ones already cached
+		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -643,10 +661,10 @@ export class RichText extends Component {
 		}
 
 		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // Selection change event always fires after the fact
+		this.firedAfterTextChanged = true; // Selection change event always fires after the fact.
 
-		// update text before updating selection
-		// Make sure there are changes made to the content before upgrading it upward
+		// Update text before updating selection
+		// Make sure there are changes made to the content before upgrading it upward.
 		this.onTextUpdate( event );
 
 		// Aztec can send us selection change events after it has lost focus.
@@ -659,7 +677,7 @@ export class RichText extends Component {
 		if ( this.props.__unstableIsSelected ) {
 			this.onSelectionChange( realStart, realEnd );
 		}
-		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent
+		// Update lastEventCount to prevent Aztec from re-rendering the content it just sent.
 		this.lastEventCount = event.nativeEvent.eventCount;
 
 		this.lastAztecEventType = 'selection change';
@@ -707,14 +725,11 @@ export class RichText extends Component {
 
 		if ( typeof this.lastEventCount !== 'undefined' ) {
 			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
-		} else {
-			window.console.warn(
-				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
-			);
-		}
+		} // no need to bump when 'undefined' as native side won't receive the key when the value is undefined, and that will cause force updating anyway,
+		//   see https://github.com/WordPress/gutenberg/blob/82e578dcc75e67891c750a41a04c1e31994192fc/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java#L213-L215
 	}
 
-	shouldComponentUpdate( nextProps ) {
+	shouldComponentUpdate( nextProps, nextState ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
@@ -764,6 +779,23 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
+
+			// For font size changes from a prop value a force refresh
+			// is needed without the selection update.
+			if ( nextProps?.fontSize !== this.props?.fontSize ) {
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
+
+			if (
+				( nextProps?.style?.fontSize !== this.props?.style?.fontSize &&
+					nextState.currentFontSize !==
+						this.state.currentFontSize ) ||
+				nextState.currentFontSize !== this.state.currentFontSize ||
+				nextProps?.style?.lineHeight !== this.props?.style?.lineHeight
+			) {
+				this.needsSelectionUpdate = true;
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
+			}
 		}
 
 		return true;
@@ -793,6 +825,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		const { style, tagName } = this.props;
+		const { currentFontSize } = this.state;
+
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
@@ -803,7 +838,7 @@ export class RichText extends Component {
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
 			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
-			// if its internal value hasn't change. When created, default value is 0, 0
+			// if its internal value hasn't change. When created, default value is 0, 0.
 			this.onSelectionChange(
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
@@ -811,10 +846,30 @@ export class RichText extends Component {
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
 		}
+
+		// For font size values changes from the font size picker
+		// we compare previous values to refresh the selected font size,
+		// this is also used when the tag name changes
+		// e.g Heading block and a level change like h1->h2.
+		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
+		const prevFontSizeStyle = this.getParsedFontSize(
+			prevProps?.style?.fontSize
+		);
+		const isDifferentTag = prevProps.tagName !== tagName;
+		if (
+			( currentFontSize &&
+				( currentFontSizeStyle || prevFontSizeStyle ) &&
+				currentFontSizeStyle !== currentFontSize ) ||
+			isDifferentTag
+		) {
+			this.setState( {
+				currentFontSize: this.getFontSize( this.props ),
+			} );
+		}
 	}
 
 	getHtmlToRender( record, tagName ) {
-		// Save back to HTML from React tree
+		// Save back to HTML from React tree.
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
@@ -853,6 +908,132 @@ export class RichText extends Component {
 		};
 	}
 
+	getParsedFontSize( fontSize ) {
+		const { height, width } = Dimensions.get( 'window' );
+		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+
+		if ( ! fontSize ) {
+			return fontSize;
+		}
+
+		const selectedPxValue =
+			getPxFromCssUnit( fontSize, cssUnitOptions ) ?? DEFAULT_FONT_SIZE;
+
+		return parseFloat( selectedPxValue );
+	}
+
+	getFontSize( props ) {
+		const { baseGlobalStyles, tagName, fontSize, style } = props;
+		const tagNameFontSize =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.fontSize;
+
+		let newFontSize = DEFAULT_FONT_SIZE;
+
+		// For block-based themes, get the default editor font size.
+		if ( baseGlobalStyles?.typography?.fontSize && tagName === 'p' ) {
+			newFontSize = baseGlobalStyles?.typography?.fontSize;
+		}
+
+		// For block-based themes, get the default element font size
+		// e.g h1, h2.
+		if ( tagNameFontSize ) {
+			newFontSize = tagNameFontSize;
+		}
+
+		// For font size values provided from the styles,
+		// usually from values set from the font size picker.
+		if ( style?.fontSize ) {
+			newFontSize = style.fontSize;
+		}
+
+		// Fall-back to a font size provided from its props (if there's any)
+		// and there are no other default values to use.
+		if ( fontSize && ! tagNameFontSize && ! style?.fontSize ) {
+			newFontSize = fontSize;
+		}
+
+		// We need to always convert to px units because the selected value
+		// could be coming from the web where it could be stored as a different unit.
+		const selectedPxValue = this.getParsedFontSize( newFontSize );
+
+		return selectedPxValue;
+	}
+
+	getLineHeight() {
+		const { baseGlobalStyles, tagName, lineHeight, style } = this.props;
+		const tagNameLineHeight =
+			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
+		let newLineHeight;
+
+		if ( ! this.getIsBlockBasedTheme() ) {
+			return;
+		}
+
+		// For block-based themes, get the default editor line height.
+		if ( baseGlobalStyles?.typography?.lineHeight && tagName === 'p' ) {
+			newLineHeight = parseFloat(
+				baseGlobalStyles?.typography?.lineHeight
+			);
+		}
+
+		// For block-based themes, get the default element line height
+		// e.g h1, h2.
+		if ( tagNameLineHeight ) {
+			newLineHeight = parseFloat( tagNameLineHeight );
+		}
+
+		// For line height values provided from the styles,
+		// usually from values set from the line height picker.
+		if ( style?.lineHeight ) {
+			newLineHeight = parseFloat( style.lineHeight );
+		}
+
+		// Fall-back to a line height provided from its props (if there's any)
+		// and there are no other default values to use.
+		if ( lineHeight && ! tagNameLineHeight && ! style?.lineHeight ) {
+			newLineHeight = lineHeight;
+		}
+
+		// Check the final value is not over the minimum supported value.
+		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
+			newLineHeight = MIN_LINE_HEIGHT;
+		}
+
+		return newLineHeight;
+	}
+
+	getIsBlockBasedTheme() {
+		const { baseGlobalStyles } = this.props;
+
+		return (
+			baseGlobalStyles && Object.entries( baseGlobalStyles ).length !== 0
+		);
+	}
+
+	getBlockUseDefaultFont() {
+		// For block-based themes it enables using the defaultFont
+		// in Aztec for iOS so it allows customizing the font size
+		// for the Preformatted/Code and Heading blocks.
+		if ( ! this.isIOS ) {
+			return;
+		}
+
+		const { tagName } = this.props;
+		const isBlockBasedTheme = this.getIsBlockBasedTheme();
+		const tagsToMatch = /pre|h([1-6])$/gm;
+
+		return isBlockBasedTheme && tagsToMatch.test( tagName );
+	}
+
+	getLinkTextColor( defaultColor ) {
+		const { style } = this.props;
+		const customColor = style?.linkColor && colord( style.linkColor );
+
+		return customColor && customColor.isValid()
+			? customColor.toHex()
+			: defaultColor;
+	}
+
 	render() {
 		const {
 			tagName,
@@ -867,11 +1048,16 @@ export class RichText extends Component {
 			accessibilityLabel,
 			disableEditingMenu = false,
 			baseGlobalStyles,
+			selectionStart,
+			selectionEnd,
+			disableSuggestions,
 		} = this.props;
+		const { currentFontSize } = this.state;
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
 		const editableProps = this.getEditableProps();
+		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -879,19 +1065,26 @@ export class RichText extends Component {
 		);
 
 		const { color: defaultPlaceholderTextColor } = placeholderStyle;
+		const fontSize = currentFontSize;
+		const lineHeight = this.getLineHeight();
 
 		const {
 			color: defaultColor,
 			textDecorationColor: defaultTextDecorationColor,
 			fontFamily: defaultFontFamily,
 		} = getStylesFromColorScheme( styles.richText, styles.richTextDark );
+		const linkTextColor = this.getLinkTextColor(
+			defaultTextDecorationColor
+		);
 
+		const currentSelectionStart = selectionStart ?? 0;
+		const currentSelectionEnd = selectionEnd ?? 0;
 		let selection = null;
 		if ( this.needsSelectionUpdate ) {
 			this.needsSelectionUpdate = false;
 			selection = {
-				start: this.props.selectionStart,
-				end: this.props.selectionEnd,
+				start: currentSelectionStart,
+				end: currentSelectionEnd,
 			};
 
 			// On AztecAndroid, setting the caret to an out-of-bounds position will crash the editor so, let's check for some cases.
@@ -907,12 +1100,11 @@ export class RichText extends Component {
 						brBeforeParaMatches[ 0 ].match( /br/g ) || []
 					).length;
 					if ( count > 0 ) {
-						let newSelectionStart =
-							this.props.selectionStart - count;
+						let newSelectionStart = currentSelectionStart - count;
 						if ( newSelectionStart < 0 ) {
 							newSelectionStart = 0;
 						}
-						let newSelectionEnd = this.props.selectionEnd - count;
+						let newSelectionEnd = currentSelectionEnd - count;
 						if ( newSelectionEnd < 0 ) {
 							newSelectionEnd = 0;
 						}
@@ -975,12 +1167,13 @@ export class RichText extends Component {
 							: { maxWidth } ),
 						minHeight: this.state.height,
 					} }
+					blockUseDefaultFont={ blockUseDefaultFont }
 					text={ {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor:
-							style?.linkColor || defaultTextDecorationColor,
+						linkTextColor,
+						tag: tagName,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -1017,11 +1210,8 @@ export class RichText extends Component {
 					}
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
-					fontSize={
-						this.props.fontSize ||
-						( style &&
-							this.convertFontSizeFromString( style.fontSize ) )
-					}
+					fontSize={ fontSize }
+					lineHeight={ lineHeight }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
@@ -1031,20 +1221,24 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					disableAutocorrection={ this.props.disableAutocorrection }
 				/>
 				{ isSelected && (
 					<>
 						<FormatEdit
+							forwardedRef={ this._editor }
 							formatTypes={ formatTypes }
 							value={ record }
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
-						<BlockFormatControls>
-							<ToolbarButtonWithOptions
-								options={ this.suggestionOptions() }
-							/>
-						</BlockFormatControls>
+						{ ! disableSuggestions && (
+							<BlockFormatControls>
+								<ToolbarButtonWithOptions
+									options={ this.suggestionOptions() }
+								/>
+							</BlockFormatControls>
+						) }
 					</>
 				) }
 			</View>
@@ -1059,10 +1253,17 @@ RichText.defaultProps = {
 };
 
 const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
+	} = props;
 	const { formatTypes } = useFormatTypes( {
-		clientId: props.clientId,
-		identifier: props.identifier,
-		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
@@ -1079,8 +1280,14 @@ export default compose( [
 			'attributes',
 			'childrenStyles',
 		] );
-		const baseGlobalStyles = getSettings()
-			?.__experimentalGlobalStylesBaseStyles;
+
+		const settings = getSettings();
+		const baseGlobalStyles = settings?.__experimentalGlobalStylesBaseStyles;
+
+		const colorPalettes = settings?.__experimentalFeatures?.color?.palette;
+		const colorPalette = colorPalettes
+			? flatColorPalettes( colorPalettes )
+			: settings?.colors;
 
 		return {
 			areMentionsSupported:
@@ -1088,6 +1295,7 @@ export default compose( [
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 			baseGlobalStyles,
+			colorPalette,
 		};
 	} ),
 	withPreferredColorScheme,

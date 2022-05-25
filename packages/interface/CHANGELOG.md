@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 4.8.0 (2022-05-18)
+
+## 4.7.0 (2022-05-04)
+
+## 4.6.0 (2022-04-21)
+
+## 4.5.0 (2022-04-08)
+
+## 4.4.0 (2022-03-23)
+
+## 4.3.0 (2022-03-11)
+
+## 4.2.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `@wordpress/deprecated` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 4.2.0 (2022-01-27)
+
+## 4.1.0 (2021-09-09)
+
+### New Feature
+
+-   Add support for editor 'feature' preferences. Adds an `isFeatureActive` selector, a `toggleFeature` action, a `MoreMenuDropdown` component, and a `MoreMenuFeatureToggle` component. ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
+
 ## 4.0.0 (2021-07-29)
 
 ### Breaking Change

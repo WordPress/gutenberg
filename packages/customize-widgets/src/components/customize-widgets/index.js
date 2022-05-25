@@ -3,10 +3,12 @@
  */
 import { useState, useEffect, useRef, createPortal } from '@wordpress/element';
 import { SlotFillProvider, Popover } from '@wordpress/components';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
+import ErrorBoundary from '../error-boundary';
 import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
 import SidebarControls from '../sidebar-controls';
@@ -42,13 +44,15 @@ export default function CustomizeWidgets( {
 	const activeSidebar =
 		activeSidebarControl &&
 		createPortal(
-			<SidebarBlockEditor
-				key={ activeSidebarControl.id }
-				blockEditorSettings={ blockEditorSettings }
-				sidebar={ activeSidebarControl.sidebarAdapter }
-				inserter={ activeSidebarControl.inserter }
-				inspector={ activeSidebarControl.inspector }
-			/>,
+			<ErrorBoundary>
+				<SidebarBlockEditor
+					key={ activeSidebarControl.id }
+					blockEditorSettings={ blockEditorSettings }
+					sidebar={ activeSidebarControl.sidebarAdapter }
+					inserter={ activeSidebarControl.inserter }
+					inspector={ activeSidebarControl.inspector }
+				/>
+			</ErrorBoundary>,
 			activeSidebarControl.container[ 0 ]
 		);
 
@@ -64,16 +68,21 @@ export default function CustomizeWidgets( {
 		);
 
 	return (
-		<SlotFillProvider>
-			<SidebarControls
-				sidebarControls={ sidebarControls }
-				activeSidebarControl={ activeSidebarControl }
-			>
-				<FocusControl api={ api } sidebarControls={ sidebarControls }>
-					{ activeSidebar }
-					{ popover }
-				</FocusControl>
-			</SidebarControls>
-		</SlotFillProvider>
+		<ShortcutProvider>
+			<SlotFillProvider>
+				<SidebarControls
+					sidebarControls={ sidebarControls }
+					activeSidebarControl={ activeSidebarControl }
+				>
+					<FocusControl
+						api={ api }
+						sidebarControls={ sidebarControls }
+					>
+						{ activeSidebar }
+						{ popover }
+					</FocusControl>
+				</SidebarControls>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }

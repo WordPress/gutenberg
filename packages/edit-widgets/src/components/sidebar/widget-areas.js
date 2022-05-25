@@ -8,6 +8,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -47,7 +48,15 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 			<div className="edit-widgets-widget-areas__top-container">
 				<BlockIcon icon={ blockDefault } />
 				<div>
-					<p>{ description }</p>
+					<p
+						// Use `dangerouslySetInnerHTML` to keep backwards
+						// compatibility. Basic markup in the description is an
+						// established feature of WordPress.
+						// @see https://github.com/WordPress/gutenberg/issues/33106
+						dangerouslySetInnerHTML={ {
+							__html: safeHTML( description ),
+						} }
+					/>
 					{ widgetAreas?.length === 0 && (
 						<p>
 							{ __(

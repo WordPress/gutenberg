@@ -22,8 +22,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
-/* global wp */
-
 /**
  * Internal dependencies
  */
@@ -96,6 +94,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	context,
 	clientId,
 } ) {
 	const {
@@ -129,6 +128,12 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -140,6 +145,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 			} );
+
 			return;
 		}
 
@@ -183,7 +189,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':
@@ -244,7 +250,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	const isTemp = isTemporaryImage( id, url );
+	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -262,12 +268,8 @@ export function ImageEdit( {
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
+					isTemp = false;
+					onUploadError( message );
 				},
 			} );
 		}
@@ -276,14 +278,12 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! temporaryURL ) {
+		if ( isTemp ) {
+			setTemporaryURL( url );
 			return;
 		}
-
-		return () => {
-			revokeBlobURL( temporaryURL );
-		};
-	}, [ temporaryURL ] );
+		revokeBlobURL( temporaryURL );
+	}, [ isTemp, url ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -321,6 +321,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					context={ context }
 					clientId={ clientId }
 				/>
 			) }

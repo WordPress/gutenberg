@@ -56,11 +56,14 @@ class RangeTextInput extends Component {
 	}
 
 	componentDidMount() {
-		AppState.addEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription = AppState.addEventListener(
+			'change',
+			this.handleChangePixelRatio
+		);
 	}
 
 	componentWillUnmount() {
-		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
+		this.appStateChangeSubscription.remove();
 		clearTimeout( this.timeoutAnnounceValue );
 	}
 
@@ -194,6 +197,7 @@ class RangeTextInput extends Component {
 			} ),
 			{
 				width: 50 * fontScale,
+				borderRightWidth: children ? 1 : 0,
 			},
 		];
 

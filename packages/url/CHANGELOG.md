@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 3.10.0 (2022-05-18)
+
+## 3.9.0 (2022-05-04)
+
+## 3.8.0 (2022-04-21)
+
+## 3.7.0 (2022-04-08)
+
+## 3.6.0 (2022-03-23)
+
+## 3.5.0 (2022-03-11)
+
+## 3.4.0 (2022-01-27)
+
+## 3.3.0 (2021-11-07)
+
+### New Feature
+
+-   Added new `normalizePath` function ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).
+
+## 3.2.3 (2021-10-12)
+
+### Bug Fix
+
+-   Removed unused `react-native-url-polyfill` dependency ([#34687](https://github.com/WordPress/gutenberg/pull/34687)).
+
 ## 3.2.0 (2021-07-21)
 
 ## 3.1.0 (2021-05-20)

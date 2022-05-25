@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { View } from '../../view';
 
 function Item(
-	props: PolymorphicComponentProps< ItemProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps< ItemProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );
 

@@ -32,7 +32,12 @@ export const itemWrapper = css`
 	display: block;
 `;
 
-export const item = itemWrapper;
+export const item = css`
+	width: 100%;
+	display: block;
+	margin: 0;
+	color: inherit;
+`;
 
 export const bordered = css`
 	border: 1px solid ${ CONFIG.surfaceBorderColor };

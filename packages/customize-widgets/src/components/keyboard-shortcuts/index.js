@@ -10,32 +10,20 @@ import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts( { undo, redo, save } ) {
-	useShortcut(
-		'core/customize-widgets/undo',
-		( event ) => {
-			undo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/customize-widgets/undo', ( event ) => {
+		undo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/customize-widgets/redo',
-		( event ) => {
-			redo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/customize-widgets/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/customize-widgets/save',
-		( event ) => {
-			event.preventDefault();
-			save();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/customize-widgets/save', ( event ) => {
+		event.preventDefault();
+		save();
+	} );
 
 	return null;
 }

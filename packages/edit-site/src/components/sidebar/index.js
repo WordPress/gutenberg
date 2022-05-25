@@ -3,8 +3,8 @@
  */
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { cog, typography } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
+import { cog } from '@wordpress/icons';
+import { useEffect, Fragment } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
+import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import TemplateCard from './template-card';
@@ -45,6 +46,7 @@ export function SidebarComplementaryAreaFills() {
 		[]
 	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
 	useEffect( () => {
 		if ( ! isEditorSidebarOpened ) return;
 		if ( hasBlockSelection ) {
@@ -53,10 +55,21 @@ export function SidebarComplementaryAreaFills() {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
 	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
 	}
+
+	// Conditionally include NavMenu sidebar in Plugin only.
+	// Optimise for dead code elimination.
+	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
+	let MaybeNavigationMenuSidebar = Fragment;
+
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
+	}
+
 	return (
 		<>
 			<DefaultSidebar
@@ -76,12 +89,8 @@ export function SidebarComplementaryAreaFills() {
 					<InspectorSlot bubblesVirtually />
 				) }
 			</DefaultSidebar>
-			<GlobalStylesSidebar
-				identifier="edit-site/global-styles"
-				title={ __( 'Global Styles' ) }
-				closeLabel={ __( 'Close global styles sidebar' ) }
-				icon={ typography }
-			/>
+			<GlobalStylesSidebar />
+			<MaybeNavigationMenuSidebar />
 		</>
 	);
 }

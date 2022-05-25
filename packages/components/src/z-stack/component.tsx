@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref, ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -14,8 +13,7 @@ import { isValidElement } from '@wordpress/element';
  */
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../ui/context';
 import { ZStackView, ZStackChildView } from './styles';
 
 export interface ZStackProps {
@@ -32,7 +30,7 @@ export interface ZStackProps {
 	 */
 	isReversed?: boolean;
 	/**
-	 * The amount of offset between each child element.
+	 * The amount of offset between each child element. The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
 	 *
 	 * @default 0
 	 */
@@ -44,8 +42,8 @@ export interface ZStackProps {
 }
 
 function ZStack(
-	props: PolymorphicComponentProps< ZStackProps, 'div' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps< ZStackProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		children,

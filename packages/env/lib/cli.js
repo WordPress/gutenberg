@@ -14,14 +14,14 @@ const { execSync } = require( 'child_process' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 
-// Colors
+// Colors.
 const boldWhite = chalk.bold.white;
 const wpPrimary = boldWhite.bgHex( '#00669b' );
 const wpGreen = boldWhite.bgHex( '#4ab866' );
 const wpRed = boldWhite.bgHex( '#d94f4f' );
 const wpYellow = boldWhite.bgHex( '#f0b849' );
 
-// Spinner
+// Spinner.
 const withSpinner = ( command ) => ( ...args ) => {
 	const spinner = ora().start();
 	args[ 0 ].spinner = spinner;
@@ -91,6 +91,10 @@ module.exports = function cli() {
 		describe: 'Enable debug output.',
 		default: false,
 	} );
+
+	// Make sure any unknown arguments are passed to the command as arguments.
+	// This allows options to be passed to "run" without being quoted.
+	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
 
 	yargs.command(
 		'start',
@@ -171,7 +175,7 @@ module.exports = function cli() {
 				describe: 'The container to run the command on.',
 			} );
 			args.positional( 'command', {
-				type: 'string',
+				type: 'array',
 				describe: 'The command to run.',
 			} );
 		},
@@ -189,6 +193,7 @@ module.exports = function cli() {
 		'$0 run tests-cli bash',
 		'Open a bash session in the WordPress tests instance.'
 	);
+
 	yargs.command(
 		'destroy',
 		wpRed(
@@ -196,6 +201,12 @@ module.exports = function cli() {
 		),
 		() => {},
 		withSpinner( env.destroy )
+	);
+	yargs.command(
+		'install-path',
+		'Get the path where environment files are located.',
+		() => {},
+		withSpinner( env.installPath )
 	);
 
 	return yargs;

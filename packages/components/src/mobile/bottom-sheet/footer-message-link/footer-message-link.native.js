@@ -5,21 +5,22 @@ import { Text, Linking } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
 function FooterMessageLink( { href, value } ) {
+	const textStyle = usePreferredColorSchemeStyle(
+		styles.footerMessageLink,
+		styles.footerMessageLinkDark
+	);
 	return (
-		<Text
-			style={ styles.footerMessageLink }
-			onPress={ () => Linking.openURL( href ) }
-		>
+		<Text style={ textStyle } onPress={ () => Linking.openURL( href ) }>
 			{ value }
 		</Text>
 	);
 }
 
-export default withPreferredColorScheme( FooterMessageLink );
+export default FooterMessageLink;

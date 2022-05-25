@@ -101,9 +101,7 @@ export default function KeyboardShortcutHelpModal( {
 		},
 	} );
 
-	useShortcut( 'core/customize-widgets/keyboard-shortcuts', toggleModal, {
-		bindGlobal: true,
-	} );
+	useShortcut( 'core/customize-widgets/keyboard-shortcuts', toggleModal );
 
 	if ( ! isModalActive ) {
 		return null;

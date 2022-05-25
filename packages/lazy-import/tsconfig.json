@@ -2,7 +2,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "lib",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"useUnknownInCatchVariables": false
 	},
 	"include": [ "lib/**/*" ]
 }

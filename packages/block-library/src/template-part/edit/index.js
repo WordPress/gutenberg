@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -8,24 +13,31 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import {
-	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
+	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import TemplatePartPlaceholder from './placeholder';
-import TemplatePartSelection from './selection';
+import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import {
+	useAlternativeBlockPatterns,
+	useAlternativeTemplateParts,
+	useTemplatePartArea,
+} from './utils/hooks';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -34,29 +46,22 @@ export default function TemplatePartEdit( {
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
-
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
+	const [
+		isTemplatePartSelectionOpen,
+		setIsTemplatePartSelectionOpen,
+	] = useState( false );
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const {
-		isResolved,
-		innerBlocks,
-		isMissing,
-		defaultWrapper,
-		area,
-		enableSelection,
-		hasResolvedReplacements,
-	} = useSelect(
+	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
-			const {
-				getEditedEntityRecord,
-				getEntityRecords,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getEditedEntityRecord, hasFinishedResolution } = select(
+				coreStore
+			);
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -68,20 +73,6 @@ export default function TemplatePartEdit( {
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
 			const _area = entityRecord?.area || attributes.area;
-
-			// Check whether other entities exist for switching/selection.
-			const availableReplacementArgs = [
-				'postType',
-				'wp_template_part',
-				_area && 'uncategorized' !== _area && { area: _area },
-			];
-			const matchingReplacements = getEntityRecords(
-				...availableReplacementArgs
-			);
-			const _enableSelection = templatePartId
-				? matchingReplacements?.length > 1
-				: matchingReplacements?.length > 0;
-
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -89,33 +80,34 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const defaultWrapperElement = select( 'core/editor' )
-				.__experimentalGetDefaultTemplatePartAreas()
-				.find( ( { area: value } ) => value === _area )?.area_tag;
-
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && ! entityRecord,
-				defaultWrapper: defaultWrapperElement || 'div',
+				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
 				area: _area,
-				enableSelection: _enableSelection,
-				hasResolvedReplacements: hasFinishedResolution(
-					'getEntityRecords',
-					availableReplacementArgs
-				),
 			};
 		},
 		[ templatePartId, clientId ]
 	);
-
-	const blockProps = useBlockProps();
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const areaObject = useTemplatePartArea( area );
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
+		{
+			className: hasBlockOverlay
+				? 'block-editor-block-content-overlay'
+				: undefined,
+		},
+		{ __unstableIsDisabled: hasBlockOverlay }
+	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
-	const TagName = tagName || defaultWrapper;
+	const TagName = tagName || areaObject.tagName;
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -155,52 +147,38 @@ export default function TemplatePartEdit( {
 				setAttributes={ setAttributes }
 				isEntityAvailable={ isEntityAvailable }
 				templatePartId={ templatePartId }
-				defaultWrapper={ defaultWrapper }
+				defaultWrapper={ areaObject.tagName }
 			/>
 			{ isPlaceholder && (
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
+						templatePartId={ templatePartId }
 						clientId={ clientId }
 						setAttributes={ setAttributes }
-						enableSelection={ enableSelection }
-						hasResolvedReplacements={ hasResolvedReplacements }
+						onOpenSelectionModal={ () =>
+							setIsTemplatePartSelectionOpen( true )
+						}
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && enableSelection && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<Dropdown
-							className="wp-block-template-part__preview-dropdown-button"
-							contentClassName="wp-block-template-part__preview-dropdown-content"
-							position="bottom right left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									aria-expanded={ isOpen }
-									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
-								>
-									{ __( 'Replace' ) }
-								</ToolbarButton>
-							) }
-							renderContent={ ( { onClose } ) => (
-								<TemplatePartSelection
-									setAttributes={ setAttributes }
-									onClose={ onClose }
-									area={ area }
-									templatePartId={ templatePartId }
-								/>
-							) }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+			{ isEntityAvailable &&
+				hasReplacements &&
+				( area === 'header' || area === 'footer' ) && (
+					<BlockControls>
+						<ToolbarGroup className="wp-block-template-part__block-control-group">
+							<ToolbarButton
+								onClick={ () =>
+									setIsTemplatePartSelectionOpen( true )
+								}
+							>
+								{ __( 'Replace' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
-					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }
@@ -212,6 +190,30 @@ export default function TemplatePartEdit( {
 				<TagName { ...blockProps }>
 					<Spinner />
 				</TagName>
+			) }
+			{ isTemplatePartSelectionOpen && (
+				<Modal
+					className="block-editor-template-part__selection-modal"
+					title={ sprintf(
+						// Translators: %s as template part area title ("Header", "Footer", etc.).
+						__( 'Choose a %s' ),
+						areaObject.label.toLowerCase()
+					) }
+					closeLabel={ __( 'Cancel' ) }
+					onRequestClose={ () =>
+						setIsTemplatePartSelectionOpen( false )
+					}
+				>
+					<TemplatePartSelectionModal
+						templatePartId={ templatePartId }
+						clientId={ clientId }
+						area={ area }
+						setAttributes={ setAttributes }
+						onClose={ () =>
+							setIsTemplatePartSelectionOpen( false )
+						}
+					/>
+				</Modal>
 			) }
 		</RecursionProvider>
 	);

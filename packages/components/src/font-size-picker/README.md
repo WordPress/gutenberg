@@ -97,3 +97,11 @@ If `true`, the UI will contain a slider, instead of a numeric text input field. 
 -   Type: `Boolean`
 -   Required: no
 -   Default: `false`
+
+### withReset
+
+If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.
+
+-   Type: `Boolean`
+-   Required: no
+-   Default: `true`

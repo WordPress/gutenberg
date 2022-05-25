@@ -19,7 +19,7 @@ const DEFAULT_STATE = {
  *
  * @return {Object} Updated state.
  */
-export function locks( state = DEFAULT_STATE, action ) {
+export default function locks( state = DEFAULT_STATE, action ) {
 	switch ( action.type ) {
 		case 'ENQUEUE_LOCK_REQUEST': {
 			const { request } = action;
@@ -60,5 +60,3 @@ export function locks( state = DEFAULT_STATE, action ) {
 
 	return state;
 }
-
-export default locks;

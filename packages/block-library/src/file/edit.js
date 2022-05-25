@@ -22,8 +22,9 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalElementButtonClassName,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
@@ -65,9 +66,11 @@ function FileEdit( {
 	setAttributes,
 	noticeUI,
 	noticeOperations,
+	clientId,
 } ) {
 	const {
 		id,
+		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -77,7 +80,6 @@ function FileEdit( {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const [ hasError, setHasError ] = useState( false );
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
@@ -89,20 +91,20 @@ function FileEdit( {
 		[ id ]
 	);
 
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const {
+		toggleSelection,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor
+		// Upload a file drag-and-dropped into the editor.
 		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: ( message ) => {
-					setHasError( true );
-					noticeOperations.createErrorNotice( message );
-				},
+				onError: onUploadError,
 			} );
 
 			revokeBlobURL( href );
@@ -113,9 +115,16 @@ function FileEdit( {
 		}
 	}, [] );
 
+	useEffect( () => {
+		if ( ! fileId && href ) {
+			// Add a unique fileId to each file block.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
+		}
+	}, [ href, fileId, clientId ] );
+
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
-			setHasError( false );
 			const isPdf = newMedia.url.endsWith( '.pdf' );
 			setAttributes( {
 				href: newMedia.url,
@@ -129,13 +138,13 @@ function FileEdit( {
 	}
 
 	function onUploadError( message ) {
-		setHasError( true );
+		setAttributes( { href: undefined } );
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
 	}
 
 	function changeLinkDestinationOption( newHref ) {
-		// Choose Media File or Attachment Page (when file is in Media Library)
+		// Choose Media File or Attachment Page (when file is in Media Library).
 		setAttributes( { textLinkHref: newHref } );
 	}
 
@@ -188,7 +197,7 @@ function FileEdit( {
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
-	if ( ! href || hasError ) {
+	if ( ! href ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -289,11 +298,14 @@ function FileEdit( {
 								'wp-block-file__button-richtext-wrapper'
 							}
 						>
-							{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
+							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
-								tagName="div" // must be block-level or else cursor disappears
+								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ 'wp-block-file__button' }
+								className={ classnames(
+									'wp-block-file__button',
+									__experimentalElementButtonClassName
+								) }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }

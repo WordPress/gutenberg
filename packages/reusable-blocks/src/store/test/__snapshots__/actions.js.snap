@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Actions __experimentalConvertBlockToStatic should convert a static reusable into a static block 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "name": "Big Bird",
+    },
+    "innerBlocks": Array [
+      Object {
+        "attributes": Object {
+          "name": "Oscar the Grouch",
+        },
+        "innerBlocks": Array [],
+        "isValid": true,
+        "name": "core/test-block",
+        "originalContent": "",
+        "validationIssues": Array [],
+      },
+      Object {
+        "attributes": Object {
+          "name": "Cookie Monster",
+        },
+        "innerBlocks": Array [],
+        "isValid": true,
+        "name": "core/test-block",
+        "originalContent": "",
+        "validationIssues": Array [],
+      },
+    ],
+    "isValid": true,
+    "name": "core/test-block",
+    "originalContent": "",
+    "validationIssues": Array [],
+  },
+]
+`;
+
+exports[`Actions __experimentalConvertBlocksToReusable should convert a static block into a reusable block 1`] = `
+Array [
+  Object {
+    "attributes": Object {
+      "ref": "new-id",
+    },
+    "innerBlocks": Array [],
+    "isValid": true,
+    "name": "core/block",
+  },
+]
+`;

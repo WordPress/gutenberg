@@ -16,10 +16,6 @@
 	padding-right: $grid-unit-10;
 	display: flex;
 	justify-content: flex-end;
-
-	@include break-medium() {
-		display: none;
-	}
 }
 
 .edit-site-editor__inserter-panel-content,

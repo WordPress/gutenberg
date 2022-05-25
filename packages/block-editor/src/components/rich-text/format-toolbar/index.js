@@ -3,6 +3,7 @@
  */
 
 import { orderBy } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -20,22 +21,40 @@ const POPOVER_PROPS = {
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link', 'text-color' ].map( ( format ) => (
+			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
 				<Slot
 					name={ `RichText.ToolbarControls.${ format }` }
 					key={ format }
 				/>
 			) ) }
 			<Slot name="RichText.ToolbarControls">
-				{ ( fills ) =>
-					fills.length !== 0 && (
+				{ ( fills ) => {
+					if ( ! fills.length ) {
+						return null;
+					}
+
+					const allProps = fills.map( ( [ { props } ] ) => props );
+					const hasActive = allProps.some(
+						( { isActive } ) => isActive
+					);
+
+					return (
 						<ToolbarItem>
 							{ ( toggleProps ) => (
 								<DropdownMenu
 									icon={ chevronDown }
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'More' ) }
-									toggleProps={ toggleProps }
+									toggleProps={ {
+										...toggleProps,
+										className: classnames(
+											toggleProps.className,
+											{ 'is-pressed': hasActive }
+										),
+										describedBy: __(
+											'Displays more block tools'
+										),
+									} }
 									controls={ orderBy(
 										fills.map( ( [ { props } ] ) => props ),
 										'title'
@@ -44,8 +63,8 @@ const FormatToolbar = () => {
 								/>
 							) }
 						</ToolbarItem>
-					)
-				}
+					);
+				} }
 			</Slot>
 		</>
 	);

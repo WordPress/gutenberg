@@ -10,24 +10,22 @@ const postcss = require( 'postcss' );
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
 const {
 	NODE_ENV: mode = 'development',
-	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
+	WP_DEVTOOL: devtool = 'source-map',
 } = process.env;
 
 const baseConfig = {
+	target: 'browserslist',
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: mode !== 'production',
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
@@ -46,7 +44,7 @@ const baseConfig = {
 	mode,
 	module: {
 		rules: compact( [
-			mode !== 'production' && {
+			{
 				test: /\.js$/,
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
@@ -54,7 +52,10 @@ const baseConfig = {
 		] ),
 	},
 	watchOptions: {
-		ignored: [ '**/node_modules', '**/packages/*/src' ],
+		ignored: [
+			'**/node_modules',
+			'**/packages/*/src/**/*.{js,ts,tsx,scss}',
+		],
 		aggregateTimeout: 500,
 	},
 	devtool,
@@ -65,15 +66,10 @@ const plugins = [
 	// content as a convenient interactive zoomable treemap.
 	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 	new DefinePlugin( {
-		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-		'process.env.GUTENBERG_PHASE': JSON.stringify(
-			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
-		),
-		'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
-			process.env.FORCE_REDUCED_MOTION
-		),
+		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
+		'process.env.IS_GUTENBERG_PLUGIN':
+			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
 	} ),
-	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];
 

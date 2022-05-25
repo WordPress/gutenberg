@@ -3,7 +3,7 @@
  */
 import {
 	RangeControl,
-	__experimentalParseUnit as parseUnit,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -53,11 +53,14 @@ export default function BorderRadiusControl( { onChange, values } ) {
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
+
 	const unit = getAllUnit( values );
 	const unitConfig = units && units.find( ( item ) => item.value === unit );
 	const step = unitConfig?.step || 1;
 
-	const [ allValue ] = parseUnit( getAllValue( values ) );
+	const [ allValue ] = parseQuantityAndUnitFromRawValue(
+		getAllValue( values )
+	);
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
@@ -76,12 +79,11 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							values={ values }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
-							unit={ unit }
 							units={ units }
 						/>
 						<RangeControl
 							className="components-border-radius-control__range-control"
-							value={ allValue }
+							value={ allValue ?? '' }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							max={ MAX_BORDER_RADIUS_VALUES[ unit ] }
 							initialPosition={ 0 }

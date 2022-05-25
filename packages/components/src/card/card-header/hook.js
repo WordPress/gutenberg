@@ -11,7 +11,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
  */
 export function useCardHeader( props ) {
 	const {
@@ -37,7 +37,7 @@ export function useCardHeader( props ) {
 				'components-card__header',
 				className
 			),
-		[ className, isBorderless, isShady, size ]
+		[ className, cx, isBorderless, isShady, size ]
 	);
 
 	return {

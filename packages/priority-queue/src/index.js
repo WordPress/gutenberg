@@ -38,9 +38,10 @@ import requestIdleCallback from './request-idle-callback';
  *
  * @typedef {Object} WPPriorityQueue
  *
- * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
- * @property {WPPriorityQueueFlush} flush Flush queue for context.
- * @property {WPPriorityQueueReset} reset Reset queue.
+ * @property {WPPriorityQueueAdd}   add    Add callback to queue for context.
+ * @property {WPPriorityQueueFlush} flush  Flush queue for context.
+ * @property {WPPriorityQueueFlush} cancel Clear queue for context.
+ * @property {WPPriorityQueueReset} reset  Reset queue.
  */
 
 /**
@@ -152,6 +153,29 @@ export const createQueue = () => {
 	};
 
 	/**
+	 * Clears the queue for a given context, cancelling the callbacks without
+	 * executing them. Returns `true` if there were scheduled callbacks to cancel,
+	 * or `false` if there was is no queue for the given context.
+	 *
+	 * @type {WPPriorityQueueFlush}
+	 *
+	 * @param {WPPriorityQueueContext} element Context object.
+	 *
+	 * @return {boolean} Whether any callbacks got cancelled.
+	 */
+	const cancel = ( element ) => {
+		if ( ! elementsMap.has( element ) ) {
+			return false;
+		}
+
+		const index = waitingList.indexOf( element );
+		waitingList.splice( index, 1 );
+		elementsMap.delete( element );
+
+		return true;
+	};
+
+	/**
 	 * Reset the queue without running the pending callbacks.
 	 *
 	 * @type {WPPriorityQueueReset}
@@ -165,6 +189,7 @@ export const createQueue = () => {
 	return {
 		add,
 		flush,
+		cancel,
 		reset,
 	};
 };

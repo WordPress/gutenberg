@@ -53,7 +53,7 @@ Install the module
 npm install @wordpress/compose --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## API
 
@@ -79,12 +79,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
+-   _mapComponent_ `HigherOrderComponent< HOCProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
+-   Component class with generated display name assigned.
 
 ### ifCondition
 
@@ -109,16 +109,12 @@ _Parameters_
 
 _Returns_
 
--   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
+-   Higher-order component.
 
 ### pure
 
 Given a component returns the enhanced component augmented with a component
-only rerendering when its props/state change
-
-_Type_
-
--   `SimpleHigherOrderComponent`
+only re-rendering when its props/state change
 
 ### useAsyncList
 
@@ -128,6 +124,7 @@ This behavior is useful if we want to render a list of items asynchronously for 
 _Parameters_
 
 -   _list_ `T[]`: Source array.
+-   _config_ `AsyncListConfig`: Configuration object.
 
 _Returns_
 
@@ -185,7 +182,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
+-   `import('react').Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -206,7 +203,49 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Debounced function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+
+### useDisabled
+
+In some circumstances, such as block previews, all focusable DOM elements
+(input fields, links, buttons, etc.) need to be disabled. This hook adds the
+behavior to disable nested DOM elements to the returned ref.
+
+_Usage_
+
+```js
+import { useDisabled } from '@wordpress/compose';
+const DisabledExample = () => {
+	const disabledRef = useDisabled();
+	return (
+		<div ref={ disabledRef }>
+			<a href="#">This link will have tabindex set to -1</a>
+			<input
+				placeholder="This input will have the disabled attribute added to it."
+				type="text"
+			/>
+		</div>
+	);
+};
+```
+
+_Parameters_
+
+-   _config_ `Object`: Configuration object.
+-   _config.isDisabled_ `boolean=`: Whether the element should be disabled.
+
+_Returns_
+
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
+
+### useFocusableIframe
+
+Dispatches a bubbling focus event when the iframe receives focus. Use
+`onFocus` as usual on the iframe or a parent element.
+
+_Returns_
+
+-   `Object`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 
@@ -398,7 +437,7 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
 -   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
@@ -408,14 +447,7 @@ _Returns_
 ### useResizeObserver
 
 Hook which allows to listen the resize event of any target element when it changes sizes.
-_Note: `useResizeObserver` will report `null` until after first render_
-
-Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
-for more details.
-
-_Related_
-
--   <https://github.com/FezVrasta/react-resize-aware>
+\_Note: `useResizeObserver` will report `null` until after first render.
 
 _Usage_
 
@@ -451,7 +483,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Throttled function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
 
 ### useViewportMatch
 
@@ -518,18 +550,10 @@ _Returns_
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
-_Type_
-
--   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
-
 ### withSafeTimeout
 
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
-
-_Type_
-
--   `PropInjectingHigherOrderComponent< TimeoutProps >`
 
 ### withState
 
@@ -548,4 +572,10 @@ _Returns_
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

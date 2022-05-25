@@ -6,7 +6,7 @@ import { dropRight, times, map, compact, delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
@@ -190,9 +190,14 @@ function ColumnsEditContainer( {
 		return innerWidths.map( ( column, index ) => {
 			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
+			const label = sprintf(
+				/* translators: %d: column index. */
+				__( 'Column %d' ),
+				index + 1
+			);
 			return (
 				<UnitControl
-					label={ `Column ${ index + 1 }` }
+					label={ label }
 					settingLabel="Width"
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length
@@ -274,7 +279,7 @@ function ColumnsEditContainer( {
 						orientation={
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
-						horizontal={ true }
+						horizontal={ columnsInRow > 1 }
 						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }
@@ -312,7 +317,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
 
-			// Update all child Column Blocks to match
+			// Update all child Column Blocks to match.
 			const innerBlockClientIds = getBlockOrder( clientId );
 			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
 				updateBlockAttributes( innerBlockClientId, {
@@ -354,7 +359,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
 
-			// Get verticalAlignment from Columns block to set the same to new Column
+			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId ) || {};
 
 			if ( isAddingColumn && hasExplicitWidths ) {
@@ -416,7 +421,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				blockEditorStore
 			);
 
-			// Get verticalAlignment from Columns block to set the same to new Column
+			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId );
 
 			const innerBlocks = getBlocks( clientId );

@@ -34,45 +34,14 @@
 		// Reference element for the block popover position.
 		position: relative;
 
-		// The 10px match that of similar settings pages.
-		padding: $grid-unit-15 10px 10px 10px;
-
-		@include break-medium() {
-			// Provide space for the floating block toolbar.
-			padding-top: $navigation-editor-spacing-top;
-		}
-
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
 		// deselection to work.
 		flex-grow: 1;
 	}
 
-	.interface-interface-skeleton__header {
-		border-bottom-color: transparent;
-	}
-
-	// Force the sidebar to the right side of the screen on larger
-	// breakpoints.
-	&.has-permanent-sidebar .interface-interface-skeleton__sidebar {
-		position: fixed !important;
-		top: $grid-unit-40;
-		right: 0;
-		bottom: 0;
-		left: auto;
-
-		// Hide the toggle as the sidebar should be permanently open.
-		.edit-navigation-sidebar__panel-tabs > button {
-			display: none;
-		}
-	}
-
 	.edit-navigation-header {
 		background: $white;
-
-		@include break-medium() {
-			background: transparent;
-		}
 	}
 }
 

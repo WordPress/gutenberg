@@ -20,7 +20,7 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { stack } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,6 +38,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
+		canRemove,
 		hasBlockStyles,
 		icon,
 		blockTitle,
@@ -50,6 +51,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				__experimentalGetPatternTransformItems,
 			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType } = select( blocksStore );
+			const { canRemoveBlocks } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
 			);
@@ -67,16 +69,17 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType
 					? getBlockType( firstBlockName )?.icon
-					: stack;
+					: copy;
 			}
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
 					rootClientId
 				),
+				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
-				blockTitle: getBlockType( firstBlockName ).title,
+				blockTitle: getBlockType( firstBlockName )?.title,
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId
@@ -95,8 +98,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) =>
 		replaceBlocks( clientIds, transformedBlocks );
-	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
-	const hasPatternTransformation = !! patterns?.length;
+	const hasPossibleBlockTransformations =
+		!! possibleBlockTransformations.length && canRemove;
+	const hasPatternTransformation = !! patterns?.length && canRemove;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
 			<ToolbarGroup>
@@ -104,7 +108,19 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
 					title={ blockTitle }
-					icon={ <BlockIcon icon={ icon } showColors /> }
+					icon={
+						<>
+							<BlockIcon icon={ icon } showColors />
+							{ ( isReusable || isTemplate ) && (
+								<span className="block-editor-block-switcher__toggle-text">
+									<BlockTitle
+										clientId={ clientIds }
+										maximumLength={ 35 }
+									/>
+								</span>
+							) }
+						</>
+					}
 				/>
 			</ToolbarGroup>
 		);
@@ -154,7 +170,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 								/>
 								{ ( isReusable || isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
-										<BlockTitle clientId={ clientIds } />
+										<BlockTitle
+											clientId={ clientIds }
+											maximumLength={ 35 }
+										/>
 									</span>
 								) }
 							</>

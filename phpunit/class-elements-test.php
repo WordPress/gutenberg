@@ -13,7 +13,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 	 * @return string                String where the unique id classes were replaced with "wp-elements-1".
 	 */
 	private static function make_unique_id_one( $string ) {
-		return preg_replace( '/wp-elements-.{13}/', 'wp-elements-1', $string );
+		return preg_replace( '/wp-elements-[a-zA-Z0-9]+/', 'wp-elements-1', $string );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: var(--wp--preset--color--subtle-background) !important;}</style>' . "\n"
+			'<p class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
 
@@ -71,7 +71,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p class="wp-elements-1 has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: red !important;}</style>' . "\n"
+			'<p class="wp-elements-1 has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
 
@@ -100,7 +100,8 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 		);
 		$this->assertSame(
 			$result,
-			'<p id="anchor" class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p><style>.wp-elements-1 a{color: #fff000 !important;}</style>' . "\n"
+			'<p id="anchor" class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
+
 }

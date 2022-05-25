@@ -13,7 +13,7 @@ import { getPhrasingContentSchema } from '@wordpress/dom';
  * Internal dependencies
  */
 import { htmlToBlocks } from './html-to-blocks';
-import { parseWithGrammar } from '../parser';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import listReducer from './list-reducer';
@@ -43,7 +43,7 @@ export function deprecatedGetPhrasingContentSchema( context ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+		return parse( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched

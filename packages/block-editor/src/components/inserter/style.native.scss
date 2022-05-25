@@ -1,14 +1,40 @@
 /** @format */
 
-.addBlockButton {
-	color: $blue-wordpress;
+.inserter-menu__add-block-button-icon {
+	color: $blue-50;
 }
 
-.addBlockButtonDark {
+.inserter-menu__add-block-button-icon--dark {
 	color: $blue-30;
 }
 
-.list {
+.inserter-menu__add-block-button-icon--expanded {
+	color: $white;
+}
+
+.inserter-menu__add-block-button {
+	border-radius: 22px;
+	background-color: $blue-50;
+	margin: 8px;
+	padding: 6px 16px 6px 12px;
+}
+
+.inserter-menu__add-block-button--dark {
+	background-color: $blue-30;
+}
+
+.inserter-menu__add-block-button-text {
+	color: $white;
+	font-weight: 500;
+	align-self: center;
+	text-transform: capitalize;
+}
+
+.inserter-menu__list-wrapper {
+	flex: 1;
+}
+
+.inserter-menu__list {
 	padding-bottom: 20;
 	padding-top: 8;
 }
@@ -51,13 +77,12 @@
 
 .inserter-tabs__wrapper {
 	overflow: hidden;
+	flex: 1;
 }
 
 .inserter-tabs__container {
 	height: 100%;
 	width: 100%;
-}
-
-.inserter-tabs__item {
-	position: absolute;
+	flex: 1;
+	flex-direction: row;
 }

@@ -14,7 +14,7 @@ import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import NavigationHeader from '../bottom-sheet/navigation-header';
+import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
 const FocalPointSettingsPanelMemo = memo(
@@ -43,12 +43,17 @@ const FocalPointSettingsPanelMemo = memo(
 
 		return (
 			<SafeAreaView style={ styles.safearea }>
-				<NavigationHeader
-					screen={ __( 'Edit focal point' ) }
-					leftButtonOnPress={ () => onButtonPress( 'cancel' ) }
-					applyButtonOnPress={ () => onButtonPress( 'apply' ) }
-					isFullscreen
-				/>
+				<NavBar>
+					<NavBar.DismissButton
+						onPress={ () => onButtonPress( 'cancel' ) }
+					/>
+					<NavBar.Heading>
+						{ __( 'Edit focal point' ) }
+					</NavBar.Heading>
+					<NavBar.ApplyButton
+						onPress={ () => onButtonPress( 'apply' ) }
+					/>
+				</NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ setPosition }

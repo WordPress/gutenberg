@@ -25,7 +25,7 @@ function PostAuthorEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const isDescendentOfQueryLoop = !! queryId;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(
@@ -69,29 +69,31 @@ function PostAuthorEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Author Settings' ) }>
-					{ ! isDescendentOfQueryLoop && !! authors?.length && (
-						<SelectControl
-							label={ __( 'Author' ) }
-							value={ authorId }
-							options={ authors.map( ( { id, name } ) => {
-								return {
-									value: id,
-									label: name,
-								};
-							} ) }
-							onChange={ ( nextAuthorId ) => {
-								editEntityRecord(
-									'postType',
-									postType,
-									postId,
-									{
-										author: nextAuthorId,
-									}
-								);
-							} }
-						/>
-					) }
+				<PanelBody title={ __( 'Settings' ) }>
+					{ !! postId &&
+						! isDescendentOfQueryLoop &&
+						!! authors?.length && (
+							<SelectControl
+								label={ __( 'Author' ) }
+								value={ authorId }
+								options={ authors.map( ( { id, name } ) => {
+									return {
+										value: id,
+										label: name,
+									};
+								} ) }
+								onChange={ ( nextAuthorId ) => {
+									editEntityRecord(
+										'postType',
+										postType,
+										postId,
+										{
+											author: nextAuthorId,
+										}
+									);
+								} }
+							/>
+						) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }

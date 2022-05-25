@@ -12,6 +12,9 @@ import { Grid } from '..';
 export default {
 	component: Grid,
 	title: 'Components (Experimental)/Grid',
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 const Item = ( props ) => (

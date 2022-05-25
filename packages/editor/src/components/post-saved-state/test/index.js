@@ -23,13 +23,13 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
 
 jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -48,7 +48,7 @@ describe( 'PostSavedState', () => {
 		expect( wrapper.text() ).toContain( 'Saving' );
 	} );
 
-	it( 'returns null if the post is not saveable', () => {
+	it( 'returns a disabled button if the post is not saveable', () => {
 		useSelect.mockImplementation( () => ( {
 			isDirty: false,
 			isNew: true,
@@ -58,7 +58,7 @@ describe( 'PostSavedState', () => {
 
 		const wrapper = shallow( <PostSavedState /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'returns a switch to draft link if the post is published', () => {

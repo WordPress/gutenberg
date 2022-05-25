@@ -125,18 +125,18 @@ describe( 'getGlobalStyles', () => {
 
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
-				colors: RAW_FEATURES.color,
-				gradients,
 				__experimentalFeatures: {
 					color: {
 						palette: RAW_FEATURES.color.palette,
 						gradients,
+						text: true,
+						background: true,
+						defaultPalette: true,
+						defaultGradients: true,
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,
-						custom: {
-							'line-height': RAW_FEATURES.custom[ 'line-height' ],
-						},
+						customLineHeight: RAW_FEATURES.custom[ 'line-height' ],
 					},
 				},
 				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,

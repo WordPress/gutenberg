@@ -20,8 +20,8 @@ import CONFIG from '../../utils/config-values';
 import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                              forwardedRef
+ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+ * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
  */
 function Card( props, forwardedRef ) {
 	const {
@@ -38,7 +38,7 @@ function Card( props, forwardedRef ) {
 
 	const elevationClassName = useMemo(
 		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
-		[ elevationBorderRadius ]
+		[ cx, elevationBorderRadius ]
 	);
 
 	const contextProviderValue = useMemo( () => {

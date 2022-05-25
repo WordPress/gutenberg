@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -6,6 +11,7 @@ import {
 	Disabled,
 	PanelBody,
 	SelectControl,
+	Spinner,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -20,10 +26,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -34,6 +40,7 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
+	className,
 	noticeOperations,
 	setAttributes,
 	onReplace,
@@ -42,7 +49,7 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const blockProps = useBlockProps();
+	const isTemporaryAudio = ! id && isBlobURL( src );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -55,13 +62,8 @@ function AudioEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						noticeOperations.createErrorNotice( e );
-					},
+					onFileChange: ( [ media ] ) => onSelectAudio( media ),
+					onError: ( e ) => onUploadError( e ),
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -82,7 +84,7 @@ function AudioEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -101,18 +103,26 @@ function AudioEdit( {
 			: null;
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( { src: undefined, id: undefined } );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
 		setAttributes( { src: media.url, id: media.id } );
 	}
+
+	const classes = classnames( className, {
+		'is-transient': isTemporaryAudio,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
 	if ( ! src ) {
 		return (
 			<div { ...blockProps }>
@@ -144,7 +154,7 @@ function AudioEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Audio settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
@@ -157,7 +167,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
-						label={ __( 'Preload' ) }
+						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
 						onChange={ ( value ) =>
@@ -169,7 +179,10 @@ function AudioEdit( {
 							{ value: '', label: __( 'Browser default' ) },
 							{ value: 'auto', label: __( 'Auto' ) },
 							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: __( 'None' ) },
+							{
+								value: 'none',
+								label: _x( 'None', 'Preload value' ),
+							},
 						] }
 					/>
 				</PanelBody>
@@ -183,6 +196,7 @@ function AudioEdit( {
 				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
+				{ isTemporaryAudio && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
@@ -194,7 +208,9 @@ function AudioEdit( {
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

@@ -7,12 +7,17 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
@@ -127,7 +132,8 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+
+		AztecInputState.blur( this.aztecViewRef.current );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -170,7 +176,7 @@ class AztecView extends Component {
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
 			this.props.onCaretVerticalPositionChange(
-				event.target,
+				event.nativeEvent.target,
 				caretY,
 				this.selectionEndCaretY
 			);
@@ -179,22 +185,22 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+		AztecInputState.blur( this.aztecViewRef.current );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( this.aztecViewRef.current );
+		AztecInputState.focus( this.aztecViewRef.current );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedInput();
-		return focusedField && focusedField === this.aztecViewRef.current;
+		const focusedElement = AztecInputState.getCurrentFocusedElement();
+		return focusedElement && focusedElement === this.aztecViewRef.current;
 	}
 
 	_onPress( event ) {
 		if ( ! this.isFocused() ) {
 			this.focus(); // Call to move the focus in RN way (TextInputState)
-			this._onFocus( event ); // Check if there are listeners set on the focus event
+			this._onFocus( event ); // Check if there are listeners set on the focus event.
 		}
 	}
 
@@ -220,10 +226,8 @@ class AztecView extends Component {
 			window.console.warn(
 				"Removing lineHeight style as it's not supported by native AztecView"
 			);
-			// IMPORTANT: Current Gutenberg implementation is supporting line-height without unit e.g. 'line-height':1.5
-			// and library which we are using to convert css to react-native requires unit to be included with dimension
-			// https://github.com/kristerkari/css-to-react-native-transform/blob/945866e84a505fdfb1a43b03ebe4bd32784a7f22/src/index.spec.js#L1234
-			// which means that we would need to patch the library if we want to support line-height from native AztecView in the future.
+			// Prevents passing line-heigth within styles to avoid a crash due to values without units
+			// We now support this but passing line-height as a prop instead.
 		}
 
 		return (
@@ -252,5 +256,7 @@ class AztecView extends Component {
 }
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
+
+AztecView.InputState = AztecInputState;
 
 export default AztecView;

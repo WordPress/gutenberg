@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
-	PanelBody,
 	ToggleControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -22,6 +22,11 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useOnEnter } from './use-enter';
 
 const name = 'core/paragraph';
 
@@ -57,6 +62,7 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
+		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
@@ -81,8 +87,16 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			{ isDropCapFeatureEnabled && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Text settings' ) }>
+				<InspectorControls __experimentalGroup="typography">
+					<ToolsPanelItem
+						hasValue={ () => !! dropCap }
+						label={ __( 'Drop cap' ) }
+						onDeselect={ () =>
+							setAttributes( { dropCap: undefined } )
+						}
+						resetAllFilter={ () => ( { dropCap: undefined } ) }
+						panelId={ clientId }
+					>
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
 							checked={ !! dropCap }
@@ -97,7 +111,7 @@ function ParagraphBlock( {
 									  )
 							}
 						/>
-					</PanelBody>
+					</ToolsPanelItem>
 				</InspectorControls>
 			) }
 			<RichText

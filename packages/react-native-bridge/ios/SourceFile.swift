@@ -20,11 +20,26 @@ public struct SourceFile {
         self.bundle = bundle
     }
 
-    func getContent() throws -> String {
+    public func getContent() throws -> String {
         guard let path = bundle.path(forResource: name, ofType: type.rawValue) else {
             throw SourceFileError.sourceFileNotFound("\(name).\(type)")
         }
         return try String(contentsOfFile: path, encoding: .utf8)
+    }
+}
+
+extension SourceFile {
+    public func jsScript(with argument: String? = nil) throws -> WKUserScript {
+        let content = try getContent()
+        let formatted = String(format: content, argument ?? [])
+        
+        switch self.type {
+        case .css:
+            let injectCssScriptTemplate = "window.injectCss(`%@`)"
+            return String(format: injectCssScriptTemplate, formatted).toJsScript()
+        case .js, .json:
+            return formatted.toJsScript()
+        }
     }
 }
 

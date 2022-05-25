@@ -16,6 +16,8 @@ import {
 	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -48,12 +50,14 @@ export default function WidgetAreasBlockEditorProvider( {
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
 				: [],
-			isFixedToolbarActive: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'fixedToolbar' ),
-			keepCaretInsideBlock: select(
-				editWidgetsStore
-			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+			isFixedToolbarActive: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'keepCaretInsideBlock'
+			),
 		} ),
 		[]
 	);
@@ -97,7 +101,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<>
+		<ShortcutProvider>
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
@@ -113,6 +117,6 @@ export default function WidgetAreasBlockEditorProvider( {
 					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
 				</BlockEditorProvider>
 			</SlotFillProvider>
-		</>
+		</ShortcutProvider>
 	);
 }

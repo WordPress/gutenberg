@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 11.8.0 (2022-05-18)
+
+## 11.7.0 (2022-05-04)
+
+## 11.6.0 (2022-04-21)
+
+## 11.5.0 (2022-04-08)
+
+## 11.4.0 (2022-03-23)
+
+## 11.3.0 (2022-03-11)
+
+## 11.2.0 (2022-01-27)
+
+## 11.1.0 (2021-09-09)
+
+### Backward Compatibility
+
+-   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
+
+### New API
+
+-   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
+
 ## 11.0.0 (2021-07-29)
 
 ### Breaking Change

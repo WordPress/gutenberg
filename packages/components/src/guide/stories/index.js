@@ -15,7 +15,13 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import Guide from '../';
 
-export default { title: 'Components/Guide', component: Guide };
+export default {
+	title: 'Components/Guide',
+	component: Guide,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 const ModalExample = ( { numberOfPages, ...props } ) => {
 	const [ isOpen, setOpen ] = useState( false );

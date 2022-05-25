@@ -96,6 +96,16 @@ const deprecated = [
 			},
 		},
 
+		migrate( attributes ) {
+			if ( ! isNaN( parseInt( attributes.style ) ) ) {
+				return {
+					...omit( attributes, [ 'style' ] ),
+				};
+			}
+
+			return attributes;
+		},
+
 		save( { attributes } ) {
 			const { align, value, citation, style } = attributes;
 

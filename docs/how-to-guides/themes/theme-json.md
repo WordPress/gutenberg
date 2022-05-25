@@ -1,6 +1,6 @@
 # Global Settings & Styles (theme.json)
 
-WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. This page documents its format.
+WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. Then `theme.json` [evolved to a v2](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) with WordPress 5.9 release. This page documents its format.
 
 - Rationale
     - Settings for the block editor
@@ -20,6 +20,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
         - Elements
     - customTemplates
     - templateParts
+    - patterns
 - FAQ
     - The naming schema of CSS Custom Properties
     - Why using -- as a separator?
@@ -71,7 +72,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"color": {
 			"palette": [
@@ -109,7 +110,7 @@ body {
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"custom": {
 			"line-height": {
@@ -134,11 +135,11 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via an user interface that is being worked on.
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {},
 	"styles": {},
 	"customTemplates": {},
@@ -147,10 +148,10 @@ This specification is the same for the three different origins that use this for
 ```
 
 ### Version
+This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
 
-This field describes the format of the `theme.json` file. The current and only version is 1.
+If you have used [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) previously, you don’t need to update the version in the v1 file to v2, as it’ll be [migrated](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) into v2 at runtime for you.
 
-WordPress 5.8 will ignore the contents of any `theme.json` whose version is not equals to the current. Should the Gutenberg plugin need it, it'll update the version and will add the corresponding migration mechanisms from older versions.
 
 ### Settings
 
@@ -167,8 +168,14 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
+		"border": {
+			"radius": false,
+			"color": false,
+			"style": false,
+			"width": false
+		},
 		"color": {
 			"custom": true,
 			"customDuotone": true,
@@ -176,7 +183,11 @@ The settings section has the following structure:
 			"duotone": [],
 			"gradients": [],
 			"link": false,
-			"palette": []
+			"palette": [],
+			"text": true,
+			"background": true,
+			"defaultGradients": true,
+			"defaultPalette": true
 		},
 		"custom": {},
 		"layout": {
@@ -184,15 +195,22 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
-			"customMargin": false,
-			"customPadding": false,
+			"margin": false,
+			"padding": false,
+			"blockGap": null,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customLineHeight": false,
+			"lineHeight": false,
 			"dropCap": true,
-			"fontSizes": []
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"textDecoration": true,
+			"textTransform": true,
+			"fontSizes": [],
+			"fontFamilies": []
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -213,22 +231,27 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
+		"appearanceTools": false,
 		"border": {
-			"customColor": false,
-			"customRadius": false,
-			"customStyle": false,
-			"customWidth": false
+			"color": false,
+			"radius": false,
+			"style": false,
+			"width": false
 		},
 		"color": {
+			"background": true,
 			"custom": true,
 			"customDuotone": true,
 			"customGradient": true,
+			"defaultGradients": true,
+			"defaultPalette": true,
 			"duotone": [],
 			"gradients": [],
 			"link": false,
-			"palette": []
+			"palette": [],
+			"text": true
 		},
 		"custom": {},
 		"layout": {
@@ -236,20 +259,22 @@ The settings section has the following structure:
 			"wideSize": "1000px"
 		},
 		"spacing": {
-			"customMargin": false,
-			"customPadding": false,
+			"blockGap": null,
+			"margin": false,
+			"padding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
 			"customFontSize": true,
-			"customFontStyle": true,
-			"customFontWeight": true,
-			"customLineHeight": false,
-			"customTextDecorations": true,
-			"customTextTransforms": true,
 			"dropCap": true,
 			"fontFamilies": [],
-			"fontSizes": []
+			"fontSizes": [],
+			"fontStyle": true,
+			"fontWeight": true,
+			"letterSpacing": true,
+			"lineHeight": false,
+			"textDecoration": true,
+			"textTransform": true
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -273,14 +298,23 @@ Each block can configure any of these settings separately, providing a more fine
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
+### Opt-in into UI controls
+
+There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+
 #### Backward compatibility with add_theme_support
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight` to `false`.             |
-| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |
 | `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
@@ -288,7 +322,7 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `experimental-link-color`   | Set `color.link` to `true`.                               |
+| `experimental-link-color`   | Set `color.link` to `true`. `experimental-link-color` will be removed when the plugin requires WordPress 5.9 as the minimum version. |
 
 #### Presets
 
@@ -314,7 +348,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"color": {
 			"duotone": [
@@ -364,15 +398,15 @@ The naming schema for the classes and the custom properties is as follows:
 			],
 			"fontSizes": [
 				{
-					"slug": "normal",
-					"size": 16,
-					"name": "Normal"
-				},
-				{
 					"slug": "big",
 					"size": 32,
 					"name": "Big"
-				}
+				},
+				{
+					"slug": "x-large",
+					"size": 46,
+					"name": "Large"
+				},
 			]
 		},
 		"blocks": {
@@ -388,7 +422,7 @@ The naming schema for the classes and the custom properties is as follows:
 							"slug": "white",
 							"color": "#ffffff",
 							"name": "White"
-						},
+						}
 					]
 				}
 			}
@@ -406,8 +440,8 @@ body {
 	--wp--preset--color--very-dark-grey: #444;
 	--wp--preset--gradient--blush-bordeaux: linear-gradient( 135deg, rgb( 254, 205, 165 ) 0%, rgb( 254, 45, 45 ) 50%, rgb( 107, 0, 62 ) 100% );
 	--wp--preset--gradient--blush-light-purple: linear-gradient( 135deg, rgb( 255, 206, 236 ) 0%, rgb( 152, 150, 240 ) 100% );
+	--wp--preset--font-size--x-large: 46;
 	--wp--preset--font-size--big: 32;
-	--wp--preset--font-size--normal: 16;
 	--wp--preset--font-family--helvetica-arial: Helvetica Neue, Helvetica, Arial, sans-serif;
 	--wp--preset--font-family--system: -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell, \"Helvetica Neue\",sans-serif;
 }
@@ -456,7 +490,7 @@ For example:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"custom": {
 			"baseFont": 16,
@@ -501,7 +535,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"color": {
 			"custom": false
@@ -517,15 +551,17 @@ Note that the name of the variable is created by adding `--` in between each nes
 }
 ```
 
-- Disable border radius for the button block (borders only work in the plugin so far):
+- Disable border radius for the button block:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
-		"core/button": {
-			"border": {
-				"customRadius": false
+		"blocks": {
+			"core/button": {
+				"border": {
+					"radius": false
+				}
 			}
 		}
 	}
@@ -536,7 +572,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"color": {
 			"palette": [
@@ -567,20 +603,22 @@ Note that the name of the variable is created by adding `--` in between each nes
 				}
 			]
 		},
-		"core/group": {
-			"color": {
-				"palette": [
-					{
-						"slug": "black",
-						"color": "#000000",
-						"name": "Black"
-					},
-					{
-						"slug": "white",
-						"color": "#FFF",
-						"name": "White"
-					}
-				]
+		"blocks": {
+			"core/group": {
+				"color": {
+					"palette": [
+						{
+							"slug": "black",
+							"color": "#000000",
+							"name": "Black"
+						},
+						{
+							"slug": "white",
+							"color": "#FFF",
+							"name": "White"
+						}
+					]
+				}
 			}
 		}
 	}
@@ -595,7 +633,7 @@ The Gutenberg plugin extends the styles available from WordPress 5.8, so they ca
 The tabs below show WordPress 5.8 supported styles and the ones supported by the Gutenberg plugin.
 </div>
 
-Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
+Each block declares which style properties it exposes via the [block supports mechanism](/docs/reference-guides/block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 {% codetabs %}
 
@@ -603,19 +641,29 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"styles": {
+		"border": {
+			"radius": "value",
+			"color": "value",
+			"style": "value",
+			"width": "value"
+		},
+		"filter": {
+			"duotone": "value"
+		},
 		"color": {
 			"background": "value",
 			"gradient": "value",
 			"text": "value"
 		},
 		"spacing": {
+			"blockGap": "value",
 			"margin": {
 				"top": "value",
 				"right": "value",
 				"bottom": "value",
-				"left": "value"
+				"left": "value",
 			},
 			"padding": {
 				"top": "value",
@@ -626,10 +674,16 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"typography": {
 			"fontSize": "value",
-			"lineHeight": "value"
+			"fontStyle": "value",
+			"fontWeight": "value",
+			"letterSpacing": "value",
+			"lineHeight": "value",
+			"textDecoration": "value",
+			"textTransform": "value"
 		},
 		"elements": {
 			"link": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {}
@@ -643,6 +697,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"blocks": {
 			"core/group": {
+				"border": {},
 				"color": {},
 				"spacing": {},
 				"typography": {},
@@ -666,7 +721,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"styles": {
 		"border": {
 			"color": "value",
@@ -679,7 +734,11 @@ Each block declares which style properties it exposes via the [block supports me
 			"gradient": "value",
 			"text": "value"
 		},
+		"filter": {
+			"duotone": "value"
+		},
 		"spacing": {
+			"blockGap": "value",
 			"margin": {
 				"top": "value",
 				"right": "value",
@@ -698,6 +757,7 @@ Each block declares which style properties it exposes via the [block supports me
 			"fontSize": "value",
 			"fontStyle": "value",
 			"fontWeight": "value",
+			"letterSpacing": "value",
 			"lineHeight": "value",
 			"textDecoration": "value",
 			"textTransform": "value"
@@ -772,7 +832,7 @@ body {
 
 Styles found within a block will be enqueued using the block selector.
 
-By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitly telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file. Note that the block needs to be registered server-side for the `__experimentalSelector` field to be available to the style engine.
 
 {% codetabs %}
 {% Input %}
@@ -908,7 +968,7 @@ h3 {
 This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
 </div>
 
-Within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
+Within this field themes can list the custom templates present in the `templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
 - name: mandatory.
 - title: mandatory, translatable.
@@ -916,7 +976,7 @@ Within this field themes can list the custom templates present in the `block-tem
 
 ```json
 {
-    "version": 1,
+    "version": 2,
 	"customTemplates": [
 		{
 			"name": "my-custom-template",
@@ -937,24 +997,50 @@ Within this field themes can list the custom templates present in the `block-tem
 This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
 </div>
 
-Within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
+Within this field themes can list the template parts present in the `parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 - name: mandatory.
+- title: optional, translatable.
 - area: optional, will be set to `uncategorized` by default and trigger no block variation.
 
 ```json
 {
-    "version": 1,
+    "version": 2,
 	"templateParts": [
 		{
 			"name": "my-template-part",
+			"title": "Header",
 			"area": "header"
 		}
 	]
 }
 ```
+
+### patterns
+
+<div class="callout callout-alert">
+This field requires the Gutenberg plugin active and using the [version 2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) of `theme.json`.
+</div>
+
+Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
+
+```json
+{
+    "version": 2,
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+}
+```
+
+## Developing with theme.json
+
+It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+
+Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
+
+![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
+
 
 ## Frequently Asked Questions
 
@@ -977,8 +1063,8 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 The `--` as a separator has two functions:
 
-- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
-- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readability, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parsability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 
@@ -1001,7 +1087,7 @@ For example:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"custom": {
 			"lineHeight": {
@@ -1032,12 +1118,84 @@ A few notes about this process:
 
 ```json
 {
-	"version": 1,
+	"version": 2,
 	"settings": {
 		"custom": {
 			"line--height": { // DO NOT DO THIS
 				"body": 1.7
 			}
+		}
+	}
+}
+```
+
+### Global Stylesheet
+
+In WordPress 5.8, the CSS for some of the presets defined by WordPress (font sizes, colors, and gradients) was loaded twice for most themes: in the block-library stylesheet plus in the global stylesheet. Additionally, there were slight differences in the CSS in both places.
+
+In WordPress 5.9 release, CSS of presets are consolidated into the global stylesheet, that is now loaded for all themes. Each preset value generates a single CSS Custom Property and a class, as in:
+
+```css
+/* CSS Custom Properties for the preset values */
+body {
+  --wp--preset--<PRESET_TYPE>--<PRESET_SLUG>: <DEFAULT_VALUE>;
+  --wp--preset--color--pale-pink: #f78da7;
+  --wp--preset--font-size--large: 36px;
+  /* etc. */
+}
+
+/* CSS classes for the preset values */
+.has-<PRESET_SLUG>-<PRESET_TYPE> { ... }
+.has-pale-pink-color { color: var(--wp--preset--color--pale-pink) !important; } 
+.has-large-font-size { font-size: var(--wp--preset--font-size--large) !important; }
+```
+
+For themes to override the default values they can use the `theme.json` and provide the same slug. Themes that do not use a `theme.json` can still override the default values by enqueuing some CSS that sets the corresponding CSS Custom Property.
+
+`Example` (sets a new value for the default large font size):
+
+```css
+body {
+ --wp--preset--font-size--large: <NEW_VALUE>;
+}
+```
+
+### Specificity for link colors provided by the user
+
+In v1, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
+
+```css
+.wp-element-<ID> a { color: <USER_COLOR_VALUE> !important; }
+```
+
+While this preserved user preferences at all times, the specificity was too strong and conflicted with some blocks with legit uses of an HTML element that shouldn’t be considered links. To [address this issue](https://github.com/WordPress/gutenberg/pull/34689), in WordPress 5.9 release, the `!important` was removed and updated the corresponding blocks to style the a elements with a specificity higher than the user link color, which now is:
+
+```css
+.wp-element-<ID> a { color: <USER_COLOR_VALUE>; }
+```
+
+As a result of this change, it’s now the block author and theme author’s responsibility to make sure the user choices are respected at all times and that the link color provided by the user (specificity 011) is not overridden.
+
+### What is blockGap and how can I use it?
+
+blockGap adjusts the vertical margin, or gap, between blocks.
+It is also used for margins between inner blocks in columns, buttons, and social icons.
+In the editor, the control for the blockGap is called Block spacing, located in the Dimensions panel.
+
+The value you define for the blockGap style uses a CSS property, a preset, named `--wp--style--block-gap`.
+The default value is 2em.
+
+```json
+{
+	"version": 2,
+	"settings": {
+		"spacing": {
+			"blockGap": true,
+		}
+	},
+	"styles": {
+		"spacing": {
+			"blockGap": "1.5rem"
 		}
 	}
 }

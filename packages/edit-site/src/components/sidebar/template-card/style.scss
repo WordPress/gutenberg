@@ -5,24 +5,47 @@
 
 .edit-site-template-card__content {
 	flex-grow: 1;
+	margin-bottom: $grid-unit-05;
 }
 
 .edit-site-template-card__title {
 	font-weight: 500;
+	line-height: $icon-size;
 	&.edit-site-template-card__title {
-		margin: 0 0 5px;
+		margin: 0 0 $grid-unit-05;
 	}
 }
 
 .edit-site-template-card__description {
 	font-size: $default-font-size;
+	margin: 0 0 $grid-unit-20;
 }
 
 .edit-site-template-card__icon {
-	flex: 0 0 $button-size;
-	margin-left: -2px;
-	margin-right: 10px;
-	padding: 0 3px;
-	width: $button-size;
-	height: $button-size-small;
+	flex: 0 0 $icon-size;
+	margin-right: $grid-unit-15;
+	width: $icon-size;
+	height: $icon-size;
+}
+
+h3.edit-site-template-card__template-areas-title {
+	font-weight: 500;
+	margin: 0 0 $grid-unit-10;
+}
+
+.edit-site-template-card__template-areas-list {
+	margin: 0;
+
+	> li {
+		margin: 0;
+	}
+}
+
+.edit-site-template-card__template-areas-item {
+	width: 100%;
+
+	// Override the default padding.
+	&.components-button.has-icon {
+		padding: 0;
+	}
 }

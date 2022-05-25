@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -26,19 +27,20 @@ function useObservableState( initialState, onStateChange ) {
 	];
 }
 
-export default function Dropdown( {
-	renderContent,
-	renderToggle,
-	position = 'bottom right',
-	className,
-	contentClassName,
-	expandOnMobile,
-	headerTitle,
-	focusOnMount,
-	popoverProps,
-	onClose,
-	onToggle,
-} ) {
+export default function Dropdown( props ) {
+	const {
+		renderContent,
+		renderToggle,
+		className,
+		contentClassName,
+		expandOnMobile,
+		headerTitle,
+		focusOnMount,
+		position,
+		popoverProps,
+		onClose,
+		onToggle,
+	} = props;
 	const containerRef = useRef();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
@@ -80,11 +82,19 @@ export default function Dropdown( {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
+	const hasAnchorRef =
+		!! popoverProps?.anchorRef ||
+		!! popoverProps?.getAnchorRect ||
+		!! popoverProps?.anchorRect;
 
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
+			// Some UAs focus the closest focusable parent when the toggle is
+			// clicked. Making this div focusable ensures such UAs will focus
+			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+			tabIndex="-1"
 		>
 			{ renderToggle( args ) }
 			{ isOpen && (
@@ -95,10 +105,11 @@ export default function Dropdown( {
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
+					// This value is used to ensure that the dropdowns
+					// align with the editor header by default.
+					offset={ 13 }
+					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
 					{ ...popoverProps }
-					anchorRef={
-						popoverProps?.anchorRef ?? containerRef.current
-					}
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,

@@ -1,19 +1,8 @@
-.components-inline-color__indicator {
-	position: absolute;
-	background: #000;
-	height: 3px;
-	width: 20px;
-	bottom: 6px;
-	left: auto;
-	right: auto;
-	margin: 0 5px;
-}
-
 .components-inline-color-popover {
 
 	.components-popover__content {
-		> div {
-			padding: 20px 18px;
+		.components-tab-panel__tab-content {
+			padding: 16px;
 		}
 
 		.components-color-palette {
@@ -31,15 +20,4 @@
 			vertical-align: text-bottom;
 		}
 	}
-}
-
-.format-library-text-color-button {
-	position: relative;
-}
-.format-library-text-color-button__indicator {
-	height: 4px;
-	width: 20px;
-	position: absolute;
-	bottom: 10px;
-	left: 8px;
 }

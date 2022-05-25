@@ -12,7 +12,7 @@ import { useCx } from '../utils/hooks/use-cx';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {
@@ -36,7 +36,7 @@ export function useScrollable( props ) {
 				scrollDirection === 'auto' && styles.scrollAuto,
 				className
 			),
-		[ className, scrollDirection, smoothScroll ]
+		[ className, cx, scrollDirection, smoothScroll ]
 	);
 
 	return { ...otherProps, className: classes };

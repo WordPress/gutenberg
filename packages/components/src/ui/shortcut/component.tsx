@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../context';
+import {
+	useContextSystem,
+	contextConnect,
+	WordPressComponentProps,
+} from '../context';
 import { View } from '../../view';
 
 export interface ShortcutDescription {
@@ -23,8 +24,8 @@ export interface Props {
 }
 
 function Shortcut(
-	props: PolymorphicComponentProps< Props, 'span' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps< Props, 'span' >,
+	forwardedRef: ForwardedRef< any >
 ): JSX.Element | null {
 	const {
 		as: asProp = 'span',

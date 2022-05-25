@@ -8,10 +8,9 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( blockNames.image );
-		await editorPage.driver.sleep( 1000 );
 		await editorPage.closePicker();
 
-		let imageBlock = await editorPage.getBlockAtPosition(
+		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image
 		);
 
@@ -20,13 +19,12 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
 
-			// Workaround because of #952
+			// Workaround because of #952.
 			const titleElement = await editorPage.getTitleElement();
 			await clickMiddleOfElement( editorPage.driver, titleElement );
 			await editorPage.dismissKeyboard();
-			// end workaround
+			// End workaround.
 
-			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await swipeUp( editorPage.driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock(
 				testData.imageCaption,
@@ -35,7 +33,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);

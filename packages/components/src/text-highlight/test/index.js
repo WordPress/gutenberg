@@ -12,13 +12,13 @@ import TextHighlight from '../index';
 let container = null;
 
 beforeEach( () => {
-	// setup a DOM element as a render target
+	// Setup a DOM element as a render target.
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 } );
 
 afterEach( () => {
-	// cleanup on exiting
+	// Cleanup on exiting.
 	unmountComponentAtNode( container );
 	container.remove();
 	container = null;
@@ -77,7 +77,7 @@ describe( 'Basic rendering', () => {
 	} );
 
 	it( 'should highlight occurances of a string regardless of capitalisation', () => {
-		const highlight = 'The'; // note this occurs in both sentance of lowercase forms
+		const highlight = 'The'; // Note this occurs in both sentance of lowercase forms.
 
 		act( () => {
 			render(
@@ -91,7 +91,7 @@ describe( 'Basic rendering', () => {
 		);
 
 		// Our component matcher is case insensitive so string.Containing will
-		// return a false failure
+		// return a false failure.
 		const regex = new RegExp( highlight, 'i' );
 
 		expect( highlightedEls ).toHaveLength( 2 );

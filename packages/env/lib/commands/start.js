@@ -174,12 +174,20 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
 	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
+
 	const { out: mySQLAddress } = await dockerCompose.port(
 		'mysql',
 		3306,
 		dockerComposeConfig
 	);
 	const mySQLPort = mySQLAddress.split( ':' ).pop();
+
+	const { out: testsMySQLAddress } = await dockerCompose.port(
+		'tests-mysql',
+		3306,
+		dockerComposeConfig
+	);
+	const testsMySQLPort = testsMySQLAddress.split( ':' ).pop();
 
 	spinner.prefixText = 'WordPress development site started'
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )
@@ -188,6 +196,9 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		.concat( e2eSiteUrl ? ` at ${ e2eSiteUrl }` : '.' )
 		.concat( '\n' )
 		.concat( `MySQL is listening on port ${ mySQLPort }` )
+		.concat(
+			`MySQL for automated testing is listening on port ${ testsMySQLPort }`
+		)
 		.concat( '\n' );
 
 	spinner.text = 'Done!';

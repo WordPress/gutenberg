@@ -15,7 +15,9 @@ const files = process.argv.slice( 2 );
  *
  * @type {string}
  */
-const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
+const PACKAGES_DIR = path
+	.resolve( __dirname, '../../packages' )
+	.replace( /\\/g, '/' );
 
 const stylesheetEntryPoints = glob.sync(
 	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
@@ -132,10 +134,10 @@ function createStyleEntryTransform() {
 			entries.forEach( ( entry ) => this.push( entry ) );
 
 			// Find other stylesheets that need to be rebuilt because
-			// they import the styles that are being transformed
+			// they import the styles that are being transformed.
 			const styleEntries = findStyleEntriesThatImportFile( file );
 
-			// Rebuild stylesheets that import the styles being transformed
+			// Rebuild stylesheets that import the styles being transformed.
 			if ( styleEntries.length ) {
 				styleEntries.forEach( ( entry ) => stream.push( entry ) );
 			}
@@ -222,6 +224,7 @@ if ( files.length ) {
 				`**/benchmark/**`,
 				`**/{__mocks__,__tests__,test}/**`,
 				`**/{storybook,stories}/**`,
+				`**/e2e-test-utils-playwright/**`,
 			],
 			onlyFiles: true,
 		}
@@ -263,7 +266,8 @@ stream
 				console.error( error );
 			}
 
-			if ( ended && ++complete === files.length ) {
+			++complete;
+			if ( ended && complete === files.length ) {
 				workerFarm.end( worker );
 			}
 		} )

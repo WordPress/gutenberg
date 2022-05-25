@@ -23,13 +23,15 @@ import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
-	return block
-		? getBlockLabel( getBlockType( block.name ), block.attributes )
-		: null;
+	if ( block ) {
+		const blockType = getBlockType( block.name );
+		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
+	}
+	return null;
 }
 
 function useSecondaryText() {
-	const { getBlock } = useSelect( 'core/block-editor' );
+	const { getBlock } = useSelect( blockEditorStore );
 	const activeEntityBlockId = useSelect(
 		( select ) =>
 			select(
@@ -51,21 +53,23 @@ function useSecondaryText() {
 }
 
 /**
- * @param {Object}   props             Props for the DocumentActions component.
- * @param {string}   props.entityTitle The title to display.
- * @param {string}   props.entityLabel A label to use for entity-related options.
- *                                     E.g. "template" would be used for "edit
- *                                     template" and "show template details".
- * @param {boolean}  props.isLoaded    Whether the data is available.
- * @param {Function} props.children    React component to use for the
- *                                     information dropdown area. Should be a
- *                                     function which accepts dropdown props.
+ * @param {Object}   props                Props for the DocumentActions component.
+ * @param {string}   props.entityTitle    The title to display.
+ * @param {string}   props.entityLabel    A label to use for entity-related options.
+ *                                        E.g. "template" would be used for "edit
+ *                                        template" and "show template details".
+ * @param {boolean}  props.isLoaded       Whether the data is available.
+ * @param {Function} props.children       React component to use for the
+ *                                        information dropdown area. Should be a
+ *                                        function which accepts dropdown props.
+ * @param {boolean}  props.showIconLabels Whether buttons display icons or text labels.
  */
 export default function DocumentActions( {
 	entityTitle,
 	entityLabel,
 	isLoaded,
 	children: dropdownContent,
+	showIconLabels,
 } ) {
 	const { label } = useSecondaryText();
 
@@ -104,22 +108,16 @@ export default function DocumentActions( {
 			>
 				<Text
 					size="body"
-					className="edit-site-document-actions__title-prefix"
+					className="edit-site-document-actions__title"
+					as="h1"
 				>
 					<VisuallyHidden as="span">
 						{ sprintf(
 							/* translators: %s: the entity being edited, like "template"*/
-							__( 'Editing %s:' ),
+							__( 'Editing %s: ' ),
 							entityLabel
 						) }
 					</VisuallyHidden>
-				</Text>
-
-				<Text
-					size="body"
-					className="edit-site-document-actions__title"
-					as="h1"
-				>
 					{ entityTitle }
 				</Text>
 
@@ -148,7 +146,9 @@ export default function DocumentActions( {
 									__( 'Show %s details' ),
 									entityLabel
 								) }
-							/>
+							>
+								{ showIconLabels && __( 'Details' ) }
+							</Button>
 						) }
 						contentClassName="edit-site-document-actions__info-dropdown"
 						renderContent={ dropdownContent }

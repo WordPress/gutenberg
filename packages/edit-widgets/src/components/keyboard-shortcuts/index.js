@@ -19,38 +19,26 @@ function KeyboardShortcuts() {
 	const { redo, undo } = useDispatch( coreStore );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
-	useShortcut(
-		'core/edit-widgets/undo',
-		( event ) => {
-			undo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-widgets/undo', ( event ) => {
+		undo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/edit-widgets/redo',
-		( event ) => {
-			redo();
-			event.preventDefault();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-widgets/redo', ( event ) => {
+		redo();
+		event.preventDefault();
+	} );
 
-	useShortcut(
-		'core/edit-widgets/save',
-		( event ) => {
-			event.preventDefault();
-			saveEditedWidgetAreas();
-		},
-		{ bindGlobal: true }
-	);
+	useShortcut( 'core/edit-widgets/save', ( event ) => {
+		event.preventDefault();
+		saveEditedWidgetAreas();
+	} );
 
 	return null;
 }
 
 function KeyboardShortcutsRegister() {
-	// Registering the shortcuts
+	// Registering the shortcuts.
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {

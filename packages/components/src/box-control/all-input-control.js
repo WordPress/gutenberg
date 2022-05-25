@@ -10,7 +10,6 @@ import {
 	ALL_SIDES,
 	LABELS,
 	getAllValue,
-	getAllUnitFallback,
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
@@ -26,16 +25,10 @@ export default function AllInputControl( {
 	setSelectedUnits,
 	...props
 } ) {
-	const allValue = getAllValue( values, sides );
+	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values, sides );
+	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
-
-	// Set meaningful unit selection if no allValue and user has previously
-	// selected units without assigning values while controls were unlinked.
-	const allUnitFallback = ! allValue
-		? getAllUnitFallback( selectedUnits )
-		: undefined;
 
 	const handleOnFocus = ( event ) => {
 		onFocus( event, { side: 'all' } );
@@ -104,7 +97,6 @@ export default function AllInputControl( {
 			disableUnits={ isMixed }
 			isOnly
 			value={ allValue }
-			unit={ allUnitFallback }
 			onChange={ handleOnChange }
 			onUnitChange={ handleOnUnitChange }
 			onFocus={ handleOnFocus }

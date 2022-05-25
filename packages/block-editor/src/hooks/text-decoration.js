@@ -29,11 +29,6 @@ export function TextDecorationEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-	const isDisabled = useIsTextDecorationDisabled( props );
-
-	if ( isDisabled ) {
-		return null;
-	}
 
 	function onChange( newDecoration ) {
 		setAttributes( {
@@ -67,7 +62,40 @@ export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_DECORATION_SUPPORT_KEY
 	);
-	const hasTextDecoration = useSetting( 'typography.customTextDecorations' );
+	const hasTextDecoration = useSetting( 'typography.textDecoration' );
 
 	return notSupported || ! hasTextDecoration;
+}
+
+/**
+ * Checks if there is a current value set for the text decoration block support.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a text decoration set.
+ */
+export function hasTextDecorationValue( props ) {
+	return !! props.attributes.style?.typography?.textDecoration;
+}
+
+/**
+ * Resets the text decoration block support attribute. This can be used when
+ * disabling the text decoration support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetTextDecoration( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			typography: {
+				...style?.typography,
+				textDecoration: undefined,
+			},
+		} ),
+	} );
 }

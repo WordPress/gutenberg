@@ -14,7 +14,7 @@ const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const {
-	getBlockTemplate,
+	getPluginTemplate,
 	getDefaultValues,
 	getPrompts,
 } = require( './templates' );
@@ -23,24 +23,30 @@ const commandName = `wp-create-block`;
 program
 	.name( commandName )
 	.description(
-		'Generates PHP, JS and CSS code for registering a block for a WordPress plugin.\n\n' +
-			'[slug] is optional. When provided it triggers the quick mode where ' +
+		'Generates PHP, JS and CSS code for registering a WordPress plugin with blocks.\n\n' +
+			'[slug] is optional. When provided, it triggers the quick mode where ' +
 			'it is used as the block slug used for its identification, the output ' +
 			'location for scaffolded files, and the name of the WordPress plugin.' +
 			'The rest of the configuration is set to all default values unless ' +
-			'overridden with some of the options listed below.'
+			'overridden with some options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext", or the name of an external npm package',
-		'esnext'
+		'project template type name; allowed values: "static", "es5", the name of an external npm package, or the path to a local directory',
+		'static'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
-	.option( '--title <value>', 'display title for the block' )
+	.option(
+		'--title <value>',
+		'display title for the block and the WordPress plugin'
+	)
 	// The name "description" is used internally so it couldn't be used.
-	.option( '--short-description <value>', 'short description for the block' )
+	.option(
+		'--short-description <value>',
+		'short description for the block and the WordPress plugin'
+	)
 	.option( '--category <name>', 'category name for the block' )
 	.option(
 		'--wp-scripts',
@@ -66,8 +72,8 @@ program
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const blockTemplate = await getBlockTemplate( templateName );
-				const defaultValues = getDefaultValues( blockTemplate );
+				const pluginTemplate = await getPluginTemplate( templateName );
+				const defaultValues = getDefaultValues( pluginTemplate );
 				const optionsValues = pickBy(
 					{
 						category,
@@ -88,19 +94,57 @@ program
 						title: startCase( slug ),
 						...optionsValues,
 					};
-					await scaffold( blockTemplate, answers );
+					await scaffold( pluginTemplate, answers );
 				} else {
-					const prompts = getPrompts( blockTemplate ).filter(
-						( { name } ) =>
-							! Object.keys( optionsValues ).includes( name )
-					);
 					log.info( '' );
-					log.info( "Let's customize your block:" );
-					const answers = await inquirer.prompt( prompts );
-					await scaffold( blockTemplate, {
+					log.info(
+						"Let's customize your WordPress plugin with blocks:"
+					);
+
+					const filterOptionsProvided = ( { name } ) =>
+						! Object.keys( optionsValues ).includes( name );
+					const blockPrompts = getPrompts( pluginTemplate, [
+						'slug',
+						'namespace',
+						'title',
+						'description',
+						'dashicon',
+						'category',
+					] ).filter( filterOptionsProvided );
+					const blockAnswers = await inquirer.prompt( blockPrompts );
+
+					const pluginAnswers = await inquirer
+						.prompt( {
+							type: 'confirm',
+							name: 'configurePlugin',
+							message:
+								'Do you want to customize the WordPress plugin?',
+							default: false,
+						} )
+						.then( async ( { configurePlugin } ) => {
+							if ( ! configurePlugin ) {
+								return {};
+							}
+
+							const pluginPrompts = getPrompts( pluginTemplate, [
+								'pluginURI',
+								'version',
+								'author',
+								'license',
+								'licenseURI',
+								'domainPath',
+								'updateURI',
+							] ).filter( filterOptionsProvided );
+							const result = await inquirer.prompt(
+								pluginPrompts
+							);
+							return result;
+						} );
+					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
-						...answers,
+						...blockAnswers,
+						...pluginAnswers,
 					} );
 				}
 			} catch ( error ) {

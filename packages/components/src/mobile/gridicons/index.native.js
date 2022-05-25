@@ -9,6 +9,9 @@ const fromPathData24x24 = ( pathData ) => (
 	</SVG>
 );
 
+export const clipboard = fromPathData24x24(
+	'M16 18H8v-2h8v2zm0-6H8v2h8v-2zm2-9h-2v2h2v15H6V5h2V3H6a2 2 0 00-2 2v15a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2zm-4 2V4a2 2 0 10-4 0v1a2 2 0 00-2 2v1h8V7a2 2 0 00-2-2z'
+);
 export const posts = fromPathData24x24(
 	'M16 19H3v-2h13v2zm5-10H3v2h18V9zM3 5v2h11V5H3zm14 0v2h4V5h-4zm-6 8v2h10v-2H11zm-8 0v2h5v-2H3z'
 );
@@ -21,15 +24,12 @@ export const refresh = fromPathData24x24(
 export const noticeOutline = fromPathData24x24(
 	'M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 13h-2v2h2v-2zm-2-2h2l.5-6h-3l.5 6z'
 );
-
 export const empty = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" />
 );
-
 export const search = fromPathData24x24(
 	'M21,19l-5.154-5.154C16.574,12.742,17,11.421,17,10c0-3.866-3.134-7-7-7s-7,3.134-7,7c0,3.866,3.134,7,7,7 c1.421,0,2.742-0.426,3.846-1.154L19,21L21,19z M5,10c0-2.757,2.243-5,5-5s5,2.243,5,5s-2.243,5-5,5S5,12.757,5,10z'
 );
-
 export default {
 	empty,
 	posts,

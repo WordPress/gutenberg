@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useSpring } from 'react-spring/web.cjs';
+import { useSpring } from '@react-spring/web';
 
 /**
  * WordPress dependencies
@@ -102,7 +102,7 @@ function useMovingAnimation( {
 		}
 
 		if ( prefersReducedMotion ) {
-			// if the animation is disabled and the scroll needs to be adjusted,
+			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
 
@@ -136,19 +136,20 @@ function useMovingAnimation( {
 	}
 
 	// Called for every frame computed by useSpring.
-	function onFrame( { x, y } ) {
+	function onChange( { value } ) {
+		let { x, y } = value;
 		x = Math.round( x );
 		y = Math.round( y );
 
-		if ( x !== onFrame.x || y !== onFrame.y ) {
+		if ( x !== onChange.x || y !== onChange.y ) {
 			onFrameChange( { x, y } );
-			onFrame.x = x;
-			onFrame.y = y;
+			onChange.x = x;
+			onChange.y = y;
 		}
 	}
 
-	onFrame.x = 0;
-	onFrame.y = 0;
+	onChange.x = 0;
+	onChange.y = 0;
 
 	useSpring( {
 		from: {
@@ -162,7 +163,7 @@ function useMovingAnimation( {
 		reset: triggeredAnimation !== finishedAnimation,
 		config: { mass: 5, tension: 2000, friction: 200 },
 		immediate: prefersReducedMotion,
-		onFrame,
+		onChange,
 	} );
 
 	return ref;

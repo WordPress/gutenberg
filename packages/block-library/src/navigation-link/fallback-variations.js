@@ -5,14 +5,14 @@ import { __ } from '@wordpress/i18n';
 import {
 	category as categoryIcon,
 	page as pageIcon,
-	postTitle as postIcon,
+	postContent as postIcon,
 	tag as tagIcon,
 } from '@wordpress/icons';
 
 // FALLBACK: this is only used when the server does not understand the variations property in the
 // register_block_type call. see navigation-link/index.php.
 // Delete this file when supported WP ranges understand the `variations` property when passed to
-// register_block_type in index.php
+// register_block_type in index.php.
 const fallbackVariations = [
 	{
 		name: 'link',

@@ -26,8 +26,8 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 ];
 
@@ -49,12 +49,13 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/gutenberg-phase': 'error',
+		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
@@ -71,14 +72,14 @@ module.exports = {
 			{
 				paths: [
 					{
+						name: 'framer-motion',
+						message:
+							'Please use the Framer Motion API through `@wordpress/components` instead.',
+					},
+					{
 						name: 'lodash',
 						importNames: [ 'memoize' ],
 						message: 'Please use `memize` instead.',
-					},
-					{
-						name: 'react',
-						message:
-							'Please use React API through `@wordpress/element` instead.',
 					},
 					{
 						name: 'reakit',
@@ -99,7 +100,20 @@ module.exports = {
 					{
 						name: '@emotion/css',
 						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+				],
+			},
+		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
+				paths: [
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
+						allowTypeImports: true,
 					},
 				],
 			},
@@ -114,12 +128,6 @@ module.exports = {
 					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
 				message:
 					'Path access on WordPress dependencies is not allowed.',
-			},
-			{
-				selector:
-					'ImportDeclaration[source.value=/^react-spring(?!\\u002Fweb.cjs)/]',
-				message:
-					'The react-spring dependency must specify CommonJS bundle: react-spring/web.cjs',
 			},
 			{
 				selector:
@@ -176,6 +184,7 @@ module.exports = {
 				...developmentFiles,
 			],
 			rules: {
+				'import/default': 'off',
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
@@ -185,7 +194,7 @@ module.exports = {
 		{
 			files: [ 'packages/react-native-*/**/*.js' ],
 			settings: {
-				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
 			},
 		},
 		{
@@ -216,14 +225,45 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
+			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
+			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
+			},
+		},
+		{
+			files: [
+				'test/e2e/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.property.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.property.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
+					},
+				],
 			},
 		},
 		{
@@ -237,6 +277,17 @@ module.exports = {
 			rules: {
 				'jsdoc/no-undefined-types': 'off',
 				'jsdoc/valid-types': 'off',
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/*',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where params are likely already documented outside of the JSDoc.
+				'jsdoc/require-param': 'off',
 			},
 		},
 	],

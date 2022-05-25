@@ -1,13 +1,14 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/navigation",
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"isResponsive": false
+			"openSubmenusOnClick": false,
+			"overlayMenu": "mobile",
+			"hasIcon": true,
+			"maxNestingLevel": 5
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

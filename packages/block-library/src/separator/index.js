@@ -10,6 +10,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import deprecated from './deprecated';
 
 const { name } = metadata;
 
@@ -26,4 +27,5 @@ export const settings = {
 	transforms,
 	edit,
 	save,
+	deprecated,
 };

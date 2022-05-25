@@ -1,27 +1,41 @@
 /**
  * External dependencies
  */
-import { text, object } from '@storybook/addon-knobs';
+import { text } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
  */
 import DropdownMenu from '../';
 
-export default { title: 'Components/DropdownMenu', component: DropdownMenu };
+/**
+ * WordPress dependencies
+ */
+import { menu, arrowUp, arrowDown } from '@wordpress/icons';
+
+export default {
+	title: 'Components/DropdownMenu',
+	component: DropdownMenu,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const label = text( 'Label', 'Select a direction.' );
-	const icon = text( 'Icon', 'ellipsis' );
-	const controls = object( 'Controls', [
+	const firstMenuItemLabel = text( 'First Menu Item Label', 'Up' );
+	const secondMenuItemLabel = text( 'First Menu Item Label', 'Down' );
+
+	const controls = [
 		{
-			title: 'Up',
-			icon: 'arrow-up',
+			title: firstMenuItemLabel,
+			icon: arrowUp,
 		},
 		{
-			title: 'Down',
-			icon: 'arrow-down',
+			title: secondMenuItemLabel,
+			icon: arrowDown,
 		},
-	] );
-	return <DropdownMenu icon={ icon } label={ label } controls={ controls } />;
+	];
+
+	return <DropdownMenu icon={ menu } label={ label } controls={ controls } />;
 };

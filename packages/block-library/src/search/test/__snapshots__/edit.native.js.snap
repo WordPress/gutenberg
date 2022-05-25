@@ -23,6 +23,7 @@ exports[`Search Block renders block with button inside option 1`] = `
         disableEditingMenu={false}
         focusable={true}
         fontFamily="serif"
+        fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
         onBackspace={[Function]}
@@ -56,6 +57,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -78,7 +80,6 @@ exports[`Search Block renders block with button inside option 1`] = `
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -89,15 +90,17 @@ exports[`Search Block renders block with button inside option 1`] = `
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
           Array [
-            false,
+            Array [
+              false,
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
@@ -105,6 +108,8 @@ exports[`Search Block renders block with button inside option 1`] = `
         Array [
           undefined,
           false,
+          undefined,
+          undefined,
         ]
       }
     >
@@ -126,6 +131,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             disableEditingMenu={false}
             focusable={true}
             fontFamily="serif"
+            fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
@@ -160,6 +166,7 @@ exports[`Search Block renders block with button inside option 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -196,6 +203,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         disableEditingMenu={false}
         focusable={true}
         fontFamily="serif"
+        fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
         onBackspace={[Function]}
@@ -229,6 +237,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -251,7 +260,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -262,15 +270,17 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
@@ -278,6 +288,8 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         Array [
           undefined,
           false,
+          undefined,
+          undefined,
         ]
       }
     >
@@ -308,7 +320,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -319,15 +330,17 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
@@ -335,6 +348,8 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         Array [
           undefined,
           false,
+          undefined,
+          undefined,
         ]
       }
     >
@@ -356,6 +371,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             disableEditingMenu={false}
             focusable={true}
             fontFamily="serif"
+            fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
@@ -390,6 +406,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -426,6 +443,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         disableEditingMenu={false}
         focusable={true}
         fontFamily="serif"
+        fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
         onBackspace={[Function]}
@@ -459,6 +477,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -481,7 +500,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       accessible={true}
     >
       <TextInput
-        allowFontScaling={true}
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
@@ -492,15 +510,17 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         onChange={[Function]}
         onFocus={[Function]}
         placeholder="Optional placeholder…"
-        rejectResponderTermination={true}
         scrollEnabled={false}
         style={
           Array [
-            undefined,
+            Array [
+              undefined,
+              undefined,
+              undefined,
+            ],
             undefined,
           ]
         }
-        underlineColorAndroid="transparent"
       />
     </View>
     <View
@@ -508,6 +528,8 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         Array [
           undefined,
           false,
+          undefined,
+          undefined,
         ]
       }
     >
@@ -529,6 +551,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             disableEditingMenu={false}
             focusable={true}
             fontFamily="serif"
+            fontSize={16}
             isMultiline={false}
             maxImagesWidth={200}
             minWidth={75}
@@ -563,6 +586,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
+                "tag": "p",
                 "text": "<p>Search Button</p>",
               }
             }
@@ -599,6 +623,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
         disableEditingMenu={false}
         focusable={true}
         fontFamily="serif"
+        fontSize={16}
         isMultiline={false}
         maxImagesWidth={200}
         onBackspace={[Function]}
@@ -632,6 +657,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
+            "tag": "p",
             "text": "<p>Search</p>",
           }
         }
@@ -645,7 +671,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessible={true}
   >
     <TextInput
-      allowFontScaling={true}
       className="wp-block-search__input"
       ellipsizeMode="tail"
       fontFamily="serif"
@@ -656,15 +681,17 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       onChange={[Function]}
       onFocus={[Function]}
       placeholder="Optional placeholder…"
-      rejectResponderTermination={true}
       scrollEnabled={false}
       style={
         Array [
-          undefined,
+          Array [
+            undefined,
+            undefined,
+            undefined,
+          ],
           undefined,
         ]
       }
-      underlineColorAndroid="transparent"
     />
   </View>
 </View>

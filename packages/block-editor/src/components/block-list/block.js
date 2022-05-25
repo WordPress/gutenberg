@@ -17,10 +17,15 @@ import {
 	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
-	hasBlockSupport,
+	serializeRawBlock,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useDispatch,
+	useSelect,
+} from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
@@ -70,8 +75,10 @@ function Block( { children, isHtml, ...props } ) {
 }
 
 function BlockListBlock( {
+	block: { __unstableBlockSource },
 	mode,
 	isLocked,
+	canRemove,
 	clientId,
 	isSelected,
 	isSelectionEnabled,
@@ -86,6 +93,10 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().supportsLayout;
+	}, [] );
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -100,9 +111,9 @@ function BlockListBlock( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-			onReplace={ isLocked ? undefined : onReplace }
-			onRemove={ isLocked ? undefined : onRemove }
-			mergeBlocks={ isLocked ? undefined : onMerge }
+			onReplace={ canRemove ? onReplace : undefined }
+			onRemove={ canRemove ? onRemove : undefined }
+			mergeBlocks={ canRemove ? onMerge : undefined }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
@@ -110,22 +121,28 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
+	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
 			blockType.getEditWrapperProps( attributes )
 		);
 	}
 
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
+	const isAligned =
+		wrapperProps &&
+		!! wrapperProps[ 'data-align' ] &&
+		! themeSupportsLayout;
 
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
+	// This is only kept for classic themes that don't support layout
+	// Historically we used to rely on extra divs and data-align to
+	// provide the alignments styles in the editor.
+	// Due to the differences between frontend and backend, we migrated
+	// to the layout feature, and we're now aligning the markup of frontend
+	// and backend.
 	if ( isAligned ) {
 		blockEdit = (
 			<div
@@ -140,7 +157,9 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
-		const saveContent = getSaveContent( blockType, attributes );
+		const saveContent = __unstableBlockSource
+			? serializeRawBlock( __unstableBlockSource )
+			: getSaveContent( blockType, attributes );
 
 		block = (
 			<Block className="has-warning">
@@ -159,7 +178,7 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
-	} else if ( lightBlockWrapper ) {
+	} else if ( blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
@@ -167,7 +186,13 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		className,
+		className:
+			wrapperProps?.[ 'data-align' ] && themeSupportsLayout
+				? classnames(
+						className,
+						`align${ wrapperProps[ 'data-align' ] }`
+				  )
+				: className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 		isAligned,
 	};
@@ -195,10 +220,15 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		isSelectionEnabled,
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
+		canRemoveBlock,
+		canMoveBlock,
 	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
+	const canRemove = canRemoveBlock( clientId, rootClientId );
+	const canMove = canMoveBlock( clientId, rootClientId );
+
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
@@ -211,6 +241,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		isLocked: !! templateLock,
+		canRemove,
+		canMove,
 		// Users of the editor.BlockListBlock filter used to be able to
 		// access the block prop.
 		// Ideally these blocks would rely on the clientId prop only.
@@ -255,7 +287,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
 			const { getBlockIndex } = select( blockEditorStore );
-			const index = getBlockIndex( clientId, rootClientId );
+			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
@@ -302,7 +334,7 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
-	// block is sometimes not mounted at the right time, causing it be undefined
+	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
 	ifCondition( ( { block } ) => !! block ),

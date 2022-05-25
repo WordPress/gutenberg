@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -14,18 +15,19 @@ import { store as editWidgetsStore } from '../../store';
 export default function WelcomeGuide() {
 	const isActive = useSelect(
 		( select ) =>
-			select( editWidgetsStore ).__unstableIsFeatureActive(
+			!! select( preferencesStore ).get(
+				'core/edit-widgets',
 				'welcomeGuide'
 			),
 		[]
 	);
 
-	const { __unstableToggleFeature: toggleFeature } = useDispatch(
-		editWidgetsStore
-	);
+	const { toggle } = useDispatch( preferencesStore );
 
-	const widgetAreas = useSelect( ( select ) =>
-		select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } )
+	const widgetAreas = useSelect(
+		( select ) =>
+			select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } ),
+		[]
 	);
 
 	if ( ! isActive ) {
@@ -50,7 +52,7 @@ export default function WelcomeGuide() {
 			className="edit-widgets-welcome-guide"
 			contentLabel={ __( 'Welcome to block Widgets' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
+			onFinish={ () => toggle( 'core/edit-widgets', 'welcomeGuide' ) }
 			pages={ [
 				{
 					image: (

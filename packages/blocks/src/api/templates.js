@@ -11,7 +11,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { convertLegacyBlocks } from './parser';
+import { convertLegacyBlockNameAndAttributes } from './parser/convert-legacy-block';
 import { createBlock } from './factory';
 import { getBlockType } from './registration';
 
@@ -108,10 +108,24 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				attributes
 			);
 
-			const {
-				name: blockName,
-				attributes: blockAttributes,
-			} = convertLegacyBlocks( name, normalizedAttributes );
+			let [
+				blockName,
+				blockAttributes,
+			] = convertLegacyBlockNameAndAttributes(
+				name,
+				normalizedAttributes
+			);
+
+			// If a Block is undefined at this point, use the core/missing block as
+			// a placeholder for a better user experience.
+			if ( undefined === getBlockType( blockName ) ) {
+				blockAttributes = {
+					originalName: name,
+					originalContent: '',
+					originalUndelimitedContent: '',
+				};
+				blockName = 'core/missing';
+			}
 
 			return createBlock(
 				blockName,

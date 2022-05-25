@@ -20,7 +20,7 @@ export default function TemplatePartConverter() {
 			clientIds: selectedBlockClientIds,
 			blocks: getBlocksByClientId( selectedBlockClientIds ),
 		};
-	} );
+	}, [] );
 
 	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {

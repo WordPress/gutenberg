@@ -12,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
 /**
  * @template T
  * @param {T} value
- * @return {import('react').MutableRefObject<T>} A ref with the value.
+ * @return {import('react').MutableRefObject<T|null>} A ref with the value.
  */
 function useFreshRef( value ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -73,17 +73,23 @@ export default function useDropZone( {
 			/**
 			 * Checks if an element is in the drop zone.
 			 *
-			 * @param {HTMLElement|null} elementToCheck
+			 * @param {EventTarget|null} targetToCheck
 			 *
 			 * @return {boolean} True if in drop zone, false if not.
 			 */
-			function isElementInZone( elementToCheck ) {
+			function isElementInZone( targetToCheck ) {
+				const { defaultView } = ownerDocument;
 				if (
-					! elementToCheck ||
-					! element.contains( elementToCheck )
+					! targetToCheck ||
+					! defaultView ||
+					! ( targetToCheck instanceof defaultView.HTMLElement ) ||
+					! element.contains( targetToCheck )
 				) {
 					return false;
 				}
+
+				/** @type {HTMLElement|null} */
+				let elementToCheck = targetToCheck;
 
 				do {
 					if ( elementToCheck.dataset.isDropZone ) {
@@ -155,11 +161,7 @@ export default function useDropZone( {
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
-				if (
-					isElementInZone(
-						/** @type {HTMLElement|null} */ ( event.relatedTarget )
-					)
-				) {
+				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}
 
@@ -217,6 +219,12 @@ export default function useDropZone( {
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
+				onDropRef.current = null;
+				onDragStartRef.current = null;
+				onDragEnterRef.current = null;
+				onDragLeaveRef.current = null;
+				onDragEndRef.current = null;
+				onDragOverRef.current = null;
 				delete element.dataset.isDropZone;
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );

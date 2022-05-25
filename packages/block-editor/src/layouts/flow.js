@@ -6,7 +6,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
@@ -14,13 +14,16 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import useSetting from '../components/use-setting';
 import { appendSelectors } from './utils';
+import { getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { shouldSkipSerialization } from '../hooks/utils';
 
 export default {
 	name: 'default',
-
 	label: __( 'Flow' ),
-
-	edit: function LayoutDefaultEdit( { layout, onChange } ) {
+	inspectorControls: function DefaultLayoutInspectorControls( {
+		layout,
+		onChange,
+	} ) {
 		const { wideSize, contentSize } = layout;
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [
@@ -101,55 +104,142 @@ export default {
 			</>
 		);
 	},
-
-	save: function DefaultLayoutStyle( { selector, layout = {} } ) {
+	toolBarControls: function DefaultLayoutToolbarControls() {
+		return null;
+	},
+	save: function DefaultLayoutStyle( {
+		selector,
+		layout = {},
+		style,
+		blockName,
+	} ) {
 		const { contentSize, wideSize } = layout;
+		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const hasBlockGapStylesSupport = blockGapSupport !== null;
+		const blockGapStyleValue = getGapBoxControlValueFromStyle(
+			style?.spacing?.blockGap
+		);
+		// If a block's block.json skips serialization for spacing or
+		// spacing.blockGap, don't apply the user-defined value to the styles.
+		const blockGapValue =
+			blockGapStyleValue?.top &&
+			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
+				? blockGapStyleValue?.top
+				: 'var( --wp--style--block-gap )';
 
-		let style =
+		let output =
 			!! contentSize || !! wideSize
 				? `
-					${ appendSelectors( selector, '> *' ) } {
+					${ appendSelectors(
+						selector,
+						'> :where(:not(.alignleft):not(.alignright))'
+					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-	
-					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
+					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-	
-					${ appendSelectors( selector, '> [data-align="full"]' ) } {
+					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
 				`
 				: '';
 
-		style += `
-			${ appendSelectors( selector, '> [data-align="left"]' ) } {
+		output += `
+			${ appendSelectors( selector, '> .alignleft' ) } {
 				float: left;
-				margin-right: 2em;
+				margin-inline-start: 0;
+				margin-inline-end: 2em;
 			}
-	
-			${ appendSelectors( selector, '> [data-align="right"]' ) } {
+			${ appendSelectors( selector, '> .alignright' ) } {
 				float: right;
-				margin-left: 2em;
+				margin-inline-start: 2em;
+				margin-inline-end: 0;
+			}
+
+			${ appendSelectors( selector, '> .aligncenter' ) } {
+				margin-left: auto !important;
+				margin-right: auto !important;
 			}
 		`;
 
-		return <style>{ style }</style>;
-	},
+		if ( hasBlockGapStylesSupport ) {
+			output += `
+				${ appendSelectors( selector, '> *' ) } {
+					margin-block-start: 0;
+					margin-block-end: 0;
+				}
+				${ appendSelectors( selector, '> * + *' ) } {
+					margin-block-start: ${ blockGapValue };
+				}
+			`;
+		}
 
+		return <style>{ output }</style>;
+	},
 	getOrientation() {
 		return 'vertical';
 	},
-
 	getAlignments( layout ) {
+		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
-			return layout.alignments;
+			if ( ! layout.alignments.includes( 'none' ) ) {
+				layout.alignments.unshift( 'none' );
+			}
+			return layout.alignments.map( ( alignment ) => ( {
+				name: alignment,
+				info: alignmentInfo[ alignment ],
+			} ) );
+		}
+		const { contentSize, wideSize } = layout;
+
+		const alignments = [
+			{ name: 'left' },
+			{ name: 'center' },
+			{ name: 'right' },
+		];
+
+		if ( contentSize ) {
+			alignments.unshift( { name: 'full' } );
 		}
 
-		return layout.contentSize || layout.wideSize
-			? [ 'wide', 'full', 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right' ];
+		if ( wideSize ) {
+			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
+		}
+
+		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
+
+		return alignments;
 	},
 };
+
+/**
+ * Helper method to assign contextual info to clarify
+ * alignment settings.
+ *
+ * Besides checking if `contentSize` and `wideSize` have a
+ * value, we now show this information only if their values
+ * are not a `css var`. This needs to change when parsing
+ * css variables land.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/34710#issuecomment-918000752
+ *
+ * @param {Object} layout The layout object.
+ * @return {Object} An object with contextual info per alignment.
+ */
+function getAlignmentsInfo( layout ) {
+	const { contentSize, wideSize } = layout;
+	const alignmentInfo = {};
+	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	if ( sizeRegex.test( contentSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
+	}
+	if ( sizeRegex.test( wideSize ) ) {
+		// translators: %s: container size (i.e. 600px etc)
+		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
+	}
+	return alignmentInfo;
+}

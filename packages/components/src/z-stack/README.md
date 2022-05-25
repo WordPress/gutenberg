@@ -34,7 +34,7 @@ Reverse the layer ordering. When `true`, the first child has the lowest `z-index
 
 ### `offset`: `number`
 
-The amount of space between each child element. Defaults to `0`.
+The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
 
 ### `children`: `ReactNode`
 

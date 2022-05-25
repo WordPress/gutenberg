@@ -17,11 +17,17 @@ import {
 import { __ } from '@wordpress/i18n';
 
 export default function PostNavigationLinkEdit( {
-	attributes: { type, label, showTitle, textAlign },
+	attributes: { type, label, showTitle, textAlign, linkLabel },
 	setAttributes,
 } ) {
 	const isNext = type === 'next';
-	const placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
+	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
+
+	if ( showTitle ) {
+		/* translators: Label before for next and previous post. There is a space after the colon. */
+		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+	}
+
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -44,6 +50,19 @@ export default function PostNavigationLinkEdit( {
 							} )
 						}
 					/>
+					{ showTitle && (
+						<ToggleControl
+							label={ __(
+								'Include the label as part of the link'
+							) }
+							checked={ !! linkLabel }
+							onChange={ () =>
+								setAttributes( {
+									linkLabel: ! linkLabel,
+								} )
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls>
@@ -65,6 +84,14 @@ export default function PostNavigationLinkEdit( {
 						setAttributes( { label: newLabel } )
 					}
 				/>
+				{ showTitle && (
+					<a
+						href="#post-navigation-pseudo-link"
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						{ __( 'An example title' ) }
+					</a>
+				) }
 			</div>
 		</>
 	);

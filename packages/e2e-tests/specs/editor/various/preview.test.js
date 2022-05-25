@@ -11,9 +11,10 @@ import {
 	publishPost,
 	saveDraft,
 	openPreviewPage,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('puppeteer').Page} Page */
+/** @typedef {import('puppeteer-core').Page} Page */
 
 /**
  * Given the Page instance for the editor, opens preview drodpdown, and
@@ -53,7 +54,7 @@ async function waitForPreviewNavigation( previewPage ) {
  * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
-	const baseXPath = '//*[contains(@class, "edit-post-preferences-modal")]';
+	const baseXPath = '//*[contains(@class, "interface-preferences-modal")]';
 	const paneslXPath = `${ baseXPath }//button[contains(text(), "Panels")]`;
 	const checkboxXPath = `${ baseXPath }//label[contains(text(), "Custom fields")]`;
 	await clickOnMoreMenuItem( 'Preferences' );
@@ -82,7 +83,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await clickOnCloseModalButton( '.edit-post-preferences-modal' );
+	await clickOnCloseModalButton( '.interface-preferences-modal' );
 }
 
 describe( 'Preview', () => {
@@ -151,11 +152,21 @@ describe( 'Preview', () => {
 
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
+		/**
+		 * Temp workaround until we find a reliable solution for `publishPost` util.
+		 *
+		 * @see https://github.com/WordPress/gutenberg/pull/35565
+		 */
+		await editorPage.click( '.components-snackbar' );
 		await publishPost();
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await editorPage.waitForSelector( '.editor-post-title__input' );
+		await editorPage.click( '.editor-post-title__input' );
+		await pressKeyWithModifier( 'primary', 'A' );
+		await editorPage.keyboard.press( 'ArrowRight' );
+		await editorPage.keyboard.type( ' And more.' );
 		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
@@ -193,7 +204,7 @@ describe( 'Preview', () => {
 	it( 'should not revert title during a preview right after a save draft', async () => {
 		const editorPage = page;
 
-		// Type aaaaa in the title filed.
+		// Type aaaaa in the title field.
 		await editorPage.type( '.editor-post-title__input', 'aaaaa' );
 		await editorPage.keyboard.press( 'Tab' );
 
@@ -216,7 +227,10 @@ describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
+		await editorPage.focus( '.editor-post-title__input' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await editorPage.keyboard.press( 'ArrowRight' );
+		await editorPage.keyboard.type( 'bbbbb' );
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
@@ -231,6 +245,75 @@ describe( 'Preview', () => {
 			( node ) => node.textContent
 		);
 		expect( previewTitle ).toBe( 'aaaaabbbbb' );
+
+		await previewPage.close();
+	} );
+
+	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
+	it( 'should display the correct preview when switching between published and draft statuses', async () => {
+		const editorPage = page;
+
+		// Type Lorem in the title field.
+		await editorPage.type( '[aria-label="Add title"]', 'Lorem' );
+
+		// Open the preview page.
+		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
+
+		// Title in preview should match input.
+		let previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+		expect( previewTitle ).toBe( 'Lorem' );
+
+		// Return to editor and publish post.
+		await editorPage.bringToFront();
+		await publishPost();
+
+		// Close the panel.
+		await page.waitForSelector(
+			'.editor-post-publish-panel button[aria-label="Close panel"]'
+		);
+		await page.click(
+			'.editor-post-publish-panel button[aria-label="Close panel"]'
+		);
+
+		// Change the title and preview again.
+		await editorPage.type( '[aria-label="Add title"]', ' Ipsum' );
+		await editorPage.keyboard.press( 'Tab' );
+		await waitForPreviewDropdownOpen( editorPage );
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+
+		expect( previewTitle ).toBe( 'Lorem Ipsum' );
+
+		// Return to editor and switch to Draft.
+		await editorPage.bringToFront();
+		await editorPage.waitForSelector( '.editor-post-switch-to-draft' );
+		await editorPage.click( '.editor-post-switch-to-draft' );
+		await page.keyboard.press( 'Enter' );
+
+		// Change the title.
+		await editorPage.type( '[aria-label="Add title"]', 'Draft ' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Open the preview page.
+		await waitForPreviewDropdownOpen( editorPage );
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval(
+			'.entry-title',
+			( node ) => node.textContent
+		);
+
+		expect( previewTitle ).toBe( 'Draft Lorem Ipsum' );
 
 		await previewPage.close();
 	} );

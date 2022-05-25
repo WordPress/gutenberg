@@ -107,6 +107,15 @@ export function useInBetweenInserter() {
 					}
 				}
 
+				// Don't show the insertion point if a parent block has an "overlay"
+				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
+				const parentOverlay = element.parentElement?.closest(
+					'.block-editor-block-content-overlay'
+				);
+				if ( parentOverlay ) {
+					return;
+				}
+
 				const clientId = element.id.slice( 'block-'.length );
 
 				if ( ! clientId ) {
@@ -135,7 +144,7 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const index = getBlockIndex( clientId, rootClientId );
+				const index = getBlockIndex( clientId );
 
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).

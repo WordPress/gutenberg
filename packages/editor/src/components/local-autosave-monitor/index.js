@@ -17,7 +17,10 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import AutosaveMonitor from '../autosave-monitor';
-import { localAutosaveGet, localAutosaveClear } from '../../store/controls';
+import {
+	localAutosaveGet,
+	localAutosaveClear,
+} from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
 
 const requestIdleCallback = window.requestIdleCallback
@@ -51,14 +54,12 @@ function useAutosaveNotice() {
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			getEditedPostAttribute: select( editorStore )
-				.getEditedPostAttribute,
 			hasRemoteAutosave: !! select( editorStore ).getEditorSettings()
 				.autosave,
 		} ),
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( 'core/editor' );
+	const { getEditedPostAttribute } = useSelect( editorStore );
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
@@ -177,7 +178,7 @@ function LocalAutosaveMonitor() {
 	const { localAutosaveInterval } = useSelect(
 		( select ) => ( {
 			localAutosaveInterval: select( editorStore ).getEditorSettings()
-				.__experimentalLocalAutosaveInterval,
+				.localAutosaveInterval,
 		} ),
 		[]
 	);

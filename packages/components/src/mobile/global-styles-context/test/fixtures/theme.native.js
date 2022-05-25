@@ -20,10 +20,15 @@ export const GLOBAL_STYLES_PALETTE = [
 		color: '#D1D1E4',
 		name: 'Purple',
 	},
+	{
+		color: '#cf1594',
+		name: 'Color 2 ',
+		slug: 'custom-color-2',
+	},
 ];
 
 export const GLOBAL_STYLES_GRADIENTS = {
-	core: [
+	default: [
 		{
 			name: 'Vivid cyan blue to vivid purple',
 			gradient:
@@ -91,6 +96,11 @@ export const DEFAULT_GLOBAL_STYLES = {
 				fontSize: 'var(--wp--preset--font-size--normal)',
 			},
 		},
+		'core/separator': {
+			color: {
+				text: 'var:preset|color|custom-color-2',
+			},
+		},
 	},
 };
 
@@ -132,13 +142,18 @@ export const PARSED_GLOBAL_STYLES = {
 				fontSize: '18px',
 			},
 		},
+		'core/separator': {
+			color: {
+				text: '#cf1594',
+			},
+		},
 	},
 };
 
 export const RAW_FEATURES = {
 	color: {
 		palette: {
-			core: [
+			default: [
 				{
 					name: 'Black',
 					slug: 'black',
@@ -172,9 +187,21 @@ export const RAW_FEATURES = {
 					name: 'Purple',
 				},
 			],
+			custom: [
+				{
+					color: '#1bf5c1',
+					name: 'Color 1 ',
+					slug: 'custom-color-1',
+				},
+				{
+					color: '#cf1594',
+					name: 'Color 2 ',
+					slug: 'custom-color-2',
+				},
+			],
 		},
 		gradients: {
-			core: [
+			default: [
 				{
 					name: 'Vivid cyan blue to vivid purple',
 					gradient:
@@ -204,21 +231,24 @@ export const RAW_FEATURES = {
 	},
 	typography: {
 		fontSizes: {
-			core: [
+			default: [
 				{
 					name: 'Small',
 					slug: 'small',
 					size: '13px',
+					sizePx: '13px',
 				},
 				{
 					name: 'Normal',
 					slug: 'normal',
 					size: '16px',
+					sizePx: '16px',
 				},
 				{
 					name: 'Huge',
 					slug: 'huge',
 					size: '42px',
+					sizePx: '42px',
 				},
 			],
 			theme: [
@@ -226,15 +256,18 @@ export const RAW_FEATURES = {
 					name: 'Normal',
 					slug: 'normal',
 					size: '18px',
+					sizePx: '18px',
 				},
 				{
 					slug: 'extra-large',
 					size: '40px',
+					sizePx: '40px',
 					name: 'Extra large',
 				},
 				{
 					slug: 'gigantic',
 					size: '144px',
+					sizePx: '144px',
 					name: 'Gigantic',
 				},
 			],
