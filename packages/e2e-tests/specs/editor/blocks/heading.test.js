@@ -84,8 +84,7 @@ describe( 'Heading', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '4b7f4d' );
-		await page.waitForXPath( '//button//span[contains(text(), "4b7f4d")]' );
-		await page.click( '.wp-block-post-title' );
+		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
 		<h3 class=\\"has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
