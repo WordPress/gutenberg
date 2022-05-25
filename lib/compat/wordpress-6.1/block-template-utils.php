@@ -26,4 +26,4 @@ function gutenberg_get_default_block_template_types( $default_template_types ) {
 	}
 	return $default_template_types;
 }
-add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10, 2 );
+add_filter( 'default_template_types', 'gutenberg_get_default_block_template_types', 10 );
