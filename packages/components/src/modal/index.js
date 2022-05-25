@@ -12,6 +12,7 @@ import {
 	createPortal,
 	useEffect,
 	useRef,
+	useState,
 	forwardRef,
 } from '@wordpress/element';
 import {
@@ -73,6 +74,9 @@ function Modal( props, forwardedRef ) {
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
 
+	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+	const contentRef = useRef();
+
 	useEffect( () => {
 		openModalCount++;
 
@@ -103,6 +107,34 @@ function Modal( props, forwardedRef ) {
 			}
 		}
 	}
+
+	useEffect( () => {
+		const onContentContainerScroll = ( e ) => {
+			const scrollY = e?.target?.scrollTop ?? -1;
+
+			if ( ! hasScrolledContent && scrollY > 0 ) {
+				setHasScrolledContent( true );
+			} else if ( hasScrolledContent && scrollY <= 0 ) {
+				setHasScrolledContent( false );
+			}
+		};
+
+		if ( contentRef.current ) {
+			contentRef.current.addEventListener(
+				'scroll',
+				onContentContainerScroll,
+				false
+			);
+
+			return () => {
+				contentRef.current.removeEventListener(
+					'scroll',
+					onContentContainerScroll,
+					false
+				);
+			};
+		}
+	}, [ hasScrolledContent ] );
 
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -142,8 +174,10 @@ function Modal( props, forwardedRef ) {
 					<div
 						className={ classnames( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
+							'has-scrolled-content': hasScrolledContent,
 						} ) }
 						role="document"
+						ref={ contentRef }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">

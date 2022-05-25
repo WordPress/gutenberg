@@ -64,6 +64,7 @@
 // modal screen).
 .components-modal__header {
 	box-sizing: border-box;
+	border-bottom: $border-width solid transparent;
 	padding: $grid-unit-20 $grid-unit-40 0;
 	display: flex;
 	flex-direction: row;
@@ -89,6 +90,10 @@
 	.components-button {
 		position: relative;
 		left: $grid-unit-10;
+	}
+
+	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+		border-bottom-color: $gray-300;
 	}
 }
 
