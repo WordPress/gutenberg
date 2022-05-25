@@ -49,18 +49,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
-		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
-			// Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
-			unset( $query_args['offset'] );
-			$query_args = wp_parse_args( $wp_query->query_vars, $query_args );
-
-			if ( empty( $query_args['post_type'] ) && is_singular() ) {
-				$query_args['post_type'] = get_post_type( get_the_ID() );
-			}
-		}
+		$query = $wp_query;
+    }else{
+		$query = new WP_Query( $query_args );
 	}
-
-	$query = new WP_Query( $query_args );
 
 	if ( ! $query->have_posts() ) {
 		return '';
