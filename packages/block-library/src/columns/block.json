@@ -7,6 +7,10 @@
 	"description": "Display content in multiple columns, with blocks added to each column.",
 	"textdomain": "default",
 	"attributes": {
+		"columnsOnTablet": {
+			"type": "number",
+			"default": 1
+		},
 		"verticalAlignment": {
 			"type": "string"
 		},

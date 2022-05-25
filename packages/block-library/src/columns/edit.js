@@ -59,7 +59,11 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const {
+		columnsOnTablet,
+		isStackedOnMobile,
+		verticalAlignment,
+	} = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -73,6 +77,7 @@ function ColumnsEditContainer( {
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `tablet-columns-${ columnsOnTablet || 1 }` ]: !! isStackedOnMobile,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -107,6 +112,17 @@ function ColumnsEditContainer( {
 								'This column count exceeds the recommended amount and may cause visual breakage.'
 							) }
 						</Notice>
+					) }
+					{ isStackedOnMobile && (
+						<RangeControl
+							label={ __( 'Columns at tablet screen sizes' ) }
+							value={ columnsOnTablet || 1 }
+							onChange={ ( value ) =>
+								setAttributes( { columnsOnTablet: value } )
+							}
+							min={ 1 }
+							max={ count } // Ensure user can't select more columns than there are.
+						/>
 					) }
 					<ToggleControl
 						label={ __( 'Stack on mobile' ) }

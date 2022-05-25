@@ -29,29 +29,46 @@
 		align-items: flex-end;
 	}
 
-	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
-		@media (max-width: #{ ($break-medium - 1) }) {
-			// Responsiveness: Show at most one columns on mobile. This must be
-			// important since the Column assigns its own width as an inline style.
-			flex-basis: 100% !important;
+	&:not(.is-not-stacked-on-mobile) {
+		@media (max-width: #{ ($break-small - 1) }) {
+			> .wp-block-column {
+				// Responsiveness: Show at most one columns on mobile. This must be
+				// important since the Column assigns its own width as an inline style.
+				flex-basis: 100% !important;
+			}
+		}
+
+		// Between mobile and large viewports (tablet), allow specific number of columns.
+		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+
+			@for $i from 1 through 6 {
+				&.tablet-columns-#{ $i } {
+					> .wp-block-column {
+						// width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
+						flex-basis: calc((100% / #{ $i }) - calc(var(--wp--style--block-gap, 2em) + var(--wp--style--unstable-columns-gap, 0em) / 2)) !important;
+					}
+				}
+			}
 		}
 
 		// At large viewports, show all columns horizontally.
 		@include break-medium() {
-			// Available space should be divided equally amongst columns without an
-			// assigned width. This is achieved by assigning a flex basis that is
-			// consistent (equal), would not cause the sum total of column widths to
-			// exceed 100%, and which would cede to a column with an assigned width.
-			// The `flex-grow` allows columns to maximally and equally occupy space
-			// remaining after subtracting the space occupied by columns with
-			// explicit widths (if any exist).
-			flex-basis: 0;
-			flex-grow: 1;
+			> .wp-block-column {
+				// Available space should be divided equally amongst columns without an
+				// assigned width. This is achieved by assigning a flex basis that is
+				// consistent (equal), would not cause the sum total of column widths to
+				// exceed 100%, and which would cede to a column with an assigned width.
+				// The `flex-grow` allows columns to maximally and equally occupy space
+				// remaining after subtracting the space occupied by columns with
+				// explicit widths (if any exist).
+				flex-basis: 0;
+				flex-grow: 1;
 
-			// Columns with an explicitly-assigned width should maintain their
-			// `flex-basis` width and not grow.
-			&[style*="flex-basis"] {
-				flex-grow: 0;
+				// Columns with an explicitly-assigned width should maintain their
+				// `flex-basis` width and not grow.
+				&[style*="flex-basis"] {
+					flex-grow: 0;
+				}
 			}
 		}
 	}
