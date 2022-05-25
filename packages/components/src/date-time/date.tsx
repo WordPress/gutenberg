@@ -8,12 +8,7 @@ import { noop } from 'lodash';
 
 // `react-dates` doesn't tree-shake correctly, so we import from the individual
 // component here.
-// @ts-expect-error TypeScript won't find any type declarations at
-// `react-dates/lib/components/DayPickerSingleDateController` as they're located
-// at `react-dates`.
-import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
-import type { DayPickerSingleDateController } from 'react-dates';
-const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
+import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
 
 /**
  * WordPress dependencies
@@ -176,8 +171,9 @@ export function DatePicker( {
 
 	return (
 		<div className="components-datetime__date" ref={ nodeRef }>
-			<TypedDayPickerSingleDateController
+			<DayPickerSingleDateController
 				date={ momentDate }
+				initialVisibleMonth={ null }
 				daySize={ 30 }
 				focused
 				hideKeyboardShortcutsPanel
