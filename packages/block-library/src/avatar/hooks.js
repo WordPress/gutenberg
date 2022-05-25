@@ -76,6 +76,16 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		},
 		[ postType, postId, userId ]
 	);
+	const defaultAvatar = useDefaultAvatar();
+	if ( authorDetails && ! authorDetails?.avatar_urls ) {
+		return {
+			src: defaultAvatar,
+			minSize: 24,
+			maxSize: 96,
+			alt: authorDetails.name,
+		};
+	}
+
 	const avatarUrls = authorDetails
 		? Object.values( authorDetails.avatar_urls )
 		: null;
@@ -83,7 +93,6 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		? Object.keys( authorDetails.avatar_urls )
 		: null;
 	const { minSize, maxSize } = getAvatarSizes( sizes );
-	const defaultAvatar = useDefaultAvatar();
 	return {
 		src: avatarUrls ? avatarUrls[ avatarUrls.length - 1 ] : defaultAvatar,
 		minSize,
