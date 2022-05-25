@@ -283,7 +283,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						label={ label }
 						showTooltip={ false }
 						className="block-selection-button_select-button"
-						showTooltip={ false }
 					>
 						<BlockTitle
 							clientId={ clientId }
