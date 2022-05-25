@@ -52,4 +52,7 @@ const Template: ComponentStory< typeof TextareaControl > = ( {
 export const Default: ComponentStory< typeof TextareaControl > = Template.bind(
 	{}
 );
-Default.args = {};
+Default.args = {
+	label: 'Text',
+	help: 'Enter some text',
+};
