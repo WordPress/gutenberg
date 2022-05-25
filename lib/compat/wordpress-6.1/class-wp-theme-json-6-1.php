@@ -17,8 +17,15 @@
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	const __EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
 
+	/**
+	 * The valid elements that can be found under styles.
+	 *
+	 * @since 5.8.0
+	 * @var string[]
+	 */
 	const ELEMENTS = array(
 		'link'   => 'a',
+		'link:hover' => 'a:hover',
 		'h1'     => 'h1',
 		'h2'     => 'h2',
 		'h3'     => 'h3',
