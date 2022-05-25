@@ -15,7 +15,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
+class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver {
 	/**
 	 * Given a theme.json structure modifies it in place
 	 * to update certain values by its translated strings
