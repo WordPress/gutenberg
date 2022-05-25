@@ -73,16 +73,14 @@ function isLegacyProps( props: any ): props is LegacyProps {
 	);
 }
 
-function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
-	if ( typeof props?.color === 'undefined' ) {
-		return undefined;
-	}
-	if ( typeof props.color === 'string' ) {
-		return props.color;
-	}
-	if ( props.color.hex ) {
-		return props.color.hex;
-	}
+function getColorFromLegacyProps(
+	color: LegacyProps[ 'color' ]
+): string | undefined {
+	if ( color === undefined ) return;
+
+	if ( typeof color === 'string' ) return color;
+
+	if ( color.hex ) return color.hex;
 
 	return undefined;
 }
@@ -109,39 +107,37 @@ const transformColorStringToLegacyColor = memoize(
 export function useDeprecatedProps(
 	props: LegacyProps | ColorPickerProps
 ): ColorPickerProps {
+	const isUsingLegacy = isLegacyProps( props );
+	const { onChangeComplete } = props as LegacyProps;
+	const { onChange: onChangeProp } = props as ColorPickerProps;
 	const onChange = useCallback(
 		( color: string ) => {
-			if ( isLegacyProps( props ) ) {
-				return props.onChangeComplete(
+			if ( isUsingLegacy ) {
+				return onChangeComplete(
 					transformColorStringToLegacyColor( color )
 				);
 			}
 
-			return props.onChange?.( color );
+			return onChangeProp?.( color );
 		},
-		[
-			( props as LegacyProps ).onChangeComplete,
-			( props as ColorPickerProps ).onChange,
-		]
+		[ onChangeComplete, onChangeProp, isUsingLegacy ]
 	);
 
+	const { color: colorProp } = props;
 	const color = useMemo( () => {
-		return isLegacyProps( props )
-			? getColorFromLegacyProps( props )
-			: props.color;
-	}, [ props.color ] );
+		return isUsingLegacy
+			? getColorFromLegacyProps( colorProp )
+			: ( colorProp as ColorPickerProps[ 'color' ] );
+	}, [ colorProp, isUsingLegacy ] );
 
+	const { disableAlpha } = props as LegacyProps;
+	const { enableAlpha: enableAlphaProp } = props as ColorPickerProps;
 	const enableAlpha = useMemo( () => {
-		return isLegacyProps( props )
-			? ! props.disableAlpha
-			: props.enableAlpha;
-	}, [
-		( props as LegacyProps ).disableAlpha,
-		( props as ColorPickerProps ).enableAlpha,
-	] );
+		return isUsingLegacy ? ! disableAlpha : enableAlphaProp;
+	}, [ disableAlpha, enableAlphaProp, isUsingLegacy ] );
 
 	return {
-		...( isLegacyProps( props ) ? {} : props ),
+		...( isUsingLegacy ? {} : props ),
 		onChange,
 		color,
 		enableAlpha,
