@@ -67,17 +67,20 @@ function ListView(
 		selectedClientIds,
 	} = useListViewClientIds( blocks );
 
-	const { visibleBlockCount } = useSelect(
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } = select(
-				blockEditorStore
-			);
+			const {
+				getGlobalBlockCount,
+				getClientIdsOfDescendants,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
 			};
 		},
 		[ draggedClientIds ]
@@ -197,6 +200,7 @@ function ListView(
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
