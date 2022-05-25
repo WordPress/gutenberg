@@ -273,4 +273,32 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		return $block_rules;
 	}
+	
+	/**
+	 * Converts each style section into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each section this creates a new ruleset such as:
+	 *
+	 *   block-selector {
+	 *     style-property-one: value;
+	 *   }
+	 *
+	 * @param array $style_nodes Nodes with styles.
+	 * @return string The new stylesheet.
+	 */
+	protected function get_block_classes( $style_nodes ) {
+		$block_rules = '';
+
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+			$block_rules.= static::get_styles_for_block( $metadata );
+		}
+		
+		return $block_rules;
+	}
 }
