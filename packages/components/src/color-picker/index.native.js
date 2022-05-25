@@ -89,9 +89,9 @@ function ColorPicker( {
 			return;
 		}
 		setColor( currentColor );
-	}, [ currentColor ] );
+	}, [ currentColor, setColor ] );
 
-	useEffect( () => {
+	const { current: bottomSheetInitializer } = useRef( () => {
 		shouldEnableBottomSheetMaxHeight( false );
 		onHandleClosingBottomSheet( () => {
 			if ( savedColor ) {
@@ -104,7 +104,8 @@ function ColorPicker( {
 		if ( onHandleHardwareButtonPress ) {
 			onHandleHardwareButtonPress( onButtonPress );
 		}
-	}, [] );
+	} );
+	useEffect( bottomSheetInitializer, [ bottomSheetInitializer ] );
 
 	function onHuePickerChange( { hue: h } ) {
 		setHue( h );
