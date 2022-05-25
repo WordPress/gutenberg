@@ -22,8 +22,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
-/* global wp */
-
 /**
  * Internal dependencies
  */
@@ -87,20 +85,6 @@ function hasDefaultSize( image, defaultSize ) {
 	);
 }
 
-/**
- * Checks if a media attachment object has been "destroyed",
- * that is, removed from the media library. The core Media Library
- * adds a `destroyed` property to a deleted attachment object in the media collection.
- *
- * @param {number} id The attachment id.
- *
- * @return {boolean} Whether the image has been destroyed.
- */
-export function isMediaDestroyed( id ) {
-	const attachment = wp?.media?.attachment( id ) || {};
-	return attachment.destroyed;
-}
-
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -141,36 +125,15 @@ export function ImageEdit( {
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	}, [] );
 
-	// A callback passed to MediaUpload,
-	// fired when the media modal closes.
-	function onCloseModal() {
-		if ( isMediaDestroyed( attributes?.id ) ) {
-			setAttributes( {
-				url: undefined,
-				id: undefined,
-			} );
-		}
-	}
-
-	/*
-		 Runs an error callback if the image does not load.
-		 If the error callback is triggered, we infer that that image
-		 has been deleted.
-	*/
-	function onImageError( isReplaced = false ) {
-		// If the image block was not replaced with an embed,
-		// clear the attributes and trigger the placeholder.
-		if ( ! isReplaced ) {
-			setAttributes( {
-				url: undefined,
-				id: undefined,
-			} );
-		}
-	}
-
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -226,7 +189,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':
@@ -306,12 +269,7 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					isTemp = false;
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
+					onUploadError( message );
 				},
 			} );
 		}
@@ -365,8 +323,6 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
-					onCloseModal={ onCloseModal }
-					onImageLoadError={ onImageError }
 				/>
 			) }
 			{ ! url && (
@@ -383,7 +339,6 @@ export function ImageEdit( {
 				onSelectURL={ onSelectURL }
 				notices={ noticeUI }
 				onError={ onUploadError }
-				onClose={ onCloseModal }
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }

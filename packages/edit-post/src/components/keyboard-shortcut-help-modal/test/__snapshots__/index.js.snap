@@ -70,6 +70,12 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           },
         },
         Object {
+          "description": "Insert a link to a post or page",
+          "keyCombination": Object {
+            "character": "[[",
+          },
+        },
+        Object {
           "description": "Underline the selected text.",
           "keyCombination": Object {
             "character": "u",

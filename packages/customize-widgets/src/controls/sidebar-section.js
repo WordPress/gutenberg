@@ -16,6 +16,14 @@ export default function getSidebarSection() {
 		wp: { customize },
 	} = window;
 
+	const reduceMotionMediaQuery = window.matchMedia(
+		'(prefers-reduced-motion: reduce)'
+	);
+	let isReducedMotion = reduceMotionMediaQuery.matches;
+	reduceMotionMediaQuery.addEventListener( 'change', ( event ) => {
+		isReducedMotion = event.matches;
+	} );
+
 	return class SidebarSection extends customize.Section {
 		ready() {
 			const InspectorSection = getInspectorSection();
@@ -58,10 +66,6 @@ export default function getSidebarSection() {
 					this.contentContainer
 						.closest( '.wp-full-overlay' )
 						.addClass( 'section-open' );
-					this.contentContainer.one( 'transitionend', () => {
-						this.contentContainer.removeClass( 'busy' );
-						args.completeCallback();
-					} );
 				} else {
 					this.contentContainer.addClass( [
 						'busy',
@@ -71,10 +75,20 @@ export default function getSidebarSection() {
 						.closest( '.wp-full-overlay' )
 						.addClass( 'section-open' );
 					this.contentContainer.removeClass( 'open' );
-					this.contentContainer.one( 'transitionend', () => {
-						this.contentContainer.removeClass( 'busy' );
-						args.completeCallback();
-					} );
+				}
+
+				const handleTransitionEnd = () => {
+					this.contentContainer.removeClass( 'busy' );
+					args.completeCallback();
+				};
+
+				if ( isReducedMotion ) {
+					handleTransitionEnd();
+				} else {
+					this.contentContainer.one(
+						'transitionend',
+						handleTransitionEnd
+					);
 				}
 			} else {
 				super.onChangeExpanded( expanded, args );

@@ -54,6 +54,7 @@ export function getAllowedFormats( {
 	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
 		since: '5.4',
 		alternative: 'allowedFormats',
+		version: '6.2',
 	} );
 
 	return formattingControls.map( ( name ) => `core/${ name }` );

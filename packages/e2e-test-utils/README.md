@@ -4,6 +4,8 @@ End-To-End (E2E) test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
+
 ## Installation
 
 Install the module
@@ -106,7 +108,6 @@ Clicks on More Menu item, searches for the button with the text provided and cli
 _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
--   _context_ `[GutenbergContext]`: Whether to click the button in the post editor or site editor context.
 
 ### clickSiteEditorMenuItem
 
@@ -235,6 +236,14 @@ _Parameters_
 ### deleteAllMenus
 
 Delete all menus using the REST API
+
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
 
 ### deleteAllWidgets
 
@@ -396,6 +405,18 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
 
 ### getOption
 
@@ -666,6 +687,10 @@ _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
 
+### resetPreferences
+
+Clears all user meta preferences.
+
 ### saveDraft
 
 Saves the post as a draft, resolving once the request is complete (once the
@@ -734,6 +759,10 @@ _Parameters_
 
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
+
+_Returns_
+
+-   `string`: The previous value of the option.
 
 ### setPostContent
 
@@ -824,7 +853,6 @@ Toggles the More Menu.
 _Parameters_
 
 -   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
--   _context_ `[GutenbergContext]`: Whether it's toggling in the context of the site editor or post editor.
 
 ### toggleOfflineMode
 
@@ -847,6 +875,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 

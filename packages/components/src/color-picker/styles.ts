@@ -50,7 +50,7 @@ const inputHeightStyle = `
 	height: 40px;
 }`;
 
-// Make the Hue circle picker not go out of the bar
+// Make the Hue circle picker not go out of the bar.
 const interactiveHueStyles = `
 .react-colorful__interactive {
 	width: calc( 100% - ${ space( 2 ) } );

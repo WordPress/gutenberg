@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -16,9 +16,9 @@ import {
 import { DividerView } from './styles';
 import type { Props } from './types';
 
-function Divider(
+function UnconnectedDivider(
 	props: WordPressComponentProps< Props, 'hr', false >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );
 
@@ -53,6 +53,6 @@ function Divider(
  * }
  * ```
  */
-const ConnectedDivider = contextConnect( Divider, 'Divider' );
+export const Divider = contextConnect( UnconnectedDivider, 'Divider' );
 
-export default ConnectedDivider;
+export default Divider;

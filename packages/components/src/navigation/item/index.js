@@ -43,7 +43,7 @@ export default function NavigationItem( props ) {
 
 	// If hideIfTargetMenuEmpty prop is true
 	// And the menu we are supposed to navigate to
-	// Is marked as empty, then we skip rendering the item
+	// Is marked as empty, then we skip rendering the item.
 	if (
 		hideIfTargetMenuEmpty &&
 		navigateToMenu &&

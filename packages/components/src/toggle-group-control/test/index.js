@@ -4,9 +4,18 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { formatLowercase, formatUppercase } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
-import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+	ToggleGroupControlOptionIcon,
+} from '../index';
 
 describe( 'ToggleGroupControl', () => {
 	const options = (
@@ -31,16 +40,40 @@ describe( 'ToggleGroupControl', () => {
 		</>
 	);
 
-	it( 'should render correctly', () => {
-		const { container } = render(
-			<ToggleGroupControl label="Test Toggle Group Control">
-				{ options }
-			</ToggleGroupControl>
-		);
+	describe( 'should render correctly', () => {
+		it( 'with text options', () => {
+			const { container } = render(
+				<ToggleGroupControl label="Test Toggle Group Control">
+					{ options }
+				</ToggleGroupControl>
+			);
 
-		expect( container.firstChild ).toMatchSnapshot();
+			expect( container.firstChild ).toMatchSnapshot();
+		} );
+		it( 'with icons', () => {
+			const { container } = render(
+				<ToggleGroupControl
+					value="uppercase"
+					label="Test Toggle Group Control"
+				>
+					<ToggleGroupControlOptionIcon
+						value="uppercase"
+						icon={ formatUppercase }
+						showTooltip={ true }
+						aria-label="Uppercase"
+					/>
+					<ToggleGroupControlOptionIcon
+						value="lowercase"
+						icon={ formatLowercase }
+						showTooltip={ true }
+						aria-label="Lowercase"
+					/>
+				</ToggleGroupControl>
+			);
+
+			expect( container.firstChild ).toMatchSnapshot();
+		} );
 	} );
-
 	it( 'should call onChange with proper value', () => {
 		const mockOnChange = jest.fn();
 

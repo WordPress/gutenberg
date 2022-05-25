@@ -17,15 +17,14 @@ if ( ! function_exists( '_load_remote_featured_patterns' ) ) {
 		 *
 		 * @param bool $should_load_remote
 		 */
-		$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
-
-		if ( ! $should_load_remote ) {
+		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
 			return;
 		}
 
-		if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'featured' ) ) {
-			register_block_pattern_category( 'featured', array( 'label' => __( 'Featured', 'gutenberg' ) ) );
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
 		}
+
 		$request             = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request['category'] = 26; // This is the `Featured` category id from pattern directory.
 		$response            = rest_do_request( $request );
@@ -43,18 +42,4 @@ if ( ! function_exists( '_load_remote_featured_patterns' ) ) {
 			}
 		}
 	}
-
-	add_action(
-		'current_screen',
-		function( $current_screen ) {
-			if ( ! get_theme_support( 'core-block-patterns' ) ) {
-				return;
-			}
-
-			$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
-			if ( $current_screen->is_block_editor || $is_site_editor ) {
-				_load_remote_featured_patterns();
-			}
-		}
-	);
 }

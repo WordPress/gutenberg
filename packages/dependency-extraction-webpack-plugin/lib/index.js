@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-const { createHash } = require( 'crypto' );
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 // In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
 const { RawSource } = webpack.sources || require( 'webpack-sources' );
 const json2php = require( 'json2php' );
 const isWebpack4 = webpack.version.startsWith( '4.' );
+const { createHash } = webpack.util;
 
 /**
  * Internal dependencies
@@ -55,12 +55,12 @@ class DependencyExtractionWebpackPlugin {
 	externalizeWpDeps( _context, request, callback ) {
 		let externalRequest;
 
-		// Handle via options.requestToExternal first
+		// Handle via options.requestToExternal first.
 		if ( typeof this.options.requestToExternal === 'function' ) {
 			externalRequest = this.options.requestToExternal( request );
 		}
 
-		// Cascade to default if unhandled and enabled
+		// Cascade to default if unhandled and enabled.
 		if (
 			typeof externalRequest === 'undefined' &&
 			this.options.useDefaults
@@ -82,7 +82,7 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	mapRequestToDependency( request ) {
-		// Handle via options.requestToHandle first
+		// Handle via options.requestToHandle first.
 		if ( typeof this.options.requestToHandle === 'function' ) {
 			const scriptDependency = this.options.requestToHandle( request );
 			if ( scriptDependency ) {
@@ -90,7 +90,7 @@ class DependencyExtractionWebpackPlugin {
 			}
 		}
 
-		// Cascade to default if enabled
+		// Cascade to default if enabled.
 		if ( this.options.useDefaults ) {
 			const scriptDependency = defaultRequestToHandle( request );
 			if ( scriptDependency ) {
@@ -98,7 +98,7 @@ class DependencyExtractionWebpackPlugin {
 			}
 		}
 
-		// Fall back to the request name
+		// Fall back to the request name.
 		return request;
 	}
 
@@ -106,7 +106,7 @@ class DependencyExtractionWebpackPlugin {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
 				JSON.parse( JSON.stringify( asset ) )
-			) };`;
+			) };\n`;
 		}
 
 		return JSON.stringify( asset );
@@ -128,7 +128,7 @@ class DependencyExtractionWebpackPlugin {
 							name: this.constructor.name,
 							stage:
 								compiler.webpack.Compilation
-									.PROCESS_ASSETS_STAGE_ADDITIONAL,
+									.PROCESS_ASSETS_STAGE_ANALYSE,
 						},
 						() => this.addAssets( compilation, compiler )
 					);
@@ -189,7 +189,7 @@ class DependencyExtractionWebpackPlugin {
 					: compilation.chunkGraph.getChunkModules( chunk );
 				for ( const chunkModule of modulesIterable ) {
 					processModule( chunkModule );
-					// loop through submodules of ConcatenatedModule
+					// Loop through submodules of ConcatenatedModule.
 					if ( chunkModule.modules ) {
 						for ( const concatModule of chunkModule.modules ) {
 							processModule( concatModule );
@@ -198,6 +198,27 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
+			const {
+				hashFunction,
+				hashDigest,
+				hashDigestLength,
+			} = compilation.outputOptions;
+
+			// Go through the assets and hash the sources. We can't just use
+			// `entrypointChunk.contentHash` because that's not updated when
+			// assets are minified. In practice the hash is updated by
+			// `RealContentHashPlugin` after minification, but it only modifies
+			// already-produced asset filenames and the updated hash is not
+			// available to plugins.
+			const hash = createHash( hashFunction );
+			for ( const filename of entrypoint.getFiles().sort() ) {
+				const asset = compilation.getAsset( filename );
+				hash.update( asset.source.buffer() );
+			}
+			const version = hash
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
+
 			const entrypointChunk = isWebpack4
 				? entrypoint.chunks.find( ( c ) => c.name === entrypointName )
 				: entrypoint.getEntrypointChunk();
@@ -205,10 +226,14 @@ class DependencyExtractionWebpackPlugin {
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
 				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
-				version: entrypointChunk.hash,
+				version,
 			};
 
 			const assetString = this.stringify( assetData );
+			const contentHash = createHash( hashFunction )
+				.update( assetString )
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
 
 			// Determine a filename for the asset file.
 			const [ filename, query ] = entrypointName.split( '?', 2 );
@@ -219,9 +244,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
+					contentHash,
 				}
 			);
 
@@ -238,9 +261,7 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
+					contentHash,
 				} );
 			} else {
 				assetFilename = buildFilename.replace(

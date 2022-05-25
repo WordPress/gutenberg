@@ -3,6 +3,7 @@
  */
 import {
 	render,
+	screen,
 	fireEvent,
 	waitForElementToBeRemoved,
 } from '@testing-library/react';
@@ -31,6 +32,33 @@ describe( 'Confirm', () => {
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = wrapper.getByText( txt );
+					expect( el ).toBeInTheDocument();
+				} );
+			} );
+			it( 'should render correctly with custom button labels', () => {
+				const cancelButtonText = 'No thanks';
+				const confirmButtonText = 'Yes please!';
+				render(
+					<ConfirmDialog
+						onConfirm={ noop }
+						onCancel={ noop }
+						cancelButtonText={ cancelButtonText }
+						confirmButtonText={ confirmButtonText }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				const dialog = screen.getByRole( 'dialog' );
+				const elementsTexts = [ confirmButtonText, cancelButtonText ];
+
+				expect( dialog ).toBeInTheDocument();
+				expect(
+					screen.getByText( 'Are you sure?' )
+				).toBeInTheDocument();
+
+				elementsTexts.forEach( ( txt ) => {
+					const el = screen.getByRole( 'button', { name: txt } );
 					expect( el ).toBeInTheDocument();
 				} );
 			} );

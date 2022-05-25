@@ -137,17 +137,31 @@ async function resetLocalBranchAgainstOrigin(
 }
 
 /**
+ * Gets the commit hash for the last commit in the current branch.
+ *
+ * @param {string} gitWorkingDirectoryPath Local repository path.
+ *
+ * @return {string} Commit hash.
+ */
+async function getLastCommitHash( gitWorkingDirectoryPath ) {
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	return await simpleGit.revparse( [ '--short', 'HEAD' ] );
+}
+
+/**
  * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
- * @param {string} commitHash              Branch Name
+ * @param {string} branchName              Branch name.
+ * @param {string} commitHash              Commit hash.
  */
 async function cherrypickCommitIntoBranch(
 	gitWorkingDirectoryPath,
+	branchName,
 	commitHash
 ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'trunk' );
+	await simpleGit.checkout( branchName );
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 
@@ -182,6 +196,7 @@ module.exports = {
 	pushTagsToOrigin,
 	discardLocalChanges,
 	resetLocalBranchAgainstOrigin,
+	getLastCommitHash,
 	cherrypickCommitIntoBranch,
 	replaceContentFromRemoteBranch,
 };

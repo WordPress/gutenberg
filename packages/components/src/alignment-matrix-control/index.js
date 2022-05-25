@@ -53,11 +53,13 @@ export default function AlignmentMatrixControl( {
 		onChange( nextValue );
 	};
 
+	const { setCurrentId } = composite;
+
 	useEffect( () => {
 		if ( typeof value !== 'undefined' ) {
-			composite.setCurrentId( getItemId( baseId, value ) );
+			setCurrentId( getItemId( baseId, value ) );
 		}
-	}, [ value, composite.setCurrentId ] );
+	}, [ value, setCurrentId, baseId ] );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',

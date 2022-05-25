@@ -35,7 +35,7 @@ export function useCardBody( props ) {
 				'components-card__body',
 				className
 			),
-		[ className, isShady, size ]
+		[ className, cx, isShady, size ]
 	);
 
 	return {

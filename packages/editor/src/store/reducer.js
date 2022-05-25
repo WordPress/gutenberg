@@ -11,7 +11,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -84,7 +84,6 @@ export function shouldOverwriteState( action, previousAction ) {
 export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.id;
 	}
 
@@ -94,7 +93,6 @@ export function postId( state = null, action ) {
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.type;
 	}
 
@@ -115,32 +113,6 @@ export function template( state = { isValid: true }, action ) {
 			return {
 				...state,
 				isValid: action.isValid,
-			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'ENABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: true,
-			};
-
-		case 'DISABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: false,
 			};
 	}
 
@@ -284,7 +256,6 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 export default combineReducers( {
 	postId,
 	postType,
-	preferences,
 	saving,
 	postLock,
 	template,

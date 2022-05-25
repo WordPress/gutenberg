@@ -67,7 +67,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 										id,
 										{ force: true }
 									);
-									onDelete();
+									onDelete( title );
 								} }
 							>
 								{ __( 'Confirm' ) }

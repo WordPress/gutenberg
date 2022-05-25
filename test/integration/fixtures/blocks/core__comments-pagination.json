@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comments-pagination",
 		"isValid": true,
 		"attributes": {
@@ -19,34 +18,27 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/comments-pagination-previous",
 				"isValid": true,
 				"attributes": {
 					"label": "Previous label comments"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/comments-pagination-numbers",
 				"isValid": true,
 				"attributes": {},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/comments-pagination-next",
 				"isValid": true,
 				"attributes": {
 					"label": "Next label comments"
 				},
-				"innerBlocks": [],
-				"originalContent": ""
+				"innerBlocks": []
 			}
-		],
-		"originalContent": ""
+		]
 	}
 ]

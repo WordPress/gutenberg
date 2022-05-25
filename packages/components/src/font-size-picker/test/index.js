@@ -203,7 +203,6 @@ describe( 'FontSizePicker', () => {
 				);
 				const element = screen.getByLabelText( 'Large' );
 				expect( element ).toBeInTheDocument();
-				expect( element.children ).toHaveLength( 2 );
 				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
 			} );
 			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
@@ -223,7 +222,6 @@ describe( 'FontSizePicker', () => {
 				);
 				const element = screen.getByLabelText( 'Large' );
 				expect( element ).toBeInTheDocument();
-				expect( element.children ).toHaveLength( 2 );
 				expect( element.children[ 0 ].textContent ).toBe( '3' );
 			} );
 		} );

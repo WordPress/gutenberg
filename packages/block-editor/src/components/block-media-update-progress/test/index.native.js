@@ -130,7 +130,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledWith( payload );
 	} );
 
-	// UPLOAD tests
+	// UPLOAD tests.
 	it( 'upload does not get affected by unrelated media uploads', () => {
 		const payload = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
@@ -276,7 +276,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onMediaUploadStateReset ).toHaveBeenCalledWith( payloadReset );
 	} );
 
-	// SAVE tests
+	// SAVE tests.
 	it( 'save does not get affected by unrelated media save events', () => {
 		const payload = {
 			state: MEDIA_SAVE_STATE_SAVING,

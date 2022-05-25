@@ -12,9 +12,9 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUnitControl as UnitControl,
 	__experimentalUseColorProps as useColorProps,
 	store as blockEditorStore,
+	__experimentalElementButtonClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -28,10 +28,12 @@ import {
 	PanelBody,
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -102,8 +104,6 @@ export default function SearchEdit( {
 		} );
 	}, [ insertedInNavigationBlock ] );
 	const borderRadius = style?.border?.radius;
-	const borderColor = style?.border?.color;
-	const borderWidth = style?.border?.width;
 	const borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
@@ -218,6 +218,7 @@ export default function SearchEdit( {
 
 		return (
 			<input
+				type="search"
 				className={ textFieldClasses }
 				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
@@ -241,7 +242,8 @@ export default function SearchEdit( {
 			'wp-block-search__button',
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
-			buttonUseIcon ? 'has-icon' : undefined
+			buttonUseIcon ? 'has-icon' : undefined,
+			__experimentalElementButtonClassName
 		);
 		const buttonStyles = {
 			...colorProps.style,
@@ -257,6 +259,11 @@ export default function SearchEdit( {
 						type="button"
 						className={ buttonClasses }
 						style={ buttonStyles }
+						aria-label={
+							buttonText
+								? stripHTML( buttonText )
+								: __( 'Search' )
+						}
 					>
 						<Icon icon={ search } />
 					</button>
@@ -346,7 +353,6 @@ export default function SearchEdit( {
 							} }
 							style={ { maxWidth: 80 } }
 							value={ `${ width }${ widthUnit }` }
-							unit={ widthUnit }
 							units={ units }
 						/>
 
@@ -387,10 +393,18 @@ export default function SearchEdit( {
 		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
 
 	const getWrapperStyles = () => {
-		const styles = {
-			borderColor,
-			borderWidth: isButtonPositionInside ? borderWidth : undefined,
-		};
+		const styles = isButtonPositionInside
+			? borderProps.style
+			: {
+					borderRadius: borderProps.style?.borderRadius,
+					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
+					borderTopRightRadius:
+						borderProps.style?.borderTopRightRadius,
+					borderBottomLeftRadius:
+						borderProps.style?.borderBottomLeftRadius,
+					borderBottomRightRadius:
+						borderProps.style?.borderBottomRightRadius,
+			  };
 
 		const isNonZeroBorderRadius =
 			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
@@ -412,11 +426,11 @@ export default function SearchEdit( {
 				} = borderRadius;
 
 				return {
+					...styles,
 					borderTopLeftRadius: padBorderRadius( topLeft ),
 					borderTopRightRadius: padBorderRadius( topRight ),
 					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
 					borderBottomRightRadius: padBorderRadius( bottomRight ),
-					...styles,
 				};
 			}
 

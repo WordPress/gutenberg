@@ -23,11 +23,11 @@ function BlockManagerCategory( { title, blockTypes } ) {
 	const { defaultAllowedBlockTypes, hiddenBlockTypes } = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
-			const { getPreference } = select( editPostStore );
+			const { getHiddenBlockTypes } = select( editPostStore );
 			return {
 				defaultAllowedBlockTypes: getEditorSettings()
 					.defaultAllowedBlockTypes,
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				hiddenBlockTypes: getHiddenBlockTypes(),
 			};
 		},
 		[]

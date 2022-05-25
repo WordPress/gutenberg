@@ -4,7 +4,7 @@
 	"name": "core/group",
 	"title": "Group",
 	"category": "design",
-	"description": "Combine blocks into a group.",
+	"description": "Gather blocks in a layout container.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
 	"attributes": {
@@ -18,14 +18,20 @@
 		}
 	},
 	"supports": {
+		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"spacing": {
+			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"blockGap": true,
 			"__experimentalDefaultControls": {

@@ -34,7 +34,7 @@ class PostTitle extends Component {
 		this.setRef = this.setRef.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected and blur the RichText
+		// Unselect if any other block is selected and blur the RichText.
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&
@@ -142,7 +142,7 @@ class PostTitle extends Component {
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 					multiline={ false }
 					style={ titleStyles }
 					styles={ styles }

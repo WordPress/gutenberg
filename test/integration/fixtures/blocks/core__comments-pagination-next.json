@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/comments-pagination-next",
 		"isValid": true,
 		"attributes": {
@@ -12,7 +11,6 @@
 				}
 			}
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

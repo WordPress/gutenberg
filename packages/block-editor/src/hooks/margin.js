@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
+import {
+	Platform,
+	useMemo,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -20,6 +27,7 @@ import {
 	useIsDimensionsSupportValid,
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
+import BlockPopover from '../components/block-popover';
 
 /**
  * Determines if there is margin support.
@@ -124,26 +132,12 @@ export function MarginEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				margin: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.margin }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }
@@ -154,4 +148,59 @@ export function MarginEdit( props ) {
 		),
 		native: null,
 	} );
+}
+
+export function MarginVisualizer( { clientId, attributes } ) {
+	const margin = attributes?.style?.spacing?.margin;
+	const style = useMemo( () => {
+		return {
+			borderTopWidth: margin?.top ?? 0,
+			borderRightWidth: margin?.right ?? 0,
+			borderBottomWidth: margin?.bottom ?? 0,
+			borderLeftWidth: margin?.left ?? 0,
+			top: margin?.top ? `-${ margin.top }` : 0,
+			right: margin?.right ? `-${ margin.right }` : 0,
+			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,
+			left: margin?.left ? `-${ margin.left }` : 0,
+		};
+	}, [ margin ] );
+
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( margin );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( ! isShallowEqual( margin, valueRef.current ) ) {
+			setIsActive( true );
+			valueRef.current = margin;
+
+			clearTimer();
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 400 );
+		}
+
+		return () => clearTimer();
+	}, [ margin ] );
+
+	if ( ! isActive ) {
+		return null;
+	}
+
+	return (
+		<BlockPopover
+			clientId={ clientId }
+			__unstableCoverTarget
+			__unstableRefreshSize={ margin }
+		>
+			<div className="block-editor__padding-visualizer" style={ style } />
+		</BlockPopover>
+	);
 }

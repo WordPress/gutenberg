@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { useHover } from 'react-use-gesture';
+import { useHover } from '@use-gesture/react';
 
 /**
  * Internal dependencies

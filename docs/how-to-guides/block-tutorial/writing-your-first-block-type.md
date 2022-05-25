@@ -21,7 +21,7 @@ Blocks are added to WordPress using plugins, so you will need:
 
 ### Step 1: Configure block.json
 
-The functions of a static block is defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
+The functions of a static block are defined in JavaScript, however the settings and other metadata should be defined in a block.json file.
 
 Here are the basic settings:
 
@@ -42,10 +42,10 @@ Create a basic `block.json` file there:
 ```json
 {
 	"apiVersion": 2,
-	"name": "gutenberg-examples/example-01-basic-esnext",
 	"title": "Example: Basic (ESNext)",
-	"icon": "universal-access-alt",
+	"name": "gutenberg-examples/example-01-basic-esnext",
 	"category": "layout",
+	"icon": "universal-access-alt",
 	"editorScript": "file:./build/index.js"
 }
 ```
@@ -152,9 +152,9 @@ When you save the post and view it published, you will see the `Hola mundo (from
 
 This shows the most basic static block. The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository has complete examples for both.
 
--   [Basic example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic-esnext)
+-   [Basic Example with JSX build](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/01-basic-esnext)
 
--   [Basic example plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/01-basic),
+-   [Basic Example Plain JavaScript](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/01-basic),
 
 **NOTE:** The examples include a more complete block setup with translation features included, it is recommended to follow those examples for a production block. The internationalization features were left out of this guide for simplicity and focusing on the very basics of a block.
 

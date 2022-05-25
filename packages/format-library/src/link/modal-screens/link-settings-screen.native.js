@@ -103,7 +103,7 @@ const LinkSettingsScreen = ( {
 		} );
 		let newAttributes;
 		if ( isCollapsed( value ) && ! isActive ) {
-			// insert link
+			// Insert link.
 			const toInsert = applyFormat(
 				create( { text: linkText } ),
 				format,
@@ -112,7 +112,7 @@ const LinkSettingsScreen = ( {
 			);
 			newAttributes = insert( value, toInsert );
 		} else if ( text !== getTextContent( slice( value ) ) ) {
-			// edit text in selected link
+			// Edit text in selected link.
 			const toInsert = applyFormat(
 				create( { text } ),
 				format,
@@ -121,10 +121,10 @@ const LinkSettingsScreen = ( {
 			);
 			newAttributes = insert( value, toInsert, value.start, value.end );
 		} else {
-			// transform selected text into link
+			// Transform selected text into link.
 			newAttributes = applyFormat( value, format );
 		}
-		// move selection to end of link
+		// Move selection to end of link.
 		const textLength = newAttributes.text.length;
 		// check for zero width spaces
 		if ( newAttributes.end > textLength ) {

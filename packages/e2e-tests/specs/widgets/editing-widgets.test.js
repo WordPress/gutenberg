@@ -31,16 +31,17 @@ describe( 'Widgets screen', () => {
 		await visitWidgetsScreen();
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
-			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/edit-widgets', 'welcomeGuide' )
+		const isWelcomeGuideActive = await page.evaluate(
+			() =>
+				!! wp.data
+					.select( 'core/preferences' )
+					.get( 'core/edit-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/edit-widgets', 'welcomeGuide' )
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/edit-widgets', 'welcomeGuide' )
 			);
 		}
 
@@ -811,7 +812,7 @@ describe( 'Widgets screen', () => {
 		// To do: clicking on the Snackbar causes focus loss.
 		await page.focus( '.block-editor-writing-flow' );
 
-		// Undo block deletion and save again
+		// Undo block deletion and save again.
 		await pressKeyWithModifier( 'primary', 'z' );
 		await saveWidgets();
 

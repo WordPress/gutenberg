@@ -15,7 +15,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
-import { apiFetch } from '@wordpress/data-controls';
 import {
 	setFeaturedImage,
 	sendMediaUpload,
@@ -40,14 +39,6 @@ sendMediaUpload.mockImplementation( ( payload ) => {
 	uploadCallBack( payload );
 } );
 
-jest.mock( '@wordpress/data-controls', () => {
-	const dataControls = jest.requireActual( '@wordpress/data-controls' );
-	return {
-		...dataControls,
-		apiFetch: jest.fn(),
-	};
-} );
-
 /**
  * Immediately invoke delayed functions. A better alternative would be using
  * fake timers and test the delay itself. However, fake timers does not work
@@ -59,7 +50,6 @@ jest.mock( 'lodash', () => {
 } );
 
 const apiFetchPromise = Promise.resolve( {} );
-apiFetch.mockImplementation( () => apiFetchPromise );
 
 const clipboardPromise = Promise.resolve( '' );
 Clipboard.getString.mockImplementation( () => clipboardPromise );
@@ -77,7 +67,7 @@ afterAll( () => {
 		unregisterBlockType( name );
 	} );
 
-	// Restore mocks
+	// Restore mocks.
 	Image.getSize.mockRestore();
 } );
 
@@ -97,7 +87,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -123,7 +113,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -149,7 +139,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -182,7 +172,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -222,7 +212,7 @@ describe( 'Image Block', () => {
 
 		fireEvent.press( screen.getByA11yLabel( /Image Block/ ) );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
 			fireEvent.press( screen.getByA11yLabel( 'Open Settings' ) )
 		);
@@ -249,7 +239,7 @@ describe( 'Image Block', () => {
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );
@@ -280,7 +270,7 @@ describe( 'Image Block', () => {
 
 		const settingsButton = screen.getByA11yLabel( 'Open Settings' );
 		// Awaiting navigation event seemingly required due to React Navigation bug
-		// https://git.io/Ju35Z
+		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () => fireEvent.press( settingsButton ) );
 
 		const linkTargetButton = screen.getByText( 'Open in new tab' );

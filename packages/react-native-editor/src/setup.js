@@ -6,10 +6,6 @@ import { I18nManager, LogBox } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	validateThemeColors,
-	validateThemeGradients,
-} from '@wordpress/block-editor';
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
@@ -30,10 +26,16 @@ const reactNativeSetup = () => {
 		 * TODO: Migrate to @gorhom/bottom-sheet or replace usage of
 		 * LayoutAnimation to Animated. KeyboardAvoidingView's usage of
 		 * LayoutAnimation collides with both BottomSheet and NavigationContainer
-		 * usage of LayoutAnimation simultaneously https://git.io/J1lZv,
-		 * https://git.io/J1lZY
+		 * usage of LayoutAnimation simultaneously https://github.com/facebook/react-native/issues/12663,
+		 * https://github.com/facebook/react-native/issues/10606
 		 */
 		'Overriding previous layout animation',
+	] );
+
+	// "@react-navigation" package uses the old API of gesture handler,
+	// so the warning will be silenced until it gets updated.
+	LogBox.ignoreLogs( [
+		"[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
 	] );
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
@@ -56,9 +58,13 @@ const gutenbergSetup = () => {
 
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
-		registerBlocks();
-
 		const capabilities = props.capabilities ?? {};
+		const blocksFlags = {
+			__experimentalEnableQuoteBlockV2: props?.quoteBlockV2,
+		};
+
+		registerBlocks( blocksFlags );
+
 		// Unregister non-supported blocks by capabilities
 		if (
 			getBlockType( 'core/block' ) !== undefined &&
@@ -80,8 +86,6 @@ const setupInitHooks = () => {
 				initialTitle,
 				postType,
 				featuredImageId,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
@@ -98,10 +102,6 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
-			colors = validateThemeColors( colors );
-
-			gradients = validateThemeGradients( gradients );
-
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
@@ -109,8 +109,6 @@ const setupInitHooks = () => {
 				postType,
 				featuredImageId,
 				capabilities,
-				colors,
-				gradients,
 				rawStyles,
 				rawFeatures,
 				galleryWithImageBlocks,
@@ -121,12 +119,12 @@ const setupInitHooks = () => {
 };
 
 let blocksRegistered = false;
-const registerBlocks = () => {
+const registerBlocks = ( blocksFlags ) => {
 	if ( blocksRegistered ) {
 		return;
 	}
 
-	registerCoreBlocks();
+	registerCoreBlocks( blocksFlags );
 
 	blocksRegistered = true;
 };

@@ -23,7 +23,7 @@ function render_block_core_site_tagline( $attributes ) {
 	return sprintf(
 		'<p %1$s>%2$s</p>',
 		$wrapper_attributes,
-		esc_html( $site_tagline )
+		$site_tagline
 	);
 }
 

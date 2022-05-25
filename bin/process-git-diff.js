@@ -23,7 +23,6 @@
 // -                       "dev": true
 // +                       "dev": true,
 // +                       "optional": true
-
 const hasNonOptionalDiff = !! ( process.argv[ 2 ] || '' )
 	// Strip individual diffs of optional-only.
 	.replace( /@@ .+ @@\n(-.+\n\+.+,\n)?\+.+\"optional\": true,?\n/gm, '' )

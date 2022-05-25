@@ -21,10 +21,16 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"spacing": {
-			"blockGap": true,
+			"blockGap": {
+				"__experimentalDefault": "2em"
+			},
 			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
@@ -38,6 +44,18 @@
 			"default": {
 				"type": "flex",
 				"flexWrap": "nowrap"
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		}
 	},

@@ -76,7 +76,7 @@ export function I18nProvider( props: I18nProviderProps ): JSX.Element {
 	const { children, i18n = defaultI18n } = props;
 	const [ update, forceUpdate ] = useReducer( () => [], [] );
 
-	// rerender translations whenever the i18n instance fires a change event
+	// Rerender translations whenever the i18n instance fires a change event.
 	useEffect( () => i18n.subscribe( forceUpdate ), [ i18n ] );
 
 	const value = useMemo( () => makeContextValue( i18n ), [ i18n, update ] );

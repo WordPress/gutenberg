@@ -124,7 +124,6 @@ Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in a
 
 Alongside template level locking, you can lock individual blocks; you can do this using a `lock` attribute on the attributes level. Block-level lock takes priority over the `templateLock` feature. Currently, you can lock moving and removing blocks.
 
-**Block-level locking is an experimental feature that may be removed or change anytime.**
 ```js
 attributes: {
   // Prevent a block from being moved or removed.
@@ -139,6 +138,25 @@ _Options:_
 -   `move` — Locks the ability of a block from being moved.
 
 You can use this with `templateLock` to lock all blocks except a single block by using `false` in `remove` or `move`.
+
+```php
+$template = array(
+	array( 'core/image', array(
+		'align' => 'left',
+	) ),
+	array( 'core/heading', array(
+		'placeholder' => 'Add Author...',
+	) ),
+	// Allow a Paragraph block to be moved or removed.
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add Description...',
+		'lock' => array(
+			'move'   => false,
+			'remove' => false,
+		),
+	) ),
+);
+```
 
 ## Nested Templates
 

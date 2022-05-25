@@ -16,7 +16,7 @@ import {
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -120,16 +120,12 @@ export function getClosestTabbable(
 export default function useArrowNav() {
 	const {
 		getSelectedBlockClientId,
-		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
-		getFirstMultiSelectedBlockClientId,
-		getLastMultiSelectedBlockClientId,
 		getSettings,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
-	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -138,44 +134,6 @@ export default function useArrowNav() {
 
 		function onMouseDown() {
 			verticalRect = null;
-		}
-
-		function expandSelection( isReverse ) {
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const selectionStartClientId = getMultiSelectedBlocksStartClientId();
-			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-			const selectionBeforeEndClientId = getPreviousBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-			const selectionAfterEndClientId = getNextBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-			const nextSelectionEndClientId = isReverse
-				? selectionBeforeEndClientId
-				: selectionAfterEndClientId;
-
-			if ( nextSelectionEndClientId ) {
-				if ( selectionStartClientId === nextSelectionEndClientId ) {
-					selectBlock( nextSelectionEndClientId );
-				} else {
-					multiSelect(
-						selectionStartClientId || selectedBlockClientId,
-						nextSelectionEndClientId
-					);
-				}
-			}
-		}
-
-		function moveSelection( isReverse ) {
-			const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
-			const selectedLastClientId = getLastMultiSelectedBlockClientId();
-			const focusedBlockClientId = isReverse
-				? selectedFirstClientId
-				: selectedLastClientId;
-
-			if ( focusedBlockClientId ) {
-				selectBlock( focusedBlockClientId );
-			}
 		}
 
 		/**
@@ -218,12 +176,6 @@ export default function useArrowNav() {
 			const { defaultView } = ownerDocument;
 
 			if ( hasMultiSelection() ) {
-				if ( isNav ) {
-					const action = isShift ? expandSelection : moveSelection;
-					action( isReverse );
-					event.preventDefault();
-				}
-
 				return;
 			}
 
@@ -278,10 +230,9 @@ export default function useArrowNav() {
 					isTabbableEdge( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
-					// Shift key is down, and there is multi selection or we're
-					// at the end of the current block.
-					expandSelection( isReverse );
-					event.preventDefault();
+					node.contentEditable = true;
+					// Firefox doesn't automatically move focus.
+					node.focus();
 				}
 			} else if (
 				isVertical &&

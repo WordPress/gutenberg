@@ -12,12 +12,13 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import settingsV2 from './v2';
 
 const { name } = metadata;
 
-export { metadata, name };
+export { metadata, name, settingsV2 };
 
-export const settings = {
+export const settingsV1 = {
 	icon,
 	example: {
 		attributes: {
@@ -51,3 +52,11 @@ export const settings = {
 	},
 	deprecated,
 };
+
+let settings = settingsV1;
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	settings = window?.__experimentalEnableQuoteBlockV2
+		? settingsV2
+		: settingsV1;
+}
+export { settings };

@@ -114,7 +114,6 @@ Let's see how this indirection can be removed with thunks:
 
 ```js
 const store = wp.data.createReduxStore( 'my-store', {
-    __experimentalUseThunks: true,
     actions: {
         saveTemperatureToAPI: ( temperature ) => async () => {
             const response = await window.fetch( 'https://...', {
@@ -147,7 +146,8 @@ const store = wp.data.createReduxStore( 'my-store', {
 } );
 ```
 
-Support for thunks is experimental for now. You can enable it by setting `__experimentalUseThunks: true` when registering your store.
+Support for thunks is included by default in every data store, just like the (now legacy) support for
+generators and controls.
 
 ## Thunks API
 
@@ -225,4 +225,3 @@ const thunk = () => ( { registry } ) => {
   /* ... */
 }
 ```
-

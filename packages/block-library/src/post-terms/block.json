@@ -16,6 +16,14 @@
 		"separator": {
 			"type": "string",
 			"default": ", "
+		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
@@ -23,7 +31,12 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
 		},
 		"typography": {
 			"lineHeight": true,

@@ -1,7 +1,7 @@
 // Developer notes: these rules are duplicated for the site editor.
 // They need to be updated in both places.
 
-.edit-post-fullscreen-mode-close.has-icon {
+.edit-post-fullscreen-mode-close.components-button {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
@@ -44,6 +44,10 @@
 		// Hover color.
 		&:hover::before {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
+		}
+
+		&.has-icon:hover::before {
+			box-shadow: none;
 		}
 
 		// Lightened spot color focus.

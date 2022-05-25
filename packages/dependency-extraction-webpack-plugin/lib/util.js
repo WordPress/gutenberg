@@ -1,5 +1,9 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const BUNDLED_PACKAGES = [
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/style-engine',
+];
 
 /**
  * Default request to global transformation

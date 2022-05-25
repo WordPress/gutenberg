@@ -15,6 +15,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { getBlockSupport } from '@wordpress/blocks';
+
+/**
  * Removed falsy values from nested object.
  *
  * @param {*} object
@@ -86,4 +91,25 @@ export function transformStyles(
 		}
 	} );
 	return returnBlock;
+}
+
+/**
+ * Check whether serialization of specific block support feature or set should
+ * be skipped.
+ *
+ * @param {string|Object} blockType  Block name or block type object.
+ * @param {string}        featureSet Name of block support feature set.
+ * @param {string}        feature    Name of the individual feature to check.
+ *
+ * @return {boolean} Whether serialization should occur.
+ */
+export function shouldSkipSerialization( blockType, featureSet, feature ) {
+	const support = getBlockSupport( blockType, featureSet );
+	const skipSerialization = support?.__experimentalSkipSerialization;
+
+	if ( Array.isArray( skipSerialization ) ) {
+		return skipSerialization.includes( feature );
+	}
+
+	return skipSerialization;
 }

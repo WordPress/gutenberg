@@ -97,7 +97,7 @@ describe( 'anchor', () => {
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
 
-		it( 'should remove an anchor attribute ID when feild is cleared', () => {
+		it( 'should remove an anchor attribute ID when field is cleared', () => {
 			const attributes = { anchor: '' };
 			const extraProps = getSaveContentExtraProps(
 				{},

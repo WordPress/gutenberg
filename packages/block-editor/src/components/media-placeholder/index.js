@@ -17,7 +17,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { keyboardReturn } from '@wordpress/icons';
 
 /**
@@ -65,7 +64,6 @@ export function MediaPlaceholder( {
 	addToGallery,
 	multiple = false,
 	handleUpload = true,
-	dropZoneUIOnly,
 	disableDropZone,
 	disableMediaButtons,
 	onError,
@@ -75,7 +73,6 @@ export function MediaPlaceholder( {
 	onDoubleClick,
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
-	onClose = noop,
 	children,
 	mediaLibraryButton,
 	placeholder,
@@ -329,7 +326,6 @@ export function MediaPlaceholder( {
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
 				onSelect={ onSelect }
-				onClose={ onClose }
 				allowedTypes={ allowedTypes }
 				value={
 					Array.isArray( value )
@@ -400,14 +396,7 @@ export function MediaPlaceholder( {
 		return renderPlaceholder( uploadMediaLibraryButton );
 	};
 
-	if ( dropZoneUIOnly || disableMediaButtons ) {
-		if ( dropZoneUIOnly ) {
-			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-				since: '5.4',
-				alternative: 'disableMediaButtons',
-			} );
-		}
-
+	if ( disableMediaButtons ) {
 		return <MediaUploadCheck>{ renderDropZone() }</MediaUploadCheck>;
 	}
 

@@ -60,11 +60,16 @@
 		"alignWide": false,
 		"color": {
 			"__experimentalSkipSerialization": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
+			"__experimentalTextTransform": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

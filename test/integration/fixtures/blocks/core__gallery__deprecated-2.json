@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
@@ -12,7 +11,6 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -25,7 +23,6 @@
 				"innerBlocks": []
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
@@ -37,7 +34,6 @@
 				},
 				"innerBlocks": []
 			}
-		],
-		"originalContent": "<ul class=\"wp-block-gallery columns-2 is-cropped alignwide\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" data-id=\"1\" alt=\"title\" class=\"wp-image-1\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" data-id=\"2\" alt=\"title\" class=\"wp-image-2\" />\n\t\t</figure>\n\t</li>\n</ul>"
+		]
 	}
 ]

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.2.0 (2022-04-21)
+
+### Enhancement
+
+-   Add additional configuration for CSS styles to better align with [CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/) ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
+### Bug Fix
+
+-   Ensure that the config can work with both `prettier` and `wp-prettier` without reporting warnings ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
 ## 1.0.0 (2021-01-21)
 
 ### Breaking Changes

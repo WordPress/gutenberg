@@ -25,7 +25,7 @@ function readFile( filePath ) {
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {

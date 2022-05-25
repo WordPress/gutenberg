@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import type { Props } from './types';
 
 function Spacer(
 	props: WordPressComponentProps< Props, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const spacerProps = useSpacer( props );
 

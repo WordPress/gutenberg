@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -15,7 +20,7 @@ import { store as editSiteStore } from '../../store';
 import { useGlobalStylesOutput } from '../global-styles/use-global-styles-output';
 
 function useGlobalStylesRenderer() {
-	const [ styles, settings ] = useGlobalStylesOutput();
+	const [ styles, settings, svgFilters ] = useGlobalStylesOutput();
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
 
@@ -25,12 +30,14 @@ function useGlobalStylesRenderer() {
 		}
 
 		const currentStoreSettings = getSettings();
-		const nonGlobalStyles = currentStoreSettings?.styles?.filter(
+		const nonGlobalStyles = filter(
+			currentStoreSettings.styles,
 			( style ) => ! style.isGlobalStyles
 		);
 		updateSettings( {
 			...currentStoreSettings,
 			styles: [ ...nonGlobalStyles, ...styles ],
+			svgFilters,
 			__experimentalFeatures: settings,
 		} );
 	}, [ styles, settings ] );

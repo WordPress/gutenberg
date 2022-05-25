@@ -3,7 +3,7 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
-import type { Ref } from 'react';
+import type { Ref, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -43,7 +43,7 @@ function ResizeTooltip(
 		zIndex = 1000,
 		...props
 	}: ResizeTooltipProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ): JSX.Element | null {
 	const { label, resizeListener } = useResizeLabel( {
 		axis,

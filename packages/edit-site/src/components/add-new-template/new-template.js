@@ -15,6 +15,21 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import {
+	archive,
+	blockMeta,
+	category,
+	home,
+	list,
+	media,
+	notFound,
+	page,
+	post,
+	postAuthor,
+	postDate,
+	search,
+	tag,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -22,16 +37,38 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { useHistory } from '../routes';
+import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	'single-post',
+	'single',
 	'page',
+	'index',
 	'archive',
+	'author',
+	'category',
+	'date',
+	'tag',
+	'taxonomy',
 	'search',
 	'404',
-	'index',
 ];
+
+const TEMPLATE_ICONS = {
+	'front-page': home,
+	single: post,
+	page,
+	archive,
+	search,
+	404: notFound,
+	index: list,
+	category,
+	author: postAuthor,
+	taxonomy: blockMeta,
+	date: postDate,
+	tag,
+	attachment: media,
+};
 
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
@@ -50,7 +87,7 @@ export default function NewTemplate( { postType } ) {
 	);
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { getLastEntitySaveError } = useSelect( coreStore );
+	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( { slug } ) {
 		try {
@@ -62,22 +99,17 @@ export default function NewTemplate( { postType } ) {
 				'postType',
 				'wp_template',
 				{
-					excerpt: description,
+					description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-				}
+				},
+				{ throwOnError: true }
 			);
 
-			const lastEntitySaveError = getLastEntitySaveError(
-				'postType',
-				'wp_template',
-				template.id
-			);
-			if ( lastEntitySaveError ) {
-				throw lastEntitySaveError;
-			}
+			// Set template before navigating away to avoid initial stale value.
+			setTemplate( template.id, template.slug );
 
 			// Navigate to the created template editor.
 			history.push( {
@@ -111,6 +143,14 @@ export default function NewTemplate( { postType } ) {
 		return null;
 	}
 
+	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
+	missingTemplates.sort( ( template1, template2 ) => {
+		return (
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) -
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
+		);
+	} );
+
 	return (
 		<DropdownMenu
 			className="edit-site-new-template-dropdown"
@@ -131,6 +171,8 @@ export default function NewTemplate( { postType } ) {
 							missingTemplates,
 							( { title, description, slug } ) => (
 								<MenuItem
+									icon={ TEMPLATE_ICONS[ slug ] }
+									iconPosition="left"
 									info={ description }
 									key={ slug }
 									onClick={ () => {

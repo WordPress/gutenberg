@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -31,12 +32,8 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import {
-	validateThemeColors,
-	validateThemeGradients,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { getGlobalStyles } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
@@ -70,7 +67,7 @@ class NativeEditorProvider extends Component {
 	constructor() {
 		super( ...arguments );
 
-		// Keep a local reference to `post` to detect changes
+		// Keep a local reference to `post` to detect changes.
 		this.post = this.props.post;
 		this.props.addEntities( postTypeEntities );
 		this.props.receiveEntityRecords(
@@ -171,15 +168,15 @@ class NativeEditorProvider extends Component {
 			this.setState( { isHelpVisible: true } );
 		} );
 
-		// Request current block impressions from native app
+		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
 
-			// Persist impressions to JavaScript store
+			// Persist impressions to JavaScript store.
 			updateSettings( { impressions } );
 
 			// Persist impressions to native store if they do not include latest
-			// `NEW_BLOCK_TYPES` configuration
+			// `NEW_BLOCK_TYPES` configuration.
 			const storedImpressionKeys = Object.keys( storedImpressions );
 			const storedImpressionsCurrent = Object.keys(
 				NEW_BLOCK_TYPES
@@ -232,15 +229,18 @@ class NativeEditorProvider extends Component {
 		}
 	}
 
-	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
-		return {
-			...( rawStyles && rawFeatures
-				? getGlobalStyles( rawStyles, rawFeatures )
-				: {
-						colors: validateThemeColors( colors ),
-						gradients: validateThemeGradients( gradients ),
-				  } ),
-		};
+	getThemeColors( { rawStyles, rawFeatures } ) {
+		const { defaultEditorColors, defaultEditorGradients } = this.props;
+
+		if ( rawStyles && rawFeatures ) {
+			return getGlobalStyles( rawStyles, rawFeatures );
+		}
+
+		return getColorsAndGradients(
+			defaultEditorColors,
+			defaultEditorGradients,
+			rawFeatures
+		);
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -263,7 +263,7 @@ class NativeEditorProvider extends Component {
 
 		if ( this.props.mode === 'text' ) {
 			// The HTMLTextInput component does not update the store when user is doing changes
-			// Let's request the HTML from the component's state directly
+			// Let's request the HTML from the component's state directly.
 			html = applyFilters( 'native.persist-html' );
 		} else {
 			html = serialize( this.props.blocks );
@@ -306,9 +306,9 @@ class NativeEditorProvider extends Component {
 
 	toggleMode() {
 		const { mode, switchMode } = this.props;
-		// refresh html content first
+		// Refresh html content first.
 		this.serializeToNativeAction();
-		// make sure to blur the selected block and dismiss the keyboard
+		// Make sure to blur the selected block and dismiss the keyboard.
 		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
 	}
@@ -334,7 +334,7 @@ class NativeEditorProvider extends Component {
 					settings={ editorSettings }
 					{ ...props }
 				>
-					{ children }
+					<SafeAreaProvider>{ children }</SafeAreaProvider>
 				</EditorProvider>
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
@@ -363,6 +363,10 @@ export default compose( [
 			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
+		const settings = getBlockEditorSettings();
+		const defaultEditorColors = settings?.colors ?? [];
+		const defaultEditorGradients = settings?.gradients ?? [];
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			mode: getEditorMode(),
@@ -370,7 +374,8 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
-			getBlockEditorSettings,
+			defaultEditorColors,
+			defaultEditorGradients,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

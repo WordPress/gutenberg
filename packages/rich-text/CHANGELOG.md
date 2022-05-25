@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 5.7.0 (2022-05-18)
+
+## 5.6.0 (2022-05-04)
+
+## 5.5.0 (2022-04-21)
+
+## 5.4.0 (2022-04-08)
+
+## 5.3.0 (2022-03-23)
+
+## 5.2.0 (2022-03-11)
+
+## 5.1.1 (2022-02-10)
+
 ### Bug Fix
 
 -   Removed unused `@wordpress/dom`, `@wordpress/is-shallow-equal` and `classnames` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).

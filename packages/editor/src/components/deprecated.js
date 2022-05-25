@@ -1,4 +1,4 @@
-// Block Creation Components
+// Block Creation Components.
 /**
  * WordPress dependencies
  */
@@ -48,7 +48,6 @@ import {
 	MultiSelectScrollIntoView as RootMultiSelectScrollIntoView,
 	NavigableToolbar as RootNavigableToolbar,
 	ObserveTyping as RootObserveTyping,
-	PreserveScrollInReorder as RootPreserveScrollInReorder,
 	SkipToSelectedBlock as RootSkipToSelectedBlock,
 	URLInput as RootURLInput,
 	URLInputButton as RootURLInputButton,
@@ -223,10 +222,6 @@ export const NavigableToolbar = deprecateComponent(
 export const ObserveTyping = deprecateComponent(
 	'ObserveTyping',
 	RootObserveTyping
-);
-export const PreserveScrollInReorder = deprecateComponent(
-	'PreserveScrollInReorder',
-	RootPreserveScrollInReorder
 );
 export const SkipToSelectedBlock = deprecateComponent(
 	'SkipToSelectedBlock',

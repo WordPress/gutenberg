@@ -22,7 +22,11 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"spacing": {
 			"margin": true

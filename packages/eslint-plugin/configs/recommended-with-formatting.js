@@ -45,7 +45,11 @@ const config = {
 	},
 };
 
-if ( isPackageInstalled( 'jest' ) ) {
+// Don't apply Jest config if Playwright is installed.
+if (
+	isPackageInstalled( 'jest' ) &&
+	! isPackageInstalled( '@playwright/test' )
+) {
 	config.overrides = [
 		{
 			// Unit test files and their helpers only.

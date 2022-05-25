@@ -320,13 +320,13 @@ describe( 'Change detection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
-		// Save
+		// Save.
 		await saveDraft();
 
 		// Verify that the title is empty.
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			// Trim padding non-breaking space
+			// Trim padding non-breaking space.
 			( element ) => element.textContent.trim()
 		);
 		expect( title ).toBe( '' );
@@ -339,7 +339,7 @@ describe( 'Change detection', () => {
 		// Enter title.
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		// Save
+		// Save.
 		await saveDraft();
 		const postId = await page.evaluate( () =>
 			window.wp.data.select( 'core/editor' ).getCurrentPostId()

@@ -39,13 +39,13 @@ async function insertBlocksOfMultipleTypes() {
 
 describe( 'Block Grouping', () => {
 	beforeEach( async () => {
-		// Posts are auto-removed at the end of each test run
+		// Posts are auto-removed at the end of each test run.
 		await createNewPost();
 	} );
 
 	describe( 'Group creation', () => {
 		it( 'creates a group from multiple blocks of the same type via block transforms', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
@@ -58,7 +58,7 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'creates a group from multiple blocks of different types via block transforms', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfMultipleTypes();
 
 			// Multiselect via keyboard.
@@ -71,7 +71,7 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'creates a group from multiple blocks of the same type via options toolbar', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
@@ -85,18 +85,18 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'groups and ungroups multiple blocks of different types via options toolbar', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
-			// Group
+			// Group.
 			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
-			// UnGroup
+			// UnGroup.
 			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Ungroup' );
 
@@ -140,24 +140,41 @@ describe( 'Block Grouping', () => {
 			// Make sure the paragraph in reusable block exists.
 			expect( await getParagraphText() ).toEqual( paragraphText );
 		} );
+		it( 'should group another Group block via options toolbar', async () => {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( '1' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:group -->
+			<div class=\\"wp-block-group\\"><!-- wp:group -->
+			<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+			<p>1</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group --></div>
+			<!-- /wp:group -->"
+		` );
+		} );
 	} );
 
 	describe( 'Grouping Block availability', () => {
 		beforeEach( async () => {
-			// Disable the Group block
+			// Disable the Group block.
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
 			} );
 
-			// Create a Group
+			// Create a Group.
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 		} );
 
 		afterAll( async () => {
-			// Re-enable the Group block
+			// Re-enable the Group block.
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/group' ] );
@@ -239,14 +256,14 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'should use registered grouping block for grouping interactions', async () => {
-			// Set custom Block as the Block to use for Grouping
+			// Set custom Block as the Block to use for Grouping.
 			await page.evaluate( () => {
 				window.wp.blocks.setGroupingBlockName(
 					'test/alternative-group-block'
 				);
 			} );
 
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.

@@ -30,7 +30,7 @@ export const getNavigationPostForMenu = ( menuId ) => async ( {
 	}
 
 	const stubPost = createStubPost( menuId );
-	// Persist an empty post to warm up the state
+	// Persist an empty post to warm up the state.
 	dispatch( persistPost( stubPost ) );
 
 	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
@@ -42,17 +42,17 @@ export const getNavigationPostForMenu = ( menuId ) => async ( {
 	];
 	registry.dispatch( coreStore ).startResolution( 'getEntityRecord', args );
 
-	// Now let's create a proper one hydrated using actual menu items
+	// Now let's create a proper one hydrated using actual menu items.
 	const menuItems = await registry
 		.resolveSelect( coreStore )
 		.getMenuItems( menuItemsQuery( menuId ) );
 
 	const navigationBlock = createNavigationBlock( menuItems );
-	// Persist the actual post containing the navigation block
+	// Persist the actual post containing the navigation block.
 	const builtPost = createStubPost( menuId, navigationBlock );
 	dispatch( persistPost( builtPost ) );
 
-	// Dispatch finishResolution to conclude startResolution dispatched earlier
+	// Dispatch finishResolution to conclude startResolution dispatched earlier.
 	registry.dispatch( coreStore ).finishResolution( 'getEntityRecord', args );
 };
 

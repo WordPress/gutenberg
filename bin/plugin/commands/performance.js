@@ -323,7 +323,7 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches
+		// Alternate three times between branches.
 		for ( let i = 0; i < 3; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {

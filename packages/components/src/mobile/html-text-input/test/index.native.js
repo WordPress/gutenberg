@@ -8,12 +8,12 @@ import { render, fireEvent } from 'test/helpers';
  */
 import { HTMLTextInput } from '..';
 
-// Finds the Content TextInput in our HTMLInputView
+// Finds the Content TextInput in our HTMLInputView.
 const findContentTextInput = ( screen ) => {
 	return screen.getByA11yLabel( 'html-view-content' );
 };
 
-// Finds the Title TextInput in our HTMLInputView
+// Finds the Title TextInput in our HTMLInputView.
 const findTitleTextInput = ( screen ) => {
 	return screen.getByA11yLabel( 'html-view-title' );
 };
@@ -43,11 +43,11 @@ describe( 'HTMLTextInput', () => {
 			/>
 		);
 
-		// Simulate user typing text
+		// Simulate user typing text.
 		const htmlTextInput = findContentTextInput( screen );
 		fireEvent( htmlTextInput, 'changeText', 'text' );
 
-		//Check if the onChange is called and the state is updated
+		// Check if the onChange is called and the state is updated.
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( 'text' );
 
@@ -65,15 +65,15 @@ describe( 'HTMLTextInput', () => {
 			/>
 		);
 
-		// Simulate user typing text
+		// Simulate user typing text.
 		const htmlTextInput = findContentTextInput( screen );
 		fireEvent( htmlTextInput, 'changeText', 'text' );
 
-		//Simulate blur event
+		//Simulate blur event.
 		fireEvent( htmlTextInput, 'blur' );
 
-		//Normally prop.value is updated with the help of withSelect
-		//But we don't have it in tests so we just simulate it
+		// Normally prop.value is updated with the help of withSelect
+		// but we don't have it in tests so we just simulate it.
 		screen.update(
 			<HTMLTextInput
 				onPersist={ onPersist }
@@ -83,17 +83,17 @@ describe( 'HTMLTextInput', () => {
 			/>
 		);
 
-		//Check if the onPersist is called and the state is updated
+		// Check if the onPersist is called and the state is updated.
 		expect( onPersist ).toHaveBeenCalledTimes( 1 );
 		expect( onPersist ).toHaveBeenCalledWith( 'text' );
 
-		//Simulate blur event
+		//Simulate blur event.
 		fireEvent( htmlTextInput, 'blur' );
 
-		// Check that onPersist is not called for non-dirty state
+		// Check that onPersist is not called for non-dirty state.
 		expect( onPersist ).toHaveBeenCalledTimes( 1 );
 
-		//We expect state.value is getting propagated from prop.value
+		// We expect state.value is getting propagated from prop.value.
 		expect( screen.getByDisplayValue( 'text' ) ).toBeDefined();
 	} );
 
@@ -107,11 +107,11 @@ describe( 'HTMLTextInput', () => {
 			/>
 		);
 
-		// Simulate user typing text
+		// Simulate user typing text.
 		const textInput = findTitleTextInput( screen );
 		fireEvent( textInput, 'changeText', 'text' );
 
-		//Check if the setTitleAction is called
+		// Check if the setTitleAction is called.
 		expect( editTitle ).toHaveBeenCalledTimes( 1 );
 		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );

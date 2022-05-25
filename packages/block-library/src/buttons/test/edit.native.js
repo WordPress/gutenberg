@@ -16,12 +16,12 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 beforeAll( () => {
-	// Register all core blocks
+	// Register all core blocks.
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
-	// Clean up registered blocks
+	// Clean up registered blocks.
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
 	} );
@@ -32,7 +32,7 @@ describe( 'Buttons block', () => {
 		it( 'adjusts the border radius', async () => {
 			const initialHtml = `<!-- wp:buttons -->
 			<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"5px"}}} -->
-			<div class="wp-block-button"><a class="wp-block-button__link" style="border-radius:5px" >Hello</a></div>
+			<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="border-radius:5px" >Hello</a></div>
 			<!-- /wp:button --></div>
 			<!-- /wp:buttons -->`;
 			const { getByA11yLabel } = await initializeEditor( {
@@ -103,7 +103,7 @@ describe( 'Buttons block', () => {
 					getByA11yLabel( 'Change items justification' )
 				);
 
-				// Select alignment option
+				// Select alignment option.
 				fireEvent.press(
 					await waitFor( () => getByText( justificationOption ) )
 				);

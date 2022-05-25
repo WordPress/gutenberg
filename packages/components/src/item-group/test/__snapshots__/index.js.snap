@@ -11,8 +11,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-346xw3-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -24,8 +24,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-346xw3-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-10mizr-View-large-item-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -44,8 +44,8 @@ Snapshot Diff:
     role="listitem"
   >
     <div
--     class="components-item css-4qcpca-View-medium-item em57xhy0"
-+     class="components-item css-132y1d5-View-large-item em57xhy0"
+-     class="components-item css-bsdqin-View-medium-item em57xhy0"
++     class="components-item css-1ohjtsa-View-large-item em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -78,6 +78,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   width: 100%;
   display: block;
   margin: 0;
+  color: inherit;
   border-radius: 2px;
 }
 
@@ -120,8 +121,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-4qcpca-View-medium-item em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-bsdqin-View-medium-item em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -147,8 +148,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-2fnxcf-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-4qcpca-View-medium-item em57xhy0"
+-       class="components-item css-1uo9kmu-View-medium-item-spacedAround em57xhy0"
++       class="components-item css-bsdqin-View-medium-item em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >

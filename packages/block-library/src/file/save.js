@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalElementButtonClassName,
+} from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
@@ -25,6 +34,12 @@ export default function save( { attributes } ) {
 				fileName
 		  );
 
+	const hasFilename = ! RichText.isEmpty( fileName );
+
+	// Only output an `aria-describedby` when the element it's referring to is
+	// actually rendered.
+	const describedById = hasFilename ? fileId : undefined;
+
 	return (
 		href && (
 			<div { ...useBlockProps.save() }>
@@ -42,9 +57,9 @@ export default function save( { attributes } ) {
 						/>
 					</>
 				) }
-				{ ! RichText.isEmpty( fileName ) && (
+				{ hasFilename && (
 					<a
-						id={ fileId }
+						id={ describedById }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
@@ -57,9 +72,12 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className="wp-block-file__button"
+						className={ classnames(
+							'wp-block-file__button',
+							__experimentalElementButtonClassName
+						) }
 						download={ true }
-						aria-describedby={ fileId }
+						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>

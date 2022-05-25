@@ -95,7 +95,7 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 
 	let isForwardRef;
 	const { render } = OriginalComponent;
-	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
+	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
 	if ( typeof render === 'function' ) {
 		isForwardRef = true;
 		return forwardRef( Component );

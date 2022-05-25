@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	PanelBody,
-	CustomSelectControl,
-	ToggleControl,
-} from '@wordpress/components';
+	dateI18n,
+	__experimentalGetSettings as getDateSettings,
+} from '@wordpress/date';
+import {
+	InspectorControls,
+	useBlockProps,
+	__experimentalDateFormatPicker as DateFormatPicker,
+} from '@wordpress/block-editor';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
 /**
@@ -31,35 +34,22 @@ export default function Edit( {
 } ) {
 	const blockProps = useBlockProps();
 	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteDateFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-
-	const settings = __experimentalGetSettings();
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date || new Date() ),
-		} )
+	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
+		'root',
+		'site',
+		'date_format'
 	);
-	const resolvedFormat = format || siteDateFormat || settings.formats.date;
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Format settings' ) }>
-				<CustomSelectControl
-					hideLabelFromVision
-					label={ __( 'Date Format' ) }
-					options={ formatOptions }
-					onChange={ ( { selectedItem } ) =>
-						setAttributes( {
-							format: selectedItem.key,
-						} )
+			<PanelBody title={ __( 'Settings' ) }>
+				<DateFormatPicker
+					format={ format }
+					defaultFormat={ siteFormat }
+					onChange={ ( nextFormat ) =>
+						setAttributes( { format: nextFormat } )
 					}
-					value={ formatOptions.find(
-						( option ) => option.key === resolvedFormat
-					) }
 				/>
-			</PanelBody>
-			<PanelBody title={ __( 'Link settings' ) }>
 				<ToggleControl
 					label={ __( 'Link to comment' ) }
 					onChange={ () => setAttributes( { isLink: ! isLink } ) }
@@ -82,7 +72,7 @@ export default function Edit( {
 
 	let commentDate = (
 		<time dateTime={ dateI18n( 'c', date ) }>
-			{ dateI18n( resolvedFormat, date ) }
+			{ dateI18n( format || siteFormat, date ) }
 		</time>
 	);
 

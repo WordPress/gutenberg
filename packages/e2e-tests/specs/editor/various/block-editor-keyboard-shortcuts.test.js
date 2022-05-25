@@ -76,16 +76,14 @@ describe( 'block editor keyboard shortcuts', () => {
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 		} );
-		it( 'should propagate properly and delete selected blocks', async () => {
+		it( 'should propagate properly and duplicate selected blocks', async () => {
 			await clickBlockToolbarButton( 'Options' );
 			const label = 'Duplicate';
 			await page.$x(
 				`//div[@role="menu"]//span[contains(concat(" ", @class, " "), " components-menu-item__item ")][contains(text(), "${ label }")]`
 			);
-			await page.keyboard.press( 'Delete' );
-			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
-				`""`
-			);
+			await pressKeyWithModifier( 'primaryShift', 'd' );
+			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );

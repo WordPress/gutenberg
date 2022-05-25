@@ -13,7 +13,6 @@ import {
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import { RawHTML } from '@wordpress/element';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -61,9 +60,10 @@ export default function PostTitleEdit( {
 					{ ...blockProps }
 				/>
 			) : (
-				<TagName { ...blockProps }>
-					<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
-				</TagName>
+				<TagName
+					{ ...blockProps }
+					dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				/>
 			);
 	}
 
@@ -91,9 +91,10 @@ export default function PostTitleEdit( {
 						target={ linkTarget }
 						rel={ rel }
 						onClick={ ( event ) => event.preventDefault() }
-					>
-						<RawHTML key="html">{ fullTitle?.rendered }</RawHTML>
-					</a>
+						dangerouslySetInnerHTML={ {
+							__html: fullTitle?.rendered,
+						} }
+					/>
 				</TagName>
 			);
 	}

@@ -29,7 +29,7 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -85,11 +85,13 @@ function MaybeIframe( {
 export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
+		isWelcomeGuideVisible,
 		isTemplateMode,
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
 		const {
+			isFeatureActive,
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
@@ -105,11 +107,13 @@ export default function VisualEditor( { styles } ) {
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			isTemplateMode: _isTemplateMode,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
+	const { isCleanNewPost } = useSelect( editorStore );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
@@ -124,8 +128,7 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
-		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
+		height: '100%',
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -187,6 +190,14 @@ export default function VisualEditor( { styles } ) {
 		return undefined;
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
+	const titleRef = useRef();
+	useEffect( () => {
+		if ( isWelcomeGuideVisible || ! isCleanNewPost() ) {
+			return;
+		}
+		titleRef?.current?.focus();
+	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
@@ -237,8 +248,11 @@ export default function VisualEditor( { styles } ) {
 							/>
 						) }
 						{ ! isTemplateMode && (
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
+							<div
+								className="edit-post-visual-editor__post-title-wrapper"
+								contentEditable={ false }
+							>
+								<PostTitle ref={ titleRef } />
 							</div>
 						) }
 						<RecursionProvider>

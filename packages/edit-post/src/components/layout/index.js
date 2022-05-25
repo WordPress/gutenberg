@@ -38,7 +38,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import PreferencesModal from '../preferences-modal';
+import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
@@ -47,10 +47,10 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 
 const interfaceLabels = {
-	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -170,6 +170,10 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
 			return <InserterSidebar />;
@@ -177,6 +181,7 @@ function Layout( { styles } ) {
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
 		}
+
 		return null;
 	};
 
@@ -204,7 +209,10 @@ function Layout( { styles } ) {
 			<SettingsSidebar />
 			<InterfaceSkeleton
 				className={ className }
-				labels={ interfaceLabels }
+				labels={ {
+					...interfaceLabels,
+					secondarySidebar: secondarySidebarLabel,
+				} }
 				header={
 					<Header
 						setEntitiesSavedStatesCallback={
@@ -283,9 +291,10 @@ function Layout( { styles } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<PreferencesModal />
+			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
+			<StartPageOptions />
 			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
 		</>

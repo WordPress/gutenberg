@@ -9,7 +9,7 @@ import { useFormGroup } from './use-form-group';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                              forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
  */
 function FormGroup( props, forwardedRef ) {
 	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );

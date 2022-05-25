@@ -196,8 +196,8 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
+// The media library image object contains numerous attributes
+// we only need this set to display the image in the library.
 const slimImageObject = ( img ) => {
 	const attrSet = [
 		'sizes',
@@ -369,7 +369,7 @@ class MediaUpload extends Component {
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
-		// Get media attachment details from the frame state
+		// Get media attachment details from the frame state.
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
@@ -422,15 +422,15 @@ class MediaUpload extends Component {
 		if ( frameContent && frameContent.collection ) {
 			const collection = frameContent.collection;
 
-			// clean all attachments we have in memory.
+			// Clean all attachments we have in memory.
 			collection
 				.toArray()
 				.forEach( ( model ) => model.trigger( 'destroy', model ) );
 
-			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			// Reset has more flag, if library had small amount of items all items may have been loaded before.
 			collection.mirroring._hasMore = true;
 
-			// request items
+			// Request items.
 			collection.more();
 		}
 	}

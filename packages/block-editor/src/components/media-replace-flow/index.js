@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { uniqueId, noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState, createRef, renderToString } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -17,10 +17,11 @@ import {
 	Dropdown,
 	withFilters,
 } from '@wordpress/components';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
+import { compose } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -37,10 +38,10 @@ const MediaReplaceFlow = ( {
 	mediaIds,
 	allowedTypes,
 	accept,
+	onError,
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
-	onCloseModal = noop,
 	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
@@ -53,20 +54,17 @@ const MediaReplaceFlow = ( {
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const editMediaButtonRef = createRef();
+	const editMediaButtonRef = useRef();
 	const errorNoticeID = uniqueId(
 		'block-editor/media-replace-flow/error-notice/'
 	);
 
-	const onError = ( message ) => {
-		const errorElement = document.createElement( 'div' );
-		errorElement.innerHTML = renderToString( message );
-		// The default error contains some HTML that,
-		// for example, makes the filename bold.
-		// The notice, by default, accepts strings only and so
-		// we need to remove the html from the error.
-		const renderMsg =
-			errorElement.textContent || errorElement.innerText || '';
+	const onUploadError = ( message ) => {
+		const safeMessage = stripHTML( message );
+		if ( onError ) {
+			onError( safeMessage );
+			return;
+		}
 		// We need to set a timeout for showing the notice
 		// so that VoiceOver and possibly other screen readers
 		// can announce the error afer the toolbar button
@@ -74,7 +72,7 @@ const MediaReplaceFlow = ( {
 		// Otherwise VO simply skips over the notice and announces
 		// the focused element and the open menu.
 		setTimeout( () => {
-			createNotice( 'error', renderMsg, {
+			createNotice( 'error', safeMessage, {
 				speak: true,
 				id: errorNoticeID,
 				isDismissible: true,
@@ -84,15 +82,11 @@ const MediaReplaceFlow = ( {
 
 	const selectMedia = ( media, closeMenu ) => {
 		closeMenu();
-		setMediaURLValue( media.url );
+		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
 		removeNotice( errorNoticeID );
-	};
-
-	const selectURL = ( newURL ) => {
-		onSelectURL( newURL );
 	};
 
 	const uploadFiles = ( event, closeMenu ) => {
@@ -102,14 +96,13 @@ const MediaReplaceFlow = ( {
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		const setMedia = ( [ media ] ) => {
-			selectMedia( media, closeMenu );
-		};
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,
-			onFileChange: setMedia,
-			onError,
+			onFileChange: ( [ media ] ) => {
+				selectMedia( media, closeMenu );
+			},
+			onError: onUploadError,
 		} );
 	};
 
@@ -164,7 +157,6 @@ const MediaReplaceFlow = ( {
 								selectMedia( media, onClose )
 							}
 							allowedTypes={ allowedTypes }
-							onClose={ onCloseModal }
 							render={ ( { open } ) => (
 								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
@@ -206,7 +198,7 @@ const MediaReplaceFlow = ( {
 								showSuggestions={ false }
 								onChange={ ( { url } ) => {
 									setMediaURLValue( url );
-									selectURL( url );
+									onSelectURL( url );
 									editMediaButtonRef.current.focus();
 								} }
 							/>
@@ -218,6 +210,9 @@ const MediaReplaceFlow = ( {
 	);
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-replace-flow/README.md
+ */
 export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { createNotice, removeNotice } = dispatch( noticesStore );

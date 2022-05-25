@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { size, map, without } from 'lodash';
+import { forEach, size, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -43,7 +44,6 @@ function Editor( {
 		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
@@ -51,10 +51,10 @@ function Editor( {
 		( select ) => {
 			const {
 				isFeatureActive,
-				getPreference,
 				__experimentalGetPreviewDeviceType,
 				isEditingTemplate,
 				getEditedPostTemplate,
+				getHiddenBlockTypes,
 			} = select( editPostStore );
 			const { getEntityRecord, getPostType, getEntityRecords } = select(
 				coreStore
@@ -86,14 +86,12 @@ function Editor( {
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
-				preferredStyleVariations: getPreference(
+				preferredStyleVariations: select( preferencesStore ).get(
+					'core/edit-post',
 					'preferredStyleVariations'
 				),
-				hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
-				__experimentalLocalAutosaveInterval: getPreference(
-					'localAutosaveInterval'
-				),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
@@ -120,7 +118,6 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
-			__experimentalLocalAutosaveInterval,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -155,7 +152,6 @@ function Editor( {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		__experimentalLocalAutosaveInterval,
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
@@ -164,7 +160,7 @@ function Editor( {
 	const styles = useMemo( () => {
 		const themeStyles = [];
 		const presetStyles = [];
-		settings.styles.forEach( ( style ) => {
+		forEach( settings.styles, ( style ) => {
 			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
 				themeStyles.push( style );
 			} else {

@@ -8,7 +8,7 @@ import { partial, isEmpty, map, fromPairs } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import { PanelBody, SelectControl } from '@wordpress/components';
+import { Notice, PanelBody, SelectControl } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -28,6 +28,7 @@ export function TemplatePanel() {
 	const {
 		isEnabled,
 		isOpened,
+		isPostsPage,
 		selectedTemplate,
 		availableTemplates,
 		fetchedTemplates,
@@ -44,10 +45,19 @@ export function TemplatePanel() {
 		const {
 			getEditedPostAttribute,
 			getEditorSettings,
+			getCurrentPostId,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType, getEntityRecords, canUser } = select( coreStore );
+		const {
+			getPostType,
+			getEntityRecord,
+			getEntityRecords,
+			canUser,
+		} = select( coreStore );
+
+		const currentPostId = getCurrentPostId();
 		const currentPostType = getCurrentPostType();
+		const settings = getEntityRecord( 'root', 'site' );
 		const _isViewable = getPostType( currentPostType )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
@@ -61,6 +71,7 @@ export function TemplatePanel() {
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
+			isPostsPage: currentPostId === settings?.page_for_posts,
 			selectedTemplate: getEditedPostAttribute( 'template' ),
 			availableTemplates: getEditorSettings().availableTemplates,
 			fetchedTemplates: templateRecords,
@@ -112,25 +123,40 @@ export function TemplatePanel() {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<SelectControl
-				hideLabelFromVision
-				label={ __( 'Template:' ) }
-				value={
-					Object.keys( templates ).includes( selectedTemplate )
-						? selectedTemplate
-						: ''
-				}
-				onChange={ ( templateSlug ) => {
-					editPost( {
-						template: templateSlug || '',
-					} );
-				} }
-				options={ map( templates, ( templateName, templateSlug ) => ( {
-					value: templateSlug,
-					label: templateName,
-				} ) ) }
-			/>
-			{ canUserCreate && <PostTemplateActions /> }
+			{ isPostsPage ? (
+				<Notice
+					className="edit-post-template__notice"
+					status="warning"
+					isDismissible={ false }
+				>
+					{ __( 'The posts page template cannot be changed.' ) }
+				</Notice>
+			) : (
+				<SelectControl
+					hideLabelFromVision
+					label={ __( 'Template:' ) }
+					value={
+						Object.keys( templates ).includes( selectedTemplate )
+							? selectedTemplate
+							: ''
+					}
+					onChange={ ( templateSlug ) => {
+						editPost( {
+							template: templateSlug || '',
+						} );
+					} }
+					options={ map(
+						templates,
+						( templateName, templateSlug ) => ( {
+							value: templateSlug,
+							label: templateName,
+						} )
+					) }
+				/>
+			) }
+			{ canUserCreate && (
+				<PostTemplateActions isPostsPage={ isPostsPage } />
+			) }
 		</PanelBody>
 	);
 }

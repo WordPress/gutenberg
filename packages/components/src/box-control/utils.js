@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseUnit } from '../unit-control/utils';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -25,17 +25,10 @@ export const LABELS = {
 };
 
 export const DEFAULT_VALUES = {
-	top: null,
-	right: null,
-	bottom: null,
-	left: null,
-};
-
-export const DEFAULT_VISUALIZER_VALUES = {
-	top: false,
-	right: false,
-	bottom: false,
-	left: false,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
 };
 
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -61,20 +54,32 @@ function mode( arr ) {
  * Gets the 'all' input value and unit from values data.
  *
  * @param {Object} values         Box values.
+ * @param {Object} selectedUnits  Box units.
  * @param {Array}  availableSides Available box sides to evaluate.
  *
  * @return {string} A value + unit for the 'all' input.
  */
-export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
+export function getAllValue(
+	values = {},
+	selectedUnits,
+	availableSides = ALL_SIDES
+) {
 	const sides = normalizeSides( availableSides );
-	const parsedValues = sides.map( ( side ) => parseUnit( values[ side ] ) );
-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
+		parseQuantityAndUnitFromRawValue( values[ side ] )
+	);
+	const allParsedQuantities = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 0 ] ?? ''
+	);
+	const allParsedUnits = parsedQuantitiesAndUnits.map(
+		( value ) => value[ 1 ]
+	);
 
-	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
-		? allValues[ 0 ]
+	const commonQuantity = allParsedQuantities.every(
+		( v ) => v === allParsedQuantities[ 0 ]
+	)
+		? allParsedQuantities[ 0 ]
 		: '';
-	const unit = mode( allUnits );
 
 	/**
 	 * The isNumber check is important. On reset actions, the incoming value
@@ -85,9 +90,17 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	let commonUnit;
+	if ( isNumber( commonQuantity ) ) {
+		commonUnit = mode( allParsedUnits );
+	} else {
+		// Set meaningful unit selection if no commonQuantity and user has previously
+		// selected units without assigning values while controls were unlinked.
+		commonUnit =
+			getAllUnitFallback( selectedUnits ) ?? mode( allParsedUnits );
+	}
 
-	return allValue;
+	return [ commonQuantity, commonUnit ].join( '' );
 }
 
 /**
@@ -109,13 +122,14 @@ export function getAllUnitFallback( selectedUnits ) {
 /**
  * Checks to determine if values are mixed.
  *
- * @param {Object} values Box values.
- * @param {Array}  sides  Available box sides to evaluate.
+ * @param {Object} values        Box values.
+ * @param {Object} selectedUnits Box units.
+ * @param {Array}  sides         Available box sides to evaluate.
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {}, sides = ALL_SIDES ) {
-	const allValue = getAllValue( values, sides );
+export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
+	const allValue = getAllValue( values, selectedUnits, sides );
 	const isMixed = isNaN( parseFloat( allValue ) );
 
 	return isMixed;

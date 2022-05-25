@@ -10,7 +10,7 @@ import type { NavigatorContext as NavigatorContextType } from './types';
 
 const initialContextValue: NavigatorContextType = {
 	location: {},
-	push: () => {},
-	pop: () => {},
+	goTo: () => {},
+	goBack: () => {},
 };
 export const NavigatorContext = createContext( initialContextValue );

@@ -23,8 +23,17 @@ export default function SiteExport() {
 				parse: false,
 			} );
 			const blob = await response.blob();
+			const contentDisposition = response.headers.get(
+				'content-disposition'
+			);
+			const contentDispositionMatches = contentDisposition.match(
+				/=(.+)\.zip/
+			);
+			const fileName = contentDispositionMatches[ 1 ]
+				? contentDispositionMatches[ 1 ]
+				: 'edit-site-export';
 
-			downloadjs( blob, 'edit-site-export.zip', 'application/zip' );
+			downloadjs( blob, fileName + '.zip', 'application/zip' );
 		} catch ( errorResponse ) {
 			let error = {};
 			try {
@@ -44,7 +53,9 @@ export default function SiteExport() {
 			role="menuitem"
 			icon={ download }
 			onClick={ handleExport }
-			info={ __( 'Download your templates and template parts.' ) }
+			info={ __(
+				'Download your theme with updated templates and styles.'
+			) }
 		>
 			{ _x( 'Export', 'site exporter menu item' ) }
 		</MenuItem>

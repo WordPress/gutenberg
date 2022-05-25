@@ -1,0 +1,7 @@
+<!-- wp:shortcode -->
+[my-shortcode]
+<!-- /wp:shortcode -->
+
+<!-- wp:paragraph -->
+<p>Pasted: e]</p>
+<!-- /wp:paragraph -->

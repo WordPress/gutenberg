@@ -6,36 +6,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS } from './defaults';
 import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
- */
-export const preferences = combineReducers( {
-	features( state = PREFERENCES_DEFAULTS.features, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_FEATURE': {
-				return {
-					...state,
-					[ action.feature ]: ! state[ action.feature ],
-				};
-			}
-			default:
-				return state;
-		}
-	},
-	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
-		if ( action.type === 'SWITCH_MODE' ) {
-			return action.mode;
-		}
-		return state;
-	},
-} );
 
 /**
  * Reducer returning the editing canvas device type.
@@ -213,7 +184,6 @@ export function listViewPanel( state = false, action ) {
 }
 
 export default combineReducers( {
-	preferences,
 	deviceType,
 	settings,
 	editedPost,

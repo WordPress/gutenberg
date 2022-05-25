@@ -1,7 +1,7 @@
-// Block Creation Components
+// Block Creation Components.
 export * from './autocompleters';
 
-// Post Related Components
+// Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
@@ -64,7 +64,7 @@ export { default as ThemeSupportCheck } from './theme-support-check';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 
-// State Related Components
+// State Related Components.
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';

@@ -4,22 +4,6 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Reducer keeping track of selected menu ID.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
- */
-export function selectedMenuId( state = null, action ) {
-	switch ( action.type ) {
-		case 'SET_SELECTED_MENU_ID':
-			return action.menuId;
-	}
-
-	return state;
-}
-
-/**
  * Reducer tracking whether the inserter is open.
  *
  * @param {boolean|Object} state        Current state.
@@ -36,6 +20,5 @@ function blockInserterPanel( state = false, action ) {
 }
 
 export default combineReducers( {
-	selectedMenuId,
 	blockInserterPanel,
 } );

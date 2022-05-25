@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 4.7.0 (2022-05-18)
+
+### New Features
+
+-   Stabilized the `useEntityRecord` and `useEntityRecords` hooks ([#40162](https://github.com/WordPress/gutenberg/pull/40162))
+
+## 4.6.0 (2022-05-04)
+
+## 4.5.0 (2022-04-21)
+
+## 4.4.0 (2022-04-08)
+
+## 4.3.0 (2022-03-23)
+
+### New Features
+-   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
+-   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
+
+## 4.2.0 (2022-03-11)
+
+## 4.1.2 (2022-02-23)
+
+### Bug Fixes
+
+-   The `canUser` no longer uses the `GET` request with the resource ID argument [#38901](https://github.com/WordPress/gutenberg/pull/38901).
+
 ## 4.1.0 (2022-01-27)
 
 ### Bug Fixes

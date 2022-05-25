@@ -2,14 +2,14 @@
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
+import ColorGradientSettingsDropdown from '../components/colors-gradients/dropdown';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
+import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
@@ -21,10 +21,10 @@ export default function ColorPanel( {
 	settings,
 	clientId,
 	enableContrastChecking = true,
-	showTitle = true,
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
+	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
 
 	useEffect( () => {
@@ -36,6 +36,11 @@ export default function ColorPanel( {
 			return;
 		}
 		setDetectedColor( getComputedStyle( ref.current ).color );
+
+		const firstLinkElement = ref.current?.querySelector( 'a' );
+		if ( firstLinkElement && !! firstLinkElement.innerText ) {
+			setDetectedLinkColor( getComputedStyle( firstLinkElement ).color );
+		}
 
 		let backgroundColorNode = ref.current;
 		let backgroundColor = getComputedStyle( backgroundColorNode )
@@ -54,25 +59,27 @@ export default function ColorPanel( {
 		setDetectedBackgroundColor( backgroundColor );
 	} );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
-		<InspectorControls>
-			<PanelColorGradientSettings
-				title={ __( 'Color' ) }
-				initialOpen={ false }
-				settings={ settings }
-				showTitle={ showTitle }
+		<InspectorControls __experimentalGroup="color">
+			<ColorGradientSettingsDropdown
 				enableAlpha={ enableAlpha }
+				panelId={ clientId }
+				settings={ settings }
+				__experimentalIsItemGroup={ false }
 				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
-			>
-				{ enableContrastChecking && (
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-						enableAlphaChecker={ enableAlpha }
-					/>
-				) }
-			</PanelColorGradientSettings>
+				{ ...colorGradientSettings }
+			/>
+			{ enableContrastChecking && (
+				<ContrastChecker
+					backgroundColor={ detectedBackgroundColor }
+					textColor={ detectedColor }
+					enableAlphaChecker={ enableAlpha }
+					linkColor={ detectedLinkColor }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

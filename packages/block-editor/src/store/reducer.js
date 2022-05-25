@@ -216,7 +216,7 @@ function updateParentInnerBlocksInTree(
 				controlledParents.add( current );
 				break;
 			} else {
-				// else continue traversing up through parents.
+				// Else continue traversing up through parents.
 				uncontrolledParents.add( current );
 				current = state.parents[ current ];
 			}
@@ -606,12 +606,13 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
+			visibility: {},
 		};
 
 		const subTree = buildBlockTree( newState, action.blocks );
 		newState.tree = {
 			...subTree,
-			// Root
+			// Root.
 			'': {
 				innerBlocks: action.blocks.map(
 					( subBlock ) => subTree[ subBlock.clientId ]
@@ -712,7 +713,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	if ( state && action.type === 'SAVE_REUSABLE_BLOCK_SUCCESS' ) {
 		const { id, updatedId } = action;
 
-		// If a temporary reusable block is saved, we swap the temporary id with the final one
+		// If a temporary reusable block is saved, we swap the temporary id with the final one.
 		if ( id === updatedId ) {
 			return state;
 		}
@@ -769,10 +770,10 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  */
 export const blocks = flow(
 	combineReducers,
-	withSaveReusableBlock, // needs to be before withBlockCache
-	withBlockTree, // needs to be before withInnerBlocksRemoveCascade
+	withSaveReusableBlock, // Needs to be before withBlockCache.
+	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
 	withInnerBlocksRemoveCascade,
-	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
+	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
@@ -788,7 +789,7 @@ export const blocks = flow(
 				};
 
 			case 'UPDATE_BLOCK':
-				// Ignore updates if block isn't known
+				// Ignore updates if block isn't known.
 				if ( ! state[ action.clientId ] ) {
 					return state;
 				}
@@ -947,7 +948,7 @@ export const blocks = flow(
 				} = action;
 				const { index = state[ toRootClientId ].length } = action;
 
-				// Moving inside the same parent block
+				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state[ toRootClientId ];
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
@@ -962,7 +963,7 @@ export const blocks = flow(
 					};
 				}
 
-				// Moving from a parent block to another
+				// Moving from a parent block to another.
 				return {
 					...state,
 					[ fromRootClientId ]: without(
@@ -1068,10 +1069,10 @@ export const blocks = flow(
 
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				return flow( [
-					// Remove inner block ordering for removed blocks
+					// Remove inner block ordering for removed blocks.
 					( nextState ) => omit( nextState, action.removedClientIds ),
 
-					// Remove deleted blocks from other blocks' orderings
+					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
 						mapValues( nextState, ( subState ) =>
 							without( subState, ...action.removedClientIds )
@@ -1139,6 +1140,17 @@ export const blocks = flow(
 		}
 		return state;
 	},
+
+	visibility( state = {}, action ) {
+		if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
+			return {
+				...state,
+				...action.updates,
+			};
+		}
+
+		return state;
+	},
 } );
 
 /**
@@ -1176,26 +1188,6 @@ export function draggedBlocks( state = [], action ) {
 
 		case 'STOP_DRAGGING_BLOCKS':
 			return [];
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning whether the caret is within formatted text.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function isCaretWithinFormattedText( state = false, action ) {
-	switch ( action.type ) {
-		case 'ENTER_FORMATTED_TEXT':
-			return true;
-
-		case 'EXIT_FORMATTED_TEXT':
-			return false;
 	}
 
 	return state;
@@ -1278,17 +1270,24 @@ function selectionHelper( state = {}, action ) {
 export function selection( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
+			if ( action.clientId ) {
+				return {
+					selectionStart: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.startOffset,
+					},
+					selectionEnd: {
+						clientId: action.clientId,
+						attributeKey: action.attributeKey,
+						offset: action.endOffset,
+					},
+				};
+			}
+
 			return {
-				selectionStart: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.startOffset,
-				},
-				selectionEnd: {
-					clientId: action.clientId,
-					attributeKey: action.attributeKey,
-					offset: action.endOffset,
-				},
+				selectionStart: action.start || state.selectionStart,
+				selectionEnd: action.end || state.selectionEnd,
 			};
 		case 'RESET_SELECTION':
 			const { selectionStart, selectionEnd } = action;
@@ -1298,6 +1297,14 @@ export function selection( state = {}, action ) {
 			};
 		case 'MULTI_SELECT':
 			const { start, end } = action;
+
+			if (
+				start === state.selectionStart?.clientId &&
+				end === state.selectionEnd?.clientId
+			) {
+				return state;
+			}
+
 			return {
 				selectionStart: { clientId: start },
 				selectionEnd: { clientId: end },
@@ -1380,7 +1387,7 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
- * Reducer returning the intial block selection.
+ * Reducer returning the initial block selection.
  *
  * Currently this in only used to restore the selection after block deletion and
  * pasting new content.This reducer should eventually be removed in favour of setting
@@ -1399,6 +1406,7 @@ export function initialPosition( state = null, action ) {
 		return action.initialPosition;
 	} else if (
 		[
+			'MULTI_SELECT',
 			'SELECT_BLOCK',
 			'RESET_SELECTION',
 			'INSERT_BLOCKS',
@@ -1682,7 +1690,8 @@ export function automaticChangeStatus( state, action ) {
 
 			return;
 		// Undoing an automatic change should still be possible after mouse
-		// move.
+		// move or after visibility change.
+		case 'SET_BLOCK_VISIBILITY':
 		case 'START_TYPING':
 		case 'STOP_TYPING':
 			return state;
@@ -1749,7 +1758,6 @@ export default combineReducers( {
 	blocks,
 	isTyping,
 	draggedBlocks,
-	isCaretWithinFormattedText,
 	selection,
 	isMultiSelecting,
 	isSelectionEnabled,

@@ -4,20 +4,28 @@
 	"name": "core/comment-reply-link",
 	"title": "Comment Reply Link",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ],
 	"description": "Displays a link to reply to a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"fontSize": {
+			"type": "string",
+			"default": "small"
 		}
 	},
 	"supports": {
 		"color": {
 			"gradients": true,
 			"link": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

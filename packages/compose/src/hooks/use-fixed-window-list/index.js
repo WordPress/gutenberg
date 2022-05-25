@@ -69,7 +69,7 @@ export default function useFixedWindowList(
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
-			// Aim to keep opening list view fast, afterward we can optimize for scrolling
+			// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 			const windowOverscan = initRender
 				? visibleItems
 				: options?.windowOverscan ?? visibleItems;

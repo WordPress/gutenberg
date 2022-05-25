@@ -17,3 +17,13 @@ exports[`Text color creates a paragraph block with the text color format 1`] = `
 <p>Hello <mark style=\\"background-color:rgba(0,0,0,0);color:#cf2e2e\\" class=\\"has-inline-color has-vivid-red-color\\">this is a test</mark></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Text color supports old text color format using "span" tag 1`] = `
+"<!-- wp:paragraph -->
+<p>this <span class=\\"has-inline-color has-green-color\\">is</span> <span class=\\"has-inline-color has-red-color\\">test</span></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><span style=\\"color:#08a5e9\\" class=\\"has-inline-color\\">this is a test</span></p>
+<!-- /wp:paragraph -->"
+`;

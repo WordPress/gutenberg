@@ -36,6 +36,7 @@ export const item = css`
 	width: 100%;
 	display: block;
 	margin: 0;
+	color: inherit;
 `;
 
 export const bordered = css`

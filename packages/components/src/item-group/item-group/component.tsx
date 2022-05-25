@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import type { ItemGroupProps } from '../types';
 
 function ItemGroup(
 	props: WordPressComponentProps< ItemGroupProps, 'div' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		isBordered,

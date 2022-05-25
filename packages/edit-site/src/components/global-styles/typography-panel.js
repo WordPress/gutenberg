@@ -7,7 +7,11 @@ import {
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 } from '@wordpress/block-editor';
-import { PanelBody, FontSizePicker } from '@wordpress/components';
+import {
+	PanelBody,
+	FontSizePicker,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -143,10 +147,13 @@ export default function TypographyPanel( { name, element } ) {
 				/>
 			) }
 			{ hasLineHeightEnabled && (
-				<LineHeightControl
-					value={ lineHeight }
-					onChange={ setLineHeight }
-				/>
+				<Spacer marginBottom={ 6 }>
+					<LineHeightControl
+						__nextHasNoMarginBottom={ true }
+						value={ lineHeight }
+						onChange={ setLineHeight }
+					/>
+				</Spacer>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl

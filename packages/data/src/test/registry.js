@@ -11,7 +11,14 @@ import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-jest.useFakeTimers( 'legacy' );
+beforeEach( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterEach( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -467,7 +474,7 @@ describe( 'createRegistry', () => {
 			let promise = subscribeUntil(
 				() => registry.select( 'demo' ).getValue() === 'OK'
 			);
-			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK
+			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK.
 			jest.runAllTimers();
 			await promise;
 
@@ -477,7 +484,7 @@ describe( 'createRegistry', () => {
 			promise = subscribeUntil(
 				() => registry.select( 'demo' ).getValue() === 'NOTOK'
 			);
-			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
+			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK.
 			jest.runAllTimers();
 			await promise;
 		} );
@@ -609,10 +616,10 @@ describe( 'createRegistry', () => {
 			} );
 			const action = { type: 'dummy' };
 
-			store.dispatch( action ); // increment the data by => data = 2
+			store.dispatch( action ); // Increment the data by => data = 2.
 			expect( incrementedValue ).toBe( 2 );
 
-			store.dispatch( action ); // increment the data by => data = 3
+			store.dispatch( action ); // Increment the data by => data = 3.
 			expect( incrementedValue ).toBe( 3 );
 
 			unsubscribe(); // Store subscribe to changes, the data variable stops upgrading.
@@ -685,7 +692,7 @@ describe( 'createRegistry', () => {
 					increment,
 				},
 			} );
-			// state = 1
+			// State = 1.
 			const dispatchResult = await registry
 				.dispatch( 'counter' )
 				.increment();
@@ -693,7 +700,7 @@ describe( 'createRegistry', () => {
 				type: 'increment',
 				count: 1,
 			} );
-			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
+			registry.dispatch( 'counter' ).increment( 4 ); // State = 5.
 			expect( store.getState() ).toBe( 5 );
 		} );
 	} );
@@ -718,7 +725,7 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__experimentalSubscribeStore(
+			const unsubscribe = registry.__unstableSubscribeStore(
 				'myAwesomeReducer',
 				listener2
 			);

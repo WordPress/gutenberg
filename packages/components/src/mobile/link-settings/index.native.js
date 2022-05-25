@@ -33,7 +33,6 @@ import LinkRelIcon from './link-rel';
 import styles from './style.scss';
 
 const NEW_TAB_REL = 'noreferrer noopener';
-
 function LinkSettings( {
 	// Control link settings `BottomSheet` visibility
 	isVisible,
@@ -222,7 +221,7 @@ function LinkSettings( {
 		if ( ! clipboardText ) {
 			return;
 		}
-		// Check if pasted text is URL
+		// Check if pasted text is URL.
 		if ( ! isURL( clipboardText ) ) {
 			return;
 		}

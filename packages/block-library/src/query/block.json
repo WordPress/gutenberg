@@ -24,7 +24,8 @@
 				"exclude": [],
 				"sticky": "",
 				"inherit": true,
-				"taxQuery": null
+				"taxQuery": null,
+				"parents": []
 			}
 		},
 		"tagName": {
@@ -48,7 +49,11 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"__experimentalLayout": true
 	},

@@ -5,6 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ import WelcomeGuideImage from './image';
 import { store as editSiteStore } from '../../store';
 
 export default function WelcomeGuideStyles() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	const { isActive, isStylesOpen } = useSelect( ( select ) => {
 		const sidebar = select( interfaceStore ).getActiveComplementaryArea(
@@ -21,7 +22,8 @@ export default function WelcomeGuideStyles() {
 		);
 
 		return {
-			isActive: select( editSiteStore ).isFeatureActive(
+			isActive: !! select( preferencesStore ).get(
+				'core/edit-site',
 				'welcomeGuideStyles'
 			),
 			isStylesOpen: sidebar === 'edit-site/global-styles',
@@ -37,7 +39,7 @@ export default function WelcomeGuideStyles() {
 			className="edit-site-welcome-guide"
 			contentLabel={ __( 'Welcome to styles' ) }
 			finishButtonText={ __( 'Get Started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuideStyles' ) }
+			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuideStyles' ) }
 			pages={ [
 				{
 					image: (

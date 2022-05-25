@@ -191,7 +191,7 @@ class FormTokenField extends Component {
 	onKeyPress( event ) {
 		let preventDefault = false;
 		switch ( event.charCode ) {
-			case 44: // comma
+			case 44: // Comma.
 				preventDefault = this.handleCommaKey();
 				break;
 			default:
@@ -294,7 +294,7 @@ class FormTokenField extends Component {
 			selectedSuggestionScroll: true,
 		} ) );
 
-		return true; // preventDefault
+		return true; // PreventDefault.
 	}
 
 	handleDownArrowKey() {
@@ -311,7 +311,7 @@ class FormTokenField extends Component {
 			selectedSuggestionScroll: true,
 		} ) );
 
-		return true; // preventDefault
+		return true; // PreventDefault.
 	}
 
 	handleEscapeKey( event ) {
@@ -321,7 +321,7 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
 		} );
-		return true; // preventDefault
+		return true; // PreventDefault.
 	}
 
 	handleCommaKey() {
@@ -329,7 +329,7 @@ class FormTokenField extends Component {
 			this.addNewToken( this.state.incompleteTokenValue );
 		}
 
-		return true; // preventDefault
+		return true; // PreventDefault.
 	}
 
 	moveInputToIndex( index ) {
@@ -366,7 +366,7 @@ class FormTokenField extends Component {
 
 		if ( index < this.props.value.length ) {
 			this.deleteToken( this.props.value[ index ] );
-			// update input offset since it's the offset from the last token
+			// Update input offset since it's the offset from the last token.
 			this.moveInputToIndex( index );
 		}
 	}

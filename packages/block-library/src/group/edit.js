@@ -52,7 +52,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: `is-layout-${ type }`,
+	} );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps

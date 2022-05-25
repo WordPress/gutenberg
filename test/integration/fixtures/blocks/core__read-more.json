@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/read-more",
 		"isValid": true,
 		"attributes": {
 			"linkTarget": "_self"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

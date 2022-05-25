@@ -8,7 +8,7 @@ import { FormFileUpload } from '@wordpress/components';
 const MyFormFileUpload = () => (
 	<FormFileUpload
 		accept="image/*"
-		onChange={ () => console.log( 'new image' ) }
+		onChange={ ( event ) => console.log( event.target.files ) }
 	>
 		Upload
 	</FormFileUpload>
@@ -56,6 +56,24 @@ Callback function passed directly to the `input` file element.
 
 -   Type: `Function`
 -   Required: Yes
+
+### onClick
+
+Callback function passed directly to the `input` file element.
+
+This can be useful when you want to force a `change` event to fire when the user chooses the same file again. To do this, set the target value to an empty string in the `onClick` function.
+
+```jsx
+<FormFileUpload
+	onClick={ ( event ) => ( event.target.value = '' ) }
+	onChange={ onChange }
+>
+	Upload
+</FormFileUpload>
+```
+
+-   Type: `Function`
+-   Required: No
 
 ### render
 

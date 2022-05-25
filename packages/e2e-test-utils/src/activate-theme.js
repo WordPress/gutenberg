@@ -18,7 +18,7 @@ export async function activateTheme( slug ) {
 		`div[data-slug="${ slug }"] .button.activate`
 	);
 	if ( ! activateButton ) {
-		switchUserToTest();
+		await switchUserToTest();
 		return;
 	}
 
