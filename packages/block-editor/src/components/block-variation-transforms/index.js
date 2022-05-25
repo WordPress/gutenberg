@@ -122,7 +122,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const hasUniqueIcons = useMemo( () => {
 		const variationIcons = new Set();
 		if ( ! variations ) {
-			return true;
+			return false;
 		}
 		variations.forEach( ( variation ) => {
 			if ( variation.icon ) {
