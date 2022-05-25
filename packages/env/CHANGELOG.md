@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Enhancement
+-   Added `wp-env exec` command and associated `scripts` environment configuration.
 -   Removed the need for quotation marks when passing options to `wp-env run`.
 
 ## 4.7.0 (2022-05-18)
