@@ -422,7 +422,7 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
-	} else if ( ! isAndroid() && toggleOn ) {
+	} else if ( toggleOn ) {
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="..."]'
@@ -549,12 +549,12 @@ const clickIfClickable = async (
 	);
 
 	try {
-		await element.click();
+		return await element.click();
 	} catch ( error ) {
 		if ( iteration >= maxIteration ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				`Element still not clickable after "${ iteration }" retries`
+				`"${ elementLocator }" still not clickable after "${ iteration }" retries`
 			);
 			return '';
 		}
