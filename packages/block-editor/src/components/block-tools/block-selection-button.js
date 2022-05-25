@@ -275,7 +275,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					<Button
 						ref={ ref }
 						onClick={
-							editorMode === 'edit'
+							editorMode === 'navigation'
 								? () => setNavigationMode( false )
 								: undefined
 						}
