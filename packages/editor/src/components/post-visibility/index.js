@@ -17,7 +17,6 @@ import { close as closeIcon } from '@wordpress/icons';
  */
 import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 
 export default function PostVisibility( { onClose } ) {
 	const instanceId = useInstanceId( PostVisibility );
@@ -135,9 +134,6 @@ export default function PostVisibility( { onClose } ) {
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>
-			{ ( status === 'publish' || status === 'future' ) && (
-				<PostSwitchToDraftButton />
-			) }
 		</>
 	);
 }

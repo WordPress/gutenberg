@@ -4,14 +4,20 @@
 import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleLabel,
 	PostScheduleCheck,
+	PostSwitchToDraftButton,
+	store as editorStore,
 } from '@wordpress/editor';
 
 export function PostSchedule() {
 	const anchorRef = useRef();
+	const { status } = useSelect( ( select ) => ( {
+		status: select( editorStore ).getEditedPostAttribute( 'status' ),
+	} ) );
 
 	return (
 		<PostScheduleCheck>
@@ -36,6 +42,9 @@ export function PostSchedule() {
 					renderContent={ () => <PostScheduleForm /> }
 				/>
 			</PanelRow>
+			{ ( status === 'publish' || status === 'future' ) && (
+				<PostSwitchToDraftButton />
+			) }
 		</PostScheduleCheck>
 	);
 }

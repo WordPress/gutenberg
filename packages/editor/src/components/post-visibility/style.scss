@@ -42,12 +42,3 @@
 		width: calc(100% - #{$grid-unit * 4});
 	}
 }
-
-.edit-post-post-visibility__dialog {
-	.editor-post-switch-to-draft {
-		display: flex;
-		width: 100%;
-		justify-content: center;
-		margin-top: $grid-unit-20;
-	}
-}
