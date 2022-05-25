@@ -90,12 +90,13 @@ const getRegularElement = ( {
 };
 
 const addPopoverToGrandchildren = ( {
+	anchorRef,
 	grandchildren,
 	isOver,
+	offset,
 	placement,
-	text,
 	shortcut,
-	anchorRef,
+	text,
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -106,7 +107,8 @@ const addPopoverToGrandchildren = ( {
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
-				offset={ 12 }
+				offset={ offset }
+				anchorRef={ anchorRef }
 				__unstableShift
 			>
 				{ text }
@@ -138,7 +140,7 @@ const emitToChild = ( children, eventName, event ) => {
 function Tooltip( props ) {
 	const {
 		children,
-		position = 'bottom middle',
+		position = 'bottom right',
 		text,
 		shortcut,
 		delay = TOOLTIP_DELAY,
@@ -152,6 +154,10 @@ function Tooltip( props ) {
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+
+	// Create a reference to the Tooltip's child, to be passed to the Popover
+	// so that the Tooltip can be correctly positioned. Also, merge with the
+	// existing ref for the first child, so that its ref is preserved.
 	const childRef = useRef( null );
 	const mergedChildRefs = useMergeRefs( [
 		childRef,
@@ -260,14 +266,28 @@ function Tooltip( props ) {
 		? getDisabledElement
 		: getRegularElement;
 
+	// Transform the Tooltip's position property to the relevant
+	// placement point to be passed to the Popover.
 	const placement = positionToPlacement( position );
+
+	// To adequately support the Tooltip's position property,
+	// this function centers the Tooltip to the specified placement point.
+	// For example, setting the "bottom left" position will center the Tooltip
+	// at the bottom left corner of the Tooltip's first child.
+	const positionOffset = ( { floating } ) =>
+		floating?.width
+			? {
+					alignmentAxis: -floating.width / 2,
+			  }
+			: {};
 
 	const popoverData = {
 		anchorRef: childRef,
 		isOver,
+		offset: position ? positionOffset : undefined,
 		placement,
-		text,
 		shortcut,
+		text,
 	};
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
