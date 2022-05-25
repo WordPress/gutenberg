@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -9,7 +10,11 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import TimePicker from '../time';
 
 describe( 'TimePicker', () => {
-	it( 'should call onChange with updated date values', () => {
+	it( 'should call onChange with updated date values', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -26,38 +31,46 @@ describe( 'TimePicker', () => {
 		const hoursInput = screen.getByLabelText( 'Hours' );
 		const minutesInput = screen.getByLabelText( 'Minutes' );
 
-		fireEvent.change( monthInput, { target: { value: '12' } } );
-		fireEvent.blur( monthInput );
+		await user.selectOptions( monthInput, '12' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-12-18T11:00:00' );
 		onChangeSpy.mockClear();
 
-		fireEvent.change( dayInput, { target: { value: '22' } } );
-		fireEvent.blur( dayInput );
+		await user.clear( dayInput );
+		await user.type( dayInput, '22' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-12-22T11:00:00' );
 		onChangeSpy.mockClear();
 
-		fireEvent.change( yearInput, { target: { value: '2018' } } );
-		fireEvent.blur( yearInput );
+		await user.clear( yearInput );
+		await user.type( yearInput, '2018' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T11:00:00' );
 		onChangeSpy.mockClear();
 
-		fireEvent.change( hoursInput, { target: { value: '12' } } );
-		fireEvent.blur( hoursInput );
+		await user.clear( hoursInput );
+		await user.type( hoursInput, '12' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:00:00' );
 		onChangeSpy.mockClear();
 
-		fireEvent.change( minutesInput, { target: { value: '35' } } );
-		fireEvent.blur( minutesInput );
+		await user.clear( minutesInput );
+		await user.type( minutesInput, '35' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:35:00' );
 		onChangeSpy.mockClear();
 	} );
 
-	it( 'should call onChange with an updated hour (12-hour clock)', () => {
+	it( 'should call onChange with an updated hour (12-hour clock)', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -70,13 +83,18 @@ describe( 'TimePicker', () => {
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
 
-		fireEvent.change( hoursInput, { target: { value: '10' } } );
-		fireEvent.blur( hoursInput );
+		await user.clear( hoursInput );
+		await user.type( hoursInput, '10' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T10:00:00' );
 	} );
 
-	it( 'should not call onChange with an updated hour (12-hour clock) if the hour is out of bounds', () => {
+	it( 'should not call onChange with an updated hour (12-hour clock) if the hour is out of bounds', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -89,13 +107,18 @@ describe( 'TimePicker', () => {
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
 
-		fireEvent.change( hoursInput, { target: { value: '22' } } );
-		fireEvent.blur( hoursInput );
+		await user.clear( hoursInput );
+		await user.type( hoursInput, '22' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call onChange with an updated hour (24-hour clock)', () => {
+	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -108,13 +131,18 @@ describe( 'TimePicker', () => {
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
 
-		fireEvent.change( hoursInput, { target: { value: '22' } } );
-		fireEvent.blur( hoursInput );
+		await user.clear( hoursInput );
+		await user.type( hoursInput, '22' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T22:00:00' );
 	} );
 
-	it( 'should not call onChange with an updated minute if out of bounds', () => {
+	it( 'should not call onChange with an updated minute if out of bounds', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -127,13 +155,18 @@ describe( 'TimePicker', () => {
 
 		const minutesInput = screen.getByLabelText( 'Minutes' );
 
-		fireEvent.change( minutesInput, { target: { value: '99' } } );
-		fireEvent.blur( minutesInput );
+		await user.clear( minutesInput );
+		await user.type( minutesInput, '99' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should switch to PM correctly', () => {
+	it( 'should switch to PM correctly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -146,12 +179,16 @@ describe( 'TimePicker', () => {
 
 		const pmButton = screen.getByText( 'PM' );
 
-		fireEvent.click( pmButton );
+		await user.click( pmButton );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:00:00' );
 	} );
 
-	it( 'should switch to AM correctly', () => {
+	it( 'should switch to AM correctly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -164,12 +201,16 @@ describe( 'TimePicker', () => {
 
 		const amButton = screen.getByText( 'AM' );
 
-		fireEvent.click( amButton );
+		await user.click( amButton );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:00:00' );
 	} );
 
-	it( 'should allow to set the time correctly when the PM period is selected', () => {
+	it( 'should allow to set the time correctly when the PM period is selected', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -181,11 +222,12 @@ describe( 'TimePicker', () => {
 		);
 
 		const pmButton = screen.getByText( 'PM' );
-		fireEvent.click( pmButton );
+		await user.click( pmButton );
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
-		fireEvent.change( hoursInput, { target: { value: '6' } } );
-		fireEvent.blur( hoursInput );
+		await user.clear( hoursInput );
+		await user.type( hoursInput, '6' );
+		await user.keyboard( '{Tab}' );
 
 		// When clicking on 'PM', we expect the time to be 11pm
 		expect( onChangeSpy ).toHaveBeenNthCalledWith(
@@ -199,7 +241,11 @@ describe( 'TimePicker', () => {
 		);
 	} );
 
-	it( 'should truncate at the minutes on change', () => {
+	it( 'should truncate at the minutes on change', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -212,8 +258,9 @@ describe( 'TimePicker', () => {
 
 		const minutesInput = screen.getByLabelText( 'Minutes' );
 
-		fireEvent.change( minutesInput, { target: { value: '22' } } );
-		fireEvent.blur( minutesInput );
+		await user.clear( minutesInput );
+		await user.type( minutesInput, '22' );
+		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:22:00' );
 	} );

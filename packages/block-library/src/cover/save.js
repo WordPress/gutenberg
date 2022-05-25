@@ -19,10 +19,10 @@ import {
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	mediaPosition,
 } from './shared';
 
 export default function save( { attributes } ) {
@@ -61,9 +61,6 @@ export default function save( { attributes } ) {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement && ! useFeaturedImage
-			? backgroundImageStyles( url )
-			: {} ),
 		minHeight: minHeight || undefined,
 	};
 
@@ -75,8 +72,12 @@ export default function save( { attributes } ) {
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
-			 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			 : undefined;
+			  ? mediaPosition(focalPoint)
+			  : undefined;
+
+	const backgroundImage = url ? `url(${ url })` : undefined;
+
+	const backgroundPosition = mediaPosition( focalPoint );
 
 	const classes = classnames(
 		{
@@ -88,6 +89,15 @@ export default function save( { attributes } ) {
 			),
 		},
 		getPositionClassName( contentPosition )
+	);
+
+	const imgClasses = classnames(
+		'wp-block-cover__image-background',
+		id ? `wp-image-${ id }` : null,
+		{
+			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
+		}
 	);
 
 	const gradientValue = gradient || customGradient;
@@ -116,20 +126,23 @@ export default function save( { attributes } ) {
 
 			{ ! useFeaturedImage &&
 				isImageBackground &&
-				isImgElement &&
-				url && (
+				url &&
+				( isImgElement ? (
 					<img
-						className={ classnames(
-							'wp-block-cover__image-background',
-							id ? `wp-image-${ id }` : null
-						) }
+						className={ imgClasses }
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
 						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
-				) }
+				) : (
+					<div
+						role="img"
+						className={ imgClasses }
+						style={ { backgroundPosition, backgroundImage } }
+					/>
+				) ) }
 			{ isVideoBackground && url && (
 				<video
 					className={ classnames(
