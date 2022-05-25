@@ -91,6 +91,14 @@ figure.wp-block-image:not(.wp-block) {
 	max-width: 100%;
 	width: 100%;
 	overflow: hidden;
+	box-sizing: border-box;
+
+	// Strip image of border styles while within the cropper.
+	// We don't yet have access to merged global styles in the block editor
+	// to reapply them to the image cropper.
+	.reactEasyCrop_Container > .reactEasyCrop_Image {
+		border: none;
+	}
 }
 
 .wp-block-image__crop-icon {
