@@ -58,10 +58,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
@@ -101,10 +97,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		);
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		// Check styled text by verifying html contents.

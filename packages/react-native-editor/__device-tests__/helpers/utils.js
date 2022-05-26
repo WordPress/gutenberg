@@ -46,6 +46,9 @@ const strToKeycode = {
 	[ backspace ]: 67,
 };
 
+// $block-edge-to-content value
+const blockEdgeToContent = 16;
+
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
@@ -301,6 +304,18 @@ const clickBeginningOfElement = async ( driver, element ) => {
 	await action.perform();
 };
 
+// Clicks in the top left of a text-based element outside of the TextInput
+const clickElementOutsideOfTextInput = async ( driver, element ) => {
+	const location = await element.getLocation();
+	const y = isAndroid() ? location.y - blockEdgeToContent : location.y;
+	const x = isAndroid() ? location.x - blockEdgeToContent : location.x;
+
+	const action = await new wd.TouchAction( driver );
+	action.press( { x, y } );
+	action.release();
+	await action.perform();
+};
+
 // Long press to activate context menu.
 const longPressMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
@@ -342,13 +357,23 @@ const tapCopyAboveElement = async ( driver, element ) => {
 
 // Press "Paste" in floating context menu.
 const tapPasteAboveElement = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	action.wait( 2000 );
-	action.press( { x: location.x + 100, y: location.y - 50 } );
-	action.wait( 2000 );
-	action.release();
-	await action.perform();
+	await longPressMiddleOfElement( driver, element );
+
+	if ( isAndroid() ) {
+		const location = await element.getLocation();
+		const action = await new wd.TouchAction( driver );
+		action.wait( 2000 );
+		action.press( { x: location.x + 100, y: location.y - 50 } );
+		action.wait( 2000 );
+		action.release();
+		await action.perform();
+	} else {
+		const pasteButton = driver.elementByXPath(
+			'//XCUIElementTypeMenuItem[@name="Paste"]'
+		);
+		await pasteButton.click();
+		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
+	}
 };
 
 // Starts from the middle of the screen or the element(if specified)
@@ -411,6 +436,30 @@ const swipeDown = async ( driver, delay = 3000 ) => {
 		{ x: endX, y: endY },
 		delay
 	);
+};
+
+// Drag & Drop after element
+const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
+	// Element to drag & drop
+	const elementLocation = await element.getLocation();
+	const elementSize = await element.getSize();
+	const x = elementLocation.x + elementSize.width / 2;
+	const y = elementLocation.y + elementSize.height / 2;
+
+	// Element to drag & drop to
+	const nextElementLocation = await nextElement.getLocation();
+	const nextElementSize = await nextElement.getSize();
+	const nextYPosition = isAndroid()
+		? elementLocation.y + nextElementLocation.y + nextElementSize.height
+		: nextElementLocation.y + nextElementSize.height;
+
+	const action = new wd.TouchAction( driver );
+	await action
+		.press( { x, y } )
+		.wait( 5000 )
+		.moveTo( { x, y: nextYPosition } )
+		.release()
+		.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
@@ -578,9 +627,11 @@ const waitIfAndroid = async () => {
 module.exports = {
 	backspace,
 	clickBeginningOfElement,
+	clickElementOutsideOfTextInput,
 	clickIfClickable,
 	clickMiddleOfElement,
 	doubleTap,
+	dragAndDropAfterElement,
 	isAndroid,
 	isEditorVisible,
 	isElementVisible,
