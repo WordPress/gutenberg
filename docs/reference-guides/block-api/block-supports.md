@@ -549,7 +549,7 @@ supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
-        blockGap: true,  // Enables blockGap UI control.
+        blockGap: true,  // Enables block spacing UI control.
     }
 }
 ```
