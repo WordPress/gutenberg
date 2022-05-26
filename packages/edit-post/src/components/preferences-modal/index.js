@@ -152,6 +152,13 @@ export default function EditPostPreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
+							<EnableFeature
+								featureName="strictColorContrastChecks"
+								help={ __(
+									'Makes the color contrast checker more strict, to comply with WCAG AAA guidelines.'
+								) }
+								label={ __( 'Strict color-contrast checker' ) }
+							/>
 						</PreferencesModalSection>
 					</>
 				),

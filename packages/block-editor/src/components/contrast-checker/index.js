@@ -11,6 +11,8 @@ import { colord, extend } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import { select } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -50,11 +52,15 @@ function ContrastChecker( {
 			description: __( 'link color' ),
 		},
 	];
+	const strictContrastCheck = select( preferencesStore ).get(
+		'core/edit-post',
+		'strictColorContrastChecks'
+	);
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 	const backgroundColorLuminance = colordBackgroundColor.luminance();
 	const isReadableOptions = {
-		level: 'AA',
+		level: strictContrastCheck ? 'AAA' : 'AA',
 		size:
 			isLargeText || ( isLargeText !== false && fontSize >= 24 )
 				? 'large'

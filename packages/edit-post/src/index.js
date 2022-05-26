@@ -58,6 +58,7 @@ export function initializeEditor(
 		showIconLabels: false,
 		showListViewByDefault: false,
 		themeStyles: true,
+		strictColorContrastChecks: false,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
 	} );
