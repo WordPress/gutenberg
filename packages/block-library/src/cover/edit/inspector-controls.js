@@ -251,7 +251,7 @@ export default function CoverInspectorControls( {
 				/>
 				<ToolsPanelItem
 					hasValue={ () => !! dimRatio }
-					label={ __( 'Opacity' ) }
+					label={ __( 'Overlay opacity' ) }
 					onDeselect={ () =>
 						setAttributes( { dimRatio: undefined } )
 					}
@@ -260,7 +260,7 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<RangeControl
-						label={ __( 'Opacity' ) }
+						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>
 							setAttributes( {
