@@ -110,6 +110,13 @@ const resetAllLinkFilter = ( attributes ) => ( {
 	),
 } );
 
+const resetAllLinkHoverFilter = ( attributes ) => ( {
+	style: clearColorFromStyles(
+		[ 'elements', 'link:hover', 'color', 'text' ],
+		attributes.style
+	),
+} );
+
 /**
  * Clears all background color related properties including gradients from
  * supplied block attributes.
@@ -216,7 +223,6 @@ export function addSaveProps( props, blockType, attributes ) {
 		backgroundColor ||
 		style?.color?.background ||
 		( hasGradient && ( gradient || style?.color?.gradient ) );
-
 	const newClassName = classnames(
 		props.className,
 		textClass,
@@ -284,6 +290,10 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
+
+	if ( blockName === 'core/paragraph' ) {
+		// debugger;
+	}
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
@@ -443,6 +453,26 @@ export function ColorEdit( props ) {
 		};
 	};
 
+	const onChangeLinkHoverColor = ( value ) => {
+		const colorObject = getColorObjectByColorValue( allSolids, value );
+		const newLinkColorValue = colorObject?.slug
+			? `var:preset|color|${ colorObject.slug }`
+			: value;
+
+		const newStyle = cleanEmptyObject(
+			immutableSet(
+				localAttributes.current?.style,
+				[ 'elements', 'link:hover', 'color', 'text' ],
+				newLinkColorValue
+			)
+		);
+		props.setAttributes( { style: newStyle } );
+		localAttributes.current = {
+			...localAttributes.current,
+			...{ style: newStyle },
+		};
+	};
+
 	const enableContrastChecking =
 		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
 
@@ -507,6 +537,20 @@ export function ColorEdit( props ) {
 									?.text,
 								isShownByDefault: defaultColorControls?.link,
 								resetAllFilter: resetAllLinkFilter,
+							},
+							{
+								label: __( 'Link Hover' ),
+								onColorChange: onChangeLinkHoverColor,
+								colorValue: getLinkColorFromAttributeValue(
+									allSolids,
+									style?.elements?.[ 'link:hover' ]?.color
+										?.text
+								),
+								clearable: !! style?.elements?.[ 'link:hover' ]
+									?.color?.text,
+								isShownByDefault:
+									defaultColorControls?.[ 'link:hover' ],
+								resetAllFilter: resetAllLinkHoverFilter,
 							},
 					  ]
 					: [] ),
