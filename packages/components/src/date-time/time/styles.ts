@@ -50,7 +50,7 @@ const baseInput = css`
 export const HoursInput = styled( NumberControl )`
 	${ baseInput }
 
-	width: 35px;
+	width: ${ space( 9 ) };
 
 	&&& ${ Input } {
 		padding-right: 0;
@@ -75,7 +75,7 @@ export const TimeSeparator = styled.span`
 export const MinutesInput = styled( NumberControl )`
 	${ baseInput }
 
-	width: 35px;
+	width: ${ space( 9 ) };
 
 	&&& ${ Input } {
 		padding-left: 0;
@@ -105,13 +105,13 @@ export const MonthSelect = styled( SelectControl )`
 export const DayInput = styled( NumberControl )`
 	${ baseInput }
 
-	width: 35px;
+	width: ${ space( 9 ) };
 `;
 
 export const YearInput = styled( NumberControl )`
 	${ baseInput }
 
-	width: 55px;
+	width: ${ space( 14 ) };
 `;
 
 export const TimeZone = styled.div`
