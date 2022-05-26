@@ -9,6 +9,7 @@ import type { ForwardedRef } from 'react';
  */
 import { useState, forwardRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -37,6 +38,23 @@ function UnforwardedDateTimePicker(
 	}: DateTimePickerProps,
 	ref: ForwardedRef< any >
 ) {
+	if ( ! __nextRemoveHelpButton ) {
+		deprecated( 'Help button in wp.components.DateTimePicker', {
+			since: '13.4',
+			version: '14.6', // Six months of plugin releases.
+			hint:
+				'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+		} );
+	}
+	if ( ! __nextRemoveResetButton ) {
+		deprecated( 'Reset button in wp.components.DateTimePicker', {
+			since: '13.4',
+			version: '14.6', // Six months of plugin releases.
+			hint:
+				'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+		} );
+	}
+
 	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
 		false
 	);
