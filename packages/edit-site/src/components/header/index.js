@@ -160,6 +160,7 @@ export default function Header( {
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'Zoom-out View' ) }
 								onClick={ () => {
+									setPreviewDeviceType( 'desktop' );
 									setIsListViewOpened( false );
 									__unstableSetEditorMode(
 										blockEditorMode === 'zoom-out'
@@ -195,7 +196,7 @@ export default function Header( {
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					{ ! isFocusMode && (
+					{ ! isFocusMode && blockEditorMode !== 'zoom-out' && (
 						<PreviewOptions
 							deviceType={ deviceType }
 							setDeviceType={ setPreviewDeviceType }
