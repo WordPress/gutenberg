@@ -52,7 +52,7 @@ function ContrastChecker( {
 	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
-	const backgroundColorBrightness = colordBackgroundColor.brightness();
+	const backgroundColorLuminance = colordBackgroundColor.luminance();
 	const isReadableOptions = {
 		level: 'AA',
 		size:
@@ -82,7 +82,7 @@ function ContrastChecker( {
 				continue;
 			}
 			message =
-				backgroundColorBrightness < colordTextColor.brightness()
+				backgroundColorLuminance < colordTextColor.luminance()
 					? sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
