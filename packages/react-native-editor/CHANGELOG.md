@@ -14,6 +14,7 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.77.0
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
+-   [*] Add 'Insert from URL' option to Image block [#40334]
 
 ## 1.76.1
 
