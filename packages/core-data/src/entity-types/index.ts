@@ -20,7 +20,6 @@ import type { Widget } from './widget';
 import type { WidgetType } from './widget-type';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
-import type { EntityQuery, State } from '../selectors';
 import type { CoreEntities } from '../entities';
 
 export type { EntityType } from './entities';
@@ -134,9 +133,10 @@ export type KeyOf<
 	RecordOrKind extends EntityRecord | Kind,
 	N extends Name = undefined,
 	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
-> = E[ 'key' ] extends keyof E[ 'record' ]
+> = ( E[ 'key' ] extends keyof E[ 'record' ]
 	? E[ 'record' ][ E[ 'key' ] ]
-	: never;
+	: never ) &
+	( number | string );
 
 /**
  * Default context of the requested entity, sourced from PerPackageEntities.
