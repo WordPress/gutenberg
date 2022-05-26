@@ -28,6 +28,7 @@ export function useInBetweenInserter() {
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
+		__unstableIsWithinBlockOverlay,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
@@ -111,16 +112,11 @@ export function useInBetweenInserter() {
 
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const parentOverlay = element.parentElement?.closest(
-					'.block-editor-block-list__block.has-block-overlay'
-				);
-				if ( parentOverlay ) {
-					return;
-				}
-
 				const clientId = element.id.slice( 'block-'.length );
-
-				if ( ! clientId ) {
+				if (
+					! clientId ||
+					__unstableIsWithinBlockOverlay( clientId )
+				) {
 					return;
 				}
 
