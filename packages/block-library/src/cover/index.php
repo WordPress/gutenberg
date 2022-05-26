@@ -60,10 +60,13 @@ function render_block_core_cover( $attributes, $content ) {
 			esc_attr( $object_position )
 		);
 
-		$content = str_replace(
-			'</span><div',
-			'</span>' . $image . '<div',
-			preg_replace( '/<\/span>(\s+)?<div/', '</span><div', $content, 1 )
+		/* Inserts the featured image between the (1st) cover 'background' `span` and 'inner_container' `div`,
+		   and removes eventual withespace characters between the two (typically introduced at template level) */
+		$content = preg_replace(
+		    '/(<span\b[^>]*wp-block-cover__background[\s|"][^>]*>.*<\/span>)\s*(<div\b[^>]*wp-block-cover__inner-container[\s|"][^>]*>)/U',
+		    "$1$image$2",
+		    $content,
+		    1
 		);
 
 	}
