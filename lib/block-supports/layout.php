@@ -55,7 +55,8 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
-			$style = "$selector {";
+			// Add a .wp-container-default-layout so this only applies to lower level default layouts, not the top level
+			$style = ".wp-container-default-layout $selector {";
 			// Using important here to override the inline padding that could be potentially
 			// applied using the custom padding control before the layout inheritance is applied.
 			$style .= sprintf(
@@ -73,10 +74,17 @@ function gutenberg_get_layout_style( $selector, $layout, $padding, $has_block_ga
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector > .alignfull {";
+			// Add a .wp-container-default-layout so this only applies to lower level default layouts, not the top level// Add a .wp-container-default-layout so this only applies to lower level default layouts, not the top level.
+			$style .= ".wp-container-default-layout $selector > .alignfull {";
 			$style .= 'max-width: none;';
 			$style .= isset( $padding['left'] ) ? sprintf( 'margin-left: calc( -1 * %s ) !important;', $padding['left'] ) : '';
 			$style .= isset( $padding['right'] ) ? sprintf( 'margin-right: calc( -1 * %s ) !important;', $padding['right'] ) : '';
+			$style .= '}';
+
+			// Add padding to full wide blocks that inherit default layout, so the content doesn't touch the edges.
+			$style .= "$selector > .alignfull {";
+			$style .= isset( $padding['left'] ) ? sprintf( 'padding-left: %s !important;', $padding['left'] ) : '';
+			$style .= isset( $padding['right'] ) ? sprintf( 'padding-right: %s !important;', $padding['right'] ) : '';
 			$style .= '}';
 		}
 
@@ -175,9 +183,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( ! $support_layout ) {
 		return $block_content;
 	}
-
+	$class_name = wp_unique_id( 'wp-container-' );
+	$selector = '.' . $class_name;
 	$block_gap             = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
 	$default_layout        = gutenberg_get_global_settings( array( 'layout' ) );
+	$default_padding       = gutenberg_get_global_styles( array( 'spacing', 'padding' ) );
 	$padding               = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'padding' ), null );
 	$has_block_gap_support = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout  = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
@@ -186,13 +196,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		if ( ! $default_layout ) {
 			return $block_content;
 		}
-		$used_layout = $default_layout;
-		$padding     = isset( $default_layout['padding'] ) ? $default_layout['padding'] : null;
+		$class_name  .= ' wp-container-default-layout';
+		$selector    .= '.wp-container-default-layout';
+		$used_layout  = $default_layout;
+		//TODO - can we allow padding from the block settings?
+		$padding = isset( $default_padding ) ? $default_padding : null;
 	}
 
 	$class_names     = array();
-	$container_class = wp_unique_id( 'wp-container-' );
-	$class_names[]   = $container_class;
+	$class_names[]   = $class_name;
 
 	// The following section was added to reintroduce a small set of layout classnames that were
 	// removed in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719). It is
@@ -211,6 +223,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
@@ -227,7 +240,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$container_class", $used_layout, $padding, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$style                         = gutenberg_get_layout_style( $selector, $used_layout, $padding, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(

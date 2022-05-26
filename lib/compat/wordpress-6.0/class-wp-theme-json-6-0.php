@@ -373,11 +373,13 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
 				if ( $use_root_vars ) {
 					$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 					$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-					$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+
+					// This will be overridden by children who inherit default layout.
+					$block_rules .= '.wp-site-blocks .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: auto;}';
 
 					// Alignfull blocks in the block editor that are direct children of post content should also get negative margins.
 					if ( is_callable( 'get_current_screen' ) && get_current_screen()->is_block_editor() ) {
-						$block_rules .= '.is-root-container > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+						$block_rules .= '.is-root-container .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: auto; }';
 					}
 				}
 				$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
