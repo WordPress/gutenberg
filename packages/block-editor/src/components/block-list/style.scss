@@ -404,12 +404,12 @@
 	transition: all 0.3s;
 }
 
-.block-editor-iframe__body.is-zoom-out-mode {
+.block-editor-iframe__body.is-zoomed-out {
 	transform-origin: top center;
 	transform: scale(0.7);
 	margin-bottom: -70%;
 }
 
-.block-editor-iframe__body.is-zoom-out-mode > .block-list-appender {
+.block-editor-iframe__body.is-zoomed-out > .block-list-appender {
 	display: none;
 }

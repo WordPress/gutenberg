@@ -8,6 +8,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -37,9 +38,15 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 function ResizableEditor( { enableResizing, settings, children, ...props } ) {
-	const deviceType = useSelect(
-		( select ) =>
-			select( editSiteStore ).__experimentalGetPreviewDeviceType(),
+	const { deviceType, isZoomOutMode } = useSelect(
+		( select ) => ( {
+			deviceType: select(
+				editSiteStore
+			).__experimentalGetPreviewDeviceType(),
+			isZoomOutMode:
+				select( blockEditorStore ).__unstableGetEditorMode() ===
+				'zoom-out',
+		} ),
 		[]
 	);
 	const deviceStyles = useResizeCanvas( deviceType );
@@ -153,6 +160,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			} }
 		>
 			<Iframe
+				isZoomedOut={ isZoomOutMode }
 				style={ enableResizing ? undefined : deviceStyles }
 				head={
 					<>

@@ -16,14 +16,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-import { store as blockEditorStore } from '../../store';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -167,14 +165,9 @@ async function loadScript( head, { id, src } ) {
 }
 
 function Iframe(
-	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	{ contentRef, children, head, tabIndex = 0, assets, isZoomedOut, ...props },
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -276,7 +269,7 @@ function Iframe(
 							<head ref={ headRef }>
 								{ head }
 								<style>
-									{ isZoomOutMode
+									{ isZoomedOut
 										? `html { transition: padding 0.3s; background: #2f2f2f; padding: 100px 0; }`
 										: `html { transition: padding 0.3s; }` }
 								</style>
@@ -288,7 +281,7 @@ function Iframe(
 									BODY_CLASS_NAME,
 									...bodyClasses,
 									{
-										'is-zoom-out-mode': isZoomOutMode,
+										'is-zoomed-out': isZoomedOut,
 									}
 								) }
 							>
