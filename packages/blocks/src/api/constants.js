@@ -183,6 +183,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 
 export const __EXPERIMENTAL_ELEMENTS = {
 	link: 'a',
+	'link:hover': 'a:hover',
 	h1: 'h1',
 	h2: 'h2',
 	h3: 'h3',
