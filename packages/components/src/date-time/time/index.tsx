@@ -167,7 +167,7 @@ export function TimePicker( {
 
 	const dayField = (
 		<DayInput
-			className="components-datetime__time-field-day-input" // Unused, for backwards compatibility.
+			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
 			__next36pxDefaultSize
@@ -187,7 +187,7 @@ export function TimePicker( {
 	const monthField = (
 		<MonthSelectWrapper>
 			<MonthSelect
-				className="components-datetime__time-field-month-select" // Unused, for backwards compatibility.
+				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision
 				__nextHasNoMarginBottom
@@ -329,7 +329,7 @@ export function TimePicker( {
 						</>
 					) }
 					<YearInput
-						className="components-datetime__time-field-year-input" // Unused, for backwards compatibility.
+						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
 						label={ __( 'Year' ) }
 						hideLabelFromVision
 						__next36pxDefaultSize
