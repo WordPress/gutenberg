@@ -15,6 +15,7 @@ import {
 } from '../../input-control/styles/input-control-styles';
 import NumberControl from '../../number-control';
 import SelectControl from '../../select-control';
+import { Select } from '../../select-control/styles/select-control-styles';
 
 export const Wrapper = styled.div``;
 
@@ -96,8 +97,7 @@ export const MonthSelectWrapper = styled.div`
 export const MonthSelect = styled( SelectControl )`
 	height: 36px;
 
-	// Ideally would target the component instead of a classname.
-	.components-select-control__input {
+	${ Select } {
 		line-height: 30px;
 	}
 `;
