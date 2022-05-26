@@ -238,6 +238,9 @@ export function addSaveProps( props, blockType, attributes ) {
 			'has-background': serializeHasBackground && hasBackground,
 			'has-link-color':
 				shouldSerialize( 'link' ) && style?.elements?.link?.color,
+			'has-link-hover-color':
+				shouldSerialize( 'link:hover' ) &&
+				style?.elements?.[ 'link:hover' ]?.color,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
