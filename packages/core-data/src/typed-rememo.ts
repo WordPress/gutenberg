@@ -5,7 +5,11 @@ import originalCreateSelector from 'rememo';
 
 /**
  * The same as the original rememo createSelector, only with a more complete
- * TypeScript signature. See the original documentation below:
+ * TypeScript signature. A fix has been proposed in the following pull request:
+ * https://github.com/aduth/rememo/pull/7
+ * Once it's merged, this file can be safely removed.
+ *
+ * And here's the original documentation:
  *
  * Returns a memoized selector function. The getDependants function argument is
  * called before the memoized selector and is expected to return an immutable
