@@ -540,7 +540,7 @@ supports: {
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
-    -   `blockGap`: type `boolean` or `array` or `object`, default value `false`
+    -   `blockGap`: type `boolean` or `array`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
@@ -549,59 +549,41 @@ supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
+        blockGap: true,  // Enables blockGap UI control.
     }
 }
 ```
 
 When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
--   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
+- `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
-supports: {
-    spacing: {
-        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
-        padding: true,               // Enable padding for all sides.
-    }
-}
-```
-
-Within the available block support spacing properties however, `blockGap` is a special case. As with other spacing properties, assigning a `boolean` value will determine whether the "Block spacing" UI controls display in the editor.
-
-```js
-supports: {
-    spacing: {
-        blockGap: true,  // Enables blockGap UI control.
-    }
-}
-```
-
-It also supports an `array` value that enables UI controls to adjust gap column and row values.
-
-```js
-supports: {
-    spacing: {
-        blockGap: [ 'horizontal', 'vertical' ], // Enables axial (column/row) block spacing controls
-    }
-}
-```
-
-`blockGap` values are primarily used alongside the `gap` CSS property, which is tied to a block's flexbox layout. The layout styles define a fallback gap value, which all blocks receive if they haven't yet been given a value.
-
-Often this global fallback value is not appropriate for specific blocks. To customize the fallback `blockGap` value for a specific block, the `blockGap` property also accepts an object with a `__experimentalDefault`  property, the value of which is a `string` and is used as the default `gap` CSS value.
-
-```js
-supports: {
-    spacing: {
-        blockGap: {
-            __experimentalDefault: '2em' // Enables blockGap support and also provides a default, per-block fallback value of `2em` for layout purposes.
+attributes: {
+    style: {
+        margin: 'value',
+        padding: {
+            top: 'value',
         }
     }
 }
 ```
 
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
 
+Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+
+Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
+
+```js
+supports: {
+    spacing: {
+        margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
+        padding: true,                           // Enable padding for all sides.
+        blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
+    }
+}
+```
 
 ## typography
 
