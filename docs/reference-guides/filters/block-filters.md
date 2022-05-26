@@ -51,7 +51,7 @@ register_block_type( __DIR__ );
 
 ### `blocks.registerBlockType`
 
-Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings and the name of the registered block as arguments. This filter is also applied to each of a block's deprecated settings.
+Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings, the name of the registered block, and either null or the deprecated block settings (when applied to a registered deprecation) as arguments. This filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
