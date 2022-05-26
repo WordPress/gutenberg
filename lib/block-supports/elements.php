@@ -29,8 +29,9 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link:hover' );
 
-	if ( $skip_link_color_serialization ) {
+	if ( $skip_link_color_serialization && $skip_link_color_serialization ) {
 		return $block_content;
 	}
 
@@ -38,14 +39,19 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 	if ( ! empty( $block['attrs'] ) ) {
 		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
 	}
+	
+	$link_hover_color = null;
+	if ( ! empty( $block['attrs'] ) ) {
+		$link_hover_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link:hover', 'color', 'text' ), null );
+	}
 
 	/*
-	* For now we only care about link color.
+	* For now we only care about link color and link hover color.
 	* This code in the future when we have a public API
 	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
-	if ( null === $link_color ) {
+	if ( null === $link_color && null === $link_hover_color ) {
 		return $block_content;
 	}
 
@@ -75,7 +81,11 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 }
 
 /**
- * Render the elements stylesheet.
+ * Renders the elements stylesheet for a given block type.
+ *
+ * Each block may have styles for it's child HTML elements (currently only a limited subset are supported).
+ * Render an inline <style> block scoped to the block's CSS selector containing all the `element` style
+ * rules for the block.
  *
  * In the case of nested blocks we want the parent element styles to be rendered before their descendants.
  * This solves the issue of an element (e.g.: link color) being styled in both the parent and a descendant:
@@ -91,14 +101,15 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
 
 	/*
-	* For now we only care about link color.
+	* For now we only care about link color and link hover color.
 	* This code in the future when we have a public API
 	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	$skip_link_hover_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link:hover' );
 
-	if ( $skip_link_color_serialization ) {
+	if ( $skip_link_color_serialization && $skip_link_hover_color_serialization) {
 		return null;
 	}
 	$class_name        = gutenberg_get_elements_class_name( $block );
@@ -109,6 +120,22 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 			$link_block_styles,
 			array(
 				'selector' => ".$class_name a",
+				'css_vars' => true,
+			)
+		);
+
+		if ( ! empty( $styles['css'] ) ) {
+			gutenberg_enqueue_block_support_styles( $styles['css'] );
+		}
+	}
+	
+	$link_hover_block_styles = isset( $element_block_styles['link:hover'] ) ? $element_block_styles['link:hover'] : null;
+
+	if ( $link_hover_block_styles ) {
+		$styles = gutenberg_style_engine_generate(
+			$link_hover_block_styles,
+			array(
+				'selector' => ".$class_name a:hover",
 				'css_vars' => true,
 			)
 		);
