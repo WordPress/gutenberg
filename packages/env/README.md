@@ -399,6 +399,21 @@ $ cd ~/wp-env/500cd328b649d63e882d5c4695871d04
 $ docker-compose run --rm -u $(id -u) -e HOME=/tmp cli [plugin|theme] install <plugin|theme>
 ```
 
+### `wp-env exec [environment] [script]`
+
+```sh
+wp-env exec <environment> <script> [script-args...]
+
+Runs the selected script in a given environment. All arguments after the script param are passed along.
+
+Positionals:
+  environment  Which environment to execute the script in.
+                           [string] [required] [choices: "development", "tests"]
+  script       Which script to execute.                      [string] [required]
+  script-args  The arguments to be passed to the script.   [array] [default: []]
+```
+
+
 ### `wp-env destroy`
 
 ```sh
@@ -453,8 +468,11 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"scripts"`    | `Object`       | `"{}"`                                 | User configurable scripts that are executed within an environment's Docker container.                                            |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+
+### Configuring `core`, `plugins`, `themes`, and `mappings`
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
@@ -467,6 +485,18 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 | ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
+
+### Configuring `scripts`
+
+Scripts are run using the `wp-env exec` command and will be ran in the Docker container
+for a chosen environment.
+
+| Field          | Type           | Description                                                                                                                      |
+| -------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `script`       | `string`       | The script that will be executed.
+| `cwd`          | `string\|null`  | The working directory that the script should be executed from. This defaults to the WordPress installation directory.
+
+### Environment-Specific Configuration
 
 Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
 
@@ -499,7 +529,7 @@ This gives you a lot of power to change the options applicable to each environme
 
 ## .wp-env.override.json
 
-Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
+Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config`, `mappings`, and `scripts`. This means that you can set your own wp-config values without losing any of the default values.
 
 ## Default wp-config values.
 

@@ -40,7 +40,7 @@ const md5 = require( '../md5' );
  * @property {Object}                           config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>}        mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string}                           phpVersion    Version of PHP to use in the environments, of the format 0.0.
- * @property {Object.<string, WPServiceScript>} scripts       Scripts that can be executed in the environment.
+ * @property {Object.<string, WPServiceScript>} scripts       User configurable scripts that are executed within an environment's Docker container.
  */
 
 /**
@@ -55,7 +55,7 @@ const md5 = require( '../md5' );
  */
 
 /**
- * A script that can be executed in an environment.
+ * A user configurable script that is executed within an environment's Docker container.
  *
  * @typedef WPServiceScript
  * @property {string}  script The script to execute.
