@@ -276,52 +276,6 @@ interface GetEntityRecord {
 	): EntityRecordOf< K, N, C > | null | undefined;
 }
 
-const getEntityRecordImplementation: GetEntityRecord = <
-	R extends EntityRecordOf< K, N >,
-	C extends Context = DefaultContextOf< R >,
-	K extends Kind = KindOf< R >,
-	N extends Name = NameOf< R >
->(
-	state: State,
-	kind: K,
-	name: N,
-	key: KeyOf< R >,
-	query?: EntityQuery< C >
-) => {
-	const queriedState = get( state.entities.records, [
-		kind,
-		name,
-		'queriedData',
-	] );
-	if ( ! queriedState ) {
-		return undefined;
-	}
-	const context = query?.context ?? 'default';
-
-	if ( query === undefined ) {
-		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
-			return undefined;
-		}
-
-		return queriedState.items[ context ][ key ];
-	}
-
-	const item = queriedState.items[ context ]?.[ key ];
-	if ( item && query._fields ) {
-		const filteredItem = {};
-		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-		for ( let f = 0; f < fields.length; f++ ) {
-			const field = fields[ f ].split( '.' );
-			const value = get( item, field );
-			set( filteredItem, field, value );
-		}
-		return filteredItem;
-	}
-
-	return item;
-};
-
 /**
  * Returns the Entity's record object by key. Returns `null` if the value is not
  * yet received, undefined if the value entity is known to not exist, or the
@@ -336,7 +290,51 @@ const getEntityRecordImplementation: GetEntityRecord = <
  * @return Record.
  */
 export const getEntityRecord = createSelector(
-	getEntityRecordImplementation,
+	( <
+		R extends EntityRecordOf< K, N >,
+		C extends Context = DefaultContextOf< R >,
+		K extends Kind = KindOf< R >,
+		N extends Name = NameOf< R >
+	>(
+		state: State,
+		kind: K,
+		name: N,
+		key: KeyOf< R >,
+		query?: EntityQuery< C >
+	) => {
+		const queriedState = get( state.entities.records, [
+			kind,
+			name,
+			'queriedData',
+		] );
+		if ( ! queriedState ) {
+			return undefined;
+		}
+		const context = query?.context ?? 'default';
+
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
+				return undefined;
+			}
+
+			return queriedState.items[ context ][ key ];
+		}
+
+		const item = queriedState.items[ context ]?.[ key ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				const value = get( item, field );
+				set( filteredItem, field, value );
+			}
+			return filteredItem;
+		}
+
+		return item;
+	} ) as GetEntityRecord,
 	< K extends Kind, N extends Name >(
 		state: State,
 		kind: K,
