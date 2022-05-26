@@ -10,6 +10,7 @@ import {
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
+	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -156,7 +157,10 @@ export function useClipboardHandler() {
 					}
 					const serialized = serialize( blocks );
 
-					event.clipboardData.setData( 'text/plain', serialized );
+					event.clipboardData.setData(
+						'text/plain',
+						stripHTML( serialized )
+					);
 					event.clipboardData.setData( 'text/html', serialized );
 				}
 			}
