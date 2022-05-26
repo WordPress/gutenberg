@@ -1,7 +1,7 @@
 .block-editor-block-list__block.has-block-overlay {
 	cursor: default;
 
-	&::before {
+	&::after {
 		content: "";
 		position: absolute;
 		top: 0;
@@ -14,12 +14,19 @@
 		z-index: z-index(".block-editor-block-list__block.has-block-overlay");
 	}
 
-	&:hover:not(.is-dragging-blocks)::before {
+	&:hover:not(.is-dragging-blocks)::after {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
 
 	.block-editor-block-list__block {
 		pointer-events: none;
+	}
+
+	.block-editor-iframe__body.is-zoomed-out &::after {
+		// Unfortunately because of the vw unit, this is not always going to be exact
+		// When the scrollbar is visible, the frame exceeds the canvas by a few pixes.
+		width: calc(100vw);
+		left: calc(( 100% - 100vw ) / 2);
 	}
 }
