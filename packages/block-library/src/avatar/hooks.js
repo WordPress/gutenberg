@@ -82,7 +82,10 @@ export function useUserAvatar( { userId, postId, postType } ) {
 			src: defaultAvatar,
 			minSize: 24,
 			maxSize: 96,
-			alt: authorDetails.name,
+			alt: authorDetails
+				? // translators: %s is the Author name.
+				sprintf( __( '%s Avatar' ), authorDetails?.name )
+				: __( 'Default Avatar' ),
 		};
 	}
 
