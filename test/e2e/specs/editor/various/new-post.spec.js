@@ -17,10 +17,10 @@ test.describe( 'new editor state', () => {
 	} );
 
 	test( 'should show the New Post page in Gutenberg', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.createNewPost();
+		await admin.createNewPost();
 
 		await expect( page ).toHaveURL( /post-new.php/ );
 
@@ -40,8 +40,8 @@ test.describe( 'new editor state', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should have no history', async ( { page, pageUtils } ) => {
-		await pageUtils.createNewPost();
+	test( 'should have no history', async ( { admin, page } ) => {
+		await admin.createNewPost();
 
 		await expect(
 			page.locator( 'role=button[name="Undo"i]' )
@@ -52,10 +52,10 @@ test.describe( 'new editor state', () => {
 	} );
 
 	test( 'should focus the title if the title is empty', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.createNewPost();
+		await admin.createNewPost();
 
 		await expect(
 			page.locator( 'role=textbox[name="Add title"i]' )
@@ -63,10 +63,10 @@ test.describe( 'new editor state', () => {
 	} );
 
 	test( 'should not focus the title if the title exists', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.createNewPost();
+		await admin.createNewPost();
 
 		// Enter a title for this post.
 		await page.type(
@@ -89,10 +89,10 @@ test.describe( 'new editor state', () => {
 	} );
 
 	test( 'should be saveable with sufficient initial edits', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.createNewPost( { title: 'Here is the title' } );
+		await admin.createNewPost( { title: 'Here is the title' } );
 
 		// Verify saveable by presence of the Save Draft button.
 		const saveDraftButton = page.locator(

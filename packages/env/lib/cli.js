@@ -92,6 +92,10 @@ module.exports = function cli() {
 		default: false,
 	} );
 
+	// Make sure any unknown arguments are passed to the command as arguments.
+	// This allows options to be passed to "run" without being quoted.
+	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
+
 	yargs.command(
 		'start',
 		wpGreen(
@@ -171,7 +175,7 @@ module.exports = function cli() {
 				describe: 'The container to run the command on.',
 			} );
 			args.positional( 'command', {
-				type: 'string',
+				type: 'array',
 				describe: 'The command to run.',
 			} );
 		},
@@ -189,6 +193,7 @@ module.exports = function cli() {
 		'$0 run tests-cli bash',
 		'Open a bash session in the WordPress tests instance.'
 	);
+
 	yargs.command(
 		'destroy',
 		wpRed(

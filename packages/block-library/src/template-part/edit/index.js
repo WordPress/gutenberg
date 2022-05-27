@@ -162,19 +162,21 @@ export default function TemplatePartEdit( {
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && hasReplacements && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<ToolbarButton
-							onClick={ () =>
-								setIsTemplatePartSelectionOpen( true )
-							}
-						>
-							{ __( 'Replace' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+			{ isEntityAvailable &&
+				hasReplacements &&
+				( area === 'header' || area === 'footer' ) && (
+					<BlockControls>
+						<ToolbarGroup className="wp-block-template-part__block-control-group">
+							<ToolbarButton
+								onClick={ () =>
+									setIsTemplatePartSelectionOpen( true )
+								}
+							>
+								{ __( 'Replace' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
 					tagName={ TagName }

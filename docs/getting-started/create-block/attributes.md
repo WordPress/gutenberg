@@ -15,7 +15,7 @@ For this block tutorial, we want to allow the user to type in a message that we 
 },
 ```
 
-Add this to the `block.json` file. The `attributes` are at the same level as the _name_ and _title_ fields.
+Add this to the `src/block.json` file. The `attributes` are at the same level as the _name_ and _title_ fields.
 
 When the block loads it will look at the saved content for the block, look for the div tag, take the text portion, and store the content in an `attributes.message` variable.
 

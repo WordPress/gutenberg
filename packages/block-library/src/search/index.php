@@ -13,8 +13,6 @@
  * @return string The search block markup.
  */
 function render_block_core_search( $attributes ) {
-	static $instance_id = 0;
-
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -27,17 +25,19 @@ function render_block_core_search( $attributes ) {
 		)
 	);
 
-	$input_id         = 'wp-block-search__input-' . ++$instance_id;
-	$classnames       = classnames_for_block_core_search( $attributes );
-	$show_label       = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
-	$use_icon_button  = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
-	$show_input       = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
-	$show_button      = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
-	$input_markup     = '';
-	$button_markup    = '';
-	$inline_styles    = styles_for_block_core_search( $attributes );
-	$color_classes    = get_color_classes_for_block_core_search( $attributes );
-	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
+	$input_id            = wp_unique_id( 'wp-block-search__input-' );
+	$classnames          = classnames_for_block_core_search( $attributes );
+	$show_label          = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
+	$use_icon_button     = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
+	$show_input          = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
+	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
+	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
+	$input_markup        = '';
+	$button_markup       = '';
+	$query_params_markup = '';
+	$inline_styles       = styles_for_block_core_search( $attributes );
+	$color_classes       = get_color_classes_for_block_core_search( $attributes );
+	$is_button_inside    = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
@@ -63,10 +63,20 @@ function render_block_core_search( $attributes ) {
 			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( $input_classes ),
-			esc_attr( get_search_query() ),
+			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
 		);
+	}
+
+	if ( count( $query_params ) > 0 ) {
+		foreach ( $query_params as $param => $value ) {
+			$query_params_markup .= sprintf(
+				'<input type="hidden" name="%s" value="%s" />',
+				esc_attr( $param ),
+				esc_attr( $value )
+			);
+		}
 	}
 
 	if ( $show_button ) {
@@ -91,6 +101,9 @@ function render_block_core_search( $attributes ) {
 				</svg>';
 		}
 
+		// Include the button element class.
+		$button_classes .= ' ' . WP_Theme_JSON_GUTENBERG::__EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME;
+
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
 			esc_attr( $button_classes ),
@@ -105,7 +118,7 @@ function render_block_core_search( $attributes ) {
 		'<div class="wp-block-search__inside-wrapper %s" %s>%s</div>',
 		esc_attr( $field_markup_classes ),
 		$inline_styles['wrapper'],
-		$input_markup . $button_markup
+		$input_markup . $query_params_markup . $button_markup
 	);
 	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 

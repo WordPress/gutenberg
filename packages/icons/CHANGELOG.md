@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.0.0 (2022-05-18)
+
 ### Breaking Changes
 -   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
 

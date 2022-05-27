@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.7.0 (2022-05-18)
+
 ### Bug Fix
 
 -   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).

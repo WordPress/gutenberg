@@ -41,7 +41,7 @@ import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	'single-post',
+	'single',
 	'page',
 	'index',
 	'archive',
@@ -56,7 +56,7 @@ const DEFAULT_TEMPLATE_SLUGS = [
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	'single-post': post,
+	single: post,
 	page,
 	archive,
 	search,
@@ -99,7 +99,7 @@ export default function NewTemplate( { postType } ) {
 				'postType',
 				'wp_template',
 				{
-					excerpt: description,
+					description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',

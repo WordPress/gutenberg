@@ -56,7 +56,7 @@ export function useBorderControl(
 
 			onChange( newBorder );
 		},
-		[ onChange, shouldSanitizeBorder, sanitizeBorder ]
+		[ onChange, shouldSanitizeBorder ]
 	);
 
 	const onWidthChange = useCallback(
@@ -97,7 +97,13 @@ export function useBorderControl(
 
 			onBorderChange( updatedBorder );
 		},
-		[ border, hadPreviousZeroWidth, onBorderChange ]
+		[
+			border,
+			hadPreviousZeroWidth,
+			colorSelection,
+			styleSelection,
+			onBorderChange,
+		]
 	);
 
 	const onSliderChange = useCallback(

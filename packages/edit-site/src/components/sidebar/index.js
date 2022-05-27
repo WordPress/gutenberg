@@ -46,6 +46,7 @@ export function SidebarComplementaryAreaFills() {
 		[]
 	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
 	useEffect( () => {
 		if ( ! isEditorSidebarOpened ) return;
 		if ( hasBlockSelection ) {
@@ -54,6 +55,7 @@ export function SidebarComplementaryAreaFills() {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
 	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
