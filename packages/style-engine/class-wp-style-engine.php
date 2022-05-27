@@ -31,13 +31,6 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
-	 * Registered block support styles.
-	 *
-	 * @var WP_Style_Engine|null
-	 */
-	private $registered_block_support_styles = array();
-
-	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -128,13 +121,6 @@ class WP_Style_Engine {
 			),
 		),
 	);
-
-	/**
-	 * Register action for outputting styles when the class is constructed.
-	 */
-	public function __construct() {
-		$this->enqueue_block_support_styles();
-	}
 
 	/**
 	 * Utility method to retrieve the main instance of the class.
@@ -255,7 +241,6 @@ class WP_Style_Engine {
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
 	 * @param array $options array(
-	 *     'enqueue_block_support_styles' => (boolean) Whether to register generated styles and output them together in a style block. A `selector` is required.
 	 *     'selector'                     => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'css_vars'                     => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
 	 * );.
@@ -310,19 +295,12 @@ class WP_Style_Engine {
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
+			// Return an entire rule if there is a selector.
 			if ( $selector ) {
 				$style_block          = "$selector { ";
 				$style_block         .= implode( ' ', $css );
 				$style_block         .= ' }';
 				$styles_output['css'] = $style_block;
-
-				// Enqueue block support styles where there is a selector.
-				if ( $should_enqueue_block_support_styles ) {
-					if ( isset( $this->registered_block_support_styles[ $selector ] ) ) {
-						$css = array_unique( array_merge( $this->registered_block_support_styles[ $selector ], $css ) );
-					}
-					$this->registered_block_support_styles[ $selector ] = $css;
-				}
 			} else {
 				$styles_output['css'] = implode( ' ', $css );
 			}
@@ -334,51 +312,6 @@ class WP_Style_Engine {
 		}
 
 		return $styles_output;
-	}
-
-	/**
-	 * Prints registered styles in the page head or footer.
-	 *
-	 * @see $this->enqueue_block_support_styles
-	 */
-	public function output_registered_block_support_styles() {
-		if ( empty( $this->registered_block_support_styles ) ) {
-			return;
-		}
-
-		$output = '';
-
-		foreach ( $this->registered_block_support_styles as $selector => $rules ) {
-				$output .= "\t$selector { ";
-				$output .= implode( ' ', $rules );
-				$output .= " }\n";
-		}
-
-		echo "<style>\n$output</style>\n";
-	}
-
-	/**
-	 * Taken from gutenberg_enqueue_block_support_styles()
-	 *
-	 * This function takes care of adding inline styles
-	 * in the proper place, depending on the theme in use.
-	 *
-	 * For block themes, it's loaded in the head.
-	 * For classic ones, it's loaded in the body
-	 * because the wp_head action  happens before
-	 * the render_block.
-	 *
-	 * @see gutenberg_enqueue_block_support_styles()
-	 */
-	private function enqueue_block_support_styles() {
-		$action_hook_name = 'wp_footer';
-		if ( wp_is_block_theme() ) {
-			$action_hook_name = 'wp_head';
-		}
-		add_action(
-			$action_hook_name,
-			array( $this, 'output_registered_block_support_styles' )
-		);
 	}
 }
 

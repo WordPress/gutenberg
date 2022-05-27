@@ -105,14 +105,17 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
 	if ( $link_block_styles ) {
-		gutenberg_style_engine_generate(
+		$styles = gutenberg_style_engine_generate(
 			$link_block_styles,
 			array(
-				'selector'                     => ".$class_name a",
-				'css_vars'                     => true,
-				'enqueue_block_support_styles' => true,
+				'selector' => ".$class_name a",
+				'css_vars' => true,
 			)
 		);
+
+		if ( ! empty( $styles['css'] ) ) {
+			gutenberg_enqueue_block_support_styles( $styles['css'] );
+		}
 	}
 
 	return null;
