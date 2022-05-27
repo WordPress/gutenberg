@@ -76,12 +76,9 @@ export default function EditPostPreferencesModal() {
 		closeGeneralSidebar();
 	};
 
-	const colorContrastCheckedLevel = useSelect( ( select ) => {
+	const colorContrastCheckAAA = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
-		const strictColorContrastChecksEnabled = isFeatureActive(
-			'strictColorContrastChecks'
-		);
-		return strictColorContrastChecksEnabled ? 'AAA' : 'AA';
+		return isFeatureActive( 'strictColorContrastChecks' );
 	}, [] );
 	const sections = useMemo(
 		() => [
@@ -163,7 +160,7 @@ export default function EditPostPreferencesModal() {
 								featureName="strictColorContrastChecks"
 								help={ sprintf(
 									'Switches the color contrast checker to be comply with WCAG AAA guidelines instead of WCAG AA. Currently checking for: %s.',
-									colorContrastCheckedLevel
+									colorContrastCheckAAA ? 'AAA' : 'AA'
 								) }
 								label={ __( 'Strict color-contrast checker' ) }
 							/>
