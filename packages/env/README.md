@@ -413,7 +413,6 @@ Positionals:
   script-args  The arguments to be passed to the script.   [array] [default: []]
 ```
 
-
 ### `wp-env destroy`
 
 ```sh
@@ -607,6 +606,27 @@ This is useful for integration testing: that is, testing how old versions of Wor
   "themes": ["WordPress/theme-experiments"]
 }
 ```
+
+#### Run PHPUnit using user-defined script
+
+You can create user-defined scripts to wrap more complicated behavior, such as running a plugin's local `phpunit` executable.
+
+```json
+{
+  "env": {
+      "tests": {
+          "scripts": {
+              "phpunit": {
+                "script": "vendor/bin/phpunit -c phpunit.xml.dist",
+                "cwd": "wp-content/plugins/gutenberg"
+              }
+            }
+      }
+  }
+}
+```
+
+Running `wp-env exec tests phpunit` will now run unit tests.
 
 #### Add mu-plugins and other mapped directories
 
