@@ -65,7 +65,6 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 */
 	$templates = apply_filters( 'pre_get_block_templates', null, $query, $template_type );
 	if ( ! is_null( $templates ) ) {
-		echo 'hi';
 		return $templates;
 	}
 
