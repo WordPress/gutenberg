@@ -2,10 +2,11 @@
  * External dependencies
  */
 import moment from 'moment';
-import classnames from 'classnames';
 import type { Moment } from 'moment';
 import { noop } from 'lodash';
-
+// Needed to initialise the default datepicker styles.
+// See: https://github.com/airbnb/react-dates#initialize
+import 'react-dates/initialize';
 // `react-dates` doesn't tree-shake correctly, so we import from the individual
 // component here.
 import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
@@ -15,12 +16,14 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { isRTL, _n, sprintf } from '@wordpress/i18n';
+import { arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { getMomentDate } from './utils';
-import type { DatePickerDayProps, DatePickerProps } from './types';
+import type { DatePickerDayProps, DatePickerProps } from '../types';
+import { Day, NavPrevButton, NavNextButton } from './styles';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
@@ -64,14 +67,14 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 	}, [ events.length ] );
 
 	return (
-		<div
+		<Day
 			ref={ ref }
-			className={ classnames( 'components-datetime__date__day', {
-				'has-events': events?.length,
-			} ) }
+			className="components-datetime__date__day" // Unused, for backwards compatibility.
+			hasEvents={ !! events?.length }
+			alignment="center"
 		>
 			{ day.format( 'D' ) }
-		</div>
+		</Day>
 	);
 }
 
@@ -102,6 +105,7 @@ export function DatePicker( {
 	onMonthPreviewed,
 }: DatePickerProps ) {
 	const nodeRef = useRef< HTMLDivElement >( null );
+
 	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
 		onMonthPreviewed?.( newMonthDate.toISOString() );
 		keepFocusInside();
@@ -175,6 +179,7 @@ export function DatePicker( {
 				date={ momentDate }
 				initialVisibleMonth={ null }
 				daySize={ 30 }
+				horizontalMonthPadding={ 0 }
 				focused
 				hideKeyboardShortcutsPanel
 				// This is a hack to force the calendar to update on month or year change
@@ -198,6 +203,28 @@ export function DatePicker( {
 					<DatePickerDay
 						day={ day }
 						events={ getEventsPerDay( day ) }
+					/>
+				) }
+				renderMonthElement={ ( { month } ) => (
+					<>
+						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
+						{ month.format( 'YYYY' ) }
+					</>
+				) }
+				renderNavPrevButton={ ( { ariaLabel, ...props } ) => (
+					<NavPrevButton
+						icon={ arrowLeft }
+						variant="tertiary"
+						aria-label={ ariaLabel }
+						{ ...props }
+					/>
+				) }
+				renderNavNextButton={ ( { ariaLabel, ...props } ) => (
+					<NavNextButton
+						icon={ arrowRight }
+						variant="tertiary"
+						aria-label={ ariaLabel }
+						{ ...props }
 					/>
 				) }
 				onFocusChange={ noop }
