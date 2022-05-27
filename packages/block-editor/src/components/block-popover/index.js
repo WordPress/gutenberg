@@ -62,6 +62,7 @@ export default function BlockPopover( {
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
 			__unstableForcePosition
+			__unstableShift
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
