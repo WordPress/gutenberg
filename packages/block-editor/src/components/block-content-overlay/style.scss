@@ -15,11 +15,15 @@
 	}
 
 	&::after {
-		content: none;
+		content: none !important;
 	}
 
 	&:hover:not(.is-dragging-blocks)::before {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.3);
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
+	}
+
+	&.is-selected:not(.is-dragging-blocks)::before {
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
 
