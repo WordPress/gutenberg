@@ -365,10 +365,8 @@ const tapPasteAboveElement = async ( driver, element ) => {
 		action.release();
 		await action.perform();
 	} else {
-		const pasteButton = driver.elementByXPath(
-			'//XCUIElementTypeMenuItem[@name="Paste"]'
-		);
-		await pasteButton.click();
+		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
+		await clickIfClickable( driver, pasteButtonLocator );
 		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
 	}
 };
