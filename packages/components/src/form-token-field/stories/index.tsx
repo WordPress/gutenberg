@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
-
+import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
  */
@@ -12,7 +12,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import FormTokenField from '../';
-import type { TokenItem } from '../types';
 
 const meta: ComponentMeta< typeof FormTokenField > = {
 	component: FormTokenField,
@@ -48,7 +47,7 @@ const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
 	...args
 } ) => {
 	const [ selectedContinents, setSelectedContinents ] = useState<
-		( string | TokenItem )[]
+		ComponentProps< typeof FormTokenField >[ 'value' ]
 	>( [] );
 
 	return (
@@ -79,7 +78,7 @@ export const Async: ComponentStory< typeof FormTokenField > = ( {
 	...args
 } ) => {
 	const [ selectedContinents, setSelectedContinents ] = useState<
-		( string | TokenItem )[]
+		ComponentProps< typeof FormTokenField >[ 'value' ]
 	>( [] );
 	const [ availableContinents, setAvailableContinents ] = useState<
 		string[]
