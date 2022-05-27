@@ -14,6 +14,7 @@ import {
 	useStyle,
 	useColorsPerOrigin,
 } from './hooks';
+import Subtitle from './subtitle';
 
 function ScreenLinkColor( { name } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -39,6 +40,16 @@ function ScreenLinkColor( { name } ) {
 		'user'
 	);
 
+	const [ linkHoverColor, setLinkHoverColor ] = useStyle(
+		'elements.link:hover.color.text',
+		name
+	);
+	const [ userLinkHoverColor ] = useStyle(
+		'elements.link:hover.color.text',
+		name,
+		'user'
+	);
+
 	if ( ! hasLinkColor ) {
 		return null;
 	}
@@ -51,6 +62,7 @@ function ScreenLinkColor( { name } ) {
 					'Set the default color used for links across the site.'
 				) }
 			/>
+			<Subtitle>{ __( 'General' ) }</Subtitle>
 			<ColorGradientControl
 				className="edit-site-screen-link-color__control"
 				colors={ colorsPerOrigin }
@@ -62,6 +74,19 @@ function ScreenLinkColor( { name } ) {
 				colorValue={ linkColor }
 				onColorChange={ setLinkColor }
 				clearable={ linkColor === userLinkColor }
+			/>
+			<Subtitle>{ __( 'Hover' ) }</Subtitle>
+			<ColorGradientControl
+				className="edit-site-screen-link-color__control"
+				colors={ colorsPerOrigin }
+				disableCustomColors={ ! areCustomSolidsEnabled }
+				__experimentalHasMultipleOrigins
+				showTitle={ false }
+				enableAlpha
+				__experimentalIsRenderedInSidebar
+				colorValue={ linkHoverColor }
+				onColorChange={ setLinkHoverColor }
+				clearable={ linkColor === userLinkHoverColor }
 			/>
 		</>
 	);
