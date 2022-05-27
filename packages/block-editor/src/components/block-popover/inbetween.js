@@ -11,7 +11,7 @@ import {
 	useCallback,
 	useMemo,
 	createContext,
-	useState,
+	useReducer,
 	useLayoutEffect,
 } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
@@ -35,7 +35,10 @@ function BlockPopoverInbetween( {
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
-	const [ positionRecompute, forceRecompute ] = useState( {} );
+	const [ positionRecompute, forceRecompute ] = useReducer(
+		( s ) => s + 1,
+		0
+	);
 
 	const { orientation, rootClientId, isVisible } = useSelect(
 		( select ) => {
@@ -189,6 +192,22 @@ function BlockPopoverInbetween( {
 			observer.disconnect();
 		};
 	}, [ nextElement ] );
+
+	useLayoutEffect( () => {
+		if ( ! previousElement ) {
+			return;
+		}
+		previousElement.ownerDocument.defaultView.addEventListener(
+			'resize',
+			forceRecompute
+		);
+		return () => {
+			previousElement.ownerDocument.defaultView.removeEventListener(
+				'resize',
+				forceRecompute
+			);
+		};
+	}, [ previousElement ] );
 
 	if ( ! previousElement || ! nextElement || ! isVisible ) {
 		return null;
