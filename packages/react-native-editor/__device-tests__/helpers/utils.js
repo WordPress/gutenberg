@@ -310,7 +310,8 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
 	action.press( { x, y } );
-	action.wait( 2000 );
+	// Setting to wait a bit longer because this is failing more frequently on the CI
+	action.wait( 5000 );
 	action.release();
 	await action.perform();
 };
@@ -419,24 +420,28 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
-		const showHtmlButton = await driver.elementByXPath(
-			showHtmlButtonXpath
+
+		await clickIfClickable( driver, showHtmlButtonXpath );
+	} else if ( toggleOn ) {
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
 		);
-		await showHtmlButton.click();
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch to HTML"]'
+		);
 	} else {
-		const menuButton = await driver.elementByAccessibilityId( '...' );
-		await menuButton.click();
-		let toggleHtmlButton;
-		if ( toggleOn ) {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch to HTML'
-			);
-		} else {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch To Visual'
-			);
-		}
-		await toggleHtmlButton.click();
+		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
+		await driver.sleep( 3000 );
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
+		);
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch To Visual"]'
+		);
 	}
 };
 
@@ -492,7 +497,7 @@ const waitForVisible = async (
 	}
 
 	const element = await driver.elementsByXPath( elementLocator );
-	if ( element.length !== 1 ) {
+	if ( element.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(
 			driver,
@@ -530,6 +535,39 @@ const isElementVisible = async (
 	return true;
 };
 
+const clickIfClickable = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		maxIteration,
+		iteration
+	);
+
+	try {
+		return await element.click();
+	} catch ( error ) {
+		if ( iteration >= maxIteration ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`"${ elementLocator }" still not clickable after "${ iteration }" retries`
+			);
+			return '';
+		}
+
+		return clickIfClickable(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
+	}
+};
+
 // Only for Android
 const waitIfAndroid = async () => {
 	if ( isAndroid() ) {
@@ -540,6 +578,7 @@ const waitIfAndroid = async () => {
 module.exports = {
 	backspace,
 	clickBeginningOfElement,
+	clickIfClickable,
 	clickMiddleOfElement,
 	doubleTap,
 	isAndroid,
