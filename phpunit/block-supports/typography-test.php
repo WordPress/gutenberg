@@ -260,7 +260,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 						'max' => '50rem',
 					),
 				),
-				'expected_output'  => 'clamp(20px, calc(1.25rem + ((1vw - 7.68px) * 93.75)), 50rem)',
+				'expected_output'  => 'clamp(20px, 1.25rem + ((1vw - 7.68px) * 93.75), 50rem)',
 			),
 
 			'default_return_fluid_min_value'               => array(
@@ -270,7 +270,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 						'min' => '2.6rem',
 					),
 				),
-				'expected_output'  => 'max(2.6rem, calc(5.417 * 1vw))',
+				'expected_output'  => 'max(2.6rem, 5.417 * 1vw)',
 			),
 
 			'default_return_fluid_max_value'               => array(
@@ -280,7 +280,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 						'max' => '80px',
 					),
 				),
-				'expected_output'  => 'min(5rem, calc(5 * 1vw))',
+				'expected_output'  => 'min(5rem, 5 * 1vw)',
 			),
 		);
 	}

@@ -306,7 +306,7 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 		$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
 		$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
 		$linear_factor          = round( $linear_factor, 3 );
-		$fluid_target_font_size = 'calc(' . implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor))";
+		$fluid_target_font_size = implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor)";
 
 		return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
 	}
@@ -326,9 +326,9 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 		$min_ratio = round( ( $minimum_font_size['value'] / $minimum_viewport_width['value'] ) * 100, 3 );
 		$min_size  = implode( '', $minimum_font_size );
 
-		// The font-size will be set at $min_size, unless the computed value of calc($min_ratio * 1vw) is greater than that of $min_size,
+		// The font-size will be set at $min_size, unless the computed value of $min_ratio * 1vw is greater than that of $min_size,
 		// in which case it will be set to that value instead.
-		return "max($min_size, calc($min_ratio * 1vw))";
+		return "max($min_size, $min_ratio * 1vw)";
 	}
 
 	// Only maximum font size is available: min().
@@ -346,9 +346,9 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 		$max_ratio = round( ( $maximum_font_size['value'] / $maximum_viewport_width['value'] ) * 100, 3 );
 		$max_size  = implode( '', $maximum_font_size );
 
-		// The font-size will be set at $max_size, unless the result of calc($max_ratio * 1vw) is less than $max_size,
+		// The font-size will be set at $max_size, unless the result of $max_ratio * 1vw is less than $max_size,
 		// in which case it will be set to that value instead.
-		return "min($max_size, calc($max_ratio * 1vw))";
+		return "min($max_size, $max_ratio * 1vw)";
 	}
 }
 
