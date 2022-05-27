@@ -255,10 +255,9 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_rules                           = array();
-		$classnames                          = array();
-		$should_css_vars_from_presets        = isset( $options['css_vars'] ) && true === $options['css_vars'];
-		$should_enqueue_block_support_styles = isset( $options['enqueue_block_support_styles'] ) && true === $options['enqueue_block_support_styles'];
+		$css_rules                    = array();
+		$classnames                   = array();
+		$should_css_vars_from_presets = isset( $options['css_vars'] ) && true === $options['css_vars'];
 
 		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group ) {
