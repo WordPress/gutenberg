@@ -127,6 +127,58 @@ const embeddedContentSchema = {
 };
 
 /**
+ * Math tokens elements.
+ *
+ * @type {ContentSchema}
+ */
+const mathTokenSchema = {
+	mi: { children: { '#text': {} } }, // Identifier.
+	mn: { children: { '#text': {} } }, // Numeric literal.
+	mo: { children: { '#text': {} }, attributes: [ 'stretchy' ] }, // Operator.
+	ms: { children: { '#text': {} } }, // String literal.
+	mtext: { children: { '#text': {} } }, // Arbitrary text.
+};
+
+/**
+ * Math layout elements.
+ *
+ * @type {ContentSchema}
+ */
+const mathLayoutSchema = {
+	mfrac: { children: mathTokenSchema },
+	mroot: { children: mathTokenSchema },
+	mrow: { children: mathTokenSchema },
+	msqrt: { children: mathTokenSchema },
+	msub: { children: mathTokenSchema },
+	msubsup: { children: mathTokenSchema },
+	msup: { children: mathTokenSchema },
+	munderover: { children: mathTokenSchema },
+	mover: { children: mathTokenSchema },
+};
+
+// Recursion is needed.
+// Possible: strong > em > strong.
+// Impossible: strong > strong.
+Object.keys( mathLayoutSchema ).forEach( ( tag ) => {
+	Object.assign( mathLayoutSchema[ tag ].children, mathLayoutSchema );
+} );
+
+/**
+ * Math elements.
+ *
+ * @type {ContentSchema}
+ */
+const mathSchema = {
+	math: {
+		children: {
+			...mathLayoutSchema,
+			...mathTokenSchema,
+		},
+		attributes: [ 'xmlns', 'display' ],
+	},
+};
+
+/**
  * Phrasing content elements.
  *
  * @see https://www.w3.org/TR/2011/WD-html5-20110525/content-models.html#phrasing-content-0
@@ -134,6 +186,7 @@ const embeddedContentSchema = {
 const phrasingContentSchema = {
 	...textContentSchema,
 	...embeddedContentSchema,
+	...mathSchema,
 };
 
 /**
