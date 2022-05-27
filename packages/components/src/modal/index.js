@@ -10,6 +10,7 @@ import classnames from 'classnames';
  */
 import {
 	createPortal,
+	useCallback,
 	useEffect,
 	useRef,
 	useState,
@@ -75,7 +76,6 @@ function Modal( props, forwardedRef ) {
 	const focusOutsideProps = useFocusOutside( onRequestClose );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
-	const contentRef = useRef();
 
 	useEffect( () => {
 		openModalCount++;
@@ -108,8 +108,8 @@ function Modal( props, forwardedRef ) {
 		}
 	}
 
-	useEffect( () => {
-		const onContentContainerScroll = ( e ) => {
+	const onContentContainerScroll = useCallback(
+		( e ) => {
 			const scrollY = e?.target?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
@@ -117,24 +117,9 @@ function Modal( props, forwardedRef ) {
 			} else if ( hasScrolledContent && scrollY <= 0 ) {
 				setHasScrolledContent( false );
 			}
-		};
-
-		if ( contentRef.current ) {
-			contentRef.current.addEventListener(
-				'scroll',
-				onContentContainerScroll,
-				false
-			);
-
-			return () => {
-				contentRef.current.removeEventListener(
-					'scroll',
-					onContentContainerScroll,
-					false
-				);
-			};
-		}
-	}, [ hasScrolledContent ] );
+		},
+		[ hasScrolledContent ]
+	);
 
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -177,7 +162,7 @@ function Modal( props, forwardedRef ) {
 							'has-scrolled-content': hasScrolledContent,
 						} ) }
 						role="document"
-						ref={ contentRef }
+						onScroll={ onContentContainerScroll }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">
