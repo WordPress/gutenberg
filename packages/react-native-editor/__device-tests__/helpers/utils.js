@@ -310,9 +310,7 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 	const y = isAndroid() ? location.y - blockEdgeToContent : location.y;
 	const x = isAndroid() ? location.x - blockEdgeToContent : location.x;
 
-	const action = await new wd.TouchAction( driver );
-	action.press( { x, y } );
-	action.release();
+	const action = new wd.TouchAction( driver ).press( { x, y } ).release();
 	await action.perform();
 };
 
@@ -321,13 +319,12 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	const action = await new wd.TouchAction( driver );
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
-	action.press( { x, y } );
-	// Setting to wait a bit longer because this is failing more frequently on the CI
-	action.wait( 5000 );
-	action.release();
+	const action = new wd.TouchAction( driver )
+		.press( { x, y } )
+		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.release();
 	await action.perform();
 };
 
@@ -453,13 +450,12 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	const action = new wd.TouchAction( driver );
-	await action
+	const action = new wd.TouchAction( driver )
 		.press( { x, y } )
 		.wait( 5000 )
 		.moveTo( { x, y: nextYPosition } )
-		.release()
-		.perform();
+		.release();
+	await action.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
