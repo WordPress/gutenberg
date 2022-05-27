@@ -46,7 +46,7 @@ export function UnForwardedTokenInput(
 			type="text"
 			{ ...restProps }
 			value={ value || '' }
-			onChange={ onChange ? onChangeHandler : undefined }
+			onChange={ onChangeHandler }
 			size={ size }
 			className={ classnames(
 				className,
