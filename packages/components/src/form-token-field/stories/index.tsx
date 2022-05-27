@@ -18,10 +18,6 @@ const meta: ComponentMeta< typeof FormTokenField > = {
 	component: FormTokenField,
 	title: 'Components/FormTokenField',
 	argTypes: {
-		onChange: {
-			action: 'onChange',
-			control: { type: null },
-		},
 		value: {
 			control: { type: null },
 		},
