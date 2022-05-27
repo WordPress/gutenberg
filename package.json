@@ -252,7 +252,7 @@
 		"changelog": "node ./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
-		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
+		"check-local-changes": "node ./bin/check-local-changes.js",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "rimraf node_modules packages/*/node_modules",

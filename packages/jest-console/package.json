@@ -25,7 +25,8 @@
 	},
 	"files": [
 		"build",
-		"build-module"
+		"build-module",
+		"types"
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
