@@ -2,18 +2,20 @@
  * Internal dependencies
  */
 const {
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	isElementVisible,
+	longPressMiddleOfElement,
 	setupDriver,
 	stopDriver,
-	isAndroid,
-	swipeUp,
 	swipeDown,
-	typeString,
-	toggleHtmlMode,
 	swipeFromTo,
-	longPressMiddleOfElement,
-	doubleTap,
-	isEditorVisible,
+	swipeUp,
+	toggleHtmlMode,
+	typeString,
 	waitForVisible,
+	clickIfClickable,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -45,11 +47,15 @@ class EditorPage {
 		return await this.driver.hasElementByAccessibilityId( 'block-list' );
 	}
 
-	// For text blocks, e.g. Paragraph, Heading
+	// ===============================
+	// Text blocks functions
+	// E.g. Paragraph, Heading blocks
+	// ===============================
 	async getTextBlockAtPosition( blockName, position = 1 ) {
-		// iOS needs a click before
+		// iOS needs a click to get the text element
 		if ( ! isAndroid() ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
+
 			const textBlock = await waitForVisible(
 				this.driver,
 				textBlockLocator
@@ -64,37 +70,34 @@ class EditorPage {
 		return await waitForVisible( this.driver, blockLocator );
 	}
 
+	async typeTextToTextBlock( block, text, clear ) {
+		await typeString( this.driver, block, text, clear );
+	}
+
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering.
 	async getBlockAtPosition(
 		blockName,
 		position = 1,
-		options = { autoscroll: false, useWaitForVisible: false }
+		options = { autoscroll: false }
 	) {
-		let blockLocator;
-
-		// Make it optional to use waitForVisible() so we can handle this test by test.
-		// This condition can be removed once we have gone through all test cases.
-		if ( options.useWaitForVisible ) {
-			let elementType;
-			switch ( blockName ) {
-				case blockNames.cover:
-					elementType = 'XCUIElementTypeButton';
-					break;
-				default:
-					elementType = 'XCUIElementTypeOther';
-					break;
-			}
-
-			blockLocator = isAndroid()
-				? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
-				: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
-
-			await waitForVisible( this.driver, blockLocator );
-		} else {
-			blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+		let elementType;
+		switch ( blockName ) {
+			case blockNames.cover:
+				elementType = 'XCUIElementTypeButton';
+				break;
+			default:
+				elementType = 'XCUIElementTypeOther';
+				break;
 		}
+
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`
+			: `(//${ elementType }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")])[1]`;
+
+		await waitForVisible( this.driver, blockLocator );
+
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -142,12 +145,12 @@ class EditorPage {
 
 	async getFirstBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
-		const elements = await this.driver.elementsByXPath( firstBlockLocator );
-		return elements[ 0 ];
+		return await waitForVisible( this.driver, firstBlockLocator );
 	}
 
 	async getLastBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		await waitForVisible( this.driver, firstBlockLocator );
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ elements.length - 1 ];
 	}
@@ -155,9 +158,7 @@ class EditorPage {
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( blockName, position, {
-				useWaitForVisible: true,
-			} ) )
+			( await this.getBlockAtPosition( blockName, position ) )
 		);
 	}
 
@@ -243,19 +244,18 @@ class EditorPage {
 			// Sometimes double tap is not enough for paste menu to appear, so we also long press.
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 
-			const pasteButton = this.driver.elementByXPath(
+			const pasteButton = await waitForVisible(
+				this.driver,
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
 			);
 
 			await pasteButton.click();
-			await this.driver.sleep( 3000 ); // Wait for paste notification to disappear.
 		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
 
 	async dismissKeyboard() {
-		await this.driver.sleep( 1000 ); // Wait for any keyboard animations.
 		const keyboardShown = await this.driver.isKeyboardShown();
 		if ( ! keyboardShown ) {
 			return;
@@ -316,11 +316,7 @@ class EditorPage {
 				? '//android.widget.Button[@content-desc="Add Block Before"]'
 				: '//XCUIElementTypeButton[@name="Add Block Before"]';
 
-			const addBlockBeforeButton = await waitForVisible(
-				this.driver,
-				addBlockBeforeButtonLocator
-			);
-			await addBlockBeforeButton.click();
+			await clickIfClickable( this.driver, addBlockBeforeButtonLocator );
 		} else {
 			await addButton.click();
 		}
@@ -477,9 +473,7 @@ class EditorPage {
 			blockActionsMenuButtonLocator
 		);
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position, {
-				useWaitForVisible: true,
-			} );
+			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
 				blockActionsMenuButtonLocator
 			);
@@ -506,10 +500,6 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async typeTextToParagraphBlock( block, text, clear ) {
-		await typeString( this.driver, block, text, clear );
-	}
-
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -522,13 +512,9 @@ class EditorPage {
 				await block.click();
 			}
 
-			await this.typeTextToParagraphBlock(
-				block,
-				paragraphs[ i ],
-				clear
-			);
+			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.typeTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToTextBlock( block, '\n', false );
 			}
 		}
 	}
@@ -542,36 +528,93 @@ class EditorPage {
 		return await blockLocator.text();
 	}
 
+	async getNumberOfParagraphBlocks() {
+		const paragraphBlockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
+			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
+
+		const locator = await this.driver.elementsByXPath(
+			paragraphBlockLocator
+		);
+		return locator.length;
+	}
+
+	async assertSlashInserterPresent() {
+		const slashInserterLocator = isAndroid()
+			? '//android.widget.HorizontalScrollView[@content-desc="Slash inserter results"]/android.view.ViewGroup'
+			: '(//XCUIElementTypeOther[@name="Slash inserter results"])[1]';
+
+		return await isElementVisible( this.driver, slashInserterLocator, 5 );
+	}
+
 	// =========================
 	// List Block functions
 	// =========================
 
-	async getTextViewForListBlock( block ) {
-		let textViewElementName = 'XCUIElementTypeTextView';
-		if ( isAndroid() ) {
-			textViewElementName = 'android.widget.EditText';
+	async getListBlockAtPosition(
+		position = 1,
+		options = { isEmptyBlock: false }
+	) {
+		// iOS needs a few extra steps to get the text element
+		if ( ! isAndroid() ) {
+			// Click the list in the correct position
+			await clickIfClickable(
+				this.driver,
+				`(//XCUIElementTypeOther[contains(@name, "List Block. Row ${ position }")])[1]`
+			);
+
+			const listBlockLocator = options.isEmptyBlock
+				? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
+				: `//XCUIElementTypeButton[contains(@name, "List")]`;
+
+			await clickIfClickable( this.driver, listBlockLocator );
 		}
 
-		const accessibilityId = await block.getAttribute(
-			this.accessibilityIdKey
-		);
-		const blockLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
+		const listBlockTextLocatorIOS = options.isEmptyBlock
+			? `(//XCUIElementTypeStaticText[contains(@name, "List")])`
+			: `//XCUIElementTypeButton[contains(@name, "List")]//XCUIElementTypeTextView`;
 
-	async sendTextToListBlock( block, text ) {
-		const textViewElement = await this.getTextViewForListBlock( block );
+		const listBlockTextLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "List Block. Row ${ position }")]//android.widget.EditText`
+			: listBlockTextLocatorIOS;
 
-		// Cannot clear list blocks because it messes up the list bullet.
-		const clear = false;
-
-		return await typeString( this.driver, textViewElement, text, clear );
+		return await waitForVisible( this.driver, listBlockTextLocator );
 	}
 
 	async clickOrderedListToolBarButton() {
+		const toolBarLocator = isAndroid()
+			? `//android.widget.Button[@content-desc="${ this.orderedListButtonName }"]`
+			: `//XCUIElementTypeButton[@name="${ this.orderedListButtonName }"]`;
+
+		await waitForVisible( this.driver, toolBarLocator );
 		await this.clickToolBarButton( this.orderedListButtonName );
+	}
+
+	// =========================
+	// Cover Block functions
+	// For iOS only
+	// =========================
+
+	async clickAddMediaFromCoverBlock() {
+		const mediaSection = await waitForVisible(
+			this.driver,
+			'//XCUIElementTypeOther[@name="Media Add image or video"]'
+		);
+		const addMediaButton = await mediaSection.elementByAccessibilityId(
+			'Add image or video'
+		);
+		await addMediaButton.click();
+	}
+
+	async replaceMediaImage() {
+		await clickIfClickable(
+			this.driver,
+			'(//XCUIElementTypeButton[@name="Edit image"])[1]'
+		);
+		await clickIfClickable(
+			this.driver,
+			'//XCUIElementTypeButton[@name="Replace"]'
+		);
 	}
 
 	// =========================
@@ -607,34 +650,6 @@ class EditorPage {
 		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
-	}
-
-	// =========================
-	// Heading Block functions
-	// =========================
-
-	// Inner element changes on iOS if Heading Block is empty
-	async getTextViewForHeadingBlock( block, empty ) {
-		let textViewElementName = empty
-			? 'XCUIElementTypeStaticText'
-			: 'XCUIElementTypeTextView';
-		if ( isAndroid() ) {
-			textViewElementName = 'android.widget.EditText';
-		}
-
-		const accessibilityId = await block.getAttribute(
-			this.accessibilityIdKey
-		);
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
-		return await this.driver.elementByXPath( blockLocator );
-	}
-
-	async sendTextToHeadingBlock( block, text, clear = true ) {
-		const textViewElement = await this.getTextViewForHeadingBlock(
-			block,
-			true
-		);
-		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
 	async closePicker() {
@@ -681,10 +696,12 @@ class EditorPage {
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
-		return await this.driver
-			.elementByXPath( locator )
-			.click()
-			.sleep( isAndroid() ? 200 : 0 );
+		const hideSearchHeadingToggle = await waitForVisible(
+			this.driver,
+			locator
+		);
+
+		return await hideSearchHeadingToggle.click();
 	}
 
 	async changeSearchButtonPositionSetting( block, buttonPosition ) {
@@ -693,13 +710,16 @@ class EditorPage {
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
 
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
-		await this.driver.elementByXPath( locator ).click();
+		let optionMenuButton = await waitForVisible( this.driver, locator );
+		await optionMenuButton.click();
 
 		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
-		return await this.driver
-			.elementByXPath( optionMenuButtonLocator )
-			.click()
-			.sleep( isAndroid() ? 600 : 200 ); // sleep a little longer due to multiple menus.
+		optionMenuButton = await waitForVisible(
+			this.driver,
+			optionMenuButtonLocator
+		);
+
+		return await optionMenuButton.click();
 	}
 
 	async toggleSearchIconOnlySetting( block ) {
@@ -708,10 +728,16 @@ class EditorPage {
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
-		return await this.driver
-			.elementByXPath( locator )
-			.click()
-			.sleep( isAndroid() ? 200 : 0 );
+		const useIconButton = await waitForVisible( this.driver, locator );
+
+		return await useIconButton.click();
+	}
+
+	async isSearchSettingsVisible() {
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+		const buttonPositionLocator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
+
+		return await waitForVisible( this.driver, buttonPositionLocator );
 	}
 
 	// =============================
@@ -720,37 +746,28 @@ class EditorPage {
 
 	async getUnsupportedBlockHelpButton() {
 		const accessibilityId = 'Help button';
-		let blockLocator =
-			'//android.widget.Button[@content-desc="Help button, Tap here to show help"]';
+		const blockLocator = isAndroid()
+			? `//android.widget.Button[starts-with(@content-desc, "${ accessibilityId }")]`
+			: `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
 
-		if ( ! isAndroid() ) {
-			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
-		}
-		return await this.driver.elementByXPath( blockLocator );
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	async getUnsupportedBlockBottomSheetEditButton() {
 		const accessibilityId = 'Edit using web editor';
-		let blockLocator =
-			'//android.widget.Button[@content-desc="Edit using web editor"]';
+		const blockLocator = isAndroid()
+			? `//android.widget.Button[@content-desc="${ accessibilityId }"]`
+			: `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
 
-		if ( ! isAndroid() ) {
-			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
-		}
-		return await this.driver.elementByXPath( blockLocator );
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	async getUnsupportedBlockWebView() {
-		let blockLocator = '//android.webkit.WebView';
+		const blockLocator = isAndroid()
+			? '//android.webkit.WebView'
+			: '//XCUIElementTypeWebView';
 
-		if ( ! isAndroid() ) {
-			blockLocator = '//XCUIElementTypeWebView';
-		}
-
-		this.driver.setImplicitWaitTimeout( 20000 );
-		const element = await this.driver.elementByXPath( blockLocator );
-		this.driver.setImplicitWaitTimeout( 5000 );
-		return element;
+		return await waitForVisible( this.driver, blockLocator );
 	}
 
 	async stopDriver() {
@@ -760,34 +777,25 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
-
-	async getNumberOfParagraphBlocks() {
-		const paragraphBlockLocator = isAndroid()
-			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row")]//android.widget.EditText`
-			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row")])`;
-		const locator = await this.driver.elementsByXPath(
-			paragraphBlockLocator
-		);
-		return locator.length;
-	}
 }
 
 const blockNames = {
-	paragraph: 'Paragraph',
-	gallery: 'Gallery',
+	audio: 'Audio',
 	columns: 'Columns',
 	cover: 'Cover',
+	embed: 'Embed',
+	file: 'File',
+	gallery: 'Gallery',
 	heading: 'Heading',
 	image: 'Image',
 	latestPosts: 'Latest Posts',
 	list: 'List',
 	more: 'More',
+	paragraph: 'Paragraph',
+	search: 'Search',
 	separator: 'Separator',
 	spacer: 'Spacer',
 	verse: 'Verse',
-	file: 'File',
-	audio: 'Audio',
-	search: 'Search',
 };
 
 module.exports = { initializeEditorPage, blockNames };

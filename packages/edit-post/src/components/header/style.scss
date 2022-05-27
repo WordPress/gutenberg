@@ -84,10 +84,8 @@
 	}
 }
 
-.edit-post-post-preview-dropdown {
-	.components-popover__content > div {
-		padding-bottom: 0;
-	}
+.edit-post-post-preview-dropdown .components-popover__content {
+	padding-bottom: 0;
 }
 
 /**

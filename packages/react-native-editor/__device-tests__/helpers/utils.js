@@ -310,7 +310,8 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
 	action.press( { x, y } );
-	action.wait( 2000 );
+	// Setting to wait a bit longer because this is failing more frequently on the CI
+	action.wait( 5000 );
 	action.release();
 	await action.perform();
 };
@@ -419,24 +420,28 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
-		const showHtmlButton = await driver.elementByXPath(
-			showHtmlButtonXpath
+
+		await clickIfClickable( driver, showHtmlButtonXpath );
+	} else if ( toggleOn ) {
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
 		);
-		await showHtmlButton.click();
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch to HTML"]'
+		);
 	} else {
-		const menuButton = await driver.elementByAccessibilityId( '...' );
-		await menuButton.click();
-		let toggleHtmlButton;
-		if ( toggleOn ) {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch to HTML'
-			);
-		} else {
-			toggleHtmlButton = await driver.elementByAccessibilityId(
-				'Switch To Visual'
-			);
-		}
-		await toggleHtmlButton.click();
+		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
+		await driver.sleep( 3000 );
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="..."]'
+		);
+		await clickIfClickable(
+			driver,
+			'//XCUIElementTypeButton[@name="Switch To Visual"]'
+		);
 	}
 };
 
@@ -464,48 +469,136 @@ const waitForMediaLibrary = async ( driver ) => {
 	await waitForVisible( driver, locator );
 };
 
-const waitForVisible = async ( driver, elementLocator, iteration = 0 ) => {
-	const maxIteration = 25;
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25
+ * @param {number} iteration - Default value is 0
+ * @return {string} - Returns the first element found, empty string if not found
+ */
+const waitForVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
 	const timeout = 1000;
 
 	if ( iteration >= maxIteration ) {
-		throw new Error(
+		// if element not found, print error and return empty string
+		// eslint-disable-next-line no-console
+		console.error(
 			`"${ elementLocator }" is still not visible after ${ iteration } retries!`
 		);
+		return '';
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
 		await driver.sleep( timeout );
 	}
 
-	const locator = await driver.elementsByXPath( elementLocator );
-	if ( locator.length !== 1 ) {
+	const element = await driver.elementsByXPath( elementLocator );
+	if ( element.length === 0 ) {
 		// if locator is not visible, try again
-		return waitForVisible( driver, elementLocator, iteration + 1 );
+		return waitForVisible(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
 	}
-	return locator[ 0 ];
+
+	return element[ 0 ];
+};
+
+/**
+ * @param {string} driver
+ * @param {string} elementLocator
+ * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @return {boolean} - Returns true if element is found, false otherwise
+ */
+const isElementVisible = async (
+	driver,
+	elementLocator,
+	maxIteration = 25
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		maxIteration
+	);
+
+	// if there is no element, return false
+	if ( ! element ) {
+		return false;
+	}
+
+	return true;
+};
+
+const clickIfClickable = async (
+	driver,
+	elementLocator,
+	maxIteration = 25,
+	iteration = 0
+) => {
+	const element = await waitForVisible(
+		driver,
+		elementLocator,
+		maxIteration,
+		iteration
+	);
+
+	try {
+		return await element.click();
+	} catch ( error ) {
+		if ( iteration >= maxIteration ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`"${ elementLocator }" still not clickable after "${ iteration }" retries`
+			);
+			return '';
+		}
+
+		return clickIfClickable(
+			driver,
+			elementLocator,
+			maxIteration,
+			iteration + 1
+		);
+	}
+};
+
+// Only for Android
+const waitIfAndroid = async () => {
+	if ( isAndroid() ) {
+		await editorPage.driver.sleep( 1000 );
+	}
 };
 
 module.exports = {
 	backspace,
-	timer,
-	setupDriver,
-	isLocalEnvironment,
-	isAndroid,
-	typeString,
-	clickMiddleOfElement,
 	clickBeginningOfElement,
+	clickIfClickable,
+	clickMiddleOfElement,
+	doubleTap,
+	isAndroid,
+	isEditorVisible,
+	isElementVisible,
+	isLocalEnvironment,
 	longPressMiddleOfElement,
-	tapSelectAllAboveElement,
+	setupDriver,
+	stopDriver,
+	swipeDown,
+	swipeFromTo,
+	swipeUp,
 	tapCopyAboveElement,
 	tapPasteAboveElement,
-	swipeDown,
-	swipeUp,
-	swipeFromTo,
-	stopDriver,
+	tapSelectAllAboveElement,
+	timer,
 	toggleHtmlMode,
 	toggleOrientation,
-	doubleTap,
-	isEditorVisible,
+	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
+	waitIfAndroid,
 };

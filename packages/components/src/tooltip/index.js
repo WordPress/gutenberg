@@ -64,7 +64,7 @@ const addPopoverToGrandchildren = ( {
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
-				noArrow={ true }
+				offset={ 12 }
 			>
 				{ text }
 				<Shortcut
@@ -93,7 +93,13 @@ const emitToChild = ( children, eventName, event ) => {
 };
 
 function Tooltip( props ) {
-	const { children, position, text, shortcut, delay = TOOLTIP_DELAY } = props;
+	const {
+		children,
+		position = 'bottom middle',
+		text,
+		shortcut,
+		delay = TOOLTIP_DELAY,
+	} = props;
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.

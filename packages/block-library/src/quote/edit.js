@@ -81,6 +81,7 @@ export default function QuoteEdit( {
 						createBlock( 'core/paragraph' )
 					}
 					textAlign={ align }
+					__unstableEmbedURLOnPaste
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
