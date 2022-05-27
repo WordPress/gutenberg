@@ -64,6 +64,7 @@ class VideoEdit extends Component {
 		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
 			this
 		);
+		this.onSelectURL = this.onSelectURL.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
 		);
@@ -160,6 +161,20 @@ class VideoEdit extends Component {
 		setAttributes( { id, src: url } );
 	}
 
+	onSelectURL( newURL ) {
+		const { createErrorNotice } = this.props;
+
+		if ( isURL( newURL ) ) {
+			this.setState( {
+				isFetchingVideo: true,
+			} );
+
+			// TODO: Check if video is valid and set attributes
+		} else {
+			createErrorNotice( __( 'Invalid URL.' ) );
+		}
+	}
+
 	onVideoContanerLayout( event ) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
@@ -205,6 +220,7 @@ class VideoEdit extends Component {
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
+				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<ToolbarGroup>
