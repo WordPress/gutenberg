@@ -57,7 +57,8 @@
 				"style": true,
 				"width": true
 			}
-		}
+		},
+		"__experimentalTagName": true
 	},
 	"editorStyle": "wp-block-columns-editor",
 	"style": "wp-block-columns"
