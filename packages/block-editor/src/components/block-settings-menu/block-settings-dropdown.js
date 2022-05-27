@@ -48,6 +48,7 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
 	children,
+	popoverProps,
 	...props
 } ) {
 	const blockClientIds = castArray( clientIds );
@@ -195,7 +196,7 @@ export function BlockSettingsDropdown( {
 					icon={ moreVertical }
 					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
+					popoverProps={ { ...POPOVER_PROPS, ...popoverProps } }
 					noIcons
 					{ ...props }
 				>

@@ -58,6 +58,7 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const { clientId } = block;
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -183,9 +184,19 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback( ( event ) => {
 		if ( showBlockActions && allowRightClickOverrides ) {
-			event.preventDefault();
 			settingsRef.current?.click();
+			// Ensure the position of the settings dropdown is at the cursor.
+			setSettingsAnchorRect(
+				new window.DOMRect( event.clientX, event.clientY, 0, 0 )
+			);
+			event.preventDefault();
 		}
+	} );
+
+	const clearSettingsAnchorRect = useCallback( () => {
+		// Clear the custom position for the settings dropdown so that it is restored back
+		// to being anchored to the DropdownMenu toggle button.
+		setSettingsAnchorRect( undefined );
 	} );
 
 	let colSpan;
@@ -307,10 +318,14 @@ function ListViewBlock( {
 							clientIds={ dropdownClientIds }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
+							popoverProps={ {
+								anchorRect: settingsAnchorRect, // Used to position the settings at the cursor on right-click.
+							} }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
 								tabIndex,
+								onClick: clearSettingsAnchorRect,
 								onFocus,
 							} }
 							disableOpenOnArrowDown
