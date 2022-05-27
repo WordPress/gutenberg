@@ -47,7 +47,7 @@
 	}
 }
 
-.wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper {
+:where(.wp-block-search__button-inside) :where(.wp-block-search__inside-wrapper) {
 	padding: 4px;
 	border: 1px solid #949494;
 
@@ -61,7 +61,7 @@
 		}
 	}
 
-	.wp-block-search__button {
+	:where(.wp-block-search__button) {
 		padding: 0.125em 0.5em;
 	}
 }
