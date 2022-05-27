@@ -15,6 +15,8 @@ function gutenberg_get_elements_class_name( $block ) {
 	return 'wp-elements-' . md5( serialize( $block ) );
 }
 
+
+
 /**
  * Update the block content with elements class names.
  *
@@ -29,9 +31,9 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
-	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link:hover' );
+	$skip_link_hover_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link:hover' );
 
-	if ( $skip_link_color_serialization && $skip_link_color_serialization ) {
+	if ( $skip_link_color_serialization && $skip_link_hover_color_serialization ) {
 		return $block_content;
 	}
 
@@ -99,6 +101,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
+
 
 	/*
 	* For now we only care about link color and link hover color.
