@@ -14,7 +14,7 @@ export default function NavigationMenuNameControl() {
 
 	return (
 		<TextControl
-			label={ __( 'Name' ) }
+			label={ __( 'Menu name' ) }
 			value={ title }
 			onChange={ updateTitle }
 		/>

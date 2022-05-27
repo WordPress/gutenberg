@@ -70,7 +70,7 @@ const SocialLinkEdit = ( {
 	setAttributes,
 } ) => {
 	const { url, service, label } = attributes;
-	const { iconColorValue, iconBackgroundColorValue } = context;
+	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
@@ -79,6 +79,7 @@ const SocialLinkEdit = ( {
 	const ref = useRef();
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
+	const socialLinkLabel = label ?? socialLinkName;
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
@@ -113,8 +114,19 @@ const SocialLinkEdit = ( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<Button ref={ ref } onClick={ () => setPopover( true ) }>
+				<Button
+					className="wp-block-social-link-anchor"
+					ref={ ref }
+					onClick={ () => setPopover( true ) }
+				>
 					<IconComponent />
+					<span
+						className={ classNames( 'wp-block-social-link-label', {
+							'screen-reader-text': ! showLabels,
+						} ) }
+					>
+						{ socialLinkLabel }
+					</span>
 					{ isSelected && showURLPopover && (
 						<SocialLinkURLPopover
 							url={ url }

@@ -6,30 +6,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS } from './defaults';
 import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
- */
-export const preferences = combineReducers( {
-	features( state = PREFERENCES_DEFAULTS.features, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_FEATURE': {
-				return {
-					...state,
-					[ action.feature ]: ! state[ action.feature ],
-				};
-			}
-			default:
-				return state;
-		}
-	},
-} );
 
 /**
  * Reducer returning the editing canvas device type.
@@ -72,39 +49,25 @@ export function settings( state = {}, action ) {
  * Reducer keeping track of the currently edited Post Type,
  * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Array}  state  Current state history.
+ * @param {Object} state  Current edited post.
  * @param {Object} action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function editedPost( state = [], action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
-			return [
-				{
-					type: 'wp_template',
-					id: action.templateId,
-					page: action.page,
-				},
-			];
+			return {
+				type: 'wp_template',
+				id: action.templateId,
+				page: action.page,
+			};
 		case 'SET_TEMPLATE_PART':
-			return [
-				{
-					type: 'wp_template_part',
-					id: action.templatePartId,
-				},
-			];
-		case 'PUSH_TEMPLATE_PART':
-			return [
-				...state,
-				{
-					type: 'wp_template_part',
-					id: action.templatePartId,
-				},
-			];
-		case 'GO_BACK':
-			return state.slice( 0, -1 );
+			return {
+				type: 'wp_template_part',
+				id: action.templatePartId,
+			};
 	}
 
 	return state;
@@ -221,7 +184,6 @@ export function listViewPanel( state = false, action ) {
 }
 
 export default combineReducers( {
-	preferences,
 	deviceType,
 	settings,
 	editedPost,

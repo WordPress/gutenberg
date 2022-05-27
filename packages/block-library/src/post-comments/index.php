@@ -51,6 +51,8 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$output             = ob_get_clean();
 
+	wp_enqueue_script( 'comment-reply' );
+
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $output );
 }
 
@@ -66,3 +68,20 @@ function register_block_core_post_comments() {
 	);
 }
 add_action( 'init', 'register_block_core_post_comments' );
+
+/**
+ * Use the button block classes for the form-submit button.
+ *
+ * @param array $fields The default comment form arguments.
+ *
+ * @return array Returns the modified fields.
+ */
+function post_comments_block_form_defaults( $fields ) {
+	if ( wp_is_block_theme() ) {
+		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . WP_Theme_JSON_Gutenberg::__EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME . '" value="%4$s" />';
+		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
+	}
+
+	return $fields;
+}
+add_filter( 'comment_form_defaults', 'post_comments_block_form_defaults' );

@@ -32,8 +32,10 @@ describe( 'adding inline tokens', () => {
 		await clickButton( 'Inline image' );
 
 		// Wait for media modal to appear and upload image.
-		await page.waitForSelector( '.media-modal input[type=file]' );
-		const inputElement = await page.$( '.media-modal input[type=file]' );
+		// Wait for media modal to appear and upload image.
+		const inputElement = await page.waitForSelector(
+			'.media-modal .moxie-shim input[type=file]'
+		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',

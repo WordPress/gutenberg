@@ -6,7 +6,12 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,6 +46,7 @@ export default function ClassicEdit( {
 	setAttributes,
 	onReplace,
 } ) {
+	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const didMount = useRef( false );
 
 	useEffect( () => {
@@ -83,9 +89,13 @@ export default function ClassicEdit( {
 				);
 				const scrollPosition = scrollContainer.scrollTop;
 
-				setAttributes( {
-					content: editor.getContent(),
-				} );
+				// Only update attributes if we aren't multi-selecting blocks.
+				// Updating during multi-selection can overwrite attributes of other blocks.
+				if ( ! getMultiSelectedBlockClientIds()?.length ) {
+					setAttributes( {
+						content: editor.getContent(),
+					} );
+				}
 
 				editor.once( 'focus', () => {
 					if ( bookmark ) {
@@ -122,7 +132,7 @@ export default function ClassicEdit( {
 
 			editor.on( 'keydown', ( event ) => {
 				if ( isKeyboardEvent.primary( event, 'z' ) ) {
-					// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
+					// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected.
 					event.stopPropagation();
 				}
 
@@ -131,7 +141,7 @@ export default function ClassicEdit( {
 						event.keyCode === DELETE ) &&
 					isTmceEmpty( editor )
 				) {
-					// delete the block
+					// Delete the block.
 					onReplace( [] );
 					event.preventDefault();
 					event.stopImmediatePropagation();

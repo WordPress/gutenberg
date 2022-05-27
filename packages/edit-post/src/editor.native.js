@@ -30,8 +30,13 @@ class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
+		// need to set this globally to avoid race with deprecations
+		// defaulting to true to avoid issues with a not-yet-cached value
+		const { galleryWithImageBlocks = true } = props;
+		window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
-			// enable html mode if the initial mode the parent wants it but we're not already in it
+			// Enable html mode if the initial mode the parent wants it but we're not already in it.
 			this.props.switchEditorMode( 'text' );
 		}
 
@@ -59,8 +64,8 @@ class Editor extends Component {
 		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
 			if ( settings.allowedBlockTypes === undefined ) {
-				// if no specific flags for allowedBlockTypes are set, assume `true`
-				// meaning allow all block types
+				// If no specific flags for allowedBlockTypes are set, assume `true`
+				// meaning allow all block types.
 				settings.allowedBlockTypes = true;
 			}
 			// Defer to passed setting for `allowedBlockTypes` if provided as
@@ -87,6 +92,9 @@ class Editor extends Component {
 			() => {
 				if ( this.postTitleRef ) {
 					this.postTitleRef.focus();
+				} else {
+					// If the post title ref is not available, we postpone setting focus to when it's available.
+					this.focusTitleWhenAvailable = true;
 				}
 			}
 		);
@@ -117,6 +125,11 @@ class Editor extends Component {
 	}
 
 	setTitleRef( titleRef ) {
+		if ( this.focusTitleWhenAvailable && ! this.postTitleRef ) {
+			this.focusTitleWhenAvailable = false;
+			titleRef.focus();
+		}
+
 		this.postTitleRef = titleRef;
 	}
 
@@ -151,9 +164,9 @@ class Editor extends Component {
 			},
 			featured_media: featuredImageId,
 			content: {
-				// make sure the post content is in sync with gutenberg store
+				// Make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
-				// For now, let's assume: serialize( parse( html ) ) !== html
+				// For now, let's assume: serialize( parse( html ) ) !== html.
 				raw: serialize( parse( initialHtml || '' ) ),
 			},
 			type: postType,
@@ -182,8 +195,8 @@ export default compose( [
 		const {
 			isFeatureActive,
 			getEditorMode,
-			getPreference,
 			__experimentalGetPreviewDeviceType,
+			getHiddenBlockTypes,
 		} = select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
 
@@ -193,7 +206,7 @@ export default compose( [
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
-			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
+			hiddenBlockTypes: getHiddenBlockTypes(),
 			blockTypes: getBlockTypes(),
 		};
 	} ),

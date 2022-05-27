@@ -1,4 +1,4 @@
-// Listeners for native context menu visibility changes
+// Listeners for native context menu visibility changes.
 let isContextMenuVisible = false;
 const hideContextMenuListeners = [];
 

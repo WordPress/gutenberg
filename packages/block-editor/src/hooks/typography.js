@@ -130,6 +130,7 @@ export function TypographyPanel( props ) {
 			{ ! isFontSizeDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasFontSizeValue( props ) }
+					/* translators: Ensure translation is distinct from "Letter case" */
 					label={ __( 'Font size' ) }
 					onDeselect={ () => resetFontSize( props ) }
 					isShownByDefault={ defaultControls?.fontSize }
@@ -205,6 +206,7 @@ export function TypographyPanel( props ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => hasTextTransformValue( props ) }
+					/* translators: Ensure translation is distinct from "Font size" */
 					label={ __( 'Letter case' ) }
 					onDeselect={ () => resetTextTransform( props ) }
 					isShownByDefault={ defaultControls?.textTransform }
@@ -216,8 +218,9 @@ export function TypographyPanel( props ) {
 			) }
 			{ ! isLetterSpacingDisabled && (
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ () => hasLetterSpacingValue( props ) }
-					label={ __( 'Letter-spacing' ) }
+					label={ __( 'Letter spacing' ) }
 					onDeselect={ () => resetLetterSpacing( props ) }
 					isShownByDefault={ defaultControls?.letterSpacing }
 					resetAllFilter={ createResetAllFilter( 'letterSpacing' ) }
@@ -230,7 +233,7 @@ export function TypographyPanel( props ) {
 	);
 }
 
-const hasTypographySupport = ( blockName ) => {
+export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
 		hasBlockSupport( blockName, key )
 	);

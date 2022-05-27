@@ -30,6 +30,7 @@ import {
 	cleanForSlug,
 	getQueryArgs,
 	getFilename,
+	normalizePath,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -973,15 +974,59 @@ describe( 'filterURLForDisplay', () => {
 } );
 
 describe( 'cleanForSlug', () => {
-	it( 'should return string prepared for use as url slug', () => {
+	it( 'Should return string prepared for use as url slug', () => {
 		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
-	it( 'should return an empty string for missing argument', () => {
+	it( 'Should return an empty string for missing argument', () => {
 		expect( cleanForSlug() ).toBe( '' );
 	} );
 
-	it( 'should return an empty string for falsy argument', () => {
+	it( 'Should return an empty string for falsy argument', () => {
 		expect( cleanForSlug( null ) ).toBe( '' );
+	} );
+
+	it( 'Should not allow characters used internally in rich-text', () => {
+		//The last space is an object replacement character
+		expect( cleanForSlug( 'the long cat￼' ) ).toBe( 'the-long-cat' );
+	} );
+
+	it( 'Creates a slug for languages that use multibyte encodings', () => {
+		expect( cleanForSlug( '新荣记 ' ) ).toBe( '新荣记' );
+		expect( cleanForSlug( '私のテンプレートパーツのテスト ' ) ).toBe(
+			'私のテンプレートパーツのテスト'
+		);
+		expect( cleanForSlug( 'ქართული ნაწილი' ) ).toBe( 'ქართული-ნაწილი' );
+		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
+		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
+		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
+	} );
+} );
+
+describe( 'normalizePath', () => {
+	it( 'returns same value if no query parameters', () => {
+		const path = '/foo/bar';
+
+		expect( normalizePath( path ) ).toBe( path );
+	} );
+
+	it( 'returns a stable path', () => {
+		const abc = normalizePath( '/foo/bar?a=5&b=1&c=2' );
+		const bca = normalizePath( '/foo/bar?b=1&c=2&a=5' );
+		const bac = normalizePath( '/foo/bar?b=1&a=5&c=2' );
+		const acb = normalizePath( '/foo/bar?a=5&c=2&b=1' );
+		const cba = normalizePath( '/foo/bar?c=2&b=1&a=5' );
+		const cab = normalizePath( '/foo/bar?c=2&a=5&b=1' );
+
+		expect( abc ).toBe( bca );
+		expect( bca ).toBe( bac );
+		expect( bac ).toBe( acb );
+		expect( acb ).toBe( cba );
+		expect( cba ).toBe( cab );
+	} );
+
+	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
+		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
+		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
 	} );
 } );

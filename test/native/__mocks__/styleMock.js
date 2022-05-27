@@ -1,5 +1,5 @@
 module.exports = {
-	//Mock block paragraph style with minimum height
+	// Mock block paragraph style with minimum height.
 	blockText: {
 		minHeight: 50,
 	},
@@ -137,5 +137,32 @@ module.exports = {
 	},
 	isSelected: {
 		color: 'blue',
+	},
+	'embed-no-preview__help-icon': {
+		fill: 'gray',
+	},
+	'embed-no-preview__sheet-icon': {
+		fill: 'gray',
+	},
+	fullAlignment: {
+		width: '100%',
+	},
+	'embed__icon--error': {
+		fill: 'red',
+	},
+	'components-autocomplete': {
+		height: 100,
+	},
+	addMediaButton: {
+		color: 'white',
+	},
+	'header-toolbar__container': {
+		height: 44,
+	},
+	'dropping-insertion-point': {
+		height: 3,
+	},
+	blockShortcodeContainer: {
+		padding: 12,
 	},
 };

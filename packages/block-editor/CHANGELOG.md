@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+## 9.1.0 (2022-05-18)
+
+## 9.0.0 (2022-05-04)
+
+### Breaking change
+
+-   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+-   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
+
+## 8.6.0 (2022-04-21)
+
+## 8.5.0 (2022-04-08)
+
+## 8.4.0 (2022-03-23)
+
+## 8.3.0 (2022-03-11)
+
+## 8.2.0 (2022-02-23)
+
+### New Features
+
+-   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
+
+## 8.1.1 (2022-02-10)
+
+### Bug Fix
+
+-   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### New Features
+
+-   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
+
+## 8.1.0 (2022-01-27)
+
+## 8.0.0 (2021-11-07)
+
 ### Performance
 
 -   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). When List View is open Block focus time is 4 times faster in large posts.

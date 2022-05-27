@@ -23,7 +23,7 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 
-// remove duplicates after gallery append
+// Remove duplicates after gallery append.
 const dedupMedia = ( media ) =>
 	uniqWith(
 		media,
@@ -53,11 +53,11 @@ function MediaPlaceholder( props ) {
 		onSelectURL,
 	} = props;
 
-	// use ref to keep media array current for callbacks during rerenders
+	// Use ref to keep media array current for callbacks during rerenders.
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
 
-	// append and deduplicate media array for gallery use case
+	// Append and deduplicate media array for gallery use case.
 	const setMedia =
 		multiple && addToGallery
 			? ( selected ) =>
@@ -130,12 +130,14 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Icon
-					icon={ plusCircleFilled }
-					style={ addMediaButtonStyle }
-					color={ addMediaButtonStyle.color }
-					size={ addMediaButtonStyle.size }
-				/>
+				<View testID="media-placeholder-appender-icon">
+					<Icon
+						icon={ plusCircleFilled }
+						style={ addMediaButtonStyle }
+						color={ addMediaButtonStyle.color }
+						size={ addMediaButtonStyle.size }
+					/>
+				</View>
 			);
 		}
 	};

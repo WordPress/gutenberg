@@ -34,10 +34,13 @@ export default function BlockTypesList( {
 	const [ maxWidth, setMaxWidth ] = useState();
 
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onLayout );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onLayout
+		);
 		onLayout();
 		return () => {
-			Dimensions.removeEventListener( 'change', onLayout );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 
@@ -82,7 +85,7 @@ export default function BlockTypesList( {
 	return (
 		<FlatList
 			onLayout={ onLayout }
-			key={ `InserterUI-${ name }-${ numberOfColumns }` } //re-render when numberOfColumns changes
+			key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }

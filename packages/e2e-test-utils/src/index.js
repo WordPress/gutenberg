@@ -15,6 +15,7 @@ export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
+export { createReusableBlock } from './create-reusable-block';
 export { createUser } from './create-user';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
@@ -36,8 +37,10 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { getCurrentPostContent } from './get-current-post-content';
+export { getListViewBlocks } from './get-list-view-blocks';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
+export { getOption } from './get-option';
 export {
 	insertBlock,
 	insertPattern,
@@ -62,7 +65,9 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { openTypographyToolsPanelMenu } from './open-typography-tools-panel-menu';
 export { trashAllPosts } from './posts';
+export { resetPreferences } from './preferences';
 export { pressKeyTimes } from './press-key-times';
 export {
 	pressKeyWithModifier,
@@ -73,6 +78,7 @@ export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre
 export { saveDraft } from './save-draft';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
+export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
@@ -82,6 +88,7 @@ export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { togglePreferencesOption } from './toggle-preferences-option';
 export { transformBlockTo } from './transform-block-to';
+export { trashAllComments } from './trash-all-comments';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
@@ -89,10 +96,27 @@ export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
+export { deleteAllTemplates } from './templates';
 export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
+export {
+	clickSiteEditorMenuItem,
+	closeSiteEditorNavigationPanel,
+	disableSiteEditorWelcomeGuide,
+	getCurrentSiteEditorContent,
+	getSiteEditorMenuItem,
+	isSiteEditorRoot,
+	navigateSiteEditorBack,
+	navigateSiteEditorBackToRoot,
+	openSiteEditorNavigationPanel,
+	siteEditorNavigateSequence,
+	visitSiteEditor,
+	toggleGlobalStyles,
+	openGlobalStylesPanel,
+	openPreviousGlobalStylesPanel,
+} from './site-editor';
 
 export * from './mocks';

@@ -58,11 +58,11 @@ describe( 'Scheduling', () => {
 
 		await page.click( '.edit-post-post-schedule__toggle' );
 		await page.click(
-			'div[aria-label="Move backward to switch to the previous month."]'
+			'*[aria-label="Move backward to switch to the previous month."]'
 		);
 		expect( await isDateTimeComponentFocused() ).toBe( true );
 		await page.click(
-			'div[aria-label="Move forward to switch to the next month."]'
+			'*[aria-label="Move forward to switch to the next month."]'
 		);
 		expect( await isDateTimeComponentFocused() ).toBe( true );
 	} );

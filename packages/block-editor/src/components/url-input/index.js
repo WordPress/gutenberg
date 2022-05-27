@@ -60,10 +60,13 @@ class URLInput extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
-		const { value } = this.props;
+		const {
+			value,
+			__experimentalShowInitialSuggestions = false,
+		} = this.props;
 
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
+		// Only have to worry about scrolling selected suggestion into view
+		// when already expanded.
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
@@ -84,12 +87,19 @@ class URLInput extends Component {
 			}, 100 );
 		}
 
-		// Only attempt an update on suggestions if the input value has actually changed.
+		// Update suggestions when the value changes.
 		if (
 			prevProps.value !== value &&
-			this.shouldShowInitialSuggestions()
+			! this.props.disableSuggestions &&
+			! this.isUpdatingSuggestions
 		) {
-			this.updateSuggestions();
+			if ( value?.length ) {
+				// If the new value is not empty we need to update with suggestions for it.
+				this.updateSuggestions( value );
+			} else if ( __experimentalShowInitialSuggestions ) {
+				// If the new value is empty and we can show initial suggestions, then show initial suggestions.
+				this.updateSuggestions();
+			}
 		}
 	}
 
@@ -241,7 +251,7 @@ class URLInput extends Component {
 			! this.isUpdatingSuggestions &&
 			! ( suggestions && suggestions.length )
 		) {
-			// Ensure the suggestions are updated with the current input value
+			// Ensure the suggestions are updated with the current input value.
 			this.updateSuggestions( value );
 		}
 	}
@@ -255,7 +265,7 @@ class URLInput extends Component {
 		} = this.state;
 
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
-		// We shouldn't preventDefault to allow block arrow keys navigation
+		// We shouldn't preventDefault to allow block arrow keys navigation.
 		if ( ! showSuggestions || ! suggestions.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
@@ -269,7 +279,7 @@ class URLInput extends Component {
 					if ( 0 !== event.target.selectionStart ) {
 						event.preventDefault();
 
-						// Set the input caret to position 0
+						// Set the input caret to position 0.
 						event.target.setSelectionRange( 0, 0 );
 					}
 					break;
@@ -282,7 +292,7 @@ class URLInput extends Component {
 					) {
 						event.preventDefault();
 
-						// Set the input caret to the last position
+						// Set the input caret to the last position.
 						event.target.setSelectionRange(
 							this.props.value.length,
 							this.props.value.length
@@ -291,8 +301,9 @@ class URLInput extends Component {
 					break;
 				}
 
-				// Submitting while loading should trigger onSubmit
+				// Submitting while loading should trigger onSubmit.
 				case ENTER: {
+					event.preventDefault();
 					if ( this.props.onSubmit ) {
 						this.props.onSubmit( null, event );
 					}
@@ -340,6 +351,7 @@ class URLInput extends Component {
 				break;
 			}
 			case ENTER: {
+				event.preventDefault();
 				if ( this.state.selectedSuggestion !== null ) {
 					this.selectLink( suggestion );
 
@@ -408,7 +420,7 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
-			label,
+			label = null,
 			className,
 			isFullWidth,
 			instanceId,
@@ -425,8 +437,10 @@ class URLInput extends Component {
 			suggestionOptionIdPrefix,
 		} = this.state;
 
+		const inputId = `url-input-control-${ instanceId }`;
+
 		const controlProps = {
-			id: `url-input-control-${ instanceId }`,
+			id: inputId, // Passes attribute to label for the for attribute
 			label,
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
@@ -434,6 +448,7 @@ class URLInput extends Component {
 		};
 
 		const inputProps = {
+			id: inputId,
 			value,
 			required: true,
 			className: 'block-editor-url-input__input',
@@ -443,7 +458,7 @@ class URLInput extends Component {
 			placeholder,
 			onKeyDown: this.onKeyDown,
 			role: 'combobox',
-			'aria-label': __( 'URL' ),
+			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
 			'aria-owns': suggestionsListboxId,
@@ -523,7 +538,7 @@ class URLInput extends Component {
 			!! suggestions.length
 		) {
 			return (
-				<Popover position="bottom" noArrow focusOnMount={ false }>
+				<Popover position="bottom" focusOnMount={ false }>
 					<div
 						{ ...suggestionsListProps }
 						className={ classnames(
@@ -569,7 +584,7 @@ export default compose(
 	withInstanceId,
 	withSelect( ( select, props ) => {
 		// If a link suggestions handler is already provided then
-		// bail
+		// bail.
 		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}

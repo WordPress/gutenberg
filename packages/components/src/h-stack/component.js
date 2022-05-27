@@ -7,7 +7,7 @@ import { useHStack } from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                        forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
  */
 function HStack( props, forwardedRef ) {
 	const hStackProps = useHStack( props );

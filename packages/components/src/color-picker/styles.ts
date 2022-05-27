@@ -50,7 +50,7 @@ const inputHeightStyle = `
 	height: 40px;
 }`;
 
-// Make the Hue circle picker not go out of the bar
+// Make the Hue circle picker not go out of the bar.
 const interactiveHueStyles = `
 .react-colorful__interactive {
 	width: calc( 100% - ${ space( 2 ) } );
@@ -111,10 +111,14 @@ export const ColorfulWrapper = styled.div`
 	${ inputHeightStyle }
 `;
 
-export const DetailsControlButton = styled( Button )`
+export const CopyButton = styled( Button )`
 	&&&&& {
 		min-width: ${ space( 6 ) };
 		padding: 0;
+
+		> svg {
+			margin-right: 0;
+		}
 	}
 `;
 

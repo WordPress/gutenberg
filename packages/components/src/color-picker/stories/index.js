@@ -20,7 +20,7 @@ export default {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

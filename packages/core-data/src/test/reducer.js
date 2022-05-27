@@ -46,7 +46,7 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {},
 			queries: {},
 			itemIsComplete: {},
@@ -65,7 +65,7 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {
 				default: {
 					b: { slug: 'b', title: 'beach' },
@@ -84,7 +84,7 @@ describe( 'entities', () => {
 
 	it( 'appends the received post types by slug', () => {
 		const originalState = deepFreeze( {
-			data: {
+			records: {
 				root: {
 					postType: {
 						queriedData: {
@@ -111,7 +111,7 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {
 				default: {
 					w: { slug: 'w', title: 'water' },

@@ -17,7 +17,7 @@ export default {
 	title: 'Components/FormTokenField',
 	component: FormTokenField,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

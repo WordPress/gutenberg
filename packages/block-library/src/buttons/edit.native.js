@@ -13,7 +13,7 @@ import {
 	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -30,15 +30,22 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align },
+	attributes: { layout, align },
 	clientId,
 	isSelected,
 	setAttributes,
 	blockWidth,
+	name,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
+
+	// Extract attributes from block layout
+	const layoutBlockSupport = getBlockSupport( name, '__experimentalLayout' );
+	const defaultBlockLayout = layoutBlockSupport?.default;
+	const usedLayout = layout || defaultBlockLayout || {};
+	const { justifyContent } = usedLayout;
 
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
@@ -126,9 +133,14 @@ export default function ButtonsEdit( {
 				<BlockControls group="block">
 					<JustifyContentControl
 						allowedControls={ justifyControls }
-						value={ contentJustification }
+						value={ justifyContent }
 						onChange={ ( value ) =>
-							setAttributes( { contentJustification: value } )
+							setAttributes( {
+								layout: {
+									...usedLayout,
+									justifyContent: value,
+								},
+							} )
 						}
 						popoverProps={ {
 							position: 'bottom right',
@@ -154,7 +166,7 @@ export default function ButtonsEdit( {
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				orientation="horizontal"
-				horizontalAlignment={ contentJustification }
+				horizontalAlignment={ justifyContent }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.

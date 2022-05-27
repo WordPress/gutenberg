@@ -22,7 +22,7 @@ export default {
 	component: Card,
 	title: 'Components/Card',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

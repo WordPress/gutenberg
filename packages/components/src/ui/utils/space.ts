@@ -21,14 +21,14 @@ export function space( value?: SpaceInput ): string | undefined {
 		return undefined;
 	}
 
-	// handle empty strings, if it's the number 0 this still works
+	// Handle empty strings, if it's the number 0 this still works.
 	if ( ! value ) {
 		return '0';
 	}
 
 	const asInt = typeof value === 'number' ? value : Number( value );
 
-	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
+	// Test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value.
 	if (
 		( typeof window !== 'undefined' &&
 			window.CSS?.supports?.( 'margin', value.toString() ) ) ||

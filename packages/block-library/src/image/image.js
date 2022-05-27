@@ -30,10 +30,14 @@ import {
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -79,6 +83,7 @@ export default function Image( {
 	context,
 	clientId,
 } ) {
+	const imageRef = useRef();
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
 	const { allowResize = true } = context;
@@ -92,7 +97,10 @@ export default function Image( {
 			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && isSelected
+						? getMedia( id, { context: 'view' } )
+						: null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -141,7 +149,10 @@ export default function Image( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
-	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
+	const [
+		{ loadedNaturalWidth, loadedNaturalHeight },
+		setLoadedNaturalSize,
+	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
@@ -179,6 +190,27 @@ export default function Image( {
 		}
 	}, [ url, prevUrl ] );
 
+	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
+	// width and height. This resolves an issue in Safari where the loaded natural
+	// witdth and height is otherwise lost when switching between alignments.
+	// See: https://github.com/WordPress/gutenberg/pull/37210.
+	const { naturalWidth, naturalHeight } = useMemo( () => {
+		return {
+			naturalWidth:
+				imageRef.current?.naturalWidth ||
+				loadedNaturalWidth ||
+				undefined,
+			naturalHeight:
+				imageRef.current?.naturalHeight ||
+				loadedNaturalHeight ||
+				undefined,
+		};
+	}, [
+		loadedNaturalWidth,
+		loadedNaturalHeight,
+		imageRef.current?.complete,
+	] );
+
 	function onResizeStart() {
 		toggleSelection( false );
 	}
@@ -188,8 +220,10 @@ export default function Image( {
 	}
 
 	function onImageError() {
-		// Check if there's an embed block that handles this URL.
+		// Check if there's an embed block that handles this URL, e.g., instagram URL.
+		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
+
 		if ( undefined !== embedBlock ) {
 			onReplace( embedBlock );
 		}
@@ -331,7 +365,7 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
 							label={ __( 'Alt text (alternative text)' ) }
@@ -411,13 +445,12 @@ export default function Image( {
 				alt={ defaultedAlt }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
-					setNaturalSize(
-						pick( event.target, [
-							'naturalWidth',
-							'naturalHeight',
-						] )
-					);
+					setLoadedNaturalSize( {
+						loadedNaturalWidth: event.target?.naturalWidth,
+						loadedNaturalHeight: event.target?.naturalHeight,
+					} );
 				} }
+				ref={ imageRef }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -560,7 +593,9 @@ export default function Image( {
 					}
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

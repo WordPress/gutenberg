@@ -51,7 +51,7 @@ function Header() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover
+			// Focusing the inserter button closes the inserter popover.
 			setIsInserterOpened( false );
 		} else {
 			if ( ! isLastSelectedWidgetAreaOpen ) {

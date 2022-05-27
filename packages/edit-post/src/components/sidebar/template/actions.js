@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Modal,
@@ -25,7 +25,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 import { createBlock, serialize } from '@wordpress/blocks';
 
-function PostTemplateActions() {
+function PostTemplateActions( { isPostsPage } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
@@ -128,9 +128,17 @@ function PostTemplateActions() {
 						{ __( 'Edit' ) }
 					</Button>
 				) }
-				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
-					{ __( 'New' ) }
-				</Button>
+				{ ! isPostsPage && (
+					<Button
+						variant="link"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{
+							/* translators: button to create a new template */
+							_x( 'New', 'action' )
+						}
+					</Button>
+				) }
 			</div>
 			{ isModalOpen && (
 				<Modal

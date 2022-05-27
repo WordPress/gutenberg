@@ -19,9 +19,10 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -47,21 +48,21 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
-		const { isFeatureActive } = select( interfaceStore );
+		const { get } = select( preferencesStore );
 		return {
 			hasUploadPermissions: defaultTo(
 				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
-			isFixedToolbarActive: isFeatureActive(
+			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
 				'fixedToolbar'
 			),
-			keepCaretInsideBlock: isFeatureActive(
+			keepCaretInsideBlock: !! get(
 				'core/customize-widgets',
 				'keepCaretInsideBlock'
 			),
-			isWelcomeGuideActive: isFeatureActive(
+			isWelcomeGuideActive: !! get(
 				'core/customize-widgets',
 				'welcomeGuide'
 			),
@@ -121,8 +122,9 @@ export default function SidebarBlockEditor( {
 
 				<CopyHandler>
 					<BlockTools>
+						<EditorStyles styles={ settings.defaultEditorStyles } />
 						<BlockSelectionClearer>
-							<WritingFlow>
+							<WritingFlow className="editor-styles-wrapper">
 								<ObserveTyping>
 									<BlockList
 										renderAppender={ BlockAppender }

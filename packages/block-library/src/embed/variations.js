@@ -25,6 +25,7 @@ import {
 	embedAnimotoIcon,
 	embedDailymotionIcon,
 	embedPinterestIcon,
+	embedWolframIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -150,7 +151,7 @@ const variations = [
 		attributes: { providerNameSlug: 'cloudup', responsive: true },
 	},
 	{
-		// Deprecated since CollegeHumor content is now powered by YouTube
+		// Deprecated since CollegeHumor content is now powered by YouTube.
 		name: 'collegehumor',
 		title: 'CollegeHumor',
 		icon: embedVideoIcon,
@@ -340,6 +341,14 @@ const variations = [
 			/^https?:\/\/([a-z]{2}|www)\.pinterest\.com(\.(au|mx))?\/.*/i,
 		],
 		attributes: { providerNameSlug: 'pinterest' },
+	},
+	{
+		name: 'wolfram-cloud',
+		title: 'Wolfram',
+		icon: embedWolframIcon,
+		description: __( 'Embed Wolfram notebook content.' ),
+		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
+		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
 ];
 

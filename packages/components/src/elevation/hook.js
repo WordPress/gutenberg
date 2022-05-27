@@ -112,6 +112,7 @@ export function useElevation( props ) {
 		active,
 		borderRadius,
 		className,
+		cx,
 		focus,
 		hover,
 		isInteractive,

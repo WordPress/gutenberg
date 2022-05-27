@@ -29,6 +29,10 @@ function setPath( object, path, value ) {
 			key = object.length.toString();
 		}
 
+		key = [ '__proto__', 'constructor', 'prototype' ].includes( key )
+			? key.toUpperCase()
+			: key;
+
 		// If the next key in the path is numeric (or empty string), it will be
 		// created as an array. Otherwise, it will be created as an object.
 		const isNextKeyArrayIndex = ! isNaN( Number( path[ i + 1 ] ) );
@@ -89,6 +93,6 @@ export function getQueryArgs( url ) {
 				}
 
 				return accumulator;
-			}, {} )
+			}, Object.create( null ) )
 	);
 }

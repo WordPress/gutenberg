@@ -1,81 +1,94 @@
 /**
  * WordPress dependencies
  */
-import { serialize } from '@wordpress/blocks';
-import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { Placeholder, Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-const PLACEHOLDER_STEPS = {
-	selectNavigationPost: 1,
-	createInnerBlocks: 2,
-};
+import { navigation, Icon } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import SelectNavigationMenuStep from './select-navigation-menu-step';
-import CreateInnerBlocksStep from './create-inner-blocks-step';
+import useNavigationEntities from '../../use-navigation-entities';
+import PlaceholderPreview from './placeholder-preview';
+import NavigationMenuSelector from '../navigation-menu-selector';
 
-export default function Placeholder( {
+export default function NavigationPlaceholder( {
+	isSelected,
+	currentMenuId,
+	clientId,
+	canUserCreateNavigationMenu = false,
+	isResolvingCanUserCreateNavigationMenu,
 	onFinish,
-	canSwitchNavigationMenu,
-	hasResolvedNavigationMenu,
+	onCreateEmpty,
 } ) {
-	const [ step, setStep ] = useState(
-		PLACEHOLDER_STEPS.selectNavigationPost
-	);
-	const [ navigationMenuTitle, setNavigationMenuTitle ] = useState( '' );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
 
-	// This callback uses data from the two placeholder steps and only creates
-	// a new navigation menu when the user completes the final step.
-	const createNavigationMenu = useCallback(
-		async ( title = __( 'Untitled Navigation Menu' ), blocks = [] ) => {
-			const record = {
-				title,
-				content: serialize( blocks ),
-				status: 'publish',
-			};
+	useEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
 
-			const navigationMenu = await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				record
-			);
+		if ( isResolvingMenus ) {
+			speak( __( 'Loading Navigation block setup options.' ) );
+		}
 
-			return navigationMenu;
-		},
-		[ serialize, saveEntityRecord ]
-	);
+		if ( hasResolvedMenus ) {
+			speak( __( 'Navigation block setup options ready.' ) );
+		}
+	}, [ isResolvingMenus, isSelected ] );
+
+	const isResolvingActions =
+		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
 
 	return (
 		<>
-			{ step === PLACEHOLDER_STEPS.selectNavigationPost && (
-				<SelectNavigationMenuStep
-					onCreateNew={ ( newTitle ) => {
-						setNavigationMenuTitle( newTitle );
-						setStep( PLACEHOLDER_STEPS.createInnerBlocks );
-					} }
-					onSelectExisting={ ( navigationMenu ) => {
-						onFinish( navigationMenu );
-					} }
-					canSwitchNavigationMenu={ canSwitchNavigationMenu }
-					hasResolvedNavigationMenu={ hasResolvedNavigationMenu }
-				/>
-			) }
-			{ step === PLACEHOLDER_STEPS.createInnerBlocks && (
-				<CreateInnerBlocksStep
-					onFinish={ async ( blocks ) => {
-						const navigationMenu = await createNavigationMenu(
-							navigationMenuTitle,
-							blocks
-						);
-						onFinish( navigationMenu );
-					} }
-				/>
-			) }
+			<Placeholder className="wp-block-navigation-placeholder">
+				{
+					// The <PlaceholderPreview> component is displayed conditionally via CSS depending on
+					// whether the block is selected or not. This is achieved via CSS to avoid
+					// component re-renders
+				 }
+				<PlaceholderPreview isVisible={ ! isSelected } />
+				<div
+					aria-hidden={ ! isSelected ? true : undefined }
+					className="wp-block-navigation-placeholder__controls"
+				>
+					<div className="wp-block-navigation-placeholder__actions">
+						<div className="wp-block-navigation-placeholder__actions__indicator">
+							<Icon icon={ navigation } /> { __( 'Navigation' ) }
+						</div>
+
+						<hr />
+
+						{ isResolvingActions && <Spinner /> }
+
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							clientId={ clientId }
+							onSelect={ onFinish }
+							toggleProps={ {
+								variant: 'tertiary',
+								iconPosition: 'right',
+								className:
+									'wp-block-navigation-placeholder__actions__dropdown',
+							} }
+						/>
+
+						<hr />
+
+						{ canUserCreateNavigationMenu && (
+							<Button
+								variant="tertiary"
+								onClick={ onCreateEmpty }
+							>
+								{ __( 'Start empty' ) }
+							</Button>
+						) }
+					</div>
+				</div>
+			</Placeholder>
 		</>
 	);
 }

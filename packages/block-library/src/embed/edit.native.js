@@ -5,15 +5,15 @@ import {
 	createUpgradedEmbedBlock,
 	getClassNames,
 	fallback,
-	getAttributesFromPreview,
 	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-import EmbedBottomSheet from './embed-bottom-sheet';
+import EmbedLinkSettings from './embed-link-settings';
 
 /**
  * External dependencies
@@ -24,7 +24,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useCallback, useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
@@ -130,19 +130,14 @@ const EmbedEdit = ( props ) => {
 	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
 	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = ( ignorePreviousClassName = false ) => {
-		const { allowResponsive, className } = attributes;
-		return {
-			...attributes,
-			...getAttributesFromPreview(
-				preview,
-				title,
-				ignorePreviousClassName ? undefined : className,
-				responsive,
-				allowResponsive
-			),
-		};
-	};
+	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+		getMergedAttributesWithPreview(
+			attributes,
+			preview,
+			title,
+			responsive,
+			ignorePreviousClassName
+		);
 
 	const toggleResponsive = () => {
 		const { allowResponsive, className } = attributes;
@@ -170,7 +165,7 @@ const EmbedEdit = ( props ) => {
 		setAttributes( { url: newURL } );
 	}, [ preview?.html, url ] );
 
-	// Handle incoming preview
+	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
 			// When obtaining an incoming preview, we set the attributes derived from
@@ -195,6 +190,14 @@ const EmbedEdit = ( props ) => {
 	useEffect( () => setShowEmbedBottomSheet( isEditingURL ), [
 		isEditingURL,
 	] );
+
+	const onEditURL = useCallback( ( value ) => {
+		// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+		// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+		// for creating the new block.
+		setAttributes( { url: value } );
+		setIsEditingURL( false );
+	}, [] );
 
 	const blockProps = useBlockProps();
 
@@ -230,16 +233,12 @@ const EmbedEdit = ( props ) => {
 		( WP_EMBED_TYPE === type &&
 			! NOT_PREVIEWABLE_WP_EMBED_PROVIDERS.includes( providerNameSlug ) );
 
-	const bottomSheetLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
+	const linkLabel = WP_EMBED_TYPE === type ? 'WordPress' : title;
 
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
 				<>
-					<EmbedControls
-						showEditButton={ cannotEmbed }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
-					/>
 					<View { ...blockProps }>
 						<EmbedPlaceholder
 							icon={ icon }
@@ -256,18 +255,22 @@ const EmbedEdit = ( props ) => {
 									url,
 								] );
 							} }
+							openEmbedLinkSettings={ () =>
+								setShowEmbedBottomSheet( true )
+							}
 						/>
 					</View>
 				</>
 			) : (
 				<>
 					<EmbedControls
-						showEditButton={ preview && ! cannotEmbed }
 						themeSupportsResponsive={ themeSupportsResponsive }
 						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
 						toggleResponsive={ toggleResponsive }
-						switchBackToURLInput={ () => setIsEditingURL( true ) }
+						url={ url }
+						linkLabel={ linkLabel }
+						onEditURL={ onEditURL }
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
@@ -289,18 +292,15 @@ const EmbedEdit = ( props ) => {
 					</View>
 				</>
 			) }
-			<EmbedBottomSheet
+			<EmbedLinkSettings
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus
 				value={ url }
-				label={ bottomSheetLabel }
+				label={ linkLabel }
 				isVisible={ showEmbedBottomSheet }
 				onClose={ () => setShowEmbedBottomSheet( false ) }
-				onSubmit={ ( value ) => {
-					// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
-					// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
-					// for creating the new block.
-					setAttributes( { url: value } );
-					setIsEditingURL( false );
-				} }
+				onSubmit={ onEditURL }
+				withBottomSheet
 			/>
 		</>
 	);

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, hasIn, compact, uniq } from 'lodash';
+import { find, includes, get, compact, uniq, map, mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,8 +13,8 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
+import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -52,15 +52,15 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 	select,
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, key ],
+		[ 'entities', 'records', kind, name, key ],
 		{ exclusive: false }
 	);
 
@@ -73,7 +73,7 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 				...query,
 				_fields: uniq( [
 					...( getNormalizedCommaSeparable( query._fields ) || [] ),
-					entity.key || DEFAULT_ENTITY_KEY,
+					entityConfig.key || DEFAULT_ENTITY_KEY,
 				] ).join(),
 			};
 		}
@@ -85,10 +85,13 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 		// for how the request is made to the REST API.
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const path = addQueryArgs( entity.baseURL + ( key ? '/' + key : '' ), {
-			...entity.baseURLParams,
-			...query,
-		} );
+		const path = addQueryArgs(
+			entityConfig.baseURL + ( key ? '/' + key : '' ),
+			{
+				...entityConfig.baseURLParams,
+				...query,
+			}
+		);
 
 		if ( query !== undefined ) {
 			query = { ...query, include: [ key ] };
@@ -104,9 +107,6 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 
 		const record = await apiFetch( { path } );
 		dispatch.receiveEntityRecords( kind, name, record, query );
-	} catch ( error ) {
-		// We need a way to handle and access REST API errors in state
-		// Until then, catching the error ensures the resolver is marked as resolved.
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
 	}
@@ -115,18 +115,12 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 /**
  * Requests an entity's record from the REST API.
  */
-export const getRawEntityRecord = ifNotResolved(
-	getEntityRecord,
-	'getEntityRecord'
-);
+export const getRawEntityRecord = forwardResolver( 'getEntityRecord' );
 
 /**
  * Requests an entity's record from the REST API.
  */
-export const getEditedEntityRecord = ifNotResolved(
-	getRawEntityRecord,
-	'getRawEntityRecord'
-);
+export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 
 /**
  * Requests the entity's records from the REST API.
@@ -138,15 +132,15 @@ export const getEditedEntityRecord = ifNotResolved(
 export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name ],
+		[ 'entities', 'records', kind, name ],
 		{ exclusive: false }
 	);
 
@@ -159,13 +153,13 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 				...query,
 				_fields: uniq( [
 					...( getNormalizedCommaSeparable( query._fields ) || [] ),
-					entity.key || DEFAULT_ENTITY_KEY,
+					entityConfig.key || DEFAULT_ENTITY_KEY,
 				] ).join(),
 			};
 		}
 
-		const path = addQueryArgs( entity.baseURL, {
-			...entity.baseURLParams,
+		const path = addQueryArgs( entityConfig.baseURL, {
+			...entityConfig.baseURLParams,
 			...query,
 		} );
 
@@ -191,7 +185,7 @@ export const getEntityRecords = ( kind, name, query = {} ) => async ( {
 		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
 		// See https://github.com/WordPress/gutenberg/pull/26575
 		if ( ! query?._fields && ! query.context ) {
-			const key = entity.key || DEFAULT_ENTITY_KEY;
+			const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 			const resolutionsArgs = records
 				.filter( ( record ) => record[ key ] )
 				.map( ( record ) => [ kind, name, record[ key ] ] );
@@ -224,22 +218,20 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 /**
  * Requests the current theme.
  */
-export const getCurrentTheme = () => async ( { dispatch } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
+export const getCurrentTheme = () => async ( { dispatch, resolveSelect } ) => {
+	const activeThemes = await resolveSelect.getEntityRecords(
+		'root',
+		'theme',
+		{ status: 'active' }
+	);
+
 	dispatch.receiveCurrentTheme( activeThemes[ 0 ] );
 };
 
 /**
  * Requests theme supports data from the index.
  */
-export const getThemeSupports = () => async ( { dispatch } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
-	dispatch.receiveThemeSupports( activeThemes[ 0 ].theme_supports );
-};
+export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
  * Requests a preview from the from the Embed API.
@@ -286,11 +278,7 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 	try {
 		response = await apiFetch( {
 			path,
-			// Ideally this would always be an OPTIONS request, but unfortunately there's
-			// a bug in the REST API which causes the Allow header to not be sent on
-			// OPTIONS requests to /posts/:id routes.
-			// https://core.trac.wordpress.org/ticket/45753
-			method: id ? 'GET' : 'OPTIONS',
+			method: 'OPTIONS',
 			parse: false,
 		} );
 	} catch ( error ) {
@@ -299,17 +287,10 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		return;
 	}
 
-	let allowHeader;
-	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
-		// If the request is fetched using the fetch api, the header can be
-		// retrieved using the 'get' method.
-		allowHeader = response.headers.get( 'allow' );
-	} else {
-		// If the request was preloaded server-side and is returned by the
-		// preloading middleware, the header will be a simple property.
-		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
-	}
-
+	// Optional chaining operator is used here because the API requests don't
+	// return the expected result in the native version. Instead, API requests
+	// only return the result, without including response properties like the headers.
+	const allowHeader = response.headers?.get( 'allow' );
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	dispatch.receiveUserPermission( key, isAllowed );
@@ -326,13 +307,13 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 export const canUserEditEntityRecord = ( kind, name, recordId ) => async ( {
 	dispatch,
 } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig ) {
 		return;
 	}
 
-	const resource = entity.__unstable_rest_base;
+	const resource = entityConfig.__unstable_rest_base;
 	await dispatch( canUser( 'update', resource, recordId ) );
 };
 
@@ -421,10 +402,13 @@ __experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
 
 export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 	dispatch,
+	resolveSelect,
 } ) => {
-	const activeThemes = await apiFetch( {
-		path: '/wp/v2/themes?status=active',
-	} );
+	const activeThemes = await resolveSelect.getEntityRecords(
+		'root',
+		'theme',
+		{ status: 'active' }
+	);
 	const globalStylesURL = get( activeThemes, [
 		0,
 		'_links',
@@ -440,4 +424,58 @@ export const __experimentalGetCurrentGlobalStylesId = () => async ( {
 			globalStylesObject.id
 		);
 	}
+};
+
+export const __experimentalGetCurrentThemeBaseGlobalStyles = () => async ( {
+	resolveSelect,
+	dispatch,
+} ) => {
+	const currentTheme = await resolveSelect.getCurrentTheme();
+	const themeGlobalStyles = await apiFetch( {
+		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+	} );
+	dispatch.__experimentalReceiveThemeBaseGlobalStyles(
+		currentTheme.stylesheet,
+		themeGlobalStyles
+	);
+};
+
+export const __experimentalGetCurrentThemeGlobalStylesVariations = () => async ( {
+	resolveSelect,
+	dispatch,
+} ) => {
+	const currentTheme = await resolveSelect.getCurrentTheme();
+	const variations = await apiFetch( {
+		path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+	} );
+	dispatch.__experimentalReceiveThemeGlobalStyleVariations(
+		currentTheme.stylesheet,
+		variations
+	);
+};
+
+export const getBlockPatterns = () => async ( { dispatch } ) => {
+	const restPatterns = await apiFetch( {
+		path: '/wp/v2/block-patterns/patterns',
+	} );
+	const patterns = map( restPatterns, ( pattern ) =>
+		mapKeys( pattern, ( value, key ) => {
+			switch ( key ) {
+				case 'block_types':
+					return 'blockTypes';
+				case 'viewport_width':
+					return 'viewportWidth';
+				default:
+					return key;
+			}
+		} )
+	);
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
+};
+
+export const getBlockPatternCategories = () => async ( { dispatch } ) => {
+	const categories = await apiFetch( {
+		path: '/wp/v2/block-patterns/categories',
+	} );
+	dispatch( { type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories } );
 };

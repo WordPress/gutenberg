@@ -9,12 +9,13 @@ import { v4 as uuid } from 'uuid';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
-import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 
@@ -65,8 +66,8 @@ export function addEntities( entities ) {
 /**
  * Returns an action object used in signalling that entity records have been received.
  *
- * @param {string}       kind            Kind of the received entity.
- * @param {string}       name            Name of the received entity.
+ * @param {string}       kind            Kind of the received entity record.
+ * @param {string}       name            Name of the received entity record.
  * @param {Array|Object} records         Records received.
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
@@ -134,16 +135,57 @@ export function __experimentalReceiveCurrentGlobalStylesId(
 }
 
 /**
- * Returns an action object used in signalling that the index has been received.
+ * Returns an action object used in signalling that the theme base global styles have been received
  *
- * @param {Object} themeSupports Theme support for the current theme.
+ * @param {string} stylesheet   The theme's identifier
+ * @param {Object} globalStyles The global styles object.
  *
  * @return {Object} Action object.
  */
-export function receiveThemeSupports( themeSupports ) {
+export function __experimentalReceiveThemeBaseGlobalStyles(
+	stylesheet,
+	globalStyles
+) {
 	return {
-		type: 'RECEIVE_THEME_SUPPORTS',
-		themeSupports,
+		type: 'RECEIVE_THEME_GLOBAL_STYLES',
+		stylesheet,
+		globalStyles,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the theme global styles variations have been received.
+ *
+ * @param {string} stylesheet The theme's identifier
+ * @param {Array}  variations The global styles variations.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeGlobalStyleVariations(
+	stylesheet,
+	variations
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS',
+		stylesheet,
+		variations,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the index has been received.
+ *
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeSupports() {
+	deprecated( "wp.data.dispatch( 'core' ).receiveThemeSupports", {
+		since: '5.9',
+	} );
+
+	return {
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -167,34 +209,36 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                      Kind of the deleted entity.
- * @param {string}   name                      Name of the deleted entity.
- * @param {string}   recordId                  Record ID of the deleted entity.
- * @param {?Object}  query                     Special query parameters for the
- *                                             DELETE API call.
- * @param {Object}   [options]                 Delete options.
- * @param {Function} [options.__unstableFetch] Internal use only. Function to
- *                                             call instead of `apiFetch()`.
- *                                             Must return a promise.
+ * @param {string}   kind                         Kind of the deleted entity.
+ * @param {string}   name                         Name of the deleted entity.
+ * @param {string}   recordId                     Record ID of the deleted entity.
+ * @param {?Object}  query                        Special query parameters for the
+ *                                                DELETE API call.
+ * @param {Object}   [options]                    Delete options.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 export const deleteEntityRecord = (
 	kind,
 	name,
 	recordId,
 	query,
-	{ __unstableFetch = apiFetch } = {}
+	{ __unstableFetch = apiFetch, throwOnError = false } = {}
 ) => async ( { dispatch } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
 	let error;
 	let deletedRecord = false;
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, recordId ],
+		[ 'entities', 'records', kind, name, recordId ],
 		{ exclusive: true }
 	);
 
@@ -206,8 +250,9 @@ export const deleteEntityRecord = (
 			recordId,
 		} );
 
+		let hasError = false;
 		try {
-			let path = `${ entity.baseURL }/${ recordId }`;
+			let path = `${ entityConfig.baseURL }/${ recordId }`;
 
 			if ( query ) {
 				path = addQueryArgs( path, query );
@@ -220,6 +265,7 @@ export const deleteEntityRecord = (
 
 			await dispatch( removeItems( kind, name, recordId, true ) );
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 
@@ -231,6 +277,10 @@ export const deleteEntityRecord = (
 			error,
 		} );
 
+		if ( hasError && throwOnError ) {
+			throw error;
+		}
+
 		return deletedRecord;
 	} finally {
 		dispatch.__unstableReleaseStoreLock( lock );
@@ -241,12 +291,12 @@ export const deleteEntityRecord = (
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}  kind               Kind of the edited entity record.
- * @param {string}  name               Name of the edited entity record.
- * @param {number}  recordId           Record ID of the edited entity record.
- * @param {Object}  edits              The edits.
- * @param {Object}  options            Options for the edit.
- * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
+ * @param {string}  kind                 Kind of the edited entity record.
+ * @param {string}  name                 Name of the edited entity record.
+ * @param {number}  recordId             Record ID of the edited entity record.
+ * @param {Object}  edits                The edits.
+ * @param {Object}  options              Options for the edit.
+ * @param {boolean} [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
@@ -257,13 +307,13 @@ export const editEntityRecord = (
 	edits,
 	options = {}
 ) => ( { select, dispatch } ) => {
-	const entity = select.getEntity( kind, name );
-	if ( ! entity ) {
+	const entityConfig = select.getEntityConfig( kind, name );
+	if ( ! entityConfig ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
-	const { transientEdits = {}, mergedEdits = {} } = entity;
+	const { transientEdits = {}, mergedEdits = {} } = entityConfig;
 	const record = select.getRawEntityRecord( kind, name, recordId );
 	const editedRecord = select.getEditedEntityRecord( kind, name, recordId );
 
@@ -303,8 +353,6 @@ export const editEntityRecord = (
 /**
  * Action triggered to undo the last edit to
  * an entity record, if any.
- *
- * @return {undefined}
  */
 export const undo = () => ( { select, dispatch } ) => {
 	const undoEdit = select.getUndoEdit();
@@ -321,8 +369,6 @@ export const undo = () => ( { select, dispatch } ) => {
 /**
  * Action triggered to redo the last undoed
  * edit to an entity record, if any.
- *
- * @return {undefined}
  */
 export const redo = () => ( { select, dispatch } ) => {
 	const redoEdit = select.getRedoEdit();
@@ -348,32 +394,38 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}   kind                       Kind of the received entity.
- * @param {string}   name                       Name of the received entity.
- * @param {Object}   record                     Record to be saved.
- * @param {Object}   options                    Saving options.
- * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
- * @param {Function} [options.__unstableFetch]  Internal use only. Function to
- *                                              call instead of `apiFetch()`.
- *                                              Must return a promise.
+ * @param {string}   kind                         Kind of the received entity.
+ * @param {string}   name                         Name of the received entity.
+ * @param {Object}   record                       Record to be saved.
+ * @param {Object}   options                      Saving options.
+ * @param {boolean}  [options.isAutosave=false]   Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]    Internal use only. Function to
+ *                                                call instead of `apiFetch()`.
+ *                                                Must return a promise.
+ * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
+ *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord = (
 	kind,
 	name,
 	record,
-	{ isAutosave = false, __unstableFetch = apiFetch } = {}
+	{
+		isAutosave = false,
+		__unstableFetch = apiFetch,
+		throwOnError = false,
+	} = {}
 ) => async ( { select, resolveSelect, dispatch } ) => {
-	const entities = await dispatch( getKindEntities( kind ) );
-	const entity = find( entities, { kind, name } );
-	if ( ! entity || entity?.__experimentalNoFetch ) {
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 		return;
 	}
-	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
+	const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
 	const lock = await dispatch.__unstableAcquireStoreLock(
 		STORE_NAME,
-		[ 'entities', 'data', kind, name, recordId || uuid() ],
+		[ 'entities', 'records', kind, name, recordId || uuid() ],
 		{ exclusive: true }
 	);
 
@@ -407,8 +459,9 @@ export const saveEntityRecord = (
 		} );
 		let updatedRecord;
 		let error;
+		let hasError = false;
 		try {
-			const path = `${ entity.baseURL }${
+			const path = `${ entityConfig.baseURL }${
 				recordId ? '/' + recordId : ''
 			}`;
 			const persistedRecord = select.getRawEntityRecord(
@@ -424,7 +477,7 @@ export const saveEntityRecord = (
 				// so the client just sends and receives objects.
 				const currentUser = select.getCurrentUser();
 				const currentUserId = currentUser ? currentUser.id : undefined;
-				const autosavePost = resolveSelect.getAutosave(
+				const autosavePost = await resolveSelect.getAutosave(
 					persistedRecord.type,
 					persistedRecord.id,
 					currentUserId
@@ -505,10 +558,10 @@ export const saveEntityRecord = (
 				}
 			} else {
 				let edits = record;
-				if ( entity.__unstablePrePersist ) {
+				if ( entityConfig.__unstablePrePersist ) {
 					edits = {
 						...edits,
-						...entity.__unstablePrePersist(
+						...entityConfig.__unstablePrePersist(
 							persistedRecord,
 							edits
 						),
@@ -529,6 +582,7 @@ export const saveEntityRecord = (
 				);
 			}
 		} catch ( _error ) {
+			hasError = true;
 			error = _error;
 		}
 		dispatch( {
@@ -539,6 +593,10 @@ export const saveEntityRecord = (
 			error,
 			isAutosave,
 		} );
+
+		if ( hasError && throwOnError ) {
+			throw error;
+		}
 
 		return updatedRecord;
 	} finally {
@@ -565,8 +623,8 @@ export const saveEntityRecord = (
  *                         `saveEntityRecord`, `saveEditedEntityRecord`, and
  *                         `deleteEntityRecord`.
  *
- * @return {Promise} A promise that resolves to an array containing the return
- *                   values of each function given in `requests`.
+ * @return {(thunkArgs: Object) => Promise} A promise that resolves to an array containing the return
+ *                                          values of each function given in `requests`.
  */
 export const __experimentalBatch = ( requests ) => async ( { dispatch } ) => {
 	const batch = createBatch();
@@ -621,12 +679,19 @@ export const saveEditedEntityRecord = (
 	if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 		return;
 	}
+	const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	const entityConfig = find( configs, { kind, name } );
+	if ( ! entityConfig ) {
+		return;
+	}
+	const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+
 	const edits = select.getEntityRecordNonTransientEdits(
 		kind,
 		name,
 		recordId
 	);
-	const record = { id: recordId, ...edits };
+	const record = { [ entityIdKey ]: recordId, ...edits };
 	return await dispatch.saveEntityRecord( kind, name, record, options );
 };
 
@@ -666,16 +731,19 @@ export const __experimentalSaveSpecifiedEntityEdits = (
 /**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
+ * @deprecated since WP 5.9, use receiveUserPermission instead.
+ *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?
  *
  * @return {Object} Action object.
  */
 export function receiveUploadPermissions( hasUploadPermissions ) {
-	return {
-		type: 'RECEIVE_USER_PERMISSION',
-		key: 'create/media',
-		isAllowed: hasUploadPermissions,
-	};
+	deprecated( "wp.data.dispatch( 'core' ).receiveUploadPermissions", {
+		since: '5.9',
+		alternative: 'receiveUserPermission',
+	} );
+
+	return receiveUserPermission( 'create/media', hasUploadPermissions );
 }
 
 /**

@@ -244,7 +244,11 @@ const deprecated = [
 			);
 		},
 		isEligible: ( attributes ) => {
-			return attributes.backgroundColor && ! attributes.style;
+			return (
+				attributes.backgroundColor &&
+				attributes.backgroundColor in oldColors &&
+				! attributes.style
+			);
 		},
 
 		// This version is the first to introduce the style attribute to the

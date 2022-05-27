@@ -16,6 +16,7 @@ import {
 	openGlobalBlockInserter,
 	searchForBlock,
 	closeGlobalBlockInserter,
+	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -25,25 +26,22 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
-const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
-For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
-For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`;
-
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
 		await visitWidgetsScreen();
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
-			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/edit-widgets', 'welcomeGuide' )
+		const isWelcomeGuideActive = await page.evaluate(
+			() =>
+				!! wp.data
+					.select( 'core/preferences' )
+					.get( 'core/edit-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/edit-widgets', 'welcomeGuide' )
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/edit-widgets', 'welcomeGuide' )
 			);
 		}
 
@@ -122,7 +120,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	it( 'Should insert content using the global inserter', async () => {
+	it.skip( 'Should insert content using the global inserter', async () => {
 		const updateButton = await find( {
 			role: 'button',
 			name: 'Update',
@@ -232,8 +230,6 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it.skip( 'Should insert content using the inline inserter', async () => {
@@ -601,11 +597,9 @@ describe( 'Widgets screen', () => {
 				initialSerializedWidgetAreas[ 'sidebar-1' ],
 			].join( '\n' )
 		);
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
-	it( 'Should display legacy widgets', async () => {
+	it.skip( 'Should display legacy widgets', async () => {
 		// Get the default empty instance of a legacy search widget.
 		const { instance: defaultSearchInstance } = await rest( {
 			method: 'POST',
@@ -777,8 +771,6 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'Allows widget deletion to be undone', async () => {
@@ -820,7 +812,7 @@ describe( 'Widgets screen', () => {
 		// To do: clicking on the Snackbar causes focus loss.
 		await page.focus( '.block-editor-writing-flow' );
 
-		// Undo block deletion and save again
+		// Undo block deletion and save again.
 		await pressKeyWithModifier( 'primary', 'z' );
 		await saveWidgets();
 
@@ -838,8 +830,6 @@ describe( 'Widgets screen', () => {
 		</div></div>",
 		}
 	` );
-
-		expect( console ).toHaveWarned( twentyTwentyError );
 	} );
 
 	it( 'can toggle sidebar list view', async () => {
@@ -853,6 +843,41 @@ describe( 'Widgets screen', () => {
 		);
 		expect( listItems.length >= widgetAreas.length ).toEqual( true );
 		await closeListView();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/38002.
+	it( 'allows blocks to be added on mobile viewports', async () => {
+		await setBrowserViewport( 'small' );
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'document',
+			name: 'Block: Widget Area',
+		} );
+
+		const addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		const addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'First Paragraph' );
+		const updatedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: 'Paragraph block',
+				value: 'First Paragraph',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+
+		expect( updatedParagraphBlockInFirstWidgetArea ).toBeTruthy();
 	} );
 } );
 

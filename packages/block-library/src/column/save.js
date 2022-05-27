@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment, width } = attributes;
@@ -32,14 +32,11 @@ export default function save( { attributes } ) {
 		style = { flexBasis };
 	}
 
-	return (
-		<div
-			{ ...useBlockProps.save( {
-				className: wrapperClasses,
-				style,
-			} ) }
-		>
-			<InnerBlocks.Content />
-		</div>
-	);
+	const blockProps = useBlockProps.save( {
+		className: wrapperClasses,
+		style,
+	} );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+	return <div { ...innerBlocksProps } />;
 }

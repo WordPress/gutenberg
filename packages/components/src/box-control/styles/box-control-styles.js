@@ -19,7 +19,7 @@ export const Root = styled.div`
 
 export const Header = styled( Flex )`
 	color: ${ COLORS.ui.label };
-	padding-bottom: 8px;
+	margin-bottom: 8px;
 `;
 
 export const HeaderControlWrapper = styled( Flex )`

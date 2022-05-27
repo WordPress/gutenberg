@@ -1,8 +1,3 @@
-export const COLOR_POPOVER_PROPS = {
-	className: 'components-custom-gradient-picker__color-picker-popover',
-	position: 'top',
-};
-
 export const GRADIENT_MARKERS_WIDTH = 16;
 export const INSERT_POINT_WIDTH = 16;
 export const MINIMUM_ABSOLUTE_LEFT_POSITION = 5;

@@ -37,7 +37,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 
 	useLayoutEffect( () => {
 		if ( name === ref.current.name ) {
-			// ignore initial effect
+			// Ignore initial effect.
 			return;
 		}
 		unregisterFill( ref.current.name, ref.current );

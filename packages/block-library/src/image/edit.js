@@ -22,8 +22,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
-/* global wp */
-
 /**
  * Internal dependencies
  */
@@ -130,6 +128,12 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -185,7 +189,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':
@@ -265,12 +269,7 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					isTemp = false;
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
+					onUploadError( message );
 				},
 			} );
 		}

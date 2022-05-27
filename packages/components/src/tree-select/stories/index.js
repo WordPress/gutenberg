@@ -17,7 +17,7 @@ export default {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

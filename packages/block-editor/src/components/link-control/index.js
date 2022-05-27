@@ -148,6 +148,10 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
+	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
+		createSuggestion
+	);
+
 	useEffect( () => {
 		if (
 			forceIsEditingLink !== undefined &&
@@ -185,15 +189,23 @@ function LinkControl( {
 		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
-	}, [ isEditingLink ] );
+	}, [ isEditingLink, isCreatingPage ] );
 
-	/**
-	 * If the value's `text` property changes then sync this
-	 * back up with state.
-	 */
 	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
 		if ( value?.title && value.title !== internalTextValue ) {
 			setInternalTextValue( value.title );
+		}
+
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
 		}
 	}, [ value ] );
 
@@ -208,10 +220,6 @@ function LinkControl( {
 
 		setIsEditingLink( false );
 	}
-
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
-		createSuggestion
-	);
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
@@ -238,7 +246,7 @@ function LinkControl( {
 		const { keyCode } = event;
 		if (
 			keyCode === ENTER &&
-			! currentInputIsEmpty // disallow submitting empty values.
+			! currentInputIsEmpty // Disallow submitting empty values.
 		) {
 			event.preventDefault();
 			handleSubmit();
@@ -253,7 +261,7 @@ function LinkControl( {
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length && hasTextControl;
+	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
 	return (
 		<div
@@ -311,7 +319,7 @@ function LinkControl( {
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // disallow submitting empty values.
+									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
 								/>
 							</div>
 						</LinkControlSearchInput>

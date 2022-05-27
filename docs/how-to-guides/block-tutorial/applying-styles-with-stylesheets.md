@@ -1,55 +1,143 @@
-# Applying Styles From a Stylesheet
+# Use styles and stylesheets
 
-In the [previous section](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md), the block had applied its own styles by an inline `style` attribute. While this might be adequate for very simple components, you will quickly find that it becomes easier to write your styles by extracting them to a separate stylesheet file.
+## Overview
 
-The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In this section, we will create a stylesheet to use that class name.
+A block typically inserts markup (HTML) into post content that you want to style in someway. This guides walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
+
+## Before you start
+
+You will need a basic block and WordPress development environment to implement the examples shown in this guide. See the [create a basic block](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md) or [block tutorial](/docs/getting-started/create-block/README.md) to get setup.
+
+## Methods to add style
+
+The following are different methods you can use to add style to your block, either in the editor or when saved.
+
+## Method 1: Inline style
+
+The first method shows adding the style inline. This transforms the defined style into a property on the element inserted.
+
+The `useBlockProps` React hook is used to set and apply properties on the block's wrapper element. The following example shows how:
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
-	apiVersion: 2,
-	title: 'Example: Stylesheets',
-	icon: 'universal-access-alt',
-	category: 'design',
-	example: {},
 	edit() {
-		const blockProps = useBlockProps();
+		const greenBackground = {
+			backgroundColor: '#090',
+			color: '#fff',
+			padding: '20px',
+		};
+
+		const blockProps = useBlockProps( { style: greenBackground } );
 
 		return (
-			<p { ...blockProps }>
-				Hello World (from the editor, in green).
-			</p>
+			<p { ...blockProps }>Hello World (from the editor, in green).</p>
 		);
 	},
 	save() {
-		const blockProps = useBlockProps.save();
+		const redBackground = {
+			backgroundColor: '#900',
+			color: '#fff',
+			padding: '20px',
+		};
+
+		const blockProps = useBlockProps.save( { style: redBackground } );
 
 		return (
-			<p { ...blockProps }>
-				Hello World (from the frontend, in red).
-			</p>
+			<p { ...blockProps }>Hello World (from the frontend, in red).</p>
 		);
 	},
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {
 	var el = element.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
-		apiVersion: 2,
-		title: 'Example: Stylesheets',
-		icon: 'universal-access-alt',
-		category: 'design',
-		example: {},
+		edit: function ( props ) {
+			const greenBackground = {
+				backgroundColor: '#090',
+				color: '#fff',
+				padding: '20px',
+			};
+			const blockProps = blockEditor.useBlockProps( {
+				style: greenBackground,
+			} );
+			return el(
+				'p',
+				blockProps,
+				'Hello World (from the editor, in green).'
+			);
+		},
+		save: function () {
+			const redBackground = {
+				backgroundColor: '#090',
+				color: '#fff',
+				padding: '20px',
+			};
+			const blockProps = blockEditor.useBlockProps.save( {
+				style: redBackground,
+			} );
+			return el(
+				'p',
+				blockProps,
+				'Hello World (from the frontend, in red).'
+			);
+		},
+	} );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+## Method 2: Block classname
+
+The inline style works well for a small amount of CSS to apply. If you have much more than the above you will likely find that it is easier to manage with them in a separate stylesheet file.
+
+The `useBlockProps` hooks includes the classsname for the block automatically, it generates a name for each block using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
+
+For example the block name: `gutenberg-examples/example-02-stylesheets` would get the classname: `wp-block-gutenberg-examples-example-02-stylesheets`. It might be a bit long but best to avoid conflicts with other blocks.
+
+{% codetabs %}
+{% JSX %}
+
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
+
+registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
+	edit() {
+		const blockProps = useBlockProps();
+
+		return (
+			<p { ...blockProps }>Hello World (from the editor, in green).</p>
+		);
+	},
+	save() {
+		const blockProps = useBlockProps.save();
+
+		return (
+			<p { ...blockProps }>Hello World (from the frontend, in red).</p>
+		);
+	},
+} );
+```
+
+{% Plain %}
+
+```js
+( function ( blocks, element, blockEditor ) {
+	var el = element.createElement;
+
+	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		edit: function ( props ) {
 			var blockProps = blockEditor.useBlockProps();
 			return el(
@@ -72,75 +160,58 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 {% end %}
 
-The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
+### Enqueue stylesheets
 
-## Enqueueing Editor and Front end Assets
+Like scripts, you can enqueue your block's styles using the `block.json` file.
 
-Like scripts, you need to enqueue your block's styles. As explained in the section before, you use the `editor_style` handle for styles only relevant in the editor, and the `style` handle for common styles applied both in the editor and the front of your site.
+Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on the frontend when the block is used.
 
-The stylesheets enqueued by `style` are the base styles and are loaded first. The `editor` stylesheet will be loaded after it.
+For example:
 
-Let's move on into code. Create a file called `editor.css`:
+```json
+{
+	"apiVersion": 2,
+	"name": "gutenberg-examples/example-02-stylesheets",
+	"title": "Example: Stylesheets",
+	"icon": "universal-access-alt",
+	"category": "layout",
+	"editorScript": "file:./block.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
+}
+```
+
+So in your plugin directory, create an `editor.css` file to load in editor view:
 
 ```css
+/* green background */
 .wp-block-gutenberg-examples-example-02-stylesheets {
-	color: green;
-	background: #cfc;
-	border: 2px solid #9c9;
+	background: #090;
+	color: white;
 	padding: 20px;
 }
 ```
 
-And a new `style.css` file containing:
+And a `style.css` file to load on the frontend:
 
 ```css
+/* red background */
 .wp-block-gutenberg-examples-example-02-stylesheets {
-	color: darkred;
-	background: #fcc;
-	border: 2px solid #c99;
+	background: #900;
+	color: white;
 	padding: 20px;
 }
 ```
 
-Configure your plugin to use these new styles:
+The files will automatically be enqueued when specified in the block.json.
 
-```php
-<?php
-/**
- * Plugin Name: Gutenberg Examples Stylesheets
- */
+**Note:** If you have multiple files to include, you can use standard `wp_enqueue_style` functions like any other plugin or theme. You will want to use the following hooks for the block editor:
 
-function gutenberg_examples_02_register_block() {
-	wp_register_script(
-		'gutenberg-examples-02',
-		plugins_url( 'block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'block.js' )
-	);
+-   `enqueue_block_editor_assets` - to load only in editor view
+-   `enqueue_block_assets` - loads both on frontend and editor view
 
-	wp_register_style(
-		'gutenberg-examples-02-editor',
-		plugins_url( 'editor.css', __FILE__ ),
-		array( 'wp-edit-blocks' ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'editor.css' )
-	);
+## Conclusion
 
-	wp_register_style(
-		'gutenberg-examples-02',
-		plugins_url( 'style.css', __FILE__ ),
-		array( ),
-		filemtime( plugin_dir_path( __FILE__ ) . 'style.css' )
-	);
+This guide showed a couple of different ways to apply styles to your block, by either inline or in its own style sheet. Both of these methods use the `useBlockProps` hook, see the [block wrapper reference documentation](/docs/reference-guides/block-api/block-edit-save.md#block-wrapper-props) for additional details.
 
-	// Allow inlining small stylesheets on the frontend if possible.
-	wp_style_add_data( 'gutenberg-examples-02', 'path', dirname( __FILE__ ) . '/style.css' );
-
-	register_block_type( 'gutenberg-examples/example-02-stylesheets', array(
-		'api_version' => 2,
-		'style' => 'gutenberg-examples-02',
-		'editor_style' => 'gutenberg-examples-02-editor',
-		'editor_script' => 'gutenberg-examples-02',
-	) );
-}
-add_action( 'init', 'gutenberg_examples_02_register_block' );
-```
+See the complete [example-02-stlyesheets](https://github.com/WordPress/gutenberg-examples/tree/trunk/02-stylesheets) code in the [gutenberg-examples repository](https://github.com/WordPress/gutenberg-examples).

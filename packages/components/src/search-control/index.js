@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,18 +17,50 @@ import { useRef } from '@wordpress/element';
 import { Button } from '../';
 import BaseControl from '../base-control';
 
-function SearchControl( {
-	className,
-	onChange,
-	value,
-	label,
-	placeholder = __( 'Search' ),
-	hideLabelFromVision = true,
-	help,
-} ) {
+function SearchControl(
+	{
+		className,
+		onChange,
+		onKeyDown,
+		value,
+		label,
+		placeholder = __( 'Search' ),
+		hideLabelFromVision = true,
+		help,
+		onClose,
+	},
+	forwardedRef
+) {
+	const searchRef = useRef();
 	const instanceId = useInstanceId( SearchControl );
-	const searchInput = useRef();
 	const id = `components-search-control-${ instanceId }`;
+
+	const renderRightButton = () => {
+		if ( onClose ) {
+			return (
+				<Button
+					icon={ closeSmall }
+					label={ __( 'Close search' ) }
+					onClick={ onClose }
+				/>
+			);
+		}
+
+		if ( !! value ) {
+			return (
+				<Button
+					icon={ closeSmall }
+					label={ __( 'Reset search' ) }
+					onClick={ () => {
+						onChange( '' );
+						searchRef.current.focus();
+					} }
+				/>
+			);
+		}
+
+		return <Icon icon={ search } />;
+	};
 
 	return (
 		<BaseControl
@@ -40,31 +72,22 @@ function SearchControl( {
 		>
 			<div className="components-search-control__input-wrapper">
 				<input
-					ref={ searchInput }
+					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 					className="components-search-control__input"
 					id={ id }
 					type="search"
 					placeholder={ placeholder }
 					onChange={ ( event ) => onChange( event.target.value ) }
+					onKeyDown={ onKeyDown }
 					autoComplete="off"
 					value={ value || '' }
 				/>
 				<div className="components-search-control__icon">
-					{ !! value && (
-						<Button
-							icon={ closeSmall }
-							label={ __( 'Reset search' ) }
-							onClick={ () => {
-								onChange( '' );
-								searchInput.current.focus();
-							} }
-						/>
-					) }
-					{ ! value && <Icon icon={ search } /> }
+					{ renderRightButton() }
 				</div>
 			</div>
 		</BaseControl>
 	);
 }
 
-export default SearchControl;
+export default forwardRef( SearchControl );

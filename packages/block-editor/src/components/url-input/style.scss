@@ -71,12 +71,13 @@ $input-size: 300px;
 .block-editor-url-input .components-spinner {
 	display: none;
 	@include break-small() {
-		display: inherit;
+		display: grid;
 	}
 }
 
 .block-editor-url-input__suggestion {
-	padding: 4px $input-padding;
+	min-height: $button-size;
+	height: auto;
 	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;

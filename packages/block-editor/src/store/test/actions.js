@@ -26,8 +26,6 @@ import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 
 const {
 	clearSelectedBlock,
-	enterFormattedText,
-	exitFormattedText,
 	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
@@ -151,7 +149,7 @@ describe( 'actions', () => {
 			const end = 'end';
 			const select = {
 				getBlockRootClientId() {
-					return 'parent'; // for all client IDs
+					return 'parent'; // For all client IDs.
 				},
 				getSelectedBlockCount() {
 					return 0;
@@ -165,6 +163,7 @@ describe( 'actions', () => {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+				initialPosition: 0,
 			} );
 		} );
 
@@ -818,22 +817,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'enterFormattedText', () => {
-		it( 'should return the ENTER_FORMATTED_TEXT action', () => {
-			expect( enterFormattedText() ).toEqual( {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-		} );
-	} );
-
-	describe( 'exitFormattedText', () => {
-		it( 'should return the EXIT_FORMATTED_TEXT action', () => {
-			expect( exitFormattedText() ).toEqual( {
-				type: 'EXIT_FORMATTED_TEXT',
-			} );
-		} );
-	} );
-
 	describe( 'toggleSelection', () => {
 		it( 'should return the TOGGLE_SELECTION action with default value for isSelectionEnabled = true', () => {
 			expect( toggleSelection() ).toEqual( {
@@ -1166,7 +1149,6 @@ describe( 'actions', () => {
 				actions,
 				selectors,
 				reducer,
-				__experimentalUseThunks: true,
 			} );
 
 			registerBlockType( 'core/test-block', defaultBlockSettings );

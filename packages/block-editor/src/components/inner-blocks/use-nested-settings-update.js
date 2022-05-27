@@ -11,6 +11,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
+/** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
+
 /**
  * This hook is a side effect which updates the block-editor store when changes
  * happen to inner block settings. The given props are transformed into a
@@ -18,20 +20,20 @@ import { getLayoutType } from '../../layouts';
  * the block-editor store, then the store is updated with the new settings which
  * came from props.
  *
- * @param {string}            clientId                   The client ID of the block to update.
- * @param {string[]}          allowedBlocks              An array of block names which are permitted
- *                                                       in inner blocks.
- * @param {?Array}            __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean} __experimentalDirectInsert If a default block should be inserted directly by the
- *                                                       appender.
- * @param {string}            [templateLock]             The template lock specified for the inner
- *                                                       blocks component. (e.g. "all")
- * @param {boolean}           captureToolbars            Whether or children toolbars should be shown
- *                                                       in the inner blocks component rather than on
- *                                                       the child block.
- * @param {string}            orientation                The direction in which the block
- *                                                       should face.
- * @param {Object}            layout                     The layout object for the block container.
+ * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string[]}             allowedBlocks              An array of block names which are permitted
+ *                                                          in inner blocks.
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
+ *                                                          appender.
+ * @param {string}               [templateLock]             The template lock specified for the inner
+ *                                                          blocks component. (e.g. "all")
+ * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
+ *                                                          in the inner blocks component rather than on
+ *                                                          the child block.
+ * @param {string}               orientation                The direction in which the block
+ *                                                          should face.
+ * @param {Object}               layout                     The layout object for the block container.
  */
 export default function useNestedSettingsUpdate(
 	clientId,

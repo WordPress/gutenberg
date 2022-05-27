@@ -61,7 +61,7 @@ $preview-image-height: 140px;
 	// Specificity overide of URLInput defaults.
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
-		width: calc(100% - #{$grid-unit-20*2});
+		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
@@ -197,12 +197,16 @@ $preview-image-height: 140px;
 		// of text, particular those with no spaces.
 		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
 		white-space: pre-wrap;
-		word-wrap: break-word;
+		overflow-wrap: break-word;
+
+		.block-editor-link-control__search-item-info {
+			word-break: break-all;
+		}
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
 		display: flex;
-		flex: 1; // fill available space.
+		flex: 1; // Fill available space.
 	}
 
 	&.is-error .block-editor-link-control__search-item-header {
@@ -283,6 +287,7 @@ $preview-image-height: 140px;
 		font-size: 0.9em;
 		background-color: $gray-100;
 		border-radius: 2px;
+		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
 	.block-editor-link-control__search-item-description {
@@ -478,16 +483,10 @@ $preview-image-height: 140px;
 		 * Position spinner to the left of the actions.
 		 *
 		 * Compensate for:
-		 *  - Input margin ($grid-unit-20)
-		 *  - Border (1px)
-		 *  - Vertically, for the difference in height between the input (40px)
-		 *    and the spinner.
-		 *  - Horizontally, adjust for the width occupied by the icon buttons,
-		 *    then artificially create spacing that mimics as if the spinner
-		 *    were center-padded to the same width as an icon button.
+		 *  - Input padding right ($button-size)
 		 */
-		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) * 0.5 );
-		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) * 0.5 );
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $button-size;
 	}
 }
 

@@ -192,7 +192,7 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Toggle fullscreen mode.</td>
-			<td><kbd>CMD</kbd>+<kbd>Option</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td>
+			<td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td>
 			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>F</kbd></td>
 		</tr>
 	</tbody>

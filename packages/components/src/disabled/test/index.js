@@ -65,7 +65,7 @@ describe( 'Disabled', () => {
 		</form>
 	);
 
-	// this is needed because TestUtils does not accept a stateless component.
+	// This is needed because TestUtils does not accept a stateless component.
 	class DisabledComponent extends Component {
 		render() {
 			const { children, isDisabled } = this.props;

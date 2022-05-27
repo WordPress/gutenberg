@@ -3,26 +3,18 @@
  */
 import { Button } from '@wordpress/components';
 import { arrowLeft } from '@wordpress/icons';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
+import { useLocation, useHistory } from '../routes';
 
 function BackButton() {
-	const { isTemplatePart, previousTemplateId } = useSelect( ( select ) => {
-		const { getEditedPostType, getPreviousEditedPostId } = select(
-			editSiteStore
-		);
-
-		return {
-			isTemplatePart: getEditedPostType() === 'wp_template_part',
-			previousTemplateId: getPreviousEditedPostId(),
-		};
-	}, [] );
-	const { goBack } = useDispatch( editSiteStore );
+	const location = useLocation();
+	const history = useHistory();
+	const isTemplatePart = location.params.postType === 'wp_template_part';
+	const previousTemplateId = location.state?.fromTemplateId;
 
 	if ( ! isTemplatePart || ! previousTemplateId ) {
 		return null;
@@ -33,7 +25,7 @@ function BackButton() {
 			className="edit-site-visual-editor__back-button"
 			icon={ arrowLeft }
 			onClick={ () => {
-				goBack();
+				history.back();
 			} }
 		>
 			{ __( 'Back' ) }

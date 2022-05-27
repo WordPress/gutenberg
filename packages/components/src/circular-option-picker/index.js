@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -25,15 +26,17 @@ function Option( {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
-			className={ classnames(
-				className,
-				'components-circular-option-picker__option'
-			) }
+			className="components-circular-option-picker__option"
 			{ ...additionalProps }
 		/>
 	);
 	return (
-		<div className="components-circular-option-picker__option-wrapper">
+		<div
+			className={ classnames(
+				className,
+				'components-circular-option-picker__option-wrapper'
+			) }
+		>
 			{ tooltipText ? (
 				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
 			) : (
@@ -84,8 +87,7 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 				'components-circular-option-picker__clear',
 				className
 			) }
-			isSmall
-			variant="secondary"
+			variant="tertiary"
 			{ ...additionalProps }
 		>
 			{ children }

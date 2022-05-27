@@ -1,29 +1,20 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { Icon, search } from '@wordpress/icons';
+import { Icon, navigation } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
-const PlaceholderPreview = ( { isLoading } ) => {
+const PlaceholderPreview = ( { isVisible = true } ) => {
 	return (
-		<ul
-			className={ classnames(
-				'wp-block-navigation-placeholder__preview',
-				'wp-block-navigation__container',
-				{ 'is-loading': isLoading }
-			) }
+		<div
+			aria-hidden={ ! isVisible ? true : undefined }
+			className="wp-block-navigation-placeholder__preview"
 		>
-			<li className="wp-block-navigation-item">&#8203;</li>
-			<li className="wp-block-navigation-item">&#8203;</li>
-			<li className="wp-block-navigation-item">&#8203;</li>
-			<li className="wp-block-navigation-placeholder__preview-search-icon">
-				<Icon icon={ search } />
-			</li>
-		</ul>
+			<div className="wp-block-navigation-placeholder__actions__indicator">
+				<Icon icon={ navigation } />
+				{ __( 'Navigation' ) }
+			</div>
+		</div>
 	);
 };
 

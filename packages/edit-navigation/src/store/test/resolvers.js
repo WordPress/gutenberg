@@ -38,7 +38,7 @@ jest.mock( '@wordpress/blocks', () => {
 } );
 
 function createRegistryWithStores() {
-	// create a registry and register stores
+	// Create a registry and register stores.
 	const registry = createRegistry();
 
 	registry.register( editNavigationStore );
@@ -119,7 +119,7 @@ describe( 'getNavigationPostForMenu', () => {
 	jest.useRealTimers();
 
 	apiFetch.mockImplementation( async ( { path, method = 'GET' } ) => {
-		if ( ! path.startsWith( '/__experimental/menu-items?' ) ) {
+		if ( ! path.startsWith( '/wp/v2/menu-items?' ) ) {
 			throw new Error( `unexpected API endpoint: ${ path }` );
 		}
 

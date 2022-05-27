@@ -1,32 +1,9 @@
 /**
  * Internal dependencies
  */
-import createPreloadingMiddleware, { getStablePath } from '../preloading';
+import createPreloadingMiddleware from '../preloading';
 
 describe( 'Preloading Middleware', () => {
-	describe( 'getStablePath', () => {
-		it( 'returns same value if no query parameters', () => {
-			const path = '/foo/bar';
-
-			expect( getStablePath( path ) ).toBe( path );
-		} );
-
-		it( 'returns a stable path', () => {
-			const abc = getStablePath( '/foo/bar?a=5&b=1&c=2' );
-			const bca = getStablePath( '/foo/bar?b=1&c=2&a=5' );
-			const bac = getStablePath( '/foo/bar?b=1&a=5&c=2' );
-			const acb = getStablePath( '/foo/bar?a=5&c=2&b=1' );
-			const cba = getStablePath( '/foo/bar?c=2&b=1&a=5' );
-			const cab = getStablePath( '/foo/bar?c=2&a=5&b=1' );
-
-			expect( abc ).toBe( bca );
-			expect( bca ).toBe( bac );
-			expect( bac ).toBe( acb );
-			expect( acb ).toBe( cba );
-			expect( cba ).toBe( cab );
-		} );
-	} );
-
 	describe( 'given preloaded data', () => {
 		describe( 'when data is requested from a preloaded endpoint', () => {
 			describe( 'and it is requested for the first time', () => {
@@ -82,6 +59,17 @@ describe( 'Preloading Middleware', () => {
 
 			describe( 'and the OPTIONS request has a parse flag', () => {
 				it( 'should return the full response if parse: false', () => {
+					const noResponseMock =
+						'undefined' === typeof window.Response;
+					if ( noResponseMock ) {
+						window.Response = class {
+							constructor( body, options ) {
+								this.body = JSON.parse( body );
+								this.headers = options.headers;
+							}
+						};
+					}
+
 					const data = {
 						body: {
 							status: 'this is the preloaded response',
@@ -108,6 +96,9 @@ describe( 'Preloading Middleware', () => {
 					};
 
 					const response = preloadingMiddleware( requestOptions );
+					if ( noResponseMock ) {
+						delete window.Response;
+					}
 					return response.then( ( value ) => {
 						expect( value ).toEqual( data );
 					} );
@@ -197,6 +188,60 @@ describe( 'Preloading Middleware', () => {
 
 		value = await preloadingMiddleware( requestOptions, () => {} );
 		expect( value ).toEqual( body );
+	} );
+
+	it( 'should recognize an urlencoded query param', async () => {
+		const body = { foo: 'foo', bar: 'bar' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/?_fields=foo,bar': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				path: '/?_fields=foo%2Cbar',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
+	} );
+
+	it( 'should recognize rest_route query param as path', async () => {
+		const body = { foo: 'foo' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				url: '/index.php?rest_route=%2F',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
+	} );
+
+	it( 'should recognize additional query params after rest_route', async () => {
+		const body = { foo: 'foo', bar: 'bar' };
+
+		const preloadingMiddleware = createPreloadingMiddleware( {
+			'/?_fields=foo,bar': { body },
+		} );
+
+		const response = await preloadingMiddleware(
+			{
+				method: 'GET',
+				url: '/index.php?rest_route=%2F&_fields=foo%2Cbar',
+			},
+			() => {}
+		);
+
+		expect( response ).toEqual( body );
 	} );
 
 	it( 'should remove OPTIONS type requests from the cache after the first hit', async () => {

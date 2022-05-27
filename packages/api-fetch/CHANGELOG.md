@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 6.6.0 (2022-05-18)
+
+## 6.5.0 (2022-05-04)
+
+## 6.4.0 (2022-04-21)
+
+## 6.3.0 (2022-04-08)
+
+## 6.2.0 (2022-03-23)
+
+## 6.1.0 (2022-03-11)
+
+## 6.0.0 (2022-01-27)
+
+### Breaking changes
+
+   `OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
+
+## 5.2.5 (2021-11-07)
+
+### Internal
+
+-   Removed `getStablePath` function. Please use `normalizePath` from `@wordpress/url` package instead ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).``
+
 ## 5.2.0 (2021-07-21)
 
 ### New feature

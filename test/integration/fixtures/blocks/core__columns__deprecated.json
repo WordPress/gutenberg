@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/columns",
 		"isValid": true,
 		"attributes": {
@@ -8,13 +7,11 @@
 		},
 		"innerBlocks": [
 			{
-				"clientId": "_clientId_0",
 				"name": "core/column",
 				"isValid": true,
 				"attributes": {},
 				"innerBlocks": [
 					{
-						"clientId": "_clientId_0",
 						"name": "core/paragraph",
 						"isValid": true,
 						"attributes": {
@@ -22,11 +19,9 @@
 							"dropCap": false,
 							"className": "layout-column-1"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-1\">Column One, Paragraph One</p>"
+						"innerBlocks": []
 					},
 					{
-						"clientId": "_clientId_1",
 						"name": "core/paragraph",
 						"isValid": true,
 						"attributes": {
@@ -34,19 +29,16 @@
 							"dropCap": false,
 							"className": "layout-column-1"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-1\">Column One, Paragraph Two</p>"
+						"innerBlocks": []
 					}
 				]
 			},
 			{
-				"clientId": "_clientId_1",
 				"name": "core/column",
 				"isValid": true,
 				"attributes": {},
 				"innerBlocks": [
 					{
-						"clientId": "_clientId_0",
 						"name": "core/paragraph",
 						"isValid": true,
 						"attributes": {
@@ -54,19 +46,16 @@
 							"dropCap": false,
 							"className": "layout-column-2"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-2\">Column Two, Paragraph One</p>"
+						"innerBlocks": []
 					}
 				]
 			},
 			{
-				"clientId": "_clientId_2",
 				"name": "core/column",
 				"isValid": true,
 				"attributes": {},
 				"innerBlocks": [
 					{
-						"clientId": "_clientId_0",
 						"name": "core/paragraph",
 						"isValid": true,
 						"attributes": {
@@ -74,12 +63,10 @@
 							"dropCap": false,
 							"className": "layout-column-3"
 						},
-						"innerBlocks": [],
-						"originalContent": "<p class=\"layout-column-3\">Column Three, Paragraph One</p>"
+						"innerBlocks": []
 					}
 				]
 			}
-		],
-		"originalContent": "<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n\t\n\t\n</div>"
+		]
 	}
 ]

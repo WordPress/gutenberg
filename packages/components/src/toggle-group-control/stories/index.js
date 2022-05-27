@@ -7,19 +7,24 @@ import { boolean, text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+	ToggleGroupControlOptionIcon,
+} from '../index';
 import { View } from '../../view';
 import Button from '../../button';
 
 export default {
 	component: ToggleGroupControl,
-	title: 'Components/ToggleGroupControl',
+	title: 'Components (Experimental)/ToggleGroupControl',
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 
@@ -57,18 +62,23 @@ const _default = ( { options } ) => {
 		KNOBS_GROUPS.ToggleGroupControl
 	);
 
-	const controlOptions = options.map( ( opt, index ) => (
+	const controlOptions = options.map( ( option, index ) => (
 		<ToggleGroupControlOption
-			key={ opt.value }
-			value={ opt.value }
+			key={ option.value }
+			value={ option.value }
 			label={ text(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
-				opt.label,
+				option.label,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 			aria-label={ text(
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
-				opt[ 'aria-label' ],
+				option[ 'aria-label' ],
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+			) }
+			showTooltip={ boolean(
+				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
+				option.showTooltip,
 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
 			) }
 		/>
@@ -101,6 +111,16 @@ Default.args = {
 	],
 };
 
+export const WithTooltip = _default.bind( {} );
+WithTooltip.args = {
+	...Default.args,
+	options: [
+		{ value: 1, label: '1', showTooltip: true, 'aria-label': 'One' },
+		{ value: 2, label: '2', showTooltip: true, 'aria-label': 'Two' },
+		{ value: 3, label: '3', showTooltip: true, 'aria-label': 'Three' },
+	],
+};
+
 export const WithAriaLabel = _default.bind( {} );
 WithAriaLabel.args = {
 	...Default.args,
@@ -108,6 +128,31 @@ WithAriaLabel.args = {
 		{ value: 'asc', label: 'A→Z', 'aria-label': 'Ascending' },
 		{ value: 'desc', label: 'Z→A', 'aria-label': 'Descending' },
 	],
+};
+
+export const WithIcons = () => {
+	const [ state, setState ] = useState();
+	return (
+		<ToggleGroupControl
+			onChange={ setState }
+			value={ state }
+			label={ 'With icons' }
+			hideLabelFromVision
+		>
+			<ToggleGroupControlOptionIcon
+				value="uppercase"
+				icon={ formatUppercase }
+				showTooltip={ true }
+				aria-label="Uppercase"
+			/>
+			<ToggleGroupControlOptionIcon
+				value="lowercase"
+				icon={ formatLowercase }
+				showTooltip={ true }
+				aria-label="Lowercase"
+			/>
+		</ToggleGroupControl>
+	);
 };
 
 export const WithReset = () => {

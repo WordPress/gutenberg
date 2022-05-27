@@ -19,16 +19,24 @@
 	align-items: center;
 
 	&.is-focus-mode {
-		padding: 48px;
+		padding: $grid-unit-60;
 
 		.edit-site-visual-editor__editor-canvas {
-			border-radius: 2px;
+			border-radius: $radius-block-ui;
+		}
+
+		// To hide the horizontal scrollbar and show the drag handle on the
+		// left and right of the container.
+		.components-resizable-box__container {
+			overflow: visible;
 		}
 	}
-}
 
-.edit-site-visual-editor__editor-canvas {
-	border-radius: 2px 2px 0 0;
+	.components-resizable-box__container {
+		margin: 0 auto;
+		// Removing this will cancel the bottom margins in the iframe.
+		overflow: auto;
+	}
 }
 
 .edit-site-visual-editor__back-button {
@@ -44,10 +52,6 @@
 	}
 }
 
-.components-resizable-box__container {
-	margin: 0 auto;
-}
-
 .resizable-editor__drag-handle {
 	$height: 100px;
 	position: absolute;
@@ -55,30 +59,26 @@
 	bottom: 0;
 	padding: 0;
 	margin: auto 0;
-	width: $grid-unit-10;
+	width: $grid-unit-05;
 	height: $height;
 	appearance: none;
-	cursor: grab;
+	cursor: ew-resize;
 	outline: none;
-	background: $gray-700;
-	border-radius: 4px;
+	background: $gray-600;
+	border-radius: 2px;
 	border: 0;
 
 	&.is-left {
-		left: #{-$grid-unit-30 - $grid-unit-05};
+		left: -$grid-unit-20;
 	}
 
 	&.is-right {
-		right: #{-$grid-unit-30 - $grid-unit-05};
+		right: -$grid-unit-20;
 	}
 
-	&:hover {
-		background: $gray-600;
-	}
-
+	&:hover,
 	&:active {
-		cursor: grabbing;
-		background: $gray-600;
+		background: $gray-400;
 	}
 
 	&:focus {

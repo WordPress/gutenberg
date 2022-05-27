@@ -34,7 +34,7 @@ export default function LinkPickerResults( {
 		pendingRequest.current = null;
 	};
 
-	// a stable debounced function to fetch suggestions and append
+	// A stable debounced function to fetch suggestions and append.
 	const { fetchMoreSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		const fetchLinkSuggestions = async ( { search } ) => {
@@ -49,8 +49,8 @@ export default function LinkPickerResults( {
 			query: search,
 			links: currentSuggestions,
 		} ) => {
-			// return early if we've already detected the end of data or we are
-			// already awaiting a response
+			// Return early if we've already detected the end of data or we are
+			// already awaiting a response.
 			if ( hasAllSuggestions || pendingRequest.current ) {
 				return;
 			}
@@ -58,10 +58,10 @@ export default function LinkPickerResults( {
 			pendingRequest.current = request;
 			const suggestions = await request;
 
-			// only update links for the most recent request
+			// Only update links for the most recent request.
 			if ( suggestions && request === pendingRequest.current ) {
-				// since we don't have the response header, we check if the results
-				// are truncated to determine we've reached the end
+				// Since we don't have the response header, we check if the results
+				// are truncated to determine we've reached the end.
 				if ( suggestions.length < PER_PAGE ) {
 					setHasAllSuggestions( true );
 				}
@@ -76,10 +76,10 @@ export default function LinkPickerResults( {
 		};
 	}, [] );
 
-	// prevent setting state when unmounted
+	// Prevent setting state when unmounted.
 	useEffect( () => clearRequest, [] );
 
-	// any time the query changes, we reset pagination
+	// Any time the query changes, we reset pagination.
 	useEffect( () => {
 		clearRequest();
 		nextPage.current = 1;

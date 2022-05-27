@@ -61,8 +61,9 @@ export {
 	filterUnitsWithSettings as filterUnitsWithSettings,
 } from './unit-control/utils';
 export { default as Disabled } from './disabled';
+export { default as Draggable, DraggableTrigger } from './draggable';
 
-// Higher-Order Components
+// Higher-Order Components.
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
@@ -73,7 +74,7 @@ export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';
 
-// Mobile Components
+// Mobile Components.
 export {
 	__unstableAutocompletionItemsFill,
 	__unstableAutocompletionItemsSlot,
@@ -103,6 +104,7 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
+export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/image-link-destinations-screen';
 export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
@@ -112,7 +114,7 @@ export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
 
-// Utils
+// Utils.
 export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
@@ -120,7 +122,7 @@ export {
 	alignmentHelpers,
 } from './mobile/utils/alignments';
 
-// Hooks
+// Hooks.
 export {
 	convertUnitToMobile,
 	useConvertUnitToMobile,
@@ -133,4 +135,8 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-export { getGlobalStyles } from './mobile/global-styles-context/utils';
+export {
+	getGlobalStyles,
+	getColorsAndGradients,
+	useMobileGlobalStylesColors,
+} from './mobile/global-styles-context/utils';

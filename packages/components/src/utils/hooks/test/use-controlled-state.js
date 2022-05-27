@@ -117,7 +117,7 @@ describe( 'hooks', () => {
 			expect( input.value ).toBe( 'There' );
 			expect( spy ).toHaveBeenCalledWith( 'There' );
 
-			// Input is now controlled
+			// Input is now controlled.
 			rerender( <Example value="New Value" /> );
 			expect( input.value ).toBe( 'New Value' );
 

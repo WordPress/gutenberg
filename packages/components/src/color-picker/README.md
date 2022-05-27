@@ -5,7 +5,7 @@
 ## Usage
 
 ```jsx
-import { ColorPicker } from '@wordpress/components/ui';
+import { ColorPicker } from '@wordpress/components';
 
 function Example() {
 	const [color, setColor] = useState();
@@ -22,32 +22,34 @@ function Example() {
 
 ## Props
 
-### `color`
-
-**Type**: `string`
+### `color`: `string`
 
 The current color value to display in the picker. Must be a hex or hex8 string.
 
-### `onChange`
+- Required: No
 
-**Type**: `(hex8Color: string) => void`
+### `onChange`: `(hex8Color: string) => void`
 
 Fired when the color changes. Always passes a hex8 color string.
 
-### `enableAlpha`
+- Required: No
 
-**Type**: `boolean`
+### `enableAlpha`: `boolean`
 
 Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
 
-### `defaultValue`
+- Required: No
+- Default: `false`
 
-**Type**: `string | undefined`
+### `defaultValue`: `string | undefined`
 
 An optional default value to use for the color picker.
 
-### `copyFormat`
+- Required: No
+- Default: `'#fff'`
 
-**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
+### `copyFormat`: `'hex' | 'hsl' | 'rgb' | undefined`
 
 The format to copy when clicking the displayed color format.
+
+- Required: No

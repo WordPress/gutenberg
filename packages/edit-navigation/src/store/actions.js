@@ -23,19 +23,6 @@ import { blockToMenuItem, menuItemToBlockAttributes } from './transform';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 /**
- * Returns an action object used to select menu.
- *
- * @param {number} menuId The menu ID.
- * @return {Object} Action object.
- */
-export function setSelectedMenuId( menuId ) {
-	return {
-		type: 'SET_SELECTED_MENU_ID',
-		menuId,
-	};
-}
-
-/**
  * Converts all the blocks into menu items and submits a batch request to save everything at once.
  *
  * @param {Object} post A navigation post to process
@@ -53,20 +40,14 @@ export const saveNavigationPost = ( post ) => async ( {
 	try {
 		const menuId = post.meta.menuId;
 
-		// Save menu
+		// Save menu.
 		await registry
 			.dispatch( coreDataStore )
-			.saveEditedEntityRecord( 'root', 'menu', menuId );
+			.saveEditedEntityRecord( 'root', 'menu', menuId, {
+				throwOnError: true,
+			} );
 
-		const error = registry
-			.select( coreDataStore )
-			.getLastEntitySaveError( 'root', 'menu', menuId );
-
-		if ( error ) {
-			throw new Error( error.message );
-		}
-
-		// Save menu items
+		// Save menu items.
 		const updatedBlocks = await dispatch(
 			batchSaveMenuItems( post.blocks[ 0 ], menuId )
 		);
@@ -127,7 +108,7 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 	dispatch,
 	registry,
 } ) => {
-	// Make sure all the existing menu items are available before proceeding
+	// Make sure all the existing menu items are available before proceeding.
 	const oldMenuItems = await registry
 		.resolveSelect( coreDataStore )
 		.getMenuItems( { menus: menuId, per_page: -1 } );
@@ -146,7 +127,7 @@ const batchSaveMenuItems = ( navigationBlock, menuId ) => async ( {
 		batchUpdateMenuItems( navBlockWithRecordIds, menuId )
 	);
 
-	// Delete menu items
+	// Delete menu items.
 	const deletedIds = difference(
 		oldMenuItems.map( ( { id } ) => id ),
 		blocksTreeToList( navBlockAfterUpdates ).map( getRecordIdFromBlock )
@@ -183,7 +164,7 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 		.dispatch( coreDataStore )
 		.__experimentalBatch( tasks );
 
-	// Return an updated navigation block with all the IDs in
+	// Return an updated navigation block with all the IDs in.
 	const blockToResult = new Map( zip( blocksWithoutRecordId, results ) );
 	return mapBlocksTree( navigationBlock, ( block ) => {
 		if ( ! blockToResult.has( block ) ) {
@@ -204,10 +185,25 @@ const batchInsertPlaceholderMenuItems = ( navigationBlock ) => async ( {
 const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 	registry,
 } ) => {
-	const updatedMenuItems = blocksTreeToAnnotatedList( navigationBlock )
-		// Filter out unsupported blocks
+	const allMenuItems = blocksTreeToAnnotatedList( navigationBlock );
+	const unsupportedMenuItems = allMenuItems
+		.filter( ( { block } ) => ! isBlockSupportedInNav( block ) )
+		.map( ( { block } ) => block.name );
+	if ( unsupportedMenuItems.length ) {
+		window.console.warn(
+			sprintf(
+				// translators: %s: Name of block (i.e. core/legacy-widget)
+				__(
+					'The following blocks haven\'t been saved because they are not supported: "%s".'
+				),
+				unsupportedMenuItems.join( '", "' )
+			)
+		);
+	}
+	const updatedMenuItems = allMenuItems
+		// Filter out unsupported blocks.
 		.filter( ( { block } ) => isBlockSupportedInNav( block ) )
-		// Transform the blocks into menu items
+		// Transform the blocks into menu items.
 		.map( ( { block, parentBlock, childIndex } ) =>
 			blockToMenuItem(
 				block,
@@ -219,7 +215,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 				menuId
 			)
 		)
-		// Filter out menu items without any edits
+		// Filter out menu items without any edits.
 		.filter( ( menuItem ) => {
 			// Update an existing entity record.
 			registry
@@ -233,7 +229,7 @@ const batchUpdateMenuItems = ( navigationBlock, menuId ) => async ( {
 				.hasEditsForEntityRecord( 'root', 'menuItem', menuItem.id );
 		} );
 
-	// Map the edited menu items to batch tasks
+	// Map the edited menu items to batch tasks.
 	const tasks = updatedMenuItems.map(
 		( menuItem ) => ( { saveEditedEntityRecord } ) =>
 			saveEditedEntityRecord( 'root', 'menuItem', menuItem.id )

@@ -22,6 +22,8 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	BlockControls,
+	MediaReplaceFlow,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -52,6 +54,7 @@ import useImageSizes from './use-image-sizes';
 import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -97,6 +100,8 @@ function GalleryEdit( props ) {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
+		selectBlock,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -114,6 +119,16 @@ function GalleryEdit( props ) {
 	const innerBlockImages = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+		},
+		[ clientId ]
+	);
+
+	const wasBlockJustInserted = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			);
 		},
 		[ clientId ]
 	);
@@ -137,11 +152,14 @@ function GalleryEdit( props ) {
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( false, newImage.attributes ),
+				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
 				align: undefined,
 			} );
 		} );
+		if ( newImages?.length > 0 ) {
+			clearSelectedBlock();
+		}
 	}, [ newImages ] );
 
 	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
@@ -169,29 +187,28 @@ function GalleryEdit( props ) {
 	 * it already existed in the gallery. If the image is in fact new, we need
 	 * to apply the gallery's current settings to the image.
 	 *
-	 * @param {Object} existingBlock Existing Image block that still exists after gallery update.
-	 * @param {Object} image         Media object for the actual image.
-	 * @return {Object}               Attributes to set on the new image block.
+	 * @param {Object} imageAttributes Media object for the actual image.
+	 * @return {Object}                Attributes to set on the new image block.
 	 */
-	function buildImageAttributes( existingBlock, image ) {
-		if ( existingBlock ) {
-			return existingBlock.attributes;
-		}
+	function buildImageAttributes( imageAttributes ) {
+		const image = imageAttributes.id
+			? find( imageData, { id: imageAttributes.id } )
+			: null;
 
 		let newClassName;
-		if ( image.className && image.className !== '' ) {
-			newClassName = image.className;
+		if ( imageAttributes.className && imageAttributes.className !== '' ) {
+			newClassName = imageAttributes.className;
 		} else {
 			newClassName = preferredStyle
 				? `is-style-${ preferredStyle }`
 				: undefined;
 		}
-
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
+			caption: imageAttributes.caption,
 			sizeSlug,
 		};
 	}
@@ -276,6 +293,10 @@ function GalleryEdit( props ) {
 				alt: image.alt,
 			} );
 		} );
+
+		if ( newBlocks?.length > 0 ) {
+			selectBlock( newBlocks[ 0 ].clientId );
+		}
 
 		replaceInnerBlocks(
 			clientId,
@@ -393,7 +414,7 @@ function GalleryEdit( props ) {
 	}
 
 	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
+		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
@@ -410,26 +431,38 @@ function GalleryEdit( props ) {
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
 	);
 
+	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
+	const mediaPlaceholderProps = Platform.select( {
+		web: {
+			addToGallery: false,
+			disableMediaButtons: imagesUploading,
+			value: {},
+		},
+		native: {
+			addToGallery: hasImageIds,
+			isAppender: hasImages,
+			disableMediaButtons:
+				( hasImages && ! isSelected ) || imagesUploading,
+			value: hasImageIds ? images : {},
+			autoOpenMediaUpload:
+				! hasImages && isSelected && wasBlockJustInserted,
+		},
+	} );
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImageIds }
 			handleUpload={ false }
-			isAppender={ hasImages }
-			disableMediaButtons={
-				( hasImages && ! isSelected ) || imagesUploading
-			}
-			icon={ ! hasImages && sharedIcon }
+			icon={ sharedIcon }
 			labels={ {
-				title: ! hasImages && __( 'Gallery' ),
-				instructions: ! hasImages && PLACEHOLDER_TEXT,
+				title: __( 'Gallery' ),
+				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
-			notices={ hasImages ? undefined : noticeUI }
+			notices={ noticeUI }
+			{ ...mediaPlaceholderProps }
 		/>
 	);
 
@@ -446,7 +479,7 @@ function GalleryEdit( props ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Gallery settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -491,7 +524,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{ Platform.isWeb && ! imageSizeOptions && (
+					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
@@ -504,11 +537,33 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					handleUpload={ false }
+					onSelect={ updateImages }
+					name={ __( 'Add' ) }
+					multiple={ true }
+					mediaIds={ images.map( ( image ) => image.id ) }
+					addToGallery={ hasImageIds }
+				/>
+			</BlockControls>
 			{ noticeUI }
+			{ Platform.isWeb && (
+				<GapStyles
+					blockGap={ attributes.style?.spacing?.blockGap }
+					clientId={ clientId }
+				/>
+			) }
 			<Gallery
 				{ ...props }
 				images={ images }
-				mediaPlaceholder={ mediaPlaceholder }
+				mediaPlaceholder={
+					! hasImages || Platform.isNative
+						? mediaPlaceholder
+						: undefined
+				}
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>

@@ -1,4 +1,4 @@
-// Primitives
+// Primitives.
 export {
 	SVG,
 	Path,
@@ -10,7 +10,7 @@ export {
 	BlockQuotation,
 } from '@wordpress/primitives';
 
-// Components
+// Components.
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
@@ -23,6 +23,13 @@ export {
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
 export { default as BaseControl } from './base-control';
+export {
+	BorderBoxControl as __experimentalBorderBoxControl,
+	hasSplitBorders as __experimentalHasSplitBorders,
+	isDefinedBorder as __experimentalIsDefinedBorder,
+	isEmptyBorder as __experimentalIsEmptyBorder,
+} from './border-box-control';
+export { BorderControl as __experimentalBorderControl } from './border-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
@@ -36,7 +43,7 @@ export {
 } from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
-export { default as __experimentalColorEdit } from './color-edit';
+export { default as __experimentalPaletteEdit } from './palette-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { ColorPicker } from './color-picker';
@@ -47,6 +54,7 @@ export {
 	CompositeItem as __unstableCompositeItem,
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
+export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
@@ -63,7 +71,6 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
-export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -99,6 +106,8 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	NavigatorProvider as __experimentalNavigatorProvider,
 	NavigatorScreen as __experimentalNavigatorScreen,
+	NavigatorButton as __experimentalNavigatorButton,
+	NavigatorBackButton as __experimentalNavigatorBackButton,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
@@ -136,6 +145,7 @@ export { default as ToggleControl } from './toggle-control';
 export {
 	ToggleGroupControl as __experimentalToggleGroupControl,
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
@@ -160,7 +170,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
-	parseUnit as __experimentalParseUnit,
+	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
@@ -176,7 +186,7 @@ export {
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
 
-// Higher-Order Components
+// Higher-Order Components.
 export {
 	default as navigateRegions,
 	useNavigateRegions as __unstableUseNavigateRegions,

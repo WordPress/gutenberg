@@ -14,10 +14,12 @@ export default function useListViewClientIds( blocks ) {
 		( select ) => {
 			const {
 				getDraggedBlockClientIds,
+				getSelectedBlockClientIds,
 				__unstableGetClientIdsTree,
 			} = select( blockEditorStore );
 
 			return {
+				selectedClientIds: getSelectedBlockClientIds(),
 				draggedClientIds: getDraggedBlockClientIds(),
 				clientIdsTree: blocks ? blocks : __unstableGetClientIdsTree(),
 			};

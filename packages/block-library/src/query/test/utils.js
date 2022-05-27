@@ -2,15 +2,17 @@
  * Internal dependencies
  */
 import { terms } from './fixtures';
-import { getTermsInfo } from '../utils';
+import { getEntitiesInfo } from '../utils';
 
 describe( 'Query block utils', () => {
-	describe( 'getTermsInfo', () => {
+	describe( 'getEntitiesInfo', () => {
 		it( 'should return an empty object when no terms provided', () => {
-			expect( getTermsInfo() ).toEqual( { terms: undefined } );
+			expect( getEntitiesInfo() ).toEqual( {
+				terms: undefined,
+			} );
 		} );
 		it( 'should return proper terms info object', () => {
-			expect( getTermsInfo( terms ) ).toEqual(
+			expect( getEntitiesInfo( terms ) ).toEqual(
 				expect.objectContaining( {
 					mapById: expect.objectContaining( {
 						4: expect.objectContaining( { name: 'nba' } ),

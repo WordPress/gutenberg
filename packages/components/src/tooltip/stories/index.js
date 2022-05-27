@@ -18,7 +18,7 @@ export default {
 	title: 'Components/ToolTip',
 	component: Tooltip,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

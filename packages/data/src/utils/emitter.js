@@ -1,7 +1,7 @@
 /**
  * Create an event emitter.
  *
- * @return {import("../types").WPDataEmitter} Emitter.
+ * @return {import("../types").DataEmitter} Emitter.
  */
 export function createEmitter() {
 	let isPaused = false;

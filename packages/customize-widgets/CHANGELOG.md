@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 3.6.0 (2022-05-18)
+
+## 3.5.0 (2022-05-04)
+
+## 3.4.0 (2022-04-21)
+
+## 3.3.0 (2022-04-08)
+
+## 3.2.0 (2022-03-23)
+
+## 3.1.0 (2022-03-11)
+
+## 3.0.0 (2022-02-10)
+
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fix
+
+-   Removed unused `@wordpress/a11y` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 2.1.0 (2022-01-27)
+
 ## 2.0.0 (2021-07-29)
 
 ### Breaking Change

@@ -18,7 +18,7 @@ export default {
 	title: 'Components/ToolbarButton',
 	component: ToolbarButton,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

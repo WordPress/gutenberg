@@ -28,14 +28,14 @@ export function useHasDimensionsPanel( name ) {
 
 function useHasPadding( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.customPadding', name );
+	const [ settings ] = useSetting( 'spacing.padding', name );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ settings ] = useSetting( 'spacing.customMargin', name );
+	const [ settings ] = useSetting( 'spacing.margin', name );
 
 	return settings && supports.includes( 'margin' );
 }
@@ -43,8 +43,13 @@ function useHasMargin( name ) {
 function useHasGap( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ settings ] = useSetting( 'spacing.blockGap', name );
-
-	return settings && supports.includes( '--wp--style--block-gap' );
+	// Do not show the gap control panel for block-level global styles
+	// as they do not work on the frontend.
+	// See: https://github.com/WordPress/gutenberg/pull/39845.
+	// We can revert this condition when they're working again.
+	return !! name
+		? false
+		: settings && supports.includes( '--wp--style--block-gap' );
 }
 
 function filterValuesBySides( values, sides ) {

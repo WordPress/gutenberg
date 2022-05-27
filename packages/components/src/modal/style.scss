@@ -37,6 +37,11 @@
 		animation: components-modal__appear-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
+
+		&.is-full-screen {
+			width: 90vw;
+			min-height: 90vh;
+		}
 	}
 
 	@include break-large() {
@@ -120,5 +125,14 @@
 		content: "";
 		display: block;
 		margin-bottom: $grid-unit-30;
+	}
+
+	&.hide-header {
+		margin-top: 0;
+		padding-top: $grid-unit-30;
+
+		&::before {
+			content: none;
+		}
 	}
 }

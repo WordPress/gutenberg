@@ -8,8 +8,12 @@ import classnames from 'classnames';
  */
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { SVG, Rect } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import OverlayMenuIcon from './overlay-menu-icon';
 
 export default function ResponsiveWrapper( {
 	children,
@@ -18,12 +22,16 @@ export default function ResponsiveWrapper( {
 	isResponsive,
 	onToggle,
 	isHiddenByDefault,
+	classNames,
+	styles,
+	hasIcon,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
 	}
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
+		classNames,
 		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
@@ -36,46 +44,43 @@ export default function ResponsiveWrapper( {
 
 	const modalId = `${ id }-modal`;
 
+	const dialogProps = {
+		className: 'wp-block-navigation__responsive-dialog',
+		...( isOpen && {
+			role: 'dialog',
+			'aria-modal': true,
+			'aria-label': __( 'Menu' ),
+		} ),
+	};
+
 	return (
 		<>
 			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-expanded={ isOpen }
 					aria-label={ __( 'Open menu' ) }
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
-					<SVG
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 24 24"
-						width="24"
-						height="24"
-						role="img"
-						aria-hidden="true"
-						focusable="false"
-					>
-						<Rect x="4" y="7.5" width="16" height="1.5" />
-						<Rect x="4" y="15" width="16" height="1.5" />
-					</SVG>
+					{ hasIcon && <OverlayMenuIcon /> }
+					{ ! hasIcon && (
+						<span className="wp-block-navigation__toggle_button_label">
+							{ __( 'Menu' ) }
+						</span>
+					) }
 				</Button>
 			) }
 
 			<div
 				className={ responsiveContainerClasses }
+				style={ styles }
 				id={ modalId }
-				aria-hidden={ ! isOpen }
 			>
 				<div
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
 				>
-					<div
-						className="wp-block-navigation__responsive-dialog"
-						role="dialog"
-						aria-modal="true"
-						aria-labelledby={ `${ modalId }-title` }
-					>
+					<div { ...dialogProps }>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ __( 'Close menu' ) }

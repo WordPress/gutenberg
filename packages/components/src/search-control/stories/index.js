@@ -17,7 +17,7 @@ export default {
 	title: 'Components/SearchControl',
 	component: SearchControl,
 	parameters: {
-		knobs: { disabled: false },
+		knobs: { disable: false },
 	},
 };
 

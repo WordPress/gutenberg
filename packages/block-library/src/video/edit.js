@@ -32,7 +32,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -61,7 +61,8 @@ function VideoEdit( {
 	const { id, caption, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
 	);
 
 	useEffect( () => {
@@ -70,9 +71,7 @@ function VideoEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { url } ] ) => {
-						setAttributes( { src: url } );
-					},
+					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: ( message ) => {
 						noticeOperations.createErrorNotice( message );
 					},
@@ -91,9 +90,9 @@ function VideoEdit( {
 
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error
+			// In this case there was an error
 			// previous attributes should be removed
-			// because they may be temporary blob urls
+			// because they may be temporary blob urls.
 			setAttributes( {
 				src: undefined,
 				id: undefined,
@@ -102,8 +101,8 @@ function VideoEdit( {
 			return;
 		}
 
-		// sets the block's attribute and updates the edit component from the
-		// selected media
+		// Sets the block's attribute and updates the edit component from the
+		// selected media.
 		setAttributes( {
 			src: media.url,
 			id: media.id,
@@ -191,7 +190,7 @@ function VideoEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Video settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
 						setAttributes={ setAttributes }
 						attributes={ attributes }
@@ -275,7 +274,9 @@ function VideoEdit( {
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 					/>
 				) }

@@ -266,9 +266,9 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '' } } );
 			fireEvent.blur( numberInput );
 
-			// Reset to 50. Median value of min: 0, max: 100
+			// Reset to 50. Median value of min: 0, max: 100.
 			expect( rangeInput.value ).toBe( '50' );
-			// Input field should be blank
+			// Input field should be blank.
 			expect( numberInput.value ).toBe( '' );
 		} );
 	} );

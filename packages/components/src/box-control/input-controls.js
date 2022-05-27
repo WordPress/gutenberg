@@ -7,6 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
@@ -91,25 +92,35 @@ export default function BoxInputControls( {
 				align="top"
 				className="component-box-control__input-controls"
 			>
-				{ filteredSides.map( ( side ) => (
-					<UnitControl
-						{ ...props }
-						isFirst={ first === side }
-						isLast={ last === side }
-						isOnly={ only === side }
-						value={ values[ side ] }
-						unit={
-							values[ side ] ? undefined : selectedUnits[ side ]
-						}
-						onChange={ createHandleOnChange( side ) }
-						onUnitChange={ createHandleOnUnitChange( side ) }
-						onFocus={ createHandleOnFocus( side ) }
-						onHoverOn={ createHandleOnHoverOn( side ) }
-						onHoverOff={ createHandleOnHoverOff( side ) }
-						label={ LABELS[ side ] }
-						key={ `box-control-${ side }` }
-					/>
-				) ) }
+				{ filteredSides.map( ( side ) => {
+					const [
+						parsedQuantity,
+						parsedUnit,
+					] = parseQuantityAndUnitFromRawValue( values[ side ] );
+
+					const computedUnit = values[ side ]
+						? parsedUnit
+						: selectedUnits[ side ];
+
+					return (
+						<UnitControl
+							{ ...props }
+							isFirst={ first === side }
+							isLast={ last === side }
+							isOnly={ only === side }
+							value={ [ parsedQuantity, computedUnit ].join(
+								''
+							) }
+							onChange={ createHandleOnChange( side ) }
+							onUnitChange={ createHandleOnUnitChange( side ) }
+							onFocus={ createHandleOnFocus( side ) }
+							onHoverOn={ createHandleOnHoverOn( side ) }
+							onHoverOff={ createHandleOnHoverOff( side ) }
+							label={ LABELS[ side ] }
+							key={ `box-control-${ side }` }
+						/>
+					);
+				} ) }
 			</Layout>
 		</LayoutContainer>
 	);

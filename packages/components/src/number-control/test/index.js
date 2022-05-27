@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -63,6 +63,68 @@ describe( 'NumberControl', () => {
 
 			expect( spy ).toHaveBeenCalledWith( '10' );
 		} );
+
+		it( 'should call onChange callback when value is clamped on blur', async () => {
+			const spy = jest.fn();
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 4 }
+					max={ 10 }
+					onChange={ ( v ) => spy( v ) }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 1 } } );
+
+			// Before blurring, the value is still un-clamped
+			expect( input.value ).toBe( '1' );
+
+			input.blur();
+
+			// After blur, value is clamped
+			expect( input.value ).toBe( '4' );
+
+			// After the blur, the `onChange` callback fires asynchronously.
+			await waitFor( () => {
+				expect( spy ).toHaveBeenCalledTimes( 2 );
+				expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
+				expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
+			} );
+		} );
+
+		it( 'should call onChange callback when value is not valid', () => {
+			const spy = jest.fn();
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 1 }
+					max={ 10 }
+					onChange={ ( v, extra ) =>
+						spy( v, extra.event.target.validity.valid )
+					}
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 14 } } );
+
+			expect( input.value ).toBe( '14' );
+
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '10' );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+
+			// First call: invalid, unclamped value
+			expect( spy ).toHaveBeenNthCalledWith( 1, '14', false );
+			// Second call: valid, clamped value
+			expect( spy ).toHaveBeenNthCalledWith( 2, 10, true );
+		} );
 	} );
 
 	describe( 'Validation', () => {
@@ -80,6 +142,22 @@ describe( 'NumberControl', () => {
 			 */
 
 			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should clamp value within range on blur', () => {
+			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 41 } } );
+
+			// Before blurring, the value is still un-clamped
+			expect( input.value ).toBe( '41' );
+
+			input.blur();
+
+			// After blur, value is clamped
+			expect( input.value ).toBe( '10' );
 		} );
 
 		it( 'should parse to number value on ENTER keypress when required', () => {

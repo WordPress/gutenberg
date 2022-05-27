@@ -30,7 +30,7 @@ export function useCardDivider( props ) {
 				'components-card__divider',
 				className
 			),
-		[ className ]
+		[ className, cx ]
 	);
 
 	return {

@@ -10,6 +10,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -39,7 +40,9 @@ export const settings = {
 			return;
 		}
 
-		return startCase( entity.title?.rendered || entity.slug );
+		return (
+			decodeEntities( entity.title?.rendered ) || startCase( entity.slug )
+		);
 	},
 	edit,
 };
@@ -49,4 +52,32 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/template-part',
 	enhanceTemplatePartVariations
+);
+
+// Prevent adding template parts inside post templates.
+const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+addFilter(
+	'blockEditor.__unstableCanInsertBlockType',
+	'removeTemplatePartsFromPostTemplates',
+	(
+		can,
+		blockType,
+		rootClientId,
+		{ getBlock, getBlockParentsByBlockName }
+	) => {
+		if ( blockType.name !== 'core/template-part' ) {
+			return can;
+		}
+
+		for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+			const hasDisallowedParent =
+				getBlock( rootClientId )?.name === disallowedParentType ||
+				getBlockParentsByBlockName( rootClientId, disallowedParentType )
+					.length;
+			if ( hasDisallowedParent ) {
+				return false;
+			}
+		}
+		return true;
+	}
 );

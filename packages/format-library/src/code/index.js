@@ -46,7 +46,7 @@ export const code = {
 	},
 	edit( { value, onChange, onFocus, isActive } ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
@@ -56,6 +56,7 @@ export const code = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},
