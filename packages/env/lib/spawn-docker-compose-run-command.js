@@ -4,7 +4,7 @@
 const { spawn } = require( 'child_process' );
 
 /**
- * @typedef {import('../config').Config} Config
+ * @typedef {import('./config').Config} Config
  */
 
 /**

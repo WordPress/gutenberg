@@ -50,7 +50,7 @@ module.exports = async function run( {
 	}
 
 	// We're going to run the script in the selected container.
-	const container = environment === 'tests' ? 'tests-wordpress' : 'wordpress';
+	const container = environment === 'tests' ? 'tests-cli' : 'cli';
 	const spawnCommand = execScript.script + ' ' + scriptArgs.join( ' ' );
 
 	if ( debug ) {
