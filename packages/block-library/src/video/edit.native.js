@@ -36,7 +36,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -169,7 +170,10 @@ class VideoEdit extends Component {
 				isFetchingVideo: true,
 			} );
 
-			// TODO: Check if video is valid and set attributes
+			// TODO: Check if video is valid and set attributes, and also handle errors
+			// setAttributes( { ... } )
+			// ...
+			// createErrorNotice(__('Image file not found.'));
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
@@ -394,5 +398,10 @@ export default compose( [
 			'inserter_menu'
 		),
 	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
+		return { createErrorNotice };
+	} ),
 	withPreferredColorScheme,
 ] )( VideoEdit );
