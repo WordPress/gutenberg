@@ -70,6 +70,9 @@ test.describe( 'Preview', () => {
 		await editorPage.bringToFront();
 		await editor.publishPost();
 
+		// Close the panel.
+		await page.locator( 'role=button[name="Close panel"]' ).click();
+
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.waitForSelector( 'role=textbox[name="Add title"]' );
@@ -210,11 +213,11 @@ test.describe( 'Preview', () => {
 test.describe( 'Preview with Custom Fields enabled', () => {
 	test.beforeEach( async ( { admin, previewUtils } ) => {
 		await admin.createNewPost();
-		previewUtils.toggleCustomFieldsOption( true );
+		await previewUtils.toggleCustomFieldsOption( true );
 	} );
 
 	test.afterEach( async ( { previewUtils } ) => {
-		previewUtils.toggleCustomFieldsOption( false );
+		await previewUtils.toggleCustomFieldsOption( false );
 	} );
 
 	// Catch regressions of https://github.com/WordPress/gutenberg/issues/12617
@@ -226,16 +229,20 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		const editorPage = page;
 
 		// Add an initial title and content.
-		await editorPage.type( 'role=textbox[name="Add title"]', 'title 1' );
-		await editorPage.keyboard.press( 'Enter' );
-		await editorPage.keyboard.type( 'content 1' );
+		await editorPage.type( 'role=textbox[name="Add title"i]', 'title 1' );
+		await editorPage.type(
+			'role=button[name="Add default block"i]',
+			'content 1'
+		);
 
 		// Publish the post and then close the publish panel.
 		await editor.publishPost();
+
+		// Close the panel.
 		await page.locator( 'role=button[name="Close panel"]' ).click();
 
 		// Open the preview page.
-		const previewPage = await editor.openPreviewPage( editorPage );
+		const previewPage = await editor.openPreviewPage();
 		await previewPage.waitForSelector( 'role=heading[level=1]' );
 
 		// Check the title and preview match.
@@ -247,11 +254,11 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editorPage.click( 'role=textbox[name="Add title"]' );
+		await editorPage.click( 'role=textbox[name="Add title"i]' );
 		await editorPage.keyboard.press( 'End' );
 		await editorPage.keyboard.press( 'Backspace' );
 		await editorPage.keyboard.type( '2' );
-		await editorPage.keyboard.press( 'Tab' );
+		await editorPage.click( 'role=document >> text="content 1"' );
 		await editorPage.keyboard.press( 'End' );
 		await editorPage.keyboard.press( 'Backspace' );
 		await editorPage.keyboard.type( '2' );
@@ -287,10 +294,10 @@ test.describe( 'Preview with private custom post type', () => {
 		await admin.createNewPost( { postType: 'not_public' } );
 
 		// Type in the title filed.
-		await page.type( 'role=textbox[name="Add title"]', 'aaaaa' );
+		await page.type( 'role=textbox[name="Add title"i]', 'aaaaa' );
 
 		// Open the preview menu.
-		await page.click( 'role=button[name="Preview"]' );
+		await page.click( 'role=button[name="Preview"i]' );
 
 		const previewMenu = page.locator( 'role=menu' );
 		await expect( previewMenu ).not.toContainText( 'Preview in new tab' );
@@ -304,31 +311,33 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[expanded=false][name="Preview"]'
+			'role=button[name="Preview"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {
 			await previewToggle.click();
 		}
 
-		await this.page.click( 'role=menuitem[name="Preview in new tab"]' );
+		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
 		return previewPage.waitForNavigation();
 	}
 
 	async toggleCustomFieldsOption( shouldBeChecked ) {
 		// Open preferences dialog.
-		const headerToolbar = this.page.locator(
-			'role=region[name="Editor top bar"]'
+
+		await this.page.click(
+			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
 		);
-		await headerToolbar.locator( 'role=button[name="Options"]' ).click();
-		await this.page.locator( 'role=button[name="Preferences"]' ).click();
+		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
 		// Navigate to panels section.
-		await this.page.locator( 'role=tab[name="Panels"]' ).click();
+		await this.page.click(
+			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+		);
 
 		// Find custom fields checkbox.
 		const customFieldsCheckbox = this.page.locator(
-			'role=checkbox[name="Custom fields"]'
+			'role=checkbox[name="Custom fields"i]'
 		);
 
 		if ( shouldBeChecked ) {
@@ -348,6 +357,6 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click( 'role=button[name="Close dialog"]' );
+		await this.page.click( 'role=button[name="Close dialog"i]' );
 	}
 }
