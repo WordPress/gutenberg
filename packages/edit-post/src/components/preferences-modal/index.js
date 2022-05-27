@@ -155,7 +155,7 @@ export default function EditPostPreferencesModal() {
 							<EnableFeature
 								featureName="strictColorContrastChecks"
 								help={ __(
-									'Makes the color contrast checker more strict, to comply with WCAG AAA guidelines.'
+									'Switches the color contrast checker to be more strict, complying with WCAG AAA guidelines instead of WCAG AA.'
 								) }
 								label={ __( 'Strict color-contrast checker' ) }
 							/>
