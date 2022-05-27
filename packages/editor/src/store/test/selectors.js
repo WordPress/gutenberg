@@ -2968,7 +2968,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} ).description
 			).toEqual( 'test description' );
 		} );
@@ -2996,7 +2996,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'Default (Index)',
@@ -3008,7 +3008,7 @@ describe( 'selectors', () => {
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
 					title: { rendered: 'test title' },
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'test title',
