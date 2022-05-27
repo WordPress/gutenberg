@@ -6,12 +6,6 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
