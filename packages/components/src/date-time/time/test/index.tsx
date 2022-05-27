@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import TimePicker from '../time';
+import TimePicker from '..';
 
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {
@@ -90,7 +90,7 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T10:00:00' );
 	} );
 
-	it( 'should not call onChange with an updated hour (12-hour clock) if the hour is out of bounds', async () => {
+	it( 'should call onChange with a bounded hour (12-hour clock) if the hour is out of bounds', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
@@ -111,7 +111,7 @@ describe( 'TimePicker', () => {
 		await user.type( hoursInput, '22' );
 		await user.keyboard( '{Tab}' );
 
-		expect( onChangeSpy ).not.toHaveBeenCalled();
+		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T00:00:00' );
 	} );
 
 	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
@@ -138,7 +138,7 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T22:00:00' );
 	} );
 
-	it( 'should not call onChange with an updated minute if out of bounds', async () => {
+	it( 'should call onChange with a bounded minute if out of bounds', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
@@ -159,7 +159,7 @@ describe( 'TimePicker', () => {
 		await user.type( minutesInput, '99' );
 		await user.keyboard( '{Tab}' );
 
-		expect( onChangeSpy ).not.toHaveBeenCalled();
+		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:59:00' );
 	} );
 
 	it( 'should switch to PM correctly', async () => {

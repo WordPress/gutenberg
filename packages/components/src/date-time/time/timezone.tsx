@@ -7,7 +7,8 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import Tooltip from '../tooltip';
+import Tooltip from '../../tooltip';
+import { TimeZone as StyledComponent } from './styles';
 
 /**
  * Displays timezone information when user timezone is different from site
@@ -38,7 +39,9 @@ const TimeZone = () => {
 
 	return (
 		<Tooltip position="top center" text={ timezoneDetail }>
-			<div className="components-datetime__timezone">{ zoneAbbr }</div>
+			<StyledComponent className="components-datetime__timezone">
+				{ zoneAbbr }
+			</StyledComponent>
 		</Tooltip>
 	);
 };
