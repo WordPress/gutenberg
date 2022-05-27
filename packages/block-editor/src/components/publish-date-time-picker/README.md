@@ -4,8 +4,7 @@
 a post will be published. It wraps the `<DateTimePicker />` component found in
 `@wordpress/components` and adds additional post-specific controls.
 
-See [the documentation for
-DateTimePicker](https://github.com/WordPress/gutenberg/tree/trunk/packages/components/src/date-time)
+See [the documentation for DateTimePicker](/packages/components/src/date-time)
 for more information.
 
 ## Usage
@@ -43,8 +42,7 @@ const MyDateTimePicker = () => {
 ## Props
 
 `PublishDateTimePicker` supports all of the props that
-[`DateTimePicker`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components/src/date-time#Props)
-supports, plus:
+[`DateTimePicker`](/packages/components/src/date-time#Props) supports, plus:
 
 ### onClose
 
