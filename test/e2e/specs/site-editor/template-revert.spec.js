@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRevertUtils: async ( { editor, page }, use ) => {
-		await use( new TemplateRevertUtils( { editor, page } ) );
+	templateRevertUtils: async ( { page }, use ) => {
+		await use( new TemplateRevertUtils( { page } ) );
 	},
 } );
 
@@ -26,15 +26,19 @@ test.describe( 'Template Revert', () => {
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 
-		await page.click( 'role=button[name="Show template details"]' );
+		await page.click( 'role=button[name="Show template details"i]' );
 
 		// The revert button isn't visible anymore.
 		await expect(
@@ -43,11 +47,15 @@ test.describe( 'Template Revert', () => {
 	} );
 
 	test( 'should show the original content after revert', async ( {
+		editor,
 		templateRevertUtils,
 	} ) => {
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
@@ -58,11 +66,15 @@ test.describe( 'Template Revert', () => {
 
 	test( 'should show the original content after revert and page reload', async ( {
 		admin,
+		editor,
 		templateRevertUtils,
 	} ) => {
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
@@ -73,10 +85,14 @@ test.describe( 'Template Revert', () => {
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the header toolbar', async ( {
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
@@ -86,81 +102,95 @@ test.describe( 'Template Revert', () => {
 		const contentAfterSave = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).not.toEqual( contentAfterSave );
 
-		// Undo revert and check state again.
-		await page.click( 'role=button >> text="Undo"' );
+		// Undo revert by clicking header button and check state again.
+		await page.click(
+			'role=region[name="Header"] >> role=button[name="Undo"i]'
+		);
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).toEqual( contentAfterUndo );
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the notice', async ( {
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 
-		const snackBar = page.locator(
-			'role=button[name="Dismiss this notice"]'
+		// Click the snackbar "Undo" button.
+		await page.click(
+			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
 		);
-
-		await snackBar.locator( 'role=button >> text="Undo"' ).click();
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).toEqual( contentAfter );
 	} );
 
 	test( 'should show the original content after revert, clicking undo then redo in the header toolbar', async ( {
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
-		const headerToolbar = page.locator( 'role=region[name="Header"]' );
-		await headerToolbar.locator( '[aria-label="Undo"]' ).click();
+		await page.click(
+			'role=region[name="Header"] >> role=button[name="Undo"i]'
+		);
 
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).not.toEqual( contentAfterUndo );
 
-		const redoButton = headerToolbar.locator( '[aria-label="Redo"]' );
-
-		await redoButton.click();
+		await page.click(
+			'role=region[name="Header"] >> role=button[name="Redo"i]'
+		);
 
 		const contentAfterRedo = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).toEqual( contentAfterRedo );
 	} );
 
 	test( 'should show the original content after revert, clicking undo in the notice then undo in the header toolbar', async ( {
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 
 		// Click undo in the snackbar. This reverts revert template action.
-		const snackBar = page.locator(
-			'role=button[name="Dismiss this notice"]'
+		await page.click(
+			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
 		);
-		await snackBar.locator( 'role=button >> text="Undo"' ).click();
 
 		//Check we have dummy content.
 		const contentAfterFirstUndo = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).not.toEqual( contentAfterFirstUndo );
 
 		// Click undo again, this time in the header. Reverts initial dummy content.
-		const headerToolbar = page.locator( 'role=region[name="Header"]' );
-		await headerToolbar.locator( '[aria-label="Undo"]' ).click();
+		await page.click(
+			'role=region[name="Header"] >> role=button[name="Undo"i]'
+		);
 
 		// Check dummy content is gone.
 		const contentAfterSecondUndo = await templateRevertUtils.getCurrentSiteEditorContent();
@@ -169,18 +199,23 @@ test.describe( 'Template Revert', () => {
 
 	test( 'should show the edited content after revert, clicking undo in the header toolbar, save and reload', async ( {
 		admin,
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 
-		const headerToolbar = page.locator( 'role=region[name="Header"]' );
-		await headerToolbar.locator( '[aria-label="Undo"]' ).click();
+		await page.click(
+			'role=region[name="Header"] >> role=button[name="Undo"i]'
+		);
 
 		await templateRevertUtils.save();
 
@@ -192,20 +227,23 @@ test.describe( 'Template Revert', () => {
 
 	test( 'should show the edited content after revert, clicking undo in the notice and reload', async ( {
 		admin,
+		editor,
 		page,
 		templateRevertUtils,
 	} ) => {
-		await templateRevertUtils.addDummyText();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Test' },
+		} );
 		await templateRevertUtils.save();
 		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 
-		const snackBar = page.locator(
-			'role=button[name="Dismiss this notice"]'
+		await page.click(
+			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
 		);
-		await snackBar.locator( 'role=button >> text="Undo"' ).click();
 
 		await templateRevertUtils.save();
 		await admin.visitSiteEditor();
@@ -216,24 +254,21 @@ test.describe( 'Template Revert', () => {
 } );
 
 class TemplateRevertUtils {
-	constructor( { editor, page } ) {
-		this.editor = editor;
+	constructor( { page } ) {
 		this.page = page;
 	}
 
-	async addDummyText() {
-		await this.editor.insertBlock( { name: 'core/paragraph' } );
-		await this.page.keyboard.type( 'Test' );
-	}
-
 	async save() {
-		const headerToolbar = this.page.locator( 'role=region[name="Header"]' );
-		await headerToolbar.locator( 'role=button[name="Save"]' ).click();
-		// Second Save button in the entities panel.
-		const publishToolbar = this.page.locator(
-			'role=region[name="Publish"]'
+		await this.page.click(
+			'role=region[name="Header"] >> role=button[name="Save"i]'
 		);
-		await publishToolbar.locator( 'role=button[name="Save"]' ).click();
+		// Second Save button in the entities panel.
+		await this.page.click(
+			'role=region[name="Publish"] >> role=button[name="Save"i]'
+		);
+		await this.page.waitForSelector(
+			'role=region[name="Header"] >> role=button[name="Save"i][disabled]'
+		);
 	}
 
 	async revertTemplate() {
