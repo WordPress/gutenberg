@@ -13,6 +13,10 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
 
+## 1.76.2
+
+-   [*] Ensure post title gets focused when is notified from native side [#41371]
+
 ## 1.76.1
 
 -   [*] BlockList - Add internal onLayout from CellRendererComponent to BlockListItemCell [#41105]
