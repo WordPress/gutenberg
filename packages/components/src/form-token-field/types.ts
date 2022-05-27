@@ -121,10 +121,11 @@ export interface FormTokenFieldProps
 	tokenizeOnSpace?: boolean;
 	/**
 	 * Allows customizing the messages presented by screen readers in different occasions:
-	 *     -   `added` - The user added a new token.
-	 *     -   `removed` - The user removed an existing token.
-	 *     -   `remove` - The user focused the button to remove the token.
-	 *     -   `__experimentalInvalid` - The user tried to add a token that didn't pass the validation.
+	 *
+	 * -   `added`: The user added a new token.
+	 * -   `removed`: The user removed an existing token.
+	 * -   `remove` : The user focused the button to remove the token.
+	 * -   `__experimentalInvalid`: The user tried to add a token that didn't pass the validation.
 	 */
 	messages?: Messages;
 	/**
