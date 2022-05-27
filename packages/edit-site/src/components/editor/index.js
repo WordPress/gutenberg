@@ -9,6 +9,7 @@ import {
 	BlockContextProvider,
 	BlockBreadcrumb,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -66,6 +67,7 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -78,6 +80,7 @@ function Editor( { onError } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -114,6 +117,7 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
@@ -310,11 +314,14 @@ function Editor( { onError } ) {
 												</>
 											}
 											footer={
-												<BlockBreadcrumb
-													rootLabelText={ __(
-														'Template'
-													) }
-												/>
+												blockEditorMode !==
+												'zoom-out' ? (
+													<BlockBreadcrumb
+														rootLabelText={ __(
+															'Template'
+														) }
+													/>
+												) : undefined
 											}
 											shortcuts={ {
 												previous: previousShortcut,
