@@ -149,15 +149,6 @@ export function useInputControlStateReducer(
 		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
 		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
 	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
-
 		dispatch( {
 			type,
 			payload: { value: nextValue, event },
@@ -167,15 +158,6 @@ export function useInputControlStateReducer(
 	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
 		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
 	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
-
 		dispatch( { type, payload: { event } } );
 	};
 
