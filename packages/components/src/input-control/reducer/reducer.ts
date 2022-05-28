@@ -211,17 +211,14 @@ export function useInputControlStateReducer(
 		currentValueProp.current = initialState.value;
 	} );
 	useLayoutEffect( () => {
-		if (
-			state.value !== currentValueProp.current &&
-			! currentState.current.isDirty
-		) {
+		if ( state.value !== currentValueProp.current && ! state.isDirty ) {
 			onChangeHandler( state.value ?? '', {
 				event: currentState.current._event as
 					| ChangeEvent< HTMLInputElement >
 					| PointerEvent< HTMLInputElement >,
 			} );
 		}
-	}, [ state.value ] );
+	}, [ state.value, state.isDirty ] );
 	useLayoutEffect( () => {
 		if (
 			initialState.value !== currentState.current.value &&
