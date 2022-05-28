@@ -109,9 +109,7 @@ function inputControlStateReducer(
 				break;
 		}
 
-		if ( action.payload.event ) {
-			nextState._event = action.payload.event;
-		}
+		nextState._event = action.payload.event;
 
 		/**
 		 * Send the nextState + action to the composedReducers via
@@ -211,7 +209,11 @@ export function useInputControlStateReducer(
 		currentValueProp.current = initialState.value;
 	} );
 	useLayoutEffect( () => {
-		if ( state.value !== currentValueProp.current && ! state.isDirty ) {
+		if (
+			currentState.current._event !== undefined &&
+			state.value !== currentValueProp.current &&
+			! state.isDirty
+		) {
 			onChangeHandler( state.value ?? '', {
 				event: currentState.current._event as
 					| ChangeEvent< HTMLInputElement >
@@ -224,10 +226,10 @@ export function useInputControlStateReducer(
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
-			reset(
-				initialState.value,
-				currentState.current._event as SyntheticEvent
-			);
+			dispatch( {
+				type: actions.RESET,
+				payload: { value: initialState.value },
+			} );
 		}
 	}, [ initialState.value ] );
 
