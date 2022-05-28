@@ -203,18 +203,18 @@ export function useInputControlStateReducer(
 	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
 
 	const currentState = useRef( state );
-	const currentValueProp = useRef( initialState.value );
+	const refProps = useRef( { value: initialState.value, onChangeHandler } );
 	useLayoutEffect( () => {
 		currentState.current = state;
-		currentValueProp.current = initialState.value;
+		refProps.current = { value: initialState.value, onChangeHandler };
 	} );
 	useLayoutEffect( () => {
 		if (
 			currentState.current._event !== undefined &&
-			state.value !== currentValueProp.current &&
+			state.value !== refProps.current.value &&
 			! state.isDirty
 		) {
-			onChangeHandler( state.value ?? '', {
+			refProps.current.onChangeHandler( state.value ?? '', {
 				event: currentState.current._event as
 					| ChangeEvent< HTMLInputElement >
 					| PointerEvent< HTMLInputElement >,
