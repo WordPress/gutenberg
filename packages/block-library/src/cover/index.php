@@ -18,7 +18,7 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
+	if ( ! ( $attributes['hasParallax'] ) ) {
 		$attr = array(
 			'class'           => 'wp-block-cover__image-background',
 			'data-object-fit' => 'cover',
