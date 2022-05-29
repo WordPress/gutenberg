@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import BaseInputControl from '../';
+
+const setupUser = () =>
+	userEvent.setup( {
+		advanceTimers: jest.advanceTimersByTime,
+	} );
 
 const getInput = () => screen.getByTestId( 'input' );
 
@@ -42,48 +48,52 @@ describe( 'InputControl', () => {
 	} );
 
 	describe( 'Ensurance of focus for number inputs', () => {
-		it( 'should focus its input on mousedown events', () => {
+		it( 'should focus its input on mousedown events', async () => {
+			const user = setupUser();
 			const spy = jest.fn();
 			render( <InputControl type="number" onFocus={ spy } /> );
+			const target = getInput();
 
-			const input = getInput();
-			fireEvent.mouseDown( input );
+			// Hovers the input and presses (without releasing) primary button.
+			await user.pointer( [
+				{ target },
+				{ keys: '[MouseLeft]', target },
+			] );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
 	describe( 'Value', () => {
-		it( 'should update value onChange', () => {
+		it( 'should update value onChange', async () => {
+			const user = setupUser();
 			const spy = jest.fn();
 			render( <InputControl value="Hello" onChange={ spy } /> );
-
 			const input = getInput();
-			input.focus();
-			fireEvent.change( input, { target: { value: 'There' } } );
 
-			expect( input.value ).toBe( 'There' );
-			expect( spy ).toHaveBeenCalledTimes( 1 );
+			await user.type( input, ' there' );
+
+			expect( input ).toHaveValue( 'Hello there' );
+			expect( spy ).toHaveBeenCalledTimes( 6 );
 		} );
 
-		it( 'should work as a controlled component', () => {
+		it( 'should work as a controlled component', async () => {
+			const user = setupUser();
 			const spy = jest.fn();
 			const { rerender } = render(
 				<InputControl value="one" onChange={ spy } />
 			);
-
 			const input = getInput();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 'two' } } );
+			await user.type( input, '2' );
 
 			// Ensuring <InputControl /> is controlled.
-			fireEvent.blur( input );
+			await user.click( document.body );
 
-			// Updating the value.
+			// Updating the value via props.
 			rerender( <InputControl value="three" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'three' );
+			expect( input ).toHaveValue( 'three' );
 
 			/*
 			 * onChange called only once. onChange is not called when a
@@ -98,7 +108,6 @@ describe( 'InputControl', () => {
 			const { rerender } = render(
 				<InputControl value="Original" onChange={ spy } />
 			);
-
 			const input = getInput();
 
 			// Assuming <InputControl /> is controlled (not focused)
@@ -106,12 +115,12 @@ describe( 'InputControl', () => {
 			// Updating the value.
 			rerender( <InputControl value="New" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'New' );
+			expect( input ).toHaveValue( 'New' );
 
 			// Change it back to the original value.
 			rerender( <InputControl value="Original" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'Original' );
+			expect( input ).toHaveValue( 'Original' );
 			expect( spy ).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
