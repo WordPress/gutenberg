@@ -123,5 +123,53 @@ describe( 'InputControl', () => {
 			expect( input ).toHaveValue( 'Original' );
 			expect( spy ).toHaveBeenCalledTimes( 0 );
 		} );
+
+		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
+			const user = setupUser();
+			const spy = jest.fn();
+			render(
+				<InputControl
+					value=""
+					onChange={ ( v ) => spy( v ) }
+					isPressEnterToChange
+				/>
+			);
+			const input = getInput();
+
+			await user.type( input, 'that was then' );
+			await user.click( document.body );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( spy ).toHaveBeenCalledWith( 'that was then' );
+		} );
+
+		it( 'should commit value when blurred if value is invalid', async () => {
+			const user = setupUser();
+			const spyChange = jest.fn();
+			render(
+				<InputControl
+					value="this is"
+					onChange={ ( v ) => spyChange( v ) }
+					// If the value contains 'now' it is not valid.
+					pattern="(?!.*now)^.*$"
+					__unstableStateReducer={ ( state, action ) => {
+						let { value } = state;
+						if (
+							action.type === 'COMMIT' &&
+							action.payload.event.type === 'blur'
+						)
+							value = value.replace( /\bnow\b/, 'meow' );
+
+						return { ...state, value };
+					} }
+				/>
+			);
+			const input = getInput();
+
+			await user.type( input, ' now' );
+			await user.click( document.body );
+
+			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
+		} );
 	} );
 } );
