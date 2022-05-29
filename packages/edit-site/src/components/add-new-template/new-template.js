@@ -99,7 +99,7 @@ export default function NewTemplate( { postType } ) {
 				'postType',
 				'wp_template',
 				{
-					excerpt: description,
+					description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',

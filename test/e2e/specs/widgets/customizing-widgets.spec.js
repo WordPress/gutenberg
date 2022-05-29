@@ -52,6 +52,11 @@ test.describe( 'Widgets Customizer', () => {
 			)
 		).toBeVisible();
 
+		// Clear block selection, so the block toolbar isn't visible.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
 		await widgetsCustomizerPage.addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
 

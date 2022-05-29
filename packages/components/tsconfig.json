@@ -82,6 +82,7 @@
 		"src/surface/**/*",
 		"src/text/**/*",
 		"src/text-control/**/*",
+		"src/textarea-control/**/*",
 		"src/tip/**/*",
 		"src/toggle-group-control/**/*",
 		"src/tools-panel/**/*",

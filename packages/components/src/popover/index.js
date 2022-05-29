@@ -180,11 +180,11 @@ const Popover = (
 		__unstableForcePosition
 			? undefined
 			: size( {
-					apply( { width, height } ) {
+					apply( sizeProps ) {
+						const { height } = sizeProps;
 						if ( ! refs.floating.current ) return;
-
+						// Reduce the height of the popover to the available space.
 						Object.assign( refs.floating.current.firstChild.style, {
-							maxWidth: `${ width }px`,
 							maxHeight: `${ height }px`,
 							overflow: 'auto',
 						} );
@@ -194,6 +194,7 @@ const Popover = (
 		shift( {
 			crossAxis: true,
 			limiter: limitShift(),
+			padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 		} ),
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );

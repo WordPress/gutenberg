@@ -75,7 +75,7 @@ export function getGradientAstWithControlPoints(
 			return {
 				length: {
 					type: '%',
-					value: position.toString(),
+					value: position?.toString(),
 				},
 				type: a < 1 ? 'rgba' : 'rgb',
 				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
