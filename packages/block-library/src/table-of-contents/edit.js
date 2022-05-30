@@ -13,7 +13,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	PanelBody,
 	Placeholder,
@@ -57,9 +57,16 @@ export default function TableOfContentsEdit( {
 	const blockProps = useBlockProps();
 	const disabledRef = useDisabled();
 
-	const listBlockExists = useSelect(
-		( select ) => !! select( blocksStore ).getBlockType( 'core/list' ),
-		[]
+	const canInsertList = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } = select(
+				blockEditorStore
+			);
+			const rootClientId = getBlockRootClientId( clientId );
+
+			return canInsertBlockType( 'core/list', rootClientId );
+		},
+		[ clientId ]
 	);
 
 	const {
@@ -222,7 +229,7 @@ export default function TableOfContentsEdit( {
 
 	const headingTree = linearToNestedHeadingList( headings );
 
-	const toolbarControls = listBlockExists && (
+	const toolbarControls = canInsertList && (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton

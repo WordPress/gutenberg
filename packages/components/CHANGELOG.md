@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Popover`, `Dropdown`, `CustomGradientPicker`: Fix dropdown positioning by always targeting the rendered toggle, and switch off width in the Popover size middleware to stop reducing the width of the popover. ([#41361](https://github.com/WordPress/gutenberg/pull/41361))
+-   Fix `InputControl` blocking undo/redo while focused. ([#40518](https://github.com/WordPress/gutenberg/pull/40518))
+
 ### Enhancements
 
 -   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
+-   `ColorPicker`: Strip leading hash character from hex values pasted into input. ([#41223](https://github.com/WordPress/gutenberg/pull/41223))
+-   `ColorPicker`: Display detailed color inputs by default. ([#41222](https://github.com/WordPress/gutenberg/pull/41222))
+-   Updated design for the `DateTimePicker`, `DatePicker` and `TimePicker` components ([#41097](https://github.com/WordPress/gutenberg/pull/41097)).
+-   `DateTimePicker`: Add `__nextRemoveHelpButton` and `__nextRemoveResetButton` for opting into new behaviour where there is no Help and Reset button ([#41097](https://github.com/WordPress/gutenberg/pull/41097)).
 
 ### Internal
 
@@ -15,6 +24,7 @@
 -   `TimePicker`: Update unit tests to use `@testing-library/user-event` ([#41270](https://github.com/WordPress/gutenberg/pull/41270)).
 -   `DateTimePicker`: Update `moment` to 2.26.0 and update `react-date` typings ([#41266](https://github.com/WordPress/gutenberg/pull/41266)).
 -   `TextareaControl`: Convert to TypeScript ([#41215](https://github.com/WordPress/gutenberg/pull/41215)).
+-   `BoxControl`: Update unit tests to use `@testing-library/user-event` ([#41422](https://github.com/WordPress/gutenberg/pull/41422)).
 -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
 
 ### Experimental

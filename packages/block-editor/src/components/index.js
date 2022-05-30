@@ -147,6 +147,7 @@ export { default as useBlockDisplayInformation } from './use-block-display-infor
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
+export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 
 /*
  * State Related Components

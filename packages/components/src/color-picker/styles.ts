@@ -111,10 +111,14 @@ export const ColorfulWrapper = styled.div`
 	${ inputHeightStyle }
 `;
 
-export const DetailsControlButton = styled( Button )`
+export const CopyButton = styled( Button )`
 	&&&&& {
 		min-width: ${ space( 6 ) };
 		padding: 0;
+
+		> svg {
+			margin-right: 0;
+		}
 	}
 `;
 
