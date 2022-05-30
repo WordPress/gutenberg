@@ -157,6 +157,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( inputHasValidValue() ) {
 			setIsActive( false );
 		} else {
+			// Reset to initial state
 			setIncompleteTokenValue( '' );
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
