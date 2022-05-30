@@ -89,7 +89,7 @@ function GradientColorPickerDropdown( {
 			result.position = 'bottom left';
 		}
 		return result;
-	}, [ gradientPickerDomRef.current, isRenderedInSidebar ] );
+	}, [ gradientPickerDomRef, isRenderedInSidebar ] );
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
