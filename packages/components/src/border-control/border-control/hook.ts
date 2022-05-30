@@ -106,7 +106,7 @@ export function useBorderControl(
 	);
 
 	const onSliderChange = useCallback(
-		( value: string ) => {
+		( value: number ) => {
 			onWidthChange( `${ value }${ widthUnit }` );
 		},
 		[ onWidthChange, widthUnit ]

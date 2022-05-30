@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -35,67 +35,75 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 
+import type { WordPressComponentProps } from '../ui/context';
+import type { RangeControlProps } from './types';
+
 const noop = () => {};
 
-function RangeControl(
-	{
+function RangeControl< P >(
+	props: WordPressComponentProps< RangeControlProps< P >, 'div' >,
+	ref: ForwardedRef< HTMLDivElement >
+) {
+	const {
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
 		className,
-		currentInput,
 		color: colorProp = COLORS.ui.theme,
+		currentInput,
 		disabled = false,
 		help,
+		hideLabelFromVision = false,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
-		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
-		onMouseMove = noop,
 		onMouseLeave = noop,
+		onMouseMove = noop,
 		railColor,
-		resetFallbackValue,
 		renderTooltipContent = ( v ) => v,
-		showTooltip: showTooltipProp,
+		resetFallbackValue,
 		shiftStep = 10,
+		showTooltip: showTooltipProp,
 		step = 1,
 		trackColor,
 		value: valueProp,
 		withInputField = true,
-		...props
-	},
-	ref
-) {
+		...otherProps
+	} = props;
+
 	const [ value, setValue ] = useControlledRangeValue( {
 		min,
 		max,
-		value: valueProp,
+		value: valueProp ?? null,
 		initial: initialPosition,
 	} );
 	const isResetPendent = useRef( false );
 
+	let hasTooltip = showTooltipProp;
+	let hasInputField = withInputField;
+
 	if ( step === 'any' ) {
 		// The tooltip and number input field are hidden when the step is "any"
 		// because the decimals get too lengthy to fit well.
-		showTooltipProp = false;
-		withInputField = false;
+		hasTooltip = false;
+		hasInputField = false;
 	}
 
-	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
+	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
 	const [ isFocused, setIsFocused ] = useState( false );
 
-	const inputRef = useRef();
+	const inputRef = useRef< HTMLInputElement >();
 
-	const setRef = ( nodeRef ) => {
+	const setRef = ( nodeRef: HTMLInputElement ) => {
 		inputRef.current = nodeRef;
 
-		if ( ref ) {
+		if ( typeof ref === 'function' ) {
 			ref( nodeRef );
 		}
 	};
@@ -107,10 +115,13 @@ function RangeControl(
 	const currentValue = value !== undefined ? value : currentInput;
 
 	const inputSliderValue = isValueReset ? '' : currentValue;
+	const numericValue = parseFloat( `${ value }` );
+	const rangeFillValue = isValueReset
+		? ( max - min ) / 2 + min
+		: numericValue;
 
-	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
-
-	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+	const calculatedFillValue =
+		( ( rangeFillValue - min ) / ( max - min ) ) * 100;
 	const fillValue = isValueReset ? 50 : calculatedFillValue;
 	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
@@ -125,14 +136,14 @@ function RangeControl(
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = showTooltipProp !== false && Number.isFinite( value );
 
-	const handleOnRangeChange = ( event ) => {
+	const handleOnRangeChange = ( event: ChangeEvent< HTMLInputElement > ) => {
 		const nextValue = parseFloat( event.target.value );
 		setValue( nextValue );
 		onChange( nextValue );
 	};
 
-	const handleOnChange = ( nextValue ) => {
-		nextValue = parseFloat( nextValue );
+	const handleOnChange = ( next: string ) => {
+		let nextValue: number | null = parseFloat( next );
 		setValue( nextValue );
 		/*
 		 * Calls onChange only when nextValue is numeric
@@ -157,8 +168,8 @@ function RangeControl(
 	};
 
 	const handleOnReset = () => {
-		let resetValue = parseFloat( resetFallbackValue );
-		let onChangeResetValue = resetValue;
+		let resetValue: number | null = parseFloat( `${ resetFallbackValue }` );
+		let onChangeResetValue: number | undefined = resetValue;
 
 		if ( isNaN( resetValue ) ) {
 			resetValue = null;
@@ -186,13 +197,13 @@ function RangeControl(
 	const handleShowTooltip = () => setShowTooltip( true );
 	const handleHideTooltip = () => setShowTooltip( false );
 
-	const handleOnBlur = ( event ) => {
+	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
 		setIsFocused( false );
 		handleHideTooltip();
 	};
 
-	const handleOnFocus = ( event ) => {
+	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
 		onFocus( event );
 		setIsFocused( true );
 		handleShowTooltip();
@@ -207,7 +218,7 @@ function RangeControl(
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
+			id={ `${ id }` }
 			help={ help }
 		>
 			<Root className="components-range-control__root">
@@ -222,11 +233,11 @@ function RangeControl(
 					marks={ !! marks }
 				>
 					<InputRange
-						{ ...props }
+						{ ...otherProps }
 						className="components-range-control__slider"
 						describedBy={ describedBy }
 						disabled={ disabled }
-						id={ id }
+						id={ `${ id }` }
 						label={ label }
 						max={ max }
 						min={ min }
@@ -237,7 +248,7 @@ function RangeControl(
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
 						step={ step }
-						value={ inputSliderValue }
+						value={ inputSliderValue ?? undefined }
 					/>
 					<RangeRail
 						aria-hidden={ true }
@@ -280,7 +291,7 @@ function RangeControl(
 						<Icon icon={ afterIcon } />
 					</AfterIconWrapper>
 				) }
-				{ withInputField && (
+				{ hasInputField && (
 					<InputNumber
 						aria-label={ label }
 						className="components-range-control__number"
@@ -314,6 +325,28 @@ function RangeControl(
 	);
 }
 
+/**
+ * RangeControls are used to make selections from a range of incremental values.
+ *
+ * ```jsx
+ * import { RangeControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyRangeControl = () => {
+ *   const [ isChecked, setChecked ] = useState( true );
+ *   return (
+ *     <RangeControl
+ *       help="Please select how transparent you would like this."
+ *       initialPosition={50}
+ *       label="Opacity"
+ *       max={100}
+ *       min={0}
+ *       onChange={() => {}}
+ *     />
+ *   );
+ * };
+ * ```
+ */
 const ForwardedComponent = forwardRef( RangeControl );
 
 export default ForwardedComponent;

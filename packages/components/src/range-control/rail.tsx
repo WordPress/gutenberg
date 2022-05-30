@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -10,15 +9,27 @@ import { isRTL } from '@wordpress/i18n';
 import RangeMark from './mark';
 import { MarksWrapper, Rail } from './styles/range-control-styles';
 
-export default function RangeRail( {
-	disabled = false,
-	marks = false,
-	min = 0,
-	max = 100,
-	step = 1,
-	value = 0,
-	...restProps
-} ) {
+import type { WordPressComponentProps } from '../ui/context';
+import type {
+	MarksProps,
+	RangeMarkProps,
+	RailProps,
+	useMarksArgs,
+} from './types';
+
+export default function RangeRail(
+	props: WordPressComponentProps< RailProps, 'span' >
+) {
+	const {
+		disabled = false,
+		marks = false,
+		min = 0,
+		max = 100,
+		step = 1,
+		value,
+		...restProps
+	} = props;
+
 	return (
 		<>
 			<Rail disabled={ disabled } { ...restProps } />
@@ -29,24 +40,24 @@ export default function RangeRail( {
 					min={ min }
 					max={ max }
 					step={ step }
-					value={ value }
+					value={ value ?? ( max - min ) / 2 + min }
 				/>
 			) }
 		</>
 	);
 }
 
-function Marks( {
-	disabled = false,
-	marks = false,
-	min = 0,
-	max = 100,
-	step = 1,
-	value = 0,
-} ) {
-	if ( step === 'any' ) {
-		step = 1;
-	}
+function Marks( props: WordPressComponentProps< MarksProps, 'span' > ) {
+	const {
+		disabled = false,
+		marks = false,
+		min = 0,
+		max = 100,
+		step: stepProp = 1,
+		value = 0,
+	} = props;
+
+	const step = stepProp === 'any' ? 1 : stepProp;
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (
@@ -66,7 +77,13 @@ function Marks( {
 	);
 }
 
-function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+function useMarks( {
+	marks,
+	min = 0,
+	max = 100,
+	step = 1,
+	value = 0,
+}: useMarksArgs ) {
 	if ( ! marks ) {
 		return [];
 	}
@@ -78,7 +95,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		while ( count > marks.push( { value: step * marks.length + min } ) );
 	}
 
-	const placedMarks = [];
+	const placedMarks: RangeMarkProps[] = [];
 	marks.forEach( ( mark, index ) => {
 		if ( mark.value < min || mark.value > max ) {
 			return;
