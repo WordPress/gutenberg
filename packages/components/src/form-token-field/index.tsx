@@ -85,6 +85,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	const instanceId = useInstanceId( FormTokenField );
 
+	// We reset to these initial values again in the onBlur
 	const [ incompleteTokenValue, setIncompleteTokenValue ] = useState( '' );
 	const [ inputOffsetFromEnd, setInputOffsetFromEnd ] = useState( 0 );
 	const [ isActive, setIsActive ] = useState( false );
