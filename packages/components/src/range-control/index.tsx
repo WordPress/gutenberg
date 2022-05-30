@@ -347,6 +347,6 @@ function RangeControl< P >(
  * };
  * ```
  */
-const ForwardedComponent = forwardRef( RangeControl );
+export const ForwardedComponent = forwardRef( RangeControl );
 
 export default ForwardedComponent;
