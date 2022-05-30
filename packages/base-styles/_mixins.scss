@@ -202,6 +202,11 @@
 	}
 }
 
+@mixin mark-style() {
+	background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	font-weight: 500;
+}
+
 
 /**
  * Allows users to opt-out of animations via OS-level preferences.
