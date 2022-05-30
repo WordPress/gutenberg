@@ -59,8 +59,9 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
  * @link https://core.trac.wordpress.org/ticket/53494.
  *
  * @param string $style String containing the CSS styles to be added.
+ * @param int    $priority To set the priority for the add_action.
  */
-function gutenberg_enqueue_block_support_styles( $style ) {
+function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 	$action_hook_name = 'wp_footer';
 	if ( wp_is_block_theme() ) {
 		$action_hook_name = 'wp_head';
@@ -69,6 +70,7 @@ function gutenberg_enqueue_block_support_styles( $style ) {
 		$action_hook_name,
 		static function () use ( $style ) {
 			echo "<style>$style</style>\n";
-		}
+		},
+		$priority
 	);
 }
