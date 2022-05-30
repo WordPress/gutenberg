@@ -126,10 +126,10 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
+require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
