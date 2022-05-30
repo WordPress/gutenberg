@@ -495,7 +495,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			return getMatchingSuggestions()[ selectedSuggestionIndex ];
 		}
 
-		return null;
+		return undefined;
 	}
 
 	function valueContainsToken( token: string ) {
