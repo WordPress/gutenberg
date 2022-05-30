@@ -246,6 +246,7 @@ class VideoEdit extends Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 						onSelect={ this.onSelectMediaUploadOption }
+						onSelectURL={ this.onSelectURL }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
