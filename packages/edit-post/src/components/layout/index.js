@@ -134,23 +134,13 @@ function Layout( { styles } ) {
 		};
 	}, [] );
 
-	const noChromeOpened =
-		! sidebarIsOpened && ! isListViewOpened && ! isInserterOpened;
-
 	const [ isDistractionFree, setIsDistractionFree ] = useState(
 		hasReducedUI
 	);
 
 	useEffect( () => {
 		setIsDistractionFree( hasReducedUI );
-		// if ( hasReducedUI && ! noChromeOpened ) {
-		// 	toggleFeature( 'reducedUI' );
-		// 	createInfoNotice( __( 'Distraction free mode turned off.' ), {
-		// 		speak: true,
-		// 		type: 'snackbar',
-		// 	} );
-		// }
-	}, [ noChromeOpened, hasReducedUI ] );
+	}, [ hasReducedUI ] );
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
