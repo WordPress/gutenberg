@@ -61,6 +61,8 @@ export interface FormTokenFieldProps
 	suggestions?: string[];
 	/**
 	 * The maximum number of suggestions to display at a time.
+	 *
+	 * @default 100
 	 */
 	maxSuggestions?: number;
 	/**
