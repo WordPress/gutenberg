@@ -59,6 +59,14 @@
 			}
 		}
 	},
+	"styles": [
+		{
+			"name": "regular",
+			"label": "Default",
+			"isDefault": true
+		},
+		{ "name": "tablet-stack", "label": "Tablet stack" }
+	],
 	"editorStyle": "wp-block-columns-editor",
 	"style": "wp-block-columns"
 }
