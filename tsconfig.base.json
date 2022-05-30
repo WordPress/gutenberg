@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"allowJs": true,
 		"checkJs": true,
 		"allowSyntheticDefaultImports": true,
@@ -13,9 +12,7 @@
 		"composite": true,
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
-		"paths": {
-			"csstype": ["./node_modules/csstype/"]
-		  },
+
 		/* Strict Type-Checking Options */
 		"strict": true,
 
