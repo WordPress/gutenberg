@@ -42,6 +42,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import style from './style.scss';
 import SvgIconRetry from './icon-retry';
 import VideoCommonSettings from './edit-common-settings';
@@ -162,18 +163,23 @@ class VideoEdit extends Component {
 		setAttributes( { id, src: url } );
 	}
 
-	onSelectURL( newURL ) {
-		const { createErrorNotice } = this.props;
+	onSelectURL( newSrc ) {
+		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( newURL ) ) {
+		if ( isURL( newSrc ) ) {
 			this.setState( {
 				isFetchingVideo: true,
 			} );
 
-			// TODO: Check if video is valid and set attributes, and also handle errors
-			// setAttributes( { ... } )
-			// ...
-			// createErrorNotice(__('Image file not found.'));
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
+			if ( undefined !== embedBlock ) {
+				onReplace( embedBlock );
+				return;
+			}
+			setAttributes( { src: newSrc, id: undefined, poster: undefined } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
