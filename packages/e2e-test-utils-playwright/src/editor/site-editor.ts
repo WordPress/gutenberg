@@ -26,3 +26,36 @@ export async function saveSiteEditorEntities( this: Editor ) {
 		'.edit-site-save-button__button:not(.is-busy)'
 	);
 }
+
+/**
+ * Toggles the global styles sidebar (opens it if closed and closes it if open).
+ *
+ * @param {Editor} this
+ */
+export async function toggleGlobalStyles( this: Editor ) {
+	await this.page.click(
+		'.edit-site-header__actions button[aria-label="Styles"]'
+	);
+}
+
+/**
+ * Opens a global styles panel.
+ *
+ * @param {Editor} this
+ * @param {string} panelName Name of the panel that is going to be opened.
+ */
+export async function openGlobalStylesPanel( this: Editor, panelName: string ) {
+	const selector = `xpath=//div[@aria-label="Settings"]//button[.//*[text()="${ panelName }"]]`;
+	await ( await this.page.locator( selector ) ).click();
+}
+
+/**
+ * Opens the previous global styles panel.
+ *
+ * @param {Editor} this
+ */
+export async function openPreviousGlobalStylesPanel( this: Editor ) {
+	await this.page.click(
+		'div[aria-label="Settings"] button[aria-label="Navigate to the previous view"]'
+	);
+}
