@@ -48,39 +48,18 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const classes = classnames( 'edit-post-header' );
 
-	const slideY = {
-		hidden: { y: '-50' },
-		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
-
-	const slideX = {
-		hidden: { x: '-100%' },
-		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
-	};
-
 	return (
 		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<motion.div
-					variants={ slideX }
-					transition={ { type: 'tween', delay: 0.8 } }
-				>
+				<div>
 					<FullscreenModeClose showTooltip />
-				</motion.div>
+				</div>
 			</MainDashboardButton.Slot>
-			<motion.div
-				variants={ slideY }
-				transition={ { type: 'tween', delay: 0.8 } }
-				className="edit-post-header__toolbar"
-			>
+			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />
 				<TemplateTitle />
-			</motion.div>
-			<motion.div
-				variants={ slideY }
-				transition={ { type: 'tween', delay: 0.8 } }
-				className="edit-post-header__settings"
-			>
+			</div>
+			<motion.div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because

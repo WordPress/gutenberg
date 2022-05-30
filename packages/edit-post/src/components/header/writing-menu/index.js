@@ -21,22 +21,22 @@ function WritingMenu() {
 
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
-			{ ! hasReducedUI && (
-				<PreferenceToggleMenuItem
-					scope="core/edit-post"
-					name="fixedToolbar"
-					label={ __( 'Top toolbar' ) }
-					info={ __(
-						'Access all block and document tools in a single place'
-					) }
-					messageActivated={ __( 'Top toolbar activated' ) }
-					messageDeactivated={ __( 'Top toolbar deactivated' ) }
-				/>
-			) }
+			<PreferenceToggleMenuItem
+				scope="core/edit-post"
+				disabled={ hasReducedUI }
+				name="fixedToolbar"
+				label={ __( 'Top toolbar' ) }
+				info={ __(
+					'Access all block and document tools in a single place'
+				) }
+				messageActivated={ __( 'Top toolbar activated' ) }
+				messageDeactivated={ __( 'Top toolbar deactivated' ) }
+			/>
 			<PreferenceToggleMenuItem
 				scope="core/edit-post"
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
+				disabled={ hasReducedUI }
 				info={ __( 'Focus on one block at a time' ) }
 				messageActivated={ __( 'Spotlight mode activated' ) }
 				messageDeactivated={ __( 'Spotlight mode deactivated' ) }
@@ -45,6 +45,7 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
+				disabled={ hasReducedUI }
 				info={ __( 'Show and hide admin UI' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }

@@ -20,6 +20,7 @@ export default function PreferenceToggleMenuItem( {
 	messageActivated,
 	messageDeactivated,
 	shortcut,
+	disabled = false,
 } ) {
 	const isActive = useSelect(
 		( select ) => !! select( preferencesStore ).get( scope, name ),
@@ -59,6 +60,7 @@ export default function PreferenceToggleMenuItem( {
 			role="menuitemcheckbox"
 			info={ info }
 			shortcut={ shortcut }
+			disabled={ disabled }
 		>
 			{ label }
 		</MenuItem>

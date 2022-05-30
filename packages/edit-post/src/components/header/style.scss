@@ -31,6 +31,68 @@
 	}
 }
 
+.is-distraction-free {
+	.edit-post-header {
+		box-shadow: none;
+		position: absolute;
+		width: 100vw;
+		background-color: rgba(255, 255, 255, 0);
+
+		// hide everything
+		& > .edit-post-header__settings > *,
+		& > .edit-post-header__toolbar {
+			visibility: hidden;
+		}
+
+		& > .edit-post-header__settings > .editor-post-publish-button,
+		& > .edit-post-header__settings > .editor-post-publish-panel__toggle,
+		& > .edit-post-header__settings .interface-more-menu-dropdown {
+			visibility: visible;
+			opacity: 0;
+		}
+
+		// remove the pinned items
+		& .interface-pinned-items {
+			display: none;
+		}
+
+		// show the full screen toggle
+		& > div:first-child {
+			opacity: 1;
+			a {
+				transition: width 0.2s, height 0.2s, margin 0.2s;
+				width: 50px;
+				height: 50px;
+				margin: 5px;
+			}
+		}
+
+		&:hover {
+			transition: background-color 0.4s, box-shadow 0.4s;
+			background-color: rgba(255, 255, 255, 1);
+			box-shadow: $shadow-popover;
+			// show the publish button and the more button
+			> .edit-post-header__settings > .editor-post-publish-button,
+			> .edit-post-header__settings > .editor-post-publish-panel__toggle,
+			> .edit-post-header__settings .interface-more-menu-dropdown {
+				transition: opacity 0.2s;
+				opacity: 1;
+			}
+
+		}
+
+		.components-editor-notices__dismissible {
+			position: absolute;
+			top: 0;
+			width: 100vw;
+			z-index: z-index(".interface-interface-skeleton__actions");
+		}
+
+
+	}
+
+}
+
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;

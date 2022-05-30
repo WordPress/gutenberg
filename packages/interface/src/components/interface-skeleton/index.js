@@ -10,10 +10,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useEffect } from '@wordpress/element';
-import {
-	__unstableUseNavigateRegions as useNavigateRegions,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -44,7 +41,6 @@ function InterfaceSkeleton(
 		labels,
 		className,
 		shortcuts,
-		isDistractionFree,
 	},
 	ref
 ) {
@@ -71,14 +67,6 @@ function InterfaceSkeleton(
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
-	const headerVariants = {
-		hidden: { opacity: 0 },
-		hover: {
-			opacity: 1,
-			transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-		},
-	};
-
 	return (
 		<div
 			{ ...navigateRegionsProps }
@@ -102,19 +90,14 @@ function InterfaceSkeleton(
 			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
-					<motion.div
-						animate={ isDistractionFree ? 'hidden' : 'hover' }
-						initial="hidden"
-						whileHover="hover"
-						variants={ headerVariants }
-						transition={ { type: 'tween', delay: 0.8 } }
+					<div
 						className="interface-interface-skeleton__header"
 						role="region"
 						aria-label={ mergedLabels.header }
 						tabIndex="-1"
 					>
 						{ header }
-					</motion.div>
+					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
