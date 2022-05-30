@@ -21,6 +21,8 @@
 	// For all button sizes allow sufficient space for the
 	// dropdown "arrow" icon to display.
 	&.components-custom-select-control__button {
+		padding-top: $grid-unit-05;
+		padding-bottom: $grid-unit-05;
 		// TODO: Some of these can be removed after some internal inconsistencies are addressed, such as the chevron
 		// (https://github.com/WordPress/gutenberg/issues/39400) and Button padding (https://github.com/WordPress/gutenberg/issues/39431)
 		padding-left: $grid-unit-20;
@@ -35,6 +37,12 @@
 	&:focus:not(:disabled) {
 		border-color: var(--wp-admin-theme-color);
 		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+	}
+
+	.components-custom-select-control__button-image {
+		max-height: 100%;
+		width: auto;
+		margin-right: $grid-unit-05;
 	}
 
 	.components-custom-select-control__button-icon {
@@ -74,7 +82,7 @@
 .components-custom-select-control__item {
 	align-items: center;
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: auto 30px;
 	list-style-type: none;
 	padding: $grid-unit-10 $grid-unit-20;
 	cursor: default;
@@ -84,11 +92,24 @@
 		padding: $grid-unit-10;
 	}
 
+	&.has-image {
+		grid-template-columns: max-content auto 30px;
+	}
 	&.has-hint {
 		grid-template-columns: auto auto 30px;
 	}
+	&.has-image.has-hint {
+		grid-template-columns: max-content auto auto 30px;
+	}
+
 	&.is-highlighted {
 		background: $gray-300;
+	}
+
+	.components-custom-select-control__item-image {
+		max-height: $button-size - $grid-unit-05 * 2 - $border-width * 2;
+		width: auto;
+		margin-right: $grid-unit-05;
 	}
 	.components-custom-select-control__item-hint {
 		color: $gray-700;

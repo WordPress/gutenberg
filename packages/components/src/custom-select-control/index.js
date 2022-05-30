@@ -151,6 +151,15 @@ export default function CustomSelectControl( {
 					describedBy: getDescribedBy(),
 				} ) }
 			>
+				{ selectedItem.__experimentalImage && (
+					<img
+						className="components-custom-select-control__button-image"
+						alt=""
+						width={ 32 }
+						height={ 32 }
+						{ ...selectedItem.__experimentalImage }
+					/>
+				) }
 				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
@@ -179,6 +188,7 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
+										'has-image': !! item.__experimentalImage,
 										'has-hint': !! item.__experimentalHint,
 										'is-next-36px-default-size': __next36pxDefaultSize,
 									}
@@ -186,6 +196,15 @@ export default function CustomSelectControl( {
 								style: item.style,
 							} ) }
 						>
+							{ item.__experimentalImage && (
+								<img
+									className="components-custom-select-control__item-image"
+									alt=""
+									width={ 32 }
+									height={ 32 }
+									{ ...item.__experimentalImage }
+								/>
+							) }
 							{ item.name }
 							{ item.__experimentalHint && (
 								<span className="components-custom-select-control__item-hint">

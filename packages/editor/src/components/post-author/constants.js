@@ -1,6 +1,6 @@
 export const AUTHORS_QUERY = {
 	who: 'authors',
 	per_page: 50,
-	_fields: 'id,name',
+	_fields: 'id,name,avatar_urls',
 	context: 'view', // Allows non-admins to perform requests.
 };

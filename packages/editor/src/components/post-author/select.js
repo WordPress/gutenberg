@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { SelectControl } from '@wordpress/components';
+import { CustomSelectControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -27,25 +27,34 @@ function PostAuthorSelect() {
 
 	const authorOptions = useMemo( () => {
 		return ( authors ?? [] ).map( ( author ) => {
+			const [ avatarSize, avatarURL ] = Object.entries(
+				author.avatar_urls
+			).find( ( [ size ] ) => size >= 26 * 2 );
 			return {
-				value: author.id,
-				label: decodeEntities( author.name ),
+				key: author.id,
+				name: decodeEntities( author.name ),
+				__experimentalImage: {
+					src: avatarURL,
+					width: avatarSize / 2,
+					height: avatarSize / 2,
+				},
 			};
 		} );
 	}, [ authors ] );
 
-	const setAuthorId = ( value ) => {
-		const author = Number( value );
+	const setAuthorId = ( option ) => {
+		const author = Number( option.key );
 		editPost( { author } );
 	};
 
 	return (
-		<SelectControl
-			className="post-author-selector"
+		<CustomSelectControl
+			className="editor-post-author-select"
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			onChange={ setAuthorId }
-			value={ postAuthor }
+			value={ authorOptions.find( ( { key } ) => key === postAuthor ) }
+			__next36pxDefaultSize
 		/>
 	);
 }

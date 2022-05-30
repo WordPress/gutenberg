@@ -87,3 +87,60 @@ WithHints.args = {
 		},
 	],
 };
+
+export const WithImages = CustomSelectControl.bind( {} );
+WithImages.args = {
+	...Default.args,
+	options: [
+		{
+			key: 'adam',
+			name: 'Adam Zielinski',
+			__experimentalImage: {
+				src:
+					'https://www.gravatar.com/avatar/3b7ea537531208d83deed8f3e78bc771?s=100&r=g',
+				width: 48,
+				height: 48,
+			},
+		},
+		{
+			key: 'greg',
+			name: 'Greg Ziółkowski',
+			__experimentalImage: {
+				src:
+					'https://www.gravatar.com/avatar/475d323ceec2e73597729eef1c5bf263?s=100&r=g',
+				width: 48,
+				height: 48,
+			},
+		},
+		{
+			key: 'robert',
+			name: 'Robert Anderson',
+			__experimentalImage: {
+				src:
+					'https://www.gravatar.com/avatar/c9ae983c4a94490f209c06dd46b801e4?s=100&r=g',
+				width: 48,
+				height: 48,
+			},
+		},
+		{
+			key: 'george',
+			name: 'George Mamadashvili',
+			__experimentalImage: {
+				src:
+					'https://www.gravatar.com/avatar/ddda3dc3a8502b3e1889905a9d500f3f?s=100&r=g',
+				width: 48,
+				height: 48,
+			},
+		},
+		{
+			key: 'isabel',
+			name: 'Isabel Brison',
+			__experimentalImage: {
+				src:
+					'https://www.gravatar.com/avatar/0236f3f6facfcca37aa798f9c6766116?s=100&r=g',
+				width: 48,
+				height: 48,
+			},
+		},
+	],
+};
