@@ -135,11 +135,13 @@ export interface FormTokenFieldProps
 	 */
 	__experimentalExpandOnFocus?: boolean;
 	/**
-	 * If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+	 * If passed, all introduced values will be validated before being added as tokens.
 	 */
 	__experimentalValidateInput?: ( token: string ) => boolean;
 	/**
-	 *  If passed, all introduced values will be validated before being added as tokens.
+	 * If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+	 *
+	 * @default true
 	 */
 	__experimentalShowHowTo?: boolean;
 }
