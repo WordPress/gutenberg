@@ -30,7 +30,7 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 	add_action(
 		$action_hook_name,
 		static function () use ( $style ) {
-			echo "<style>$style</style>\n";
+			echo '<style>' . esc_html( $style ) . "</style>\n";
 		},
 		$priority
 	);
