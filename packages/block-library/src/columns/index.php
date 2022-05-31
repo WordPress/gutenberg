@@ -51,15 +51,7 @@ function block_core_columns_render( $attributes, $content ) {
 	);
 
 	$style = '.' . $class . '{ --wp--style--unstable-columns-gap: ' . $gap_value . ';}';
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style> ' . $style . '</style>';
-		}
-	);
+	gutenberg_enqueue_block_support_styles( $style, 11 );
 	return $content;
 }
 
