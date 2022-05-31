@@ -98,6 +98,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		},
 		fetchRequest: jest.fn(),
 		requestPreview: jest.fn(),
+		generateHapticFeedback: jest.fn(),
 	};
 } );
 
