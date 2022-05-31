@@ -34,7 +34,7 @@ function VariationsButtons( {
 			{ variations.map( ( variation ) => (
 				<Button
 					key={ variation.name }
-					icon={ <BlockIcon icon={ variation.icon } /> }
+					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
 					label={
 						selectedValue === variation.name
