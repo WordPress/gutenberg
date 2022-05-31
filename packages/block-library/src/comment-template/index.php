@@ -101,11 +101,16 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	return sprintf(
+	$block_wrapper = sprintf( '<gutenberg-interactive-block data-gutenberg-block-type="%1$s" data-gutenberg-hydrate="idle" data-gutenberg-context-used="%2$s">', $block->name, json_encode( $block->context ) );
+
+	$actual_block = sprintf(
 		'<ol %1$s>%2$s</ol>',
 		$wrapper_attributes,
 		block_core_comment_template_render_comments( $comments, $block )
 	);
+
+	$template = '<template class="gutenberg-inner-blocks">' . $block_wrapper . $actual_block . '<template class="gutenberg-inner-blocks"></template>' . '</gutenberg-interactive-block>' . '</template>';
+	return $block_wrapper . $actual_block . $template . '</gutenberg-interactive-block>';
 }
 
 /**
