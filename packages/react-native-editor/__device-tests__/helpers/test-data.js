@@ -166,6 +166,10 @@ exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
 
+exports.paragraphBlockShortText = `<!-- wp:paragraph -->
+<p>Rock music approaches at high velocity.</p>
+<!-- /wp:paragraph -->`;
+
 exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
 <p>multiple lines<br>multiple lines<br>multiple lines</p>
 <!-- /wp:paragraph -->`;
@@ -177,3 +181,7 @@ exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
 exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
 <p>ABCD</p>
 <!-- /wp:paragraph -->`;
+
+exports.spacerBlock = `<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->`;
