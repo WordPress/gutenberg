@@ -333,10 +333,10 @@ Attribute definition:
 Attribute available in the block:
 ```js
 {
-  "images": [
-    { "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
-    { "url": "https://lorempixel.com/50/50/", "alt": "small image" }
-  ]
+	"images": [
+		{ "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
+		{ "url": "https://lorempixel.com/50/50/", "alt": "small image" }
+	]
 }
 ```
 
