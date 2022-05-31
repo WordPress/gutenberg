@@ -117,12 +117,18 @@ export default withSelect( ( select ) => {
 		isMatchingSearchTerm,
 	} = select( blocksStore );
 	const { getHiddenBlockTypes } = select( editPostStore );
-	const hiddenBlockTypes = getHiddenBlockTypes();
+
+	const blockTypes = getBlockTypes();
+	const hiddenBlockTypes = getHiddenBlockTypes().filter( ( hiddenBlock ) => {
+		return blockTypes.some(
+			( registeredBlock ) => registeredBlock.name === hiddenBlock
+		);
+	} );
 	const numberOfHiddenBlocks =
 		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 	return {
-		blockTypes: getBlockTypes(),
+		blockTypes,
 		categories: getCategories(),
 		hasBlockSupport,
 		isMatchingSearchTerm,
