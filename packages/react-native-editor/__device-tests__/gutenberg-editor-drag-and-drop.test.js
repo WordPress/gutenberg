@@ -58,7 +58,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			blockNames.paragraph
 		);
 
-		// Set cliboard text
+		// Set clipboard text
 		const base64String = Buffer.from( testData.shortText ).toString(
 			'base64'
 		);
@@ -90,7 +90,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 			blockNames.shortcode
 		);
 
-		// Set cliboard text
+		// Set clipboard text
 		const base64String = Buffer.from( testData.shortText ).toString(
 			'base64'
 		);
