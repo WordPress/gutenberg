@@ -156,7 +156,7 @@ test.describe( 'Template Revert', () => {
 		expect( contentBefore ).not.toEqual( contentAfterUndo );
 
 		await page.click(
-			'role=region[name="Header"] >> role=button[name="Redo"i]'
+			'role=region[name="Header"i] >> role=button[name="Redo"i]'
 		);
 
 		const contentAfterRedo = await templateRevertUtils.getCurrentSiteEditorContent();
