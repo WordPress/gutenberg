@@ -260,14 +260,14 @@ class TemplateRevertUtils {
 
 	async save() {
 		await this.page.click(
-			'role=region[name="Header"] >> role=button[name="Save"i]'
+			'role=region[name="Header"i] >> role=button[name="Save"i]'
 		);
 		// Second Save button in the entities panel.
 		await this.page.click(
-			'role=region[name="Publish"] >> role=button[name="Save"i]'
+			'role=region[name="Publish"i] >> role=button[name="Save"i]'
 		);
 		await this.page.waitForSelector(
-			'role=region[name="Header"] >> role=button[name="Save"i][disabled]'
+			'role=region[name="Header"i] >> role=button[name="Save"i][disabled]'
 		);
 	}
 
