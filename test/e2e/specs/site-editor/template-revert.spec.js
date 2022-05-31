@@ -242,7 +242,7 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.save();
 
 		await page.click(
-			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
+			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
 		await templateRevertUtils.save();
