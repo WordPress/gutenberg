@@ -180,7 +180,7 @@ test.describe( 'Template Revert', () => {
 
 		// Click undo in the snackbar. This reverts revert template action.
 		await page.click(
-			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
+			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
 		//Check we have dummy content.
