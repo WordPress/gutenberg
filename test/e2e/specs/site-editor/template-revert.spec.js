@@ -149,7 +149,7 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 		await page.click(
-			'role=region[name="Header"] >> role=button[name="Undo"i]'
+			'role=region[name="Header"i] >> role=button[name="Undo"i]'
 		);
 
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
