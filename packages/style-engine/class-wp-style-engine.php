@@ -31,6 +31,13 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
+	 * Registered styles.
+	 *
+	 * @var WP_Style_Engine_Store|null
+	 */
+	private $block_supports_store = null;
+
+	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -216,6 +223,13 @@ class WP_Style_Engine {
 	);
 
 	/**
+	 * Gather internals.
+	 */
+	public function __construct() {
+		$this->block_supports_store = new WP_Style_Engine_Store( 'block_supports' );
+	}
+
+	/**
 	 * Utility method to retrieve the main instance of the class.
 	 *
 	 * The instance will be created if it does not exist yet.
@@ -228,6 +242,19 @@ class WP_Style_Engine {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Global public interface to register block support styles support.
+	 *
+	 * @access private
+	 *
+	 * @param string $key Unique key for a $style_data object.
+	 * @param array  $style_data Associative array of style information.
+	 * @return void
+	 */
+	public function register_block_support_styles( $key, $style_data ) {
+		$this->block_supports_store->register( $key, $style_data );
 	}
 
 	/**
@@ -513,3 +540,21 @@ function wp_style_engine_generate( $block_styles, $options = array() ) {
 	}
 	return null;
 }
+
+// @TODO Just testing!
+/**
+ * Global public interface to register block support styles support.
+ *
+ * @access public
+ *
+ * @param string $key Unique key for a $style_data object.
+ * @param array  $style_data Associative array of style information.
+ * @return void
+ */
+function wp_style_engine_register_block_support_styles( $key, $style_data ) {
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		$style_engine = WP_Style_Engine::get_instance();
+		$style_engine->register_block_support_styles( $key, $style_data );
+	}
+}
+
