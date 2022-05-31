@@ -119,7 +119,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	);
 
 	$empty_template = sprintf( $template_wrapper, '' );
-	$template = sprintf( $template_wrapper, sprintf( $block_wrapper, $actual_block . $empty_template ) );
+	$template       = sprintf( $template_wrapper, sprintf( $block_wrapper, $actual_block . $empty_template ) );
 	return sprintf( $block_wrapper, $actual_block . $template );
 }
 
