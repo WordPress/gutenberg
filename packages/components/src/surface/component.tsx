@@ -1,15 +1,21 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
  * Internal dependencies
  */
 import { contextConnect } from '../ui/context';
 import { View } from '../view';
 import { useSurface } from './hook';
+import type { SurfaceProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
- */
-function Surface( props, forwardedRef ) {
+function UnconnectedSurface(
+	props: WordPressComponentProps< SurfaceProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const surfaceProps = useSurface( props );
 
 	return <View { ...surfaceProps } ref={ forwardedRef } />;
@@ -35,6 +41,6 @@ function Surface( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedSurface = contextConnect( Surface, 'Surface' );
+export const Surface = contextConnect( UnconnectedSurface, 'Surface' );
 
-export default ConnectedSurface;
+export default Surface;

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import type { RenderResult } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,7 +10,7 @@ import { render } from '@testing-library/react';
 import { Surface } from '../index';
 
 describe( 'props', () => {
-	let base;
+	let base: RenderResult;
 	beforeEach( () => {
 		base = render( <Surface>Surface</Surface> );
 	} );
