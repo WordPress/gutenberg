@@ -618,8 +618,38 @@ const waitIfAndroid = async () => {
 	}
 };
 
+/**
+ * Content type definitions.
+ * Note: Android only supports plaintext.
+ *
+ * @typedef {"plaintext" | "image" | "url"} ClipboardContentType
+ */
+
+/**
+ * Helper to set content in the clipboard.
+ *
+ * @param {Object}               driver      Driver
+ * @param {string}               content     Content to set in the clipboard
+ * @param {ClipboardContentType} contentType Type of the content
+ */
+const setClipboard = async ( driver, content, contentType = 'plaintext' ) => {
+	const base64String = Buffer.from( content ).toString( 'base64' );
+	await driver.setClipboard( base64String, contentType );
+};
+
+/**
+ * Helper to clear the clipboard
+ *
+ * @param {Object}               driver      Driver
+ * @param {ClipboardContentType} contentType Type of the content
+ */
+const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
+	await driver.setClipboard( '', contentType );
+};
+
 module.exports = {
 	backspace,
+	clearClipboard,
 	clickBeginningOfElement,
 	clickElementOutsideOfTextInput,
 	clickIfClickable,
@@ -631,6 +661,7 @@ module.exports = {
 	isElementVisible,
 	isLocalEnvironment,
 	longPressMiddleOfElement,
+	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,

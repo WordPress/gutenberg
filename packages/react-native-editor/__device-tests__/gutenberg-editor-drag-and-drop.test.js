@@ -3,16 +3,18 @@
  */
 import { blockNames } from './pages/editor-page';
 import {
+	clearClipboard,
 	clickElementOutsideOfTextInput,
 	dragAndDropAfterElement,
 	isAndroid,
+	setClipboard,
 	tapPasteAboveElement,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 	beforeEach( async () => {
-		await editorPage.driver.setClipboard( '', 'plaintext' );
+		await clearClipboard( editorPage.driver );
 	} );
 
 	it( 'should be able to drag & drop a block', async () => {
@@ -59,10 +61,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		);
 
 		// Set clipboard text
-		const base64String = Buffer.from( testData.shortText ).toString(
-			'base64'
-		);
-		await editorPage.driver.setClipboard( base64String, 'plaintext' );
+		await setClipboard( editorPage.driver, testData.shortText );
 
 		// Dismiss auto-suggestion popup
 		if ( isAndroid() ) {
@@ -91,10 +90,7 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		);
 
 		// Set clipboard text
-		const base64String = Buffer.from( testData.shortText ).toString(
-			'base64'
-		);
-		await editorPage.driver.setClipboard( base64String, 'plaintext' );
+		await setClipboard( editorPage.driver, testData.shortText );
 
 		// Dismiss auto-suggestion popup
 		if ( isAndroid() ) {

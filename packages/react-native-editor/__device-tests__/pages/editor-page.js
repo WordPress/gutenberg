@@ -7,6 +7,7 @@ const {
 	isEditorVisible,
 	isElementVisible,
 	longPressMiddleOfElement,
+	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
@@ -227,9 +228,7 @@ class EditorPage {
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
-		const base64String = Buffer.from( html ).toString( 'base64' );
-
-		await this.driver.setClipboard( base64String, 'plaintext' );
+		await setClipboard( this.driver, html );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 

@@ -3,6 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 import {
+	clearClipboard,
 	longPressMiddleOfElement,
 	tapSelectAllAboveElement,
 	tapCopyAboveElement,
@@ -21,7 +22,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	}
 
 	beforeAll( async () => {
-		await editorPage.driver.setClipboard( '', 'plaintext' );
+		await clearClipboard( editorPage.driver );
 	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
