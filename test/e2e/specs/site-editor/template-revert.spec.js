@@ -127,7 +127,7 @@ test.describe( 'Template Revert', () => {
 
 		// Click the snackbar "Undo" button.
 		await page.click(
-			'role=button[name="Dismiss this notice"] >> role=button[name="Undo"i]'
+			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
