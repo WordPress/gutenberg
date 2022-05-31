@@ -189,7 +189,7 @@ test.describe( 'Template Revert', () => {
 
 		// Click undo again, this time in the header. Reverts initial dummy content.
 		await page.click(
-			'role=region[name="Header"] >> role=button[name="Undo"i]'
+			'role=region[name="Header"i] >> role=button[name="Undo"i]'
 		);
 
 		// Check dummy content is gone.
