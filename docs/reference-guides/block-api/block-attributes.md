@@ -230,7 +230,7 @@ Saved content:
 
 Attribute definition:
 ```js
-attributes: {
+{
 	content: {
 		type: 'string',
 		source: 'text',
@@ -259,7 +259,7 @@ Saved content:
 
 Attribute definition:
 ```js
-attributes {
+{
 	content: {
 		type: 'string',
 		source: 'html',
