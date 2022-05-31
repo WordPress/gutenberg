@@ -7,6 +7,7 @@ const {
 	isEditorVisible,
 	isElementVisible,
 	longPressMiddleOfElement,
+	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
@@ -227,9 +228,7 @@ class EditorPage {
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
-		const base64String = Buffer.from( html ).toString( 'base64' );
-
-		await this.driver.setClipboard( base64String, 'plaintext' );
+		await setClipboard( this.driver, html );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 
@@ -499,6 +498,15 @@ class EditorPage {
 	// =========================
 	// Paragraph Block functions
 	// =========================
+
+	async getParagraphBlockWrapperAtPosition( position = 1 ) {
+		// iOS needs a click to get the text element
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
+			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
+
+		return await waitForVisible( this.driver, blockLocator );
+	}
 
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
@@ -777,6 +785,29 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
+
+	// =========================
+	// Shortcode Block functions
+	// =========================
+
+	async getShortBlockTextInputAtPosition( blockName, position = 1 ) {
+		// iOS needs a click to get the text element
+		if ( ! isAndroid() ) {
+			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")])`;
+
+			const textBlock = await waitForVisible(
+				this.driver,
+				textBlockLocator
+			);
+			await textBlock.click();
+		}
+
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[@content-desc="Shortcode Block. Row ${ position }"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
+
+		return await waitForVisible( this.driver, blockLocator );
+	}
 }
 
 const blockNames = {
@@ -796,6 +827,7 @@ const blockNames = {
 	separator: 'Separator',
 	spacer: 'Spacer',
 	verse: 'Verse',
+	shortcode: 'Shortcode',
 };
 
 module.exports = { initializeEditorPage, blockNames };
