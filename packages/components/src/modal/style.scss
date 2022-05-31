@@ -122,22 +122,8 @@
 	padding: 0 $grid-unit-40 $grid-unit-30;
 	overflow: auto;
 
-	// Emulate margin-bottom for the header. Uses a pseudo-element since the
-	// absolutely positioned header’s margins wouldn’t effect siblings and
-	// padding-top on the content element would effect positioning of any
-	// sticky elements within.
-	&::before {
-		content: "";
-		display: block;
-		margin-bottom: $grid-unit-30;
-	}
-
 	&.hide-header {
 		margin-top: 0;
 		padding-top: $grid-unit-30;
-
-		&::before {
-			content: none;
-		}
 	}
 }
