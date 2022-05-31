@@ -22,9 +22,7 @@ test.use( {
 
 test.describe( 'Global styles variations', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'style-variations'
-		);
+		await requestUtils.activateTheme( 'style-variations' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
@@ -40,34 +38,151 @@ test.describe( 'Global styles variations', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Should have three variations available with the first one being active', async ( {
+	test( 'should have three variations available with the first one being active', async ( {
+		admin,
 		editor,
 		siteEditorStyleVariations,
 	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'style-variations//index',
+			postType: 'wp_template',
+		} );
 		await editor.toggleGlobalStyles();
 		await siteEditorStyleVariations.openOtherStyles();
+
 		const variations = await siteEditorStyleVariations.getAvailableStyleVariations();
-		expect( variations ).toHaveLength( 3 );
+
+		expect( await variations.count() ).toEqual( 3 );
+		expect( await variations.first().getAttribute( 'class' ) ).toContain(
+			'is-active'
+		);
 		expect(
-			await (
-				await variations[ 0 ].getProperty( 'className' )
-			 ).jsonValue()
-		).toContain( 'is-active' );
-		expect(
-			await (
-				await variations[ 1 ].getProperty( 'className' )
-			 ).jsonValue()
+			await variations.nth( 1 ).getAttribute( 'class' )
 		).not.toContain( 'is-active' );
 		expect(
-			await (
-				await variations[ 2 ].getProperty( 'className' )
-			 ).jsonValue()
+			await variations.nth( 2 ).getAttribute( 'class' )
 		).not.toContain( 'is-active' );
 	} );
-	test( 'Should apply preset colors and font sizes in a variation', async () => {} );
-	test( 'Should apply custom colors and font sizes in a variation', async () => {} );
-	test( 'Should apply a color palette in a variation', async () => {} );
-	test( 'Should reflect style variations in the styles applied to the editor', async () => {} );
+
+	test( 'should apply preset colors and font sizes in a variation', async ( {
+		admin,
+		editor,
+		siteEditorStyleVariations,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditorStyleVariations.applyPinkVariation();
+		await editor.openPreviousGlobalStylesPanel();
+
+		await siteEditorStyleVariations.openColorsPanel();
+		expect(
+			await siteEditorStyleVariations.getBackgroundColorValue()
+		).toBe( 'rgb(202, 105, 211)' );
+		expect( await siteEditorStyleVariations.getTextColorValue() ).toBe(
+			'rgb(74, 7, 74)'
+		);
+
+		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openTypographyPanel();
+		await siteEditorStyleVariations.openTextPanel();
+
+		expect( await siteEditorStyleVariations.getFontSizeHint() ).toBe(
+			'Medium(px)'
+		);
+	} );
+
+	test( 'should apply custom colors and font sizes in a variation', async ( {
+		admin,
+		editor,
+		siteEditorStyleVariations,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditorStyleVariations.applyYellowVariation();
+		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openColorsPanel();
+
+		expect(
+			await siteEditorStyleVariations.getBackgroundColorValue()
+		).toBe( 'rgb(255, 239, 11)' );
+		expect( await siteEditorStyleVariations.getTextColorValue() ).toBe(
+			'rgb(25, 25, 17)'
+		);
+
+		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openTypographyPanel();
+		await siteEditorStyleVariations.openTextPanel();
+
+		expect( await siteEditorStyleVariations.getFontSizeHint() ).toBe(
+			'(Custom)'
+		);
+		expect( await siteEditorStyleVariations.getCustomFontSizeValue() ).toBe(
+			'15'
+		);
+	} );
+
+	test( 'should apply a color palette in a variation', async ( {
+		admin,
+		editor,
+		siteEditorStyleVariations,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditorStyleVariations.applyPinkVariation();
+		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openColorsPanel();
+		await siteEditorStyleVariations.openPalettePanel();
+
+		expect(
+			await siteEditorStyleVariations.getThemePalette()
+		).toMatchObject( [
+			{
+				color: 'rgb(74, 7, 74)',
+				name: 'Foreground',
+			},
+			{
+				color: 'rgb(202, 105, 211)',
+				name: 'Background',
+			},
+			{
+				color: 'rgba(204, 0, 255, 0.77)',
+				name: 'Awesome pink',
+			},
+		] );
+	} );
+
+	test( 'should reflect style variations in the styles applied to the editor', async ( {
+		admin,
+		page,
+		siteEditorStyleVariations,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditorStyleVariations.applyYellowVariation();
+		const frame = await page.frameLocator(
+			'css=.edit-site-visual-editor iframe'
+		);
+		const paragraph = await frame.locator(
+			'xpath=//p[text()="My awesome paragraph"]'
+		);
+		const paragraphColor = await paragraph.evaluate( ( el ) => {
+			return window.getComputedStyle( el ).color;
+		} );
+		expect( paragraphColor ).toBe( 'rgb(25, 25, 17)' );
+		const body = await frame.locator( 'css=body' );
+		const backgroundColor = await body.evaluate( ( el ) => {
+			return window.getComputedStyle( el ).backgroundColor;
+		} );
+		expect( backgroundColor ).toBe( 'rgb(255, 239, 11)' );
+	} );
 } );
 
 class SiteEditorStyleVariations {
@@ -85,9 +200,9 @@ class SiteEditorStyleVariations {
 	}
 
 	async getAvailableStyleVariations() {
-		const selector = 'css=.edit-site-global-styles-variations_item';
-		await this.page.waitForSelector( selector );
-		return this.page.locator( selector );
+		return await this.page.locator(
+			'.edit-site-global-styles-variations_item'
+		);
 	}
 
 	async applyVariation( label ) {
@@ -144,7 +259,7 @@ class SiteEditorStyleVariations {
 				`substring-before(substring-after(//div[contains(@class, "edit-site-global-styles-sidebar__panel")]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
 				document,
 				null,
-				XPathResult.ANY_TYPE,
+				window.XPathResult.ANY_TYPE,
 				null
 			).stringValue;
 		}, colorType );
@@ -159,9 +274,11 @@ class SiteEditorStyleVariations {
 	}
 
 	async getColorPalette( paletteSource ) {
-		const paletteOptions = await this.page.locator(
-			`xpath=//div[./*/h2[text()="${ paletteSource }"]]//button[contains(@class,"components-circular-option-picker__option")]`
-		);
+		const paletteOptions = await this.page
+			.locator(
+				`xpath=//div[./*/h2[text()="${ paletteSource }"]]//button[contains(@class,"components-circular-option-picker__option")]`
+			)
+			.elementHandles();
 		return Promise.all(
 			paletteOptions.map( ( element ) => {
 				return element.evaluate( ( el ) => {

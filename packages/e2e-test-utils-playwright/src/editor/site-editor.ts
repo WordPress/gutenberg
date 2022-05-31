@@ -23,7 +23,7 @@ export async function saveSiteEditorEntities( this: Editor ) {
 	// not have that classname.
 	// TODO - find a way to improve this selector to use role/name.
 	await this.page.waitForSelector(
-		'.edit-site-save-button__button:not(.is-busy)'
+		'css=.edit-site-save-button__button:not(.is-busy)'
 	);
 }
 
@@ -33,9 +33,7 @@ export async function saveSiteEditorEntities( this: Editor ) {
  * @param {Editor} this
  */
 export async function toggleGlobalStyles( this: Editor ) {
-	await this.page.click(
-		'.edit-site-header__actions button[aria-label="Styles"]'
-	);
+	await this.page.click( 'role=button[name="Styles"i]' );
 }
 
 /**
@@ -56,6 +54,6 @@ export async function openGlobalStylesPanel( this: Editor, panelName: string ) {
  */
 export async function openPreviousGlobalStylesPanel( this: Editor ) {
 	await this.page.click(
-		'div[aria-label="Settings"] button[aria-label="Navigate to the previous view"]'
+		'role=button[name="Navigate to the previous view"i]'
 	);
 }
