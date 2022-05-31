@@ -108,7 +108,9 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		'data-gutenberg-context-used="%2$s">',
 		$block->name,
 		json_encode( $block->context )
-	);
+	) . '%1$s</gutenberg-interactive-block>';
+
+	$template_wrapper = '<template class="gutenberg-inner-blocks">%1$s</template>';
 
 	$actual_block = sprintf(
 		'<ol %1$s>%2$s</ol>',
@@ -116,8 +118,8 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		block_core_comment_template_render_comments( $comments, $block )
 	);
 
-	$template = '<template class="gutenberg-inner-blocks">' . $block_wrapper . $actual_block . '<template class="gutenberg-inner-blocks"></template>' . '</gutenberg-interactive-block>' . '</template>';
-	return $block_wrapper . $actual_block . $template . '</gutenberg-interactive-block>';
+	$empty_template = sprintf( $template_wrapper, '' );
+	return sprintf( $template_wrapper, sprintf( $block_wrapper, $actual_block . $empty_template ) );
 }
 
 /**
