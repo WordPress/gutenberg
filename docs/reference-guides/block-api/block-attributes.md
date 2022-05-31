@@ -156,6 +156,7 @@ Attribute available in the block:
 
 Most attributes from markup will be of type `string`. Numeric attributes in HTML are still stored as strings, and are not converted automatically.
 
+Attribute definition:
 ```js
 {
 	width: {
@@ -167,12 +168,14 @@ Most attributes from markup will be of type `string`. Numeric attributes in HTML
 }
 ```
 
+Attribute available in the block:
 ```js
 { "width": "50" }
 ```
 
 The only exception is when checking for the existence of an attribute (for example, the `disabled` attribute on a `button`). In that case type `boolean` can be used and the stored value will be a boolean.
 
+Attribute definition:
 ```js
 {
 	disabled: {
@@ -184,6 +187,7 @@ The only exception is when checking for the existence of an attribute (for examp
 }
 ```
 
+Attribute available in the block:
 ```js
 { "disabled": true }
 ```
@@ -275,6 +279,7 @@ Attribute available in the block:
 
 Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
 
+Attribute definition:
 ```js
 {
 	content: {
@@ -346,8 +351,9 @@ Attribute available in the block:
 Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
 </div>
 
-Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key:
+Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key.
 
+Attribute definition:
 ```js
 {
 	author: {
