@@ -61,7 +61,7 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.save();
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfter );
+		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the original content after revert and page reload', async ( {
