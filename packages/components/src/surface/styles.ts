@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { CONFIG, COLORS } from '../utils';
+import type { SurfaceVariant, SurfaceProps } from './types';
 
 export const Surface = css`
 	background-color: ${ CONFIG.surfaceColor };
@@ -18,19 +19,15 @@ export const background = css`
 	background-color: ${ CONFIG.surfaceBackgroundColor };
 `;
 
-/**
- * @param {Object}  props
- * @param {boolean} [props.borderBottom]
- * @param {boolean} [props.borderLeft]
- * @param {boolean} [props.borderRight]
- * @param {boolean} [props.borderTop]
- */
 export function getBorders( {
 	borderBottom,
 	borderLeft,
 	borderRight,
 	borderTop,
-} ) {
+}: Pick<
+	SurfaceProps,
+	'borderBottom' | 'borderLeft' | 'borderRight' | 'borderTop'
+> ) {
 	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
 
 	return css( {
@@ -51,16 +48,10 @@ export const tertiary = css`
 	background: ${ CONFIG.surfaceBackgroundTertiaryColor };
 `;
 
-/**
- * @param {string} surfaceBackgroundSize
- */
-const customBackgroundSize = ( surfaceBackgroundSize ) =>
+const customBackgroundSize = ( surfaceBackgroundSize: string ) =>
 	[ surfaceBackgroundSize, surfaceBackgroundSize ].join( ' ' );
 
-/**
- * @param {string} surfaceBackgroundSizeDotted
- */
-const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackground1 = ( surfaceBackgroundSizeDotted: string ) =>
 	[
 		'90deg',
 		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
@@ -69,10 +60,7 @@ const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
 		'transparent 1%',
 	].join( ',' );
 
-/**
- * @param {string} surfaceBackgroundSizeDotted
- */
-const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackground2 = ( surfaceBackgroundSizeDotted: string ) =>
 	[
 		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
 			' '
@@ -80,10 +68,7 @@ const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
 		'transparent 1%',
 	].join( ',' );
 
-/**
- * @param {string} surfaceBackgroundSizeDotted
- */
-const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
+const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted: string ) =>
 	[
 		`linear-gradient( ${ dottedBackground1(
 			surfaceBackgroundSizeDotted
@@ -94,14 +79,9 @@ const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
 		CONFIG.surfaceBorderBoldColor,
 	].join( ',' );
 
-/**
- *
- * @param {string} surfaceBackgroundSize
- * @param {string} surfaceBackgroundSizeDotted
- */
 export const getDotted = (
-	surfaceBackgroundSize,
-	surfaceBackgroundSizeDotted
+	surfaceBackgroundSize: string,
+	surfaceBackgroundSizeDotted: string
 ) => css`
 	background: ${ dottedBackgroundCombined( surfaceBackgroundSizeDotted ) };
 	background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
@@ -123,11 +103,7 @@ const gridBackgroundCombined = [
 	`linear-gradient( ${ gridBackground2 } )`,
 ].join( ',' );
 
-/**
- * @param {string} surfaceBackgroundSize
- * @return {import('@emotion/react').SerializedStyles} CSS.
- */
-export const getGrid = ( surfaceBackgroundSize ) => {
+export const getGrid = ( surfaceBackgroundSize: string ) => {
 	return css`
 		background: ${ CONFIG.surfaceBackgroundColor };
 		background-image: ${ gridBackgroundCombined };
@@ -135,15 +111,10 @@ export const getGrid = ( surfaceBackgroundSize ) => {
 	`;
 };
 
-/**
- * @param {'dotted' | 'grid' | 'primary' | 'secondary' | 'tertiary'} variant
- * @param {string}                                                   surfaceBackgroundSize
- * @param {string}                                                   surfaceBackgroundSizeDotted
- */
 export const getVariant = (
-	variant,
-	surfaceBackgroundSize,
-	surfaceBackgroundSizeDotted
+	variant: SurfaceVariant,
+	surfaceBackgroundSize: string,
+	surfaceBackgroundSizeDotted: string
 ) => {
 	switch ( variant ) {
 		case 'dotted': {
