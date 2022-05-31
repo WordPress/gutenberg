@@ -18,7 +18,7 @@ import {
  */
 import { useBlockListContext } from '../block-list/block-list-context';
 
-const SCROLL_INACTIVE_DISTANCE_PX = 50;
+export const SCROLL_INACTIVE_DISTANCE_PX = 50;
 const SCROLL_INTERVAL_MS = 1000;
 const VELOCITY_MULTIPLIER = 5000;
 
