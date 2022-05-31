@@ -104,7 +104,7 @@ test.describe( 'Template Revert', () => {
 
 		// Undo revert by clicking header button and check state again.
 		await page.click(
-			'role=region[name="Header"] >> role=button[name="Undo"i]'
+			'role=region[name="Header"i] >> role=button[name="Undo"i]'
 		);
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentBefore ).toEqual( contentAfterUndo );
