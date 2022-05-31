@@ -149,7 +149,7 @@ test.describe( 'Preview', () => {
 	} );
 
 	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
-	test.only( 'should display the correct preview when switching between published and draft statuses', async ( {
+	test( 'should display the correct preview when switching between published and draft statuses', async ( {
 		editor,
 		page,
 		previewUtils,
