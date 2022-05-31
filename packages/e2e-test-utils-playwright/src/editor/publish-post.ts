@@ -10,25 +10,21 @@ import type { Editor } from './index';
  * @param {Editor} this
  */
 export async function publishPost( this: Editor ) {
-	const publishPanelToggle = await this.page.locator(
-		'role=button[name="Publish"i]'
-	);
-	// The classname is the only indicator that entities await publishing.
-	const isEntityPublishToggle = await publishPanelToggle.evaluate(
-		( element ) => element.classList.contains( 'has-changes-dot' )
+	await this.page.click( 'role=button[name="Publish"i]' );
+	const publishEditorPanel = this.page.locator(
+		'role=region[name="Publish editor"i]'
 	);
 
-	await publishPanelToggle.click();
+	const isPublishEditorVisible = await publishEditorPanel.isVisible();
 
 	// Save any entities.
-	if ( isEntityPublishToggle ) {
+	if ( isPublishEditorVisible ) {
 		// Handle saving entities.
 		await this.page.click(
 			'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
 		);
 	}
 
-	// components-button editor-post-publish-button editor-post-publish-button__button is-primary
 	// Handle saving just the post.
 	await this.page.click(
 		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'

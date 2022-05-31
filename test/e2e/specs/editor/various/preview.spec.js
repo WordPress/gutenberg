@@ -24,10 +24,9 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Disabled until content present.
-		const isPreviewDisabled = await editorPage
-			.locator( 'role=button[name="Preview"]' )
-			.isDisabled();
-		expect( isPreviewDisabled ).toEqual( true );
+		await expect(
+			editorPage.locator( 'role=button[name="Preview"i]' )
+		).toBeDisabled();
 
 		await editorPage.type(
 			'role=textbox[name="Add title"]',
@@ -37,19 +36,16 @@ test.describe( 'Preview', () => {
 		const previewPage = await editor.openPreviewPage( editorPage );
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
 
-		expect( await previewTitle.textContent() ).toEqual( 'Hello World' );
+		await expect( previewTitle ).toHaveText( 'Hello World' );
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await (
-			await editorPage.waitForFunction( () => {
-				return window.location.search.match( /[\?&]post=(\d+)/ );
-			} )
-		 ).jsonValue();
+		await expect( editorPage ).toHaveURL( /[\?&]post=(\d+)/ );
+		const [ , postId ] = editorPage.url().match( /[\?&]post=(\d+)/ );
 
 		const expectedPreviewURL = new URL( requestUtils.baseURL );
 		expectedPreviewURL.search = `?p=${ postId }&preview=true`;
-		expect( previewPage.url() ).toEqual( expectedPreviewURL.href );
+		await expect( previewPage ).toHaveURL( expectedPreviewURL.href );
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
@@ -57,35 +53,32 @@ test.describe( 'Preview', () => {
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual( 'Hello World!' );
+		await expect( previewTitle ).toHaveText( 'Hello World!' );
 
 		// Pressing preview without changes should bring same preview window to
 		// front and reload, but should not show interstitial.
 		await editorPage.bringToFront();
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
-		expect( await previewTitle.textContent() ).toEqual( 'Hello World!' );
+		await expect( previewTitle ).toHaveText( 'Hello World!' );
 
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.locator( 'role=button[name="Close panel"]' ).click();
+		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.waitForSelector( 'role=textbox[name="Add title"]' );
-		await editorPage.click( 'role=textbox[name="Add title"]' );
+		await editorPage.click( 'role=textbox[name="Add title"i]' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'A' );
 		await editorPage.keyboard.press( 'ArrowRight' );
 		await editorPage.keyboard.type( ' And more.' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual(
-			'Hello World! And more.'
-		);
+		await expect( previewTitle ).toHaveText( 'Hello World! And more.' );
 
 		// Published preview URL should include ID and nonce parameters.
 		const { searchParams } = new URL( previewPage.url() );
@@ -102,9 +95,7 @@ test.describe( 'Preview', () => {
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual(
-			'Hello World! And more.'
-		);
+		await expect( previewTitle ).toHaveText( 'Hello World! And more.' );
 
 		await previewPage.close();
 	} );
@@ -129,11 +120,10 @@ test.describe( 'Preview', () => {
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
-		await previewPage.waitForSelector( 'role=heading[level=1]' );
 
 		// Title in preview should match input.
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
-		expect( await previewTitle.textContent() ).toEqual( 'aaaaa' );
+		await expect( previewTitle ).toHaveText( 'aaaaa' );
 
 		// Return to editor.
 		await editorPage.bringToFront();
@@ -153,13 +143,13 @@ test.describe( 'Preview', () => {
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual( 'aaaaabbbbb' );
+		await expect( previewTitle ).toHaveText( 'aaaaabbbbb' );
 
 		await previewPage.close();
 	} );
 
 	// Verify correct preview. See: https://github.com/WordPress/gutenberg/issues/33616
-	test( 'should display the correct preview when switching between published and draft statuses', async ( {
+	test.only( 'should display the correct preview when switching between published and draft statuses', async ( {
 		editor,
 		page,
 		previewUtils,
@@ -167,33 +157,32 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editorPage.type( '[aria-label="Add title"]', 'Lorem' );
+		await editorPage.type( 'role=textbox[name="Add title"]', 'Lorem' );
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
-		await previewPage.waitForSelector( 'role=heading[level=1]' );
 
 		// Title in preview should match input.
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
-		expect( await previewTitle.textContent() ).toEqual( 'Lorem' );
+		await expect( previewTitle ).toHaveText( 'Lorem' );
 
 		// Return to editor and publish post.
 		await editorPage.bringToFront();
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.locator( 'role=button[name="Close panel"]' ).click();
+		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Change the title and preview again.
 		await editorPage.type( '[aria-label="Add title"]', ' Ipsum' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual( 'Lorem Ipsum' );
+		await expect( previewTitle ).toHaveText( 'Lorem Ipsum' );
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		await page.locator( 'role=button[name="Switch to draft"]' ).click();
+		await page.click( 'role=button[name="Switch to draft"i]' );
 
 		// Change the title.
 		await editorPage.type( '[aria-label="Add title"]', ' Draft' );
@@ -202,9 +191,7 @@ test.describe( 'Preview', () => {
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
-		expect( await previewTitle.textContent() ).toEqual(
-			'Lorem Ipsum Draft'
-		);
+		await expect( previewTitle ).toHaveText( 'Lorem Ipsum Draft' );
 
 		await previewPage.close();
 	} );
@@ -230,10 +217,10 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Add an initial title and content.
 		await editorPage.type( 'role=textbox[name="Add title"i]', 'title 1' );
-		await editorPage.type(
-			'role=button[name="Add default block"i]',
-			'content 1'
-		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'content 1' },
+		} );
 
 		// Publish the post and then close the publish panel.
 		await editor.publishPost();
@@ -243,33 +230,28 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage();
-		await previewPage.waitForSelector( 'role=heading[level=1]' );
 
 		// Check the title and preview match.
 		const previewTitle = previewPage.locator( 'role=heading[level=1]' );
-		expect( await previewTitle.textContent() ).toEqual( 'title 1' );
+		await expect( previewTitle ).toHaveText( 'title 1' );
 		// No semantics we can grab here; it's just a <p> inside a <div> :')
 		const previewContent = previewPage.locator( '.entry-content p' );
-		expect( await previewContent.textContent() ).toEqual( 'content 1' );
+		await expect( previewContent ).toHaveText( 'content 1' );
 
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
-		await editorPage.click( 'role=textbox[name="Add title"i]' );
-		await editorPage.keyboard.press( 'End' );
-		await editorPage.keyboard.press( 'Backspace' );
-		await editorPage.keyboard.type( '2' );
-		await editorPage.click( 'role=document >> text="content 1"' );
-		await editorPage.keyboard.press( 'End' );
-		await editorPage.keyboard.press( 'Backspace' );
-		await editorPage.keyboard.type( '2' );
+		await editorPage.fill( 'role=textbox[name="Add title"i]', 'title 2' );
+		await editorPage.fill(
+			'role=document >> text="content 1"',
+			'content 2'
+		);
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match input.
-		expect( await previewTitle.textContent() ).toEqual( 'title 2' );
-
-		expect( await previewContent.textContent() ).toEqual( 'content 2' );
+		await expect( previewTitle ).toHaveText( 'title 2' );
+		await expect( previewContent ).toHaveText( 'content 2' );
 
 		// Make sure the editor is active for the afterEach function.
 		await editorPage.bringToFront();
@@ -291,16 +273,14 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public' } );
-
-		// Type in the title filed.
-		await page.type( 'role=textbox[name="Add title"i]', 'aaaaa' );
+		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
 
 		// Open the preview menu.
 		await page.click( 'role=button[name="Preview"i]' );
 
-		const previewMenu = page.locator( 'role=menu' );
-		await expect( previewMenu ).not.toContainText( 'Preview in new tab' );
+		await expect(
+			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
+		).not.toBeVisible();
 	} );
 } );
 
