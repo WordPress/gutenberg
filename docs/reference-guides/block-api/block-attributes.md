@@ -248,7 +248,7 @@ Attribute available in the block:
 { "content": "The inner text of .my-content class" }
 ```
 
-### `html`
+### `html` source
 
 Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerHTML).
 
@@ -296,7 +296,7 @@ Attribute available in the block:
 { "content": "<p>First line</p><p>Second line</p>" }
 ```
 
-### `query`
+### `query` source
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the `selector` argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
 
@@ -345,7 +345,7 @@ Attribute available in the block:
 }
 ```
 
-## Meta (deprecated)
+## Meta source (deprecated)
 
 <div class="callout callout-alert">
 Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
