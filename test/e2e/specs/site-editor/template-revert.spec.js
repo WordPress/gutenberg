@@ -214,7 +214,7 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.save();
 
 		await page.click(
-			'role=region[name="Header"] >> role=button[name="Undo"i]'
+			'role=region[name="Header"i] >> role=button[name="Undo"i]'
 		);
 
 		await templateRevertUtils.save();
