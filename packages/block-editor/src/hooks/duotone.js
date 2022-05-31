@@ -56,14 +56,30 @@ export function getValuesFromColors( colors = [] ) {
  * @param {Object}   props          Duotone props.
  * @param {string}   props.selector Selector to apply the filter to.
  * @param {string}   props.id       Unique id for this duotone filter.
- * @param {string[]} props.colors   Color strings from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
-function DuotoneStylesheet( { selector, id, colors } ) {
+function DuotoneStylesheet( { selector, id } ) {
 	const css = `
 ${ selector } {
-	filter: ${ colors.length > 0 ? `url( #${ id } )` : 'none' };
+	filter: url( #${ id } );
+}
+`;
+	return <style>{ css }</style>;
+}
+
+/**
+ * Stylesheet for disabling a global styles duotone filter.
+ *
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to disable the filter for.
+ *
+ * @return {WPElement} Filter none style element.
+ */
+function DuotoneUnsetStylesheet( { selector } ) {
+	const css = `
+${ selector } {
+	filter: none;
 }
 `;
 	return <style>{ css }</style>;
@@ -144,14 +160,18 @@ function DuotoneFilter( { id, colors } ) {
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- * @param {string[]} props.colors   Color strings from dark to light.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to apply the filter to.
+ * @param {string}   props.id       Unique id for this duotone filter.
+ * @param {string[]} props.colors   Array of RGB color strings ordered from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
 function InlineDuotone( { selector, id, colors } ) {
+	if ( colors.length === 0 ) {
+		return <DuotoneUnsetStylesheet selector={ selector } />;
+	}
+
 	return (
 		<>
 			<DuotoneFilter id={ id } colors={ colors } />
