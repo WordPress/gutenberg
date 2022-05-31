@@ -81,7 +81,7 @@ test.describe( 'Template Revert', () => {
 		await admin.visitSiteEditor();
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfter );
+		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the header toolbar', async ( {
@@ -100,14 +100,14 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await templateRevertUtils.save();
 		const contentAfterSave = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).not.toEqual( contentAfterSave );
+		expect( contentAfterSave ).not.toEqual( contentBefore );
 
 		// Undo revert by clicking header button and check state again.
 		await page.click(
 			'role=region[name="Header"i] >> role=button[name="Undo"i]'
 		);
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfterUndo );
+		expect( contentAfterUndo ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the notice', async ( {
@@ -131,7 +131,7 @@ test.describe( 'Template Revert', () => {
 		);
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfter );
+		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the original content after revert, clicking undo then redo in the header toolbar', async ( {
@@ -153,14 +153,14 @@ test.describe( 'Template Revert', () => {
 		);
 
 		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).not.toEqual( contentAfterUndo );
+		expect( contentAfterUndo ).not.toEqual( contentBefore );
 
 		await page.click(
 			'role=region[name="Header"i] >> role=button[name="Redo"i]'
 		);
 
 		const contentAfterRedo = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfterRedo );
+		expect( contentAfterRedo ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the original content after revert, clicking undo in the notice then undo in the header toolbar', async ( {
@@ -185,7 +185,7 @@ test.describe( 'Template Revert', () => {
 
 		//Check we have dummy content.
 		const contentAfterFirstUndo = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).not.toEqual( contentAfterFirstUndo );
+		expect( contentAfterFirstUndo ).not.toEqual( contentBefore );
 
 		// Click undo again, this time in the header. Reverts initial dummy content.
 		await page.click(
@@ -194,7 +194,7 @@ test.describe( 'Template Revert', () => {
 
 		// Check dummy content is gone.
 		const contentAfterSecondUndo = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfterSecondUndo );
+		expect( contentAfterSecondUndo ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert, clicking undo in the header toolbar, save and reload', async ( {
@@ -222,7 +222,7 @@ test.describe( 'Template Revert', () => {
 		await admin.visitSiteEditor();
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toEqual( contentAfter );
+		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert, clicking undo in the notice and reload', async ( {
@@ -249,7 +249,7 @@ test.describe( 'Template Revert', () => {
 		await admin.visitSiteEditor();
 
 		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentBefore ).toBe( contentAfter );
+		expect( contentAfter ).toEqual( contentBefore );
 	} );
 } );
 
@@ -272,10 +272,10 @@ class TemplateRevertUtils {
 	}
 
 	async revertTemplate() {
-		await this.page.click( 'role=button[name="Show template details"]' );
+		await this.page.click( 'role=button[name="Show template details"i]' );
 		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
 		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text="Template reverted."'
+			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'
 		);
 	}
 
