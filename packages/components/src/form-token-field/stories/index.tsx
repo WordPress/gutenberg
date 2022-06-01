@@ -21,7 +21,7 @@ const meta: ComponentMeta< typeof FormTokenField > = {
 			control: { type: null },
 		},
 		__experimentalValidateInput: {
-			control: { type: 'boolean' },
+			control: { type: null },
 		},
 	},
 	parameters: {
@@ -43,7 +43,6 @@ const continents = [
 ];
 
 const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
-	__experimentalValidateInput,
 	...args
 } ) => {
 	const [ selectedContinents, setSelectedContinents ] = useState<
@@ -55,11 +54,6 @@ const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
 			{ ...args }
 			value={ selectedContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
-			__experimentalValidateInput={
-				__experimentalValidateInput
-					? ( newValue ) => continents.includes( newValue )
-					: () => true
-			}
 		/>
 	);
 };
@@ -73,7 +67,6 @@ Default.args = {
 };
 
 export const Async: ComponentStory< typeof FormTokenField > = ( {
-	__experimentalValidateInput,
 	suggestions,
 	...args
 } ) => {
@@ -102,11 +95,6 @@ export const Async: ComponentStory< typeof FormTokenField > = ( {
 			suggestions={ availableContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
-			__experimentalValidateInput={
-				__experimentalValidateInput
-					? ( newValue ) => continents.includes( newValue )
-					: () => true
-			}
 		/>
 	);
 };

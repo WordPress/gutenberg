@@ -76,7 +76,7 @@ export interface FormTokenFieldProps
 	 * - otherwise entities like `&` in tag names are double-encoded like `&amp;`,
 	 * once by the REST API and once by React).
 	 */
-	displayTransform?: ( suggestion: string ) => string;
+	displayTransform?: ( token: string ) => string;
 	/**
 	 * Function to call to transform tokens for saving. The default is to trim the token value.
 	 * This function is also applied when matching suggestions against the current value
@@ -84,6 +84,7 @@ export interface FormTokenFieldProps
 	 * this is needed to remove leading and trailing spaces from tag names, like wp-admin does.
 	 * Otherwise the REST API won't save them.)
 	 *
+	 * @default ( token: string ) => token.trim()
 	 */
 	saveTransform?: ( token: string ) => string;
 	/**
@@ -136,6 +137,8 @@ export interface FormTokenFieldProps
 	__experimentalExpandOnFocus?: boolean;
 	/**
 	 * If passed, all introduced values will be validated before being added as tokens.
+	 *
+	 * @default () => true
 	 */
 	__experimentalValidateInput?: ( token: string ) => boolean;
 	/**
