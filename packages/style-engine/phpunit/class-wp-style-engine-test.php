@@ -13,16 +13,12 @@ require __DIR__ . '/../class-wp-style-engine.php';
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
-	 * Tests various manifestations of the $block_styles argument.
+	 * Tests generating styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @dataProvider data_block_styles_fixtures
+	 * @dataProvider data_generate_styles_fixtures
 	 */
-	function test_generate_css( $block_styles, $options, $expected_output ) {
-		$style_engine     = WP_Style_Engine::get_instance();
-		$generated_styles = $style_engine->generate(
-			$block_styles,
-			$options
-		);
+	function test_generate_styles( $block_styles, $expected_output ) {
+		$generated_styles = wp_style_engine_generate( $block_styles );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
@@ -31,42 +27,30 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_block_styles_fixtures() {
+	public function data_generate_styles_fixtures() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
-				'options'         => null,
-				'expected_output' => '',
+				'expected_output' => null,
 			),
 
 			'inline_invalid_block_styles_empty'            => array(
-				'block_styles'    => array(),
-				'options'         => array(
-					'path'   => array( 'spacing', 'padding' ),
-					'inline' => true,
-				),
-				'expected_output' => '',
+				'block_styles'    => 'hello world!',
+				'expected_output' => null,
 			),
 
 			'inline_invalid_block_styles_unknown_style'    => array(
 				'block_styles'    => array(
 					'pageBreakAfter' => 'verso',
 				),
-				'options'         => array(
-					'inline' => true,
-				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_definition' => array(
 				'block_styles'    => array(
 					'pageBreakAfter' => 'verso',
 				),
-				'options'         => array(
-					'path'   => array( 'pageBreakAfter', 'verso' ),
-					'inline' => true,
-				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_property' => array(
@@ -75,39 +59,25 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'gap' => '1000vw',
 					),
 				),
-				'options'         => array(
-					'path'   => array( 'spacing', 'padding' ),
-					'inline' => true,
-				),
-				'expected_output' => '',
+				'expected_output' => array(),
 			),
 
-			'inline_invalid_multiple_style_unknown_property' => array(
+			'valid_inline_css_and_classnames'              => array(
 				'block_styles'    => array(
-					'spacing' => array(
-						'gavin' => '1000vw',
+					'color'   => array(
+						'text' => 'var:preset|color|texas-flood',
 					),
-				),
-				'options'         => array(
-					'inline' => true,
-				),
-				'expected_output' => '',
-			),
-
-			'inline_valid_single_style_string'             => array(
-				'block_styles'    => array(
 					'spacing' => array(
 						'margin' => '111px',
 					),
 				),
-				'options'         => array(
-					'path'   => array( 'spacing', 'margin' ),
-					'inline' => true,
+				'expected_output' => array(
+					'css'        => 'margin: 111px;',
+					'classnames' => 'has-text-color has-texas-flood-color',
 				),
-				'expected_output' => 'margin:111px;',
 			),
 
-			'inline_valid_single_style'                    => array(
+			'inline_valid_box_model_style'                 => array(
 				'block_styles'    => array(
 					'spacing' => array(
 						'padding' => array(
@@ -124,34 +94,83 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(
-					'path'   => array( 'spacing', 'padding' ),
-					'inline' => true,
+				'expected_output' => array(
+					'css' => 'padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
 				),
-				'expected_output' => 'padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;',
 			),
 
-			'inline_valid_multiple_style'                  => array(
+			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
+					'typography' => array(
+						'fontSize'       => 'clamp(2em, 2vw, 4em)',
+						'fontFamily'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+						'fontStyle'      => 'italic',
+						'fontWeight'     => '800',
+						'lineHeight'     => '1.3',
+						'textDecoration' => 'underline',
+						'textTransform'  => 'uppercase',
+						'letterSpacing'  => '2',
+					),
+				),
+				'expected_output' => array(
+					'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+				),
+			),
+			'valid_classnames_deduped'                     => array(
+				'block_styles'    => array(
+					'color'      => array(
+						'text'       => 'var:preset|color|copper-socks',
+						'background' => 'var:preset|color|splendid-carrot',
+						'gradient'   => 'var:preset|gradient|like-wow-dude',
+					),
+					'typography' => array(
+						'fontSize'   => 'var:preset|font-size|fantastic',
+						'fontFamily' => 'var:preset|font-family|totally-awesome',
+					),
+				),
+				'expected_output' => array(
+					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
+				),
+			),
+			'valid_classnames_with_null_style_values'      => array(
+				'block_styles'    => array(
+					'color' => array(
+						'text'       => '#fff',
+						'background' => null,
+					),
+				),
+				'expected_output' => array(
+					'css'        => 'color: #fff;',
+					'classnames' => 'has-text-color',
+				),
+			),
+			'invalid_classnames_preset_value'              => array(
+				'block_styles'    => array(
+					'color'   => array(
+						'text'       => 'var:cheese|color|fantastic',
+						'background' => 'var:preset|fromage|fantastic',
+					),
 					'spacing' => array(
-						'padding' => array(
-							'top'    => '42px',
-							'left'   => '2%',
-							'bottom' => '44px',
-							'right'  => '5rem',
+						'margin'  => 'var:cheese|spacing|margin',
+						'padding' => 'var:preset|spacing|padding',
+					),
+				),
+				'expected_output' => array(
+					'classnames' => 'has-text-color has-background',
+				),
+			),
+			'invalid_classnames_options'                   => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'fontSize'   => array(
+							'tomodachi' => 'friends',
 						),
-						'margin'  => array(
-							'top'    => '12rem',
-							'left'   => '2vh',
-							'bottom' => '2px',
-							'right'  => '10em',
+						'fontFamily' => array(
+							'oishii' => 'tasty',
 						),
 					),
 				),
-				'options'         => array(
-					'inline' => true,
-				),
-				'expected_output' => 'padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;margin-top:12rem;margin-left:2vh;margin-bottom:2px;margin-right:10em;',
+				'expected_output' => array(),
 			),
 		);
 	}

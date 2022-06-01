@@ -65,7 +65,7 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
-			'/__experimental/block-patterns/patterns',
+			'/wp/v2/block-patterns/patterns',
 			$routes,
 			'The patterns route does not exist'
 		);
@@ -77,7 +77,7 @@ class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Tes
 		$expected_names  = array( 'test/one', 'test/two' );
 		$expected_fields = array( 'name', 'content' );
 
-		$request            = new WP_REST_Request( 'GET', '/__experimental/block-patterns/patterns' );
+		$request            = new WP_REST_Request( 'GET', '/wp/v2/block-patterns/patterns' );
 		$request['_fields'] = 'name,content';
 		$response           = rest_get_server()->dispatch( $request );
 		$data               = $response->get_data();

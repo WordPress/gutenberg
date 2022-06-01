@@ -8,7 +8,7 @@ import type { ConsoleMessage } from '@playwright/test';
 /**
  * Internal dependencies
  */
-import { PageUtils, RequestUtils } from './index';
+import { Admin, Editor, PageUtils, RequestUtils } from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -98,13 +98,21 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 
 const test = base.extend<
 	{
+		admin: Admin;
+		editor: Editor;
 		pageUtils: PageUtils;
-		snapshotSuffix: void;
+		snapshotConfig: void;
 	},
 	{
 		requestUtils: RequestUtils;
 	}
 >( {
+	admin: async ( { page, pageUtils }, use ) => {
+		await use( new Admin( { page, pageUtils } ) );
+	},
+	editor: async ( { page }, use ) => {
+		await use( new Editor( { page } ) );
+	},
 	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
 
@@ -118,7 +126,7 @@ const test = base.extend<
 		await page.close();
 	},
 	pageUtils: async ( { page }, use ) => {
-		await use( new PageUtils( page ) );
+		await use( new PageUtils( { page } ) );
 	},
 	requestUtils: [
 		async ( {}, use, workerInfo ) => {
@@ -131,17 +139,26 @@ const test = base.extend<
 				requestUtils.activateTheme( 'twentytwentyone' ),
 				requestUtils.deleteAllPosts(),
 				requestUtils.deleteAllBlocks(),
+				requestUtils.resetPreferences(),
 			] );
 
 			await use( requestUtils );
 		},
 		{ scope: 'worker' },
 	],
-	// A work-around automatic fixture to remove the default snapshot suffix.
-	// See https://github.com/microsoft/playwright/issues/11134
-	snapshotSuffix: [
+	// An automatic fixture to configure snapshot settings globally.
+	snapshotConfig: [
 		async ( {}, use, testInfo ) => {
+			// A work-around to remove the default snapshot suffix.
+			// See https://github.com/microsoft/playwright/issues/11134
 			testInfo.snapshotSuffix = '';
+			// Normalize snapshots into the same `__snapshots__` folder to minimize
+			// the file name length on Windows.
+			// See https://github.com/WordPress/gutenberg/issues/40291
+			testInfo.snapshotDir = path.join(
+				path.dirname( testInfo.file ),
+				'__snapshots__'
+			);
 
 			await use();
 		},

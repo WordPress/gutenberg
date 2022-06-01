@@ -108,7 +108,19 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
 					title={ blockTitle }
-					icon={ <BlockIcon icon={ icon } showColors /> }
+					icon={
+						<>
+							<BlockIcon icon={ icon } showColors />
+							{ ( isReusable || isTemplate ) && (
+								<span className="block-editor-block-switcher__toggle-text">
+									<BlockTitle
+										clientId={ clientIds }
+										maximumLength={ 35 }
+									/>
+								</span>
+							) }
+						</>
+					}
 				/>
 			</ToolbarGroup>
 		);

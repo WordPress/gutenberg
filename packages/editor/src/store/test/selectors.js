@@ -2149,7 +2149,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestSucceed( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request has failed', () => {
+		it( 'should return false if the post save request has failed', () => {
 			const state = {
 				saving: {
 					successful: false,
@@ -2171,7 +2171,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestFail( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request is successful', () => {
+		it( 'should return false if the post save request is successful', () => {
 			const state = {
 				saving: {
 					error: false,
@@ -2968,7 +2968,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} ).description
 			).toEqual( 'test description' );
 		} );
@@ -2996,7 +2996,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'Default (Index)',
@@ -3008,7 +3008,7 @@ describe( 'selectors', () => {
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
 					title: { rendered: 'test title' },
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'test title',

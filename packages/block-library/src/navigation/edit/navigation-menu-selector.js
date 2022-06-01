@@ -10,7 +10,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
-import { useCallback, useMemo } from '@wordpress/element';
+import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,14 +18,17 @@ import { useCallback, useMemo } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
-export default function NavigationMenuSelector( {
-	currentMenuId,
-	onSelect,
-	onCreateNew,
-	showManageActions = false,
-	actionLabel,
-	toggleProps = {},
-} ) {
+function NavigationMenuSelector(
+	{
+		currentMenuId,
+		onSelect,
+		onCreateNew,
+		showManageActions = false,
+		actionLabel,
+		toggleProps = {},
+	},
+	forwardedRef
+) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -92,6 +95,7 @@ export default function NavigationMenuSelector( {
 
 	return (
 		<ToolbarDropdownMenu
+			ref={ forwardedRef }
 			label={ __( 'Select Menu' ) }
 			text={ __( 'Select Menu' ) }
 			icon={ null }
@@ -152,3 +156,5 @@ export default function NavigationMenuSelector( {
 		</ToolbarDropdownMenu>
 	);
 }
+
+export default forwardRef( NavigationMenuSelector );

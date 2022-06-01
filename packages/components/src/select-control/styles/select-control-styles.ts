@@ -8,11 +8,12 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { COLORS, rtl } from '../../utils';
-import type { Size } from '../types';
+import type { SelectControlProps } from '../types';
 
-interface SelectProps {
-	disabled?: boolean;
-	selectSize?: Size;
+interface SelectProps extends Pick< SelectControlProps, 'disabled' > {
+	// Using `selectSize` instead of `size` to avoid a type conflict with the
+	// `size` HTML attribute of the `select` element.
+	selectSize?: SelectControlProps[ 'size' ];
 }
 
 const disabledStyles = ( { disabled }: SelectProps ) => {
@@ -23,14 +24,14 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	} );
 };
 
-const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
 		'__unstable-large': '13px',
 	};
 
-	const fontSize = sizes[ selectSize as Size ];
+	const fontSize = sizes[ selectSize ];
 	const fontSizeMobile = '16px';
 
 	if ( ! fontSize ) return '';
@@ -44,26 +45,29 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
 	`;
 };
 
-const sizeStyles = ( { selectSize }: SelectProps ) => {
+const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
 		default: {
 			height: 30,
-			lineHeight: 1,
 			minHeight: 30,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 		small: {
 			height: 24,
-			lineHeight: 1,
 			minHeight: 24,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 		'__unstable-large': {
 			height: 40,
-			lineHeight: 1,
 			minHeight: 40,
+			paddingTop: 0,
+			paddingBottom: 0,
 		},
 	};
 
-	const style = sizes[ selectSize as Size ] || sizes.default;
+	const style = sizes[ selectSize ];
 
 	return css( style );
 };
@@ -96,7 +100,7 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.black };
+		color: ${ COLORS.gray[ 900 ] };
 		display: block;
 		font-family: inherit;
 		margin: 0;

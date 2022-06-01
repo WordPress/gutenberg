@@ -56,6 +56,7 @@ class FlakyTestsReporter {
 					await fs.writeFile(
 						`flaky-tests/${ filenamify( testTitle ) }.json`,
 						JSON.stringify( {
+							version: 1,
 							runner: 'jest-circus',
 							title: testTitle,
 							path: testPath,

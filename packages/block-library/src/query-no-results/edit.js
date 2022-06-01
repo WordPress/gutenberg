@@ -9,7 +9,7 @@ const TEMPLATE = [
 		'core/paragraph',
 		{
 			placeholder: __(
-				'Add a text or blocks that will display when the query returns no results.'
+				'Add text or blocks that will display when the query returns no results.'
 			),
 		},
 	],

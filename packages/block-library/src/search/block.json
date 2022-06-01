@@ -38,6 +38,10 @@
 		"buttonUseIcon": {
 			"type": "boolean",
 			"default": false
+		},
+		"query": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {

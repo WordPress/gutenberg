@@ -52,21 +52,17 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		return $attributes;
 	}
 
-	$style_engine                    = WP_Style_Engine_Gutenberg::get_instance();
 	$skip_padding                    = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'padding' );
 	$skip_margin                     = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' );
 	$spacing_block_styles            = array();
 	$spacing_block_styles['padding'] = $has_padding_support && ! $skip_padding ? _wp_array_get( $block_styles, array( 'spacing', 'padding' ), null ) : null;
 	$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
-	$inline_styles                   = $style_engine->generate(
-		array( 'spacing' => $spacing_block_styles ),
-		array(
-			'inline' => true,
-		)
+	$styles                          = gutenberg_style_engine_generate(
+		array( 'spacing' => $spacing_block_styles )
 	);
 
-	if ( ! empty( $inline_styles ) ) {
-		$attributes['style'] = $inline_styles;
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
 	return $attributes;

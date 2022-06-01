@@ -11,10 +11,9 @@ import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 
 export default function useClickSelection() {
-	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const {
 		isSelectionEnabled,
-		getBlockParents,
 		getBlockSelectionStart,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
@@ -54,10 +53,8 @@ export default function useClickSelection() {
 			};
 		},
 		[
-			multiSelect,
 			selectBlock,
 			isSelectionEnabled,
-			getBlockParents,
 			getBlockSelectionStart,
 			hasMultiSelection,
 		]

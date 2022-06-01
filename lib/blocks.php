@@ -21,22 +21,15 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'comments-query-loop',
-				'cover',
+				'comments',
 				'group',
 				'heading',
 				'html',
-				'home-link',
-				'image',
 				'list',
 				'media-text',
 				'missing',
 				'more',
-				'navigation-area',
-				'navigation-link',
-				'navigation-submenu',
 				'nextpage',
-				'pattern',
 				'paragraph',
 				'preformatted',
 				'pullquote',
@@ -45,7 +38,7 @@ function gutenberg_reregister_core_block_types() {
 				'social-links',
 				'spacer',
 				'table',
-				// 'table-of-contents',
+				'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -69,6 +62,7 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-next.php'     => 'core/comments-pagination-next',
 				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
+				'comments-title.php'               => 'core/comments-title',
 				'file.php'                         => 'core/file',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
@@ -77,7 +71,6 @@ function gutenberg_reregister_core_block_types() {
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
 				'navigation.php'                   => 'core/navigation',
-				'navigation-area.php'              => 'core/navigation-area',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
@@ -113,7 +106,6 @@ function gutenberg_reregister_core_block_types() {
 				'site-logo.php'                    => 'core/site-logo',
 				'site-tagline.php'                 => 'core/site-tagline',
 				'site-title.php'                   => 'core/site-title',
-				// 'table-of-contents.php'          => 'core/table-of-contents',
 				'tag-cloud.php'                    => 'core/tag-cloud',
 				'template-part.php'                => 'core/template-part',
 				'term-description.php'             => 'core/term-description',
@@ -150,7 +142,7 @@ function gutenberg_reregister_core_block_types() {
 			// to replace paths with overrides defined by the plugin.
 			$metadata = json_decode( file_get_contents( $block_json_file ), true );
 			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				return false;
+				continue;
 			}
 
 			if ( $registry->is_registered( $metadata['name'] ) ) {
@@ -163,7 +155,7 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
-				return;
+				continue;
 			}
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;

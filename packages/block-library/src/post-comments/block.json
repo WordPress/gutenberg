@@ -4,7 +4,7 @@
 	"name": "core/post-comments",
 	"title": "Post Comments (deprecated)",
 	"category": "theme",
-	"description": "This block is deprecated. Please use the Comments Query Loop block instead.",
+	"description": "This block is deprecated. Please use the Comments block instead.",
 	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
@@ -40,5 +40,6 @@
 		"wp-block-post-comments",
 		"wp-block-buttons",
 		"wp-block-button"
-	]
+	],
+	"editorStyle": "wp-block-post-comments-editor"
 }

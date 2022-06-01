@@ -13,7 +13,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 	 * @return string                String where the unique id classes were replaced with "wp-elements-1".
 	 */
 	private static function make_unique_id_one( $string ) {
-		return preg_replace( '/wp-elements-\d+/', 'wp-elements-1', $string );
+		return preg_replace( '/wp-elements-[a-zA-Z0-9]+/', 'wp-elements-1', $string );
 	}
 
 	/**
@@ -103,4 +103,5 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 			'<p id="anchor" class="wp-elements-1">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>'
 		);
 	}
+
 }

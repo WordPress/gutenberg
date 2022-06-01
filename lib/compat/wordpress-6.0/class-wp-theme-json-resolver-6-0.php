@@ -32,7 +32,7 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
 		}
 
-		return wp_translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
+		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
 	}
 
 	/**
@@ -61,13 +61,15 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 	 * the theme.json takes precedence.
 	 *
 	 * @param array $deprecated Deprecated argument.
-	 * @param array $settings Contains a key called with_supports to determine whether to include theme supports in the data.
+	 * @param array $options Contains a key called with_supports to determine whether to include theme supports in the data.
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
-	public static function get_theme_data( $deprecated = array(), $settings = array( 'with_supports' => true ) ) {
+	public static function get_theme_data( $deprecated = array(), $options = array() ) {
 		if ( ! empty( $deprecated ) ) {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
+
+		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
 
 		if ( null === static::$theme ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
@@ -87,7 +89,7 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 			}
 		}
 
-		if ( ! $settings['with_supports'] ) {
+		if ( ! $options['with_supports'] ) {
 			return static::$theme;
 		}
 

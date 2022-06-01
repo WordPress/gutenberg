@@ -13,6 +13,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -95,7 +96,15 @@ export default function TemplatePartEdit( {
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
-	const blockProps = useBlockProps();
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
+		{
+			className: hasBlockOverlay
+				? 'block-editor-block-content-overlay'
+				: undefined,
+		},
+		{ __unstableIsDisabled: hasBlockOverlay }
+	);
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
@@ -153,22 +162,23 @@ export default function TemplatePartEdit( {
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && hasReplacements && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<ToolbarButton
-							onClick={ () =>
-								setIsTemplatePartSelectionOpen( true )
-							}
-						>
-							{ __( 'Replace' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+			{ isEntityAvailable &&
+				hasReplacements &&
+				( area === 'header' || area === 'footer' ) && (
+					<BlockControls>
+						<ToolbarGroup className="wp-block-template-part__block-control-group">
+							<ToolbarButton
+								onClick={ () =>
+									setIsTemplatePartSelectionOpen( true )
+								}
+							>
+								{ __( 'Replace' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
-					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }

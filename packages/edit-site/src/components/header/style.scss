@@ -104,8 +104,9 @@ body.is-navigation-sidebar-open {
 	margin: 0 -6px 0;
 }
 
+
 /**
- * Buttons in the Toolbar
+ * Buttons on the right side
  */
 
 .edit-site-header__actions {
@@ -113,36 +114,23 @@ body.is-navigation-sidebar-open {
 	align-items: center;
 	padding-right: $grid-unit-05;
 
+	@include break-small () {
+		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+	}
+
+	gap: $grid-unit-05;
+
+	@include break-small() {
+		gap: $grid-unit-10;
+	}
+
+	// Pinned items.
 	.interface-pinned-items {
 		display: none;
 
 		@include break-medium() {
 			display: inline-flex;
 		}
-	}
-
-	// Adjust button paddings to scale better to mobile.
-	.editor-post-saved-state,
-	.components-button.components-button {
-		margin-right: $grid-unit-05;
-
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
-	}
-
-	.editor-post-saved-state,
-	.components-button.is-tertiary {
-		padding: 0 #{$grid-unit-15 * 0.5};
-	}
-
-	.edit-site-more-menu .components-button,
-	.interface-pinned-items .components-button {
-		margin-right: 0;
-	}
-
-	@include break-small() {
-		padding-right: $grid-unit-20;
 	}
 }
 
@@ -192,11 +180,8 @@ body.is-navigation-sidebar-open {
 	.edit-site-save-button__button {
 		padding-left: 6px;
 		padding-right: 6px;
-		margin-right: $grid-unit-05;
 	}
-	.block-editor-post-preview__button-toggle {
-		margin-right: $grid-unit-05;
-	}
+
 	// The inserter and the template details toggle have custom labels, different from their aria-label, so we don't want to display both.
 	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {

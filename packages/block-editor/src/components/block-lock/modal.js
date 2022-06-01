@@ -14,27 +14,25 @@ import {
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { isReusableBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
-	const { canMove, canRemove } = useSelect(
+	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
+	const { isReusable } = useSelect(
 		( select ) => {
-			const {
-				canMoveBlock,
-				canRemoveBlock,
-				getBlockRootClientId,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
+			const { getBlockName } = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
 
 			return {
-				canMove: canMoveBlock( clientId, rootClientId ),
-				canRemove: canRemoveBlock( clientId, rootClientId ),
+				isReusable: isReusableBlock( getBlockType( blockName ) ),
 			};
 		},
 		[ clientId ]
@@ -50,12 +48,12 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		setLock( {
 			move: ! canMove,
 			remove: ! canRemove,
+			...( isReusable ? { edit: ! canEdit } : {} ),
 		} );
-	}, [ canMove, canRemove ] );
+	}, [ canEdit, canMove, canRemove, isReusable ] );
 
 	const isAllChecked = Object.values( lock ).every( Boolean );
-	const isIndeterminate =
-		Object.values( lock ).some( Boolean ) && ! isAllChecked;
+	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
 	return (
 		<Modal
@@ -91,15 +89,41 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
 						}
 						checked={ isAllChecked }
-						indeterminate={ isIndeterminate }
+						indeterminate={ isMixed }
 						onChange={ ( newValue ) =>
 							setLock( {
 								move: newValue,
 								remove: newValue,
+								...( isReusable ? { edit: newValue } : {} ),
 							} )
 						}
 					/>
 					<ul className="block-editor-block-lock-modal__checklist">
+						{ isReusable && (
+							<li className="block-editor-block-lock-modal__checklist-item">
+								<CheckboxControl
+									label={
+										<>
+											{ __( 'Restrict editing' ) }
+											<Icon
+												icon={
+													lock.edit
+														? lockIcon
+														: unlockIcon
+												}
+											/>
+										</>
+									}
+									checked={ !! lock.edit }
+									onChange={ ( edit ) =>
+										setLock( ( prevLock ) => ( {
+											...prevLock,
+											edit,
+										} ) )
+									}
+								/>
+							</li>
+						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
 								label={

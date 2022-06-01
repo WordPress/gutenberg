@@ -31,6 +31,7 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 import { store as blockEditorStore } from '../../store';
+import BlockDraggable from '../block-draggable';
 
 const emptyArray = [];
 function BlockForType( {
@@ -47,6 +48,7 @@ function BlockForType( {
 	onDeleteBlock,
 	onReplace,
 	parentWidth,
+	parentBlockAlignment,
 	wrapperProps,
 	blockWidth,
 	baseGlobalStyles,
@@ -95,6 +97,7 @@ function BlockForType( {
 				contentStyle={ contentStyle }
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
+				parentBlockAlignment={ parentBlockAlignment }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>
@@ -187,6 +190,8 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 			name,
+			draggingEnabled,
+			draggingClientId,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -254,14 +259,23 @@ class BlockListBlock extends Component {
 								] }
 							/>
 						) }
-						{ isValid ? (
-							this.getBlockForType()
-						) : (
-							<BlockInvalidWarning
-								blockTitle={ title }
-								icon={ icon }
-							/>
-						) }
+						<BlockDraggable
+							clientId={ clientId }
+							draggingClientId={ draggingClientId }
+							enabled={ draggingEnabled }
+							testID="draggable-trigger-content"
+						>
+							{ () =>
+								isValid ? (
+									this.getBlockForType()
+								) : (
+									<BlockInvalidWarning
+										blockTitle={ title }
+										icon={ icon }
+									/>
+								)
+							}
+						</BlockDraggable>
 						<View
 							style={ styles.neutralToolbar }
 							ref={ this.anchorNodeRef }
@@ -276,6 +290,7 @@ class BlockListBlock extends Component {
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={ isFullWidthToolbar }
+									draggingClientId={ draggingClientId }
 								/>
 							) }
 						</View>
@@ -306,6 +321,7 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlockIndex,
+			getBlockCount,
 			getSettings,
 			isBlockSelected,
 			getBlock,
@@ -313,6 +329,7 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
+			getBlockHierarchyRootClientId,
 		} = select( blockEditorStore );
 
 		const order = getBlockIndex( clientId );
@@ -357,6 +374,18 @@ export default compose( [
 		const baseGlobalStyles = getSettings()
 			?.__experimentalGlobalStylesBaseStyles;
 
+		const hasInnerBlocks = getBlockCount( clientId ) > 0;
+		// For blocks with inner blocks, we only enable the dragging in the nested
+		// blocks if any of them are selected. This way we prevent the long-press
+		// gesture from being disabled for elements within the block UI.
+		const draggingEnabled =
+			! hasInnerBlocks ||
+			isSelected ||
+			! hasSelectedInnerBlock( clientId, true );
+		// Dragging nested blocks is not supported yet. For this reason, the block to be dragged
+		// will be the top in the hierarchy.
+		const draggingClientId = getBlockHierarchyRootClientId( clientId );
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -364,6 +393,8 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
+			draggingClientId,
+			draggingEnabled,
 			isSelected,
 			isInnerBlockSelected,
 			isValid,

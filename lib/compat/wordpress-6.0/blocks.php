@@ -119,164 +119,12 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 		if ( ! empty( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
 		}
+		if ( ! empty( $block->context['query']['parents'] ) && is_post_type_hierarchical( $query['post_type'] ) ) {
+			$query['post_parent__in'] = array_filter( array_map( 'intval', $block->context['query']['parents'] ) );
+		}
 	}
 	return $query;
 }
-
-/**
- * Registers view scripts for core blocks if handling is missing in WordPress core.
- *
- * This is a temporary solution until the Gutenberg plugin sets
- * the required WordPress version to 6.0.
- *
- * @param array $settings Array of determined settings for registering a block type.
- * @param array $metadata Metadata provided for registering a block type.
- *
- * @return array Array of settings for registering a block type.
- */
-function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
-	if (
-		! isset( $metadata['viewScript'] ) ||
-		! empty( $settings['view_script'] ) ||
-		! isset( $metadata['file'] ) ||
-		strpos( $metadata['file'], gutenberg_dir_path() ) !== 0
-	) {
-		return $settings;
-	}
-
-	$view_script_path = realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) );
-
-	if ( file_exists( $view_script_path ) ) {
-		$view_script_id     = str_replace( array( '.min.js', '.js' ), '', basename( remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
-		$view_script_handle = str_replace( 'core/', 'wp-block-', $metadata['name'] ) . '-' . $view_script_id;
-		wp_deregister_script( $view_script_handle );
-
-		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
-		$view_asset_file          = substr( $view_script_path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
-		$view_asset               = file_exists( $view_asset_file ) ? require( $view_asset_file ) : null;
-		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
-		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : false;
-		$result                   = wp_register_script(
-			$view_script_handle,
-			gutenberg_url( str_replace( gutenberg_dir_path(), '', $view_script_path ) ),
-			$view_script_dependencies,
-			$view_script_version
-		);
-		if ( $result ) {
-			$settings['view_script'] = $view_script_handle;
-
-			if ( ! empty( $metadata['textdomain'] ) && in_array( 'wp-i18n', $view_script_dependencies, true ) ) {
-				wp_set_script_translations( $view_script_handle, $metadata['textdomain'] );
-			}
-		}
-	}
-	return $settings;
-}
-add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
-
-if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
-	/**
-	 * Enqueues a frontend script for a specific block.
-	 *
-	 * Scripts enqueued using this function will only get printed
-	 * when the block gets rendered on the frontend.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param string $block_name The block name, including namespace.
-	 * @param array  $args       An array of arguments [handle,src,deps,ver,media,textdomain].
-	 *
-	 * @return void
-	 */
-	function wp_enqueue_block_view_script( $block_name, $args ) {
-		$args = wp_parse_args(
-			$args,
-			array(
-				'handle'     => '',
-				'src'        => '',
-				'deps'       => array(),
-				'ver'        => false,
-				'in_footer'  => false,
-
-				// Additional arg to allow translations for the script's textdomain.
-				'textdomain' => '',
-			)
-		);
-
-		/**
-		 * Callback function to register and enqueue scripts.
-		 *
-		 * @param string $content When the callback is used for the render_block filter,
-		 *                        the content needs to be returned so the function parameter
-		 *                        is to ensure the content exists.
-		 * @return string Block content.
-		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
-
-			// Sanity check.
-			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
-				return $content;
-			}
-
-			// Register the stylesheet.
-			if ( ! empty( $args['src'] ) ) {
-				wp_register_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
-			}
-
-			// Enqueue the stylesheet.
-			wp_enqueue_script( $args['handle'] );
-
-			// If a textdomain is defined, use it to set the script translations.
-			if ( ! empty( $args['textdomain'] ) && in_array( 'wp-i18n', $args['deps'], true ) ) {
-				wp_set_script_translations( $args['handle'], $args['textdomain'] );
-			}
-
-			return $content;
-		};
-
-		/*
-		 * The filter's callback here is an anonymous function because
-		 * using a named function in this case is not possible.
-		 *
-		 * The function cannot be unhooked, however, users are still able
-		 * to dequeue the script registered/enqueued by the callback
-		 * which is why in this case, using an anonymous function
-		 * was deemed acceptable.
-		 */
-		add_filter( 'render_block', $callback, 10, 2 );
-	}
-}
-
-/**
- * Allow multiple view scripts per block.
- *
- * Filters the metadata provided for registering a block type.
- *
- * @since 6.0.0
- *
- * @param array $metadata Metadata for registering a block type.
- *
- * @return array
- */
-function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
-
-	// Early return if viewScript is empty, or not an array.
-	if ( ! isset( $metadata['viewScript'] ) || ! is_array( $metadata['viewScript'] ) ) {
-		return $metadata;
-	}
-
-	// Register all viewScript items.
-	foreach ( $metadata['viewScript'] as $view_script ) {
-		$item_metadata               = $metadata;
-		$item_metadata['viewScript'] = $view_script;
-		gutenberg_block_type_metadata_view_script( array(), $item_metadata );
-	}
-
-	// Proceed with the default behavior.
-	$metadata['viewScript'] = $metadata['viewScript'][0];
-	return $metadata;
-}
-add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
 
 if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	/**
@@ -293,12 +141,21 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 	function build_comment_query_vars_from_block( $block ) {
 
 		$comment_args = array(
-			'orderby'                   => 'comment_date_gmt',
-			'order'                     => 'ASC',
-			'status'                    => 'approve',
-			'no_found_rows'             => false,
-			'update_comment_meta_cache' => false, // We lazy-load comment meta for performance.
+			'orderby'       => 'comment_date_gmt',
+			'order'         => 'ASC',
+			'status'        => 'approve',
+			'no_found_rows' => false,
 		);
+
+		if ( is_user_logged_in() ) {
+			$comment_args['include_unapproved'] = array( get_current_user_id() );
+		} else {
+			$unapproved_email = wp_get_unapproved_comment_author_email();
+
+			if ( $unapproved_email ) {
+				$comment_args['include_unapproved'] = array( $unapproved_email );
+			}
+		}
 
 		if ( ! empty( $block->context['postId'] ) ) {
 			$comment_args['post_id'] = (int) $block->context['postId'];
@@ -322,7 +179,10 @@ if ( ! function_exists( 'build_comment_query_vars_from_block' ) ) {
 				} elseif ( 'oldest' === $default_page ) {
 					$comment_args['paged'] = 1;
 				} elseif ( 'newest' === $default_page ) {
-					$comment_args['paged'] = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					$max_num_pages = (int) ( new WP_Comment_Query( $comment_args ) )->max_num_pages;
+					if ( 0 !== $max_num_pages ) {
+						$comment_args['paged'] = $max_num_pages;
+					}
 				}
 				// Set the `cpage` query var to ensure the previous and next pagination links are correct
 				// when inheriting the Discussion Settings.
@@ -384,13 +244,14 @@ if ( ! function_exists( 'get_comments_pagination_arrow' ) ) {
 function gutenberg_extend_block_editor_settings_with_discussion_settings( $settings ) {
 
 	$settings['__experimentalDiscussionSettings'] = array(
-		'commentOrder'        => get_option( 'comment_order' ),
-		'commentsPerPage'     => get_option( 'comments_per_page' ),
-		'defaultCommentsPage' => get_option( 'default_comments_page' ),
-		'pageComments'        => get_option( 'page_comments' ),
-		'threadComments'      => get_option( 'thread_comments' ),
-		'threadCommentsDepth' => get_option( 'thread_comments_depth' ),
-		'avatarURL'           => get_avatar_url(
+		'commentOrder'         => get_option( 'comment_order' ),
+		'commentsPerPage'      => get_option( 'comments_per_page' ),
+		'defaultCommentsPage'  => get_option( 'default_comments_page' ),
+		'pageComments'         => get_option( 'page_comments' ),
+		'threadComments'       => get_option( 'thread_comments' ),
+		'threadCommentsDepth'  => get_option( 'thread_comments_depth' ),
+		'defaultCommentStatus' => get_option( 'default_comment_status' ),
+		'avatarURL'            => get_avatar_url(
 			'',
 			array(
 				'size'          => 96,
@@ -425,3 +286,30 @@ function gutenberg_rest_comment_set_children_as_embeddable() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_rest_comment_set_children_as_embeddable' );
+
+/**
+ * Registers the lock block attribute for block types.
+ *
+ * Once 6.0 is the minimum supported WordPress version for the Gutenberg
+ * plugin, this shim can be removed
+ *
+ * Doesn't need to be backported into Core.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_lock_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'lock', $args['attributes'] ) ) {
+		$args['attributes']['lock'] = array(
+			'type' => 'object',
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_lock_attribute' );

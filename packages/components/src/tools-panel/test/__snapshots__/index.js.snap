@@ -64,7 +64,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   color: #1e1e1e;
   line-height: 1.2;
   margin: 0;
-  color: #050505;
+  color: #1e1e1e;
   font-size: calc(1.95 * 13px);
   font-weight: 600;
   display: block;
@@ -167,7 +167,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
         <button
           aria-expanded="false"
           aria-haspopup="true"
-          aria-label="View options"
+          aria-label="Panel header options"
           class="components-button components-dropdown-menu__toggle is-small has-icon"
           type="button"
         >

@@ -43,6 +43,19 @@
 	figcaption {
 		@include caption-style-theme();
 	}
+
+	// This is only required in the editor to overcome the fact the editor
+	// rewrites border width styles into shorthand.
+	table.has-individual-borders {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: $border-width;
+			border-style: solid;
+			border-color: currentColor;
+		}
+	}
 }
 
 .blocks-table__placeholder-form.blocks-table__placeholder-form {

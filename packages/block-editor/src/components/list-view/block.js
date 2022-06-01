@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -19,7 +20,7 @@ import {
 	useCallback,
 	memo,
 } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 /**
@@ -36,6 +37,7 @@ import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
 	block,
@@ -65,6 +67,20 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockName = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
+	);
+
+	// When a block hides its toolbar it also hides the block settings menu,
+	// since that menu is part of the toolbar in the editor canvas.
+	// List View respects this by also hiding the block settings menu.
+	const showBlockActions = hasBlockSupport(
+		blockName,
+		'__experimentalToolbar',
+		true
+	);
+	const { isLocked } = useBlockLock( clientId );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -73,13 +89,20 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block. This string indicates a link to select the block.
-				__( '%s link' ),
-				blockInformation.title
-		  )
-		: __( 'Link' );
+	let blockAriaLabel = __( 'Link' );
+	if ( blockInformation ) {
+		blockAriaLabel = isLocked
+			? sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the locked block.
+					__( '%s link (locked)' ),
+					blockInformation.title
+			  )
+			: sprintf(
+					// translators: %s: The title of the block. This string indicates a link to select the block.
+					__( '%s link' ),
+					blockInformation.title
+			  );
+	}
 
 	const settingsAriaLabel = blockInformation
 		? sprintf(
@@ -89,14 +112,7 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const {
-		__experimentalFeatures: withExperimentalFeatures,
-		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
-		__experimentalHideContainerBlockActions: hideContainerBlockActions,
-		isTreeGridMounted,
-		expand,
-		collapse,
-	} = useListViewContext();
+	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -114,27 +130,19 @@ function ListViewBlock( {
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
 	useEffect( () => {
-		if (
-			withExperimentalPersistentListViewFeatures &&
-			! isTreeGridMounted &&
-			isSelected
-		) {
+		if ( ! isTreeGridMounted && isSelected ) {
 			cellRef.current.focus();
 		}
 	}, [] );
 
-	const highlightBlock = withExperimentalPersistentListViewFeatures
-		? toggleBlockHighlight
-		: () => {};
-
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		highlightBlock( clientId, true );
-	}, [ clientId, setIsHovered, highlightBlock ] );
+		toggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		highlightBlock( clientId, false );
-	}, [ clientId, setIsHovered, highlightBlock ] );
+		toggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -165,18 +173,10 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
-	const showBlockActions =
-		withExperimentalFeatures &&
-		// hide actions for blocks like core/widget-areas
-		( ! hideContainerBlockActions ||
-			( hideContainerBlockActions && level > 1 ) );
-
-	const hideBlockActions = withExperimentalFeatures && ! showBlockActions;
-
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
-	} else if ( hideBlockActions ) {
+	} else if ( ! showBlockActions ) {
 		colSpan = 3;
 	}
 
@@ -184,10 +184,9 @@ function ListViewBlock( {
 		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
-		'is-branch-selected':
-			withExperimentalPersistentListViewFeatures && isBranchSelected,
+		'is-branch-selected': isBranchSelected,
 		'is-dragging': isDragged,
-		'has-single-cell': hideBlockActions,
+		'has-single-cell': ! showBlockActions,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

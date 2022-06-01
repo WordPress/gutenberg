@@ -34,6 +34,7 @@
 			}
 		}
 	},
+	"editorStyle": "wp-block-post-comments-form-editor",
 	"style": [
 		"wp-block-post-comments-form",
 		"wp-block-buttons",

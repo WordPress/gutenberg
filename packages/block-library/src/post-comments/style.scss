@@ -1,10 +1,24 @@
 .wp-block-post-comments {
-	// Remove extraneous top padding added to the first heading of the block.
-	> h3:first-of-type {
-		margin-top: 0;
+	/* utility classes */
+	.alignleft {
+		float: left;
+	}
+
+	.alignright {
+		float: right;
+	}
+	/* end utility classes */
+
+	.navigation {
+		&::after {
+			content: "";
+			display: table;
+			clear: both;
+		}
 	}
 
 	.commentlist {
+		clear: both;
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -48,10 +62,13 @@
 	.comment-meta {
 		font-size: 0.875em;
 		line-height: 1.5;
-		margin-left: -3.25em;
-
 		b {
 			font-weight: normal;
+		}
+		.comment-awaiting-moderation {
+			margin-top: 1em;
+			margin-bottom: 1em;
+			display: block;
 		}
 	}
 
@@ -84,6 +101,14 @@
 
 		#wp-comment-cookies-consent {
 			margin-top: 0.35em;
+		}
+	}
+
+	.comment-reply-title {
+		margin-bottom: 0;
+		:where(small) {
+			font-size: var(--wp--preset--font-size--medium, smaller);
+			margin-left: 0.5em;
 		}
 	}
 

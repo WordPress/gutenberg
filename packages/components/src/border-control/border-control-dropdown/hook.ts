@@ -20,9 +20,9 @@ export function useBorderControlDropdown(
 		border,
 		className,
 		colors,
-		contentClassName,
 		onChange,
 		previousStyleSelection,
+		__next36pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -61,12 +61,14 @@ export function useBorderControlDropdown(
 	}, [ cx ] );
 
 	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.colorIndicatorWrapper( border ) );
-	}, [ border, cx ] );
+		return cx(
+			styles.colorIndicatorWrapper( border, __next36pxDefaultSize )
+		);
+	}, [ border, cx, __next36pxDefaultSize ] );
 
 	const popoverClassName = useMemo( () => {
-		return cx( styles.borderControlPopover, contentClassName );
-	}, [ cx, contentClassName ] );
+		return cx( styles.borderControlPopover );
+	}, [ cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );

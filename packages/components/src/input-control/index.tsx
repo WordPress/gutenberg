@@ -17,6 +17,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { useDraft } from './utils';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
@@ -25,7 +26,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export function InputControl(
+export function UnforwardedInputControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
@@ -52,6 +53,12 @@ export function InputControl(
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
+	const draftHookProps = useDraft( {
+		value,
+		onBlur: props.onBlur,
+		onChange,
+	} );
+
 	return (
 		<InputBase
 			__unstableInputWidth={ __unstableInputWidth }
@@ -75,19 +82,38 @@ export function InputControl(
 				id={ id }
 				isFocused={ isFocused }
 				isPressEnterToChange={ isPressEnterToChange }
-				onChange={ onChange }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
 				size={ size }
 				stateReducer={ stateReducer }
-				value={ value }
+				{ ...draftHookProps }
 			/>
 		</InputBase>
 	);
 }
 
-const ForwardedComponent = forwardRef( InputControl );
+/**
+ * InputControl components let users enter and edit text. This is an experimental component
+ * intended to (in time) merge with or replace `TextControl`.
+ *
+ * ```jsx
+ * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/compose';
+ *
+ * const Example = () => {
+ *   const [ value, setValue ] = useState( '' );
+ *
+ *   return (
+ *  	<InputControl
+ *  		value={ value }
+ *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+ *  	/>
+ *   );
+ * };
+ * ```
+ */
+export const InputControl = forwardRef( UnforwardedInputControl );
 
-export default ForwardedComponent;
+export default InputControl;

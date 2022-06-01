@@ -724,6 +724,7 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
+-   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 
@@ -762,8 +763,10 @@ _Parameters_
 
 ### useSetting
 
-Hook that retrieves the editor setting.
-It works with nested objects using by finding the value at path.
+Hook that retrieves the given setting for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy.
+If none is found, it'll look it up in the block editor store.
 
 _Usage_
 

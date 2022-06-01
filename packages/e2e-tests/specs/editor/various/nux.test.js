@@ -116,6 +116,24 @@ describe( 'New User Experience (NUX)', () => {
 		expect( welcomeGuide ).toBeNull();
 	} );
 
+	it( 'should focus post title field after welcome guide is dismissed and post is empty', async () => {
+		// Create a new post as a first-time user.
+		await createNewPost( { showWelcomeGuide: true } );
+
+		// Guide should be open.
+		const welcomeGuide = await page.$( '.edit-post-welcome-guide' );
+		expect( welcomeGuide ).not.toBeNull();
+
+		// Close the guide.
+		await page.click( 'button[aria-label="Close dialog"]' );
+
+		// Focus should be in post title field.
+		const postTitle = await page.waitForSelector(
+			'h1[aria-label="Add title"'
+		);
+		await expect( postTitle ).toHaveFocus();
+	} );
+
 	it( 'should show the welcome guide if it is manually opened', async () => {
 		let welcomeGuide;
 
