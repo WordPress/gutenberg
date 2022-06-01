@@ -163,23 +163,20 @@ class VideoEdit extends Component {
 		setAttributes( { id, src: url } );
 	}
 
-	onSelectURL( newSrc ) {
+	onSelectURL( url ) {
 		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( newSrc ) ) {
-			this.setState( {
-				isFetchingVideo: true,
-			} );
-
+		if ( isURL( url ) ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
-				attributes: { url: newSrc },
+				attributes: { url },
 			} );
 			if ( undefined !== embedBlock ) {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined, poster: undefined } );
+
+			setAttributes( { id: url, src: url } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
