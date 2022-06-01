@@ -135,7 +135,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		return input.current === input.current?.ownerDocument.activeElement;
 	}
 
-	function onFocusEventHandler( event: FocusEvent ) {
+	function onFocusHandler( event: FocusEvent ) {
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( hasFocus() || event.target === tokensAndInput.current ) {
 			setIsActive( true );
@@ -463,7 +463,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		let match = _saveTransform( searchValue );
 		const startsWithMatch: string[] = [];
 		const containsMatch: string[] = [];
-		const selected = _value.map( ( item ) => {
+		const normalizedValue = _value.map( ( item ) => {
 			if ( typeof item === 'string' ) {
 				return item;
 			}
@@ -471,13 +471,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} );
 
 		if ( match.length === 0 ) {
-			_suggestions = difference( _suggestions, selected );
+			_suggestions = difference( _suggestions, normalizedValue );
 		} else {
 			match = match.toLocaleLowerCase();
 
 			each( _suggestions, ( suggestion ) => {
 				const index = suggestion.toLocaleLowerCase().indexOf( match );
-				if ( selected.indexOf( suggestion ) === -1 ) {
+				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
 					if ( index === 0 ) {
 						startsWithMatch.push( suggestion );
 					} else if ( index > 0 ) {
@@ -641,7 +641,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		tokenFieldProps = Object.assign( {}, tokenFieldProps, {
 			onKeyDown,
 			onKeyPress,
-			onFocus: onFocusEventHandler,
+			onFocus: onFocusHandler,
 		} );
 	}
 
