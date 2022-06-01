@@ -20,4 +20,13 @@
 			row-gap: 0;
 		}
 	}
+
+	/**
+	 * After converting PanelColorGradientSettings to render as a ToolsPanel
+	 * we need to remove the top margin when wrapping inner content due to
+	 * rendering via SlotFills.
+	 */
+	.block-editor-tools-panel-color-gradient-settings__item.first {
+		margin-top: 0;
+	}
 }

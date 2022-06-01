@@ -29,6 +29,7 @@ const BorderBoxControlSplitControls = (
 		onChange,
 		popoverPlacement,
 		popoverOffset,
+		rightAlignedClassName,
 		value,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
@@ -80,6 +81,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
+				className={ rightAlignedClassName }
 				hideLabelFromVision={ true }
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }

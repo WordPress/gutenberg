@@ -39,7 +39,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^4.0.0"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0"

@@ -7,9 +7,7 @@ describe( 'Gutenberg Editor Spacer Block test', () => {
 	it( 'should be able to add a spacer block', async () => {
 		await editorPage.addNewBlock( blockNames.spacer );
 		const spacerBlock = await editorPage.getBlockAtPosition(
-			blockNames.spacer,
-			1,
-			{ useWaitForVisible: true }
+			blockNames.spacer
 		);
 
 		expect( spacerBlock ).toBeTruthy();

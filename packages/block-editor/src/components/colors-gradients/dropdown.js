@@ -12,8 +12,6 @@ import {
 	Dropdown,
 	FlexItem,
 	__experimentalHStack as HStack,
-	__experimentalItem as Item,
-	__experimentalItemGroup as ItemGroup,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
@@ -22,46 +20,34 @@ import {
  */
 import ColorGradientControl from './control';
 
-// Conditionally wraps the `ColorGradientSettingsDropdown` color controls in an
-// `ItemGroup` allowing for a standalone group of controls to be
-// rendered semantically.
-const WithItemGroup = ( { __experimentalIsItemGroup, children } ) => {
-	if ( ! __experimentalIsItemGroup ) {
-		return children;
-	}
-
-	return (
-		<ItemGroup
-			isBordered
-			isSeparated
-			className="block-editor-panel-color-gradient-settings__item-group"
-		>
-			{ children }
-		</ItemGroup>
-	);
-};
-
 // When the `ColorGradientSettingsDropdown` controls are being rendered to a
 // `ToolsPanel` they must be wrapped in a `ToolsPanelItem`.
-const WithToolsPanelItem = ( {
-	__experimentalIsItemGroup,
-	settings,
-	children,
-	...props
-} ) => {
-	if ( __experimentalIsItemGroup ) {
-		return children;
-	}
-
+const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
+	const clearValue = () => {
+		if ( setting.colorValue ) {
+			setting.onColorChange();
+		} else if ( setting.gradientValue ) {
+			setting.onGradientChange();
+		}
+	};
 	return (
 		<ToolsPanelItem
-			hasValue={ settings.hasValue }
-			label={ settings.label }
-			onDeselect={ settings.onDeselect }
-			isShownByDefault={ settings.isShownByDefault }
-			resetAllFilter={ settings.resetAllFilter }
+			hasValue={ () => {
+				return !! setting.colorValue || !! setting.gradientValue;
+			} }
+			label={ setting.label }
+			onDeselect={ clearValue }
+			isShownByDefault={
+				setting.isShownByDefault !== undefined
+					? setting.isShownByDefault
+					: true
+			}
 			{ ...props }
 			className="block-editor-tools-panel-color-gradient-settings__item"
+			panelId={ panelId }
+			// Pass resetAllFilter if supplied due to rendering via SlotFill
+			// into parent ToolsPanel.
+			resetAllFilter={ setting.resetAllFilter }
 		>
 			{ children }
 		</ToolsPanelItem>
@@ -82,23 +68,21 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
 const renderToggle = ( settings ) => ( { onToggle, isOpen } ) => {
-	const { __experimentalIsItemGroup, colorValue, label } = settings;
+	const { colorValue, label } = settings;
 
-	// Determine component, `Item` or `Button`, to wrap color indicator with.
-	const ToggleComponent = __experimentalIsItemGroup ? Item : Button;
-	const toggleClassName = __experimentalIsItemGroup
-		? 'block-editor-panel-color-gradient-settings__item'
-		: 'block-editor-panel-color-gradient-settings__dropdown';
 	const toggleProps = {
 		onClick: onToggle,
-		className: classnames( toggleClassName, { 'is-open': isOpen } ),
-		'aria-expanded': __experimentalIsItemGroup ? undefined : isOpen,
+		className: classnames(
+			'block-editor-panel-color-gradient-settings__dropdown',
+			{ 'is-open': isOpen }
+		),
+		'aria-expanded': isOpen,
 	};
 
 	return (
-		<ToggleComponent { ...toggleProps }>
+		<Button { ...toggleProps }>
 			<LabeledColorIndicator colorValue={ colorValue } label={ label } />
-		</ToggleComponent>
+		</Button>
 	);
 };
 
@@ -115,15 +99,11 @@ export default function ColorGradientSettingsDropdown( {
 	disableCustomGradients,
 	enableAlpha,
 	gradients,
-	__experimentalIsItemGroup = true,
 	settings,
 	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
-	const dropdownClassName = __experimentalIsItemGroup
-		? 'block-editor-panel-color-gradient-settings__dropdown'
-		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
 	let popoverProps;
 	if ( __experimentalIsRenderedInSidebar ) {
 		popoverProps = {
@@ -133,12 +113,10 @@ export default function ColorGradientSettingsDropdown( {
 	}
 
 	return (
-		// Only wrap with `ItemGroup` if these controls are being rendered
-		// semantically.
-		<WithItemGroup __experimentalIsItemGroup={ __experimentalIsItemGroup }>
+		<>
 			{ settings.map( ( setting, index ) => {
 				const controlProps = {
-					clearable: __experimentalIsItemGroup ? undefined : false,
+					clearable: false,
 					colorValue: setting.colorValue,
 					colors,
 					disableCustomColors,
@@ -156,7 +134,6 @@ export default function ColorGradientSettingsDropdown( {
 				};
 				const toggleSettings = {
 					colorValue: setting.gradientValue ?? setting.colorValue,
-					__experimentalIsItemGroup,
 					label: setting.label,
 				};
 
@@ -166,15 +143,12 @@ export default function ColorGradientSettingsDropdown( {
 						// `ToolsPanelItem`
 						<WithToolsPanelItem
 							key={ index }
-							__experimentalIsItemGroup={
-								__experimentalIsItemGroup
-							}
-							settings={ setting }
+							setting={ setting }
 							{ ...props }
 						>
 							<Dropdown
 								popoverProps={ popoverProps }
-								className={ dropdownClassName }
+								className="block-editor-tools-panel-color-gradient-settings__dropdown"
 								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
@@ -185,6 +159,6 @@ export default function ColorGradientSettingsDropdown( {
 					)
 				);
 			} ) }
-		</WithItemGroup>
+		</>
 	);
 }

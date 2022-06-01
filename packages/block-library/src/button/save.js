@@ -12,6 +12,7 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalElementButtonClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
@@ -41,7 +42,8 @@ export default function save( { attributes, className } ) {
 			// For backwards compatibility add style that isn't provided via
 			// block support.
 			'no-border-radius': style?.border?.radius === 0,
-		}
+		},
+		__experimentalElementButtonClassName
 	);
 	const buttonStyle = {
 		...borderProps.style,
