@@ -97,10 +97,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		false
 	);
 
-	const debouncedSpeak = useDebounce( speak, 500 );
 	const prevSuggestions = usePrevious< string[] >( suggestions );
+	const prevValue = usePrevious< ( string | TokenItem )[] >( value );
+
 	const input = useRef< HTMLInputElement >( null );
 	const tokensAndInput = useRef< HTMLInputElement >( null );
+
+	const debouncedSpeak = useDebounce( speak, 500 );
 
 	useEffect( () => {
 		// Make sure to focus the input when the isActive state is true.
@@ -115,11 +118,18 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			prevSuggestions || []
 		);
 
+		if ( suggestionsDidUpdate || value !== prevValue ) {
+			updateSuggestions( suggestionsDidUpdate );
+		}
+
 		updateSuggestions( suggestionsDidUpdate );
-	}, [ suggestions ] );
+		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ suggestions, prevSuggestions, value, prevValue ] );
 
 	useEffect( () => {
 		updateSuggestions();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
 
 	if ( disabled && isActive ) {
