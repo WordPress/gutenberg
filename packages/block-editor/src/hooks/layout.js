@@ -32,6 +32,40 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
+/**
+ * Generates the utility classnames for the given blocks layout attributes.
+ *
+ * @param { Array } attributes Array of block attributes.
+ *
+ * @return { Array } Array of CSS classname strings.
+ */
+function getLayoutClasses( attributes ) {
+	const layoutClassnames = [];
+
+	if ( ! attributes.layout ) {
+		return layoutClassnames;
+	}
+
+	if ( attributes?.layout?.orientation ) {
+		layoutClassnames.push( `is-${ attributes.layout.orientation }` );
+	}
+
+	if ( attributes?.layout?.justifyContent ) {
+		layoutClassnames.push(
+			`is-content-justification-${ attributes.layout.justifyContent }`
+		);
+	}
+
+	if (
+		attributes?.layout?.flexWrap &&
+		attributes.layout.flexWrap === 'nowrap'
+	) {
+		layoutClassnames.push( 'is-nowrap' );
+	}
+
+	return layoutClassnames;
+}
+
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
@@ -212,9 +246,13 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
-		} );
+		const className = classnames(
+			props?.className,
+			{
+				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+			},
+			getLayoutClasses( attributes )
+		);
 
 		return (
 			<>
