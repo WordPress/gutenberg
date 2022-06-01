@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.12.0 (2022-06-01)
+
 ### Bug Fix
 
 -   `Popover`, `Dropdown`, `CustomGradientPicker`: Fix dropdown positioning by always targeting the rendered toggle, and switch off width in the Popover size middleware to stop reducing the width of the popover. ([#41361](https://github.com/WordPress/gutenberg/pull/41361))
