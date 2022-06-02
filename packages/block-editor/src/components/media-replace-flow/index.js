@@ -16,6 +16,7 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
+	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -192,16 +193,21 @@ const MediaReplaceFlow = ( {
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }
 							</span>
-							<LinkControl
-								value={ { url: mediaURLValue } }
-								settings={ [] }
-								showSuggestions={ false }
-								onChange={ ( { url } ) => {
-									setMediaURLValue( url );
-									onSelectURL( url );
-									editMediaButtonRef.current.focus();
-								} }
-							/>
+
+							<Tooltip text={ mediaURLValue } position="bottom">
+								<div>
+									<LinkControl
+										value={ { url: mediaURLValue } }
+										settings={ [] }
+										showSuggestions={ false }
+										onChange={ ( { url } ) => {
+											setMediaURLValue( url );
+											onSelectURL( url );
+											editMediaButtonRef.current.focus();
+										} }
+									/>
+								</div>
+							</Tooltip>
 						</form>
 					) }
 				</>
