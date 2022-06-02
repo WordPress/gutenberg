@@ -38,6 +38,7 @@
 		}
 	}
 
+	&.alignleft,
 	.alignleft {
 		/*rtl:ignore*/
 		float: left;
@@ -48,6 +49,7 @@
 		margin-bottom: 0.5em;
 	}
 
+	&.alignright,
 	.alignright {
 		/*rtl:ignore*/
 		float: right;
