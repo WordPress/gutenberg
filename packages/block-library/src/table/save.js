@@ -72,18 +72,17 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure { ...useBlockProps.save() }>
-			<table
-				className={ classes === '' ? undefined : classes }
-				style={ { ...colorProps.style, ...borderProps.style } }
-			>
-				<Section type="head" rows={ head } />
-				<Section type="body" rows={ body } />
-				<Section type="foot" rows={ foot } />
-			</table>
+		<table
+			className={ classes === '' ? undefined : classes }
+			style={ { ...colorProps.style, ...borderProps.style } }
+			{ ...useBlockProps.save() }
+		>
 			{ hasCaption && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content tagName="caption" value={ caption } />
 			) }
-		</figure>
+			<Section type="head" rows={ head } />
+			<Section type="body" rows={ body } />
+			<Section type="foot" rows={ foot } />
+		</table>
 	);
 }
