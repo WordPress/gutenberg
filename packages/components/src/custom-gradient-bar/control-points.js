@@ -32,6 +32,7 @@ import {
 } from './utils';
 import {
 	GRADIENT_MARKERS_WIDTH,
+	INSERT_POINT_WIDTH,
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
@@ -60,7 +61,9 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 					}
 				) }
 				style={ {
-					left: `${ position }%`,
+					left: `calc( ${ position }% - ${
+						GRADIENT_MARKERS_WIDTH / 2
+					}px )`,
 				} }
 				{ ...additionalProps }
 			/>
@@ -115,8 +118,7 @@ function ControlPoints( {
 	const onMouseMove = ( event ) => {
 		const relativePosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
-			gradientPickerDomRef.current,
-			GRADIENT_MARKERS_WIDTH
+			gradientPickerDomRef.current
 		);
 		const {
 			initialPosition,
@@ -315,7 +317,9 @@ function InsertPoint( {
 					style={ {
 						left:
 							insertPosition !== null
-								? `${ insertPosition }%`
+								? `calc( ${ insertPosition }% - ${
+										INSERT_POINT_WIDTH / 2
+								  }px )`
 								: undefined,
 					} }
 				/>
