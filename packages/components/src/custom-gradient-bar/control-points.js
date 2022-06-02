@@ -159,7 +159,7 @@ function ControlPoints( {
 		return () => {
 			cleanEventListenersRef.current();
 		};
-	}, [ cleanEventListenersRef ] );
+	}, [] );
 
 	return controlPoints.map( ( point, index ) => {
 		const initialPosition = point?.position;
