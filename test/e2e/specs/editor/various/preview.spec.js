@@ -174,7 +174,7 @@ test.describe( 'Preview', () => {
 		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Change the title and preview again.
-		await editorPage.type( '[aria-label="Add title"]', ' Ipsum' );
+		await editorPage.type( 'role=textbox[name="Add title"i]', ' Ipsum' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
