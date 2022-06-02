@@ -200,7 +200,7 @@ export default function PostCommentsEdit( {
 											<br />
 											{ createInterpolateElement(
 												__(
-													'Commenter avatars come from <a>Gravatar</a>'
+													'Commentator avatars come from <a>Gravatar</a>'
 												),
 												{
 													a: (
