@@ -28,7 +28,7 @@ describe( 'DatePicker', () => {
 	it( "should highlight today's date when not provided a currentDate", () => {
 		render( <DatePicker /> );
 
-		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
+		const todayDescription = moment().format( 'dddd, MMMM D, YYYY' );
 		expect(
 			screen.getByRole( 'button', { name: todayDescription } )
 		).toHaveClass( 'CalendarDay__selected' );
