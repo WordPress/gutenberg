@@ -19,6 +19,7 @@
 	margin-bottom: 1em;
 }
 
+//This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 .wp-block-file__button {
 	background: #32373c;
 	border-radius: 2em;
