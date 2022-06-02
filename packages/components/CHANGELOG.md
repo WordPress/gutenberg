@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+
+### Internal
+
+-   `FormTokenField`: Convert to TypeScirpt and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+
 ## 19.12.0 (2022-06-01)
 
 ### Bug Fix
