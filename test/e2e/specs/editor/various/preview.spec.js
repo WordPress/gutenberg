@@ -49,7 +49,7 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.type( 'role=textbox[name="Add title"]', '!' );
+		await editorPage.type( 'role=textbox[name="Add title"i]', '!' );
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
