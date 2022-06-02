@@ -227,7 +227,7 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.locator( 'role=button[name="Close panel"]' ).click();
+		await page.click( 'role=button[name="Close panel"i]' );
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage();
