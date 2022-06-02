@@ -40,17 +40,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg_display_experiment_section',
 		'gutenberg-experiments'
 	);
-	add_settings_field(
-		'gutenberg-navigation',
-		__( 'Navigation', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Navigation screen', 'gutenberg' ),
-			'id'    => 'gutenberg-navigation',
-		)
-	);
+
 	add_settings_field(
 		'gutenberg-list-v2',
 		__( 'List block v2', 'gutenberg' ),

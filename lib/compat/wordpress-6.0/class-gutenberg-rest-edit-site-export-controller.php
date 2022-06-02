@@ -76,9 +76,7 @@ class Gutenberg_REST_Edit_Site_Export_Controller extends WP_REST_Controller {
 			return $filename;
 		}
 
-		$stylesheet             = get_stylesheet();
-		$stylesheet_directories = explode( '/', $stylesheet );
-		$theme_name             = end( $stylesheet_directories );
+		$theme_name = basename( get_stylesheet() );
 
 		header( 'Content-Type: application/zip' );
 		header( 'Content-Disposition: attachment; filename=' . $theme_name . '.zip' );

@@ -13,7 +13,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
 ```jsx
 import {
 	__experimentalSurface as Surface,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 
 function Example() {
@@ -27,46 +27,46 @@ function Example() {
 
 ## Props
 
-### `backgroundSize`: number
+### `backgroundSize`: `number`
 
-- Required: No
-- Default: `12`
+-   Required: No
+-   Default: `12`
 
 Determines the grid size for "dotted" and "grid" variants.
 
 ### `borderBottom`: `boolean`
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 Renders a bottom border.
 
 ### `borderLeft`: `boolean`
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 Renders a left border.
 
 ### `borderRight`: `boolean`
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 Renders a right border.
 
 ### `borderTop`: `boolean`
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 Renders a top border.
 
 ### `variant`: `string`
 
-- Required: No
-- Default: `false`
-- Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
+-   Required: No
+-   Default: `false`
+-   Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
 
 Modifies the background color of `Surface`.
 

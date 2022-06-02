@@ -18,7 +18,7 @@ export function PostSchedule() {
 			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
-					popoverProps={ { anchorRef: anchorRef.current } }
+					popoverProps={ { anchorRef } }
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
@@ -33,7 +33,9 @@ export function PostSchedule() {
 							</Button>
 						</>
 					) }
-					renderContent={ () => <PostScheduleForm /> }
+					renderContent={ ( { onClose } ) => (
+						<PostScheduleForm onClose={ onClose } />
+					) }
 				/>
 			</PanelRow>
 		</PostScheduleCheck>
