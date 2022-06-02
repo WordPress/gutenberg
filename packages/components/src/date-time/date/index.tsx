@@ -64,7 +64,7 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 		);
 
 		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
-	}, [ events.length ] );
+	}, [ day, events.length ] );
 
 	return (
 		<Day

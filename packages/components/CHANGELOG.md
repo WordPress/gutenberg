@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+
+### Internal
+
+-   `FormTokenField`: Convert to TypeScirpt and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+
 ## 19.12.0 (2022-06-01)
 
 ### Bug Fix
@@ -31,6 +39,7 @@
 -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
 -   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
 -   `Dropdown` updated to satisfy `react/exhuastive-deps` eslint rule ([#41505](https://github.com/WordPress/gutenberg/pull/41505))
+-   `DateDayPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
 
 ### Experimental
 

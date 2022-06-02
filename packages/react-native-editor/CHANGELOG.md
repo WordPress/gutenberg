@@ -16,6 +16,10 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
 -   [*] Add 'Insert from URL' option to Image block [#40334]
 
+## 1.76.3
+
+-   [***] Fixes a crash on iOS related to JSI and Reanimated [#41482]
+
 ## 1.76.2
 
 -   [*] Ensure post title gets focused when is notified from native side [#41371]
