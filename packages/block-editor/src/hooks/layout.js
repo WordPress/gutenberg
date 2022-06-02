@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has } from 'lodash';
+import { has, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,12 +52,16 @@ function getLayoutClasses( attributes ) {
 	}
 
 	if ( attributes?.layout?.orientation ) {
-		layoutClassnames.push( `is-${ attributes.layout.orientation }` );
+		layoutClassnames.push(
+			`is-${ kebabCase( attributes.layout.orientation ) }`
+		);
 	}
 
 	if ( attributes?.layout?.justifyContent ) {
 		layoutClassnames.push(
-			`is-content-justification-${ attributes.layout.justifyContent }`
+			`is-content-justification-${ kebabCase(
+				attributes.layout.justifyContent
+			) }`
 		);
 	}
 
