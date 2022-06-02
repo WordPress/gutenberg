@@ -47,6 +47,7 @@
 	}
 }
 
+// We are lowering the specificity so that the button element can override the rule for the button inside the search block.
 :where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
 	padding: 4px;
 	border: 1px solid #949494;
