@@ -157,7 +157,7 @@ test.describe( 'Preview', () => {
 		const editorPage = page;
 
 		// Type Lorem in the title field.
-		await editorPage.type( 'role=textbox[name="Add title"]', 'Lorem' );
+		await editorPage.type( 'role=textbox[name="Add title"i]', 'Lorem' );
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage( editorPage );
