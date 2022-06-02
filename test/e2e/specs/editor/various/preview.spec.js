@@ -129,10 +129,10 @@ test.describe( 'Preview', () => {
 		await editorPage.bringToFront();
 
 		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
-		await editorPage.focus( 'role=textbox[name="Add title"]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'ArrowRight' );
-		await editorPage.keyboard.type( 'bbbbb' );
+		await editorPage.fill(
+			'role=textbox[name="Add title"i]',
+			'aaaaabbbbb'
+		);
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
