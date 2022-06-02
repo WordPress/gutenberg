@@ -17,7 +17,6 @@ test.describe( 'Preview', () => {
 	test( 'should open a preview window for a new post', async ( {
 		editor,
 		page,
-		pageUtils,
 		previewUtils,
 		requestUtils,
 	} ) => {
@@ -103,7 +102,6 @@ test.describe( 'Preview', () => {
 	test( 'should not revert title during a preview right after a save draft', async ( {
 		editor,
 		page,
-		pageUtils,
 		previewUtils,
 	} ) => {
 		const editorPage = page;
@@ -186,7 +184,7 @@ test.describe( 'Preview', () => {
 		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
 		// Change the title.
-		await editorPage.type( '[aria-label="Add title"]', ' Draft' );
+		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
 
 		// Open the preview page.
 		await previewUtils.waitForPreviewNavigation( previewPage );
