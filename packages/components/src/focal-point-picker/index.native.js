@@ -67,7 +67,7 @@ function FocalPointPicker( props ) {
 				y: focalPoint.y * containerSize.height,
 			} );
 		}
-	}, [ focalPoint, containerSize ] );
+	}, [ focalPoint, containerSize, pan ] );
 
 	// Pan responder to manage drag handle interactivity.
 	const panResponder = useMemo(
