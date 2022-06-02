@@ -26,10 +26,11 @@ export default function save( { attributes } ) {
 		title,
 	} = attributes;
 
-	const newRel = isEmpty( rel ) ? undefined : rel;
-	if ( ! url )  {
+	if ( ! url ) {
 		return null;
 	}
+	const newRel = isEmpty( rel ) ? undefined : rel;
+	
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
