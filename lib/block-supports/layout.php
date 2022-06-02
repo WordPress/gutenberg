@@ -169,7 +169,7 @@ function gutenberg_get_layout_classes( $block_attributes ) {
 	}
 
 	if ( ! empty( $block_attributes['layout']['justifyContent'] ) ) {
-		$class_names[] = 'is-content-justification-' . sanitize_title(  $block_attributes['layout']['justifyContent'] );
+		$class_names[] = 'is-content-justification-' . sanitize_title( $block_attributes['layout']['justifyContent'] );
 	}
 
 	if ( ! empty( $block_attributes['layout']['flexWrap'] ) && 'nowrap' === $block_attributes['layout']['flexWrap'] ) {
