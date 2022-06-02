@@ -120,7 +120,7 @@ function FocalPointPicker( props ) {
 					setSliderKey( ( prevState ) => prevState + 1 );
 				},
 			} ),
-		[ containerSize ]
+		[ containerSize, pan, onChange, shouldEnableBottomSheetScroll ]
 	);
 
 	const mediaBackground = usePreferredColorSchemeStyle(
