@@ -73,9 +73,10 @@ export default function save( { attributes } ) {
 
 	return (
 		<table
-			className={ classes === '' ? undefined : classes }
-			style={ { ...colorProps.style, ...borderProps.style } }
-			{ ...useBlockProps.save() }
+			{ ...useBlockProps.save( {
+				className: classes === '' ? undefined : classes,
+				style: { ...colorProps.style, ...borderProps.style },
+			} ) }
 		>
 			{ hasCaption && (
 				<RichText.Content tagName="caption" value={ caption } />
