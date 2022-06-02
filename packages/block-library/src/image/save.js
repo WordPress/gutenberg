@@ -27,7 +27,7 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
-	if(! attributes.url){
+	if ( ! url )  {
 		return null;
 	}
 
@@ -67,9 +67,9 @@ export default function save( { attributes } ) {
 			) }
 		</>
 	);
-		return (
-			<figure { ...useBlockProps.save( { className: classes } ) }>
-				{ figure }
-			</figure>
-		);
+	return (
+		<figure { ...useBlockProps.save( { className: classes } ) }>
+			{ figure }
+		</figure>
+	);
 }
