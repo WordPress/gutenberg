@@ -18,8 +18,8 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
-import type { Context, User, WpTemplate } from './entity-types';
-import {
+import type {
+	Context,
 	DefaultContextOf,
 	EntityRecordOf,
 	KeyOf,
@@ -27,8 +27,9 @@ import {
 	KindOf,
 	Name,
 	NameOf,
+	User,
+	WpTemplate,
 } from './entity-types';
-import type { OmitNevers } from './entity-types/helpers';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
