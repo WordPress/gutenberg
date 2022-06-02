@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 23.2.0 (2022-06-01)
+
+### Bug Fix
+
+-   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
+
 ## 23.1.0 (2022-05-18)
 
 ### New Feature

@@ -15,12 +15,24 @@ async function getSelectedOptionLabel( selector ) {
 }
 
 async function getDatePickerValues() {
-	const year = await getInputValue( '[aria-label="Year"]' );
-	const month = await getInputValue( '[aria-label="Month"]' );
-	const monthLabel = await getSelectedOptionLabel( '[aria-label="Month"]' );
-	const day = await getInputValue( '[aria-label="Day"]' );
-	const hours = await getInputValue( '[aria-label="Hours"]' );
-	const minutes = await getInputValue( '[aria-label="Minutes"]' );
+	const year = await getInputValue(
+		'.components-datetime__time-field-year input'
+	);
+	const month = await getInputValue(
+		'.components-datetime__time-field-month select'
+	);
+	const monthLabel = await getSelectedOptionLabel(
+		'.components-datetime__time-field-month select'
+	);
+	const day = await getInputValue(
+		'.components-datetime__time-field-day input'
+	);
+	const hours = await getInputValue(
+		'.components-datetime__time-field-hours-input input'
+	);
+	const minutes = await getInputValue(
+		'.components-datetime__time-field-minutes-input input'
+	);
 	const amOrPm = await page.$eval(
 		'.components-datetime__time-field-am-pm .is-primary',
 		( element ) => element.innerText.toLowerCase()
@@ -126,7 +138,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			await page.click( '.edit-post-post-schedule__toggle' );
 
 			// Clear the date.
-			await page.click( '.components-datetime__date-reset-button' );
+			await page.click( '.block-editor-publish-date-time-picker__reset' );
 
 			const publishingDate = await getPublishingDate();
 

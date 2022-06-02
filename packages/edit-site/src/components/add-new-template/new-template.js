@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, includes, map } from 'lodash';
+import { filter, includes, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -89,13 +89,11 @@ export default function NewTemplate( { postType } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
 
-	async function createTemplate( { slug } ) {
+	async function createTemplate( template ) {
 		try {
-			const { title, description } = find( defaultTemplateTypes, {
-				slug,
-			} );
+			const { title, description, slug } = template;
 
-			const template = await saveEntityRecord(
+			const newTemplate = await saveEntityRecord(
 				'postType',
 				'wp_template',
 				{
@@ -104,17 +102,19 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
+					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					is_wp_suggestion: true,
 				},
 				{ throwOnError: true }
 			);
 
 			// Set template before navigating away to avoid initial stale value.
-			setTemplate( template.id, template.slug );
+			setTemplate( newTemplate.id, newTemplate.slug );
 
 			// Navigate to the created template editor.
 			history.push( {
-				postId: template.id,
-				postType: template.type,
+				postId: newTemplate.id,
+				postType: newTemplate.type,
 			} );
 
 			// TODO: Add a success notice?
@@ -167,23 +167,23 @@ export default function NewTemplate( { postType } ) {
 			{ () => (
 				<NavigableMenu className="edit-site-new-template-dropdown__popover">
 					<MenuGroup label={ postType.labels.add_new_item }>
-						{ map(
-							missingTemplates,
-							( { title, description, slug } ) => (
+						{ map( missingTemplates, ( template ) => {
+							const { title, description, slug } = template;
+							return (
 								<MenuItem
 									icon={ TEMPLATE_ICONS[ slug ] }
 									iconPosition="left"
 									info={ description }
 									key={ slug }
 									onClick={ () => {
-										createTemplate( { slug } );
+										createTemplate( template );
 										// We will be navigated way so no need to close the dropdown.
 									} }
 								>
 									{ title }
 								</MenuItem>
-							)
-						) }
+							);
+						} ) }
 					</MenuGroup>
 				</NavigableMenu>
 			) }
