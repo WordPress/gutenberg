@@ -516,6 +516,7 @@ const waitForMediaLibrary = async ( driver ) => {
  * @param {string} driver
  * @param {string} elementLocator
  * @param {number} maxIteration - Default value is 25
+ * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
  * @param {number} iteration - Default value is 0
  * @return {string} - Returns the first element found, empty string if not found
  */
@@ -523,6 +524,7 @@ const waitForVisible = async (
 	driver,
 	elementLocator,
 	maxIteration = 25,
+	elementToReturn = 'firstElement',
 	iteration = 0
 ) => {
 	const timeout = 1000;
@@ -539,35 +541,47 @@ const waitForVisible = async (
 		await driver.sleep( timeout );
 	}
 
-	const element = await driver.elementsByXPath( elementLocator );
-	if ( element.length === 0 ) {
+	const elements = await driver.elementsByXPath( elementLocator );
+	if ( elements.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(
 			driver,
 			elementLocator,
 			maxIteration,
+			elementToReturn,
 			iteration + 1
 		);
 	}
 
-	return element[ 0 ];
+	switch ( elementToReturn ) {
+		case 'allElements':
+			return elements;
+		case 'lastElement':
+			return elements[ elements.length - 1 ];
+		default:
+			// Default is to return first element
+			return elements[ 0 ];
+	}
 };
 
 /**
  * @param {string} driver
  * @param {string} elementLocator
  * @param {number} maxIteration - Default value is 25, can be adjusted to be less to wait for element to not be visible
+ * @param {string} elementToReturn - Options are allElements, lastElement, firstElement. Defaults to "firstElement"
  * @return {boolean} - Returns true if element is found, false otherwise
  */
 const isElementVisible = async (
 	driver,
 	elementLocator,
-	maxIteration = 25
+	maxIteration = 25,
+	elementToReturn = 'firstElement'
 ) => {
 	const element = await waitForVisible(
 		driver,
 		elementLocator,
-		maxIteration
+		maxIteration,
+		elementToReturn
 	);
 
 	// if there is no element, return false
@@ -582,12 +596,14 @@ const clickIfClickable = async (
 	driver,
 	elementLocator,
 	maxIteration = 25,
+	elementToReturn = 'firstElement',
 	iteration = 0
 ) => {
 	const element = await waitForVisible(
 		driver,
 		elementLocator,
 		maxIteration,
+		elementToReturn,
 		iteration
 	);
 
@@ -606,6 +622,7 @@ const clickIfClickable = async (
 			driver,
 			elementLocator,
 			maxIteration,
+			elementToReturn,
 			iteration + 1
 		);
 	}
