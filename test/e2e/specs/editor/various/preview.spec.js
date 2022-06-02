@@ -29,7 +29,7 @@ test.describe( 'Preview', () => {
 		).toBeDisabled();
 
 		await editorPage.type(
-			'role=textbox[name="Add title"]',
+			'role=textbox[name="Add title"i]',
 			'Hello World'
 		);
 
