@@ -40,8 +40,8 @@ function FocalPointPicker( props ) {
 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
 	const [ tooltipVisible, setTooltipVisible ] = useState( false );
 
-	let locationPageOffsetX = useRef().current;
-	let locationPageOffsetY = useRef().current;
+	const locationPageOffsetX = useRef();
+	const locationPageOffsetY = useRef();
 	const videoRef = useRef( null );
 
 	useEffect( () => {
@@ -86,8 +86,8 @@ function FocalPointPicker( props ) {
 						pageX,
 						pageY,
 					} = event.nativeEvent;
-					locationPageOffsetX = pageX - x;
-					locationPageOffsetY = pageY - y;
+					locationPageOffsetX.current = pageX - x;
+					locationPageOffsetY.current = pageY - y;
 					pan.setValue( { x, y } ); // Set cursor to tap location.
 					pan.extractOffset(); // Set offset to current value.
 				},
@@ -106,8 +106,8 @@ function FocalPointPicker( props ) {
 					// Specifically, dragging the handle outside the bounds of the image
 					// results in inaccurate locationX and locationY coordinates to be
 					// reported. https://github.com/facebook/react-native/issues/15290#issuecomment-435494944
-					const x = pageX - locationPageOffsetX;
-					const y = pageY - locationPageOffsetY;
+					const x = pageX - locationPageOffsetX.current;
+					const y = pageY - locationPageOffsetY.current;
 					onChange( {
 						x: clamp( x / containerSize?.width, 0, 1 ).toFixed( 2 ),
 						y: clamp( y / containerSize?.height, 0, 1 ).toFixed(
