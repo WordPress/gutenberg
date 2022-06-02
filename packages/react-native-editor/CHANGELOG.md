@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.77.1
+
+-   [***] Fixes a crash on iOS related to JSI and Reanimated [#41482]
+
 ## 1.77.0
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
