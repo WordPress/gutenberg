@@ -298,14 +298,16 @@ Each block can configure any of these settings separately, providing a more fine
 
 Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
-### Opt-in into UI controls
+### Opt in to UI controls
 
-There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
+There's one special setting property, `appearanceTools`, which is a boolean with a default value of `false`. Themes can set this to `true` to enable the following:
 
 - border: color, radius, style, width
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+
+In addition, setting `appearanceTools` to `true` enables any tools that might be added to the block editor in the future. Block themes may consider setting this property to avoid having to keep track of new appearance tools.
 
 #### Backward compatibility with add_theme_support
 
