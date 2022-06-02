@@ -68,13 +68,16 @@ describe( 'InputControl', () => {
 		it( 'should update value onChange', async () => {
 			const user = setupUser();
 			const spy = jest.fn();
-			render( <InputControl value="Hello" onChange={ spy } /> );
+			render(
+				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
+			);
 			const input = getInput();
 
 			await user.type( input, ' there' );
 
 			expect( input ).toHaveValue( 'Hello there' );
 			expect( spy ).toHaveBeenCalledTimes( 6 );
+			expect( spy ).toHaveBeenLastCalledWith( 'Hello there' );
 		} );
 
 		it( 'should work as a controlled component', async () => {
@@ -86,15 +89,13 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			await user.type( input, '2' );
-
-			// Ensuring <InputControl /> is controlled.
+			// Blurs the input.
 			await user.click( document.body );
 
 			// Updating the value via props.
 			rerender( <InputControl value="three" onChange={ spy } /> );
 
 			expect( input ).toHaveValue( 'three' );
-
 			/*
 			 * onChange called only once. onChange is not called when a
 			 * parent component explicitly passed a (new value) change down to
@@ -109,8 +110,6 @@ describe( 'InputControl', () => {
 				<InputControl value="Original" onChange={ spy } />
 			);
 			const input = getInput();
-
-			// Assuming <InputControl /> is controlled (not focused)
 
 			// Updating the value.
 			rerender( <InputControl value="New" onChange={ spy } /> );
