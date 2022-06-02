@@ -28,6 +28,7 @@ import {
 	Name,
 	NameOf,
 } from './entity-types';
+import type { OmitNevers } from './entity-types/helpers';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -80,14 +81,20 @@ type Optional< T > = T | undefined;
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
-export type EntityQuery< C extends Context > = Record< string, any > & {
+export type EntityQuery<
+	C extends Context,
+	WithFields extends boolean = true
+> = Omit< Record< string, any >, '_fields' > & {
 	context?: C;
-	/**
-	 * The requested fields. If specified, the REST API will remove from the response
-	 * any fields not on that list.
-	 */
-	_fields: string[] | undefined;
-};
+} & ( WithFields extends true
+		? {
+				/**
+				 * The requested fields. If specified, the REST API will remove from the response
+				 * any fields not on that list.
+				 */
+				_fields: string[];
+		  }
+		: {} );
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -259,7 +266,7 @@ interface GetEntityRecord {
 		kind: K,
 		name: N,
 		key: KeyOf< K, N >,
-		query: EntityQuery< C >
+		query: EntityQuery< C, true >
 	): Partial< EntityRecordOf< K, N, C > > | null | undefined;
 
 	<
@@ -272,7 +279,7 @@ interface GetEntityRecord {
 		kind: K,
 		name: N,
 		key: KeyOf< K, N >,
-		query?: Omit< EntityQuery< C >, '_fields' >
+		query?: EntityQuery< C, false >
 	): EntityRecordOf< K, N, C > | null | undefined;
 }
 
@@ -289,8 +296,8 @@ interface GetEntityRecord {
  *
  * @return Record.
  */
-export const getEntityRecord = createSelector(
-	( <
+export const getEntityRecord: GetEntityRecord = createSelector(
+	<
 		R extends EntityRecordOf< K, N >,
 		C extends Context = DefaultContextOf< R >,
 		K extends Kind = KindOf< R >,
@@ -300,7 +307,7 @@ export const getEntityRecord = createSelector(
 		kind: K,
 		name: N,
 		key: KeyOf< R >,
-		query?: EntityQuery< C >
+		query
 	) => {
 		const queriedState = get( state.entities.records, [
 			kind,
@@ -334,14 +341,8 @@ export const getEntityRecord = createSelector(
 		}
 
 		return item;
-	} ) as GetEntityRecord,
-	< K extends Kind, N extends Name >(
-		state: State,
-		kind: K,
-		name: N,
-		recordId: KeyOf< K, N >,
-		query?: EntityQuery< any >
-	) => {
+	},
+	( state: State, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
 		return [
 			get( state.entities.records, [
@@ -363,7 +364,12 @@ export const getEntityRecord = createSelector(
 		];
 	}
 );
+const commentDefault = getEntityRecord( {} as State, 'root', 'comment', 15 );
+// commentDefault is Comment<'edit'>
 
+const commentView = getEntityRecord( {} as State, 'root', 'comment', 15, {
+	context: 'view',
+} );
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
@@ -499,7 +505,7 @@ interface GetEntityRecords {
 		state: State,
 		kind: K,
 		name: N,
-		query: EntityQuery< C > & { _fields: string[] }
+		query: EntityQuery< C, true >
 	): Partial< EntityRecordOf< K, N, C > >[] | null | undefined;
 
 	<
@@ -511,7 +517,7 @@ interface GetEntityRecords {
 		state: State,
 		kind: K,
 		name: N,
-		query?: Omit< EntityQuery< C >, '_fields' >
+		query?: EntityQuery< C, false >
 	): EntityRecordOf< K, N, C >[] | null | undefined;
 }
 
@@ -534,7 +540,7 @@ export const getEntityRecords: GetEntityRecords = <
 	state: State,
 	kind: K,
 	name: N,
-	query?: EntityQuery< C >
+	query
 ) => {
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
