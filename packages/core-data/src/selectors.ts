@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import { set, map, find, get, filter, compact } from 'lodash';
 
 /**
@@ -27,7 +28,6 @@ import {
 	Name,
 	NameOf,
 } from './entity-types';
-import createSelector from './typed-rememo';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
