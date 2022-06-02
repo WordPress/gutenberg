@@ -27,6 +27,9 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
+	if(! attributes.url){
+		return null;
+	}
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
@@ -64,12 +67,9 @@ export default function save( { attributes } ) {
 			) }
 		</>
 	);
-	if ( attributes.url ) {
 		return (
 			<figure { ...useBlockProps.save( { className: classes } ) }>
 				{ figure }
 			</figure>
 		);
-	}
-	return null;
 }
