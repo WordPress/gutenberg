@@ -203,7 +203,7 @@ class WP_Style_Engine {
 		// Before default processing, style definitions could define a callable `value_func` to generate custom CSS rules at this point.
 		$style_property = $style_definition['property_key'];
 
-		// Build CSS var values from var:? values, e..g, `var(--wp--css--rule-slug )`
+		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
 		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
 			if ( $should_return_css_vars && $style_definition['css_vars'] ) {
