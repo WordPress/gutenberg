@@ -31,8 +31,6 @@ import {
 	getHorizontalRelativeGradientPosition,
 } from './utils';
 import {
-	GRADIENT_MARKERS_WIDTH,
-	INSERT_POINT_WIDTH,
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
@@ -61,9 +59,8 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 					}
 				) }
 				style={ {
-					left: `calc( ${ position }% - ${
-						GRADIENT_MARKERS_WIDTH / 2
-					}px )`,
+					left: `${ position }%`,
+					transform: 'translateX( -50% )',
 				} }
 				{ ...additionalProps }
 			/>
@@ -314,14 +311,14 @@ function InsertPoint( {
 					} }
 					className="components-custom-gradient-picker__insert-point"
 					icon={ plus }
-					style={ {
-						left:
-							insertPosition !== null
-								? `calc( ${ insertPosition }% - ${
-										INSERT_POINT_WIDTH / 2
-								  }px )`
-								: undefined,
-					} }
+					style={
+						insertPosition !== null
+							? {
+									left: `${ insertPosition }%`,
+									transform: 'translateX( -50% )',
+							  }
+							: undefined
+					}
 				/>
 			) }
 			renderContent={ () => (
