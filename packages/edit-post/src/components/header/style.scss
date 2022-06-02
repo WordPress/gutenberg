@@ -33,10 +33,10 @@
 
 .is-distraction-free {
 	.edit-post-header {
-		box-shadow: none;
 		position: absolute;
 		width: 100vw;
 		background-color: rgba(255, 255, 255, 0);
+		border-bottom: 0 solid #fff;
 
 		// hide everything
 		& > .edit-post-header__settings > *,
@@ -48,6 +48,7 @@
 		& > .edit-post-header__settings > .editor-post-publish-panel__toggle,
 		& > .edit-post-header__settings .interface-more-menu-dropdown {
 			visibility: visible;
+			transition: opacity 0.4s;
 			opacity: 0;
 		}
 
@@ -60,17 +61,19 @@
 		& > div:first-child {
 			opacity: 1;
 			a {
-				transition: width 0.2s, height 0.2s, margin 0.2s;
+				transition: width 0.2s, height 0.2s, margin 0.2s, border-radius 0.2s;
 				width: 50px;
 				height: 50px;
 				margin: 5px;
+				border-radius: 4px;
 			}
 		}
 
 		&:hover {
-			transition: background-color 0.4s, box-shadow 0.4s;
+			transition: background-color 0.4s, border-bottom 0.4s;
 			background-color: rgba(255, 255, 255, 1);
-			box-shadow: $shadow-popover;
+			border-bottom: 1px solid #e0e0e0;
+
 			// show the publish button and the more button
 			> .edit-post-header__settings > .editor-post-publish-button,
 			> .edit-post-header__settings > .editor-post-publish-panel__toggle,

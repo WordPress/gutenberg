@@ -36,7 +36,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 							scope="core/edit-post"
 						/>
 					) }
-					<WritingMenu />
+					<WritingMenu onClose={ onClose } />
 					<ModeSwitcher />
 					<ActionItem.Slot
 						name="core/edit-post/plugin-more-menu"
