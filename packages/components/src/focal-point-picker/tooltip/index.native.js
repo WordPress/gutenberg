@@ -12,6 +12,7 @@ import {
 	useRef,
 	useState,
 	useContext,
+	useCallback,
 } from '@wordpress/element';
 
 /**
@@ -67,9 +68,9 @@ function Label( { align, text, xOffset, yOffset } ) {
 
 	useEffect( () => {
 		startAnimation();
-	}, [ visible ] );
+	}, [ visible, startAnimation ] );
 
-	const startAnimation = () => {
+	const startAnimation = useCallback( () => {
 		Animated.timing( animationValue, {
 			toValue: visible ? 1 : 0,
 			duration: visible ? 300 : 150,
@@ -77,7 +78,7 @@ function Label( { align, text, xOffset, yOffset } ) {
 			delay: visible ? 500 : 0,
 			easing: Easing.out( Easing.quad ),
 		} ).start();
-	};
+	}, [ visible, animationValue ] );
 
 	// Transforms rely upon onLayout to enable custom offsets additions.
 	let tooltipTransforms;
