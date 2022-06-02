@@ -7,6 +7,7 @@ import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockSettingsDropdown from './block-settings-dropdown';
+import BlockVisuallyConvertButton from './block-visually-convert-button';
 
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	return (
@@ -20,6 +21,7 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
 					/>
 				) }
 			</ToolbarItem>
+			<BlockVisuallyConvertButton clientIds={ clientIds } { ...props } />
 		</ToolbarGroup>
 	);
 }
