@@ -255,12 +255,15 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
+		const layoutClasses = shouldRenderLayoutStyles
+			? getLayoutClasses( attributes )
+			: null;
 		const className = classnames(
 			props?.className,
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
 			},
-			getLayoutClasses( attributes )
+			layoutClasses
 		);
 
 		return (
