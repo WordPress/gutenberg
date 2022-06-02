@@ -71,10 +71,10 @@ test.describe( 'Preview', () => {
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
-		await editorPage.click( 'role=textbox[name="Add title"i]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'A' );
-		await editorPage.keyboard.press( 'ArrowRight' );
-		await editorPage.keyboard.type( ' And more.' );
+		await editorPage.fill(
+			'role=textbox[name="Add title"i]',
+			'Hello World! And more.'
+		);
 		await previewUtils.waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
