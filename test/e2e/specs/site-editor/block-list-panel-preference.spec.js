@@ -12,8 +12,8 @@ test.describe( 'Block list view', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Should open by default', async ( { page, pageUtils } ) => {
-		await pageUtils.visitSiteEditor( {
+	test( 'Should open by default', async ( { admin, page } ) => {
+		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
+import { escape, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,6 +43,7 @@ import {
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -239,6 +240,15 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 
+	// Unfortunately this causes the escaping model to be inverted.
+	// The escaped content is stored in the block attributes (and ultimately in the database),
+	// and then the raw data is "recovered" when outputting into the DOM.
+	// It would be preferable to store the **raw** data in the block attributes and escape it in JS.
+	// Why? Because there isn't one way to escape data. Depending on the context, you need to do
+	// different transforms. It doesn't make sense to me to choose one of them for the purposes of storage.
+	// See also:
+	// - https://github.com/WordPress/gutenberg/pull/41063
+	// - https://github.com/WordPress/gutenberg/pull/18617.
 	const label = escapeTitle
 		? escape( title )
 		: originalLabel || escape( normalizedURL );
@@ -606,7 +616,17 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			type: postType,
-			title: page.title.rendered,
+			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
+			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
+			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
+			// e.g.
+			// - title.raw = "Yes & No"
+			// - title.rendered = "Yes &#038; No"
+			// - decodeEntities( title.rendered ) = "Yes & No"
+			// See:
+			// - https://github.com/WordPress/gutenberg/pull/41063
+			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
+			title: decodeEntities( page.title.rendered ),
 			url: page.link,
 			kind: 'post-type',
 		};
@@ -795,10 +815,20 @@ export default function NavigationLinkEdit( {
 										text={ tooltipText }
 									>
 										<>
-											<span>
+											<span
+												aria-label={ __(
+													'Navigation link text'
+												) }
+											>
 												{
-													/* Trim to avoid trailing white space when the placeholder text is not present */
-													`${ label } ${ placeholderText }`.trim()
+													// Some attributes are stored in an escaped form. It's a legacy issue.
+													// Ideally they would be stored in a raw, unescaped form.
+													// Unescape is used here to "recover" the escaped characters
+													// so they display without encoding.
+													// See `updateNavigationLinkBlockAttributes` for more details.
+													`${ unescape(
+														label
+													) } ${ placeholderText }`.trim()
 												}
 											</span>
 											<span className="wp-block-navigation-link__missing_text-tooltip">

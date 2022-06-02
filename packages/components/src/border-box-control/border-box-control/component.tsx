@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -51,7 +53,8 @@ const BorderBoxControl = (
 		linkedValue,
 		onLinkedChange,
 		onSplitChange,
-		popoverClassNames,
+		popoverPlacement,
+		popoverOffset,
 		splitValue,
 		toggleLinked,
 		__experimentalHasMultipleOrigins,
@@ -59,9 +62,18 @@ const BorderBoxControl = (
 		__next36pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
+	const containerRef = useRef();
+	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+	const popoverProps = popoverPlacement
+		? {
+				placement: popoverPlacement,
+				offset: popoverOffset,
+				anchorRef: containerRef,
+		  }
+		: undefined;
 
 	return (
-		<View className={ className } { ...otherProps } ref={ forwardedRef }>
+		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -78,7 +90,7 @@ const BorderBoxControl = (
 						placeholder={
 							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
-						popoverContentClassName={ popoverClassNames?.linked }
+						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider={ true }
@@ -98,7 +110,8 @@ const BorderBoxControl = (
 						enableAlpha={ enableAlpha }
 						enableStyle={ enableStyle }
 						onChange={ onSplitChange }
-						popoverClassNames={ popoverClassNames }
+						popoverPlacement={ popoverPlacement }
+						popoverOffset={ popoverOffset }
 						value={ splitValue }
 						__experimentalHasMultipleOrigins={
 							__experimentalHasMultipleOrigins

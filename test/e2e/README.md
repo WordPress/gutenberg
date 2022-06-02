@@ -14,23 +14,23 @@ In fact, any API that returns `ElementHandle` is [discouraged](https://playwrigh
 
 ### Use accessible selectors
 
-Use the selector engine [role-selector](https://github.com/kevin940726/role-selector) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations. It's an experimental library and could be swapped out if playwright supports it [natively](https://github.com/microsoft/playwright/issues/11182) instead. The syntax should be straightforward and looks like this:
+Use the selector engine [role-selector](https://playwright.dev/docs/selectors#role-selector) to construct the query wherever possible. It enables us to write accessible queries without having to rely on internal implementations. The syntax should be straightforward and looks like this:
 
 ```js
-// Select a button with the accessible name "Hello World".
-page.locator( 'role=button[name="Hello World"]' );
+// Select a button with the accessible name "Hello World" (case-insensitive).
+page.locator( 'role=button[name="Hello World"i]' );
 ```
 
-It can also be chained with built-in selector engines to perform complex queries:
+It's recommended to append `i` to the name attribute to match it case-insensitively wherever it makes sense. It can also be chained with built-in selector engines to perform complex queries:
 
 ```js
 // Select a button with a name ends with `Back` and is visible on the screen.
 page.locator( 'role=button[name=/Back$/] >> visible=true' );
-// Select a button with name "View options" under `#some-section`.
+// Select a button with the (exact) name "View options" under `#some-section`.
 page.locator( 'css=#some-section >> role=button[name="View options"]' );
 ```
 
-`role-selector` under the hood uses [`@testing-library/dom`](https://github.com/testing-library/dom-testing-library) to compute the query the elements and compute the accessible attributes.
+See the [official documentation](https://playwright.dev/docs/selectors#role-selector) for more info on how to use them.
 
 ### Selectors are strict by default
 

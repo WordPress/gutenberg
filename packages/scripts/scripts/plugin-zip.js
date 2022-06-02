@@ -49,7 +49,8 @@ if ( hasPackageProp( 'files' ) ) {
 
 files.forEach( ( file ) => {
 	stdout.write( `  Adding \`${ file }\`.\n` );
-	zip.addLocalFile( file, dirname( file ) );
+	const zipDirectory = dirname( file );
+	zip.addLocalFile( file, zipDirectory !== '.' ? zipDirectory : '' );
 } );
 
 zip.writeZip( `./${ name }.zip` );
