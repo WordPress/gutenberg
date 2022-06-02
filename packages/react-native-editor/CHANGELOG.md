@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.76.3
+
+-   [*] Bump react-native-reanimated version to 2.4.1-wp-3 [#41482]
+
 ## 1.76.2
 
 -   [*] Ensure post title gets focused when is notified from native side [#41371]
