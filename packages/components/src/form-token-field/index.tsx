@@ -122,7 +122,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			updateSuggestions( suggestionsDidUpdate );
 		}
 
-		updateSuggestions( suggestionsDidUpdate );
 		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ suggestions, prevSuggestions, value, prevValue ] );
