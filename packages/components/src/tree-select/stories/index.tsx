@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, object, text } from '@storybook/addon-knobs';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,16 +13,24 @@ import { useState } from '@wordpress/element';
  */
 import TreeSelect from '../';
 
-export default {
+const meta: ComponentMeta< typeof TreeSelect > = {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
+	argTypes: {
+		tree: { control: { type: null } },
+	},
 	parameters: {
-		knobs: { disable: false },
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
 	},
 };
 
-const TreeSelectWithState = ( props ) => {
-	const [ selection, setSelection ] = useState();
+export default meta;
+
+const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
+	const [ selection, setSelection ] = useState< string >();
 
 	return (
 		<TreeSelect
@@ -33,15 +41,9 @@ const TreeSelectWithState = ( props ) => {
 	);
 };
 
-export const _default = () => {
-	const label = text( 'Label', 'Label Text' );
-	const noOptionLabel = text( 'No Option Label', 'No parent page' );
-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
-	const help = text(
-		'Help Text',
-		'Help text to explain the select control.'
-	);
-	const tree = object( 'Tree', [
+export const Default = TreeSelectWithState.bind( {} );
+Default.args = {
+	tree: [
 		{
 			name: 'Page 1',
 			id: 'p1',
@@ -66,15 +68,5 @@ export const _default = () => {
 				},
 			],
 		},
-	] );
-
-	return (
-		<TreeSelectWithState
-			label={ label }
-			noOptionLabel={ noOptionLabel }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			tree={ tree }
-		/>
-	);
+	],
 };

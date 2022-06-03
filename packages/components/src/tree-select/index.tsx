@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
-
 /**
  * WordPress dependencies
  */
@@ -10,9 +9,13 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { SelectControl } from '../';
+import { SelectControl } from '../select-control';
+import type { TreeSelectProps, Tree } from './types';
 
-function getSelectOptions( tree, level = 0 ) {
+function getSelectOptions(
+	tree: Tree[],
+	level = 0
+): { label: string; value: string }[] {
 	return flatMap( tree, ( treeNode ) => [
 		{
 			value: treeNode.id,
@@ -28,9 +31,9 @@ export default function TreeSelect( {
 	noOptionLabel,
 	onChange,
 	selectedId,
-	tree,
+	tree = [],
 	...props
-} ) {
+}: TreeSelectProps ) {
 	const options = useMemo( () => {
 		return compact( [
 			noOptionLabel && { value: '', label: noOptionLabel },
@@ -39,6 +42,8 @@ export default function TreeSelect( {
 	}, [ noOptionLabel, tree ] );
 
 	return (
+		// TODO: onChange type fix.
+		//@ts-ignore
 		<SelectControl
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
