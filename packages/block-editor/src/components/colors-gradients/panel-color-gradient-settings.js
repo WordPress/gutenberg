@@ -89,7 +89,10 @@ export const PanelColorGradientSettingsInner = ( {
 					);
 				} );
 			} }
+			menuPosition="left"
 			panelId={ panelId }
+			popoverOffset={ 48 }
+			popoverPlacement="left-start"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 		>

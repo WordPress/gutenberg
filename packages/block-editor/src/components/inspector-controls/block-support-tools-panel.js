@@ -67,7 +67,10 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			label={ label }
 			resetAll={ resetAll }
 			key={ panelId }
+			menuPosition="left"
 			panelId={ panelId }
+			popoverOffset={ 48 }
+			popoverPlacement="left-start"
 			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"

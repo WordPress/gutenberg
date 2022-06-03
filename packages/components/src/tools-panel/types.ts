@@ -22,11 +22,26 @@ export type ToolsPanelProps = {
 	 */
 	label: string;
 	/**
+	 * Whether the menu toggle is positioned to the left or right of the panel's
+	 * header.
+	 *
+	 * @default 'right'
+	 */
+	menuPosition?: 'left' | 'right';
+	/**
 	 * If a `panelId` is set, it is passed through the `ToolsPanelContext` and
 	 * used to restrict panel items. Only items with a matching `panelId` will
 	 * be able to register themselves with this panel.
 	 */
 	panelId: string;
+	/**
+	 * The space between the popover and the menu toggle.
+	 */
+	popoverOffset?: number;
+	/**
+	 * The position of the menu popover compared to the menu toggle.
+	 */
+	popoverPlacement?: string;
 	/**
 	 * A function to call when the `Reset all` menu option is selected. This is
 	 * passed through to the panel's header component.
@@ -55,6 +70,17 @@ export type ToolsPanelHeaderProps = {
 	 * the `label` for the panel header's `DropdownMenu`.
 	 */
 	label: string;
+	/**
+	 * Whether the menu toggle is positioned to the left or right of the panel's
+	 * header.
+	 *
+	 * @default true
+	 */
+	menuPosition?: 'left' | 'right';
+	/**
+	 * An internal prop used to control the visibility of the dropdown.
+	 */
+	popoverProps?: Record< string, unknown >;
 	/**
 	 * The `resetAll` prop provides the callback to execute when the "Reset all"
 	 * menu item is selected. Its purpose is to facilitate resetting any control

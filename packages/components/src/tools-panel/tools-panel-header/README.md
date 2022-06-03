@@ -25,6 +25,20 @@ Text to be displayed within the panel header. It is also passed along as the
 
 -   Required: Yes
 
+### `menuPosition`: `left` | `right`
+
+Whether the menu toggle is positioned to the left or right of the panel's
+title.
+
+- Required: No
+- Default: `right`
+
+### `popoverProps`: `Record< string, unknown >`
+
+An internal prop used to control the visibility of the dropdown.
+
+- Required: No
+
 ### `resetAll`: `() => void`
 
 The `resetAll` prop provides the callback to execute when the "Reset all" menu

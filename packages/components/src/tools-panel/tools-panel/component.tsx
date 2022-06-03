@@ -20,7 +20,9 @@ const ToolsPanel = (
 	const {
 		children,
 		label,
+		menuPosition,
 		panelContext,
+		popoverProps,
 		resetAllItems,
 		toggleItem,
 		...toolsPanelProps
@@ -33,6 +35,8 @@ const ToolsPanel = (
 					label={ label }
 					resetAll={ resetAllItems }
 					toggleItem={ toggleItem }
+					menuPosition={ menuPosition }
+					popoverProps={ popoverProps }
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>

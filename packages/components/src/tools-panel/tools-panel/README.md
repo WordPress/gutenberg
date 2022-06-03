@@ -88,7 +88,25 @@ wrapper element allowing the panel to lay them out accordingly.
 Text to be displayed within the panel's header and as the `aria-label` for the
 panel's dropdown menu.
 
-- Required: Yes
+### `menuPosition`: `left` | `right`
+
+Whether the menu toggle is positioned to the left or right of the panel's
+header.
+
+- Required: No
+- Default: `right`
+
+### `popoverOffset`: `number`
+
+The space between the popover and the menu toggle.
+
+- Required: No
+
+### `popoverPlacement`: `string`
+
+The position of the menu popover compared to the menu toggle.
+
+- Required: No
 
 ### `panelId`: `string`
 

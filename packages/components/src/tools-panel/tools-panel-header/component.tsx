@@ -152,6 +152,8 @@ const ToolsPanelHeader = (
 		headingClassName,
 		label: labelText,
 		menuItems,
+		menuPosition = 'right',
+		popoverProps,
 		resetAll,
 		toggleItem,
 		...headerProps
@@ -177,52 +179,63 @@ const ToolsPanelHeader = (
 		( [ , isSelected ] ) => isSelected
 	);
 
+	const menuJustification =
+		menuPosition === 'right' ? 'space-between' : 'flex-start';
+
+	const dropdown = hasMenuItems && (
+		<DropdownMenu
+			icon={ dropDownMenuIcon }
+			label={ dropDownMenuLabelText }
+			menuProps={ { className: dropdownMenuClassName } }
+			toggleProps={ {
+				isSmall: true,
+				describedBy: dropdownMenuDescriptionText,
+			} }
+			popoverProps={ popoverProps }
+		>
+			{ () => (
+				<>
+					<DefaultControlsGroup
+						items={ defaultItems }
+						toggleItem={ toggleItem }
+					/>
+					<OptionalControlsGroup
+						items={ optionalItems }
+						toggleItem={ toggleItem }
+					/>
+					<MenuGroup>
+						<MenuItem
+							aria-disabled={ ! canResetAll }
+							variant={ 'tertiary' }
+							onClick={ () => {
+								if ( canResetAll ) {
+									resetAll();
+									speak(
+										__( 'All options reset' ),
+										'assertive'
+									);
+								}
+							} }
+						>
+							{ __( 'Reset all' ) }
+						</MenuItem>
+					</MenuGroup>
+				</>
+			) }
+		</DropdownMenu>
+	);
+
 	return (
-		<HStack { ...headerProps } ref={ forwardedRef }>
+		<HStack
+			{ ...headerProps }
+			justify={ menuJustification }
+			ref={ forwardedRef }
+		>
+			{ menuPosition === 'left' && dropdown }
 			<Heading level={ 2 } className={ headingClassName }>
 				{ labelText }
 			</Heading>
-			{ hasMenuItems && (
-				<DropdownMenu
-					icon={ dropDownMenuIcon }
-					label={ dropDownMenuLabelText }
-					menuProps={ { className: dropdownMenuClassName } }
-					toggleProps={ {
-						isSmall: true,
-						describedBy: dropdownMenuDescriptionText,
-					} }
-				>
-					{ () => (
-						<>
-							<DefaultControlsGroup
-								items={ defaultItems }
-								toggleItem={ toggleItem }
-							/>
-							<OptionalControlsGroup
-								items={ optionalItems }
-								toggleItem={ toggleItem }
-							/>
-							<MenuGroup>
-								<MenuItem
-									aria-disabled={ ! canResetAll }
-									variant={ 'tertiary' }
-									onClick={ () => {
-										if ( canResetAll ) {
-											resetAll();
-											speak(
-												__( 'All options reset' ),
-												'assertive'
-											);
-										}
-									} }
-								>
-									{ __( 'Reset all' ) }
-								</MenuItem>
-							</MenuGroup>
-						</>
-					) }
-				</DropdownMenu>
-			) }
+			{ menuPosition === 'right' && dropdown }
 		</HStack>
 	);
 };

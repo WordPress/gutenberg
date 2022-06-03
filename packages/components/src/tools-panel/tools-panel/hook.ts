@@ -59,6 +59,8 @@ export function useToolsPanel(
 		className,
 		resetAll,
 		panelId,
+		popoverOffset,
+		popoverPlacement,
 		hasInnerWrapper,
 		shouldRenderPlaceholderItems,
 		__experimentalFirstVisibleItemClass,
@@ -276,6 +278,11 @@ export function useToolsPanel(
 		[ ...panelItems ].reverse()
 	);
 
+	const popoverProps =
+		popoverPlacement || popoverOffset
+			? { placement: popoverPlacement, offset: popoverOffset }
+			: undefined;
+
 	const panelContext = useMemo(
 		() => ( {
 			areAllOptionalControlsHidden,
@@ -312,6 +319,7 @@ export function useToolsPanel(
 	return {
 		...otherProps,
 		panelContext,
+		popoverProps,
 		resetAllItems,
 		toggleItem,
 		className: classes,
