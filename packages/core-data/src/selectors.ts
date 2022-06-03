@@ -365,12 +365,7 @@ export const getEntityRecord: GetEntityRecord = createSelector(
 		];
 	}
 );
-const commentDefault = getEntityRecord( {} as State, 'root', 'comment', 15 );
-// commentDefault is Comment<'edit'>
 
-const commentView = getEntityRecord( {} as State, 'root', 'comment', 15, {
-	context: 'view',
-} );
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
  *
