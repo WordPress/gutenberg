@@ -9,6 +9,10 @@ import type { ComponentProps } from 'react';
 import type SelectControl from '../select-control';
 import type { SelectControlProps } from '../select-control/types';
 
+export type SelectOptions = Required<
+	ComponentProps< typeof SelectControl >
+>[ 'options' ];
+
 export interface Tree {
 	id: string;
 	name: string;

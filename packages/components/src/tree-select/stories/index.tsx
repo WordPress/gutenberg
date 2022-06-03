@@ -17,7 +17,11 @@ const meta: ComponentMeta< typeof TreeSelect > = {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
 	argTypes: {
-		tree: { control: { type: null } },
+		help: { control: { type: 'text' } },
+		label: { control: { type: 'text' } },
+		prefix: { control: { type: 'text' } },
+		suffix: { control: { type: 'text' } },
+		selectedId: { control: { type: null } },
 	},
 	parameters: {
 		controls: {
