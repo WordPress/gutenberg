@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+-   `Tooltip`: Opt in to `__stableShift` to ensure that the Tooltip is always within the viewport. ([#41524](https://github.com/WordPress/gutenberg/pull/41524))
 -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
 -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
 
