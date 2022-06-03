@@ -1,14 +1,16 @@
 # Feature Flags
 
-Often there's a need to prevent specific code in the Gutenberg project from being shipped to WordPress core, or ensure that certain experimental features are only active in the plugin.
-
-This can be achieved through a 'feature flag'.
+'Feature flags' are variables that allow you to prevent specific code in the Gutenberg project from being shipped to WordPress core, and to run certain experimental features only in the plugin.
 
 ## Introducing `process.env.IS_GUTENBERG_PLUGIN`
 
-The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable, whose value indicates whether the code is running within the plugin. When the codebase is built for the plugin, this variable will be set to `true`. When building for WordPress core, it will be set to `false` or `undefined`.
+The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable whose value 'flags' whether code is running within the Gutenberg plugin. 
+
+When the codebase is built for the plugin, this variable will be set to `true`. When building for WordPress core, it will be set to `false` or `undefined`.
 
 ## Basic Use
+
+### Exporting features
 
 A plugin-only function or constant should be exported using the following ternary syntax:
 
@@ -21,7 +23,9 @@ export const pluginOnlyFeature =
 	process.env.IS_GUTENBERG_PLUGIN ? myPluginOnlyFeature : undefined;
 ```
 
-In non-plugin environments ,the `phaseTwoFeature` export will be `undefined`.
+In the above example, the `pluginOnlyFeature` export will be `undefined` in non-plugin environments such as WordPress core.
+
+### Importing features
 
 If you're attempting to import and call a plugin-only feature, be sure to wrap the function call in an `if` statement to avoid an error:
 
@@ -33,7 +37,7 @@ if ( process.env.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-### How it works
+## How it works
 
 During the webpack build, instances of `process.env.IS_GUTENBERG_PLUGIN` will be replaced using webpack's [define plugin](https://webpack.js.org/plugins/define-plugin/).
 
@@ -45,7 +49,7 @@ if ( process.env.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-– the variable `process.env.IS_GUTENBERG_PLUGIN` will be replaced with the boolean `true` when building the codebase for the plugin:
+– the variable `process.env.IS_GUTENBERG_PLUGIN` will be replaced with the boolean `true` during the plugin-only build:
 
 ```js
 if ( true ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with `true`
@@ -69,7 +73,7 @@ if ( undefined ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with
 
 For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
 
-One of the steps involves something known as 'dead code elimination'. So when the following code is encountered, webpack determines that the surrounding `if`statement is unnecessary:
+One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if`statement is unnecessary:
 
 ```js
 if ( true ) {
@@ -77,10 +81,10 @@ if ( true ) {
 }
 ```
 
-The condition will always evaluate to `true`, so it can be removed leaving just the code in the body:
+The condition will always evaluate to `true`, so webpack removes it, leaving behind the code that was in the body:
 
 ```js
-pluginOnlyFeature();
+pluginOnlyFeature(); // The `if` condition block has been removed. Only the body remains.
 ```
 
 Similarly, when building for WordPress core, the condition in the following `if` statement always resolves to false:
