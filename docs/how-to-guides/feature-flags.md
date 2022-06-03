@@ -73,7 +73,7 @@ if ( undefined ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with
 
 For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
 
-One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if`statement is unnecessary:
+One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if` statement is unnecessary:
 
 ```js
 if ( true ) {
