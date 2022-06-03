@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import type { Meta, Story } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -16,7 +17,9 @@ const sizes = {
 	large: space( 40 ),
 };
 
-export default {
+const meta: Meta<
+	typeof Spinner & { size: 'default' | 'medium' | 'large' }
+> = {
 	title: 'Components/Spinner',
 	component: Spinner,
 	argTypes: {
@@ -27,8 +30,11 @@ export default {
 		},
 	},
 };
+export default meta;
 
-const Template = ( { size } ) => {
+const Template: Story<
+	typeof Spinner & { size: 'default' | 'medium' | 'large' }
+> = ( { size } ) => {
 	const cx = useCx();
 	const spinnerClassname = cx( css`
 		width: ${ size };
@@ -37,7 +43,9 @@ const Template = ( { size } ) => {
 	return <Spinner className={ spinnerClassname } />;
 };
 
-export const Default = Template.bind( {} );
+export const Default: Story<
+	typeof Spinner & { size: 'default' | 'medium' | 'large' }
+> = Template.bind( {} );
 Default.args = {
 	size: 'default',
 };
