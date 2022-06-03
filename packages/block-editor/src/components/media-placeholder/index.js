@@ -70,6 +70,7 @@ export function MediaPlaceholder( {
 	onError,
 	onSelect,
 	onCancel,
+	onClose = noop,
 	onSelectURL,
 	onDoubleClick,
 	onFilesPreUpload = noop,
@@ -327,6 +328,7 @@ export function MediaPlaceholder( {
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
 				onSelect={ onSelect }
+				onClose={ onClose }
 				allowedTypes={ allowedTypes }
 				mode={ 'browse' }
 				value={

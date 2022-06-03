@@ -8,13 +8,19 @@ import { get, has, omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
+import {
+	Button,
+	withNotices,
+	Placeholder,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
+	//MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -100,6 +106,55 @@ export function isMediaDestroyed( id ) {
 	return attachment.destroyed;
 }
 
+const ImageErrorPlaceholder = ( {
+	// id,
+	url,
+	onClear,
+	// onSelect,
+	// onSelectURL,
+	// onError,
+	// onCloseModal,
+} ) => (
+	<Placeholder
+		className="wp-block-image__error-placeholder"
+		icon={ icon }
+		label={ __( 'This image could not be loaded' ) }
+	>
+		<>
+			<p>{ url }</p>
+			<p>
+				{ __(
+					'This might be due to a network error, or the image may have been deleted.'
+				) }
+			</p>
+			<HStack justify="flex-start">
+				{
+					// Hiding this for now until I can get it to work :)
+				 }
+				{ /*<MediaReplaceFlow*/ }
+				{ /*	mediaId={ id }*/ }
+				{ /*	mediaURL={ url }*/ }
+				{ /*	allowedTypes={ ALLOWED_MEDIA_TYPES }*/ }
+				{ /*	accept="image/*"*/ }
+				{ /*	onSelect={ onSelect }*/ }
+				{ /*	onSelectURL={ onSelectURL }*/ }
+				{ /*	onError={ onError }*/ }
+				{ /*	onCloseModal={ onCloseModal }*/ }
+				{ /*	buttonVariant="primary"*/ }
+				{ /*/>*/ }
+				<Button
+					className="wp-block-image__error-placeholder__button"
+					title={ __( 'Clear and replace image' ) }
+					variant="secondary"
+					onClick={ onClear }
+				>
+					{ __( 'Clear and replace image' ) }
+				</Button>
+			</HStack>
+		</>
+	</Placeholder>
+);
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -123,6 +178,7 @@ export function ImageEdit( {
 		sizeSlug,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
+	const [ hasImageLoadError, setHasImageLoadError ] = useState( false );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -144,11 +200,16 @@ export function ImageEdit( {
 	// fired when the media modal closes.
 	function onCloseModal() {
 		if ( isMediaDestroyed( attributes?.id ) ) {
-			setAttributes( {
-				url: undefined,
-				id: undefined,
-			} );
+			setHasImageLoadError( true );
 		}
+	}
+
+	function clearImageAttributes() {
+		setHasImageLoadError( false );
+		setAttributes( {
+			url: undefined,
+			id: undefined,
+		} );
 	}
 
 	/*
@@ -157,26 +218,15 @@ export function ImageEdit( {
 		 has been deleted.
 	*/
 	function onImageError( isReplaced = false ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice(
-			sprintf(
-				/* translators: %s url or missing image */
-				__( 'Error loading image: %s' ),
-				url
-			)
-		);
-
 		// If the image block was not replaced with an embed,
 		// and it's not an external image,
 		// and it's been deleted from the database,
-		// clear the attributes and trigger the placeholder.
+		// clear the attributes and trigger an error placeholder.
 		if ( id && ! isReplaced && ! isExternalImage( id, url ) ) {
 			isMediaFileDeleted( id ).then( ( isFileDeleted ) => {
 				if ( isFileDeleted ) {
-					setAttributes( {
-						url: undefined,
-						id: undefined,
-					} );
+					noticeOperations.removeAllNotices();
+					setHasImageLoadError( true );
 				}
 			} );
 		}
@@ -366,7 +416,18 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ ( temporaryURL || url ) && (
+			{ hasImageLoadError && (
+				<ImageErrorPlaceholder
+					id={ id }
+					url={ url }
+					onClear={ clearImageAttributes }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					onCloseModal={ onCloseModal }
+				/>
+			) }
+			{ ! hasImageLoadError && ( temporaryURL || url ) && (
 				<Image
 					temporaryURL={ temporaryURL }
 					attributes={ attributes }
@@ -392,19 +453,21 @@ export function ImageEdit( {
 					/>
 				</BlockControls>
 			) }
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
-				onError={ onUploadError }
-				onClose={ onCloseModal }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
+			{ ! hasImageLoadError && (
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					notices={ noticeUI }
+					onError={ onUploadError }
+					onClose={ onCloseModal }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			) }
 		</figure>
 	);
 }
