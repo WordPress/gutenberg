@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ComponentProps } from 'react';
 
 /**
  * Internal dependencies
  */
+import type SelectControl from '../select-control';
 import type { SelectControlProps } from '../select-control/types';
 
 export interface Tree {
@@ -14,8 +15,7 @@ export interface Tree {
 	children?: Tree[];
 }
 
-export interface TreeSelectProps
-	extends Omit< SelectControlProps, 'value' | 'onChange' > {
+export interface TreeSelectProps extends Omit< SelectControlProps, 'value' > {
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */
@@ -27,14 +27,5 @@ export interface TreeSelectProps
 	/**
 	 * The id of the currently selected node.
 	 */
-	selectedId?: string | string[] | undefined;
-
-	value?: string | string[];
-	/**
-	 * A function that receives the id of the new node element that is being selected.
-	 */
-	onChange: (
-		value: string | string[],
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => void;
+	selectedId?: ComponentProps< typeof SelectControl >[ 'value' ];
 }

@@ -80,7 +80,7 @@ A function that receives the id of the new node element that is being selected.
 
 The id of the currently selected node.
 
--   Type: `string`
+-   Type: `string` | `string[]`
 -   Required: No
 
 ### tree

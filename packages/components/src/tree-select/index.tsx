@@ -26,7 +26,7 @@ function getSelectOptions(
 	] );
 }
 
-export default function TreeSelect( {
+export function TreeSelect( {
 	label,
 	noOptionLabel,
 	onChange,
@@ -42,7 +42,6 @@ export default function TreeSelect( {
 	}, [ noOptionLabel, tree ] );
 
 	return (
-		// TODO: onChange type fix.
 		<SelectControl
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
@@ -50,3 +49,5 @@ export default function TreeSelect( {
 		/>
 	);
 }
+
+export default TreeSelect;
