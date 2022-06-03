@@ -596,7 +596,7 @@ const isElementVisible = async (
 const clickIfClickable = async (
 	driver,
 	elementLocator,
-	maxIteration = 25,
+	maxIteration = 10,
 	elementToReturn = 'firstElement',
 	iteration = 0
 ) => {

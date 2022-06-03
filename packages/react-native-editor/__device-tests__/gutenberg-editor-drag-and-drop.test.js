@@ -3,7 +3,6 @@
  */
 import { blockNames } from './pages/editor-page';
 import {
-	clearClipboard,
 	clickElementOutsideOfTextInput,
 	dragAndDropAfterElement,
 	isAndroid,
@@ -13,10 +12,6 @@ import {
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
-	beforeEach( async () => {
-		await clearClipboard( editorPage.driver );
-	} );
-
 	it( 'should be able to drag & drop a block', async () => {
 		// Initialize the editor with a Spacer and Paragraph block
 		await editorPage.setHtmlContent(
