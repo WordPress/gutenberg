@@ -30,7 +30,7 @@ const meta: ComponentMeta< typeof TreeSelect > = {
 export default meta;
 
 const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
-	const [ selection, setSelection ] = useState< string >();
+	const [ selection, setSelection ] = useState< string | string[] >();
 
 	return (
 		<TreeSelect

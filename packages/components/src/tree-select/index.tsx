@@ -43,7 +43,6 @@ export default function TreeSelect( {
 
 	return (
 		// TODO: onChange type fix.
-		//@ts-ignore
 		<SelectControl
 			{ ...{ label, options, onChange } }
 			value={ selectedId }

@@ -27,12 +27,14 @@ export interface TreeSelectProps
 	/**
 	 * The id of the currently selected node.
 	 */
-	selectedId?: string;
+	selectedId?: string | string[] | undefined;
+
+	value?: string | string[];
 	/**
 	 * A function that receives the id of the new node element that is being selected.
 	 */
 	onChange: (
-		value: string,
+		value: string | string[],
 		extra?: { event?: ChangeEvent< HTMLSelectElement > }
 	) => void;
 }
