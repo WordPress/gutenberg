@@ -12,6 +12,9 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
+// Used to skip some tests on iOS
+const onlyOnAndroid = isAndroid() ? it : it.skip;
+
 describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 	beforeEach( async () => {
 		await clearClipboard( editorPage.driver );
@@ -53,9 +56,9 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
 	} );
 
-	// skip iOS for now
-	if ( isAndroid() ) {
-		it( 'should be able to long-press on a text-based block to paste a text in a focused textinput', async () => {
+	onlyOnAndroid(
+		'should be able to long-press on a text-based block to paste a text in a focused textinput',
+		async () => {
 			// Add a Paragraph block
 			await editorPage.addNewBlock( blockNames.paragraph );
 			const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
@@ -85,12 +88,12 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 			// Remove the block
 			await editorPage.removeBlockAtPosition( blockNames.paragraph );
-		} );
-	}
+		}
+	);
 
-	// skip iOS for now
-	if ( isAndroid() ) {
-		it( 'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput', async () => {
+	onlyOnAndroid(
+		'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput',
+		async () => {
 			// Add a Shortcode block
 			await editorPage.addNewBlock( blockNames.shortcode );
 			const shortcodeBlockElement = await editorPage.getShortBlockTextInputAtPosition(
@@ -118,8 +121,8 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 
 			// Remove the block
 			await editorPage.removeBlockAtPosition( blockNames.shortcode );
-		} );
-	}
+		}
+	);
 
 	it( 'should be able to drag & drop a text-based block when the textinput is not focused', async () => {
 		// Initialize the editor with two Paragraph blocks
