@@ -12,7 +12,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockVisuallyConvertButton( { clientIds, ...props } ) {
+export default function BlockEditVisuallyButton( { clientIds, ...props } ) {
 	const { block, shouldRender } = useSelect(
 		( select ) => {
 			const firstBlockClientId = clientIds[ 0 ];
