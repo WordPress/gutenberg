@@ -54,8 +54,8 @@ class WP_Style_Engine {
 					'--wp--preset--color--$slug' => 'color',
 				),
 				'classnames'    => array(
-					'has-text-color'    => true,
-					'has-$slug-color'   => 'color',
+					'has-text-color'  => true,
+					'has-$slug-color' => 'color',
 				),
 			),
 			'background' => array(
