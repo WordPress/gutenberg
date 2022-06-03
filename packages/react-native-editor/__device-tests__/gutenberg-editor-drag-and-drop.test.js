@@ -12,6 +12,9 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
+// Used to skip some tests on iOS
+const onlyOnAndroid = isAndroid() ? it : it.skip;
+
 describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 	beforeEach( async () => {
 		await clearClipboard( editorPage.driver );
@@ -53,61 +56,73 @@ describe( 'Gutenberg Editor Drag & Drop blocks tests', () => {
 		await editorPage.removeBlockAtPosition( blockNames.paragraph, 1 );
 	} );
 
-	it( 'should be able to long-press on a text-based block to paste a text in a focused textinput', async () => {
-		// Add a Paragraph block
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-			blockNames.paragraph
-		);
+	onlyOnAndroid(
+		'should be able to long-press on a text-based block to paste a text in a focused textinput',
+		async () => {
+			// Add a Paragraph block
+			await editorPage.addNewBlock( blockNames.paragraph );
+			const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+				blockNames.paragraph
+			);
 
-		// Set clipboard text
-		await setClipboard( editorPage.driver, testData.shortText );
+			// Set clipboard text
+			await setClipboard( editorPage.driver, testData.shortText );
 
-		// Dismiss auto-suggestion popup
-		if ( isAndroid() ) {
-			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
-			await editorPage.dismissAndroidClipboardSmartSuggestion();
+			// Dismiss auto-suggestion popup
+			if ( isAndroid() ) {
+				// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
+				await editorPage.dismissAndroidClipboardSmartSuggestion();
+			}
+
+			// Paste into the Paragraph block
+			await tapPasteAboveElement(
+				editorPage.driver,
+				paragraphBlockElement
+			);
+			const paragraphText = await editorPage.getTextForParagraphBlockAtPosition(
+				1
+			);
+
+			// Expect to have the pasted text in the Paragraph block
+			expect( paragraphText ).toMatch( testData.shortText );
+
+			// Remove the block
+			await editorPage.removeBlockAtPosition( blockNames.paragraph );
 		}
+	);
 
-		// Paste into the Paragraph block
-		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement );
-		const paragraphText = await editorPage.getTextForParagraphBlockAtPosition(
-			1
-		);
+	onlyOnAndroid(
+		'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput',
+		async () => {
+			// Add a Shortcode block
+			await editorPage.addNewBlock( blockNames.shortcode );
+			const shortcodeBlockElement = await editorPage.getShortBlockTextInputAtPosition(
+				blockNames.shortcode
+			);
 
-		// Expect to have the pasted text in the Paragraph block
-		expect( paragraphText ).toMatch( testData.shortText );
+			// Set clipboard text
+			await setClipboard( editorPage.driver, testData.shortText );
 
-		// Remove the block
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
+			// Dismiss auto-suggestion popup
+			if ( isAndroid() ) {
+				// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
+				await editorPage.dismissAndroidClipboardSmartSuggestion();
+			}
 
-	it( 'should be able to long-press on a text-based block using the PlainText component to paste a text in a focused textinput', async () => {
-		// Add a Shortcode block
-		await editorPage.addNewBlock( blockNames.shortcode );
-		const shortcodeBlockElement = await editorPage.getShortBlockTextInputAtPosition(
-			blockNames.shortcode
-		);
+			// Paste into the Shortcode block
+			await tapPasteAboveElement(
+				editorPage.driver,
+				shortcodeBlockElement
+			);
+			const shortcodeText = await shortcodeBlockElement.text();
 
-		// Set clipboard text
-		await setClipboard( editorPage.driver, testData.shortText );
+			// Expect to have the pasted text in the Shortcode block
+			expect( shortcodeText ).toMatch( testData.shortText );
 
-		// Dismiss auto-suggestion popup
-		if ( isAndroid() ) {
-			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
-			await editorPage.dismissAndroidClipboardSmartSuggestion();
+			// Remove the block
+			await editorPage.removeBlockAtPosition( blockNames.shortcode );
 		}
-
-		// Paste into the Shortcode block
-		await tapPasteAboveElement( editorPage.driver, shortcodeBlockElement );
-		const shortcodeText = await shortcodeBlockElement.text();
-
-		// Expect to have the pasted text in the Shortcode block
-		expect( shortcodeText ).toMatch( testData.shortText );
-
-		// Remove the block
-		await editorPage.removeBlockAtPosition( blockNames.shortcode );
-	} );
+	);
 
 	it( 'should be able to drag & drop a text-based block when the textinput is not focused', async () => {
 		// Initialize the editor with two Paragraph blocks
