@@ -60,7 +60,8 @@
 		margin-bottom: 0.5em;
 	}
 
-	// This is needed for classic themes where the align class is not on the container.
+	// This is needed for classic themes where the align class is not on the container before WordPress 6.0 and on the same container in 6.0.
+	&.aligncenter,
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
