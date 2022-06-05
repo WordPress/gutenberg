@@ -82,7 +82,7 @@ export default function useEntityRecords< RecordType >(
 			return query( coreStore ).getEntityRecords( kind, name, queryArgs );
 		},
 		[ kind, name, queryAsString, options.enabled ]
-	);
+	) as any;
 
 	return {
 		records,

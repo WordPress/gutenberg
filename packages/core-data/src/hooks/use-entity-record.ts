@@ -83,12 +83,12 @@ export default function useEntityRecord< RecordType >(
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
 		[ kind, name, recordId, options.enabled ]
-	);
+	) as any;
 
 	return {
 		record,
 		...rest,
-	};
+	} as any;
 }
 
 export function __experimentalUseEntityRecord(
