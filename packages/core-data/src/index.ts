@@ -13,6 +13,7 @@ import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
 import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
+import type { KeyOf } from './entity-types';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -21,8 +22,11 @@ import { STORE_NAME } from './name';
 
 const entitySelectors = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
-		selectors.getEntityRecord( state, kind, name, key, query );
+	result[ getMethodName( kind, name ) ] = (
+		state,
+		key: KeyOf< typeof kind, typeof name >,
+		query
+	) => selectors.getEntityRecord( state, kind, name, key, query );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( state, query ) =>
 		selectors.getEntityRecords( state, kind, name, query );
 	return result;

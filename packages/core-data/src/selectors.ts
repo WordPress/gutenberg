@@ -40,7 +40,7 @@ interface State {
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
-	currentTheme: number;
+	currentTheme: string;
 	currentUser: User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
@@ -569,7 +569,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const dirtyRecords = [];
+		const dirtyRecords: any[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
@@ -610,11 +610,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								dirtyRecords.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord![
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									] as KeyOf< K, N >,
 									title:
 										entityConfig?.getTitle?.(
 											entityRecord
@@ -646,7 +644,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const recordsBeingSaved = [];
+		const recordsBeingSaved: any[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
@@ -678,13 +676,11 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 								recordsBeingSaved.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord![
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									] as KeyOf< K, N >,
 									title:
-										entityConfig?.getTitle?.(
+										entityConfig.getTitle?.(
 											entityRecord
 										) || '',
 									name,
@@ -805,7 +801,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: K,
 		name: N,
 		recordId: KeyOf< K, N >
-	): EntityRecord | undefined => ( {
+	): EntityRecordOf< K, N > | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
@@ -1251,7 +1247,7 @@ export const getReferenceByDistinctEdits = createSelector(
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): WpTemplate< 'edit' > | null {
+): WpTemplate< 'edit' > | null | undefined {
 	const records = getEntityRecords( state, 'postType', 'wp_template', {
 		'find-template': link,
 	} );

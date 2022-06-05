@@ -310,25 +310,6 @@ const pluginConfig: PluginEntity[ 'config' ] = {
 };
 
 export const rootEntitiesConfig = [
-	{
-		label: __( 'Base' ),
-		kind: 'root',
-		name: '__unstableBase',
-		baseURL: '/',
-		baseURLParams: {
-			_fields: [
-				'description',
-				'gmt_offset',
-				'home',
-				'name',
-				'site_icon',
-				'site_icon_url',
-				'site_logo',
-				'timezone_string',
-				'url',
-			].join( ',' ),
-		},
-	},
 	siteConfig,
 	postTypeConfig,
 	attachmentConfig,
@@ -341,10 +322,30 @@ export const rootEntitiesConfig = [
 	menuConfig,
 	menuItemConfig,
 	menuLocationConfig,
-	globalStyleConfig,
 	themeConfig,
 	pluginConfig,
 ];
+
+rootEntitiesConfig.unshift( globalStyleConfig as any);
+rootEntitiesConfig.unshift( {
+	label: __( 'Base' ),
+	kind: 'root',
+	name: '__unstableBase',
+	baseURL: '/',
+	baseURLParams: {
+		_fields: [
+			'description',
+			'gmt_offset',
+			'home',
+			'name',
+			'site_icon',
+			'site_icon_url',
+			'site_logo',
+			'timezone_string',
+			'url',
+		].join( ',' ),
+	},
+} as any );
 
 type PostTypeConfig = {
 	kind: 'postType';
