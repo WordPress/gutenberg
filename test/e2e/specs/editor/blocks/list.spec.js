@@ -180,7 +180,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.click( '[data-type="core/paragraph"]:first-of-type' );
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'List' );
 
@@ -213,7 +213,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		await page.click( '[data-type="core/paragraph"]:first-of-type' );
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'List' );
 

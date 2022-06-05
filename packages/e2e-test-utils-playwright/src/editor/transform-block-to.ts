@@ -39,8 +39,7 @@ export async function transformBlockTo( this: Editor, name: string ) {
 	// Wait for the transformed block to appear.
 	const BLOCK_SELECTOR = '.block-editor-block-list__block';
 	const BLOCK_NAME_SELECTOR = `[data-title="${ name }"]`;
-	await this.page.waitForSelector(
-		`${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }`,
-		{ strict: false }
-	);
+	await this.page
+		.locator( `${ BLOCK_SELECTOR }${ BLOCK_NAME_SELECTOR }` )
+		.isVisible();
 }
