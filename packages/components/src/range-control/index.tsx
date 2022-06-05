@@ -40,8 +40,8 @@ import type { RangeControlProps } from './types';
 
 const noop = () => {};
 
-function UnforwardedRangeControl< P >(
-	props: WordPressComponentProps< RangeControlProps< P >, 'div' >,
+function UnforwardedRangeControl< IconProps = unknown >(
+	props: WordPressComponentProps< RangeControlProps< IconProps >, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
