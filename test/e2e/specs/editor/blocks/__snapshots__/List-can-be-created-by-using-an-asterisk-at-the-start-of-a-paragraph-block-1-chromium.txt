@@ -1,0 +1,3 @@
+<!-- wp:list -->
+<ul><li>A list item</li><li>Another list item</li></ul>
+<!-- /wp:list -->

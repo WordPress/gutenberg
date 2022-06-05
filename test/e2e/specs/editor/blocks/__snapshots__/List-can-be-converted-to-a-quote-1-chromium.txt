@@ -1,0 +1,3 @@
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><p>one</p><p>two</p></blockquote>
+<!-- /wp:quote -->
