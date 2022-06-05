@@ -9,8 +9,6 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
-/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
-
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
@@ -29,7 +27,6 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
-export * from './types';
 
 /**
  * Object of available plugins to use with a registry.

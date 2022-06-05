@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { Context } from './helpers';
-import { EntityRecord } from './index';
+import type { EntityRecord } from './index';
 
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.

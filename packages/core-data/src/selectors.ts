@@ -40,7 +40,7 @@ interface State {
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
-	currentTheme: string;
+	currentTheme: number;
 	currentUser: User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
@@ -115,7 +115,7 @@ const EMPTY_OBJECT = {};
  *
  * @return Whether a request is in progress for an embed preview.
  */
-export const isRequestingEmbedPreview = createRegistrySelector(
+export const isRequestingEmbedPreview: any = createRegistrySelector(
 	( select ) => ( state: State, url: string ): boolean => {
 		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
@@ -1199,7 +1199,7 @@ export function getAutosave(
  *
  * @return True if the REST request was completed. False otherwise.
  */
-export const hasFetchedAutosaves = createRegistrySelector(
+export const hasFetchedAutosaves: any = createRegistrySelector(
 	( select ) => (
 		state: State,
 		postType: string,

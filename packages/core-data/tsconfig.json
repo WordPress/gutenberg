@@ -1,0 +1,17 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+		"checkJs": false,
+		"noImplicitAny": false
+	},
+	"references": [
+		{ "path": "../data" }
+	],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.js"
+	]
+}
