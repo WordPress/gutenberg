@@ -46,6 +46,7 @@ function render_block_core_block( $attributes ) {
 	global $wp_embed;
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
+	$content = wpautop( $content );
 
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
