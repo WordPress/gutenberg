@@ -12,7 +12,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" }
 	],
-	"exclude": [
+	"include": [
 		"src/**/*"
 	]
 }

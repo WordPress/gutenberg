@@ -1,23 +1,16 @@
-// export interface AnyFunction {
-// 	( ...args: any[] ): any;
-// }
-//
-// /**
-//  * Internal dependencies
-//  */
-// import {
-// 	DataStores,
-// 	ReduxStoreConfig,
-// 	DataRegistry,
-// } from '@wordpress/data';
-// // } from '../../data/build-types/types';
-// // import { DataStores, ReduxStoreConfig, DataRegistry } from '@wordpress/data';
-//
+/**
+ * WordPress dependencies
+ */
+import { DataStores, ReduxStoreConfig, DataRegistry } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
 // import * as actions from './actions';
 // import * as selectors from './selectors';
-//
+
 // type CoreDataState = {};
-// declare module '../../data/build-types/types' {
+// declare module '@wordpress/data' {
 // 	interface Stores extends DataStores {
 // 		'core-data': ReduxStoreConfig<
 // 			CoreDataState,
@@ -29,5 +22,9 @@
 //
 // const x = {} as DataRegistry;
 // x.select( 'core-data' ).getEntityRecords( 'a', 'b', {} );
-//
+
 export {};
+
+export interface AnyFunction {
+	( ...args: any[] ): any;
+}
