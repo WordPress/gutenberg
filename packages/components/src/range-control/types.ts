@@ -86,6 +86,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		/**
 		 * If this property is added, a DashIcon component will be rendered
 		 * after the slider with the icon equal to afterIcon.
+		 *
+		 * For more information on `IconType` see the Icon component:
+		 * /packages/components/src/icon/index.tsx
 		 */
 		afterIcon?: IconType< IconProps >;
 		/**
@@ -98,6 +101,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		/**
 		 * If this property is added, a DashIcon component will be rendered
 		 * before the slider with the icon equal to beforeIcon.
+		 *
+		 * For more information on `IconType` see the Icon component:
+		 * /packages/components/src/icon/index.tsx
 		 */
 		beforeIcon?: IconType< IconProps >;
 		/**
