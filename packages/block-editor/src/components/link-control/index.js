@@ -148,9 +148,8 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
-	const { createPage, isCreatingPage, errorMessage } = useCreatePage(
-		createSuggestion
-	);
+	const { createPage, isCreatingPage, errorMessage } =
+		useCreatePage( createSuggestion );
 
 	useEffect( () => {
 		if (

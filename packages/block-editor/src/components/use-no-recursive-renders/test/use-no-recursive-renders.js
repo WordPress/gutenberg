@@ -16,9 +16,8 @@ import {
 // of calling itself depending on its `uniqueId` attribute.
 function Edit( { attributes: { uniqueId } } ) {
 	const { name } = useBlockEditContext();
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		uniqueId
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( uniqueId );
 
 	if ( hasAlreadyRendered ) {
 		return <div className={ `wp-block__${ name }--halted` }>Halt</div>;

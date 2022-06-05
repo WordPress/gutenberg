@@ -32,12 +32,8 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	const {
-		currentHeight,
-		currentWidth,
-		updateDimension,
-		updateDimensions,
-	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
 	return (
 		<>

@@ -173,7 +173,8 @@ export default [
 				'has-background': backgroundClass || customBackgroundColor,
 				[ backgroundClass ]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
 			const backgroundStyles = imageFill
@@ -268,7 +269,8 @@ export default [
 				'has-media-on-the-right': 'right' === mediaPosition,
 				[ backgroundClass ]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
 			const backgroundStyles = imageFill

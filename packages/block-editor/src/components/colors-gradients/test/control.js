@@ -10,15 +10,14 @@ import { noop } from 'lodash';
  */
 import ColorGradientControl from '../control';
 
-const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
-	element
-) => {
-	return (
-		element.type === 'button' &&
-		element.props[ 'aria-label' ] &&
-		element.props[ 'aria-label' ].startsWith( ariaLabelStart )
-	);
-};
+const getButtonWithAriaLabelStartPredicate =
+	( ariaLabelStart ) => ( element ) => {
+		return (
+			element.type === 'button' &&
+			element.props[ 'aria-label' ] &&
+			element.props[ 'aria-label' ].startsWith( ariaLabelStart )
+		);
+	};
 
 const getTabWithTestPredicate = ( text ) => ( element ) => {
 	return (

@@ -38,37 +38,39 @@ export default function BoxInputControls( {
 		onChange( nextValues );
 	};
 
-	const createHandleOnChange = ( side ) => ( next, { event } ) => {
-		const { altKey } = event;
-		const nextValues = { ...values };
-		const isNumeric = ! isNaN( parseFloat( next ) );
-		const nextValue = isNumeric ? next : undefined;
+	const createHandleOnChange =
+		( side ) =>
+		( next, { event } ) => {
+			const { altKey } = event;
+			const nextValues = { ...values };
+			const isNumeric = ! isNaN( parseFloat( next ) );
+			const nextValue = isNumeric ? next : undefined;
 
-		nextValues[ side ] = nextValue;
+			nextValues[ side ] = nextValue;
 
-		/**
-		 * Supports changing pair sides. For example, holding the ALT key
-		 * when changing the TOP will also update BOTTOM.
-		 */
-		if ( altKey ) {
-			switch ( side ) {
-				case 'top':
-					nextValues.bottom = nextValue;
-					break;
-				case 'bottom':
-					nextValues.top = nextValue;
-					break;
-				case 'left':
-					nextValues.right = nextValue;
-					break;
-				case 'right':
-					nextValues.left = nextValue;
-					break;
+			/**
+			 * Supports changing pair sides. For example, holding the ALT key
+			 * when changing the TOP will also update BOTTOM.
+			 */
+			if ( altKey ) {
+				switch ( side ) {
+					case 'top':
+						nextValues.bottom = nextValue;
+						break;
+					case 'bottom':
+						nextValues.top = nextValue;
+						break;
+					case 'left':
+						nextValues.right = nextValue;
+						break;
+					case 'right':
+						nextValues.left = nextValue;
+						break;
+				}
 			}
-		}
 
-		handleOnChange( nextValues );
-	};
+			handleOnChange( nextValues );
+		};
 
 	const createHandleOnUnitChange = ( side ) => ( next ) => {
 		const newUnits = { ...selectedUnits };
@@ -93,10 +95,8 @@ export default function BoxInputControls( {
 				className="component-box-control__input-controls"
 			>
 				{ filteredSides.map( ( side ) => {
-					const [
-						parsedQuantity,
-						parsedUnit,
-					] = parseQuantityAndUnitFromRawValue( values[ side ] );
+					const [ parsedQuantity, parsedUnit ] =
+						parseQuantityAndUnitFromRawValue( values[ side ] );
 
 					const computedUnit = values[ side ]
 						? parsedUnit

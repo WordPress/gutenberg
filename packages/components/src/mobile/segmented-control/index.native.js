@@ -65,9 +65,8 @@ const SegmentedControls = ( {
 	addonRight,
 } ) => {
 	const selectedSegmentIndex = selectedIndex || 0;
-	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
-		selectedSegmentIndex
-	);
+	const [ activeSegmentIndex, setActiveSegmentIndex ] =
+		useState( selectedSegmentIndex );
 	const [ segmentsDimensions, setSegmentsDimensions ] = useState( {
 		[ activeSegmentIndex ]: { width: 0, height: 0 },
 	} );

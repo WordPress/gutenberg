@@ -18,9 +18,8 @@ export default function CopyContentMenuItem() {
 	const { createNotice } = useDispatch( noticesStore );
 	const getText = useSelect( ( select ) => {
 		return () => {
-			const { getEditedPostId, getEditedPostType } = select(
-				editSiteStore
-			);
+			const { getEditedPostId, getEditedPostType } =
+				select( editSiteStore );
 			const { getEditedEntityRecord } = select( coreStore );
 			const record = getEditedEntityRecord(
 				'postType',

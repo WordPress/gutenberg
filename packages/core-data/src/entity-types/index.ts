@@ -89,16 +89,14 @@ export interface PerPackageEntityConfig< C extends Context > {
 /**
  * A union of all the registered entities.
  */
-type EntityConfig<
-	C extends Context = any
-> = PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
+type EntityConfig< C extends Context = any > =
+	PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
 
 /**
  * A union of all known record types.
  */
-export type EntityRecord<
-	C extends Context = any
-> = EntityConfig< C >[ 'record' ];
+export type EntityRecord< C extends Context = any > =
+	EntityConfig< C >[ 'record' ];
 
 /**
  * An entity corresponding to a specified record type.
@@ -113,16 +111,14 @@ export type EntityConfigOf<
 /**
  * Name of the requested entity.
  */
-export type NameOf<
-	R extends EntityRecord
-> = EntityConfigOf< R >[ 'config' ][ 'name' ];
+export type NameOf< R extends EntityRecord > =
+	EntityConfigOf< R >[ 'config' ][ 'name' ];
 
 /**
  * Kind of the requested entity.
  */
-export type KindOf<
-	R extends EntityRecord
-> = EntityConfigOf< R >[ 'config' ][ 'kind' ];
+export type KindOf< R extends EntityRecord > =
+	EntityConfigOf< R >[ 'config' ][ 'kind' ];
 
 /**
  * Primary key type of the requested entity, sourced from PerPackageEntities.

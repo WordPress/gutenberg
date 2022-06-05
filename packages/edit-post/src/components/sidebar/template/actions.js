@@ -31,9 +31,8 @@ function PostTemplateActions( { isPostsPage } ) {
 	const [ title, setTitle ] = useState( '' );
 	const { template, supportsTemplateMode, defaultTemplate } = useSelect(
 		( select ) => {
-			const { getCurrentPostType, getEditorSettings } = select(
-				editorStore
-			);
+			const { getCurrentPostType, getEditorSettings } =
+				select( editorStore );
 			const { getPostType } = select( coreStore );
 			const { getEditedPostTemplate } = select( editPostStore );
 
@@ -50,10 +49,8 @@ function PostTemplateActions( { isPostsPage } ) {
 		},
 		[]
 	);
-	const {
-		__unstableCreateTemplate,
-		__unstableSwitchToTemplateMode,
-	} = useDispatch( editPostStore );
+	const { __unstableCreateTemplate, __unstableSwitchToTemplateMode } =
+		useDispatch( editPostStore );
 
 	if ( ! supportsTemplateMode ) {
 		return null;

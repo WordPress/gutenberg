@@ -29,9 +29,8 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		editPostStore
-	);
+	const { openGeneralSidebar, closeGeneralSidebar } =
+		useDispatch( editPostStore );
 
 	const label = areAdvancedSettingsOpened
 		? __( 'Hide more settings' )

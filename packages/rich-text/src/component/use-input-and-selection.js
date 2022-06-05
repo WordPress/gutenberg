@@ -80,12 +80,8 @@ export function useInputAndSelection( props ) {
 				inputType = event.inputType;
 			}
 
-			const {
-				record,
-				applyRecord,
-				createRecord,
-				handleChange,
-			} = propsRef.current;
+			const { record, applyRecord, createRecord, handleChange } =
+				propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
 			// Overwrite it. It will be handled later by the format library if
@@ -100,10 +96,8 @@ export function useInputAndSelection( props ) {
 			}
 
 			const currentValue = createRecord();
-			const {
-				start,
-				activeFormats: oldActiveFormats = [],
-			} = record.current;
+			const { start, activeFormats: oldActiveFormats = [] } =
+				record.current;
 
 			// Update the formats between the last and new caret position.
 			const change = updateFormats( {
@@ -259,12 +253,8 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onFocus() {
-			const {
-				record,
-				isSelected,
-				onSelectionChange,
-				applyRecord,
-			} = propsRef.current;
+			const { record, isSelected, onSelectionChange, applyRecord } =
+				propsRef.current;
 
 			// When the whole editor is editable, let writing flow handle
 			// selection.

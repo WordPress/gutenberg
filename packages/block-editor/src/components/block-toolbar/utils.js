@@ -116,11 +116,8 @@ export function useShowMoversGestures( {
 	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+	const { showMovers, debouncedShowMovers, debouncedHideMovers } =
+		useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
 
 	const registerRef = useRef( false );
 

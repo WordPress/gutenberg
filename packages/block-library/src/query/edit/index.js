@@ -45,9 +45,8 @@ export function QueryContent( {
 		tagName: TagName = 'div',
 		layout = {},
 	} = attributes;
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -213,10 +212,8 @@ function QueryPatternSetup( {
 
 const QueryEdit = ( props ) => {
 	const { clientId, name } = props;
-	const [
-		isPatternSelectionModalOpen,
-		setIsPatternSelectionModalOpen,
-	] = useState( false );
+	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
+		useState( false );
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 	const hasInnerBlocks = useSelect(
 		( select ) =>
@@ -226,9 +223,8 @@ const QueryEdit = ( props ) => {
 	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
 	const onBlockPatternSelect = ( blocks ) => {
 		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-		const firstQueryClientId = getFirstQueryClientIdFromBlocks(
-			clonedBlocks
-		);
+		const firstQueryClientId =
+			getFirstQueryClientIdFromBlocks( clonedBlocks );
 		replaceBlock( clientId, clonedBlocks );
 		if ( firstQueryClientId ) {
 			selectBlock( firstQueryClientId );

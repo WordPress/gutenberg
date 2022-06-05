@@ -108,13 +108,11 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				attributes
 			);
 
-			let [
-				blockName,
-				blockAttributes,
-			] = convertLegacyBlockNameAndAttributes(
-				name,
-				normalizedAttributes
-			);
+			let [ blockName, blockAttributes ] =
+				convertLegacyBlockNameAndAttributes(
+					name,
+					normalizedAttributes
+				);
 
 			// If a Block is undefined at this point, use the core/missing block as
 			// a placeholder for a better user experience.

@@ -25,9 +25,8 @@ export class PostPublishButton extends Component {
 		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
-			this
-		);
+		this.closeEntitiesSavedStates =
+			this.closeEntitiesSavedStates.bind( this );
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
@@ -41,10 +40,8 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const {
-				hasNonPostEntityChanges,
-				setEntitiesSavedStatesCallback,
-			} = this.props;
+			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
+				this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.

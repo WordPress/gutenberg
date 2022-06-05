@@ -180,9 +180,8 @@ const DraggableTrigger = ( {
 	onLongPressEnd,
 	testID,
 } ) => {
-	const { panGestureRef, isDragging, isPanActive, draggingId } = useContext(
-		Context
-	);
+	const { panGestureRef, isDragging, isPanActive, draggingId } =
+		useContext( Context );
 
 	const gestureHandler = useAnimatedGestureHandler( {
 		onActive: () => {

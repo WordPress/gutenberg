@@ -35,9 +35,8 @@ export default function CoverBlockControls( {
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
-		minHeightUnit
-	);
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
+		useState( minHeightUnit );
 	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {

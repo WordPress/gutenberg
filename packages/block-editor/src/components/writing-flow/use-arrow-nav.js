@@ -215,7 +215,8 @@ export default function useArrowNav() {
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+				const selectionEndClientId =
+					getMultiSelectedBlocksEndClientId();
 				const selectionBeforeEndClientId = getPreviousBlockClientId(
 					selectionEndClientId || selectedBlockClientId
 				);
