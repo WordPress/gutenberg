@@ -156,6 +156,25 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Checks whether an incoming style value is valid.
+	 *
+	 * @param string? $style_value  A single css preset value.
+	 *
+	 * @return boolean
+	 */
+	protected static function is_valid_style_value( $style_value ) {
+		if ( '0' === $style_value ) {
+			return true;
+		}
+
+		if ( empty( $style_value ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., 'var:preset|color|heavenly-blue'.
 	 *
 	 * @param array         $style_value      A single raw style value or css preset property from the generate() $block_styles array.
@@ -165,6 +184,11 @@ class WP_Style_Engine {
 	 */
 	protected static function get_classnames( $style_value, $style_definition ) {
 		$classnames = array();
+
+		if ( empty( $style_value ) ) {
+			return $classnames;
+		}
+
 		if ( ! empty( $style_definition['classnames'] ) ) {
 			foreach ( $style_definition['classnames'] as $classname => $property_key ) {
 				if ( true === $property_key ) {
@@ -196,12 +220,7 @@ class WP_Style_Engine {
 	 * @return array        An array of CSS rules.
 	 */
 	protected static function get_css( $style_value, $style_definition, $should_return_css_vars ) {
-		$rules = array();
-
-		if ( ! $style_value ) {
-			return $rules;
-		}
-
+		$rules          = array();
 		$style_property = $style_definition['property_key'];
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
@@ -269,7 +288,7 @@ class WP_Style_Engine {
 			foreach ( $definition_group as $style_definition ) {
 				$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
-				if ( empty( $style_value ) ) {
+				if ( ! static::is_valid_style_value( $style_value ) ) {
 					continue;
 				}
 
