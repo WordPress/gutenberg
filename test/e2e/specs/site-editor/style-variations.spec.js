@@ -22,7 +22,9 @@ test.use( {
 
 test.describe( 'Global styles variations', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'style-variations' );
+		await requestUtils.activateTheme(
+			'gutenberg-test-themes/style-variations'
+		);
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
@@ -44,7 +46,7 @@ test.describe( 'Global styles variations', () => {
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
-			postId: 'style-variations//index',
+			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await editor.toggleGlobalStyles();
@@ -70,7 +72,7 @@ test.describe( 'Global styles variations', () => {
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
-			postId: 'style-variations//index',
+			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
@@ -99,7 +101,7 @@ test.describe( 'Global styles variations', () => {
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
-			postId: 'style-variations//index',
+			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyYellowVariation();
@@ -131,7 +133,7 @@ test.describe( 'Global styles variations', () => {
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
-			postId: 'style-variations//index',
+			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
@@ -163,7 +165,7 @@ test.describe( 'Global styles variations', () => {
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
-			postId: 'style-variations//index',
+			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyYellowVariation();
