@@ -185,10 +185,6 @@ class WP_Style_Engine {
 	protected static function get_classnames( $style_value, $style_definition ) {
 		$classnames = array();
 
-		if ( empty( $style_value ) ) {
-			return $classnames;
-		}
-
 		if ( ! empty( $style_definition['classnames'] ) ) {
 			foreach ( $style_definition['classnames'] as $classname => $property_key ) {
 				if ( true === $property_key ) {
