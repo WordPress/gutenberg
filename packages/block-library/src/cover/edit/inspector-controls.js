@@ -250,12 +250,20 @@ export default function CoverInspectorControls( {
 					{ ...colorGradientSettings }
 				/>
 				<ToolsPanelItem
-					hasValue={ () => !! dimRatio }
+					hasValue={ () => {
+						// If there's a media background the dimRatio will be
+						// defaulted to 50 whereas it will be 100 for colors.
+						return dimRatio === undefined
+							? false
+							: dimRatio !== ( url ? 50 : 100 );
+					} }
 					label={ __( 'Overlay opacity' ) }
 					onDeselect={ () =>
-						setAttributes( { dimRatio: undefined } )
+						setAttributes( { dimRatio: url ? 50 : 100 } )
 					}
-					resetAllFilter={ () => ( { dimRatio: undefined } ) }
+					resetAllFilter={ () => ( {
+						dimRatio: url ? 50 : 100,
+					} ) }
 					isShownByDefault
 					panelId={ clientId }
 				>
