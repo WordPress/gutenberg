@@ -110,7 +110,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
-		 * @default `COLORS.ui.theme`
+		 * @default COLORS.ui.theme
 		 * @see /packages/components/src/utils/colors-values.js
 		 */
 		color?: CSSProperties[ 'color' ];
