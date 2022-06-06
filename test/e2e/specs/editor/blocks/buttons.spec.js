@@ -7,11 +7,11 @@ test.describe( 'Buttons', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
- 
+
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
- 
+
 		//Check the content
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
@@ -22,16 +22,16 @@ test.describe( 'Buttons', () => {
 <!-- /wp:buttons -->`
 		);
 	} );
- 
+
 	test( 'has focus on button content (slash inserter)', async ( {
 		editor,
 		page,
-	 } ) => {
+	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
- 
+
 		//Check the content
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
@@ -42,7 +42,7 @@ test.describe( 'Buttons', () => {
 <!-- /wp:buttons -->`
 		);
 	} );
- 
+
 	test( 'dismisses link editor when escape is pressed', async ( {
 		editor,
 		page,
@@ -71,7 +71,7 @@ test.describe( 'Buttons', () => {
 <!-- /wp:buttons -->`
 		);
 	} );
- 
+
 	test( 'moves focus from the link editor back to the button when escape is pressed after the URL has been submitted', async ( {
 		editor,
 		page,
@@ -93,19 +93,19 @@ test.describe( 'Buttons', () => {
 				)
 		);
 		await page.keyboard.press( 'Escape' );
- 
+
 		// Focus should move from the link control to the button block's text.
 		await page.waitForFunction(
 			() =>
 				document.activeElement ===
 				document.querySelector( '[aria-label="Button text"]' )
 		);
- 
+
 		// The link control should still be visible when a URL is set.
 		const linkControl = await page.$( '.block-editor-link-control' );
 		expect( linkControl ).toBeTruthy();
 	} );
- 
+
 	test( 'can jump to the link editor using the keyboard shortcut', async ( {
 		editor,
 		page,
@@ -121,7 +121,7 @@ test.describe( 'Buttons', () => {
 		await page.waitForSelector(
 			':focus.block-editor-link-control__search-item-title'
 		);
- 
+
 		// Check the content
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
