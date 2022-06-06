@@ -1,51 +1,32 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
-import type { Meta, Story } from '@storybook/react';
+import type { ComponentStory, ComponentMeta } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
-import { useCx } from '../../utils';
-import { space } from '../../ui/utils/space';
 import Spinner from '../';
+import { space } from '../../ui/utils/space';
 
-const sizes = {
-	default: undefined,
-	medium: space( 20 ),
-	large: space( 40 ),
-};
-
-const meta: Meta<
-	typeof Spinner & { size: 'default' | 'medium' | 'large' }
-> = {
+const meta: ComponentMeta< typeof Spinner > = {
 	title: 'Components/Spinner',
 	component: Spinner,
-	argTypes: {
-		size: {
-			options: Object.keys( sizes ),
-			mapping: sizes,
-			control: { type: 'select' },
+	parameters: {
+		controls: {
+			expanded: true,
 		},
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
 
-const Template: Story<
-	typeof Spinner & { size: 'default' | 'medium' | 'large' }
-> = ( { size } ) => {
-	const cx = useCx();
-	const spinnerClassname = cx( css`
-		width: ${ size };
-		height: ${ size };
-	` );
-	return <Spinner className={ spinnerClassname } />;
+const Template: ComponentStory< typeof Spinner > = ( args ) => {
+	return <Spinner { ...args } />;
 };
 
-export const Default: Story<
-	typeof Spinner & { size: 'default' | 'medium' | 'large' }
-> = Template.bind( {} );
-Default.args = {
-	size: 'default',
-};
+export const Default: ComponentStory< typeof Spinner > = Template.bind( {} );
+
+// The width of the Spinner's border is not affected by the overall component's dimensions.
+export const CustomSize: ComponentStory< typeof Spinner > = Template.bind( {} );
+CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };
