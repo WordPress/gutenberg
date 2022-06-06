@@ -13,6 +13,7 @@ import type {
  */
 import type { BaseControlProps } from '../base-control/types';
 import type { IconType } from '../icon';
+import type { WordPressComponentProps } from '../ui/context';
 
 export type NumericProps = {
 	/**
@@ -228,6 +229,11 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		withInputField?: boolean;
 	};
+
+export type UnforwardedRangeControlProps< IconProps = unknown > = Omit<
+	WordPressComponentProps< RangeControlProps< IconProps >, 'div' >,
+	'as'
+>;
 
 export type RailProps = MarksProps & {
 	railColor?: CSSProperties[ 'color' ];
