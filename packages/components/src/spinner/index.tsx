@@ -7,12 +7,12 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
-import type { SpinnerProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 export default function Spinner( {
 	className,
 	...props
-}: SpinnerProps ): JSX.Element {
+}: WordPressComponentProps< {}, 'svg', false > ) {
 	return (
 		<StyledSpinner
 			className={ classNames( 'components-spinner', className ) }
