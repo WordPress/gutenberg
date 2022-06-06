@@ -61,6 +61,7 @@ test.describe( 'Buttons', () => {
 				document.querySelector( '.block-editor-rich-text__editable' )
 		);
 		await page.keyboard.type( 'WordPress' );
+
 		// Check the content
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
@@ -102,7 +103,7 @@ test.describe( 'Buttons', () => {
 		);
 
 		// The link control should still be visible when a URL is set.
-		const linkControl = await page.$( '.block-editor-link-control' );
+		const linkControl = await page.locator( '.block-editor-link-control' );
 		expect( linkControl ).toBeTruthy();
 	} );
 
