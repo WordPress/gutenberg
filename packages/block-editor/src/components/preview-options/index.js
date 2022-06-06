@@ -41,6 +41,7 @@ export default function PreviewOptions( {
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			icon={ null }
+			label={ __( 'Preview options' ) }
 		>
 			{ () => (
 				<>
