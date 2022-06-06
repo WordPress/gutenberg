@@ -34,8 +34,9 @@ export type NumericProps = {
 	value?: number;
 };
 
-export type RangeStep = number | 'any';
 export type RangeMark = { value: number; label?: string };
+// An expanded definition of this type is used in MarkProps to improve Storybook
+// generated docs.
 export type RangeMarks = boolean | RangeMark[];
 
 export type MarksProps = NumericProps & {
@@ -51,7 +52,7 @@ export type MarksProps = NumericProps & {
 	 *
 	 * @default false
 	 */
-	marks?: RangeMarks;
+	marks?: boolean | { value: number; label?: string }[];
 	/**
 	 * The minimum amount by which `value` changes. It is also a factor in
 	 * validation as `value` must be a multiple of `step` (offset by `min`) to
@@ -61,7 +62,7 @@ export type MarksProps = NumericProps & {
 	 *
 	 * @default 1
 	 */
-	step?: RangeStep;
+	step?: number | 'any';
 };
 
 export type RangeMarkProps = {
@@ -74,10 +75,6 @@ export type RangeMarkProps = {
 
 export type ControlledRangeValue = number | '' | null;
 export type SetControlledRangeValue = ( value?: number | null ) => void;
-
-type RenderTooltipContentCallback = (
-	value?: ControlledRangeValue
-) => string | number | null | undefined;
 
 export type RangeControlProps< IconProps = unknown > = Pick<
 	BaseControlProps,
@@ -184,7 +181,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 *
 		 * @default ( value ) => value
 		 */
-		renderTooltipContent?: RenderTooltipContentCallback;
+		renderTooltipContent?: (
+			value?: ControlledRangeValue
+		) => string | number | null | undefined;
 		/**
 		 * The value to revert to if the Reset button is clicked (enabled by
 		 * `allowReset`)
@@ -266,7 +265,9 @@ export type TooltipProps = {
 	inputRef?: MutableRefObject< HTMLElement | undefined >;
 	tooltipPosition?: string;
 	value?: ControlledRangeValue;
-	renderTooltipContent?: RenderTooltipContentCallback;
+	renderTooltipContent?: (
+		value?: ControlledRangeValue
+	) => string | number | null | undefined;
 	zIndex?: number;
 };
 
