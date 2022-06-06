@@ -142,7 +142,7 @@ For more information on `IconType` see the [Icon component](/packages/components
 
 ### `color`: `CSSProperties['color']`
 
-If supplied, this property sets the `color` for the `RangeControl` wrapper.
+CSS color string for the `RangeControl` wrapper.
 
 -   Required: No
 -   Platform: Web
@@ -289,7 +289,7 @@ The maximum `value` allowed.
 
 ### `railColor`: `CSSProperties[ 'color' ]`
 
-Customizes the (background) color of the rail element.
+CSS color string to customize the rail element's background.
 
 -   Required: No
 -   Platform: Web
@@ -344,7 +344,7 @@ The minimum amount by which `value` changes. It is also a factor in validation a
 -   Platform: Web
 ### `trackColor`: `CSSProperties[ 'color' ]`
 
-Customizes the (background) color of the track element.
+CSS color string to customize the track element's background.
 
 -   Required: No
 -   Platform: Web

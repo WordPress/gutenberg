@@ -107,8 +107,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		beforeIcon?: IconType< IconProps >;
 		/**
-		 * If supplied, this property sets the `color` for the `RangeControl`
-		 * wrapper.
+		 * CSS color string for the `RangeControl` wrapper.
 		 *
 		 * @default `COLORS.ui.theme`
 		 * @see /packages/components/src/utils/colors-values.js
@@ -176,7 +175,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		onMouseMove?: MouseEventHandler< HTMLInputElement >;
 		/**
-		 * Customizes the (background) color of the rail element.
+		 * CSS color string to customize the rail element's background.
 		 */
 		railColor?: CSSProperties[ 'color' ];
 		/**
@@ -210,7 +209,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		showTooltip?: boolean;
 		/**
-		 * Customizes the (background) color of the track element.
+		 * CSS color string to customize the track element's background.
 		 */
 		trackColor?: CSSProperties[ 'color' ];
 		/**
