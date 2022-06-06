@@ -10,7 +10,6 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -59,7 +58,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 				<TemplateTitle />
 			</div>
-			<motion.div className="edit-post-header__settings">
+			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -93,7 +92,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				{ showIconLabels && ! isLargeViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
-			</motion.div>
+			</div>
 		</div>
 	);
 }
