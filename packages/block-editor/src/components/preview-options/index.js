@@ -35,13 +35,16 @@ export default function PreviewOptions( {
 		/* translators: button label text should, if possible, be under 16 characters. */
 		children: __( 'Preview' ),
 	};
+	const menuProps = {
+		'aria-label': __( 'Preview options' ),
+	};
 	return (
 		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
+			menuProps={ menuProps }
 			icon={ null }
-			label={ __( 'Preview options' ) }
 		>
 			{ () => (
 				<>
