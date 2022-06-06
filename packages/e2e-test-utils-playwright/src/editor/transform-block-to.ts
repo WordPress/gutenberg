@@ -12,26 +12,14 @@ import type { Editor } from './index';
 export async function transformBlockTo( this: Editor, name: string ) {
 	await this.showBlockToolbar();
 
-	const switcherToggle = await this.page.waitForSelector(
+	const switcherToggle = this.page.locator(
 		'.block-editor-block-switcher__toggle'
 	);
-	await switcherToggle.evaluate( ( element ) => element.scrollIntoView() );
-	await this.page.waitForSelector( '.block-editor-block-switcher__toggle', {
-		state: 'visible',
-	} );
 	await switcherToggle.click();
-	await this.page.waitForSelector(
-		'.block-editor-block-switcher__container',
-		{
-			state: 'visible',
-		}
-	);
 
 	// Find the block button option within the switcher popover.
 	const xpath = `//*[contains(@class, "block-editor-block-switcher__popover")]//button[.='${ name }']`;
-	const insertButton = await this.page.waitForSelector( xpath, {
-		state: 'visible',
-	} );
+	const insertButton = this.page.locator( xpath );
 	// Clicks may fail if the button is out of view. Assure it is before click.
 	await insertButton.evaluate( ( element ) => element.scrollIntoView() );
 	await insertButton.click();
