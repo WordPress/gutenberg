@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+- `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+
 ## 19.13.0 (2022-06-15)
 
 ### Bug Fix
