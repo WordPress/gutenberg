@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 import {
 	__experimentalBorderBoxControl as BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -23,6 +24,11 @@ import {
 } from './hooks';
 
 export function useHasBorderPanel( name ) {
+	// When block's skip serialization of borders it generally means they are
+	// being applied to inner elements of which there isn't a means within
+	// Global Styles to target. To avoid the appearance of styles being
+	// misapplied we disable the border panel UI in the Global Styles sidebar.
+	const disableUI = shouldSkipBorderSerialization( name );
 	const controls = [
 		useHasBorderColorControl( name ),
 		useHasBorderRadiusControl( name ),
@@ -30,7 +36,7 @@ export function useHasBorderPanel( name ) {
 		useHasBorderWidthControl( name ),
 	];
 
-	return controls.some( Boolean );
+	return ! disableUI && controls.some( Boolean );
 }
 
 function useHasBorderColorControl( name ) {
@@ -63,6 +69,17 @@ function useHasBorderWidthControl( name ) {
 		useSetting( 'border.width', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )
 	);
+}
+
+function shouldSkipBorderSerialization( name ) {
+	const blockType = getBlockType( name );
+
+	if ( ! blockType ) {
+		return true;
+	}
+
+	return blockType?.supports?.__experimentalBorder
+		?.__experimentalSkipSerialization;
 }
 
 function applyFallbackStyle( border ) {
