@@ -46,7 +46,6 @@ export default function BlockEditVisuallyButton( { clientIds, ...props } ) {
 
 	return (
 		<ToolbarButton
-			title={ __( 'Edit visually' ) }
 			onClick={ onClick }
 			{ ...props }
 		>
