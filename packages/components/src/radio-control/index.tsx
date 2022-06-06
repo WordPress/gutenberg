@@ -65,43 +65,42 @@ export function RadioControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
+	if ( isEmpty( options ) ) {
+		return null;
+	}
+
 	return (
-		! isEmpty( options ) && (
-			<BaseControl
-				label={ label }
-				id={ id }
-				hideLabelFromVision={ hideLabelFromVision }
-				help={ help }
-				className={ classnames(
-					className,
-					'components-radio-control'
-				) }
-			>
-				{ options.map( ( option, index ) => (
-					<div
-						key={ `${ id }-${ index }` }
-						className="components-radio-control__option"
-					>
-						<input
-							id={ `${ id }-${ index }` }
-							className="components-radio-control__input"
-							type="radio"
-							name={ id }
-							value={ option.value }
-							onChange={ onChangeValue }
-							checked={ option.value === selected }
-							aria-describedby={
-								!! help ? `${ id }__help` : undefined
-							}
-							{ ...additionalProps }
-						/>
-						<label htmlFor={ `${ id }-${ index }` }>
-							{ option.label }
-						</label>
-					</div>
-				) ) }
-			</BaseControl>
-		)
+		<BaseControl
+			label={ label }
+			id={ id }
+			hideLabelFromVision={ hideLabelFromVision }
+			help={ help }
+			className={ classnames( className, 'components-radio-control' ) }
+		>
+			{ options.map( ( option, index ) => (
+				<div
+					key={ `${ id }-${ index }` }
+					className="components-radio-control__option"
+				>
+					<input
+						id={ `${ id }-${ index }` }
+						className="components-radio-control__input"
+						type="radio"
+						name={ id }
+						value={ option.value }
+						onChange={ onChangeValue }
+						checked={ option.value === selected }
+						aria-describedby={
+							!! help ? `${ id }__help` : undefined
+						}
+						{ ...additionalProps }
+					/>
+					<label htmlFor={ `${ id }-${ index }` }>
+						{ option.label }
+					</label>
+				</div>
+			) ) }
+		</BaseControl>
 	);
 }
 
