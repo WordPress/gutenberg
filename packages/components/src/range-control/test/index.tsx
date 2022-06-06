@@ -41,18 +41,22 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should render with icons', () => {
-			render(
+			const { container } = render(
 				<RangeControl
 					beforeIcon="format-image"
 					afterIcon="format-video"
 				/>
 			);
 
-			const icons = screen.getAllByRole( 'img' );
+			const beforeIcon = container.querySelector(
+				'.dashicons-format-image'
+			);
+			const afterIcon = container.querySelector(
+				'.dashicons-format-video'
+			);
 
-			expect( icons.length ).toBe( 2 );
-			expect( icons[ 0 ] ).toHaveClass( 'dashicons-format-image' );
-			expect( icons[ 1 ] ).toHaveClass( 'dashicons-format-video' );
+			expect( beforeIcon ).toBeInTheDocument();
+			expect( afterIcon ).toBeInTheDocument();
 		} );
 	} );
 
