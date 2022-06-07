@@ -4,13 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Heading', () => {
-	const CUSTOM_COLOR_BUTTON_X_SELECTOR =
-		'role=combobox[name=Custom color picker.]';
-	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
-		'role=button[name=Show detailed inputs]';
-	const COLOR_INPUT_FIELD_SELECTOR =
-		'.components-color-picker .components-input-control__input';
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -80,9 +73,7 @@ test.describe( 'Heading', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// This text is skipped because the color picker output a RGB color code
-	// in the heading markup instead of a HEX color code.
-	test.skip( 'should correctly apply custom colors', async ( {
+	test( 'should correctly apply custom colors', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -97,14 +88,10 @@ test.describe( 'Heading', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 
-		const customTextColorButton = await page.locator(
-			CUSTOM_COLOR_BUTTON_X_SELECTOR
-		);
-
-		// Set the new text color.
-		await customTextColorButton.click();
-		await page.locator( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR ).click();
-		await page.locator( COLOR_INPUT_FIELD_SELECTOR ).click();
+		// // Set the new text color.
+		await page.click( '.components-color-palette__custom-color' );
+		await page.click( 'role=button[name="Show detailed inputs"i]' );
+		await page.focus( 'input.components-input-control__input' );
 
 		await pageUtils.pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '0782f6' );
@@ -114,9 +101,11 @@ test.describe( 'Heading', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 
-		await page.locator( 'h3[data-type="core/heading"]' ).click();
-		await page.waitForXPath( '//button//span[contains(text(), "0782f6")]' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		await page.click( '[data-type="core/heading"]' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.style.color )
+		).toBe( 'rgb(7, 130, 246)' );
 	} );
 
 	test( 'should correctly apply named colors', async ( { page, editor } ) => {
