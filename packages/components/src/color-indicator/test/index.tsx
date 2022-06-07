@@ -1,19 +1,19 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import ColorIndicator from '../';
+import ColorIndicator from '..';
 
 describe( 'ColorIndicator', () => {
 	it( 'matches the snapshot', () => {
-		const wrapper = shallow(
+		const { container } = render(
 			<ColorIndicator aria-label="sample label" colorValue="#fff" />
 		);
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );
