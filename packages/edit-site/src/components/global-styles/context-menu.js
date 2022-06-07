@@ -2,7 +2,15 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, color, layout } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import {
+	brush,
+	blockDefault,
+	typography,
+	color,
+	layout,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,6 +28,13 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const { variations } = useSelect( ( select ) => {
+		return {
+			variations: select(
+				coreStore
+			).__experimentalGetCurrentThemeGlobalStylesVariations(),
+		};
+	}, [] );
 
 	return (
 		<ItemGroup>
@@ -47,6 +62,14 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					{ __( 'Layout' ) }
 				</NavigationButtonAsItem>
 			) }
+			{ !! variations?.length && (
+				<NavigationButtonAsItem path="/variations" icon={ brush }>
+					{ __( 'Browse styles' ) }
+				</NavigationButtonAsItem>
+			) }
+			<NavigationButtonAsItem path="/blocks" icon={ blockDefault }>
+				{ __( 'Blocks' ) }
+			</NavigationButtonAsItem>
 		</ItemGroup>
 	);
 }
