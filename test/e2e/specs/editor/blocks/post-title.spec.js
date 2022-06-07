@@ -14,7 +14,10 @@ test.describe( 'Post Title block', () => {
 
 		// Add the post title
 		await page.locator( 'role=textbox[name="Add title"i]' ).focus();
-		await page.keyboard.type( 'Just tweaking the post title' );
+		await page.type(
+			'role=textbox[name="Add title"i]',
+			'Just tweaking the post title'
+		);
 
 		// Save the post draft and reload.
 		await page.click( 'role=button[name="Save draft"i]' );
