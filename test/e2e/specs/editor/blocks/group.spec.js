@@ -25,6 +25,7 @@ test.describe( 'Group', () => {
 
 		const searchField = page.locator( '.components-search-control__input' );
 		await searchField.type( 'Group' );
+
 		await page.locator( '.editor-block-list-item-group' ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -48,7 +49,20 @@ test.describe( 'Group', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.searchForBlock( 'Group' );
+		// Search for the group block and insert it.
+		const inserterButton = page.locator(
+			'role=button[name="Toggle block inserter"i]'
+		);
+
+		if (
+			( await inserterButton.getAttribute( 'aria-pressed' ) ) === 'false'
+		) {
+			await inserterButton.click();
+		}
+
+		const searchField = page.locator( '.components-search-control__input' );
+		await searchField.type( 'Group' );
+
 		await page.locator( '.editor-block-list-item-group' ).click();
 		await page.locator( '.block-editor-button-block-appender' ).click();
 		await page.locator( '.editor-block-list-item-paragraph' ).click();
