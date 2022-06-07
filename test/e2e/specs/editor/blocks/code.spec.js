@@ -42,7 +42,7 @@ test.describe( 'Code', () => {
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 	} );
 
-	test( 'should paste plain text', async ( { editor, page, pageUtils } ) => {
+	test( 'should paste plain text', async ( { editor, pageUtils } ) => {
 		await editor.insertBlock( { name: 'core/code' } );
 
 		// Test to see if HTML and white space is kept.
