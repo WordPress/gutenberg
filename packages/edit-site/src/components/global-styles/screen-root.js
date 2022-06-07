@@ -16,7 +16,7 @@ import StylesPreview from './preview';
 
 function ScreenRoot() {
 	return (
-		<Card size="small">
+		<Card size="small" isBorderless>
 			<CardBody>
 				<VStack spacing={ 4 }>
 					<Card>
