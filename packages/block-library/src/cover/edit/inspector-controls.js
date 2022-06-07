@@ -246,7 +246,6 @@ export default function CoverInspectorControls( {
 						},
 					] }
 					panelId={ clientId }
-					enableAlpha={ true }
 					{ ...colorGradientSettings }
 				/>
 				<ToolsPanelItem
