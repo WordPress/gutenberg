@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
+import { some, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect, withSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -20,21 +20,36 @@ import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 import { store as editorStore } from '../../store';
 
 const TagsPanel = () => {
+	const slug = 'post_tag';
+	const tagsTaxonomy = useSelect( ( select ) => {
+		const store = select( coreStore );
+		return store.getTaxonomy( slug );
+	} );
+	const pluralName = get( tagsTaxonomy, [ 'labels', 'name' ], __( 'Tags' ) );
+	const addTerms = sprintf(
+		// translators: %s: Taxonomy terms input label
+		__( 'Add %s' ),
+		pluralName.toLowerCase()
+	);
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ __( 'Add tags' ) }
+			{ addTerms }
 		</span>,
 	];
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
 			<p>
-				{ __(
-					'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
+				{ sprintf(
+					// translators: %s: Taxonomy terms input description
+					__(
+						'%s help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
+					),
+					pluralName
 				) }
 			</p>
-			<FlatTermSelector slug={ 'post_tag' } />
+			<FlatTermSelector slug={ slug } />
 		</PanelBody>
 	);
 };
