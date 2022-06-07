@@ -9,7 +9,6 @@
  * Register webfonts defined in theme.json.
  */
 function gutenberg_register_webfonts_from_theme_json() {
-
 	// Get settings.
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
