@@ -28,18 +28,14 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
 	const align = getAlignmentProps( alignment, direction );
 
 	const validChildren = getValidChildren( children );
-	const clonedChildren = validChildren.map( ( child ) => {
+	const clonedChildren = validChildren.map( ( child, index ) => {
 		const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
 
 		if ( _isSpacer ) {
 			const childElement = child as ReactElement;
-			return (
-				<FlexItem
-					isBlock
-					key={ childElement.key }
-					{ ...childElement.props }
-				/>
-			);
+			const _key = childElement.key || `hstack-${ index }`;
+
+			return <FlexItem isBlock key={ _key } { ...childElement.props } />;
 		}
 
 		return child;
