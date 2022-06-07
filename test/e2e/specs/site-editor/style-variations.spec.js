@@ -42,19 +42,19 @@ test.describe( 'Global styles variations', () => {
 
 	test( 'should have three variations available with the first one being active', async ( {
 		admin,
-		editor,
+		page,
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await editor.toggleGlobalStyles();
+		await page.click( 'role=button[name="Styles"i]' );
 		await siteEditorStyleVariations.openOtherStyles();
 
 		const variations = await siteEditorStyleVariations.getAvailableStyleVariations();
 
-		expect( await variations.count() ).toEqual( 3 );
+		await expect( variations ).toHaveCount( 3 );
 		expect( await variations.first().getAttribute( 'class' ) ).toContain(
 			'is-active'
 		);
@@ -68,7 +68,6 @@ test.describe( 'Global styles variations', () => {
 
 	test( 'should apply preset colors and font sizes in a variation', async ( {
 		admin,
-		editor,
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
@@ -76,7 +75,7 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
-		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 
 		await siteEditorStyleVariations.openColorsPanel();
 		expect(
@@ -86,7 +85,7 @@ test.describe( 'Global styles variations', () => {
 			'rgb(74, 7, 74)'
 		);
 
-		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 		await siteEditorStyleVariations.openTypographyPanel();
 		await siteEditorStyleVariations.openTextPanel();
 
@@ -97,7 +96,7 @@ test.describe( 'Global styles variations', () => {
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
 		admin,
-		editor,
+		page,
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
@@ -105,17 +104,22 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyYellowVariation();
-		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 		await siteEditorStyleVariations.openColorsPanel();
 
-		expect(
-			await siteEditorStyleVariations.getBackgroundColorValue()
-		).toBe( 'rgb(255, 239, 11)' );
-		expect( await siteEditorStyleVariations.getTextColorValue() ).toBe(
-			'rgb(25, 25, 17)'
-		);
+		await expect(
+			page.locator(
+				'css=[aria-label="Colors background styles"] .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
-		await editor.openPreviousGlobalStylesPanel();
+		await expect(
+			page.locator(
+				'css=[aria-label="Colors text styles"] .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
+
+		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 		await siteEditorStyleVariations.openTypographyPanel();
 		await siteEditorStyleVariations.openTextPanel();
 
@@ -129,7 +133,7 @@ test.describe( 'Global styles variations', () => {
 
 	test( 'should apply a color palette in a variation', async ( {
 		admin,
-		editor,
+		page,
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
@@ -137,9 +141,9 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
-		await editor.openPreviousGlobalStylesPanel();
+		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 		await siteEditorStyleVariations.openColorsPanel();
-		await siteEditorStyleVariations.openPalettePanel();
+		await page.click( `role=button[name="Color palettes"i]` );
 
 		expect(
 			await siteEditorStyleVariations.getThemePalette()
@@ -169,17 +173,17 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyYellowVariation();
-		const frame = await page.frameLocator(
+		const frame = page.frameLocator(
 			'css=.edit-site-visual-editor iframe'
 		);
-		const paragraph = await frame.locator(
+		const paragraph = frame.locator(
 			'xpath=//p[text()="My awesome paragraph"]'
 		);
 		const paragraphColor = await paragraph.evaluate( ( el ) => {
 			return window.getComputedStyle( el ).color;
 		} );
 		expect( paragraphColor ).toBe( 'rgb(25, 25, 17)' );
-		const body = await frame.locator( 'css=body' );
+		const body = frame.locator( 'css=body' );
 		const backgroundColor = await body.evaluate( ( el ) => {
 			return window.getComputedStyle( el ).backgroundColor;
 		} );
@@ -197,8 +201,11 @@ class SiteEditorStyleVariations {
 	}
 
 	async openOtherStyles() {
-		const selector = 'xpath=//div[contains(text(),"Browse styles")]';
-		await ( await this.page.locator( selector ) ).click();
+		await this.page
+			.locator( 'role=button[name="Browse styles"i]' )
+			.waitFor(); // Wait for the element to appear after the navigation animation.
+
+		await this.page.click( 'role=button[name="Browse styles"i]' );
 	}
 
 	async getAvailableStyleVariations() {
@@ -208,7 +215,7 @@ class SiteEditorStyleVariations {
 	}
 
 	async applyVariation( label ) {
-		await this.editor.toggleGlobalStyles();
+		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.openOtherStyles();
 		const variation = await this.page.locator(
 			`xpath=//*[@role="button"][@aria-label="${ label }"]`
@@ -225,34 +232,29 @@ class SiteEditorStyleVariations {
 	}
 
 	async openColorsPanel() {
-		await this.editor.openGlobalStylesPanel( 'Colors' );
+		await this.openGlobalStylesPanel( 'Colors styles' );
 	}
 
 	async openTypographyPanel() {
-		await this.editor.openGlobalStylesPanel( 'Typography' );
+		await this.openGlobalStylesPanel( 'Typography styles' );
 	}
 
 	async openTextPanel() {
-		await this.editor.openGlobalStylesPanel( 'Text' );
-	}
-
-	async openPalettePanel() {
-		const selector = `xpath=//div[./h2[text()="Palette"]]//button`;
-		await ( await this.page.locator( selector ) ).click();
+		await this.openGlobalStylesPanel( 'Typography Text styles' );
 	}
 
 	async getFontSizeHint() {
-		const element = await this.page.locator(
+		const element = this.page.locator(
 			'css=.components-font-size-picker__header__hint'
 		);
-		return element.evaluate( ( el ) => el.textContent );
+		return await element.evaluate( ( el ) => el.textContent );
 	}
 
 	async getCustomFontSizeValue() {
-		const element = await this.page.locator(
+		const element = this.page.locator(
 			'css=.components-font-size-picker input[aria-label="Custom"]'
 		);
-		return element.evaluate( ( el ) => el.value );
+		return await element.evaluate( ( el ) => el.value );
 	}
 
 	async getColorValue( colorType ) {
@@ -295,5 +297,15 @@ class SiteEditorStyleVariations {
 	}
 	async getThemePalette() {
 		return this.getColorPalette( 'Theme' );
+	}
+
+	async openPreviousGlobalStylesPanel() {
+		await this.page.click(
+			'role=button[name="Navigate to the previous view"i]'
+		);
+	}
+
+	async openGlobalStylesPanel( panelName ) {
+		await this.page.click( `role=button[name="${ panelName }"i]` );
 	}
 }

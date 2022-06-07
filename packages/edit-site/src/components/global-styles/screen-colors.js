@@ -33,7 +33,10 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/background' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/background' }
+			aria-label={ __( 'Colors background styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
@@ -56,7 +59,10 @@ function TextColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/text' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/text' }
+			aria-label={ __( 'Colors text styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
@@ -77,7 +83,10 @@ function LinkColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/link' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/link' }
+			aria-label={ __( 'Colors link styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
