@@ -13,7 +13,6 @@ test.describe( 'Post Title block', () => {
 		await editor.insertBlock( { name: 'core/post-title' } );
 
 		// Add the post title
-		await page.locator( 'role=textbox[name="Add title"i]' ).focus();
 		await page.type(
 			'role=textbox[name="Add title"i]',
 			'Just tweaking the post title'
