@@ -83,6 +83,8 @@ Settings related to spacing.
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
+| customSpacingSize | boolean | true |  |
+| spacingSizes | array |  | name, size, slug |
 
 ---
 
