@@ -193,24 +193,29 @@
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingSizes": [
 				{
-					"name": "Small",
-					"slug": "small",
+					"name": "S",
+					"slug": "10",
 					"size": "4px"
 				},
 				{
-					"name": "Medium",
-					"slug": "medium",
+					"name": "M",
+					"slug": "20",
 					"size": "8px"
 				},
 				{
-					"name": "Large",
-					"slug": "large",
+					"name": "L",
+					"slug": "30",
 					"size": "16px"
 				},
 				{
-					"name": "Extra Large",
-					"slug": "x-large",
+					"name": "XL",
+					"slug": "40",
 					"size": "32px"
+				},
+				{
+					"name": "2XL",
+					"slug": "50",
+					"size": "64px"
 				}
 			]
 		},
