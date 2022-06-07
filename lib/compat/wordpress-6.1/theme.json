@@ -193,27 +193,27 @@
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingSizes": [
 				{
-					"name": "S",
+					"name": "Extra small",
 					"slug": "10",
 					"size": "4px"
 				},
 				{
-					"name": "M",
+					"name": "Small",
 					"slug": "20",
 					"size": "8px"
 				},
 				{
-					"name": "L",
+					"name": "Medium",
 					"slug": "30",
 					"size": "16px"
 				},
 				{
-					"name": "XL",
+					"name": "Large",
 					"slug": "40",
 					"size": "32px"
 				},
 				{
-					"name": "2XL",
+					"name": "Extra large",
 					"slug": "50",
 					"size": "64px"
 				}
