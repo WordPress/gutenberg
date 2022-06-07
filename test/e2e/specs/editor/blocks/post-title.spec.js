@@ -17,7 +17,7 @@ test.describe( 'Post Title block', () => {
 		await page.keyboard.type( 'Just tweaking the post title' );
 
 		// Save the post draft and reload.
-		await page.locator( '.editor-post-save-draft' ).click();
+		await page.click( 'role=button[name="Save draft"i]' );
 		await page.waitForSelector(
 			'role=button[name="Dismiss this notice"i]'
 		);
