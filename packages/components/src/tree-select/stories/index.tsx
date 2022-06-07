@@ -49,6 +49,9 @@ const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
 
 export const Default = TreeSelectWithState.bind( {} );
 Default.args = {
+	label: 'Label Text',
+	noOptionLabel: 'No parent page',
+	help: 'Help text to explain the select control.',
 	tree: [
 		{
 			name: 'Page 1',
