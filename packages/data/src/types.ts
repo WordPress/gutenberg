@@ -55,40 +55,15 @@ export type UseSelectReturn<
 	: never;
 export type MapSelect = ( select: SelectFunction ) => any;
 
-export type SelectFunction = < Descriptor >(
+type SelectFunction = < Descriptor >(
 	store: Descriptor
 ) => GetSelectorsOf< Descriptor >;
 
-export type GetSelectorsOf< Descriptor > = Descriptor extends StoreDescriptor<
+type GetSelectorsOf< Descriptor > = Descriptor extends StoreDescriptor<
 	ReduxStoreConfig< infer X, any, infer S >
 >
 	? S
 	: never;
-
-/*
-
- */
-// Test {{{
-const useSelect = {} as UseSelect;
-export type CoreStore = StoreDescriptor<
-	ReduxStoreConfig<
-		{ lorem: 'ipsum' },
-		any,
-		{ getEntityRecord: ( name: string ) => 123 }
-	>
->;
-const store: CoreStore = {} as any;
-export function PretendedReactComponent() {
-	const selectors = useSelect( store );
-	// Selectors reflect the CoreStore's selecots
-	const nb123 = useSelect( ( select ) => {
-		const number = select( store ).getEntityRecord( 'a' );
-		return number;
-	} );
-	// nb123 is a number 123
-	return { selectors, nb123 };
-}
-// }}
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
