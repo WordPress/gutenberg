@@ -569,7 +569,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const dirtyRecords = [];
+		const dirtyRecords: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
@@ -646,7 +646,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const recordsBeingSaved = [];
+		const recordsBeingSaved: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
