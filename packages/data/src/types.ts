@@ -47,14 +47,12 @@ export type UseSelectReturn<
 
 export type MapSelect = ( select: SelectFunction ) => any;
 
-type SelectFunction = < Descriptor >(
-	store: Descriptor
-) => GetSelectorsOf< Descriptor >;
+type SelectFunction = < S >( store: S ) => GetSelectorsOf< S >;
 
-type GetSelectorsOf< Descriptor > = Descriptor extends StoreDescriptor<
-	ReduxStoreConfig< any, any, infer S >
+type GetSelectorsOf< S > = S extends StoreDescriptor<
+	ReduxStoreConfig< any, any, infer Selectors >
 >
-	? S
+	? Selectors
 	: never;
 
 export interface DataRegistry {
