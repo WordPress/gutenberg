@@ -98,3 +98,7 @@
 .block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
 	background-attachment: scroll;
 }
+
+.color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
+	margin-top: $grid-unit-30;
+}

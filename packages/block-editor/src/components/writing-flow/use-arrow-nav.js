@@ -43,9 +43,25 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 		return true;
 	}
 
-	// Native inputs should not navigate horizontally.
 	const { tagName } = element;
-	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
+
+	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
+	if ( tagName === 'INPUT' ) {
+		const simpleInputTypes = [
+			'button',
+			'checkbox',
+			'color',
+			'file',
+			'image',
+			'radio',
+			'reset',
+			'submit',
+		];
+		return simpleInputTypes.includes( element.getAttribute( 'type' ) );
+	}
+
+	// Native textareas should not navigate horizontally.
+	return tagName !== 'TEXTAREA';
 }
 
 /**
