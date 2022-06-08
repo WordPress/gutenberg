@@ -86,8 +86,8 @@ function createResolversCache() {
  * @template {ReduxStoreConfig} Config
  * @param {string} key     Unique namespace identifier.
  * @param {Config} options Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
+ *                         describing reducer, actions, selectors,
+ *                         and resolvers.
  *
  * @return {import('../types').StoreDescriptor<Config>} Store Object.
  */
