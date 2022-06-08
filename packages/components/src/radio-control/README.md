@@ -110,8 +110,8 @@ A function that receives the value of the new option that is being selected as i
 
 An array of objects containing the value and label of the options.
 
--   `label`: (string) The label to be shown to the user.
--   `value`: (string) The internal value compared against select and passed to onChange.
+-   `label`: `string` The label to be shown to the user.
+-   `value`: `string` The internal value compared against select and passed to onChange.
 
 *   Required: No
 
