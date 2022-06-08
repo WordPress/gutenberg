@@ -66,7 +66,7 @@ function Variation( { variation } ) {
 	}, [ user, variation ] );
 
 	const styleVariationTitle =
-		variation?.title || __( 'Untitled theme style.' );
+		variation?.title || __( 'Untitled theme style' );
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
