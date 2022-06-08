@@ -1606,14 +1606,16 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		return {};
 	}
 
-	const { excerpt, slug, title, area } = template;
+	const { description, slug, title, area } = template;
 	const {
 		title: defaultTitle,
 		description: defaultDescription,
 	} = __experimentalGetDefaultTemplateType( state, slug );
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
-	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+	const templateDescription = isString( description )
+		? description
+		: description?.raw;
 	const templateIcon =
 		__experimentalGetDefaultTemplatePartAreas( state ).find(
 			( item ) => area === item.area

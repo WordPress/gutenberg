@@ -3,8 +3,8 @@
  */
 import { __experimentalGetSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { DateTimePicker } from '@wordpress/components';
-import { useRef, useState, useMemo } from '@wordpress/element';
+import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
+import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -21,7 +21,7 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 	).toISOString();
 }
 
-export default function PostSchedule() {
+export default function PostSchedule( { onClose } ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -61,7 +61,6 @@ export default function PostSchedule() {
 		[ eventsByPostType ]
 	);
 
-	const ref = useRef();
 	const settings = __experimentalGetSettings();
 
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
@@ -75,20 +74,14 @@ export default function PostSchedule() {
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
 
-	function onChange( newDate ) {
-		onUpdateDate( newDate );
-		const { ownerDocument } = ref.current;
-		ownerDocument.activeElement.blur();
-	}
-
 	return (
-		<DateTimePicker
-			ref={ ref }
+		<PublishDateTimePicker
 			currentDate={ postDate }
-			onChange={ onChange }
+			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
 			events={ events }
 			onMonthPreviewed={ setPreviewedMonth }
+			onClose={ onClose }
 		/>
 	);
 }

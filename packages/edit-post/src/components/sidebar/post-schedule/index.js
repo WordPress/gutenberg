@@ -33,7 +33,9 @@ export function PostSchedule() {
 							</Button>
 						</>
 					) }
-					renderContent={ () => <PostScheduleForm /> }
+					renderContent={ ( { onClose } ) => (
+						<PostScheduleForm onClose={ onClose } />
+					) }
 				/>
 			</PanelRow>
 		</PostScheduleCheck>
