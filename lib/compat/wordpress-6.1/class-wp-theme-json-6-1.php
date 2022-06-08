@@ -429,7 +429,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'use_default_names' => true,
 			'value_key'         => 'size',
 			'css_vars'          => '--wp--preset--spacing-size--$slug',
-			'classes'           => array( '.has-$slug-spacing-size' => 'spacing-size' ),
 			'properties'        => array( 'padding', 'margin' ),
 		),
 	);
