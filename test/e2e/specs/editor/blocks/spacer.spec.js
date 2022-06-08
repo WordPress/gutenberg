@@ -1,12 +1,6 @@
 /**
  * WordPress dependencies
  */
-// import {
-// 	clickBlockAppender,
-// 	getEditedPostContent,
-// 	createNewPost,
-// 	dragAndResize,
-// } from '@wordpress/e2e-test-utils';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Spacer', () => {
