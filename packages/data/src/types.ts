@@ -42,18 +42,32 @@ export type UseSelectReturn<
 > = F extends MapSelect
 	? ReturnType< F >
 	: F extends StoreDescriptor< any >
-	? GetSelectorsOf< F >
+	? CurriedSelectorsOf< F >
 	: never;
 
 export type MapSelect = ( select: SelectFunction ) => any;
 
-type SelectFunction = < S >( store: S ) => GetSelectorsOf< S >;
+type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
 
-type GetSelectorsOf< S > = S extends StoreDescriptor<
+type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	ReduxStoreConfig< any, any, infer Selectors >
 >
-	? Selectors
+	? { [ key in keyof Selectors ]: CurriedState< Selectors[ key ] > }
 	: never;
+
+/**
+ * Removes the first argument from a function
+ *
+ * This is designed to remove the `state` parameter from
+ * registered selectors since that argument is supplied
+ * by the editor when calling `select(…)`.
+ *
+ * For functions with no arguments, which some selectors
+ * are free to define, returns the original function.
+ */
+type CurriedState< F > = F extends ( state: any, ...args: infer P ) => infer R
+	? ( ...args: P ) => R
+	: F;
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
