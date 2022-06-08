@@ -21,67 +21,16 @@ const noop = () => {};
 const renderQueue = createQueue();
 
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
-
-/**
- * @interface Store
- * @template S
- * @return {{ selectors: S }}
- */
-
-/**
- * @callback getEntityRecord
- * @param {string} name
- * @return {null}
- */
-
-/**
- * @typedef {{ getEntityRecord: getEntityRecord }} CoreSelectors
- */
-
-/** @type {CoreSelectors} */
-const coreSelectors = {};
-coreSelectors.getEntityRecord( 'name' );
-
-/**
- * @typedef {Store.<CoreSelectors>} CoreStore
- */
-
-/**
- * @interface
- * @template S
- * @param {Store.<S>} store
- * @return {S} Selectors
- */
-function select( store ) {
-	return store.selectors;
-}
-
-/** @type {Store.<CoreSelectors>} */
-const coreStore = {};
-
-select( coreStore ).getEntityRecord( 'root' );
-select( /** @type {CoreStore} */ 'core' ).getEntityRecord( 'root' );
+/** @typedef {import('../../types').UseSelect} UseSelect */
+/** @typedef {import('../../types').UseSelectReturn} UseSelectReturn */
+/** @typedef {import('../../types').MapSelect} MapSelect */
+/** @typedef {import('../../types').CoreStore} CoreStore */
 
 /**
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
- *
- * @param {Function|StoreDescriptor|string} mapSelect Function called on every state change. The
- *                                                    returned value is exposed to the component
- *                                                    implementing this hook. The function receives
- *                                                    the `registry.select` method on the first
- *                                                    argument and the `registry` on the second
- *                                                    argument.
- *                                                    When a store key is passed, all selectors for
- *                                                    the store will be returned. This is only meant
- *                                                    for usage of these selectors in event
- *                                                    callbacks, not for data needed to create the
- *                                                    element tree.
- * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
- *                                                    same `mapSelect` is invoked on every state
- *                                                    change unless the dependencies change.
  *
  * @example
  * ```js
@@ -126,8 +75,22 @@ select( /** @type {CoreStore} */ 'core' ).getEntityRecord( 'root' );
  *   return <div onPaste={ onPaste }>{ children }</div>;
  * }
  * ```
- *
- * @return {Function}  A custom react hook.
+ * @template {MapSelect|StoreDescriptor.<any>} T
+ * @param {T} mapSelect Function called on every state change. The
+ *                      returned value is exposed to the component
+ *                      implementing this hook. The function receives
+ *                      the `registry.select` method on the first
+ *                      argument and the `registry` on the second
+ *                      argument.
+ *                      When a store key is passed, all selectors for
+ *                      the store will be returned. This is only meant
+ *                      for usage of these selectors in event
+ *                      callbacks, not for data needed to create the
+ *                      element tree.
+ * @param {*} deps      If provided, this memoizes the mapSelect so the
+ *                      same `mapSelect` is invoked on every state
+ *                      change unless the dependencies change.
+ * @return {import('../../types').UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
