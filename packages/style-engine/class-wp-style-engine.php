@@ -436,7 +436,7 @@ class WP_Style_Engine {
 	/**
 	 * Style value parser that returns a CSS ruleset of style properties for style definition groups
 	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
-	 * e.g., "$style_property-$individua_feature: $value;", which could represent the following:
+	 * e.g., "$style_property-$individual_feature: $value;", which could represent the following:
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
