@@ -89,7 +89,7 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			await user.type( input, '2' );
-			// Blurs the input.
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			// Updating the value via props.
@@ -136,6 +136,7 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			await user.type( input, 'that was then' );
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
