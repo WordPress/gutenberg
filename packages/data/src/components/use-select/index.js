@@ -23,6 +23,46 @@ const renderQueue = createQueue();
 /** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
 
 /**
+ * @interface Store
+ * @template S
+ * @return {{ selectors: S }}
+ */
+
+/**
+ * @callback getEntityRecord
+ * @param {string} name
+ * @return {null}
+ */
+
+/**
+ * @typedef {{ getEntityRecord: getEntityRecord }} CoreSelectors
+ */
+
+/** @type {CoreSelectors} */
+const coreSelectors = {};
+coreSelectors.getEntityRecord( 'name' );
+
+/**
+ * @typedef {Store.<CoreSelectors>} CoreStore
+ */
+
+/**
+ * @interface
+ * @template S
+ * @param {Store.<S>} store
+ * @return {S} Selectors
+ */
+function select( store ) {
+	return store.selectors;
+}
+
+/** @type {Store.<CoreSelectors>} */
+const coreStore = {};
+
+select( coreStore ).getEntityRecord( 'root' );
+select( /** @type {CoreStore} */ 'core' ).getEntityRecord( 'root' );
+
+/**
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
