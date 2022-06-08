@@ -57,10 +57,7 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
-	.option(
-		'--block-only',
-		'scaffold only block files inside of a directory with the value passed'
-	)
+	.option( '--block-only', 'scaffold only block files' )
 	.action(
 		async (
 			slug,

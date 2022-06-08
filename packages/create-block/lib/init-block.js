@@ -15,6 +15,7 @@ const { writeOutputTemplate } = require( './output' );
 async function initBlockJSON( {
 	$schema,
 	apiVersion,
+	blockOnly,
 	slug,
 	namespace,
 	title,
@@ -33,7 +34,9 @@ async function initBlockJSON( {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
 
-	const outputFile = join( process.cwd(), slug, folderName, 'block.json' );
+	const outputFile = blockOnly
+		? join( process.cwd(), folderName, slug, 'block.json' )
+		: join( process.cwd(), slug, folderName, 'block.json' );
 	await makeDir( dirname( outputFile ) );
 	await writeFile(
 		outputFile,
@@ -65,15 +68,17 @@ async function initBlockJSON( {
 
 module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
-		Object.keys( outputTemplates ).map(
-			async ( outputFile ) =>
-				await writeOutputTemplate(
-					outputTemplates[ outputFile ],
-					join( view.folderName, outputFile ),
-					view
-				)
-		)
-	);
+		Object.keys( outputTemplates ).map( async ( outputFile ) => {
+			const pathName = view.blockOnly
+				? join( process.cwd(), view.folderName, view.slug, outputFile )
+				: join( view.folderName, outputFile );
 
+			await writeOutputTemplate(
+				outputTemplates[ outputFile ],
+				pathName,
+				view
+			);
+		} )
+	);
 	await initBlockJSON( view );
 };

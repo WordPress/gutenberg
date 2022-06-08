@@ -2,6 +2,8 @@
  * External dependencies
  */
 const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
+const { existsSync } = require( 'fs' );
+const { resolve } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -12,12 +14,14 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+const CLIError = require( './cli-error' );
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
 	{
 		$schema,
 		apiVersion,
+		blockOnly,
 		namespace,
 		slug,
 		title,
@@ -53,6 +57,7 @@ module.exports = async (
 	const view = {
 		$schema,
 		apiVersion,
+		blockOnly,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
@@ -83,16 +88,19 @@ module.exports = async (
 		style,
 	};
 
-	await Promise.all(
-		Object.keys( pluginOutputTemplates ).map(
-			async ( outputFile ) =>
-				await writeOutputTemplate(
-					pluginOutputTemplates[ outputFile ],
-					outputFile,
-					view
-				)
-		)
-	);
+	if ( ! blockOnly ) {
+		// If blockOnly exists, we don't need to scaffold the plugin files.
+		await Promise.all(
+			Object.keys( pluginOutputTemplates ).map(
+				async ( outputFile ) =>
+					await writeOutputTemplate(
+						pluginOutputTemplates[ outputFile ],
+						outputFile,
+						view
+					)
+			)
+		);
+	}
 
 	await Promise.all(
 		Object.keys( outputAssets ).map(
@@ -107,21 +115,23 @@ module.exports = async (
 
 	await initBlock( blockOutputTemplates, view );
 
-	await initPackageJSON( view );
+	if ( ! blockOnly ) {
+		await initPackageJSON( view );
+		if ( wpScripts ) {
+			await initWPScripts( view );
+		}
 
-	if ( wpScripts ) {
-		await initWPScripts( view );
-	}
-
-	if ( wpEnv ) {
-		await initWPEnv( view );
+		if ( wpEnv ) {
+			await initWPEnv( view );
+		}
 	}
 
 	info( '' );
 	success(
 		`Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
 	);
-	if ( wpScripts ) {
+
+	if ( ! blockOnly && wpScripts ) {
 		info( '' );
 		info( 'You can run several commands inside:' );
 		info( '' );
@@ -150,13 +160,13 @@ module.exports = async (
 	info( 'To enter the directory type:' );
 	info( '' );
 	code( `  $ cd ${ slug }` );
-	if ( wpScripts ) {
+	if ( ! blockOnly && wpScripts ) {
 		info( '' );
 		info( 'You can start development with:' );
 		info( '' );
 		code( '  $ npm start' );
 	}
-	if ( wpEnv ) {
+	if ( ! blockOnly && wpEnv ) {
 		info( '' );
 		info( 'You can start WordPress with:' );
 		info( '' );
