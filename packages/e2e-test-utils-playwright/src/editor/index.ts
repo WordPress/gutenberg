@@ -6,6 +6,7 @@ import type { Browser, Page, BrowserContext, Frame } from '@playwright/test';
 /**
  * Internal dependencies
  */
+// import { clickBlockAppender } from './click-block-appender';
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { getEditedPostContent } from './get-edited-post-content';
@@ -52,6 +53,7 @@ export class Editor {
 		return frame;
 	}
 
+	// clickBlockAppender = clickBlockAppender;
 	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem;
 	clickBlockToolbarButton = clickBlockToolbarButton;
 	getEditedPostContent = getEditedPostContent;
