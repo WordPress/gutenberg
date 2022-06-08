@@ -24,6 +24,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
+import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -33,7 +34,6 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -46,6 +46,18 @@ import CoverPlaceholder from './cover-placeholder';
 import ResizableCover from './resizable-cover';
 
 extend( [ namesPlugin ] );
+
+const placeholderIllustration = (
+	<SVG
+		className="components-placeholder__illustration"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+	>
+		<Path vectorEffect="non-scaling-stroke" d="M60 60 0 0" />
+	</SVG>
+);
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -158,11 +170,12 @@ function CoverEdit( {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: undefined ),
 		minHeight: minHeightWithUnit || undefined,
 	};
+
+	const backgroundImage = url ? `url(${ url })` : undefined;
+
+	const backgroundPosition = mediaPosition( focalPoint );
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
@@ -212,7 +225,7 @@ function CoverEdit( {
 		overlayColor,
 	};
 
-	if ( ! hasInnerBlocks && ! hasBackground ) {
+	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				<CoverBlockControls
@@ -324,35 +337,55 @@ function CoverEdit( {
 					showHandle={ isSelected }
 				/>
 
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__background',
-						dimRatioToClass( dimRatio ),
-						{
-							[ overlayColor.class ]: overlayColor.class,
-							'has-background-dim': dimRatio !== undefined,
-							// For backwards compatibility. Former versions of the Cover Block applied
-							// `.wp-block-cover__gradient-background` in the presence of
-							// media, a gradient and a dim.
-							'wp-block-cover__gradient-background':
-								url && gradientValue && dimRatio !== 0,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
-					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
-				/>
-
-				{ url && isImageBackground && isImgElement && (
-					<img
-						ref={ mediaElement }
-						className="wp-block-cover__image-background"
-						alt={ alt }
-						src={ url }
-						style={ mediaStyle }
+				{ ( ! useFeaturedImage || url ) && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ { backgroundImage: gradientValue, ...bgStyle } }
 					/>
 				) }
+
+				{ ! url && useFeaturedImage && (
+					<div className="wp-block-cover__image--placeholder-image">
+						{ placeholderIllustration }
+					</div>
+				) }
+
+				{ url &&
+					isImageBackground &&
+					( isImgElement ? (
+						<img
+							ref={ mediaElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) : (
+						<div
+							ref={ mediaElement }
+							role="img"
+							className={ classnames(
+								classes,
+								'wp-block-cover__image-background'
+							) }
+							style={ { backgroundImage, backgroundPosition } }
+						/>
+					) ) }
 				{ url && isVideoBackground && (
 					<video
 						ref={ mediaElement }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Reducer } from 'react';
+import type { Reducer, SyntheticEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { Reducer } from 'react';
 import type { InputAction } from './actions';
 
 export interface InputState {
-	_event: Event | {};
+	_event?: SyntheticEvent;
 	error: unknown;
 	initialValue?: string;
 	isDirty: boolean;
@@ -24,7 +24,6 @@ export type StateReducer = Reducer< InputState, InputAction >;
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;
 
 export const initialInputControlState: InputState = {
-	_event: {},
 	error: null,
 	initialValue: '',
 	isDirty: false,

@@ -126,7 +126,7 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	);
 }
 
-const extractColorNameFromCurrentValue = (
+export const extractColorNameFromCurrentValue = (
 	currentValue,
 	colors = [],
 	showMultiplePalettes = false
@@ -135,13 +135,20 @@ const extractColorNameFromCurrentValue = (
 		return '';
 	}
 
+	const currentValueIsCssVariable = /^var\(/.test( currentValue );
+	const normalizedCurrentValue = currentValueIsCssVariable
+		? currentValue
+		: colord( currentValue ).toHex();
+
 	// Normalize format of `colors` to simplify the following loop
 	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			if (
-				colord( currentValue ).toHex() === colord( colorValue ).toHex()
-			) {
+			const normalizedColorValue = currentValueIsCssVariable
+				? colorValue
+				: colord( colorValue ).toHex();
+
+			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
 			}
 		}

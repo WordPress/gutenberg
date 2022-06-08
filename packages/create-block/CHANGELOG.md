@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.3.0 (2022-06-01)
+
+### Enhancement
+
+-   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
+
 ## 3.2.0 (2022-05-18)
 
 ### Bug Fix
