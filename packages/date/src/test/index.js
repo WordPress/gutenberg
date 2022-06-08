@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import momentLib from 'moment';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	getDate,
 	gmdate,
 	gmdateI18n,
+	humanTimeDiff,
 	isInTheFuture,
 	setSettings,
 } from '../';
@@ -587,6 +593,228 @@ describe( 'Function gmdateI18n', () => {
 
 		// Restore default settings.
 		setSettings( settings );
+	} );
+} );
+
+describe( 'Function humanTimeDiff', () => {
+	it( 'should show a human readable string showing the difference between two timestamps', () => {
+		// Set a date one second in the past and check it works between then and now.
+		expect(
+			humanTimeDiff( new Date( Number( getDate() ) - 1000 ) )
+		).toEqual( 'a few seconds' );
+
+		// Set a date two seconds in the past and check it works between then and now.
+		expect(
+			humanTimeDiff( new Date( Number( getDate() ) - 1000 * 2 ) )
+		).toEqual( 'a few seconds' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 3 )
+			)
+		).toEqual( 'a few seconds' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 61 )
+			)
+		).toEqual( 'a minute' );
+
+		// Set a date one minute in the past and check it works between then and now.
+		expect(
+			humanTimeDiff( new Date( Number( getDate() ) - 1000 * 60 ) )
+		).toEqual( 'a minute' );
+
+		// Set a date two minutes in the past and check it works between then and now.
+		expect(
+			humanTimeDiff( new Date( Number( getDate() ) - 1000 * 120 ) )
+		).toEqual( '2 minutes' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 ),
+				new Date( Number( getDate() ) - 1000 * 120 )
+			)
+		).toEqual( 'a minute' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 44 )
+			)
+		).toEqual( '42 minutes' );
+
+		// Set a date one hour in the past and check it works between then and now.
+		expect(
+			humanTimeDiff( new Date( Number( getDate() ) - 1000 * 60 * 60 ) )
+		).toEqual( 'an hour' );
+
+		// Set a date two hours in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 2 )
+			)
+		).toEqual( '2 hours' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 2 )
+			)
+		).toEqual( 'an hour' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 7 )
+			)
+		).toEqual( '5 hours' );
+
+		// Set a date one day in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 )
+			)
+		).toEqual( 'a day' );
+
+		// Set a date two hours in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 2 )
+			)
+		).toEqual( '2 days' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 3 )
+			)
+		).toEqual( 'a day' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 8 )
+			)
+		).toEqual( '6 days' );
+
+		// Set a date one month in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 30 )
+			)
+		).toEqual( 'a month' );
+
+		// Set a date two months in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 60 )
+			)
+		).toEqual( '2 months' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 60 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 90 )
+			)
+		).toEqual( 'a month' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 30 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 30 * 9 )
+			)
+		).toEqual( '7 months' );
+
+		// Set a date one year in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 )
+			)
+		).toEqual( 'a year' );
+
+		// Set a date one year in the future and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) + 1000 * 60 * 60 * 24 * 365 )
+			)
+		).toEqual( 'a year' );
+
+		// Set a date two months in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 * 2 )
+			)
+		).toEqual( '2 years' );
+
+		// Check it works when two timestamps are supplied.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 * 2 )
+			)
+		).toEqual( 'a year' );
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 60 * 24 * 365 * 12 )
+			)
+		).toEqual( '11 years' );
+	} );
+
+	it( 'should include the suffix if includeAffix is true', () => {
+		// Set a date one second in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 ),
+				new Date( Number( getDate() ) - 1000 ),
+				true
+			)
+		).toEqual( 'a few seconds ago' );
+
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 44 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 2 ),
+				true
+			)
+		).toEqual( '42 minutes ago' );
+
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 * 60 * 2 ),
+				new Date( Number( getDate() ) - 1000 * 60 * 44 ),
+				true
+			)
+		).toEqual( 'in 42 minutes' );
+	} );
+	it( 'should ignore the timezone if both dates are in the same timezone', () => {
+		const settings = __experimentalGetSettings();
+
+		// Set a timezone in the past.
+		setSettings( {
+			...settings,
+			timezone: { offset: '-4', string: 'America/New_York' },
+		} );
+		// Set a date one second in the past and check it works between then and now.
+		expect(
+			humanTimeDiff(
+				new Date( Number( getDate() ) - 1000 ),
+				new Date( Number( getDate() ) - 2000 )
+			)
+		).toEqual( 'a few seconds' );
+	} );
+
+	it( 'should compare across two different timezones', () => {
+		// Set a date in UTC and another in America/New_York (4 hours in the past) and check it works between the different timestamps.
+		expect(
+			humanTimeDiff(
+				momentLib.tz( '2022-06-07T22:31:18', 'America/New_York' ),
+				momentLib.tz( '2022-06-07T22:31:18', 'Etc/UTC' )
+			)
+		).toEqual( '4 hours' );
 	} );
 } );
 
