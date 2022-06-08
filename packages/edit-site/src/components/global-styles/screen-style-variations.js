@@ -109,7 +109,10 @@ function ScreenStyleVariations() {
 				settings: {},
 				styles: {},
 			},
-			...variations,
+			...variations.map( ( variation ) => ( {
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			} ) ),
 		];
 	}, [ variations ] );
 
