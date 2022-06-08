@@ -269,7 +269,7 @@ Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handb
 Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/code/coding-guidelines.md#imports).
 
 ```js
-/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 ```
 
 Note that all custom types defined in another file can be imported.
@@ -277,9 +277,9 @@ Note that all custom types defined in another file can be imported.
 When considering which types should be made available from a WordPress package, the `@typedef` statements in the package's entry point script should be treated as effectively the same as its public API. It is important to be aware of this, both to avoid unintentionally exposing internal types on the public interface, and as a way to expose the public types of a project.
 
 ```js
-// packages/data/src/index.js
+// packages/rich-text/src/can-indent-list-items.js
 
-/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('./create').RichTextValue} RichTextValue */
 ```
 
 In this snippet, the `@typedef` will support the usage of the previous example's `import('@wordpress/data')`.

@@ -8,12 +8,12 @@ import { get } from 'lodash';
  */
 import coreDataStore from './store';
 
-/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('./types').DataRegistry} DataRegistry */
 
 /**
  * Creates a middleware handling resolvers cache invalidation.
  *
- * @param {WPDataRegistry} registry   The registry reference for which to create
+ * @param {DataRegistry} registry   The registry reference for which to create
  *                                    the middleware.
  * @param {string}         reducerKey The namespace for which to create the
  *                                    middleware.
