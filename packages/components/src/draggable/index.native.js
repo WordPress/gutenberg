@@ -142,7 +142,7 @@ const Draggable = ( {
 
 	const providerValue = useMemo( () => {
 		return { panGestureRef, isDragging, isPanActive, draggingId };
-	}, [] );
+	}, [ isDragging, isPanActive, draggingId ] );
 
 	return (
 		<GestureDetector gesture={ panGesture }>
