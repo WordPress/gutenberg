@@ -26,8 +26,8 @@ export interface StoreDescriptor< Config extends AnyConfig > {
 
 export interface ReduxStoreConfig<
 	State,
-	ActionCreators, // extends MapOf< ActionCreator >,
-	Selectors // extends MapOf< Selector >
+	ActionCreators extends MapOf< ActionCreator >,
+	Selectors extends MapOf< Selector >
 > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
