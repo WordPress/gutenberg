@@ -27,14 +27,18 @@ test.describe( 'Spacer', () => {
 		await page.keyboard.press( 'Enter' );
 
 		const resizableHandle = page.locator(
-			'[aria-label="Block: Spacer"] .block-library-spacer__resize-container .components-resizable-box__handle'
+			'role=document[name="Block: Spacer"i] >> css=.block-library-spacer__resize-container .components-resizable-box__handle'
 		);
-		await editor.dragAndResize( resizableHandle, { x: 0, y: 50 } );
+		const elementPoint = await resizableHandle.boundingBox();
+		await page.mouse.move( elementPoint.x, elementPoint.y );
+		await page.mouse.down();
+		await page.mouse.move( elementPoint.x + 0, elementPoint.y + 50 );
+		await page.mouse.up();
+
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		const selectedSpacer = page.locator(
-			'[data-type="core/spacer"].is-selected'
-		);
-		expect( selectedSpacer ).not.toBe( null );
+		await expect(
+			page.locator( 'role=document[name="Block Spacer"i]' )
+		).not.toBe( null );
 	} );
 } );
