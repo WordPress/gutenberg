@@ -21,12 +21,15 @@ import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 import type {
 	Context,
 	DefaultContextOf,
+	EntityConfig as GenericEntityConfig,
 	EntityRecordOf,
 	KeyOf,
 	Kind,
 	KindOf,
 	Name,
 	NameOf,
+	Post,
+	Theme,
 	User,
 	WpTemplate,
 } from './entity-types';
@@ -50,6 +53,8 @@ interface State {
 	users: UserState;
 }
 
+type EntityConfig = GenericEntityConfig< EntityRecord, Context >;
+
 interface EntitiesState {
 	config: EntityConfig[];
 	records: Record< Kind, Record< Name, EntityState< Kind, Name > > >;
@@ -58,11 +63,6 @@ interface EntitiesState {
 interface EntityState< K extends Kind, N extends Name > {
 	edits: Record< KeyOf< K, N >, Partial< EntityRecordOf< K, N > > >;
 	saving: Record< KeyOf< K, N >, { pending: boolean } >;
-}
-
-interface EntityConfig {
-	name: Name;
-	kind: Kind;
 }
 
 interface UndoState extends Array< Object > {
@@ -187,7 +187,7 @@ export const getUserQueryResults = createSelector(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind( state: State, kind: Kind ): Array< any > {
+export function getEntitiesByKind( state: State, kind: Kind ): EntityConfig[] {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
@@ -203,7 +203,7 @@ export function getEntitiesByKind( state: State, kind: Kind ): Array< any > {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: Kind ): Array< any > {
+export function getEntitiesConfig( state: State, kind: Kind ): EntityConfig[] {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -217,7 +217,11 @@ export function getEntitiesConfig( state: State, kind: Kind ): Array< any > {
  *
  * @return Entity config
  */
-export function getEntity( state: State, kind: Kind, name: Name ): any {
+export function getEntity(
+	state: State,
+	kind: Kind,
+	name: Name
+): EntityConfig {
 	deprecated( "wp.data.select( 'core' ).getEntity()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntityConfig()",
@@ -234,7 +238,11 @@ export function getEntity( state: State, kind: Kind, name: Name ): any {
  *
  * @return Entity config
  */
-export function getEntityConfig( state: State, kind: Kind, name: Name ): any {
+export function getEntityConfig(
+	state: State,
+	kind: Kind,
+	name: Name
+): EntityConfig {
 	return find( state.entities.config, { kind, name } );
 }
 
@@ -716,7 +724,7 @@ export function getEntityRecordEdits< K extends Kind, N extends Name >(
 	kind: K,
 	name: N,
 	recordId: KeyOf< K, N >
-): Optional< any > {
+): Optional< Partial< EntityRecordOf< K, N > > > {
 	return get( state.entities.records, [
 		kind,
 		name,
@@ -745,7 +753,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		kind: K,
 		name: N,
 		recordId: KeyOf< K, N >
-	): Optional< any > => {
+	): Optional< Partial< EntityRecordOf< K, N > > > => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
@@ -805,7 +813,7 @@ export const getEditedEntityRecord = createSelector(
 		kind: K,
 		name: N,
 		recordId: KeyOf< K, N >
-	): EntityRecord | undefined => ( {
+	): EntityRecordOf< K, N > | undefined => ( {
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
@@ -850,11 +858,11 @@ export const getEditedEntityRecord = createSelector(
  *
  * @return Whether the entity record is autosaving or not.
  */
-export function isAutosavingEntityRecord(
+export function isAutosavingEntityRecord< K extends Kind, N extends Name >(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: K,
+	name: N,
+	recordId: KeyOf< K, N >
 ): boolean {
 	const { pending, isAutosave } = get(
 		state.entities.records,
@@ -897,11 +905,11 @@ export function isSavingEntityRecord< K extends Kind, N extends Name >(
  *
  * @return Whether the entity record is deleting or not.
  */
-export function isDeletingEntityRecord(
+export function isDeletingEntityRecord< K extends Kind, N extends Name >(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: K,
+	name: N,
+	recordId: KeyOf< K, N >
 ): boolean {
 	return get(
 		state.entities.records,
@@ -920,11 +928,11 @@ export function isDeletingEntityRecord(
  *
  * @return The entity record's save error.
  */
-export function getLastEntitySaveError(
+export function getLastEntitySaveError< K extends Kind, N extends Name >(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: K,
+	name: N,
+	recordId: KeyOf< K, N >
 ): any {
 	return get( state.entities.records, [
 		kind,
@@ -945,11 +953,11 @@ export function getLastEntitySaveError(
  *
  * @return The entity record's save error.
  */
-export function getLastEntityDeleteError(
+export function getLastEntityDeleteError< K extends Kind, N extends Name >(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: K,
+	name: N,
+	recordId: KeyOf< K, N >
 ): any {
 	return get( state.entities.records, [
 		kind,
@@ -1030,7 +1038,9 @@ export function hasRedo( state: State ): boolean {
  *
  * @return The current theme.
  */
-export function getCurrentTheme( state: State ): any {
+export function getCurrentTheme(
+	state: State
+): Theme< DefaultContextOf< Theme< any > > > {
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
@@ -1110,7 +1120,7 @@ export function canUser(
 	state: State,
 	action: string,
 	resource: string,
-	id?: GenericRecordKey
+	id?: unknown
 ): boolean | undefined {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
@@ -1131,11 +1141,11 @@ export function canUser(
  * @return Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
-export function canUserEditEntityRecord(
+export function canUserEditEntityRecord< K extends Kind, N extends Name >(
 	state: State,
-	kind: Kind,
-	name: Name,
-	recordId: GenericRecordKey
+	kind: K,
+	name: N,
+	recordId: KeyOf< K, N >
 ): boolean | undefined {
 	const entityConfig = getEntityConfig( state, kind, name );
 	if ( ! entityConfig ) {
@@ -1160,8 +1170,8 @@ export function canUserEditEntityRecord(
  */
 export function getAutosaves(
 	state: State,
-	postType: string,
-	postId: GenericRecordKey
+	postType: Post< any >[ 'type' ],
+	postId: Post< any >[ 'id' ]
 ): Array< any > | undefined {
 	return state.autosaves[ postId ];
 }
@@ -1178,9 +1188,9 @@ export function getAutosaves(
  */
 export function getAutosave(
 	state: State,
-	postType: string,
-	postId: GenericRecordKey,
-	authorId: GenericRecordKey
+	postType: Post< any >[ 'type' ],
+	postId: Post< any >[ 'id' ],
+	authorId: User< any >[ 'id' ]
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
@@ -1202,8 +1212,8 @@ export function getAutosave(
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => (
 		state: State,
-		postType: string,
-		postId: GenericRecordKey
+		postType: Post< any >[ 'type' ],
+		postId: Post< any >[ 'id' ]
 	): boolean => {
 		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,
