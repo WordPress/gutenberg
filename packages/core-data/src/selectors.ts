@@ -21,7 +21,6 @@ import { getNormalizedCommaSeparable, isRawAttribute } from './utils';
 import type {
 	Context,
 	DefaultContextOf,
-	EntityConfig as GenericEntityConfig,
 	EntityRecordOf,
 	KeyOf,
 	Kind,
@@ -29,10 +28,10 @@ import type {
 	Name,
 	NameOf,
 	Post,
-	Theme,
 	User,
 	WpTemplate,
 } from './entity-types';
+import type { EntityConfig } from './entity-types/entities';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -53,10 +52,10 @@ interface State {
 	users: UserState;
 }
 
-type EntityConfig = GenericEntityConfig< EntityRecord, Context >;
+type AnyEntityConfig = EntityConfig< EntityRecord, Context >;
 
 interface EntitiesState {
-	config: EntityConfig[];
+	config: AnyEntityConfig[];
 	records: Record< Kind, Record< Name, EntityState< Kind, Name > > >;
 }
 
@@ -187,7 +186,10 @@ export const getUserQueryResults = createSelector(
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesByKind( state: State, kind: Kind ): EntityConfig[] {
+export function getEntitiesByKind(
+	state: State,
+	kind: Kind
+): AnyEntityConfig[] {
 	deprecated( "wp.data.select( 'core' ).getEntitiesByKind()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntitiesConfig()",
@@ -203,7 +205,10 @@ export function getEntitiesByKind( state: State, kind: Kind ): EntityConfig[] {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: Kind ): EntityConfig[] {
+export function getEntitiesConfig(
+	state: State,
+	kind: Kind
+): AnyEntityConfig[] {
 	return filter( state.entities.config, { kind } );
 }
 
@@ -217,11 +222,7 @@ export function getEntitiesConfig( state: State, kind: Kind ): EntityConfig[] {
  *
  * @return Entity config
  */
-export function getEntity(
-	state: State,
-	kind: Kind,
-	name: Name
-): EntityConfig {
+export function getEntity( state: State, kind: Kind, name: Name ) {
 	deprecated( "wp.data.select( 'core' ).getEntity()", {
 		since: '6.0',
 		alternative: "wp.data.select( 'core' ).getEntityConfig()",
@@ -242,7 +243,7 @@ export function getEntityConfig(
 	state: State,
 	kind: Kind,
 	name: Name
-): EntityConfig {
+): Optional< AnyEntityConfig > {
 	return find( state.entities.config, { kind, name } );
 }
 
@@ -614,13 +615,13 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 									kind,
 									name,
 									primaryKey
-								);
+								)!;
 								dirtyRecords.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
 									key:
 										entityRecord[
-											entityConfig.key ||
+											entityConfig!.key ||
 												DEFAULT_ENTITY_KEY
 										],
 									title:
@@ -682,13 +683,13 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 									kind,
 									name,
 									primaryKey
-								);
+								)!;
 								recordsBeingSaved.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
 									key:
 										entityRecord[
-											entityConfig.key ||
+											entityConfig!.key ||
 												DEFAULT_ENTITY_KEY
 										],
 									title:
@@ -753,7 +754,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		kind: K,
 		name: N,
 		recordId: KeyOf< K, N >
-	): Optional< Partial< EntityRecordOf< K, N > > > => {
+	): Partial< EntityRecordOf< K, N > > => {
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
@@ -1038,9 +1039,7 @@ export function hasRedo( state: State ): boolean {
  *
  * @return The current theme.
  */
-export function getCurrentTheme(
-	state: State
-): Theme< DefaultContextOf< Theme< any > > > {
+export function getCurrentTheme( state: State ) {
 	return getEntityRecord( state, 'root', 'theme', state.currentTheme );
 }
 
@@ -1148,11 +1147,10 @@ export function canUserEditEntityRecord< K extends Kind, N extends Name >(
 	recordId: KeyOf< K, N >
 ): boolean | undefined {
 	const entityConfig = getEntityConfig( state, kind, name );
-	if ( ! entityConfig ) {
+	const resource = entityConfig?.__unstable_rest_base;
+	if ( ! entityConfig || ! resource ) {
 		return false;
 	}
-	const resource = entityConfig.__unstable_rest_base;
-
 	return canUser( state, 'update', resource, recordId );
 }
 
@@ -1261,7 +1259,7 @@ export const getReferenceByDistinctEdits = createSelector(
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): WpTemplate< 'edit' > | null {
+): WpTemplate< 'edit' > | null | undefined {
 	const records = getEntityRecords( state, 'postType', 'wp_template', {
 		'find-template': link,
 	} );

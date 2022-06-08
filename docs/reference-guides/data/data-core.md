@@ -21,7 +21,7 @@ _Parameters_
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `GenericRecordKey`: Optional ID of the rest resource to check.
+-   _id_ `unknown`: Optional ID of the rest resource to check.
 
 _Returns_
 
@@ -39,9 +39,9 @@ Calling this may trigger an OPTIONS request to the REST API via the
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record's id.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record's id.
 
 _Returns_
 
@@ -69,9 +69,9 @@ Returns the autosave for the post and author.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
--   _authorId_ `GenericRecordKey`: The id of the author.
+-   _postType_ `Post[ 'type' ]`: The type of the parent post.
+-   _postId_ `Post[ 'id' ]`: The id of the parent post.
+-   _authorId_ `User[ 'id' ]`: The id of the author.
 
 _Returns_
 
@@ -87,8 +87,8 @@ author for each post.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postType_ `Post[ 'type' ]`: The type of the parent post.
+-   _postId_ `Post[ 'id' ]`: The id of the parent post.
 
 _Returns_
 
@@ -128,7 +128,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: The current theme.
+-   The current theme.
 
 ### getCurrentUser
 
@@ -155,7 +155,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord | undefined`: The entity record, merged with its edits.
+-   `EntityRecordOf< K, N > | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -183,7 +183,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< any >`: Array of entities with config matching kind.
+-   `AnyEntityConfig[]`: Array of entities with config matching kind.
 
 ### getEntitiesConfig
 
@@ -196,7 +196,7 @@ _Parameters_
 
 _Returns_
 
--   `Array< any >`: Array of entities with config matching kind.
+-   `AnyEntityConfig[]`: Array of entities with config matching kind.
 
 ### getEntity
 
@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: Entity config
+-   Entity config
 
 ### getEntityConfig
 
@@ -226,7 +226,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: Entity config
+-   `Optional< AnyEntityConfig >`: Entity config
 
 ### getEntityRecord
 
@@ -259,7 +259,7 @@ _Parameters_
 
 _Returns_
 
--   `Optional< any >`: The entity record's edits.
+-   `Optional< Partial< EntityRecordOf< K, N > > >`: The entity record's edits.
 
 ### getEntityRecordNonTransientEdits
 
@@ -278,7 +278,7 @@ _Parameters_
 
 _Returns_
 
--   `Optional< any >`: The entity record's non transient edits.
+-   `Partial< EntityRecordOf< K, N > >`: The entity record's non transient edits.
 
 ### getEntityRecords
 
@@ -302,9 +302,9 @@ Returns the specified entity record's last delete error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -317,9 +317,9 @@ Returns the specified entity record's last save error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -452,8 +452,8 @@ Returns true if the REST request for autosaves has completed.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _postType_ `string`: The type of the parent post.
--   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _postType_ `Post[ 'type' ]`: The type of the parent post.
+-   _postId_ `Post[ 'id' ]`: The id of the parent post.
 
 _Returns_
 
@@ -492,9 +492,9 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -507,9 +507,9 @@ Returns true if the specified entity record is deleting, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `Kind`: Entity kind.
--   _name_ `Name`: Entity name.
--   _recordId_ `GenericRecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
