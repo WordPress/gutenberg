@@ -101,7 +101,7 @@ export default function CoverBlockControls( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					accept="image/*,video/*"
 					onSelect={ onSelectMedia }
-					onSelectFeaturedImage={ toggleUseFeaturedImage }
+					onToggleFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
 				/>

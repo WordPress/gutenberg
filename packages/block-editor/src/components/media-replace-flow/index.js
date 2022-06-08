@@ -46,7 +46,7 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
-	onSelectFeaturedImage,
+	onToggleFeaturedImage,
 	useFeaturedImage,
 	onFilesUpload = noop,
 	name = __( 'Replace' ),
@@ -88,6 +88,9 @@ const MediaReplaceFlow = ( {
 	};
 
 	const selectMedia = ( media, closeMenu ) => {
+		if ( useFeaturedImage && onToggleFeaturedImage ) {
+			onToggleFeaturedImage();
+		}
 		closeMenu();
 		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
@@ -155,53 +158,51 @@ const MediaReplaceFlow = ( {
 			renderContent={ ( { onClose } ) => (
 				<>
 					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
-						{ ! useFeaturedImage && (
-							<>
-								<MediaUpload
-									gallery={ gallery }
-									addToGallery={ addToGallery }
+						<>
+							<MediaUpload
+								gallery={ gallery }
+								addToGallery={ addToGallery }
+								multiple={ multiple }
+								value={ multiple ? mediaIds : mediaId }
+								onSelect={ ( media ) =>
+									selectMedia( media, onClose )
+								}
+								allowedTypes={ allowedTypes }
+								render={ ( { open } ) => (
+									<MenuItem
+										icon={ mediaIcon }
+										onClick={ open }
+									>
+										{ __( 'Open Media Library' ) }
+									</MenuItem>
+								) }
+							/>
+							<MediaUploadCheck>
+								<FormFileUpload
+									onChange={ ( event ) => {
+										uploadFiles( event, onClose );
+									} }
+									accept={ accept }
 									multiple={ multiple }
-									value={ multiple ? mediaIds : mediaId }
-									onSelect={ ( media ) =>
-										selectMedia( media, onClose )
-									}
-									allowedTypes={ allowedTypes }
-									render={ ( { open } ) => (
-										<MenuItem
-											icon={ mediaIcon }
-											onClick={ open }
-										>
-											{ __( 'Open Media Library' ) }
-										</MenuItem>
-									) }
+									render={ ( { openFileDialog } ) => {
+										return (
+											<MenuItem
+												icon={ upload }
+												onClick={ () => {
+													openFileDialog();
+												} }
+											>
+												{ __( 'Upload' ) }
+											</MenuItem>
+										);
+									} }
 								/>
-								<MediaUploadCheck>
-									<FormFileUpload
-										onChange={ ( event ) => {
-											uploadFiles( event, onClose );
-										} }
-										accept={ accept }
-										multiple={ multiple }
-										render={ ( { openFileDialog } ) => {
-											return (
-												<MenuItem
-													icon={ upload }
-													onClick={ () => {
-														openFileDialog();
-													} }
-												>
-													{ __( 'Upload' ) }
-												</MenuItem>
-											);
-										} }
-									/>
-								</MediaUploadCheck>
-							</>
-						) }
-						{ onSelectFeaturedImage && (
+							</MediaUploadCheck>
+						</>
+						{ onToggleFeaturedImage && (
 							<MenuItem
 								icon={ postFeaturedImage }
-								onClick={ onSelectFeaturedImage }
+								onClick={ onToggleFeaturedImage }
 								isPressed={ useFeaturedImage }
 							>
 								{ __( 'Use featured image' ) }
