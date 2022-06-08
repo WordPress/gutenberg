@@ -76,7 +76,11 @@ export default function PostCommentsFormEdit( {
 					comment_status: 'open',
 				} );
 			actions = [
-				<Button key="enableComments" onClick={ enableComments }>
+				<Button
+					key="enableComments"
+					onClick={ enableComments }
+					variant="primary"
+				>
 					{ __( 'Enable comments' ) }
 				</Button>,
 			];
