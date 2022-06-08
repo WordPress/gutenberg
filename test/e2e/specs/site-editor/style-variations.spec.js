@@ -52,22 +52,27 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Styles"i]' );
 		await siteEditorStyleVariations.openOtherStyles();
 
-		const variations = await siteEditorStyleVariations.getAvailableStyleVariations();
+		const variations = page.locator(
+			'.edit-site-global-styles-variations_item'
+		);
 
 		await expect( variations ).toHaveCount( 3 );
-		expect( await variations.first().getAttribute( 'class' ) ).toContain(
-			'is-active'
+
+		// To avoid having to assert class names, https://github.com/WordPress/gutenberg/pull/41591
+		// adds aria-label and aria-current attributes to the style variation buttons.
+		// Once that PR is merged we can refactor this, e.g., await expect( variations.first() ).toHaveAttribute( 'aria-current', true );
+		await expect( await variations.first() ).toHaveClass( /is\-active/ );
+		await expect( await variations.nth( 1 ) ).not.toHaveClass(
+			/is\-active/
 		);
-		expect(
-			await variations.nth( 1 ).getAttribute( 'class' )
-		).not.toContain( 'is-active' );
-		expect(
-			await variations.nth( 2 ).getAttribute( 'class' )
-		).not.toContain( 'is-active' );
+		await expect( await variations.nth( 2 ) ).not.toHaveClass(
+			/is\-active/
+		);
 	} );
 
 	test( 'should apply preset colors and font sizes in a variation', async ( {
 		admin,
+		page,
 		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
@@ -78,12 +83,18 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 
 		await siteEditorStyleVariations.openColorsPanel();
-		expect(
-			await siteEditorStyleVariations.getBackgroundColorValue()
-		).toBe( 'rgb(202, 105, 211)' );
-		expect( await siteEditorStyleVariations.getTextColorValue() ).toBe(
-			'rgb(74, 7, 74)'
-		);
+
+		await expect(
+			page.locator(
+				'css=[aria-label="Colors background styles"] .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
+
+		await expect(
+			page.locator(
+				'css=[aria-label="Colors text styles"] .component-color-indicator'
+			)
+		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
 		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
 		await siteEditorStyleVariations.openTypographyPanel();
@@ -145,22 +156,17 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.openColorsPanel();
 		await page.click( `role=button[name="Color palettes"i]` );
 
-		expect(
-			await siteEditorStyleVariations.getThemePalette()
-		).toMatchObject( [
-			{
-				color: 'rgb(74, 7, 74)',
-				name: 'Foreground',
-			},
-			{
-				color: 'rgb(202, 105, 211)',
-				name: 'Background',
-			},
-			{
-				color: 'rgba(204, 0, 255, 0.77)',
-				name: 'Awesome pink',
-			},
-		] );
+		await expect(
+			page.locator( 'role=button[name="Color: Foreground"i]' )
+		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
+
+		await expect(
+			page.locator( 'role=button[name="Color: Background"i]' )
+		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
+
+		await expect(
+			page.locator( 'role=button[name="Color: Awesome pink"i]' )
+		).toHaveCSS( 'background', /rgba\(204, 0, 255, 0\.77\)/ );
 	} );
 
 	test( 'should reflect style variations in the styles applied to the editor', async ( {
@@ -203,24 +209,15 @@ class SiteEditorStyleVariations {
 	async openOtherStyles() {
 		await this.page
 			.locator( 'role=button[name="Browse styles"i]' )
-			.waitFor(); // Wait for the element to appear after the navigation animation.
+			.waitFor( { state: 'attached' } ); // Wait for the element to appear after the navigation animation.
 
 		await this.page.click( 'role=button[name="Browse styles"i]' );
-	}
-
-	async getAvailableStyleVariations() {
-		return await this.page.locator(
-			'.edit-site-global-styles-variations_item'
-		);
 	}
 
 	async applyVariation( label ) {
 		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.openOtherStyles();
-		const variation = await this.page.locator(
-			`xpath=//*[@role="button"][@aria-label="${ label }"]`
-		);
-		await variation.click();
+		await this.page.click( `role=button[name="${ label }"i]` );
 	}
 
 	async applyPinkVariation() {
@@ -255,48 +252,6 @@ class SiteEditorStyleVariations {
 			'css=.components-font-size-picker input[aria-label="Custom"]'
 		);
 		return await element.evaluate( ( el ) => el.value );
-	}
-
-	async getColorValue( colorType ) {
-		return this.page.evaluate( ( _colorType ) => {
-			return document.evaluate(
-				`substring-before(substring-after(//div[contains(@class, "edit-site-global-styles-sidebar__panel")]//button[.//*[text()="${ _colorType }"]]//*[contains(@class,"component-color-indicator")]/@style, "background: "), ";")`,
-				document,
-				null,
-				window.XPathResult.ANY_TYPE,
-				null
-			).stringValue;
-		}, colorType );
-	}
-
-	async getBackgroundColorValue() {
-		return this.getColorValue( 'Background' );
-	}
-
-	async getTextColorValue() {
-		return this.getColorValue( 'Text' );
-	}
-
-	async getColorPalette( paletteSource ) {
-		const paletteOptions = await this.page
-			.locator(
-				`xpath=//div[./*/h2[text()="${ paletteSource }"]]//button[contains(@class,"components-circular-option-picker__option")]`
-			)
-			.elementHandles();
-		return Promise.all(
-			paletteOptions.map( ( element ) => {
-				return element.evaluate( ( el ) => {
-					const color = el.style.backgroundColor;
-					const name = el
-						.getAttribute( 'aria-label' )
-						.substring( 'Color: '.length );
-					return { color, name };
-				} );
-			} )
-		);
-	}
-	async getThemePalette() {
-		return this.getColorPalette( 'Theme' );
 	}
 
 	async openPreviousGlobalStylesPanel() {
