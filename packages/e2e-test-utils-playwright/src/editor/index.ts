@@ -6,9 +6,9 @@ import type { Browser, Page, BrowserContext, Frame } from '@playwright/test';
 /**
  * Internal dependencies
  */
-// import { clickBlockAppender } from './click-block-appender';
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { dragAndResize } from './drag-and-resize';
 import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
@@ -53,9 +53,9 @@ export class Editor {
 		return frame;
 	}
 
-	// clickBlockAppender = clickBlockAppender;
 	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem;
 	clickBlockToolbarButton = clickBlockToolbarButton;
+	dragAndResize = dragAndResize;
 	getEditedPostContent = getEditedPostContent;
 	insertBlock = insertBlock;
 	openDocumentSettingsSidebar = openDocumentSettingsSidebar;

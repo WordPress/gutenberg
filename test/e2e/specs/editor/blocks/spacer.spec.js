@@ -16,11 +16,8 @@ test.describe( 'Spacer', () => {
 
 	test( 'can be created by typing "/spacer"', async ( { editor, page } ) => {
 		// Create a spacer with the slash block shortcut.
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/spacer' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
-		);
 		await page.keyboard.press( 'Enter' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -31,20 +28,17 @@ test.describe( 'Spacer', () => {
 		editor,
 	} ) => {
 		// Create a spacer with the slash block shortcut.
-		await editor.clickBlockAppender();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/spacer' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
-		);
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = await page.locator(
-			'.block-library-spacer__resize-container .components-resizable-box__handle'
+		const resizableHandle = page.locator(
+			'[aria-label="Block: Spacer"] .block-library-spacer__resize-container .components-resizable-box__handle'
 		);
 		await editor.dragAndResize( resizableHandle, { x: 0, y: 50 } );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		const selectedSpacer = await page.locator(
+		const selectedSpacer = page.locator(
 			'[data-type="core/spacer"].is-selected'
 		);
 		expect( selectedSpacer ).not.toBe( null );
