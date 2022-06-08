@@ -11,6 +11,7 @@
 ### Internal
 
 -   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+-   `Draggable` updated to satisfy `react/exhuastive-deps` eslint rule ([#41499](https://github.com/WordPress/gutenberg/pull/41499))
 
 ## 19.12.0 (2022-06-01)
 
@@ -41,7 +42,6 @@
 -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
 -   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
 -   `DateDayPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
--   `Draggable` updated to satisfy `react/exhuastive-deps` eslint rule ([#41499](https://github.com/WordPress/gutenberg/pull/41499))
 
 ### Experimental
 
