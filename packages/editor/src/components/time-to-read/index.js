@@ -10,7 +10,14 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 import { store as editorStore } from '../../store';
 
-const AVERAGE_READING_RATE = 200;
+/**
+ * Average reading rate - based on average taken from
+ * https://irisreading.com/average-reading-speed-in-various-languages/
+ * (Characters/minute used for Chinese rather than words).
+ *
+ * @type {number} A rough estimate of the average reading rate across multiple languages.
+ */
+const AVERAGE_READING_RATE = 189;
 
 export default function TimeToRead() {
 	const content = useSelect(
