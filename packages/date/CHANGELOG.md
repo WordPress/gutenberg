@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### New Feature
+-	Add `humanTimeDiff` function to get the difference between two timestamps in a human-readable format.
+
 ## 4.10.0 (2022-06-01)
 
 ## 4.9.0 (2022-05-18)
