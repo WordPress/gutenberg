@@ -117,7 +117,7 @@ _Parameters_
 
 -   _from_ `Moment | Date | string | undefined`: The timestamp to measure from. Defaults to the current time if undefined or invalid.
 -   _to_ `Moment | Date | string | undefined`: The timestamp to measure to. Defaults to the current time if undefined or invalid.
--   _includeAffix_ `boolean`: Whether to include the "ago" suffix in the comparison.
+-   _includeAffix_ `boolean`: Whether to include the "ago" or "to" affix in the comparison.
 
 _Returns_
 

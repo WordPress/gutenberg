@@ -565,10 +565,11 @@ export function getDate( dateString ) {
  *
  * @param {Moment | Date | string | undefined} from         The timestamp to measure from. Defaults to the current time if undefined or invalid.
  * @param {Moment | Date | string | undefined} to           The timestamp to measure to. Defaults to the current time if undefined or invalid.
- * @param {boolean}                            includeAffix Whether to include the "ago" suffix in the comparison.
+ * @param {boolean}                            includeAffix Whether to include the "ago" or "to" affix in the comparison.
  * @return {string} The difference between the timestamps.
  */
 export function humanTimeDiff( from, to, includeAffix ) {
+	// Normalize inputs to a moment object, defaults to current time.
 	from = momentLib( from );
 	to = momentLib( to );
 	return from.from( to, ! includeAffix );
