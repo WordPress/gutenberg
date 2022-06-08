@@ -90,6 +90,7 @@
 		"src/toggle-group-control/**/*",
 		"src/tools-panel/**/*",
 		"src/tooltip/**/*",
+		"src/tree-select/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
 		"src/unit-control/**/*",
