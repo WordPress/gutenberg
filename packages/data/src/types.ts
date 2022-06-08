@@ -37,15 +37,6 @@ export interface ReduxStoreConfig<
 	controls?: MapOf< Function >;
 }
 
-export type UseSelect = < F extends MapSelect | StoreDescriptor< any > >(
-	mapSelect: F,
-	deps?: any[]
-) => F extends StoreDescriptor< any >
-	? GetSelectorsOf< F >
-	: F extends MapSelect
-	? ReturnType< F >
-	: never;
-
 export type UseSelectReturn<
 	F extends MapSelect | StoreDescriptor< any >
 > = F extends MapSelect
@@ -53,6 +44,7 @@ export type UseSelectReturn<
 	: F extends StoreDescriptor< any >
 	? GetSelectorsOf< F >
 	: never;
+
 export type MapSelect = ( select: SelectFunction ) => any;
 
 type SelectFunction = < Descriptor >(
@@ -60,7 +52,7 @@ type SelectFunction = < Descriptor >(
 ) => GetSelectorsOf< Descriptor >;
 
 type GetSelectorsOf< Descriptor > = Descriptor extends StoreDescriptor<
-	ReduxStoreConfig< infer X, any, infer S >
+	ReduxStoreConfig< any, any, infer S >
 >
 	? S
 	: never;
