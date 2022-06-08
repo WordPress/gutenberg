@@ -85,21 +85,11 @@ module.exports = async (
 		isDynamic,
 	};
 
-	// Filter the files based on whether this block is dynamic or not.
-	const templateList = view.isDynamic
-		? Object.keys( pluginOutputTemplates ).filter(
-				( item ) => ! item.includes( 'static' )
-		  )
-		: Object.keys( pluginOutputTemplates ).filter(
-				( item ) => ! item.includes( 'dynamic' )
-		  );
-
 	await Promise.all(
-		templateList.map( async ( outputFile ) => {
-			const file = outputFile.replace( /(-static|-dynamic)/, '' );
+		Object.keys( pluginOutputTemplates ).map( async ( outputFile ) => {
 			await writeOutputTemplate(
 				pluginOutputTemplates[ outputFile ],
-				file,
+				outputFile,
 				view
 			);
 		} )
