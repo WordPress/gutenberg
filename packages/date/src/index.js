@@ -561,6 +561,20 @@ export function getDate( dateString ) {
 }
 
 /**
+ * Returns the difference between two timestamps in a human-readable format.
+ *
+ * @param {Moment | Date | string | undefined} from         The timestamp to measure from. Defaults to the current time if undefined or invalid.
+ * @param {Moment | Date | string | undefined} to           The timestamp to measure to. Defaults to the current time if undefined or invalid.
+ * @param {boolean}                            includeAffix Whether to include the "ago" suffix in the comparison.
+ * @return {string} The difference between the timestamps.
+ */
+export function humanTimeDiff( from, to, includeAffix ) {
+	from = momentLib( from );
+	to = momentLib( to );
+	return from.from( to, ! includeAffix );
+}
+
+/**
  * Creates a moment instance using the given timezone or, if none is provided, using global settings.
  *
  * @param {Moment | Date | string | undefined} dateValue Date object or string, parsable

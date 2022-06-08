@@ -109,6 +109,20 @@ _Returns_
 
 -   `string`: Formatted date.
 
+### humanTimeDiff
+
+Returns the difference between two timestamps in a human-readable format.
+
+_Parameters_
+
+-   _from_ `Moment | Date | string | undefined`: The timestamp to measure from. Defaults to the current time if undefined or invalid.
+-   _to_ `Moment | Date | string | undefined`: The timestamp to measure to. Defaults to the current time if undefined or invalid.
+-   _includeAffix_ `boolean`: Whether to include the "ago" suffix in the comparison.
+
+_Returns_
+
+-   `string`: The difference between the timestamps.
+
 ### isInTheFuture
 
 Check whether a date is considered in the future according to the WordPress settings.
