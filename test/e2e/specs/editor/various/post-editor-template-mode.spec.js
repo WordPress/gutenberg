@@ -94,12 +94,12 @@ test.describe( 'Post Editor Template mode', () => {
 
 		// Preview changes.
 		const previewPage = await editor.openPreviewPage();
-		const siteBlocks = await previewPage.waitForSelector(
-			'.wp-site-blocks'
-		);
-		const content = await siteBlocks.innerHTML();
 
-		expect( content ).toMatchSnapshot();
+		await expect(
+			previewPage.locator(
+				'text="Just a random paragraph added to the template"'
+			)
+		).toBeVisible();
 	} );
 
 	test.describe( 'Delete Post Template Confirmation Dialog', () => {

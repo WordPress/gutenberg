@@ -73,12 +73,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text' => 'var:preset|color|texas-flood',
 					),
 					'spacing' => array(
-						'margin' => '111px',
+						'margin'  => '111px',
+						'padding' => '0',
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'        => 'margin: 111px;',
+					'css'        => 'padding: 0; margin: 111px;',
 					'classnames' => 'has-text-color has-texas-flood-color',
 				),
 			),

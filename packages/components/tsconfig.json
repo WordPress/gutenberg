@@ -71,6 +71,7 @@
 		"src/navigator/**/*",
 		"src/number-control/**/*",
 		"src/popover/**/*",
+		"src/radio-control/**/*",
 		"src/range-control/**/*",
 		"src/resizable-box/**/*",
 		"src/scroll-lock/**/*",

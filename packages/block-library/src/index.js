@@ -153,7 +153,7 @@ const getAllBlocks = () => [
 	buttons,
 	calendar,
 	categories,
-	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context.
+	...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 	code,
 	column,
 	columns,
