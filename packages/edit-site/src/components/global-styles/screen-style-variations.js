@@ -65,6 +65,9 @@ function Variation( { variation } ) {
 		return compareVariations( user, variation );
 	}, [ user, variation ] );
 
+	const styleVariationTitle =
+		variation?.title || __( 'Untitled theme style.' );
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
@@ -78,7 +81,8 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.title }
+				aria-label={ styleVariationTitle }
+				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
