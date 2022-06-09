@@ -297,7 +297,7 @@ class PostEditorTemplateMode {
 		await this.expandTemplatePanel();
 
 		await this.editorSettingsSidebar
-			.locator( 'role=button[name="Edit"i]' )
+			.locator( 'role=button[name^="Edit Template: "i]' )
 			.click();
 
 		// Check that we switched properly to edit mode.
@@ -335,7 +335,7 @@ class PostEditorTemplateMode {
 		await this.expandTemplatePanel();
 
 		const newTemplateButton = this.editorSettingsSidebar.locator(
-			'role=button[name="New"i]'
+			'role=button[name="New Template"i]'
 		);
 		await newTemplateButton.click();
 
