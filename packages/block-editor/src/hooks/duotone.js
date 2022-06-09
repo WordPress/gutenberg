@@ -22,7 +22,7 @@ import {
 	useSetting,
 } from '../components';
 import BlockList from '../components/block-list';
-import { 
+import {
 	__unstableGetValuesFromColors as getValuesFromColors,
 	__unstableDuotoneFilter as DuotoneFilter,
 	__unstableDuotoneStylesheet as DuotoneStylesheet,
@@ -196,7 +196,7 @@ function scopeSelector( scope, selector ) {
  *
  * @return {WPElement} Duotone element.
  */
- export function InlineDuotone( { selector, id, values } ) {
+export function InlineDuotone( { selector, id, values } ) {
 	return (
 		<>
 			<DuotoneFilter id={ id } values={ values } />

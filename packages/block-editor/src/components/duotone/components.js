@@ -8,7 +8,6 @@ import { SVG } from '@wordpress/components';
  */
 import { __unstableGetValuesFromColors as getValuesFromColors } from './index';
 
-
 /**
  * Stylesheet for rendering the duotone filter.
  *
@@ -109,10 +108,10 @@ export function DuotoneFilter( { id, values } ) {
 }
 
 /**
- * SVG filter from on a duotone preset.
+ * SVG from a duotone preset
  *
- * @param {Object} props          Preset props.
- * @param {Object} props.preset   Duotone preset.
+ * @param {Object} props        Duotone props.
+ * @param {Object} props.preset Duotone preset settings.
  *
  * @return {WPElement} Duotone element.
  */
