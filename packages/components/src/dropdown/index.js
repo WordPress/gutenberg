@@ -50,7 +50,7 @@ export default function Dropdown( props ) {
 				onToggle( false );
 			}
 		},
-		[]
+		[ onToggle ]
 	);
 
 	function toggle() {
