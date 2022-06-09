@@ -473,7 +473,6 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
-
 ### InnerBlocks
 
 _Related_
