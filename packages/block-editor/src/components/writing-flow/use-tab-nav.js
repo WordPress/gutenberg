@@ -59,7 +59,6 @@ export default function useTabNav() {
 	const before = (
 		<div
 			ref={ focusCaptureBeforeRef }
-			className="before-focus-accessibility"
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
 		/>
@@ -68,7 +67,6 @@ export default function useTabNav() {
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
-			className="after-focus-accessibility"
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
 		/>
