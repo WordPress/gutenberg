@@ -103,8 +103,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		$blocks   = $registry->get_all_registered();
 		$config   = array( 'version' => 1 );
 		foreach ( $blocks as $block_name => $block_type ) {
-			if ( isset( $block_type->supports['blockStyles'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = static::removeJsonComments( $block_type->supports['blockStyles'] );
+			if ( is_array( $block_type->style ) ) {
+				$config['styles']['blocks'][ $block_name ] = static::removeJsonComments( $block_type->style );
 			}
 		}
 
