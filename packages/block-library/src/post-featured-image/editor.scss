@@ -39,21 +39,6 @@
 		// against any background color.
 		color: currentColor;
 		background: transparent;
-		&::before {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			border: $border-width dashed currentColor;
-			opacity: 0.4;
-			pointer-events: none;
-
-			// Inherit border radius from style variations.
-			border-radius: inherit;
-		}
 
 		// Style the upload button.
 		.components-placeholder__fieldset {
@@ -80,20 +65,6 @@
 
 		.components-button.components-button > svg {
 			color: $white;
-		}
-
-		// Style the placeholder illustration.
-		.components-placeholder__illustration {
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			stroke: currentColor;
-			stroke-dasharray: 3;
-			opacity: 0.4;
 		}
 
 		// Show default placeholder height when not resized.
