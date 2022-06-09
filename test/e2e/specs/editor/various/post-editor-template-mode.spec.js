@@ -296,6 +296,7 @@ class PostEditorTemplateMode {
 
 		await this.expandTemplatePanel();
 
+		// Only match the beginning of Edit Template: because it contains the template name or slug afterwards.
 		await this.editorSettingsSidebar
 			.locator( 'role=button[name^="Edit Template: "i]' )
 			.click();
