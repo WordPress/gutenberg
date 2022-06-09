@@ -38,7 +38,7 @@ test.describe( 'Spacer', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		await expect(
-			page.locator( 'role=document[name="Block Spacer"i]' )
-		).not.toBe( null );
+			page.locator( 'role=document[name="Block: Spacer"i]' )
+		).toBeFocused();
 	} );
 } );
