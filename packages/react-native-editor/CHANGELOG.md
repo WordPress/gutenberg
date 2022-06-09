@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Add 'Insert from URL' option to Video block [#41493]
 
 ## 1.77.1
 
