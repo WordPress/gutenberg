@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, reverse } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -89,7 +89,7 @@ export function getClosestTabbable(
 	let focusableNodes = focus.focusable.find( containerElement );
 
 	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
+		focusableNodes.reverse();
 	}
 
 	// Consider as candidates those focusables after the current target. It's
