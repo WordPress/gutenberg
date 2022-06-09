@@ -22,7 +22,8 @@ const writeOutputTemplate = async ( inputFile, outputFile, view ) => {
 	// If the rendered template is empty, don't write it. This is how we can conditionally add template files.
 	const renderedFile = render( inputFile, view ).trim();
 	if ( renderedFile.length ) {
-		writeFile( outputFilePath, renderedFile );
+		// We need to re-render so that the whitespace at the end of files are maintained
+		writeFile( outputFilePath, render( inputFile, view ) );
 	}
 };
 
