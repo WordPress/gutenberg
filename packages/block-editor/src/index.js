@@ -3,7 +3,6 @@
  */
 import './hooks';
 export {
-	PresetDuotoneFilter as __unstablePresetDuotoneFilter,
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
@@ -17,3 +16,4 @@ export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
+export { PresetDuotoneFilter as __unstablePresetDuotoneFilter } from './components/duotone';

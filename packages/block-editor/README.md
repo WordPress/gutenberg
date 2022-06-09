@@ -347,6 +347,20 @@ _Returns_
 
 Undocumented declaration.
 
+### DuotoneFilter
+
+SVG for rendering the duotone filter.
+
+_Parameters_
+
+-   _props_ `Object`: Duotone props.
+-   _props.id_ `string`: Unique id for this duotone filter.
+-   _props.values_ `Values`: R, G, B, and A values to filter with.
+
+_Returns_
+
+-   `WPElement`: Duotone element.
+
 ### FontSizePicker
 
 _Related_
@@ -473,6 +487,33 @@ _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
 
+### getValuesFromColors
+
+Convert a list of colors to an object of R, G, and B values.
+
+_Parameters_
+
+-   _colors_ `string[]`: Array of RBG color strings.
+
+_Returns_
+
+-   `Object`: R, G, and B values.
+
+### InlineDuotone
+
+SVG and stylesheet needed for rendering the duotone filter.
+
+_Parameters_
+
+-   _props_ `Object`: Duotone props.
+-   _props.selector_ `string`: Selector to apply the filter to.
+-   _props.id_ `string`: Unique id for this duotone filter.
+-   _props.values_ `Values`: R, G, B, and A values to filter with.
+
+_Returns_
+
+-   `WPElement`: Duotone element.
+
 ### InnerBlocks
 
 _Related_
@@ -561,6 +602,19 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+### PresetDuotoneFilter
+
+SVG filter from on a duotone preset.
+
+_Parameters_
+
+-   _props_ `Object`: Preset props.
+-   _props.preset_ `Object`: Duotone preset.
+
+_Returns_
+
+-   `WPElement`: Duotone element.
 
 ### RichText
 
