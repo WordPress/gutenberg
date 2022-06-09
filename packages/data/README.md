@@ -839,7 +839,7 @@ _Parameters_
 
 _Returns_
 
--   `import('../../types').UseSelectReturn<T>`: A custom react hook.
+-   `UseSelectReturn<T>`: A custom react hook.
 
 ### useSuspenseSelect
 

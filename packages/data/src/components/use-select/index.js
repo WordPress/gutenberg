@@ -28,7 +28,10 @@ const renderQueue = createQueue();
  * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
  * @template State,Actions,Selectors
  */
-/** @typedef {import('../../types').UseSelectReturn} UseSelectReturn */
+/**
+ * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
+ * @template T
+ */
 /** @typedef {import('../../types').MapSelect} MapSelect */
 
 /**
@@ -37,7 +40,6 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @template S
  * @template {MapSelect | StoreDescriptor<any>} T
  * @param {T} mapSelect Function called on every state change. The
  *                      returned value is exposed to the component
@@ -97,7 +99,7 @@ const renderQueue = createQueue();
  *   return <div onPaste={ onPaste }>{ children }</div>;
  * }
  * ```
- * @return {import('../../types').UseSelectReturn<T>} A custom react hook.
+ * @return {UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
