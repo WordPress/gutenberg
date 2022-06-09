@@ -48,9 +48,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$classes = array();
-	$styles  = array();
-	$sides   = array( 'top', 'right', 'bottom', 'left' );
+	$sides               = array( 'top', 'right', 'bottom', 'left' );
+	$border_block_styles = array();
 
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
@@ -63,21 +62,11 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	) {
 		$border_radius = $block_attributes['style']['border']['radius'];
 
-		if ( is_array( $border_radius ) ) {
-			// We have individual border radius corner values.
-			foreach ( $border_radius as $key => $radius ) {
-				// Convert CamelCase corner name to kebab-case.
-				$corner   = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-				$styles[] = sprintf( 'border-%s-radius: %s;', $corner, $radius );
-			}
-		} else {
-			// This check handles original unitless implementation.
-			if ( is_numeric( $border_radius ) ) {
-				$border_radius .= 'px';
-			}
-
-			$styles[] = sprintf( 'border-radius: %s;', $border_radius );
+		if ( is_numeric( $border_radius ) ) {
+			$border_radius .= 'px';
 		}
+
+		$border_block_styles['radius'] = $border_radius;
 	}
 
 	// Border style.
@@ -86,8 +75,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		isset( $block_attributes['style']['border']['style'] ) &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
 	) {
-		$border_style = $block_attributes['style']['border']['style'];
-		$styles[]     = sprintf( 'border-style: %s;', $border_style );
+		$border_block_styles['style'] = $block_attributes['style']['border']['style'];
 	}
 
 	// Border width.
@@ -103,7 +91,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 			$border_width .= 'px';
 		}
 
-		$styles[] = sprintf( 'border-width: %s;', $border_width );
+		$border_block_styles['width'] = $border_width;
 	}
 
 	// Border color.
@@ -111,95 +99,37 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		$has_border_color_support &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
-		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
-		$has_custom_border_color = isset( $block_attributes['style']['border']['color'] );
-
-		if ( $has_named_border_color || $has_custom_border_color ) {
-			$classes[] = 'has-border-color';
-		}
-
-		if ( $has_named_border_color ) {
-			$classes[] = sprintf( 'has-%s-border-color', $block_attributes['borderColor'] );
-		} elseif ( $has_custom_border_color ) {
-			$border_color = $block_attributes['style']['border']['color'];
-			$styles[]     = sprintf( 'border-color: %s;', $border_color );
-		}
+		$preset_border_color          = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
+		$custom_border_color          = _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null );
+		$border_block_styles['color'] = $preset_border_color ? $preset_border_color : $custom_border_color;
 	}
 
 	// Generate styles for individual border sides.
 	if ( $has_border_color_support || $has_border_width_support ) {
 		foreach ( $sides as $side ) {
-			$border = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), false );
-
-			if ( is_array( $border ) && ! empty( $border ) ) {
-				$split_border_styles = gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type );
-				$styles              = array_merge( $styles, $split_border_styles );
-			}
+			$border                       = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), null );
+			$border_side_values           = array(
+				'width' => isset( $border['width'] ) && ! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' ) ? $border['width'] : null,
+				'color' => isset( $border['color'] ) && ! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' ) ? $border['color'] : null,
+				'style' => isset( $border['style'] ) && ! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' ) ? $border['style'] : null,
+			);
+			$border_block_styles[ $side ] = $border_side_values;
 		}
 	}
 
 	// Collect classes and styles.
 	$attributes = array();
+	$styles     = gutenberg_style_engine_generate( array( 'border' => $border_block_styles ) );
 
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
 	}
 
-	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( ' ', $styles );
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
 	}
 
 	return $attributes;
-}
-
-/**
- * Generates longhand CSS styles for an individual side border.
- *
- * If some values are omitted from the border configuration, using shorthand
- * styles would lead to `initial` values being used instead of the more
- * desirable inherited values. This could also lead to browser inconsistencies.
- *
- * @param string        $side       The side the styles are being generated for.
- * @param array         $border     Array containing border color, style, and width values.
- * @param WP_Block_Type $block_type Block type.
- *
- * @return array Longhand CSS border styles for a single side.
- */
-function gutenberg_generate_individual_border_classes_and_styles( $side, $border, $block_type ) {
-	$styles = array();
-
-	if (
-		isset( $border['width'] ) &&
-		null !== $border['width'] &&
-		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' )
-	) {
-		$styles[] = sprintf( 'border-%s-width: %s;', $side, $border['width'] );
-	}
-
-	if (
-		isset( $border['style'] ) &&
-		null !== $border['style'] &&
-		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
-	) {
-		$styles[] = sprintf( 'border-%s-style: %s;', $side, $border['style'] );
-	}
-
-	$border_color = _wp_array_get( $border, array( 'color' ), null );
-
-	if (
-		$border_color &&
-		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
-	) {
-		$has_color_preset = strpos( $border_color, 'var:preset|color|' ) !== false;
-		if ( $has_color_preset ) {
-			$named_color_slug = substr( $border_color, strrpos( $border_color, '|' ) + 1 );
-			$styles []        = sprintf( 'border-%s-color: var(--wp--preset--color--%s);', $side, $named_color_slug );
-		} else {
-			$styles [] = sprintf( 'border-%s-color: %s;', $side, $border['color'] );
-		}
-	}
-
-	return $styles;
 }
 
 /**

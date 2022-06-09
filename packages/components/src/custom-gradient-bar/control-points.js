@@ -89,7 +89,7 @@ function GradientColorPickerDropdown( {
 			result.position = 'bottom left';
 		}
 		return result;
-	}, [ gradientPickerDomRef.current, isRenderedInSidebar ] );
+	}, [ gradientPickerDomRef, isRenderedInSidebar ] );
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
@@ -149,9 +149,15 @@ function ControlPoints( {
 		}
 	};
 
+	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
+	// This memoization would prevent the event listeners from being properly cleaned.
+	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
+	const cleanEventListenersRef = useRef();
+	cleanEventListenersRef.current = cleanEventListeners;
+
 	useEffect( () => {
 		return () => {
-			cleanEventListeners();
+			cleanEventListenersRef.current();
 		};
 	}, [] );
 
