@@ -27,6 +27,6 @@ const Template: ComponentStory< typeof Spinner > = ( args ) => {
 
 export const Default: ComponentStory< typeof Spinner > = Template.bind( {} );
 
-// The width of the Spinner's border is not affected by the overall component's dimensions.
+// The Spinner can be resized to any size, but the stroke width will remain unchanged.
 export const CustomSize: ComponentStory< typeof Spinner > = Template.bind( {} );
 CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };
