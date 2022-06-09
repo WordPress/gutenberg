@@ -273,7 +273,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		return $block_rules;
 	}
-	
+
 	/**
 	 * Converts each style section into a list of rulesets
 	 * containing the block styles to be appended to the stylesheet.
@@ -296,9 +296,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
-			$block_rules.= static::get_styles_for_block( $metadata );
+			$block_rules .= static::get_styles_for_block( $metadata );
 		}
-		
+
 		return $block_rules;
 	}
 }
