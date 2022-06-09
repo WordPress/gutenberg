@@ -47,9 +47,9 @@ export type UseSelectReturn<
 
 export type MapSelect = ( select: SelectFunction ) => any;
 
-type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
+export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
 
-type CurriedSelectorsOf< S > = S extends StoreDescriptor<
+export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	ReduxStoreConfig< any, any, infer Selectors >
 >
 	? { [ key in keyof Selectors ]: CurriedState< Selectors[ key ] > }
@@ -65,7 +65,10 @@ type CurriedSelectorsOf< S > = S extends StoreDescriptor<
  * For functions with no arguments, which some selectors
  * are free to define, returns the original function.
  */
-type CurriedState< F > = F extends ( state: any, ...args: infer P ) => infer R
+export type CurriedState< F > = F extends (
+	state: any,
+	...args: infer P
+) => infer R
 	? ( ...args: P ) => R
 	: F;
 

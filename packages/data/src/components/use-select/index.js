@@ -20,7 +20,14 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 const noop = () => {};
 const renderQueue = createQueue();
 
-/** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
+/**
+ * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
+ * @template C
+ */
+/**
+ * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
+ * @template State,Actions,Selectors
+ */
 /** @typedef {import('../../types').UseSelectReturn} UseSelectReturn */
 /** @typedef {import('../../types').MapSelect} MapSelect */
 
@@ -30,7 +37,8 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @template {MapSelect|StoreDescriptor.<any>} T
+ * @template S
+ * @template {MapSelect | StoreDescriptor<any>} T
  * @param {T} mapSelect Function called on every state change. The
  *                      returned value is exposed to the component
  *                      implementing this hook. The function receives
