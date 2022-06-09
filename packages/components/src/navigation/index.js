@@ -55,9 +55,11 @@ export default function Navigation( {
 		menuRef.current = menu;
 	}, [ menu ] );
 
+	// Used to prevent resetting the `menu` state when navigating between menus
+	const setActiveMenuRef = useRef( setActiveMenu );
 	useEffect( () => {
 		if ( activeMenu !== menuRef.current ) {
-			setActiveMenu( activeMenu );
+			setActiveMenuRef.current( activeMenu );
 		}
 	}, [ activeMenu ] );
 
