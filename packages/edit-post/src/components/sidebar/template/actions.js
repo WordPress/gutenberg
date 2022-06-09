@@ -126,8 +126,8 @@ function PostTemplateActions( { isPostsPage } ) {
 						onClick={ () => __unstableSwitchToTemplateMode() }
 						label={ sprintf(
 							// Translators: 1: The title or the slug of the currently selected template.
-							__( 'Edit Template: %s' ),
-							template?.title ?? template.slug
+							__( 'Edit template: %s' ),
+							template?.title.toLowerCase() ?? template.slug
 						) }
 					>
 						{ __( 'Edit' ) }
@@ -137,7 +137,7 @@ function PostTemplateActions( { isPostsPage } ) {
 					<Button
 						variant="link"
 						onClick={ () => setIsModalOpen( true ) }
-						label={ _x( 'New Template', 'action' ) }
+						label={ _x( 'New template', 'action' ) }
 					>
 						{
 							/* translators: button to create a new template */
