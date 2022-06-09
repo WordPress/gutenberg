@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -130,7 +125,7 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return find( focusableNodes, isTabCandidate );
+	return focusableNodes.find( isTabCandidate );
 }
 
 export default function useArrowNav() {
