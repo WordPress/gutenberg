@@ -123,7 +123,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 -	**Name:** core/comment-author-name
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, isLink, linkTarget, textAlign
+-	**Attributes:** isLink, linkTarget, textAlign
 
 ## Comment Content
 
@@ -150,7 +150,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, linkTarget, textAlign
+-	**Attributes:** linkTarget, textAlign
 
 ## Comment Reply Link
 
@@ -159,7 +159,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, textAlign
+-	**Attributes:** textAlign
 
 ## Comment Template
 
