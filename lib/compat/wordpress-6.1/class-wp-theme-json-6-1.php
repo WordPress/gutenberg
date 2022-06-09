@@ -226,7 +226,79 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$selector     = $block_metadata['selector'];
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$declarations = static::compute_style_properties( $node, $settings );
-		$block_rules  = static::to_ruleset( $selector, $declarations );
+		$block_rules  = '';
+
+		// 1. Separate the ones who use the general selector
+		// and the ones who use the duotone selector.
+		$declarations_duotone = array();
+		foreach ( $declarations as $index => $declaration ) {
+			if ( 'filter' === $declaration['name'] ) {
+				unset( $declarations[ $index ] );
+				$declarations_duotone[] = $declaration;
+			}
+		}
+
+		/*
+		 * Reset default browser margin on the root body element.
+		 * This is set on the root selector **before** generating the ruleset
+		 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+		 * `margin` in its `spacing` declaration for the `body` element then these
+		 * user-generated values take precedence in the CSS cascade.
+		 * @link https://github.com/WordPress/gutenberg/issues/36147.
+		 */
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			$block_rules .= 'body { margin: 0; }';
+		}
+
+		// 2. Generate the rules that use the general selector.
+		$block_rules .= static::to_ruleset( $selector, $declarations );
+
+		// 3. Generate the rules that use the duotone selector.
+		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
+		}
+
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+			if ( $has_block_gap_support ) {
+				$block_rules .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
+				$block_rules .= '.wp-site-blocks > * + * { margin-block-start: var( --wp--style--block-gap ); }';
+			}
+		}
+
+		return $block_rules;
+	}
+
+	/**
+	 * Converts each style section into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each section this creates a new ruleset such as:
+	 *
+	 *   block-selector {
+	 *     style-property-one: value;
+	 *   }
+	 *
+	 * @param array $style_nodes Nodes with styles.
+	 * @return string The new stylesheet.
+	 */
+	protected function get_block_classes( $style_nodes ) {
+		$block_rules = '';
+
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
+			}
+			$block_rules .= static::get_styles_for_block( $metadata );
+		}
+
 		return $block_rules;
 	}
 }
