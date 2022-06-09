@@ -24,9 +24,13 @@ function render_block_core_comment_date( $attributes, $content, $block ) {
 	}
 
 	$classes = '';
-	if ( isset( $attributes['fontSize'] ) ) {
-		$classes .= 'has-' . esc_attr( $attributes['fontSize'] ) . '-font-size';
-	}
+
+	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+
+	if ( $has_named_font_size ) {
+		// Add the font size class.
+		$classes .= sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+	} 
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$formatted_date     = get_comment_date(
