@@ -79,15 +79,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
 	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
 
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style> ' . $style . '</style>';
-		}
-	);
+	gutenberg_enqueue_block_support_styles( $style, 11 );
 	return $content;
 }
 /**

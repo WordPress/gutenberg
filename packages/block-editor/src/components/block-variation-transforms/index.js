@@ -17,6 +17,7 @@ import { chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 function VariationsButtons( {
@@ -33,7 +34,7 @@ function VariationsButtons( {
 			{ variations.map( ( variation ) => (
 				<Button
 					key={ variation.name }
-					icon={ variation.icon }
+					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
 					label={
 						selectedValue === variation.name
@@ -121,9 +122,12 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	// Check if each variation has a unique icon.
 	const hasUniqueIcons = useMemo( () => {
 		const variationIcons = new Set();
+		if ( ! variations ) {
+			return false;
+		}
 		variations.forEach( ( variation ) => {
 			if ( variation.icon ) {
-				variationIcons.add( variation.icon );
+				variationIcons.add( variation.icon?.src || variation.icon );
 			}
 		} );
 		return variationIcons.size === variations.length;

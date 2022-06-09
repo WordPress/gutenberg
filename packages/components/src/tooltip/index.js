@@ -65,6 +65,7 @@ const addPopoverToGrandchildren = ( {
 				aria-hidden="true"
 				animate={ false }
 				offset={ 12 }
+				__unstableShift
 			>
 				{ text }
 				<Shortcut
