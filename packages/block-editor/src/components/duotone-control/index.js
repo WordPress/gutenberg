@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	ColorIndicator,
 	Dropdown,
 	DuotonePicker,
 	DuotoneSwatch,
@@ -43,7 +44,9 @@ function DuotoneControl( {
 						onKeyDown={ openOnArrowDown }
 						label={ __( 'Apply duotone filter' ) }
 						icon={
-							value ? (
+							value === 'unset' ? (
+								<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
+							) : value ? (
 								<DuotoneSwatch values={ value } />
 							) : (
 								<Icon icon={ filter } />

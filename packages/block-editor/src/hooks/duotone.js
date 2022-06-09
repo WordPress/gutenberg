@@ -160,15 +160,15 @@ function DuotoneFilter( { id, colors } ) {
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object}   props          Duotone props.
- * @param {string}   props.selector Selector to apply the filter to.
- * @param {string}   props.id       Unique id for this duotone filter.
- * @param {string[]} props.colors   Array of RGB color strings ordered from dark to light.
+ * @param {Object} props Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id Unique id for this duotone filter.
+ * @param {string[]|"unset"} props.colors Array of RGB color strings ordered from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
 function InlineDuotone( { selector, id, colors } ) {
-	if ( colors.length === 0 ) {
+	if ( colors === 'unset' ) {
 		return <DuotoneUnsetStylesheet selector={ selector } />;
 	}
 
@@ -188,14 +188,8 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
 	const defaultPresets =
 		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
-	const unsetPreset = {
-		colors: EMPTY_ARRAY,
-		slug: 'unset',
-		name: __( 'Unset' ),
-	};
 	return useMemo(
 		() => [
-			unsetPreset,
 			...userPresets,
 			...themePresets,
 			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),

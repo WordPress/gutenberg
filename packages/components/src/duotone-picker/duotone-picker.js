@@ -20,6 +20,7 @@ import { getDefaultColors, getGradientFromCSSColors } from './utils';
 
 function DuotonePicker( {
 	clearable = true,
+	unsetable = true,
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
@@ -32,57 +33,60 @@ function DuotonePicker( {
 		[ colorPalette ]
 	);
 
+	const isUnset = value === 'unset';
+
+	const unsetOption = (
+		<CircularOptionPicker.Option
+			key="unset"
+			value="unset"
+			isSelected={ isUnset }
+			tooltipText={ __( 'Unset' ) }
+			className="components-duotone-picker__color-indicator"
+			onClick={ () => {
+				onChange( isUnset ? undefined : 'unset' );
+			} }
+		/>
+	);
+
+	const options = duotonePalette.map( ( { colors, slug, name } ) => {
+		const style = {
+			background: getGradientFromCSSColors( colors, '135deg' ),
+			color: 'transparent',
+		};
+		const tooltipText =
+			name ??
+			sprintf(
+				// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
+				__( 'Duotone code: %s' ),
+				slug
+			);
+		const label = name
+			? sprintf(
+					// translators: %s: The name of the option e.g: "Dark grayscale".
+					__( 'Duotone: %s' ),
+					name
+			  )
+			: tooltipText;
+		const isSelected = isEqual( colors, value );
+
+		return (
+			<CircularOptionPicker.Option
+				key={ slug }
+				value={ colors }
+				isSelected={ isSelected }
+				aria-label={ label }
+				tooltipText={ tooltipText }
+				style={ style }
+				onClick={ () => {
+					onChange( isSelected ? undefined : colors );
+				} }
+			/>
+		);
+	} );
+
 	return (
 		<CircularOptionPicker
-			options={ duotonePalette.map( ( { colors, slug, name } ) => {
-				const iconProps =
-					slug === 'unset'
-						? {
-								style: {
-									background:
-										'#fff linear-gradient(-45deg, transparent 48%, #ddd 48%, #ddd 52%, transparent 52%)',
-									boxShadow: 'none',
-								},
-						  }
-						: {
-								style: {
-									background: getGradientFromCSSColors(
-										colors,
-										'135deg'
-									),
-									color: 'transparent',
-								},
-						  };
-				const tooltipText =
-					name ??
-					sprintf(
-						// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
-						__( 'Duotone code: %s' ),
-						slug
-					);
-				const label = name
-					? sprintf(
-							// translators: %s: The name of the option e.g: "Dark grayscale".
-							__( 'Duotone: %s' ),
-							name
-					  )
-					: tooltipText;
-				const isSelected = isEqual( colors, value );
-
-				return (
-					<CircularOptionPicker.Option
-						key={ slug }
-						value={ colors }
-						isSelected={ isSelected }
-						aria-label={ label }
-						tooltipText={ tooltipText }
-						onClick={ () => {
-							onChange( isSelected ? undefined : colors );
-						} }
-						{ ...iconProps }
-					/>
-				);
-			} ) }
+			options={ unsetable ? [ unsetOption, ...options ] : options }
 			actions={
 				!! clearable && (
 					<CircularOptionPicker.ButtonAction
@@ -94,7 +98,10 @@ function DuotonePicker( {
 			}
 		>
 			{ ! disableCustomColors && ! disableCustomDuotone && (
-				<CustomDuotoneBar value={ value } onChange={ onChange } />
+				<CustomDuotoneBar
+					value={ isUnset ? undefined : value }
+					onChange={ onChange }
+				/>
 			) }
 			{ ! disableCustomDuotone && (
 				<ColorListPicker
