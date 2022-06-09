@@ -76,11 +76,16 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin'  => '111px',
 						'padding' => '0',
 					),
+					'border'  => array(
+						'color' => 'var:preset|color|cool-caramel',
+						'width' => '2rem',
+						'style' => 'dotted',
+					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'        => 'padding: 0; margin: 111px;',
-					'classnames' => 'has-text-color has-texas-flood-color',
+					'css'        => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;',
+					'classnames' => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
 				),
 			),
 
@@ -100,10 +105,18 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 							'right'  => '10em',
 						),
 					),
+					'border'  => array(
+						'radius' => array(
+							'topLeft'     => '99px',
+							'topRight'    => '98px',
+							'bottomLeft'  => '97px',
+							'bottomRight' => '96px',
+						),
+					),
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css' => 'padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+					'css' => 'border-top-left-radius: 99px; border-top-right-radius: 98px; border-bottom-left-radius: 97px; border-bottom-right-radius: 96px; padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
 				),
 			),
 
@@ -246,6 +259,66 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(),
+			),
+
+			'inline_valid_box_model_style_with_sides'      => array(
+				'block_styles'    => array(
+					'border' => array(
+						'top'    => array(
+							'color' => '#fe1',
+							'width' => '1.5rem',
+							'style' => 'dashed',
+						),
+						'right'  => array(
+							'color' => '#fe2',
+							'width' => '1.4rem',
+							'style' => 'solid',
+						),
+						'bottom' => array(
+							'color' => '#fe3',
+							'width' => '1.3rem',
+						),
+						'left'   => array(
+							'color' => 'var:preset|color|swampy-yellow',
+							'width' => '0.5rem',
+							'style' => 'dotted',
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
+				),
+			),
+
+			'inline_invalid_box_model_style_with_sides'    => array(
+				'block_styles'    => array(
+					'border' => array(
+						'top'    => array(
+							'top'    => '#fe1',
+							'right'  => '1.5rem',
+							'cheese' => 'dashed',
+						),
+						'right'  => array(
+							'right' => '#fe2',
+							'top'   => '1.4rem',
+							'bacon' => 'solid',
+						),
+						'bottom' => array(
+							'color'  => 'var:preset|color|terrible-lizard',
+							'bottom' => '1.3rem',
+						),
+						'left'   => array(
+							'left'  => null,
+							'width' => null,
+							'top'   => 'dotted',
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+				),
 			),
 		);
 	}
