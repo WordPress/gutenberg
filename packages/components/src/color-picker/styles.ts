@@ -12,6 +12,7 @@ import InnerRangeControl from '../range-control';
 import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
 import Button from '../button';
+import { HStack } from '../h-stack';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
@@ -36,6 +37,7 @@ export const SelectControl = styled( InnerSelectControl )`
 
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
+	margin-right: ${ space( 2 ) };
 
 	${ StyledField } {
 		margin-bottom: 0;
@@ -58,7 +60,17 @@ const interactiveHueStyles = `
 }`;
 
 export const AuxiliaryColorArtefactWrapper = styled.div`
-	padding: ${ space( 2 ) } ${ space( 4 ) };
+	padding: ${ space( 2 ) } 0 };
+`;
+
+export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`
+	padding-left: ${ space( 4 ) };
+	padding-right: ${ space( 4 ) };
+`;
+
+export const ColorInputWrapper = styled.div`
+	padding-left: ${ space( 4 ) };
+	padding-right: ${ space( 3 ) };
 `;
 
 export const ColorfulWrapper = styled.div`
