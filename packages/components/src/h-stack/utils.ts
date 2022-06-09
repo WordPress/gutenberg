@@ -1,12 +1,12 @@
 /**
- * Internal dependencies
- */
-import type { HStackAlignment, AlignmentProps, Alignments } from './types';
-/**
  * External dependencies
  */
 import type { CSSProperties } from 'react';
+/**
+ * Internal dependencies
+ */
 import type { FlexDirection } from '../flex/types';
+import type { HStackAlignment, AlignmentProps, Alignments } from './types';
 import { isValueDefined } from '../utils/values';
 
 const H_ALIGNMENTS: Alignments = {
