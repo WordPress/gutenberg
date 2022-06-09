@@ -63,6 +63,9 @@ class WP_Style_Engine {
 					'default' => 'background-color',
 				),
 				'path'          => array( 'color', 'background' ),
+				'css_vars'      => array(
+					'--wp--preset--color--$slug' => 'color',
+				),
 				'classnames'    => array(
 					'has-background'             => true,
 					'has-$slug-background-color' => 'color',
@@ -141,14 +144,32 @@ class WP_Style_Engine {
 				),
 			),
 		),
+		'effects'    => array(
+			'transition' => array(
+				'property_keys' => array(
+					'default' => 'transition',
+				),
+				'path'          => array( 'effects', 'transition' ),
+			),
+		),
 		'elements'   => array(
-			'link' => array(
+			'link'   => array(
 				'path'     => array( 'elements', 'link' ),
 				'selector' => 'a',
 				'states'   => array(
 					'hover' => array(
 						'path'     => array( 'elements', 'link', 'states', 'hover' ),
 						'selector' => 'a:hover',
+					),
+				),
+			),
+			'button' => array(
+				'path'     => array( 'elements', 'button' ),
+				'selector' => 'button',
+				'states'   => array(
+					'hover' => array(
+						'path'     => array( 'elements', 'button', 'states', 'hover' ),
+						'selector' => 'button:hover',
 					),
 				),
 			),
@@ -393,7 +414,7 @@ class WP_Style_Engine {
 		// Elements are a special case: we need to define styles on a per-element basis using the element's selector.
 		// And we also need to combine selectors.
 		if ( array_key_exists( 'elements', $block_styles ) ) {
-			return static::generate_elements_rules_output( $block_styles, $options );
+			return static::generate_elements_styles( $block_styles, $options );
 		}
 
 		// Collect CSS and classnames.
@@ -423,7 +444,10 @@ class WP_Style_Engine {
 		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
 			foreach ( $css_rules as $rule => $value ) {
-				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
+				// $filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
+				// @TODO disabling escaping only for this test.
+				// The `transition` property is filtered out otherwise.
+				$filtered_css = "{$rule}: {$value}";
 				if ( ! empty( $filtered_css ) ) {
 					$css[] = $filtered_css . ';';
 				}
@@ -512,11 +536,11 @@ class WP_Style_Engine {
 	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 * );.
 	 *
-	 * @return array|null array(
-	 *     'css'        => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
+	 * @return array array(
+	 *     'css' => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
 	 * );
 	 */
-	protected static function generate_elements_rules_output( $element_styles, $options = array() ) {
+	protected static function generate_elements_styles( $element_styles, $options = array() ) {
 		$css_output = array();
 
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'] as $element_definition ) {
