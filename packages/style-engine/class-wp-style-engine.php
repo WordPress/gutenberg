@@ -143,10 +143,9 @@ class WP_Style_Engine {
 		),
 		'elements'   => array(
 			'link' => array(
-				'path'       => array( 'elements', 'link' ),
-				'value_func' => 'static::get_elements_rules',
-				'selector'   => 'a',
-				'states'     => array(
+				'path'     => array( 'elements', 'link' ),
+				'selector' => 'a',
+				'states'   => array(
 					'hover' => array(
 						'path'     => array( 'elements', 'link', 'states', 'hover' ),
 						'selector' => 'a:hover',
