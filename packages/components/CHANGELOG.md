@@ -18,6 +18,9 @@
 -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
 -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
 
+### Enhancements
+
+-   `RadioControl`: add ref forwarding ([#41641](https://github.com/WordPress/gutenberg/pull/41641)).
 
 ## 19.12.0 (2022-06-01)
 
