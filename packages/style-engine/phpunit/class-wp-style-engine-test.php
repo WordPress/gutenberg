@@ -156,7 +156,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'elements_with_css_var_value'                  => array(
+			'with_valid_css_value_preset_style_property'   => array(
 				'block_styles'    => array(
 					'color' => array(
 						'text' => 'var:preset|color|my-little-pony',
@@ -172,7 +172,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'elements_with_invalid_preset_style_property'  => array(
+			'with_invalid_css_value_preset_style_property' => array(
 				'block_styles'    => array(
 					'color' => array(
 						'text' => 'var:preset|invalid_property|my-little-pony',
@@ -318,6 +318,56 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+				),
+			),
+
+			'elements_and_element_states_default'          => array(
+				'block_styles'    => array(
+					'elements' => array(
+						'link' => array(
+							'color'  => array(
+								'text'       => '#fff',
+								'background' => '#000',
+							),
+							'states' => array(
+								'hover' => array(
+									'color' => array(
+										'text'       => '#000',
+										'background' => '#fff',
+									),
+								),
+							),
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css' => 'a { color: #fff; background-color: #000; } a:hover { color: #000; background-color: #fff; }',
+				),
+			),
+
+			'elements_and_element_states_with_selector'    => array(
+				'block_styles'    => array(
+					'elements' => array(
+						'link' => array(
+							'color'  => array(
+								'text'       => '#fff',
+								'background' => '#000',
+							),
+							'states' => array(
+								'hover' => array(
+									'color' => array(
+										'text'       => '#000',
+										'background' => '#fff',
+									),
+								),
+							),
+						),
+					),
+				),
+				'options'         => array( 'selector' => '.la-sinistra' ),
+				'expected_output' => array(
+					'css' => '.la-sinistra a { color: #fff; background-color: #000; } .la-sinistra a:hover { color: #000; background-color: #fff; }',
 				),
 			),
 		);
