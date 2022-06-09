@@ -4,55 +4,71 @@
 import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
+import type { MouseEventHandler } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
+import { useRefEffect } from '@wordpress/compose';
 
-const emptyList = Object.freeze( [] );
+/**
+ * Internal dependencies
+ */
+import type { SuggestionsListProps } from './types';
 
-const handleMouseDown = ( e ) => {
+const { setTimeout, clearTimeout } = window;
+
+const handleMouseDown: MouseEventHandler = ( e ) => {
 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 	e.preventDefault();
 };
 
-function SuggestionsList( {
+export function SuggestionsList< T extends string | { value: string } >( {
 	selectedIndex,
 	scrollIntoView,
-	match = '',
+	match,
 	onHover,
 	onSelect,
-	suggestions = emptyList,
+	suggestions = [],
 	displayTransform,
 	instanceId,
-	setTimeout,
-} ) {
+}: SuggestionsListProps< T > ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
-	const listRef = useRefEffect(
+	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
+			let id: number;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
 				listNode.children[ selectedIndex ]
 			) {
 				setScrollingIntoView( true );
-				scrollView( listNode.children[ selectedIndex ], listNode, {
-					onlyScrollIfNeeded: true,
-				} );
-				setTimeout( () => {
+				scrollView(
+					listNode.children[ selectedIndex ] as HTMLLIElement,
+					listNode,
+					{
+						onlyScrollIfNeeded: true,
+					}
+				);
+				id = setTimeout( () => {
 					setScrollingIntoView( false );
 				}, 100 );
 			}
+
+			return () => {
+				if ( id !== undefined ) {
+					clearTimeout( id );
+				}
+			};
 		},
 		[ selectedIndex, scrollIntoView ]
 	);
 
-	const handleHover = ( suggestion ) => {
+	const handleHover = ( suggestion: T ) => {
 		return () => {
 			if ( ! scrollingIntoView ) {
 				onHover?.( suggestion );
@@ -60,39 +76,38 @@ function SuggestionsList( {
 		};
 	};
 
-	const handleClick = ( suggestion ) => {
+	const handleClick = ( suggestion: T ) => {
 		return () => {
 			onSelect?.( suggestion );
 		};
 	};
 
-	const computeSuggestionMatch = ( suggestion ) => {
-		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
+	const computeSuggestionMatch = ( suggestion: T ) => {
+		const matchText = displayTransform( match ).toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}
 
-		suggestion = displayTransform( suggestion );
-		const indexOfMatch = suggestion
+		const transformedSuggestion = displayTransform( suggestion );
+		const indexOfMatch = transformedSuggestion
 			.toLocaleLowerCase()
 			.indexOf( matchText );
 
 		return {
-			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
-			suggestionMatch: suggestion.substring(
+			suggestionBeforeMatch: transformedSuggestion.substring(
+				0,
+				indexOfMatch
+			),
+			suggestionMatch: transformedSuggestion.substring(
 				indexOfMatch,
 				indexOfMatch + matchText.length
 			),
-			suggestionAfterMatch: suggestion.substring(
+			suggestionAfterMatch: transformedSuggestion.substring(
 				indexOfMatch + matchText.length
 			),
 		};
 	};
 
-	// We set `tabIndex` here because otherwise Firefox sets focus on this
-	// div when tabbing off of the input in `TokenField` -- not really sure
-	// why, since usually a div isn't focusable by default
-	// TODO does this still apply now that it's a <ul> and not a <div>?
 	return (
 		<ul
 			ref={ listRef }
@@ -116,8 +131,9 @@ function SuggestionsList( {
 						role="option"
 						className={ className }
 						key={
-							suggestion?.value
-								? suggestion.value
+							typeof suggestion === 'object' &&
+							'value' in suggestion
+								? suggestion?.value
 								: displayTransform( suggestion )
 						}
 						onMouseDown={ handleMouseDown }
@@ -144,4 +160,4 @@ function SuggestionsList( {
 	);
 }
 
-export default withSafeTimeout( SuggestionsList );
+export default SuggestionsList;

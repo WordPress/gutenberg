@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { unescape } from 'lodash';
+import type { ComponentProps } from 'react';
 
 /**
  * WordPress dependencies
@@ -12,23 +13,33 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import fixtures from './fixtures';
-import TokenField from '../../';
+import type { FormTokenFieldProps } from '../../types';
+import FormTokenField from '../../';
 
 const {
 	specialSuggestions: { default: suggestions },
 } = fixtures;
 
-function unescapeAndFormatSpaces( str ) {
+function unescapeAndFormatSpaces( str: string ) {
 	const nbsp = String.fromCharCode( 160 );
 	return unescape( str ).replace( / /g, nbsp );
 }
 
-class TokenFieldWrapper extends Component {
-	constructor() {
-		super( ...arguments );
+class TokenFieldWrapper extends Component<
+	FormTokenFieldProps,
+	{
+		tokenSuggestions: ComponentProps<
+			typeof FormTokenField
+		>[ 'suggestions' ];
+		tokens: ComponentProps< typeof FormTokenField >[ 'value' ];
+		isExpanded: boolean;
+	}
+> {
+	constructor( props: FormTokenFieldProps ) {
+		super( props );
 		this.state = {
 			tokenSuggestions: suggestions,
-			tokens: Object.freeze( [ 'foo', 'bar' ] ),
+			tokens: Object.freeze( [ 'foo', 'bar' ] ) as string[],
 			isExpanded: false,
 		};
 		this.onTokensChange = this.onTokensChange.bind( this );
@@ -36,9 +47,11 @@ class TokenFieldWrapper extends Component {
 
 	render() {
 		return (
-			<TokenField
+			<FormTokenField
 				suggestions={
-					this.state.isExpanded ? this.state.tokenSuggestions : null
+					this.state.isExpanded
+						? this.state.tokenSuggestions
+						: undefined
 				}
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
@@ -48,7 +61,9 @@ class TokenFieldWrapper extends Component {
 		);
 	}
 
-	onTokensChange( value ) {
+	onTokensChange(
+		value: ComponentProps< typeof FormTokenField >[ 'value' ]
+	) {
 		this.setState( { tokens: value } );
 	}
 }
