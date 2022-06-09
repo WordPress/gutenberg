@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
-import { PresetDuotoneFilter } from '../../components/duotone/index';
+import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '../../components/duotone';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.

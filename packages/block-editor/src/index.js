@@ -16,4 +16,3 @@ export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
-export { PresetDuotoneFilter as __unstablePresetDuotoneFilter } from './components/duotone';

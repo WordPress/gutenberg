@@ -22,7 +22,11 @@ import {
 	useSetting,
 } from '../components';
 import BlockList from '../components/block-list';
-import { getValuesFromColors, InlineDuotone } from '../components/duotone';
+import { 
+	__unstableGetValuesFromColors as getValuesFromColors,
+	__unstableDuotoneFilter as DuotoneFilter,
+	__unstableDuotoneStylesheet as DuotoneStylesheet,
+} from '../components/duotone';
 
 const EMPTY_ARRAY = [];
 
@@ -170,6 +174,35 @@ function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Values for the SVG `feComponentTransfer`.
+ *
+ * @typedef Values {Object}
+ * @property {number[]} r Red values.
+ * @property {number[]} g Green values.
+ * @property {number[]} b Blue values.
+ * @property {number[]} a Alpha values.
+ */
+
+/**
+ * SVG and stylesheet needed for rendering the duotone filter.
+ *
+ * @param {Object} props          Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Values} props.values   R, G, B, and A values to filter with.
+ *
+ * @return {WPElement} Duotone element.
+ */
+ export function InlineDuotone( { selector, id, values } ) {
+	return (
+		<>
+			<DuotoneFilter id={ id } values={ values } />
+			<DuotoneStylesheet id={ id } selector={ selector } />
+		</>
+	);
 }
 
 /**

@@ -6,17 +6,8 @@ import { SVG } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getValuesFromColors } from './index';
+import { __unstableGetValuesFromColors as getValuesFromColors } from './index';
 
-/**
- * Values for the SVG `feComponentTransfer`.
- *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
- */
 
 /**
  * Stylesheet for rendering the duotone filter.
@@ -27,7 +18,7 @@ import { getValuesFromColors } from './index';
  *
  * @return {WPElement} Duotone element.
  */
-function DuotoneStylesheet( { selector, id } ) {
+export function DuotoneStylesheet( { selector, id } ) {
 	const css = `
 ${ selector } {
 	filter: url( #${ id } );
@@ -35,6 +26,16 @@ ${ selector } {
 `;
 	return <style>{ css }</style>;
 }
+
+/**
+ * Values for the SVG `feComponentTransfer`.
+ *
+ * @typedef Values {Object}
+ * @property {number[]} r Red values.
+ * @property {number[]} g Green values.
+ * @property {number[]} b Blue values.
+ * @property {number[]} a Alpha values.
+ */
 
 /**
  * SVG for rendering the duotone filter.
@@ -104,25 +105,6 @@ export function DuotoneFilter( { id, values } ) {
 				</filter>
 			</defs>
 		</SVG>
-	);
-}
-
-/**
- * SVG and stylesheet needed for rendering the duotone filter.
- *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, B, and A values to filter with.
- *
- * @return {WPElement} Duotone element.
- */
-export function InlineDuotone( { selector, id, values } ) {
-	return (
-		<>
-			<DuotoneFilter id={ id } values={ values } />
-			<DuotoneStylesheet id={ id } selector={ selector } />
-		</>
 	);
 }
 
