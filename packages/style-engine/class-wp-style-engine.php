@@ -376,7 +376,6 @@ class WP_Style_Engine {
 	 * @param array $options array(
 	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
-	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -506,14 +505,12 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns an CSS ruleset specifically for elements.
-	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * Returns an CSS ruleset specifically for elements and their states.
+	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA['elements'].
 	 *
 	 * @param array $element_styles An array of elements, each of which contain styles from a block's attributes.
 	 * @param array $options array(
 	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
-	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -523,7 +520,7 @@ class WP_Style_Engine {
 	protected static function generate_elements_rules_output( $element_styles, $options = array() ) {
 		$css_output = array();
 
-		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'] as $elements_group_key => $element_definition ) {
+		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA['elements'] as $element_definition ) {
 			$block_styles = _wp_array_get( $element_styles, $element_definition['path'], null );
 
 			if ( empty( $block_styles ) ) {
@@ -537,7 +534,7 @@ class WP_Style_Engine {
 				)
 			);
 
-			$generated_elements_styles = wp_style_engine_generate( $block_styles, $element_options );
+			$generated_elements_styles = self::get_instance()->generate( $block_styles, $element_options );
 
 			if ( isset( $generated_elements_styles['css'] ) ) {
 				$css_output[] = $generated_elements_styles['css'];
@@ -545,7 +542,7 @@ class WP_Style_Engine {
 
 			// States.
 			if ( array_key_exists( 'states', $element_definition ) ) {
-				foreach ( $element_definition['states'] as $state_group_key => $state_definition ) {
+				foreach ( $element_definition['states'] as $state_definition ) {
 					$state_styles = _wp_array_get( $element_styles, $state_definition['path'], null );
 
 					if ( empty( $state_styles ) ) {
@@ -559,7 +556,7 @@ class WP_Style_Engine {
 						)
 					);
 
-					$generated_state_styles = wp_style_engine_generate( $state_styles, $state_options );
+					$generated_state_styles = self::get_instance()->generate( $state_styles, $state_options );
 
 					if ( isset( $generated_state_styles['css'] ) ) {
 						$css_output[] = $generated_state_styles['css'];
