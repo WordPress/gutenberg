@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { dropRight, times, map, compact, delay } from 'lodash';
+import { times, map, compact, delay } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -394,9 +394,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
+				innerBlocks = innerBlocks.slice(
+					0,
+					-( previousColumns - newColumns )
 				);
 
 				if ( hasExplicitWidths ) {
