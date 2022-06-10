@@ -73,7 +73,7 @@ ${ selector } {
  * @param {Object}   props          Duotone props.
  * @param {string}   props.selector Selector to disable the filter for.
  *
- * @returns {WPElement} Filter none style element.
+ * @return {WPElement} Filter none style element.
  */
 function DuotoneUnsetStylesheet( { selector } ) {
 	const css = `
@@ -91,7 +91,7 @@ ${ selector } {
  * @param {string}   props.id     Unique id for this duotone filter.
  * @param {string[]} props.colors Color strings from dark to light.
  *
- * @returns {WPElement} Duotone SVG.
+ * @return {WPElement} Duotone SVG.
  */
 function DuotoneFilter( { id, colors } ) {
 	const values = getValuesFromColors( colors );
