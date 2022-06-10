@@ -239,7 +239,7 @@ export const updateNavigationLinkBlockAttributes = (
 
 	const useNewLabel =
 		newLabel &&
-		originalLabel !== newLabel &&
+		newLabel !== originalLabel &&
 		// LinkControl without the title field relies
 		// on the check below. Specifically, it assumes that
 		// the URL is the same as a title.
