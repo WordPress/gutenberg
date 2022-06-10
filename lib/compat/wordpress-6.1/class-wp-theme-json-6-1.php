@@ -904,7 +904,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		);
 		$spacing_sizes[] = array(
 			'name' => 1,
-			'slug' => 1,
+			'slug' => 10,
 			'size' => $spacing_scale['firstStep'] . $spacing_scale['units'],
 		);
 
@@ -917,7 +917,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$spacing_sizes[] = array(
 				'name' => $x + 1,
-				'slug' => $x + 1,
+				'slug' => ( $x + 1 ) * 10,
 				'size' => $current_step,
 			);
 		}
