@@ -82,6 +82,22 @@ module.exports = {
 						message: 'Please use `memize` instead.',
 					},
 					{
+						name: 'lodash',
+						importNames: [
+							'differenceWith',
+							'findIndex',
+							'isUndefined',
+							'negate',
+							'random',
+							'reverse',
+							'stubFalse',
+							'stubTrue',
+							'sum',
+						],
+						message:
+							'This Lodash method is not recommended. Please use native functionality instead.',
+					},
+					{
 						name: 'reakit',
 						message:
 							'Please use Reakit API through `@wordpress/components` instead.',
