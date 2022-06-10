@@ -90,7 +90,7 @@
 			}
 		},
 		"__experimentalSelector": ".wp-block-button__link",
-		"blockStyles": {
+		"__experimentalStyle": {
 			"border": {
 				"//": "100% causes an oval, but any explicit but really high value retains the pill shape.",
 				"radius": "9999px"
