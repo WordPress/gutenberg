@@ -281,7 +281,7 @@ to run them through any block transforms.
 
 ### Shortcode
 
-This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes. It's applied as part of the `raw` transformation process.
+This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes. It's applied as part of the `raw` transformation process. This means that the conversion happens when running "Convert to blocks" on the classic block. To transform the shortcode block use the `block` transformation process. 
 
 A transformation of type `shortcode` is an object that takes the following parameters:
 
