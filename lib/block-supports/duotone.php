@@ -486,7 +486,6 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				 */
 				global $is_safari;
 				if ( $is_safari ) {
-
 					/*
 					 * Simply accessing el.offsetHeight flushes layout and style
 					 * changes in WebKit without having to wait for setTimeout.
