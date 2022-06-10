@@ -10,6 +10,7 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 export default function useTabNav() {
@@ -29,7 +30,7 @@ export default function useTabNav() {
 	);
 
 	// Don't allow tabbing to this element in Navigation mode.
-	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
+	const focusCaptureTabIndex = ! isNavigationMode ? undefined : undefined;
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
@@ -115,21 +116,23 @@ export default function useTabNav() {
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				( isFormElement( event.target ) ||
+				( isFormElement( event.target, {
+					includeContentEditable: true,
+				} ) ||
 					event.target.getAttribute( 'data-block' ) ===
 						getSelectedBlockClientId() ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement( focus.tabbable[ direction ]( event.target ), {
+					includeContentEditable: true,
+				} ) &&
+				isInSameBlock(
+					event.target,
+					focus.tabbable[ direction ]( event.target )
+				)
 			) {
 				return;
 			}
 
 			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
-
-			// Prevent moving backwards in to block toolbar.
-			if ( next.current === focusCaptureBeforeRef.current ) {
-				event.preventDefault();
-				return;
-			}
 
 			// Disable focus capturing on the focus capture element, so it
 			// doesn't refocus this block and so it allows default behaviour
