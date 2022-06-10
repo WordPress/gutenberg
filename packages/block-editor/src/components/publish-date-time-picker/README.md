@@ -49,4 +49,4 @@ const MyDateTimePicker = () => {
 Called when the user presses the close button.
 
 - Type: `Function`
-- Required: Yes
+- Required: No

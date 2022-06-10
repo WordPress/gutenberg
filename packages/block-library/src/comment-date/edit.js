@@ -64,7 +64,7 @@ export default function Edit( {
 			<>
 				{ inspectorControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Comment Date', 'block title' ) }</p>
+					<time>{ _x( 'Comment Date', 'block title' ) }</time>
 				</div>
 			</>
 		);

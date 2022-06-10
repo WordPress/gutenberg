@@ -237,7 +237,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
 			'class' => 'has-border-color',
-			'style' => 'border-style: dashed; border-width: 2px; border-color: #72aee6;',
+			'style' => 'border-color: #72aee6; border-style: dashed; border-width: 2px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -282,7 +282,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: #72aee6; border-right-width: 0.25rem; border-right-style: dotted; border-right-color: #e65054; border-bottom-width: 0.5em; border-bottom-style: solid; border-bottom-color: #007017; border-left-width: 1px; border-left-style: solid; border-left-color: #f6f7f7;',
+			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: #007017; border-bottom-style: solid; border-left-width: 1px; border-left-color: #f6f7f7; border-left-style: solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -409,7 +409,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: #72aee6; border-right-width: 0.25rem; border-right-color: #e65054; border-left-style: solid;',
+			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-left-style: solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -454,7 +454,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-style: dashed; border-top-color: var(--wp--preset--color--red); border-right-width: 0.25rem; border-right-style: dotted; border-right-color: var(--wp--preset--color--green); border-bottom-width: 0.5em; border-bottom-style: solid; border-bottom-color: var(--wp--preset--color--blue); border-left-width: 1px; border-left-style: solid; border-left-color: var(--wp--preset--color--yellow);',
+			'style' => 'border-top-width: 2px; border-top-color: var(--wp--preset--color--red); border-top-style: dashed; border-right-width: 0.25rem; border-right-color: var(--wp--preset--color--green); border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: var(--wp--preset--color--blue); border-bottom-style: solid; border-left-width: 1px; border-left-color: var(--wp--preset--color--yellow); border-left-style: solid;',
 		);
 
 		$this->assertSame( $expected, $actual );

@@ -79,6 +79,7 @@ function Variation( { variation } ) {
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
 				aria-label={ variation?.title }
+				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -109,7 +110,11 @@ function ScreenStyleVariations() {
 				settings: {},
 				styles: {},
 			},
-			...variations,
+			...variations.map( ( variation ) => ( {
+				...variation,
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			} ) ),
 		];
 	}, [ variations ] );
 

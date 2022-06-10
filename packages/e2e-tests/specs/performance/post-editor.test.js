@@ -3,7 +3,6 @@
  */
 import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
-import { sum } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -226,6 +225,10 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Searching the inserter', async () => {
+		function sum( arr ) {
+			return arr.reduce( ( a, b ) => a + b, 0 );
+		}
+
 		// Measure time to search the inserter and get results.
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
