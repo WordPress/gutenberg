@@ -107,7 +107,7 @@ function DuotonePicker( {
 				<ColorListPicker
 					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 					colors={ colorPalette }
-					value={ value }
+					value={ isUnset ? undefined : value }
 					disableCustomColors={ disableCustomColors }
 					enableAlpha
 					onChange={ ( newColors ) => {
