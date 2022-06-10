@@ -54,13 +54,17 @@
 			}
 		}
 	}
+
+	@include break-medium() {
+		width: 456px;
+	}
 }
 
 .edit-site-custom-template-modal__suggestions_list {
 	margin-top: $grid-unit-20;
 
 	@include break-small() {
-		max-height: 256px;
+		height: 232px;
 		overflow: scroll;
 	}
 
