@@ -896,20 +896,26 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return array An array of spacing preset sizes.
 	 */
 	protected static function get_spacing_sizes( $spacing_scale ) {
-		$spacing_sizes    = array();
-		$spacing_sizes[0] = array(
+		$spacing_sizes   = array();
+		$spacing_sizes[] = array(
+			'name' => 0,
+			'slug' => 0,
+			'size' => 0,
+		);
+		$spacing_sizes[] = array(
 			'name' => 1,
 			'slug' => 1,
 			'size' => $spacing_scale['firstStep'] . $spacing_scale['units'],
 		);
-		$current_step     = $spacing_scale['firstStep'];
+
+		$current_step = $spacing_scale['firstStep'];
 
 		for ( $x = 1; $x <= $spacing_scale['steps'] - 1; $x++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment'] . $spacing_scale['units']
 				: $current_step * $spacing_scale['increment'] . $spacing_scale['units'];
 
-			$spacing_sizes[ $x + 1 ] = array(
+			$spacing_sizes[] = array(
 				'name' => $x + 1,
 				'slug' => $x + 1,
 				'size' => $current_step,
