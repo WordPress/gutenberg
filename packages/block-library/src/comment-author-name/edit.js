@@ -97,7 +97,7 @@ export default function Edit( {
 				{ inspectorControls }
 				{ blockControls }
 				<div { ...blockProps }>
-					<p>{ _x( 'Comment Author', 'block title' ) }</p>
+					{ _x( 'Comment Author', 'block title' ) }
 				</div>
 			</>
 		);
@@ -111,7 +111,7 @@ export default function Edit( {
 			{ displayName }
 		</a>
 	) : (
-		<p>{ displayName }</p>
+		{ displayName }
 	);
 
 	return (
