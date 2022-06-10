@@ -121,6 +121,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	/**
 	 * When given an array, this will remove any keys with the name `//`.
 	 *
+	 * @param array The array to filter.
 	 * @return array The filtered array.
 	 */
 	private static function remove_JSON_comments( $array ) {
