@@ -28,9 +28,6 @@ export default function useTabNav() {
 		[]
 	);
 
-	// Don't allow tabbing to this element in Navigation mode.
-	const focusCaptureTabIndex = ! isNavigationMode ? 0 : undefined;
-
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
 	const noCapture = useRef();
@@ -59,7 +56,7 @@ export default function useTabNav() {
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
-			tabIndex={ focusCaptureTabIndex }
+			tabIndex={ ! isNavigationMode ? 0 : undefined }
 			onFocus={ onFocusCapture }
 		/>
 	);
