@@ -5,6 +5,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Navigation from '..';
@@ -45,6 +50,119 @@ const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 		</NavigationMenu>
 	</Navigation>
 );
+
+const TestNavigationControlled = () => {
+	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+
+	// Mock navigation link.
+	const MockLink = ( { href, children } ) => (
+		<button
+			href={ href }
+			// Since we're not actually navigating pages, simulate it with on onClick.
+			onClick={ ( event ) => {
+				event.preventDefault();
+				const item = href.replace( 'https://example.com/', '' );
+				setActiveItem( item );
+			} }
+		>
+			{ children }
+		</button>
+	);
+
+	return (
+		<>
+			<Navigation
+				activeItem={ activeItem }
+				activeMenu={ activeMenu }
+				className="navigation-story"
+				onActivateMenu={ setActiveMenu }
+			>
+				<NavigationMenu title="Home">
+					<NavigationItem item="item-1" title="Item 1">
+						<MockLink href="https://example.com/item-1">
+							Item 1
+						</MockLink>
+					</NavigationItem>
+					<NavigationItem item="item-2">
+						<MockLink href="https://example.com/item-2">
+							Item 2
+						</MockLink>
+					</NavigationItem>
+					<NavigationItem
+						item="item-sub-menu"
+						navigateToMenu="sub-menu"
+						title="Sub-Menu"
+					/>
+				</NavigationMenu>
+				<NavigationMenu
+					menu="sub-menu"
+					parentMenu="root"
+					title="Sub-Menu"
+				>
+					<NavigationItem
+						item="child-1"
+						onClick={ () => setActiveItem( 'child-1' ) }
+						title="Child 1"
+					/>
+					<NavigationItem
+						item="child-2"
+						onClick={ () => setActiveItem( 'child-2' ) }
+						title="Child 2"
+					/>
+					<NavigationItem
+						item="child-nested-sub-menu"
+						navigateToMenu="nested-sub-menu"
+						title="Nested Sub-Menu"
+					/>
+				</NavigationMenu>
+				<NavigationMenu
+					menu="nested-sub-menu"
+					parentMenu="sub-menu"
+					title="Nested Sub-Menu"
+				>
+					<NavigationItem
+						item="sub-child-1"
+						onClick={ () => setActiveItem( 'sub-child-1' ) }
+						title="Sub-Child 1"
+					/>
+					<NavigationItem
+						item="sub-child-2"
+						onClick={ () => setActiveItem( 'sub-child-2' ) }
+						title="Sub-Child 2"
+					/>
+				</NavigationMenu>
+			</Navigation>
+
+			<div className="navigation-story__aside">
+				<p>
+					Menu <code>{ activeMenu }</code> is active.
+					<br />
+					Item <code>{ activeItem }</code> is active.
+				</p>
+				<p>
+					<button
+						onClick={ () => {
+							setActiveMenu( 'nested-sub-menu' );
+						} }
+					>
+						Open the Nested Sub-Menu menu
+					</button>
+				</p>
+				<p>
+					<button
+						onClick={ () => {
+							setActiveItem( 'child-2' );
+							setActiveMenu( 'sub-menu' );
+						} }
+					>
+						Navigate to Child 2 item
+					</button>
+				</p>
+			</div>
+		</>
+	);
+};
 
 describe( 'Navigation', () => {
 	it( 'should render the panes and active item', async () => {
@@ -134,5 +252,90 @@ describe( 'Navigation', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Home' } ) );
 
 		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Home' );
+	} );
+
+	it( 'should navigate correctly when controlled', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		render( <TestNavigationControlled /> );
+
+		// check root menu is shown and item 1 is selected
+		expect(
+			screen.getByRole( 'heading', { name: 'Home' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Item 1' } ).parentElement
+		).toHaveClass( 'is-active' );
+
+		// click Item 2, check it's selected
+		await user.click( screen.getByRole( 'button', { name: 'Item 2' } ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Item 2' } ).parentElement
+		).toHaveClass( 'is-active' );
+
+		// click sub-menu, check new menu is shown
+		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
+		expect(
+			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+		).toBeInTheDocument();
+
+		// click Child 1, check it's selected
+		await user.click( screen.getByRole( 'button', { name: 'Child 1' } ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Child 1' } ).parentElement
+		).toHaveClass( 'is-active' );
+
+		// click nested sub-menu, check nested sub-menu is shown
+		await user.click(
+			screen.getByRole( 'button', { name: 'Nested Sub-Menu' } )
+		);
+		expect(
+			screen.getByRole( 'heading', { name: 'Nested Sub-Menu' } )
+		).toBeInTheDocument();
+
+		// click Sub Child 2, check it's selected
+		await user.click(
+			screen.getByRole( 'button', { name: 'Sub-Child 2' } )
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Sub-Child 2' } ).parentElement
+		).toHaveClass( 'is-active' );
+
+		// click back, check sub-menu is shown
+		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
+		expect(
+			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+		).toBeInTheDocument();
+
+		// click back, check root menu is shown
+		await user.click( screen.getByRole( 'button', { name: 'Home' } ) );
+		expect(
+			screen.getByRole( 'heading', { name: 'Home' } )
+		).toBeInTheDocument();
+
+		// click the programmatic nested sub-menu button, check nested sub menu is shown
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Open the Nested Sub-Menu menu',
+			} )
+		);
+		expect(
+			screen.getByRole( 'heading', { name: 'Nested Sub-Menu' } )
+		).toBeInTheDocument();
+
+		// click navigate to child2 item button, check the correct menu is shown and the item is selected
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Navigate to Child 2 item',
+			} )
+		);
+		expect(
+			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Child 2' } ).parentElement
+		).toHaveClass( 'is-active' );
 	} );
 } );
