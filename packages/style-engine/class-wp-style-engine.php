@@ -161,6 +161,10 @@ class WP_Style_Engine {
 						'path'     => array( 'elements', 'link', 'states', 'hover' ),
 						'selector' => 'a:hover',
 					),
+					'focus' => array(
+						'path'     => array( 'elements', 'link', 'states', 'focus' ),
+						'selector' => 'a:focus',
+					),
 				),
 			),
 			'button' => array(
@@ -170,6 +174,10 @@ class WP_Style_Engine {
 					'hover' => array(
 						'path'     => array( 'elements', 'button', 'states', 'hover' ),
 						'selector' => 'button:hover',
+					),
+					'disabled' => array(
+						'path'     => array( 'elements', 'button', 'states', 'disabled' ),
+						'selector' => 'button:disabled',
 					),
 				),
 			),
@@ -444,10 +452,8 @@ class WP_Style_Engine {
 		if ( ! empty( $css_rules ) ) {
 			// Generate inline style rules.
 			foreach ( $css_rules as $rule => $value ) {
-				// $filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
-				// @TODO disabling escaping only for this test.
-				// The `transition` property is filtered out otherwise.
-				$filtered_css = "{$rule}: {$value}";
+				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
+
 				if ( ! empty( $filtered_css ) ) {
 					$css[] = $filtered_css . ';';
 				}
@@ -626,3 +632,6 @@ function wp_style_engine_generate( $block_styles, $options = array() ) {
 	}
 	return null;
 }
+
+
+
