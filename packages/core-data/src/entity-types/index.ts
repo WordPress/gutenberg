@@ -105,7 +105,7 @@ export type EntityRecord<
  */
 export type EntityConfigOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined
+	N extends Name | undefined = undefined
 > = RecordOrKind extends EntityRecord
 	? Extract< EntityConfig, { record: RecordOrKind } >
 	: Extract< EntityConfig, { config: { kind: RecordOrKind; name: N } } >;
@@ -131,7 +131,7 @@ export type KindOf<
  */
 export type KeyOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined,
+	N extends Name | undefined = undefined,
 	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
 > = ( E[ 'key' ] extends keyof E[ 'record' ]
 	? E[ 'record' ][ E[ 'key' ] ]
@@ -146,7 +146,7 @@ export type KeyOf<
  */
 export type DefaultContextOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined
+	N extends Name | undefined = undefined
 > = EntityConfigOf< RecordOrKind, N >[ 'defaultContext' ];
 
 /**
