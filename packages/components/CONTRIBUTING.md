@@ -524,7 +524,23 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	4. Use existing HTML types when possible? (e.g. `required` for an input field?)
 	5. Use the `CSSProperties` type where it makes sense.
 	6. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
-	7. Use `WordPressComponent` type if possible.
+	7. If the component forwards its `...restProps` to an underlying element, you should use the `WordPressComponentProps` type for the component's props:
+
+		```jsx
+		import type { WordPressComponentProps } from '../ui/context';
+		import type { ComponentOwnProps } from './types';
+
+		function UnconnectedMyComponent(
+			// The resulting type will include:
+			// - all props defined in `ComponentOwnProps`
+			// - all HTML props/attributes from the component specified as the second
+			//   parameter (`div` in this example)
+			// - the special `as` prop (which marks the component as polymorphic),
+			//   unless the third parameter is `false`
+			props:  WordPressComponentProps< ComponentOwnProps, 'div', true >
+		) { /* ... */ }
+		```
+
 	8. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
 	9. Prefer `unknown` to `any`, and in general avoid it when possible.
 8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
