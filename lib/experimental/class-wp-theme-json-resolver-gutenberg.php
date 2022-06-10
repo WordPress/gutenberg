@@ -101,7 +101,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 	/**
 	 * Gets the styles for blocks from the block.json file.
 	 *
-	 * @return WP_Theme_JSON object with the styles for each block.
+	 * @return WP_Theme_JSON
 	 */
 	public static function get_block_data() {
 		$registry = WP_Block_Type_Registry::get_instance();
@@ -109,7 +109,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		$config   = array( 'version' => 1 );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = static::removeJsonComments( $block_type->supports['__experimentalStyle'] );
+				$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $block_type->supports['__experimentalStyle'] );
 			}
 		}
 
@@ -118,17 +118,48 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		return new WP_Theme_JSON( $config, 'core' );
 	}
 
-	private static function removeJsonComments( $array ) {
+	/**
+	 * When given an array, this will remove any keys with the name `//`.
+	 *
+	 * @return array The filtered array.
+	 */
+	private static function remove_JSON_comments( $array ) {
 		unset( $array['//'] );
 		foreach ( $array as $k => $v ) {
 			if ( is_array( $v ) ) {
-				$array[ $k ] = static::removeJsonComments( $v );
+				$array[ $k ] = static::remove_JSON_comments( $v );
 			}
 		}
 
 		return $array;
 	}
 
+	/**
+	 * Returns the data merged from multiple origins.
+	 *
+	 * There are three sources of data (origins) for a site:
+	 * default, theme, and custom. The custom's has higher priority
+	 * than the theme's, and the theme's higher than default's.
+	 *
+	 * Unlike the getters {@link get_core_data},
+	 * {@link get_theme_data}, and {@link get_user_data},
+	 * this method returns data after it has been merged
+	 * with the previous origins. This means that if the same piece of data
+	 * is declared in different origins (user, theme, and core),
+	 * the last origin overrides the previous.
+	 *
+	 * For example, if the user has set a background color
+	 * for the paragraph block, and the theme has done it as well,
+	 * the user preference wins.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Added user data, removed the `$settings` parameter,
+	 *              added the `$origin` parameter.
+	 *
+	 * @param string $origin Optional. To what level should we merge data.
+	 *                       Valid values are 'theme' or 'custom'. Default 'custom'.
+	 * @return WP_Theme_JSON
+	 */
 	public static function get_merged_data( $origin = 'custom' ) {
 		if ( is_array( $origin ) ) {
 			_deprecated_argument( __FUNCTION__, '5.9' );
