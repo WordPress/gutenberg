@@ -88,6 +88,28 @@ function LinkColorItem( { name, parentMenu } ) {
 	);
 }
 
+function ButtonColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'linkColor' ); // TODO - use a real support
+	const [ color ] = useStyle( 'elements.button.color.text', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
+			<HStack justify="flex-start">
+				<ColorIndicatorWrapper expanded={ false }>
+					<ColorIndicator colorValue={ color } />
+				</ColorIndicatorWrapper>
+				<FlexItem>{ __( 'Buttons' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
+
 function ScreenColors( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
@@ -116,6 +138,10 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<ButtonColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>
