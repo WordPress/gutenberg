@@ -231,8 +231,8 @@ export function useInputAndSelection( props ) {
 			// It is important that the internal value is updated first,
 			// otherwise the value will be wrong on render!
 			record.current = newValue;
-			applyRecord( newValue, { domOnly: true } );
 			onSelectionChange( start, end );
+			applyRecord( newValue, { domOnly: true } );
 		}
 
 		function onCompositionStart() {

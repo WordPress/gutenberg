@@ -429,9 +429,8 @@ export function attributeListToReact( attributeList ) {
 	}, {} );
 }
 
-let keyCounter = 0;
-
 export function nodeListToReact( nodeList, createElement ) {
+	let keyCounter = 0;
 	return [ ...nodeList ].reduce( ( accumulator, node ) => {
 		if ( ! node._domReactKey ) {
 			node._domReactKey = '_domReact' + String( keyCounter++ );
