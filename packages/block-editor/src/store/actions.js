@@ -1603,3 +1603,15 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Action that sets whether given blocks are visible on the canvas.
+ *
+ * @param {Record<string,boolean>} updates For each block's clientId, its new visibility setting.
+ */
+export function setBlockVisibility( updates ) {
+	return {
+		type: 'SET_BLOCK_VISIBILITY',
+		updates,
+	};
+}

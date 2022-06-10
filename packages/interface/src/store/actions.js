@@ -5,20 +5,49 @@ import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
+ * Set a default complementary area.
+ *
+ * @param {string} scope Complementary area scope.
+ * @param {string} area  Area identifier.
+ *
+ * @return {Object} Action object.
+ */
+export const setDefaultComplementaryArea = ( scope, area ) => ( {
+	type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+	scope,
+	area,
+} );
+
+/**
  * Enable the complementary area.
  *
  * @param {string} scope Complementary area scope.
  * @param {string} area  Area identifier.
  */
-export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
+export const enableComplementaryArea = ( scope, area ) => ( {
+	registry,
+	dispatch,
+} ) => {
 	// Return early if there's no area.
 	if ( ! area ) {
 		return;
 	}
 
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', area );
+	const isComplementaryAreaVisible = registry
+		.select( preferencesStore )
+		.get( scope, 'isComplementaryAreaVisible' );
+
+	if ( ! isComplementaryAreaVisible ) {
+		registry
+			.dispatch( preferencesStore )
+			.set( scope, 'isComplementaryAreaVisible', true );
+	}
+
+	dispatch( {
+		type: 'ENABLE_COMPLEMENTARY_AREA',
+		scope,
+		area,
+	} );
 };
 
 /**
@@ -27,9 +56,15 @@ export const enableComplementaryArea = ( scope, area ) => ( { registry } ) => {
  * @param {string} scope Complementary area scope.
  */
 export const disableComplementaryArea = ( scope ) => ( { registry } ) => {
-	registry
-		.dispatch( preferencesStore )
-		.set( scope, 'complementaryArea', null );
+	const isComplementaryAreaVisible = registry
+		.select( preferencesStore )
+		.get( scope, 'isComplementaryAreaVisible' );
+
+	if ( isComplementaryAreaVisible ) {
+		registry
+			.dispatch( preferencesStore )
+			.set( scope, 'isComplementaryAreaVisible', false );
+	}
 };
 
 /**

@@ -64,6 +64,7 @@ export function useFlex( props ) {
 		typeof direction === 'string' && direction.includes( 'reverse' );
 
 	const cx = useCx();
+	const rtlWatchResult = rtl.watch();
 
 	const classes = useMemo( () => {
 		const sx = {};
@@ -123,6 +124,8 @@ export function useFlex( props ) {
 			isColumn ? styles.ItemsColumn : styles.ItemsRow,
 			className
 		);
+		// rtlWatchResult is needed to refresh styles when the writing direction changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		align,
 		className,
@@ -134,7 +137,7 @@ export function useFlex( props ) {
 		isReverse,
 		justify,
 		wrap,
-		rtl.watch(),
+		rtlWatchResult,
 	] );
 
 	return { ...otherProps, className: classes, isColumn };

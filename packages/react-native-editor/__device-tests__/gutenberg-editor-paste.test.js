@@ -3,6 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 import {
+	clearClipboard,
 	longPressMiddleOfElement,
 	tapSelectAllAboveElement,
 	tapCopyAboveElement,
@@ -21,7 +22,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	}
 
 	beforeAll( async () => {
-		await editorPage.driver.setClipboard( '', 'plaintext' );
+		await clearClipboard( editorPage.driver );
 	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
@@ -29,11 +30,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.pastePlainText
 		);
@@ -59,15 +57,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement2.click();
-		}
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 2 );
@@ -83,9 +74,6 @@ describe( 'Gutenberg Editor paste tests', () => {
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
 		// Copy content to clipboard.
 		await longPressMiddleOfElement(
@@ -108,15 +96,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement2.click();
-		}
 
 		// Paste into second paragraph block.
-		await longPressMiddleOfElement(
-			editorPage.driver,
-			paragraphBlockElement2
-		);
 		await tapPasteAboveElement( editorPage.driver, paragraphBlockElement2 );
 
 		// Check styled text by verifying html contents.

@@ -33,7 +33,11 @@ import {
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -43,7 +47,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import { isExternalImage, isMediaDestroyed } from './edit';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
@@ -72,14 +76,12 @@ export default function Image( {
 	isSelected,
 	insertBlocksAfter,
 	onReplace,
-	onCloseModal,
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
 	containerRef,
 	context,
 	clientId,
-	onImageLoadError,
 } ) {
 	const imageRef = useRef();
 	const captionRef = useRef();
@@ -221,13 +223,10 @@ export default function Image( {
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		const shouldReplace = undefined !== embedBlock;
 
-		if ( shouldReplace ) {
+		if ( undefined !== embedBlock ) {
 			onReplace( embedBlock );
 		}
-
-		onImageLoadError( shouldReplace );
 	}
 
 	function onSetHref( props ) {
@@ -299,9 +298,6 @@ export default function Image( {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
 		}
-		if ( isSelected && isMediaDestroyed( id ) ) {
-			onImageLoadError();
-		}
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
@@ -365,7 +361,6 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onCloseModal={ onCloseModal }
 					/>
 				</BlockControls>
 			) }
@@ -598,7 +593,9 @@ export default function Image( {
 					}
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }

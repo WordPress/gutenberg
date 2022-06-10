@@ -173,12 +173,9 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       id="toggle-group-control-1"
       role="radiogroup"
     >
-      <iframe
+      <div
         aria-hidden="true"
-        frameborder="0"
-        src="about:blank"
-        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-        tabindex="-1"
+        style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
       />
       <div
         class="emotion-8 emotion-9"
@@ -402,12 +399,9 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       id="toggle-group-control-0"
       role="radiogroup"
     >
-      <iframe
+      <div
         aria-hidden="true"
-        frameborder="0"
-        src="about:blank"
-        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-        tabindex="-1"
+        style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
       />
       <div
         class="emotion-8 emotion-9"

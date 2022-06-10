@@ -2,7 +2,7 @@
 
 The Style Engine powering global styles and block customizations.
 
-## Installation
+## Installation (JS only)
 
 Install the module
 
@@ -22,9 +22,9 @@ Currently it's not a package that generates a wp.styleEngine global because it's
 
 -   Add style definitions for all the currently supported styles in blocks and theme.json.
 -   the CSS variable shortcuts for values (for presets...)
--   Support generating styles in the frontend.
--   Support generating styles in the backend (block supports and theme.json stylesheet).
--   Refactor all block styles to use the style engine server side.
+-   Support generating styles in the frontend. (Ongoing)
+-   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
+-   Refactor all block styles to use the style engine server side. (Ongoing)
 -   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
 
 ## Usage

@@ -16,6 +16,7 @@ import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
 import { ColorHexInputControl } from './styles';
 import { COLORS } from '../utils/colors-values';
+import type { StateReducer } from '../input-control/reducer/state';
 
 interface HexInputProps {
 	color: Colord;
@@ -31,6 +32,20 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			: '#' + nextValue;
 
 		onChange( colord( hexValue ) );
+	};
+
+	const stateReducer: StateReducer = ( state, action ) => {
+		const nativeEvent = action.payload?.event?.nativeEvent as InputEvent;
+
+		if ( 'insertFromPaste' !== nativeEvent?.inputType ) {
+			return { ...state };
+		}
+
+		const value = state.value?.startsWith( '#' )
+			? state.value.slice( 1 ).toUpperCase()
+			: state.value?.toUpperCase();
+
+		return { ...state, value };
 	};
 
 	return (
@@ -50,6 +65,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			__unstableStateReducer={ stateReducer }
 		/>
 	);
 };

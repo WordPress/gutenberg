@@ -33,10 +33,6 @@
 	z-index: z-index("{core/video track editor popover}");
 }
 
-.block-library-video-tracks-editor > .components-popover__content {
-	width: 360px;
-}
-
 .block-library-video-tracks-editor__track-list-track {
 	display: flex;
 	place-content: space-between;
@@ -75,16 +71,17 @@
 	display: block;
 }
 
-.block-library-video-tracks-editor > .components-popover__content > div {
+.block-library-video-tracks-editor > .components-popover__content {
+	width: 360px;
 	padding: 0;
 }
+
 .block-library-video-tracks-editor__track-list,
 .block-library-video-tracks-editor__add-tracks-container {
 	.components-menu-group__label {
 		padding: 0;
 	}
 }
-
 
 .block-library-video-tracks-editor__single-track-editor,
 .block-library-video-tracks-editor__track-list,

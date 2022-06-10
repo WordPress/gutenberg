@@ -76,6 +76,8 @@ function removeNativeProps( props ) {
 		'minWidth',
 		'maxWidth',
 		'setRef',
+		'disableSuggestions',
+		'disableAutocorrection',
 	] );
 }
 
@@ -338,7 +340,7 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef.current }
+					anchorRef={ anchorRef }
 				/>
 			) }
 			<TagName

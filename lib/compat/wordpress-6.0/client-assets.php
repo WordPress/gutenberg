@@ -45,9 +45,12 @@ function gutenberg_resolve_assets() {
 	$style_handles  = array(
 		'wp-block-editor',
 		'wp-block-library',
-		'wp-block-library-theme',
 		'wp-edit-blocks',
 	);
+
+	if ( current_theme_supports( 'wp-block-styles' ) ) {
+		$style_handles[] = 'wp-block-library-theme';
+	}
 
 	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
 		$style_handles[] = 'wp-widgets';

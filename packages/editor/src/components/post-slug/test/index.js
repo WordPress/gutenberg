@@ -15,11 +15,11 @@ describe( 'PostSlug', () => {
 
 			wrapper.find( 'input' ).simulate( 'change', {
 				target: {
-					value: 'single-post',
+					value: 'single',
 				},
 			} );
 
-			expect( wrapper.state().editedSlug ).toEqual( 'single-post' );
+			expect( wrapper.state().editedSlug ).toEqual( 'single' );
 		} );
 
 		it( 'should update slug', () => {
@@ -30,11 +30,11 @@ describe( 'PostSlug', () => {
 
 			wrapper.find( 'input' ).simulate( 'blur', {
 				target: {
-					value: 'single-post',
+					value: 'single',
 				},
 			} );
 
-			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single-post' );
+			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single' );
 		} );
 	} );
 } );

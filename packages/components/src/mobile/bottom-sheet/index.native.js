@@ -148,7 +148,7 @@ class BottomSheet extends Component {
 			// TODO: Reinstate animations, possibly replacing `LayoutAnimation` with
 			// more nuanced `Animated` usage or replacing our custom `BottomSheet`
 			// with `@gorhom/bottom-sheet`. This animation was disabled to avoid a
-			// preexisting bug: https://git.io/JMPCV
+			// preexisting bug: https://github.com/WordPress/gutenberg/issues/30562
 			// this.performRegularLayoutAnimation( {
 			// 	useLastLayoutAnimation: false,
 			// } );.

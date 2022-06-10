@@ -679,27 +679,11 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Tab' );
 		// Create the table.
 		await page.keyboard.press( 'Space' );
-		// Return focus after focus loss. This should be fixed.
-		await page.keyboard.press( 'Tab' );
 		// Navigate to the second cell.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		// The content should only have one tab stop.
-		await page.keyboard.press( 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Post' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			)
-		).toBe( 'Table' );
 	} );
 
 	it( 'should unselect all blocks when hitting double escape', async () => {
@@ -749,5 +733,24 @@ describe( 'Writing Flow', () => {
 			'.wp-block-paragraph.is-selected'
 		);
 		expect( selectedParagraph ).toBeDefined();
+	} );
+	it( 'should prevent browser default formatting on multi selection', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		// Multi select both paragraphs.
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowLeft', 2 );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		const paragraphs = await page.$$eval(
+			'[data-type="core/paragraph"]',
+			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
+		);
+		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
 	} );
 } );

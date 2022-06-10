@@ -8,7 +8,7 @@ import { omit } from 'lodash';
  */
 import { createBlock } from '@wordpress/blocks';
 
-function createListBlockFromDOMElement( listElement ) {
+export function createListBlockFromDOMElement( listElement ) {
 	const listAttributes = {
 		ordered: 'OL' === listElement.tagName,
 		start: listElement.getAttribute( 'start' )

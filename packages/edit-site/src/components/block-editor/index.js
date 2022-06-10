@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef, Fragment } from '@wordpress/element';
+import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
@@ -48,50 +49,67 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings } = useSelect(
+	const { storedSettings, templateType, templateId, page } = useSelect(
 		( select ) => {
-			let storedSettings = select( editSiteStore ).getSettings(
-				setIsInserterOpen
-			);
-
-			if ( ! storedSettings.__experimentalBlockPatterns ) {
-				storedSettings = {
-					...storedSettings,
-					__experimentalBlockPatterns: select(
-						coreStore
-					).getBlockPatterns(),
-				};
-			}
-
-			if ( ! storedSettings.__experimentalBlockPatternCategories ) {
-				storedSettings = {
-					...storedSettings,
-					__experimentalBlockPatternCategories: select(
-						coreStore
-					).getBlockPatternCategories(),
-				};
-			}
+			const {
+				getSettings,
+				getEditedPostType,
+				getEditedPostId,
+				getPage,
+			} = select( editSiteStore );
 
 			return {
-				settings: storedSettings,
-			};
-		},
-		[ setIsInserterOpen ]
-	);
-
-	const { templateType, templateId, page } = useSelect(
-		( select ) => {
-			const { getEditedPostType, getEditedPostId, getPage } = select(
-				editSiteStore
-			);
-
-			return {
+				storedSettings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				templateId: getEditedPostId(),
 				page: getPage(),
 			};
 		},
 		[ setIsInserterOpen ]
+	);
+
+	const settingsBlockPatterns =
+		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		storedSettings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
+		( select ) => ( {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories: select(
+				coreStore
+			).getBlockPatternCategories(),
+		} ),
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		[ settingsBlockPatterns, restBlockPatterns ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			unionBy(
+				settingsBlockPatternCategories,
+				restBlockPatternCategories,
+				'name'
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
+
+	const settings = useMemo(
+		() => ( {
+			...omit( storedSettings, [
+				'__experimentalAdditionalBlockPatterns',
+				'__experimentalAdditionalBlockPatternCategories',
+			] ),
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
+		} ),
+		[ storedSettings, blockPatterns, blockPatternCategories ]
 	);
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -112,6 +130,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const isTemplatePart = templateType === 'wp_template_part';
+	const hasBlocks = blocks.length !== 0;
 
 	const NavMenuSidebarToggle = () => (
 		<ToolbarGroup>
@@ -186,7 +205,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					<BlockList
 						className="edit-site-block-editor__block-list wp-site-blocks"
 						__experimentalLayout={ LAYOUT }
-						renderAppender={ isTemplatePart ? false : undefined }
+						renderAppender={
+							isTemplatePart && hasBlocks ? false : undefined
+						}
 					/>
 				</ResizableEditor>
 				<__unstableBlockSettingsMenuFirstItem>

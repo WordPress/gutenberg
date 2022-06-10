@@ -9,7 +9,6 @@ import namesPlugin from 'colord/plugins/names';
  * WordPress dependencies
  */
 import { useCallback, useState, useMemo } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -27,9 +26,8 @@ import {
 	ColorfulWrapper,
 	SelectControl,
 	AuxiliaryColorArtefactWrapper,
-	DetailsControlButton,
 } from './styles';
-import { ColorDisplay } from './color-display';
+import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
@@ -85,7 +83,6 @@ const ColorPicker = (
 		[ debouncedSetColor ]
 	);
 
-	const [ showInputs, setShowInputs ] = useState< boolean >( false );
 	const [ colorType, setColorType ] = useState< ColorType >(
 		copyFormat || 'hex'
 	);
@@ -99,44 +96,27 @@ const ColorPicker = (
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<HStack justify="space-between">
-					{ showInputs ? (
-						<SelectControl
-							options={ options }
-							value={ colorType }
-							onChange={ ( nextColorType ) =>
-								setColorType( nextColorType as ColorType )
-							}
-							label={ __( 'Color format' ) }
-							hideLabelFromVision
-						/>
-					) : (
-						<ColorDisplay
-							color={ safeColordColor }
-							colorType={ copyFormat || colorType }
-							enableAlpha={ enableAlpha }
-						/>
-					) }
-					<DetailsControlButton
-						isSmall
-						onClick={ () => setShowInputs( ! showInputs ) }
-						icon={ settings }
-						isPressed={ showInputs }
-						label={
-							showInputs
-								? __( 'Hide detailed inputs' )
-								: __( 'Show detailed inputs' )
+					<SelectControl
+						options={ options }
+						value={ colorType }
+						onChange={ ( nextColorType ) =>
+							setColorType( nextColorType as ColorType )
 						}
+						label={ __( 'Color format' ) }
+						hideLabelFromVision
+					/>
+					<ColorCopyButton
+						color={ safeColordColor }
+						colorType={ copyFormat || colorType }
 					/>
 				</HStack>
 				<Spacer margin={ 4 } />
-				{ showInputs && (
-					<ColorInput
-						colorType={ colorType }
-						color={ safeColordColor }
-						onChange={ handleChange }
-						enableAlpha={ enableAlpha }
-					/>
-				) }
+				<ColorInput
+					colorType={ colorType }
+					color={ safeColordColor }
+					onChange={ handleChange }
+					enableAlpha={ enableAlpha }
+				/>
 			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>
 	);

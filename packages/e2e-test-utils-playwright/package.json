@@ -35,8 +35,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
 		"form-data": "^4.0.0",
-		"lodash": "^4.17.21",
-		"role-selector": "0.5.0"
+		"lodash": "^4.17.21"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1"
