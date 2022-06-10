@@ -379,7 +379,7 @@ export function PresetDuotoneFilter( { preset } ) {
 	return (
 		<DuotoneFilter
 			id={ `wp-duotone-${ preset.slug }` }
-			values={ getValuesFromColors( preset.colors ) }
+			colors={ preset.colors }
 		/>
 	);
 }
