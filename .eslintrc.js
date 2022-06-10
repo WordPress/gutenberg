@@ -83,6 +83,7 @@ module.exports = {
 							'differenceWith',
 							'findIndex',
 							'isArray',
+							'isFinite',
 							'isUndefined',
 							'memoize',
 							'negate',
