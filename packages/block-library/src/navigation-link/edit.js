@@ -261,12 +261,6 @@ export const updateNavigationLinkBlockAttributes = (
 		? escape( newLabel )
 		: originalLabel || escape( newUrlWithoutHttp );
 
-	// const isTitleAlreadyEscaped = ! newLabel || isNewLabelTheSameAsUrl || originalLabel === newLabel;
-	//
-	// const escapedNewLabel = isTitleAlreadyEscaped
-	// 	? originalLabel || escape( newUrl )
-	// 	: escape( newLabel );
-	//
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
 
