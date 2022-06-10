@@ -490,9 +490,23 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 		2. Resume work on this component once all dependencies have been refactored.
 	2. Alternatively:
 		1. For each of those files, add `// @ts-nocheck` at the start of the file.
-		2. Add the folders to the `tsconfig.json` file.
-		3. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
-		4. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
+		2. If the components in the ignored files are destructuring props directly from the function's arguments, move the props destructuring to the function's body (this is to avoid TypeScript errors from trying to infer the props type):
+
+			```jsx
+			// Before:
+			function MyComponent( { myProp1, myProp2, ...restProps } ) { /* ... */ }
+
+			// After:
+			function MyComponent( props ) {
+				const {  myProp1, myProp2, ...restProps } = props;
+
+				/* ... */
+			}
+			```
+
+		3. Add the folders to the `tsconfig.json` file.
+		4. If you’re still getting errors about a component’s props, the easiest way is to slightly refactor this component and perform the props destructuring inside the component’s body (as opposed as in the function signature) — this is to prevent TypeScript from inferring the types of these props.
+		5. Continue with the refactor of the current component (and take care of the refactor of the dependent components at a later stage).
 6. Create a new `types.ts` file.
 7. Slowly work your way through fixing the TypeScript errors in the folder:
 	1. Try to avoid introducing any runtime changes, if possible. The aim of this refactor is to simply rewrite the component to TypeScript.
