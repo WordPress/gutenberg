@@ -176,7 +176,7 @@ function _gutenberg_multiple_block_styles( $metadata ) {
 			$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
 				$args = array( 'handle' => $handle );
-				if ( 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
+				if ( is_string( $handle ) && 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
 					$style_path      = remove_block_asset_path_prefix( $handle );
 					$theme_path_norm = wp_normalize_path( get_theme_file_path() );
 					$style_path_norm = wp_normalize_path( realpath( dirname( $metadata['file'] ) . '/' . $style_path ) );
