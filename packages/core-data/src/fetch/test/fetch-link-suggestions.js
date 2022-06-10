@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
+import fetchLinkSuggestions from '../fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
 	jest.fn( ( { path } ) => {

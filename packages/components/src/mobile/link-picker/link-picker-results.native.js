@@ -39,10 +39,11 @@ export default function LinkPickerResults( {
 		const { getSettings } = select( 'core/block-editor' );
 		const fetchLinkSuggestions = async ( { search } ) => {
 			if ( meetsThreshold( search ) ) {
-				return await getSettings().__experimentalFetchLinkSuggestions(
-					search,
-					{ page: nextPage.current, type: 'post', perPage: PER_PAGE }
-				);
+				return await getSettings().fetchLinkSuggestions( search, {
+					page: nextPage.current,
+					type: 'post',
+					perPage: PER_PAGE,
+				} );
 			}
 		};
 		const fetchMore = async ( {

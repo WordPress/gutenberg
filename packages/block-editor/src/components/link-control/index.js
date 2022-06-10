@@ -91,7 +91,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
- * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.fetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.

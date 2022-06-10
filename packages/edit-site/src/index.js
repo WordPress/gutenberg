@@ -9,7 +9,7 @@ import {
 import { dispatch, select } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
@@ -117,7 +117,7 @@ export function reinitializeEditor( target, settings ) {
  * @param {Object} settings Editor settings.
  */
 export function initializeEditor( id, settings ) {
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+	settings.fetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalFetchRichUrlData = fetchUrlData;
 

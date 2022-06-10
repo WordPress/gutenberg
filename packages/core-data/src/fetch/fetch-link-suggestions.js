@@ -65,13 +65,13 @@ import { __ } from '@wordpress/i18n';
  *
  * @example
  * ```js
- * import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+ * import { fetchLinkSuggestions } from '@wordpress/core-data';
  *
  * //...
  *
  * export function initialize( id, settings ) {
  *
- * settings.__experimentalFetchLinkSuggestions = (
+ * settings.fetchLinkSuggestions = (
  *     search,
  *     searchOptions
  * ) => fetchLinkSuggestions( search, searchOptions, settings );

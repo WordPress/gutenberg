@@ -10,7 +10,7 @@ import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -160,7 +160,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+			fetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,

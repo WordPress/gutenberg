@@ -6,7 +6,7 @@ import { updateNavigationLinkBlockAttributes } from '../edit';
 describe( 'edit', () => {
 	describe( 'updateNavigationLinkBlockAttributes', () => {
 		// Data shapes are linked to fetchLinkSuggestions from
-		// core-data/src/fetch/__experimental-fetch-link-suggestions.js.
+		// core-data/src/fetch/fetch-link-suggestions.js.
 		it( 'can update a post link', () => {
 			const setAttributes = jest.fn();
 			const linkSuggestion = {

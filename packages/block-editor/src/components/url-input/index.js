@@ -136,7 +136,7 @@ class URLInput extends Component {
 
 	updateSuggestions( value = '' ) {
 		const {
-			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			fetchLinkSuggestions,
 			__experimentalHandleURLSuggestions: handleURLSuggestions,
 		} = this.props;
 
@@ -585,13 +585,12 @@ export default compose(
 	withSelect( ( select, props ) => {
 		// If a link suggestions handler is already provided then
 		// bail.
-		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
+		if ( isFunction( props.fetchLinkSuggestions ) ) {
 			return;
 		}
 		const { getSettings } = select( blockEditorStore );
 		return {
-			__experimentalFetchLinkSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			fetchLinkSuggestions: getSettings().fetchLinkSuggestions,
 		};
 	} )
 )( URLInput );

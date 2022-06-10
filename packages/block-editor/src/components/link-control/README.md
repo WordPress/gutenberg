@@ -28,7 +28,7 @@ When this suggestion is selected it will call the `createSuggestion` prop afford
 
 ### Data sources
 
-By default `LinkControl` utilizes the `__experimentalFetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities.
+By default `LinkControl` utilizes the `fetchLinkSuggestions` API from `core/block-editor` in order to retrieve search suggestions for matching post-type entities.
 
 By default this provides no functionality and so you must implement and provide this in your own Editor instance ([example](https://github.com/WordPress/gutenberg/blob/65c752816f46a9334b84f4801d80dea00ed76fba/packages/editor/src/components/provider/use-block-editor-settings.js#L114-L115)).
 
@@ -69,9 +69,7 @@ An array of settings objects associated with a link (for example: a setting to d
 To disable settings, pass in an empty array. for example:
 
 ```jsx
-<LinkControl
-	settings={ [] }
-/>
+<LinkControl settings={ [] } />
 ```
 
 ### onChange
@@ -192,7 +190,8 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
-### renderControlBottom 
+
+### renderControlBottom
 
 -   Type: `Function`
 -   Required: No
@@ -262,9 +261,9 @@ The same as `value` in LinkControl, refer to an earlier section of this README f
 -   Type: `Function`
 -   Required: No
 
-Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`, if not, the default handler is used.
+Custom search handler for suggestions. If specified, it's passed to `URLInput` as `fetchLinkSuggestions`, if not, the default handler is used.
 
-Refer to URLInput's README.md for more details about `__experimentalFetchLinkSuggestions` and see the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
+Refer to URLInput's README.md for more details about `fetchLinkSuggestions` and see the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
 ### onChange
 
