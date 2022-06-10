@@ -103,6 +103,7 @@ export function DatePicker( {
 	events,
 	isInvalidDate,
 	onMonthPreviewed,
+	startOfWeek = 0,
 }: DatePickerProps ) {
 	const nodeRef = useRef< HTMLDivElement >( null );
 
@@ -197,6 +198,7 @@ export function DatePicker( {
 				isOutsideRange={ ( date ) => {
 					return !! isInvalidDate && isInvalidDate( date.toDate() );
 				} }
+				firstDayOfWeek={ startOfWeek }
 				onPrevMonthClick={ onMonthPreviewedHandler }
 				onNextMonthClick={ onMonthPreviewedHandler }
 				renderDayContents={ ( day ) => (
