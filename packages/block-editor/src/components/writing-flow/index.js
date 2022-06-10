@@ -25,14 +25,13 @@ import useInput from './use-input';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
-	const [ before, ref, after ] = useTabNav();
+	const [ ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
 
 	return [
-		before,
 		useMergeRefs( [
 			ref,
 			useInput(),
@@ -68,10 +67,9 @@ export function useWritingFlow() {
 }
 
 function WritingFlow( { children, ...props }, forwardedRef ) {
-	const [ before, ref, after ] = useWritingFlow();
+	const [ ref, after ] = useWritingFlow();
 	return (
 		<>
-			{ before }
 			<div
 				{ ...props }
 				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
