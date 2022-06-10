@@ -206,27 +206,27 @@
 				},
 				{
 					"name": "Extra small",
-					"slug": "1",
+					"slug": "10",
 					"size": "0.5rem"
 				},
 				{
 					"name": "Small",
-					"slug": "2",
+					"slug": "20",
 					"size": "1rem"
 				},
 				{
 					"name": "Medium",
-					"slug": "3",
+					"slug": "30",
 					"size": "1.5rem"
 				},
 				{
 					"name": "Large",
-					"slug": "4",
+					"slug": "40",
 					"size": "2rem"
 				},
 				{
 					"name": "Extra large",
-					"slug": "5",
+					"slug": "50",
 					"size": "2.5rem"
 				}
 			]
