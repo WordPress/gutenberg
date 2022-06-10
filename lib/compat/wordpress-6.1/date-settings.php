@@ -1,4 +1,9 @@
 <?php
+/**
+ * Updates to the settings given to @wordpress/date.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Removes the call to wp.date.setSettings() added by Core and adds our own call
@@ -8,13 +13,15 @@
  *
  * To merge this into Core, simply update the wp.date.setSettings() call in
  * wp_default_packages_inline_scripts.
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
  */
 function gutenberg_update_date_settings( $scripts ) {
 	global $wp_locale;
 
 	$inline_scripts = $scripts->get_data( 'wp-date', 'after' );
 	if ( $inline_scripts ) {
-		foreach( $inline_scripts as $index => $inline_script ) {
+		foreach ( $inline_scripts as $index => $inline_script ) {
 			if ( str_starts_with( $inline_script, 'wp.date.setSettings' ) ) {
 				unset( $scripts->registered['wp-date']->extra['after'][ $index ] );
 			}
@@ -49,7 +56,7 @@ function gutenberg_update_date_settings( $scripts ) {
 							/* translators: %s: Duration. */
 							'past'   => __( '%s ago', 'gutenberg' ),
 						),
-						'startOfWeek' => (int) get_option( 'start_of_week', 0 ),
+						'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
 					),
 					'formats'  => array(
 						/* translators: Time format, see https://www.php.net/manual/datetime.format.php */
