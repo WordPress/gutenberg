@@ -19,6 +19,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
+- [TypeScript migration guide](#refactoring-a-component-to-typescript)
 
 ## Compatibility
 
