@@ -60,7 +60,10 @@ const interactiveHueStyles = `
 }`;
 
 export const AuxiliaryColorArtefactWrapper = styled.div`
-	padding: ${ space( 2 ) } 0 };
+	padding-top: ${ space( 2 ) };
+	padding-right: 0;
+	padding-left: 0;
+	padding-bottom: ${ space( 3 ) };
 `;
 
 export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`

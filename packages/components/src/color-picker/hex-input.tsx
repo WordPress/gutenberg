@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { HStack } from '../h-stack';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
@@ -49,23 +50,25 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	};
 
 	return (
-		<ColorHexInputControl
-			prefix={
-				<Spacer
-					as={ Text }
-					marginLeft={ space( 3.5 ) }
-					color={ COLORS.ui.theme }
-					lineHeight={ 1 }
-				>
-					#
-				</Spacer>
-			}
-			value={ color.toHex().slice( 1 ).toUpperCase() }
-			onChange={ handleChange }
-			maxLength={ enableAlpha ? 9 : 7 }
-			label={ __( 'Hex color' ) }
-			hideLabelFromVision
-			__unstableStateReducer={ stateReducer }
-		/>
+		<Spacer as={ HStack } spacing={ 4 }>
+			<ColorHexInputControl
+				prefix={
+					<Spacer
+						as={ Text }
+						marginLeft={ space( 3.5 ) }
+						color={ COLORS.ui.theme }
+						lineHeight={ 1 }
+					>
+						#
+					</Spacer>
+				}
+				value={ color.toHex().slice( 1 ).toUpperCase() }
+				onChange={ handleChange }
+				maxLength={ enableAlpha ? 9 : 7 }
+				label={ __( 'Hex color' ) }
+				hideLabelFromVision
+				__unstableStateReducer={ stateReducer }
+			/>
+		</Spacer>
 	);
 };
