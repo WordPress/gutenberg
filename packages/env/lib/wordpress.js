@@ -64,6 +64,11 @@ async function configureWordPress( environment, config, spinner ) {
 	for ( let [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
+		// Allow the configuration to skip a default constant by specifying it as null.
+		if ( null === value ) {
+			continue;
+		}
+
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(

@@ -92,7 +92,7 @@ describe( 'Post visibility', () => {
 		// Set a publish date for the next month.
 		await page.click( '.edit-post-post-schedule__toggle' );
 		await page.click(
-			'div[aria-label="Move forward to switch to the next month."]'
+			'*[aria-label="Move forward to switch to the next month."]'
 		);
 		await (
 			await page.$x(

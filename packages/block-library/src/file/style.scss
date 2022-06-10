@@ -10,19 +10,24 @@
 		text-align: right;
 	}
 
-	.wp-block-file__embed {
-		margin-bottom: 1em;
+	* + .wp-block-file__button {
+		margin-left: 0.75em;
 	}
+}
 
-	.wp-block-file__button {
-		background: #32373c;
-		border-radius: 2em;
-		color: $white;
-		font-size: 0.8em;
-		padding: 0.5em 1em;
-	}
+.wp-block-file__embed {
+	margin-bottom: 1em;
+}
 
-	a.wp-block-file__button {
+//This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+.wp-block-file__button {
+	background: #32373c;
+	border-radius: 2em;
+	color: $white;
+	font-size: 0.8em;
+	padding: 0.5em 1em;
+
+	&:is(a) {
 		text-decoration: none;
 
 		&:hover,
@@ -34,9 +39,5 @@
 			opacity: 0.85;
 			text-decoration: none;
 		}
-	}
-
-	* + .wp-block-file__button {
-		margin-left: 0.75em;
 	}
 }

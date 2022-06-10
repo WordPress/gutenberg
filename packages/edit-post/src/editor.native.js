@@ -92,6 +92,9 @@ class Editor extends Component {
 			() => {
 				if ( this.postTitleRef ) {
 					this.postTitleRef.focus();
+				} else {
+					// If the post title ref is not available, we postpone setting focus to when it's available.
+					this.focusTitleWhenAvailable = true;
 				}
 			}
 		);
@@ -122,6 +125,11 @@ class Editor extends Component {
 	}
 
 	setTitleRef( titleRef ) {
+		if ( this.focusTitleWhenAvailable && ! this.postTitleRef ) {
+			this.focusTitleWhenAvailable = false;
+			titleRef.focus();
+		}
+
 		this.postTitleRef = titleRef;
 	}
 

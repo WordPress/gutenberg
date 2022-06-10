@@ -13,6 +13,7 @@ export {
 	useCachedTruthy,
 } from './hooks';
 export * from './components';
+export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';

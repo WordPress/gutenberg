@@ -372,26 +372,6 @@ describe( 'edit', () => {
 					url: 'https://wordpress.org',
 				} );
 			} );
-			// https://github.com/WordPress/gutenberg/pull/18617
-			it( 'label is javascript escaped', () => {
-				const setAttributes = jest.fn();
-				const linkSuggestion = {
-					opensInNewTab: false,
-					title: '<Navigation />',
-					type: 'URL',
-					url: 'https://wordpress.local?p=1',
-				};
-				updateNavigationLinkBlockAttributes(
-					linkSuggestion,
-					setAttributes
-				);
-				expect( setAttributes ).toHaveBeenCalledWith( {
-					opensInNewTab: false,
-					label: '&lt;Navigation /&gt;',
-					kind: 'custom',
-					url: 'https://wordpress.local?p=1',
-				} );
-			} );
 			// https://github.com/WordPress/gutenberg/pull/19679
 			it( 'url when escaped is still an actual link', () => {
 				const setAttributes = jest.fn();

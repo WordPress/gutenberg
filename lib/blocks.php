@@ -71,7 +71,6 @@ function gutenberg_reregister_core_block_types() {
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
 				'navigation.php'                   => 'core/navigation',
-				'navigation-area.php'              => 'core/navigation-area',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',

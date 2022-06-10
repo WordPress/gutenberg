@@ -79,7 +79,7 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponent_ `HigherOrderComponent< HOCProps >`: Function mapping component to enhanced component.
+-   _mapComponent_ `( Inner: TInner ) => TOuter`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
@@ -105,7 +105,7 @@ const ConditionalComponent = ifCondition(
 
 _Parameters_
 
--   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
+-   _predicate_ `( props: Props ) => boolean`: Function to test condition.
 
 _Returns_
 

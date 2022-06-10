@@ -807,6 +807,58 @@ describe( 'Navigation', () => {
 		);
 	} );
 
+	it( 'correctly decodes special characters in the created Page title for display', async () => {
+		await createNewPost();
+		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
+
+		// Wait for URL input to be focused
+		// Insert name for the new page.
+		const pageTitle = 'This & That & Some < other > chars';
+		const input = await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+		await input.type( pageTitle );
+
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
+		const createPageButton = await page.waitForSelector(
+			'.block-editor-link-control__search-create'
+		);
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
+		);
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
+
+		await waitForBlock( 'Navigation' );
+
+		const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+		const linkText = await innerLinkBlock.$eval(
+			'[aria-label="Navigation link text"]',
+			( element ) => {
+				return element.innerText;
+			}
+		);
+
+		expect( linkText ).toContain( pageTitle );
+
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
+	} );
+
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
 		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await createNewPost();
@@ -1294,11 +1346,9 @@ describe( 'Navigation', () => {
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
 
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
 			expect( console ).toHaveErrored();
 		} );
 
@@ -1317,11 +1367,9 @@ describe( 'Navigation', () => {
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);
 
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
 			expect( console ).toHaveErrored();
 		} );
 	} );

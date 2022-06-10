@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Theme_JSON_Gutenberg class
+ * WP_Theme_JSON_6_0 class
  *
  * @package gutenberg
  */
