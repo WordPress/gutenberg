@@ -17,7 +17,6 @@ import { Button } from '@wordpress/components';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -42,7 +41,15 @@ export default function PostCommentsFormEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const { editPost } = useDispatch( editorStore );
+
+	// We're deliberately using the string literal to avoid tight coupling
+	// to `@wordpress/editor`, since we don't want the block-library package
+	// to depend on it, in order to keep it backend agnostic. For more details, see
+	// https://github.com/WordPress/gutenberg/pull/41603#discussion_r893429223
+	// Alternatively, we could consider using a dynamic import.
+	//
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const editorDispatcher = useDispatch( 'core/editor' );
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
@@ -71,19 +78,21 @@ export default function PostCommentsFormEdit( {
 				),
 				postType
 			);
-			const enableComments = () =>
-				editPost( {
-					comment_status: 'open',
-				} );
-			actions = [
-				<Button
-					key="enableComments"
-					onClick={ enableComments }
-					variant="primary"
-				>
-					{ __( 'Enable comments' ) }
-				</Button>,
-			];
+			if ( editorDispatcher ) {
+				const enableComments = () =>
+					editorDispatcher.editPost( {
+						comment_status: 'open',
+					} );
+				actions = [
+					<Button
+						key="enableComments"
+						onClick={ enableComments }
+						variant="primary"
+					>
+						{ __( 'Enable comments' ) }
+					</Button>,
+				];
+			}
 			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
