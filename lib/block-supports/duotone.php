@@ -446,7 +446,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	}
 
 	$colors          = $block['attrs']['style']['color']['duotone'];
-	$filter_key      =  is_array( $colors ) ? implode( '-', $colors ) : $colors;
+	$filter_key      = is_array( $colors ) ? implode( '-', $colors ) : $colors;
 	$filter_preset   = array(
 		'slug'   => wp_unique_id( sanitize_key( $filter_key . '-' ) ),
 		'colors' => $colors,
@@ -486,12 +486,12 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 				 */
 				global $is_safari;
 				if ( $is_safari ) {
+
+					/*
+					 * Simply accessing el.offsetHeight flushes layout and style
+					 * changes in WebKit without having to wait for setTimeout.
+					 */
 					printf(
-						/*
-						 * Simply accessing el.offsetHeight flushes layout and
-						 * style changes in WebKit without having to wait
-						 * for setTimeout.
-						 */
 						'<script>( function() { var el = document.querySelector( %s ); var display = el.style.display; el.style.display = "none"; el.offsetHeight; el.style.display = display; } )();</script>',
 						wp_json_encode( $selector )
 					);
