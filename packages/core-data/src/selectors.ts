@@ -1168,8 +1168,8 @@ export function canUserEditEntityRecord< K extends Kind, N extends Name >(
  */
 export function getAutosaves(
 	state: State,
-	postType: Post< any >[ 'type' ],
-	postId: Post< any >[ 'id' ]
+	postType: Post[ 'type' ],
+	postId: Post[ 'id' ]
 ): Array< any > | undefined {
 	return state.autosaves[ postId ];
 }
@@ -1186,9 +1186,9 @@ export function getAutosaves(
  */
 export function getAutosave(
 	state: State,
-	postType: Post< any >[ 'type' ],
-	postId: Post< any >[ 'id' ],
-	authorId: User< any >[ 'id' ]
+	postType: Post[ 'type' ],
+	postId: Post[ 'id' ],
+	authorId: User[ 'id' ]
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
@@ -1210,8 +1210,8 @@ export function getAutosave(
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => (
 		state: State,
-		postType: Post< any >[ 'type' ],
-		postId: Post< any >[ 'id' ]
+		postType: Post[ 'type' ],
+		postId: Post[ 'id' ]
 	): boolean => {
 		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,
