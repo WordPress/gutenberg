@@ -412,6 +412,7 @@ function RichTextWrapper(
 				onKeyDown={ onKeyDown }
 			>
 				{ richTextContent }
+				{ autocompleteProps.children }
 			</TagName>
 		</>
 	);
