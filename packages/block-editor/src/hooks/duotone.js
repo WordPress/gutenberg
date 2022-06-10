@@ -73,7 +73,7 @@ ${ selector } {
  * @param {Object}   props          Duotone props.
  * @param {string}   props.selector Selector to disable the filter for.
  *
- * @return {WPElement} Filter none style element.
+ * @returns {WPElement} Filter none style element.
  */
 function DuotoneUnsetStylesheet( { selector } ) {
 	const css = `
