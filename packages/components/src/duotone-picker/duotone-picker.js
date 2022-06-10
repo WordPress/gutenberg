@@ -36,7 +36,10 @@ function DuotonePicker( {
 		<CircularOptionPicker
 			options={ duotonePalette.map( ( { colors, slug, name } ) => {
 				const style = {
-					background: getGradientFromCSSColors( colors, '135deg' ),
+					background:
+						slug === 'unset'
+							? `red`
+							: getGradientFromCSSColors( colors, '135deg' ),
 					color: 'transparent',
 				};
 				const tooltipText =

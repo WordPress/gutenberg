@@ -446,7 +446,9 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		'slug'   => wp_unique_id( sanitize_key( implode( '-', $block['attrs']['style']['color']['duotone'] ) . '-' ) ),
 		'colors' => $block['attrs']['style']['color']['duotone'],
 	);
-	$filter_property = gutenberg_get_duotone_filter_property( $filter_preset );
+	$filter_property = 0 < count( $filter_preset['colors'] )
+		? gutenberg_get_duotone_filter_property( $filter_preset )
+		: 'none';
 	$filter_id       = gutenberg_get_duotone_filter_id( $filter_preset );
 	$filter_svg      = gutenberg_get_duotone_filter_svg( $filter_preset );
 

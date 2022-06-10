@@ -13,6 +13,7 @@ import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -50,43 +51,35 @@ export function getValuesFromColors( colors = [] ) {
 }
 
 /**
- * Values for the SVG `feComponentTransfer`.
+ * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
- */
-
-/**
- * Stylesheet for rendering the duotone filter.
- *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to apply the filter to.
+ * @param {string}   props.id       Unique id for this duotone filter.
+ * @param {string[]} props.colors   Color strings from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
-function DuotoneStylesheet( { selector, id } ) {
+function DuotoneStylesheet( { selector, id, colors } ) {
 	const css = `
 ${ selector } {
-	filter: url( #${ id } );
+	filter: ${ colors.length > 0 ? `url( #${ id } )` : 'none' };
 }
 `;
 	return <style>{ css }</style>;
 }
 
 /**
- * SVG for rendering the duotone filter.
+ * The SVG part of the duotone filter.
  *
- * @param {Object} props        Duotone props.
- * @param {string} props.id     Unique id for this duotone filter.
- * @param {Values} props.values R, G, B, and A values to filter with.
+ * @param {Object}   props        Duotone props.
+ * @param {string}   props.id     Unique id for this duotone filter.
+ * @param {string[]} props.colors Color strings from dark to light.
  *
- * @return {WPElement} Duotone element.
+ * @returns {WPElement} Duotone SVG.
  */
-function DuotoneFilter( { id, values } ) {
+function DuotoneFilter( { id, colors } ) {
+	const values = getValuesFromColors( colors );
 	return (
 		<SVG
 			xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -154,14 +147,14 @@ function DuotoneFilter( { id, values } ) {
  * @param {Object} props          Duotone props.
  * @param {string} props.selector Selector to apply the filter to.
  * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, B, and A values to filter with.
+ * @param {string[]} props.colors   Color strings from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
-function InlineDuotone( { selector, id, values } ) {
+function InlineDuotone( { selector, id, colors } ) {
 	return (
 		<>
-			<DuotoneFilter id={ id } values={ values } />
+			<DuotoneFilter id={ id } colors={ colors } />
 			<DuotoneStylesheet id={ id } selector={ selector } />
 		</>
 	);
@@ -175,11 +168,17 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
 	const defaultPresets =
 		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+	const unsetPreset = {
+		colors: EMPTY_ARRAY,
+		slug: 'unset',
+		name: __( 'Unset' ),
+	};
 	return useMemo(
 		() => [
 			...userPresets,
 			...themePresets,
 			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
+			unsetPreset,
 		],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);
@@ -324,9 +323,9 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const values = props?.attributes?.style?.color?.duotone;
+		const colors = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! values ) {
+		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
 		}
 
@@ -351,7 +350,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 						<InlineDuotone
 							selector={ selectorsGroup }
 							id={ id }
-							values={ getValuesFromColors( values ) }
+							colors={ colors }
 						/>,
 						element
 					) }
