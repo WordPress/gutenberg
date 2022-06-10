@@ -15,6 +15,7 @@ import { store as blockEditorStore } from '../../store';
 
 export default function useTabNav() {
 	const container = useRef();
+	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
 	const {
@@ -27,6 +28,9 @@ export default function useTabNav() {
 		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
+
+	// Don't allow tabbing to this element in Navigation mode.
+	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
@@ -53,10 +57,18 @@ export default function useTabNav() {
 		}
 	}
 
+	const before = (
+		<div
+			ref={ focusCaptureBeforeRef }
+			tabIndex={ focusCaptureTabIndex }
+			onFocus={ onFocusCapture }
+		/>
+	);
+
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
-			tabIndex={ ! isNavigationMode ? 0 : undefined }
+			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
 		/>
 	);
@@ -120,6 +132,13 @@ export default function useTabNav() {
 				return;
 			}
 
+			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
+
+			if ( next.current === focusCaptureBeforeRef.current ) {
+				event.preventDefault();
+				return;
+			}
+
 			// Disable focus capturing on the focus capture element, so it
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
@@ -128,9 +147,7 @@ export default function useTabNav() {
 			// Focusing the focus capture element, which is located above and
 			// below the editor, should not scroll the page all the way up or
 			// down.
-			if ( ! isShift ) {
-				focusCaptureAfterRef.current.focus( { preventScroll: true } );
-			}
+			next.current.focus( { preventScroll: true } );
 		}
 
 		function onFocusOut( event ) {
@@ -174,7 +191,10 @@ export default function useTabNav() {
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const target = focus.tabbable[ direction ]( event.target );
 			// Only do something when the next tabbable is a focus capture div (before/after)
-			if ( target === focusCaptureAfterRef.current ) {
+			if (
+				target === focusCaptureBeforeRef.current ||
+				target === focusCaptureAfterRef.current
+			) {
 				event.preventDefault();
 				target.focus( { preventScroll: true } );
 			}
@@ -194,5 +214,5 @@ export default function useTabNav() {
 
 	const mergedRefs = useMergeRefs( [ container, ref ] );
 
-	return [ mergedRefs, after ];
+	return [ before, mergedRefs, after ];
 }
