@@ -203,7 +203,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							<Text as="span">
 								{ sprintf(
 									// translators: %s: Name of the post type in plural e.g: "Posts".
-									__( 'Design a template for a all %s.' ),
+									__( 'Design a template for all %s.' ),
 									entityForSuggestions.labels.plural
 								) }
 							</Text>
