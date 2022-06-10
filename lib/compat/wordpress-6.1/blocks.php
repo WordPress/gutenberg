@@ -164,6 +164,7 @@ add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_
  * Allows multiple block styles.
  *
  * This is a duplicate of _wp_multiple_block_styles, except that it removes the line that sets the key to the first item in the array.
+ * We also check that $handle is a string.
  *
  * @since 5.9.0
  *
