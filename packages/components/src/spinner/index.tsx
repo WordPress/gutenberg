@@ -7,12 +7,12 @@ import classNames from 'classnames';
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
-import type { WordPressComponentProps } from '../ui/context';
+import { WordPressComponentProps, contextConnect } from '../ui/context';
 
-export default function Spinner( {
-	className,
-	...props
-}: WordPressComponentProps< {}, 'svg', false > ) {
+export function Spinner(
+	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
+	forwardedRef: React.ForwardedRef< any >
+) {
 	return (
 		<StyledSpinner
 			className={ classNames( 'components-spinner', className ) }
@@ -21,6 +21,7 @@ export default function Spinner( {
 			role="presentation"
 			focusable="false"
 			{ ...props }
+			ref={ forwardedRef }
 		>
 			{ /* Gray circular background */ }
 			<SpinnerTrack
@@ -38,3 +39,7 @@ export default function Spinner( {
 		</StyledSpinner>
 	);
 }
+
+const ConnectedSpinner = contextConnect( Spinner, 'Spinner' );
+
+export default ConnectedSpinner;
