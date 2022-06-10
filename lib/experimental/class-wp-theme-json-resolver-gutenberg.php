@@ -98,6 +98,11 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		return $with_theme_supports;
 	}
 
+	/**
+	 * Gets the styles for blocks from the block.json file.
+	 *
+	 * @return WP_Theme_JSON object with the styles for each block.
+	 */
 	public static function get_block_data() {
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
