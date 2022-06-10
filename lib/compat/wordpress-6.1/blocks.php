@@ -174,7 +174,7 @@ add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_
 function _gutenberg_multiple_block_styles( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
 		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
-			$default_style = array_shift( $metadata[ $key ] );
+			//$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
 				$args = array( 'handle' => $handle );
 				if ( is_string( $handle ) && 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
@@ -203,4 +203,5 @@ function _gutenberg_multiple_block_styles( $metadata ) {
 	return $metadata;
 }
 remove_filter( 'block_type_metadata', '_wp_multiple_block_styles' );
+remove_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
 add_filter( 'block_type_metadata', '_gutenberg_multiple_block_styles', 9 );
