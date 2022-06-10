@@ -361,13 +361,33 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 										'background' => '#fff',
 									),
 								),
+								'focus' => array(
+									'color' => array(
+										'text'       => '#000',
+										'background' => '#fff',
+									),
+								),
+							),
+						),
+						'button' => array(
+							'color'  => array(
+								'text'       => '#fff',
+								'background' => '#000',
+							),
+							'states' => array(
+								'disabled' => array(
+									'color' => array(
+										'text'       => '#999',
+										'background' => '#fff',
+									),
+								),
 							),
 						),
 					),
 				),
 				'options'         => array( 'selector' => '.la-sinistra' ),
 				'expected_output' => array(
-					'css' => '.la-sinistra a { color: #fff; background-color: #000; } .la-sinistra a:hover { color: #000; background-color: #fff; }',
+					'css' => '.la-sinistra a { color: #fff; background-color: #000; } .la-sinistra a:hover { color: #000; background-color: #fff; } .la-sinistra a:focus { color: #000; background-color: #fff; } .la-sinistra button { color: #fff; background-color: #000; } .la-sinistra button:disabled { color: #999; background-color: #fff; }',
 				),
 			),
 
