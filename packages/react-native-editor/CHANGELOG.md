@@ -11,9 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.78.0
+
+-   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
+
 ## 1.77.1
 
--   [***] Fixes a crash on iOS related to JSI and Reanimated [#41482]
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
 
 ## 1.77.0
 
