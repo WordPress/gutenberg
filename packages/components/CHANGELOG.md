@@ -23,6 +23,9 @@
 -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
 -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
 
+### Experimental
+
+-   `Navigation`: improve unit tests by using `@testing-library/user-event` and modern `@testing-library` assertions; add unit test for controlled component ([#41668](https://github.com/WordPress/gutenberg/pull/41668)).
 
 ## 19.12.0 (2022-06-01)
 
