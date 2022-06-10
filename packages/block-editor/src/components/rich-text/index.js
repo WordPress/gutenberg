@@ -241,7 +241,12 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, ref: richTextRef } = useRichText( {
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+		children: richTextContent,
+	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -405,7 +410,9 @@ function RichTextWrapper(
 				) }
 				onFocus={ unstableOnFocus }
 				onKeyDown={ onKeyDown }
-			/>
+			>
+				{ richTextContent }
+			</TagName>
 		</>
 	);
 

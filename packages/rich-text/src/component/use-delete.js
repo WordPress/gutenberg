@@ -11,6 +11,7 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { remove } from '../remove';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
+import { isCollapsed } from '../is-collapsed';
 
 export function useDelete( props ) {
 	const propsRef = useRef( props );
@@ -41,6 +42,25 @@ export function useDelete( props ) {
 				handleChange( remove( currentValue ) );
 				event.preventDefault();
 				return;
+			}
+
+			if ( isCollapsed( currentValue ) ) {
+				const offset = isReverse ? -1 : 0;
+				const targetIsLineBreak = text[ start + offset ] === '\n';
+
+				if ( targetIsLineBreak ) {
+					if ( isReverse ) {
+						handleChange(
+							remove( currentValue, start - 1, start )
+						);
+					} else {
+						handleChange(
+							remove( currentValue, start, start + 1 )
+						);
+					}
+
+					event.preventDefault();
+				}
 			}
 
 			if ( multilineTag ) {

@@ -37,6 +37,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
+		"dom-react": "2.2.1",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"rememo": "^4.0.0"
