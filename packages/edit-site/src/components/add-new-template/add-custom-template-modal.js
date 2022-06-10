@@ -7,7 +7,6 @@ import {
 	Button,
 	Flex,
 	FlexItem,
-	Icon,
 	Modal,
 	SearchControl,
 	TextHighlight,
@@ -17,7 +16,6 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
-import { pin, globe } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -198,7 +196,6 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 								} )
 							}
 						>
-							<Icon icon={ globe } />
 							<Heading level={ 5 }>{ __( 'General' ) }</Heading>
 							<Text as="span">
 								{ sprintf(
@@ -214,7 +211,6 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Icon icon={ pin } />
 							<Heading level={ 5 }>{ __( 'Specific' ) }</Heading>
 							<Text as="span">
 								{ sprintf(
