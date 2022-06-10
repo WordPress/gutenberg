@@ -784,6 +784,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
 		),
+		array(
+			'path'              => array( 'spacing', 'spacingScale' ),
+			'prevent_override'  => false,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--spacing-size--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'padding', 'margin' ),
+		),
 	);
 
 	/**
@@ -820,6 +829,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'spacing'         => array(
 			'customSpacingSize' => null,
 			'spacingSizes'      => null,
+			'spacingScale'      => null,
 			'blockGap'          => null,
 			'margin'            => null,
 			'padding'           => null,
@@ -838,4 +848,74 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'textTransform'  => null,
 		),
 	);
+
+	/**
+	 * Given the block settings, it extracts the CSS Custom Properties
+	 * for the presets and adds them to the $declarations array
+	 * following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $settings Settings to process.
+	 * @param array $origins  List of origins to process.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_preset_vars( $settings, $origins ) {
+		$declarations = array();
+
+		// Theme.json can specify either a spacingScale to autogenerate spacing size presets, or a fixed array of spacingSizes.
+		// The spaceScale takes presidence so will replace the spacingSizes array if present.
+		if ( isset( $settings['spacing']['spacingScale'] ) ) {
+			$settings['spacing']['spacingSizes'] = array( 'default' => static::get_spacing_sizes( $settings['spacing']['spacingScale'] ) );
+		}
+
+		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+
+			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
+
+			foreach ( $values_by_slug as $slug => $value ) {
+				$declarations[] = array(
+					'name'  => static::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
+					'value' => $value,
+				);
+			}
+		}
+
+		return $declarations;
+	}
+
+	/**
+	 * Transform the spacing scale values into an array of spacing scale presets.
+	 *
+	 * @param array $spacing_scale scale Array of values used to create the scale of spacing presets.
+	 * @return array An array of spacing preset sizes.
+	 */
+	protected static function get_spacing_sizes( $spacing_scale ) {
+		$spacing_sizes    = array();
+		$spacing_sizes[0] = array(
+			'name' => 1,
+			'slug' => 1,
+			'size' => $spacing_scale['firstStep'] . $spacing_scale['units'],
+		);
+		$current_step     = $spacing_scale['firstStep'];
+
+		for ( $x = 1; $x <= $spacing_scale['steps'] - 1; $x++ ) {
+			$current_step = '+' === $spacing_scale['operator']
+				? $current_step + $spacing_scale['increment'] . $spacing_scale['units']
+				: $current_step * $spacing_scale['increment'] . $spacing_scale['units'];
+
+			$spacing_sizes[ $x + 1 ] = array(
+				'name' => $x + 1,
+				'slug' => $x + 1,
+				'size' => $current_step,
+			);
+		}
+
+		return $spacing_sizes;
+	}
 }
