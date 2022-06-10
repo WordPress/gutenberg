@@ -36,6 +36,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		hasReducedUI,
 		isValid,
 		isVisual,
+		isAltMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -64,6 +65,9 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			),
 			isVisual: selectedBlockClientIds.every(
 				( id ) => getBlockMode( id ) === 'visual'
+			),
+			isAltMode: selectedBlockClientIds.every(
+				( id ) => getBlockMode( id ) === 'alt'
 			),
 		};
 	}, [] );
@@ -108,6 +112,17 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		'block-editor-block-toolbar',
 		shouldShowMovers && 'is-showing-movers'
 	);
+
+	if ( isAltMode ) {
+		return (
+			<div className={ classes }>
+				<BlockControls.Slot
+					group="alt"
+					className="block-editor-block-toolbar__slot"
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<div className={ classes }>
