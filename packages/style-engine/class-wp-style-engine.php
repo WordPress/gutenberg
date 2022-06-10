@@ -156,30 +156,12 @@ class WP_Style_Engine {
 			'link'   => array(
 				'path'     => array( 'elements', 'link' ),
 				'selector' => 'a',
-				'states'   => array(
-					'hover' => array(
-						'path'     => array( 'elements', 'link', 'states', 'hover' ),
-						'selector' => 'a:hover',
-					),
-					'focus' => array(
-						'path'     => array( 'elements', 'link', 'states', 'focus' ),
-						'selector' => 'a:focus',
-					),
-				),
+				'states'   => array( 'hover', 'focus' ),
 			),
 			'button' => array(
 				'path'     => array( 'elements', 'button' ),
 				'selector' => 'button',
-				'states'   => array(
-					'hover' => array(
-						'path'     => array( 'elements', 'button', 'states', 'hover' ),
-						'selector' => 'button:hover',
-					),
-					'disabled' => array(
-						'path'     => array( 'elements', 'button', 'states', 'disabled' ),
-						'selector' => 'button:disabled',
-					),
-				),
+				'states'   => array( 'hover', 'focus', 'disabled' ),
 			),
 		),
 		'spacing'    => array(
@@ -571,7 +553,15 @@ class WP_Style_Engine {
 
 			// States.
 			if ( array_key_exists( 'states', $element_definition ) ) {
-				foreach ( $element_definition['states'] as $state_definition ) {
+				foreach ( $element_definition['states'] as $the_state ) {
+
+					// Dynamically generate the state definitions based on the state keys provided.
+					$state_definition = array(
+						'path'     => array_merge( $element_definition['path'], array( 'states', $the_state ) ),
+						'selector' => "{$element_definition['selector']}:{$the_state}",
+
+					);
+
 					$state_styles = _wp_array_get( $element_styles, $state_definition['path'], null );
 
 					if ( empty( $state_styles ) ) {
