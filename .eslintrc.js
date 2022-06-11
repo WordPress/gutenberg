@@ -85,6 +85,7 @@ module.exports = {
 							'isUndefined',
 							'memoize',
 							'negate',
+							'noop',
 							'random',
 							'reverse',
 							'stubFalse',
