@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes, isArray } from 'lodash';
+import { filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -119,7 +119,7 @@ export default withSelect( ( select ) => {
 	const { getHiddenBlockTypes } = select( editPostStore );
 	const hiddenBlockTypes = getHiddenBlockTypes();
 	const numberOfHiddenBlocks =
-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+		Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 	return {
 		blockTypes: getBlockTypes(),

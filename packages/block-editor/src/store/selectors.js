@@ -4,7 +4,6 @@
 import {
 	castArray,
 	first,
-	isArray,
 	isBoolean,
 	last,
 	map,
@@ -1450,7 +1449,7 @@ const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( isBoolean( list ) ) {
 		return list;
 	}
-	if ( isArray( list ) ) {
+	if ( Array.isArray( list ) ) {
 		// TODO: when there is a canonical way to detect that we are editing a post
 		// the following check should be changed to something like:
 		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
