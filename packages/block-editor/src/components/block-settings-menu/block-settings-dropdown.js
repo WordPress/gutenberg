@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, flow, noop } from 'lodash';
+import { castArray, flow } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,6 +33,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useShowMoversGestures } from '../block-toolbar/utils';
 
+const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',

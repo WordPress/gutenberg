@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import renderer, { act } from 'react-test-renderer';
 
 /**
@@ -24,6 +23,8 @@ import {
 	withDataAlign,
 	addAssignedAlign,
 } from '../align';
+
+const noop = () => {};
 
 describe( 'align', () => {
 	const blockSettings = {

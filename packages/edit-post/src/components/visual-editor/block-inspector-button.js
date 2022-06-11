@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,6 +11,8 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+
+const noop = () => {};
 
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(

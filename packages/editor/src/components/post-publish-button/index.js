@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, get, some } from 'lodash';
+import { get, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,6 +18,8 @@ import { __ } from '@wordpress/i18n';
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+
+const noop = () => {};
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
