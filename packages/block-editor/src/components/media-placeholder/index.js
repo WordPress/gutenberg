@@ -327,6 +327,7 @@ export function MediaPlaceholder( {
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
+				mode={ 'browse' }
 				value={
 					Array.isArray( value )
 						? value.map( ( { id } ) => id )
