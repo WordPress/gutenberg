@@ -23,8 +23,19 @@
 		},
 		"name": {
 			"type": "string",
-			"pattern": "^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$",
+			"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$",
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme."
+		},
+		"__experimental": {
+			"description": "The name of the experiment this block is a part of, or boolean true if there there is no specific experiment name.",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "boolean"
+				}
+			]
 		},
 		"title": {
 			"type": "string",
@@ -51,6 +62,13 @@
 		"parent": {
 			"type": "array",
 			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an ‘Add to Cart’ block to only be available within a ‘Product’ block.",
+			"items": {
+				"type": "string"
+			}
+		},
+		"ancestor": {
+			"type": "array",
+			"description": "The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block.",
 			"items": {
 				"type": "string"
 			}
@@ -167,7 +185,7 @@
 							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
 						},
 						"default": {
-							"description": "TA block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
+							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
 					"required": [ "type" ]
@@ -286,6 +304,11 @@
 				"reusable": {
 					"type": "boolean",
 					"description": "A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.",
+					"default": true
+				},
+				"lock": {
+					"type": "boolean",
+					"description": "A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block 'Options' dropdown by default. To disable this behavior, set lock to false.",
 					"default": true
 				},
 				"spacing": {
@@ -414,8 +437,18 @@
 			"description": "Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site."
 		},
 		"viewScript": {
-			"type": "string",
-			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site."
+			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"editorStyle": {
 			"description": "Block type editor style definition. It will only be enqueued in the context of the editor.",

@@ -2,6 +2,7 @@
  * External dependencies
  */
 const chalk = require( 'chalk' );
+const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
 
@@ -183,26 +184,34 @@ function getWebpackEntryPoints() {
 		return JSON.parse( process.env.WP_ENTRY );
 	}
 
-	// Continue only if the `src` directory exists.
-	if ( ! hasProjectFile( 'src' ) ) {
+	// Continue only if the source directory exists.
+	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
+		log(
+			chalk.yellow(
+				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+			)
+		);
 		return {};
 	}
 
-	// 2. Checks whether any block metadata files can be detected in the `src` directory.
+	// 2. Checks whether any block metadata files can be detected in the defined source directory.
 	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
-	const blockMetadataFiles = glob( 'src/**/block.json', {
-		absolute: true,
-	} );
+	const blockMetadataFiles = glob(
+		`${ process.env.WP_SRC_DIRECTORY }/**/block.json`,
+		{
+			absolute: true,
+		}
+	);
 
 	if ( blockMetadataFiles.length > 0 ) {
-		const srcDirectory = fromProjectRoot( 'src' + sep );
+		const srcDirectory = fromProjectRoot(
+			process.env.WP_SRC_DIRECTORY + sep
+		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
-				const {
-					editorScript,
-					script,
-					viewScript,
-				} = require( blockMetadataFile );
+				const { editorScript, script, viewScript } = JSON.parse(
+					readFileSync( blockMetadataFile )
+				);
 				[ editorScript, script, viewScript ]
 					.flat()
 					.filter( ( value ) => value && value.startsWith( 'file:' ) )
@@ -213,7 +222,7 @@ function getWebpackEntryPoints() {
 							value.replace( 'file:', '' )
 						);
 
-						// Takes the path without the file extension, and relative to the `src` directory.
+						// Takes the path without the file extension, and relative to the defined source directory.
 						if ( ! filepath.startsWith( srcDirectory ) ) {
 							log(
 								chalk.yellow(
@@ -223,7 +232,9 @@ function getWebpackEntryPoints() {
 									) }" listed in "${ blockMetadataFile.replace(
 										fromProjectRoot( sep ),
 										''
-									) }". File is located outside of the "src" directory.`
+									) }". File is located outside of the "${
+										process.env.WP_SRC_DIRECTORY
+									}" directory.`
 								)
 							);
 							return;
@@ -233,9 +244,9 @@ function getWebpackEntryPoints() {
 							.replace( srcDirectory, '' )
 							.replace( /\\/g, '/' );
 
-						// Detects the proper file extension used in the `src` directory.
+						// Detects the proper file extension used in the defined source directory.
 						const [ entryFilepath ] = glob(
-							`src/${ entryName }.[jt]s?(x)`,
+							`${ process.env.WP_SRC_DIRECTORY }/${ entryName }.[jt]s?(x)`,
 							{
 								absolute: true,
 							}
@@ -250,7 +261,9 @@ function getWebpackEntryPoints() {
 									) }" listed in "${ blockMetadataFile.replace(
 										fromProjectRoot( sep ),
 										''
-									) }". File does not exist in the "src" directory.`
+									) }". File does not exist in the "${
+										process.env.WP_SRC_DIRECTORY
+									}" directory.`
 								)
 							);
 							return;
@@ -267,14 +280,19 @@ function getWebpackEntryPoints() {
 		}
 	}
 
-	// 3. Checks whether a standard file name can be detected in the `src` directory,
+	// 3. Checks whether a standard file name can be detected in the defined source directory,
 	//    and converts the discovered file to entry point.
-	const [ entryFile ] = glob( 'src/index.[jt]s?(x)', {
-		absolute: true,
-	} );
+	const [ entryFile ] = glob(
+		`${ process.env.WP_SRC_DIRECTORY }/index.[jt]s?(x)`,
+		{
+			absolute: true,
+		}
+	);
 	if ( ! entryFile ) {
 		log(
-			chalk.yellow( 'No entry file discovered in the "src" directory.' )
+			chalk.yellow(
+				`No entry file discovered in the "${ process.env.WP_SRC_DIRECTORY }" directory.`
+			)
 		);
 		return {};
 	}

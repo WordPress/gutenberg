@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.0 (2022-04-08)
+
 ### Enhancement
 
 -   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502](https://github.com/WordPress/gutenberg/pull/39502)

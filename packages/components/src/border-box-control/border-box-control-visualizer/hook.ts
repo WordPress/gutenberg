@@ -15,16 +15,24 @@ import type { VisualizerProps } from '../types';
 export function useBorderBoxControlVisualizer(
 	props: WordPressComponentProps< VisualizerProps, 'div' >
 ) {
-	const { className, value, ...otherProps } = useContextSystem(
-		props,
-		'BorderBoxControlVisualizer'
-	);
+	const {
+		className,
+		value,
+		__next36pxDefaultSize = false,
+		...otherProps
+	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
 
 	// Generate class names.
 	const cx = useCx();
+	const rtlWatchResult = rtl.watch();
 	const classes = useMemo( () => {
-		return cx( styles.BorderBoxControlVisualizer( value ), className );
-	}, [ className, value, rtl.watch() ] );
+		return cx(
+			styles.borderBoxControlVisualizer( value, __next36pxDefaultSize ),
+			className
+		);
+		// rtlWatchResult is needed to refresh styles when the writing direction changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ cx, className, value, __next36pxDefaultSize, rtlWatchResult ] );
 
 	return { ...otherProps, className: classes, value };
 }

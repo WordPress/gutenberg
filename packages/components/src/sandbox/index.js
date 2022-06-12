@@ -227,11 +227,11 @@ export default function Sandbox( {
 
 	useEffect( () => {
 		trySandbox();
-	}, [ title, type, styles, scripts ] );
+	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandbox( true );
-	}, [ html ] );
+	}, [ html, type ] );
 
 	return (
 		<iframe

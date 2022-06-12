@@ -4,7 +4,7 @@
 	"name": "core/comment-edit-link",
 	"title": "Comment Edit Link",
 	"category": "theme",
-	"parent": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ],
 	"description": "Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
@@ -15,6 +15,10 @@
 		},
 		"textAlign": {
 			"type": "string"
+		},
+		"fontSize": {
+			"type": "string",
+			"default": "small"
 		}
 	},
 	"supports": {

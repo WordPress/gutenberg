@@ -11,7 +11,14 @@ import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 
-jest.useFakeTimers( 'legacy' );
+beforeEach( () => {
+	jest.useFakeTimers( 'legacy' );
+} );
+
+afterEach( () => {
+	jest.runOnlyPendingTimers();
+	jest.useRealTimers();
+} );
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -718,7 +725,7 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__experimentalSubscribeStore(
+			const unsubscribe = registry.__unstableSubscribeStore(
 				'myAwesomeReducer',
 				listener2
 			);

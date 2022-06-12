@@ -71,7 +71,6 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
-export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -146,6 +145,7 @@ export { default as ToggleControl } from './toggle-control';
 export {
 	ToggleGroupControl as __experimentalToggleGroupControl,
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';

@@ -31,6 +31,21 @@
 	padding: 0;
 }
 
+.helpSectionTitleContainer {
+	margin-top: 24px;
+	margin-bottom: 16px;
+}
+
+.helpSectionTitle {
+	color: $light-primary;
+	font-weight: 600;
+	font-size: 16px;
+}
+
+.helpSectionTitleDark {
+	color: $dark-secondary;
+}
+
 .helpDetailContainer {
 	padding: 0 16px;
 }
@@ -62,14 +77,18 @@
 }
 
 .helpDetailSectionHeading {
-	color: $light-primary;
-	font-weight: 600;
-	font-size: 16px;
-	margin-top: 24px;
+	flex-direction: row;
+	align-items: center;
 }
 
-.helpDetailSectionHeadingDark {
-	color: $dark-secondary;
+.helpDetailSectionHeadingText {
+	color: $light-primary;
+	font-weight: 700;
+	font-size: 16px;
+}
+
+.helpDetailSectionHeadingTextDark {
+	color: $dark-primary;
 }
 
 .helpDetailBody {
@@ -80,4 +99,17 @@
 
 .helpDetailBodyDark {
 	color: $dark-secondary;
+}
+
+.helpDetailBadgeContainer {
+	padding: 2px 6px;
+	margin-right: 8px;
+	border-radius: 6px;
+	background-color: #c9356e;
+}
+
+.helpDetailBadgeText {
+	color: $white;
+	font-weight: 500;
+	font-size: 12px;
 }

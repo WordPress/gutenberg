@@ -23,7 +23,7 @@ import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
-const DEFAULT_MAX_ITEMS = 10;
+const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
@@ -109,7 +109,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ toolbarControls } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'RSS settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }

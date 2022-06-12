@@ -10,7 +10,7 @@
 		min-height: auto !important;
 		padding: 0 !important;
 
-		// Resizeable placeholder for placeholder.
+		// Resizable placeholder for placeholder.
 		.block-library-cover__resize-container {
 			display: none;
 		}
@@ -62,6 +62,15 @@
 	.wp-block-cover__placeholder-background-options {
 		width: 100%;
 	}
+
+	.wp-block-cover__image--placeholder-image {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
+
 }
 
 [data-align="left"] > .wp-block-cover,
@@ -97,4 +106,8 @@
 // doesn't work with the transforms that are applied to resize the block in that context.
 .block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
 	background-attachment: scroll;
+}
+
+.color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
+	margin-top: $grid-unit-30;
 }

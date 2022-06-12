@@ -135,7 +135,7 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <!-- /wp:cover -->`;
 
 exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
-<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->`;
 
 exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
@@ -165,3 +165,23 @@ exports.moreBlockEmpty = `<!-- wp:more -->
 exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->`;
+
+exports.paragraphBlockShortText = `<!-- wp:paragraph -->
+<p>Rock music approaches at high velocity.</p>
+<!-- /wp:paragraph -->`;
+
+exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
+<p>multiple lines<br>multiple lines<br>multiple lines</p>
+<!-- /wp:paragraph -->`;
+
+exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
+<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
+<!-- /wp:paragraph -->`;
+
+exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
+<p>ABCD</p>
+<!-- /wp:paragraph -->`;
+
+exports.spacerBlock = `<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->`;

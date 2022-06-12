@@ -66,10 +66,6 @@ function AudioEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const onError = () => {
-		createErrorNotice( __( 'Failed to insert audio file.' ) );
-	};
-
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			setAttributes( { [ attribute ]: newValue } );
@@ -144,7 +140,6 @@ function AudioEdit( {
 			<MediaUploadProgress
 				mediaId={ id }
 				onFinishMediaUploadWithSuccess={ onFileChange }
-				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
 				containerStyle={ styles.progressContainer }
 				progressBarStyle={ styles.progressBar }
@@ -182,7 +177,7 @@ function AudioEdit( {
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }

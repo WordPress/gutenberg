@@ -29,7 +29,7 @@ const transforms = {
 						query: {
 							content: {
 								type: 'string',
-								source: 'text',
+								source: 'html',
 							},
 						},
 					} ).map( ( { content } ) =>

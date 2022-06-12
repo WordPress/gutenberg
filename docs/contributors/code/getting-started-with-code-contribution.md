@@ -116,6 +116,7 @@ To access the MySQL database on the `wp-env` instance you will first need the co
 ```
 Host: 127.0.0.1
 Username: root
+Password: password
 Database: wordpress
 Port: {MYSQL_PORT_NUMBER}
 ```

@@ -15,13 +15,13 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( {
+const LineHeightControl = ( {
 	value: lineHeight,
 	onChange,
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
-} ) {
+} ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
@@ -101,4 +101,9 @@ export default function LineHeightControl( {
 			/>
 		</div>
 	);
-}
+};
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md
+ */
+export default LineHeightControl;

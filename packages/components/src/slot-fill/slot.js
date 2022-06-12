@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { isFunction, isString, map, negate } from 'lodash';
+import { isFunction, isString, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ class SlotComponent extends Component {
 			// In some cases fills are rendered only when some conditions apply.
 			// This ensures that we only use non-empty fills when rendering, i.e.,
 			// it allows us to render wrappers only when the fills are actually present.
-			negate( isEmptyElement )
+			( element ) => ! isEmptyElement( element )
 		);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;

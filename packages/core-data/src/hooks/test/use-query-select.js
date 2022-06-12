@@ -19,6 +19,7 @@ import useQuerySelect from '../use-query-select';
 
 describe( 'useQuerySelect', () => {
 	let registry;
+
 	beforeEach( () => {
 		jest.useFakeTimers();
 

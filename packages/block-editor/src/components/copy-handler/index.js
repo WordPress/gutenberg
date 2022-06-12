@@ -78,10 +78,18 @@ export function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		__unstableIsFullySelected,
+		__unstableIsSelectionCollapsed,
+		__unstableIsSelectionMergeable,
+		__unstableGetSelectedBlocksWithPartialSelection,
 	} = useSelect( blockEditorStore );
-	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		flashBlock,
+		removeBlocks,
+		replaceBlocks,
+		__unstableDeleteSelection,
+		__unstableExpandSelection,
+	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node ) => {
@@ -116,20 +124,54 @@ export function useClipboardHandler() {
 			const eventDefaultPrevented = event.defaultPrevented;
 			event.preventDefault();
 
+			const isSelectionMergeable = __unstableIsSelectionMergeable();
+			const shouldHandleWholeBlocks =
+				__unstableIsSelectionCollapsed() || __unstableIsFullySelected();
+			const expandSelectionIsNeeded =
+				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
-				notifyCopy( event.type, selectedBlockClientIds );
-				const blocks = getBlocksByClientId( selectedBlockClientIds );
-				const serialized = serialize( blocks );
+				// If we have a partial selection that is not mergeable, just
+				// expand the selection to the whole blocks.
+				if ( expandSelectionIsNeeded ) {
+					__unstableExpandSelection();
+				} else {
+					notifyCopy( event.type, selectedBlockClientIds );
+					let blocks;
+					// Check if we have partial selection.
+					if ( shouldHandleWholeBlocks ) {
+						blocks = getBlocksByClientId( selectedBlockClientIds );
+					} else {
+						const [
+							head,
+							tail,
+						] = __unstableGetSelectedBlocksWithPartialSelection();
+						const inBetweenBlocks = getBlocksByClientId(
+							selectedBlockClientIds.slice(
+								1,
+								selectedBlockClientIds.length - 1
+							)
+						);
+						blocks = [ head, ...inBetweenBlocks, tail ];
+					}
+					const serialized = serialize( blocks );
 
-				event.clipboardData.setData( 'text/plain', serialized );
-				event.clipboardData.setData( 'text/html', serialized );
+					event.clipboardData.setData( 'text/plain', serialized );
+					event.clipboardData.setData( 'text/html', serialized );
+				}
 			}
 
 			if ( event.type === 'cut' ) {
-				removeBlocks( selectedBlockClientIds );
+				// We need to also check if at the start we needed to
+				// expand the selection, as in this point we might have
+				// programmatically fully selected the blocks above.
+				if ( shouldHandleWholeBlocks && ! expandSelectionIsNeeded ) {
+					removeBlocks( selectedBlockClientIds );
+				} else {
+					__unstableDeleteSelection();
+				}
 			} else if ( event.type === 'paste' ) {
 				if ( eventDefaultPrevented ) {
 					// This was likely already handled in rich-text/use-paste-handler.js.
@@ -171,4 +213,7 @@ function CopyHandler( { children } ) {
 	return <div ref={ useClipboardHandler() }>{ children }</div>;
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/copy-handler/README.md
+ */
 export default CopyHandler;

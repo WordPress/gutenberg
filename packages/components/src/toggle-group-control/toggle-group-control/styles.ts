@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -35,4 +36,17 @@ export const ToggleGroupControl = css`
 export const block = css`
 	display: flex;
 	width: 100%;
+`;
+
+export const BackdropView = styled.div`
+	background: ${ COLORS.gray[ 900 ] };
+	border-radius: ${ CONFIG.controlBorderRadius };
+	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
+	left: 0;
+	position: absolute;
+	top: 2px;
+	bottom: 2px;
+	transition: transform ${ CONFIG.transitionDurationFast } ease;
+	${ reduceMotion( 'transition' ) }
+	z-index: 1;
 `;

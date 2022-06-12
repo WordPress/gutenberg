@@ -23,19 +23,16 @@ const BlockDraggable = ( {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
 			const {
+				canMoveBlocks,
 				getBlockRootClientId,
-				getTemplateLock,
 				getBlockName,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-			const templateLock = rootClientId
-				? getTemplateLock( rootClientId )
-				: null;
 			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: 'all' !== templateLock,
+				isDraggable: canMoveBlocks( clientIds, rootClientId ),
 				icon: getBlockType( blockName )?.icon,
 			};
 		},

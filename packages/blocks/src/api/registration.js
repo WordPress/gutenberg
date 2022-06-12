@@ -5,7 +5,6 @@
  */
 import {
 	camelCase,
-	isArray,
 	isEmpty,
 	isNil,
 	isObject,
@@ -164,6 +163,17 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 				serverSideBlockDefinitions[ blockName ].apiVersion =
 					definitions[ blockName ].apiVersion;
 			}
+			// The `ancestor` prop is not included in the definitions shared
+			// from the server yet, so it needs to be polyfilled as well.
+			// @see https://github.com/WordPress/gutenberg/pull/39894
+			if (
+				serverSideBlockDefinitions[ blockName ].ancestor ===
+					undefined &&
+				definitions[ blockName ].ancestor
+			) {
+				serverSideBlockDefinitions[ blockName ].ancestor =
+					definitions[ blockName ].ancestor;
+			}
 			continue;
 		}
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
@@ -187,6 +197,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'title',
 		'category',
 		'parent',
+		'ancestor',
 		'icon',
 		'description',
 		'keywords',
@@ -294,9 +305,9 @@ function translateBlockSettingUsingI18nSchema(
 		return _x( settingValue, i18nSchema, textdomain );
 	}
 	if (
-		isArray( i18nSchema ) &&
+		Array.isArray( i18nSchema ) &&
 		! isEmpty( i18nSchema ) &&
-		isArray( settingValue )
+		Array.isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
 			translateBlockSettingUsingI18nSchema(

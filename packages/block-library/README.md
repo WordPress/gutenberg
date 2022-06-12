@@ -14,7 +14,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Building JavaScript for the browser
 
-If a `view.js` file is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
+If a `view.js` file (or a file prefixed with `view`, e.g. `view-example.js`) is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
 
 This enables us to, for instance, load this file when the block is present on the page in two ways:
 
@@ -106,8 +106,9 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     // packages/block-library/src/index.js
     import * as blinkingParagraph from './blinking-paragraph';
 
-    // Then add `blinkingParagraph` to either `__experimentalGetCoreBlocks()`
-    // or `__experimentalRegisterExperimentalCoreBlocks()`
+    // Then add `blinkingParagraph` to `getAllBlocks()`
+    // If it's experimental, add the following property to block.json:
+    __experimental: 'true';
     ```
 
 2.  Register your block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).

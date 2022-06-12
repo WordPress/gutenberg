@@ -519,17 +519,17 @@ supports: {
 }
 ```
 
-## __experimentalLock
+## lock
 
 -   Type: `boolean`
 -   Default value: `true`
 
-A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `__experimentalLock` to `false`.
+A block may want to disable the ability to toggle the lock state. It can be locked/unlocked by a user from the block "Options" dropdown by default. To disable this behavior, set `lock` to `false`.
 
 ```js
 supports: {
 	// Remove support for locking UI.
-	__experimentalLock: false
+	lock: false
 }
 ```
 
@@ -540,6 +540,7 @@ supports: {
 -   Subproperties:
     -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
+    -   `blockGap`: type `boolean` or `array`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
@@ -548,25 +549,41 @@ supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
+        blockGap: true,  // Enables block spacing UI control.
     }
 }
 ```
 
 When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
--   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
+- `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
 
 ```js
-supports: {
-    spacing: {
-        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
-        padding: true,               // Enable padding for all sides.
+attributes: {
+    style: {
+        margin: 'value',
+        padding: {
+            top: 'value',
+        }
     }
 }
 ```
 
-A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed. Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
 
+Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
+
+Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
+
+```js
+supports: {
+    spacing: {
+        margin: [ 'top', 'bottom' ],             // Enable margin for arbitrary sides.
+        padding: true,                           // Enable padding for all sides.
+        blockGap: [ 'horizontal', 'vertical' ],  // Enables axial (column/row) block spacing controls
+    }
+}
+```
 
 ## typography
 

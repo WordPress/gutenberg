@@ -452,7 +452,6 @@ export class FileEdit extends Component {
 						<TouchableWithoutFeedback
 							accessible={ ! isSelected }
 							onPress={ this.onFilePressed }
-							onLongPress={ openMediaOptions }
 							disabled={ ! isSelected }
 						>
 							<View

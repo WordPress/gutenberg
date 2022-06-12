@@ -69,7 +69,7 @@ const BottomSheetNavigationScreen = ( {
 			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
 			 * callbacks triggered based upon which screen is currently active.
 			 *
-			 * Related: https://git.io/JD2no
+			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
 			 */
 		}, [] )
 	);

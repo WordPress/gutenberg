@@ -7,5 +7,6 @@
 	// due to the way that color block supports adds additional background color styles.
 	&.wp-block-separator.is-style-dots {
 		background: none !important;
+		border: none;
 	}
 }

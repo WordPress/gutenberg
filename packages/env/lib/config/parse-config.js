@@ -114,14 +114,42 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	// SSH URLs (git)
+	const supportedProtocols = [ 'ssh:', 'git+ssh:' ];
+	try {
+		const sshUrl = new URL( sourceString );
+		if ( supportedProtocols.includes( sshUrl.protocol ) ) {
+			const pathElements = sshUrl.pathname
+				.split( '/' )
+				.filter( ( e ) => !! e );
+			const basename = pathElements
+				.slice( -1 )[ 0 ]
+				.replace( /\.git/, '' );
+			const workingPath = path.resolve(
+				workDirectoryPath,
+				...pathElements.slice( 0, -1 ),
+				basename
+			);
+			return {
+				type: 'git',
+				url: sshUrl.href.split( '#' )[ 0 ],
+				ref: sshUrl.hash.slice( 1 ) || undefined,
+				path: workingPath,
+				clonePath: workingPath,
+				basename,
+			};
+		}
+	} catch ( err ) {}
+
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
+
 	if ( gitHubFields ) {
 		return {
 			type: 'git',
 			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 5 ] || 'master',
+			ref: gitHubFields[ 5 ],
 			path: path.resolve(
 				workDirectoryPath,
 				gitHubFields[ 2 ],
@@ -136,6 +164,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		`Invalid or unrecognized source: "${ sourceString }".`
 	);
 }
+module.exports.parseSourceString = parseSourceString;
 
 /**
  * Given a source object, returns a new source object with the testsPath
@@ -160,3 +189,4 @@ function includeTestsPath( source, { workDirectoryPath } ) {
 		),
 	};
 }
+module.exports.includeTestsPath = includeTestsPath;

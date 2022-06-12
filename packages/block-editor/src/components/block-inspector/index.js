@@ -70,6 +70,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				<InspectorControls.Slot
 					__experimentalGroup="color"
 					label={ __( 'Color' ) }
+					className="color-block-support-panel__inner-wrapper"
 				/>
 				<InspectorControls.Slot
 					__experimentalGroup="typography"
@@ -187,4 +188,7 @@ const AdvancedControls = () => {
 	);
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md
+ */
 export default BlockInspector;

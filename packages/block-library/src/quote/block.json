@@ -30,6 +30,7 @@
 	"supports": {
 		"anchor": true,
 		"__experimentalSlashInserter": true,
+		"__experimentalOnEnter": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -40,6 +41,14 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
 			}
 		}
 	},

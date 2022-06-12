@@ -76,36 +76,81 @@ export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } = useDispatch(
 		blockEditorStore
 	);
-	const { getBlockParents } = useSelect( blockEditorStore );
+	const { getBlockParents, getBlockSelectionStart } = useSelect(
+		blockEditorStore
+	);
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			function onSelectionChange() {
+			function onSelectionChange( event ) {
 				const selection = defaultView.getSelection();
-
 				// If no selection is found, end multi selection and disable the
 				// contentEditable wrapper.
-				if ( ! selection.rangeCount || selection.isCollapsed ) {
+				if ( ! selection.rangeCount ) {
+					setContentEditableWrapper( node, false );
+					return;
+				}
+				// If selection is collapsed and we haven't used `shift+click`,
+				// end multi selection and disable the contentEditable wrapper.
+				// We have to check about `shift+click` case because elements
+				// that don't support text selection might be involved, and we might
+				// update the clientIds to multi-select blocks.
+				// For now we check if the event is a `mouse` event.
+				const isClickShift = event.shiftKey && event.type === 'mouseup';
+				if ( selection.isCollapsed && ! isClickShift ) {
 					setContentEditableWrapper( node, false );
 					return;
 				}
 
-				const clientId = getBlockClientId(
+				let startClientId = getBlockClientId(
 					extractSelectionStartNode( selection )
 				);
-				const endClientId = getBlockClientId(
+				let endClientId = getBlockClientId(
 					extractSelectionEndNode( selection )
 				);
-				const isSingularSelection = clientId === endClientId;
+				// If the selection has changed and we had pressed `shift+click`,
+				// we need to check if in an element that doesn't support
+				// text selection has been clicked.
+				if ( isClickShift ) {
+					const selectedClientId = getBlockSelectionStart();
+					const clickedClientId = getBlockClientId( event.target );
+					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
+					// We need to check if there was already a selection with a non-selectable focusNode.
+					const focusNodeIsNonSelectable =
+						clickedClientId !== endClientId;
+					if (
+						( startClientId === endClientId &&
+							selection.isCollapsed ) ||
+						! endClientId ||
+						focusNodeIsNonSelectable
+					) {
+						endClientId = clickedClientId;
+					}
+					// Handle the case when we have a non-selectable block
+					// selected and click another one.
+					if ( startClientId !== selectedClientId ) {
+						startClientId = selectedClientId;
+					}
+				}
 
+				// If the selection did not involve a block, return.
+				if (
+					startClientId === undefined &&
+					endClientId === undefined
+				) {
+					setContentEditableWrapper( node, false );
+					return;
+				}
+
+				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
-					selectBlock( clientId );
+					selectBlock( startClientId );
 				} else {
 					const startPath = [
-						...getBlockParents( clientId ),
-						clientId,
+						...getBlockParents( startClientId ),
+						startClientId,
 					];
 					const endPath = [
 						...getBlockParents( endClientId ),

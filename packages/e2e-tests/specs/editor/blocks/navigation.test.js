@@ -21,12 +21,15 @@ import {
 	openPreviewPage,
 	ensureSidebarOpened,
 	__experimentalRest as rest,
+	__experimentalBatch as batch,
 	publishPost,
 	createUser,
 	loginUser,
 	deleteUser,
 	switchUserToAdmin,
 	clickBlockToolbarButton,
+	openListView,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -109,6 +112,29 @@ async function mockSearchResponse( items ) {
 			],
 		} ),
 	] );
+}
+
+async function forceSelectNavigationBlock() {
+	const navBlock = await waitForBlock( 'Navigation' );
+
+	if ( ! navBlock ) {
+		return;
+	}
+
+	await page.evaluate( () => {
+		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+		const navigationBlock = blocks.find(
+			( block ) => block.name === 'core/navigation'
+		);
+
+		if ( ! navigationBlock ) {
+			return;
+		}
+
+		return wp.data
+			.dispatch( 'core/block-editor' )
+			.selectBlock( navigationBlock?.clientId, 0 );
+	} );
 }
 
 /**
@@ -196,7 +222,6 @@ async function populateNavWithOneItem() {
 const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
 const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
 const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
-const SELECT_MENU_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Select Menu']`;
 
 /**
  * Delete all items for the given REST resources using the REST API.
@@ -223,6 +248,17 @@ async function deleteAll( endpoints ) {
 			} );
 		}
 	}
+}
+
+async function resetNavBlockToInitialState() {
+	const selectMenuDropdown = await page.waitForSelector(
+		'[aria-label="Select Menu"]'
+	);
+	await selectMenuDropdown.click();
+	const newMenuButton = await page.waitForXPath(
+		'//span[text()="Create new menu"]'
+	);
+	newMenuButton.click();
 }
 
 /**
@@ -317,9 +353,17 @@ describe( 'Navigation', () => {
 	} );
 
 	describe( 'loading states', () => {
-		it( 'does not show a loading indicator if there is no ref to a Navigation post', async () => {
+		it( 'does not show a loading indicator if there is no ref to a Navigation post and Nav Menus have loaded', async () => {
 			await createNewPost();
+
+			// Insert an empty block to trigger resolution of Nav Menu items.
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Now we have Nav Menu items resolved. Continue to assert.
 			await clickOnMoreMenuItem( 'Code editor' );
+
 			const codeEditorInput = await page.waitForSelector(
 				'.editor-post-text-editor'
 			);
@@ -412,7 +456,7 @@ describe( 'Navigation', () => {
 					match: ( request ) =>
 						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
-						request.url().includes( testNavId ),
+						request.url().includes( `${ testNavId }?` ),
 					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
@@ -763,6 +807,58 @@ describe( 'Navigation', () => {
 		);
 	} );
 
+	it( 'correctly decodes special characters in the created Page title for display', async () => {
+		await createNewPost();
+		await insertBlock( 'Navigation' );
+		const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+		await startEmptyButton.click();
+		const appender = await page.waitForSelector(
+			'.wp-block-navigation .block-list-appender'
+		);
+		await appender.click();
+
+		// Wait for URL input to be focused
+		// Insert name for the new page.
+		const pageTitle = 'This & That & Some < other > chars';
+		const input = await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+		await input.type( pageTitle );
+
+		// When creating a page, the URLControl makes a request to the
+		// url-details endpoint to fetch information about the page.
+		// Because the draft is inaccessible publicly, this request
+		// returns a 404 response. Wait for the response and expect
+		// the error to have occurred.
+		const createPageButton = await page.waitForSelector(
+			'.block-editor-link-control__search-create'
+		);
+		const responsePromise = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'url-details' ) &&
+				response.status() === 404
+		);
+		const createPagePromise = createPageButton.click();
+		await Promise.all( [ responsePromise, createPagePromise ] );
+
+		await waitForBlock( 'Navigation' );
+
+		const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+		const linkText = await innerLinkBlock.$eval(
+			'[aria-label="Navigation link text"]',
+			( element ) => {
+				return element.innerText;
+			}
+		);
+
+		expect( linkText ).toContain( pageTitle );
+
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+		);
+	} );
+
 	it( 'renders buttons for the submenu opener elements when the block is set to open on click instead of hover', async () => {
 		await createClassicMenu( { name: 'Test Menu 2' }, menuItemsFixture );
 		await createNewPost();
@@ -841,50 +937,90 @@ describe( 'Navigation', () => {
 		expect( quickInserter ).toBeTruthy();
 	} );
 
-	it( 'supports navigation blocks that have inner blocks within their markup and converts them to wp_navigation posts', async () => {
-		// Insert 'old-school' inner blocks via the code editor.
-		await createNewPost();
-		await clickOnMoreMenuItem( 'Code editor' );
-		const codeEditorInput = await page.waitForSelector(
-			'.editor-post-text-editor'
-		);
-		await codeEditorInput.click();
-		const markup =
-			'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
-		await page.keyboard.type( markup );
-
-		await clickButton( 'Exit code editor' );
-
-		const navBlock = await waitForBlock( 'Navigation' );
-
-		// Select the block to convert to a wp_navigation.
-		await navBlock.click();
-
-		// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
-		await waitForBlock( 'Page List' );
-
-		await publishPost();
-
-		// Check that the wp_navigation post has the page list block.
-		expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
-	} );
-
 	describe( 'Creating and restarting', () => {
 		const NAV_ENTITY_SELECTOR =
 			'//div[@class="entities-saved-states__panel"]//label//strong[contains(text(), "Navigation")]';
 
-		async function resetNavBlockToInitialState() {
-			const selectMenuDropdown = await page.waitForSelector(
-				'[aria-label="Select Menu"]'
-			);
-			await selectMenuDropdown.click();
-			const newMenuButton = await page.waitForXPath(
-				'//span[text()="Create new menu"]'
-			);
-			newMenuButton.click();
-		}
+		it( 'respects the nesting level', async () => {
+			await createNewPost();
 
-		it( 'does not retain uncontrolled inner blocks when creating a new entity', async () => {
+			await insertBlock( 'Navigation' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Create empty Navigation block with no items
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			await populateNavWithOneItem();
+
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+
+			let code = await codeEditorInput.evaluate( ( el ) => el.value );
+			code = code.replace( '} /-->', ',"maxNestingLevel":0} /-->' );
+			await codeEditorInput.evaluate(
+				( el, newCode ) => ( el.value = newCode ),
+				code
+			);
+			await clickButton( 'Exit code editor' );
+
+			const blockAppender = navBlock.$( '.block-list-appender' );
+
+			expect( blockAppender ).not.toBeNull();
+
+			// Check the Submenu block is no longer present.
+			const navSubmenuSelector =
+				'[aria-label="Editor content"][role="region"] [aria-label="Block: Submenu"]';
+			const submenuBlock = await page.$( navSubmenuSelector );
+
+			expect( submenuBlock ).toBeFalsy();
+		} );
+
+		it( 'retains initial uncontrolled inner blocks whilst there are no modifications to those blocks', async () => {
+			await createNewPost();
+			await clickOnMoreMenuItem( 'Code editor' );
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+			await codeEditorInput.click();
+
+			const markup =
+				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
+
+			const navBlock = await waitForBlock( 'Navigation' );
+
+			// Select the block
+			await navBlock.click();
+
+			const hasUncontrolledInnerBlocks = await page.evaluate( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				return !! blocks[ 0 ]?.innerBlocks?.length;
+			} );
+
+			expect( hasUncontrolledInnerBlocks ).toBe( true );
+		} );
+
+		it( 'converts uncontrolled inner blocks to an entity when modifications are made to the blocks', async () => {
+			await rest( {
+				method: 'POST',
+				path: `/wp/v2/pages/`,
+				data: {
+					status: 'publish',
+					title: 'A Test Page',
+					content: 'Hello world',
+				},
+			} );
+
+			// Insert 'old-school' inner blocks via the code editor.
 			await createNewPost();
 			await clickOnMoreMenuItem( 'Code editor' );
 			const codeEditorInput = await page.waitForSelector(
@@ -894,33 +1030,52 @@ describe( 'Navigation', () => {
 			const markup =
 				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
 			await page.keyboard.type( markup );
+
 			await clickButton( 'Exit code editor' );
 
 			const navBlock = await waitForBlock( 'Navigation' );
 
-			// Select the block to convert to a wp_navigation.
 			await navBlock.click();
 
-			// The Page List block is rendered within Navigation InnerBlocks when saving is complete.
-			await waitForBlock( 'Page List' );
-
-			// Reset the nav block to create a new entity.
-			await resetNavBlockToInitialState();
-
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
+			// Wait for the Page List to have resolved and render as a `<ul>`.
+			await page.waitForSelector(
+				`[aria-label="Editor content"][role="region"] ul[aria-label="Block: Page List"]`
 			);
-			await startEmptyButton.click();
-			await populateNavWithOneItem();
 
-			// Confirm that only the last menu entity was updated.
-			const publishPanelButton2 = await page.waitForSelector(
-				'.editor-post-publish-button__button:not([aria-disabled="true"])'
+			// Select the Page List block.
+			await openListView();
+
+			const navExpander = await page.waitForXPath(
+				`//a[span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`
 			);
-			await publishPanelButton2.click();
 
-			await page.waitForXPath( NAV_ENTITY_SELECTOR );
-			expect( await page.$x( NAV_ENTITY_SELECTOR ) ).toHaveLength( 1 );
+			await navExpander.click();
+
+			const pageListBlock = (
+				await getListViewBlocks( 'Page List' )
+			 )[ 0 ];
+
+			await pageListBlock.click();
+
+			// Modify the uncontrolled inner blocks by converting Page List.
+			await clickBlockToolbarButton( 'Edit' );
+
+			// Must wait for button to be enabled.
+			const convertButton = await page.waitForXPath(
+				`//button[not(@disabled) and text()="Convert"]`
+			);
+
+			await convertButton.click();
+
+			// Wait for new Nav Menu entity to be created as a result of the modification to inner blocks.
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="New Navigation Menu created." ]`
+			);
+
+			await publishPost();
+
+			// Check that the wp_navigation post exists and has the page list block.
+			expect( await getNavigationMenuRawContent() ).toMatchSnapshot();
 		} );
 
 		it( 'only updates a single entity currently linked with the block', async () => {
@@ -953,12 +1108,16 @@ describe( 'Navigation', () => {
 			await publishButton.click();
 
 			// A success notice should show up.
-			await page.waitForSelector( '.components-snackbar' );
+			await page.waitForXPath(
+				`//*[contains(@class, 'components-snackbar__content')][ text()="Post published." ]`
+			);
 
 			// Now try inserting another Link block via the quick inserter.
-			await page.click( 'nav[aria-label="Block: Navigation"]' );
+			// await page.click( 'nav[aria-label="Block: Navigation"]' );
+			await forceSelectNavigationBlock();
 
 			await resetNavBlockToInitialState();
+
 			const startEmptyButton2 = await page.waitForXPath(
 				START_EMPTY_XPATH
 			);
@@ -1178,29 +1337,18 @@ describe( 'Navigation', () => {
 
 			await createNewPost();
 
+			// At this point the block will automatically pick the first Navigation Menu
+			// which will be the one created by the Admin User.
 			await insertBlock( 'Navigation' );
-
-			// Select the Navigation post created by the Admin earlier
-			// in the test.
-			const navigationPostCreatedByAdminName = 'Navigation';
-
-			const dropdown = await page.waitForXPath( SELECT_MENU_XPATH );
-			await dropdown.click();
-			const theOption = await page.waitForXPath(
-				`//*[contains(@class, 'components-menu-item__item')][ text()="${ navigationPostCreatedByAdminName }" ]`
-			);
-			await theOption.click();
 
 			// Make sure the snackbar error shows up.
 			await page.waitForXPath(
 				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
 			);
 
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
 			expect( console ).toHaveErrored();
 		} );
 
@@ -1219,12 +1367,153 @@ describe( 'Navigation', () => {
 				`//*[contains(@class, 'components-snackbar__content')][ text()="${ noticeText }" ]`
 			);
 
-			// Expect a console 403 for request to Navigation Areas for lower permission users.
-			// This is because reading requires the `edit_theme_options` capability
-			// which the Contributor level user does not have.
-			// See: https://github.com/WordPress/gutenberg/blob/4cedaf0c4abb0aeac4bfd4289d63e9889efe9733/lib/class-wp-rest-block-navigation-areas-controller.php#L81-L91.
-			// Todo: removed once Nav Areas are removed from the Gutenberg Plugin.
+			// Expect a console 403 for requests to:
+			// * /wp/v2/settings?_locale=user
+			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
 			expect( console ).toHaveErrored();
+		} );
+	} );
+
+	describe( 'Initial block insertion state', () => {
+		async function createNavigationMenu( menu = {} ) {
+			return rest( {
+				method: 'POST',
+				path: '/wp/v2/navigation',
+				data: {
+					status: 'publish',
+					...menu,
+				},
+			} );
+		}
+
+		afterEach( async () => {
+			const navMenusEndpoint = '/wp/v2/navigation';
+			const allNavMenus = await rest( { path: navMenusEndpoint } );
+
+			if ( ! allNavMenus?.length ) {
+				return;
+			}
+
+			return batch(
+				allNavMenus.map( ( menu ) => ( {
+					method: 'DELETE',
+					path: `${ navMenusEndpoint }/${ menu.id }?force=true`,
+				} ) )
+			);
+		} );
+
+		it( 'automatically uses the first Navigation Menu if only one is available', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			const innerLinkBlock = await waitForBlock( 'Custom Link' );
+
+			const linkText = await innerLinkBlock.$eval(
+				'[aria-label="Navigation link text"]',
+				( element ) => {
+					return element.innerText;
+				}
+			);
+
+			expect( linkText ).toBe( 'WordPress' );
+		} );
+
+		it( 'does not automatically use first Navigation Menu if more than one exists', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await page.waitForXPath( START_EMPTY_XPATH );
+		} );
+
+		it( 'allows users to manually create new empty menu when block has automatically selected the first available Navigation Menu', async () => {
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await createNewPost();
+
+			await insertBlock( 'Navigation' );
+
+			await waitForBlock( 'Navigation' );
+
+			await waitForBlock( 'Custom Link' );
+
+			// Reset the nav block to create a new entity.
+			await resetNavBlockToInitialState();
+
+			const startEmptyButton = await page.waitForXPath(
+				START_EMPTY_XPATH
+			);
+			await startEmptyButton.click();
+
+			// Wait for Navigation creation of empty Navigation to complete.
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Navigation Menu successfully created."]'
+			);
+		} );
+
+		it( 'should always focus select menu button after item selection', async () => {
+			// Create some navigation menus to work with.
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+			await createNavigationMenu( {
+				title: 'Second Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"WordPress","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			// Create new post.
+			await createNewPost();
+
+			// Insert new block and wait for the insert to complete.
+			await insertBlock( 'Navigation' );
+			await waitForBlock( 'Navigation' );
+			await page.waitForXPath( START_EMPTY_XPATH );
+
+			// Change menus via the select menu toolbar button.
+			const selectMenuDropdown = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await selectMenuDropdown.click();
+			const exampleNavigationOption = await page.waitForXPath(
+				'//span[contains(text(), "Second Example Navigation")]'
+			);
+			await exampleNavigationOption.click();
+
+			// Once the options are closed, does select menu button receive focus?
+			const selectMenuDropdown2 = await page.waitForSelector(
+				'[aria-label="Select Menu"]'
+			);
+			await expect( selectMenuDropdown2 ).toHaveFocus();
 		} );
 	} );
 } );

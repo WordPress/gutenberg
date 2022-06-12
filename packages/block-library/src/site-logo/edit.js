@@ -40,7 +40,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
-import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -417,8 +416,9 @@ export default function LogoEdit( {
 	};
 
 	const setIcon = ( newValue ) =>
+		// The new value needs to be `null` to reset the Site Icon.
 		editEntityRecord( 'root', 'site', undefined, {
-			site_icon: newValue,
+			site_icon: newValue ?? null,
 		} );
 
 	let alt = null;
@@ -468,7 +468,7 @@ export default function LogoEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
-		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	const controls = canUserEdit && logoUrl && (
@@ -519,20 +519,8 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
+				withIllustration={ true }
 			>
-				{
-					<SVG
-						className="components-placeholder__illustration"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 60 60"
-					>
-						<Path
-							vectorEffect="non-scaling-stroke"
-							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-						/>
-					</SVG>
-				}
 				{ content }
 			</Placeholder>
 		);

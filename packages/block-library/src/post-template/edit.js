@@ -26,7 +26,10 @@ const TEMPLATE = [
 ];
 
 function PostTemplateInnerBlocks() {
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const innerBlocksProps = useInnerBlocksProps(
+		{ className: 'wp-block-post' },
+		{ template: TEMPLATE }
+	);
 	return <li { ...innerBlocksProps } />;
 }
 
@@ -38,6 +41,9 @@ function PostTemplateBlockPreview( {
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
+		props: {
+			className: 'wp-block-post',
+		},
 	} );
 
 	const handleOnClick = () => {
@@ -78,6 +84,7 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 			taxQuery,
+			parents,
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
@@ -132,6 +139,9 @@ export default function PostTemplateEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			if ( parents?.length ) {
+				query.parent = parents;
+			}
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
@@ -166,6 +176,7 @@ export default function PostTemplateEdit( {
 			inherit,
 			templateSlug,
 			taxQuery,
+			parents,
 		]
 	);
 	const blockContexts = useMemo(

@@ -22,6 +22,7 @@
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
 @import "./components/welcome-guide/style.scss";
+@import "./components/start-page-options/style.scss";
 
 /**
  * Animations
@@ -92,10 +93,6 @@ body.block-editor-page {
 	img {
 		max-width: 100%;
 		height: auto;
-	}
-
-	iframe {
-		width: 100%;
 	}
 }
 

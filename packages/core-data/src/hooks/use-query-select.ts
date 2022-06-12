@@ -17,9 +17,9 @@ export const META_SELECTORS = [
 	'getCachedResolvers',
 ];
 
-interface QuerySelectResponse {
+interface QuerySelectResponse< Data > {
 	/** the requested selector return value */
-	data: Object;
+	data: Data;
 
 	/** is the record still being resolved? Via the `getIsResolving` meta-selector */
 	isResolving: boolean;
@@ -78,9 +78,14 @@ export default function __experimentalUseQuerySelect( mapQuerySelect, deps ) {
 	}, deps );
 }
 
-type QuerySelector = ( ...args ) => QuerySelectResponse;
 interface EnrichedSelectors {
-	[ key: string ]: QuerySelector;
+	< Selectors extends Record< string, ( ...args: any[] ) => any > >(
+		selectors: Selectors
+	): {
+		[ Selector in keyof Selectors ]: (
+			...args: Parameters< Selectors[ Selector ] >
+		) => QuerySelectResponse< ReturnType< Selectors[ Selector ] > >;
+	};
 }
 
 /**
@@ -90,14 +95,14 @@ interface EnrichedSelectors {
  * @param {Object} selectors Selectors to enrich
  * @return {EnrichedSelectors} Enriched selectors
  */
-const enrichSelectors = memoize( ( selectors ) => {
+const enrichSelectors = memoize( ( ( selectors ) => {
 	const resolvers = {};
 	for ( const selectorName in selectors ) {
 		if ( META_SELECTORS.includes( selectorName ) ) {
 			continue;
 		}
 		Object.defineProperty( resolvers, selectorName, {
-			get: () => ( ...args ) => {
+			get: () => ( ...args: unknown[] ) => {
 				const { getIsResolving, hasFinishedResolution } = selectors;
 				const isResolving = !! getIsResolving( selectorName, args );
 				const hasResolved =
@@ -128,4 +133,4 @@ const enrichSelectors = memoize( ( selectors ) => {
 		} );
 	}
 	return resolvers;
-} );
+} ) as EnrichedSelectors );
