@@ -40,9 +40,7 @@ export function useBlockScreenReaderDescription( clientId ) {
 		if ( hasChildBlocks ) {
 			description = sprintf(
 				// Translators: 1: The block title to lowercase for good sentence structure.
-				__(
-					'Press Escape key to navigate child blocks of %1$s.'
-				),
+				__( 'Press Escape key to navigate child blocks of %1$s.' ),
 				blockTitle.toLowerCase()
 			);
 		} else {
