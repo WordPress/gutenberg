@@ -42,8 +42,7 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+	const copyMenuItemLabel = _n( 'Copy block', 'Copy blocks', blocks.length );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
