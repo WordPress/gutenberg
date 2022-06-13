@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classNames from 'classnames';
 import type { ForwardedRef } from 'react';
 
@@ -18,6 +17,8 @@ import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
 import { useDraft } from './utils';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -24,6 +23,8 @@ import { Heading } from '../../heading';
 import { Spacer } from '../../spacer';
 
 export { DatePicker, TimePicker };
+
+const noop = () => {};
 
 function UnforwardedDateTimePicker(
 	{
