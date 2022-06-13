@@ -870,7 +870,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// Theme.json can specify either a spacingScale to autogenerate spacing size presets, or a fixed array of spacingSizes.
 		// The spaceScale takes presidence so will replace the spacingSizes array if present.
-		if ( isset( $settings['spacing']['spacingScale'] ) ) {
+		if ( ! isset( $settings['spacing']['spacingSizes']['theme'] ) ) {
 			$settings['spacing']['spacingSizes'] = array( 'default' => static::get_spacing_sizes( $settings['spacing']['spacingScale'] ) );
 		}
 

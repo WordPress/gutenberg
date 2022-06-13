@@ -197,39 +197,7 @@
 				"steps": 5,
 				"firstStep": 0.5,
 				"units": "rem"
-			},
-			"spacingSizes": [
-				{
-					"name": "None",
-					"slug": "0",
-					"size": "0"
-				},
-				{
-					"name": "Extra small",
-					"slug": "10",
-					"size": "0.5rem"
-				},
-				{
-					"name": "Small",
-					"slug": "20",
-					"size": "1rem"
-				},
-				{
-					"name": "Medium",
-					"slug": "30",
-					"size": "1.5rem"
-				},
-				{
-					"name": "Large",
-					"slug": "40",
-					"size": "2rem"
-				},
-				{
-					"name": "Extra large",
-					"slug": "50",
-					"size": "2.5rem"
-				}
-			]
+			}
 		},
 		"typography": {
 			"customFontSize": true,
