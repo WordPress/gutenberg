@@ -998,6 +998,12 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '안녕하세요 ' ) ).toBe( '안녕하세요' );
 		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
 	} );
+
+	it( 'Should trim multiple leading and trailing dashes', () => {
+		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
+			'is-tht-deja_vu'
+		);
+	} );
 } );
 
 describe( 'normalizePath', () => {
