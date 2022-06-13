@@ -112,7 +112,7 @@ const resetAllLinkFilter = ( attributes ) => ( {
 
 const resetAllLinkHoverFilter = ( attributes ) => ( {
 	style: clearColorFromStyles(
-		[ 'elements', 'link:hover', 'color', 'text' ],
+		[ 'elements', 'link', 'states', 'hover', 'color', 'text' ],
 		attributes.style
 	),
 } );
@@ -239,8 +239,8 @@ export function addSaveProps( props, blockType, attributes ) {
 			'has-link-color':
 				shouldSerialize( 'link' ) && style?.elements?.link?.color,
 			'has-link-hover-color':
-				shouldSerialize( 'link:hover' ) &&
-				style?.elements?.[ 'link:hover' ]?.color,
+				shouldSerialize( 'link' ) &&
+				style?.elements?.link?.states?.hover?.color,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -465,7 +465,7 @@ export function ColorEdit( props ) {
 		const newStyle = cleanEmptyObject(
 			immutableSet(
 				localAttributes.current?.style,
-				[ 'elements', 'link:hover', 'color', 'text' ],
+				[ 'elements', 'link', 'states', 'hover', 'color', 'text' ],
 				newLinkColorValue
 			)
 		);
@@ -546,13 +546,13 @@ export function ColorEdit( props ) {
 								onColorChange: onChangeLinkHoverColor,
 								colorValue: getLinkColorFromAttributeValue(
 									allSolids,
-									style?.elements?.[ 'link:hover' ]?.color
+									style?.elements?.link?.states?.hover?.color
 										?.text
 								),
-								clearable: !! style?.elements?.[ 'link:hover' ]
-									?.color?.text,
+								clearable: !! style?.elements?.link?.states
+									?.hover?.color?.text,
 								isShownByDefault:
-									defaultColorControls?.[ 'link:hover' ],
+									defaultColorControls?.link?.states?.hover,
 								resetAllFilter: resetAllLinkHoverFilter,
 							},
 					  ]
