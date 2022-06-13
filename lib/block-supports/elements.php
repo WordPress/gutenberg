@@ -96,26 +96,39 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
-	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+	// $skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
-	if ( $skip_link_color_serialization ) {
-		return null;
+	// if ( $skip_link_color_serialization ) {
+	// return null;
+	// }
+	$class_name = gutenberg_get_elements_class_name( $block );
+	// $link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
+
+	$css_styles = '';
+
+	// $style_definition      = _wp_array_get( WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+
+	if ( ! is_array( $element_block_styles ) ) {
+		return;
 	}
-	$class_name        = gutenberg_get_elements_class_name( $block );
-	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_generate(
-			$link_block_styles,
-			array(
-				'selector' => ".$class_name a",
-				'css_vars' => true,
-			)
-		);
+	// Currently this is `elements -> link -> DEFS`.
+	// In the future we should extend $element_block_styles
+	// to include all DEFS from all supported elements.
+	$block_styles = array(
+		'elements' => $element_block_styles,
+	);
 
-		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
-		}
+	$style_defs = gutenberg_style_engine_generate(
+		$block_styles,
+		array(
+			'selector' => ".$class_name",
+			'css_vars' => true,
+		)
+	);
+
+	if ( ! empty( $style_defs['css'] ) ) {
+		gutenberg_enqueue_block_support_styles( $style_defs['css'] );
 	}
 
 	return null;
