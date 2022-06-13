@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +29,7 @@ import icon from './media-container-icon';
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const noop = () => {};
 
 export function imageFillStyles( url, focalPoint ) {
 	return url

@@ -3,12 +3,13 @@
  */
 import { render, screen } from '@testing-library/react';
 import { create, act } from 'react-test-renderer';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../control';
+
+const noop = () => {};
 
 const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
 	element

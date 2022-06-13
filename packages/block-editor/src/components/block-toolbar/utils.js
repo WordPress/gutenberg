@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 const { clearTimeout, setTimeout } = window;
-
+const noop = () => {};
 const DEBOUNCE_TIMEOUT = 200;
 
 /**

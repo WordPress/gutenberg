@@ -2,12 +2,11 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import FormToggle from '../';
+import FormToggle, { noop } from '../';
 
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {

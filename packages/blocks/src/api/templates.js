@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, map, get, mapValues, isArray } from 'lodash';
+import { every, map, get, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -84,7 +84,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 				} );
 			};
 			const normalizeAttribute = ( definition, value ) => {
-				if ( isHTMLAttribute( definition ) && isArray( value ) ) {
+				if ( isHTMLAttribute( definition ) && Array.isArray( value ) ) {
 					// Introduce a deprecated call at this point
 					// When we're confident that "children" format should be removed from the templates.
 

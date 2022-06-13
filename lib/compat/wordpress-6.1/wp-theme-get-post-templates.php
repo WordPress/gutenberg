@@ -19,13 +19,26 @@ function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_t
 		return $templates;
 	}
 
-	// `$templates` in core come from `get_block_templates`, but since we have udpated the logic there,
-	// we need to use and return the templates from `gutenberg_get_block_templates`.
-	$block_templates = gutenberg_get_block_templates( array( 'post_type' => $post_type ), 'wp_template' );
-	$new_templates   = array();
-	foreach ( $block_templates as $template ) {
-		$new_templates[ $template->slug ] = $template->title;
+	// `get_post_templates` in core uses `get_block_templates` and since we have updated the
+	// logic in that function, we need to find and remove the templates that were added from
+	// the core function. That is why we need to call both functions to find which templates
+	// we should exclude from passed `$templates`.
+	$gutenberg_block_templates = array_map(
+		function( $template ) {
+			return $template->slug;
+		},
+		gutenberg_get_block_templates( array( 'post_type' => $post_type ), 'wp_template' )
+	);
+	$core_block_templates      = array_map(
+		function( $template ) {
+			return $template->slug;
+		},
+		get_block_templates( array( 'post_type' => $post_type ), 'wp_template' )
+	);
+	$templates_to_exclude      = array_diff( $core_block_templates, $gutenberg_block_templates );
+	foreach ( $templates_to_exclude as $template_slug ) {
+		unset( $templates[ $template_slug ] );
 	}
-	return $new_templates;
+	return $templates;
 }
 add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );
