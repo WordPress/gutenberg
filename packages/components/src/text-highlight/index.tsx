@@ -28,7 +28,7 @@ import type { TextHighlightProps } from './types';
  * );
  * ```
  */
-export const TextHighlight = ( props: TextHighlightProps ): JSX.Element => {
+export const TextHighlight = ( props: TextHighlightProps ) => {
 	const { text = '', highlight = '' } = props;
 	const trimmedHighlightText = highlight.trim();
 
