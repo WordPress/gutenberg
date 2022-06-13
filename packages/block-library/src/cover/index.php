@@ -43,12 +43,18 @@ function render_block_core_cover( $attributes, $content ) {
 			update_post_thumbnail_cache();
 		}
 		$current_featured_image = get_the_post_thumbnail_url();
-		$content                = preg_replace(
-			'/class=\".*?\"/',
-			'${0} style="background-image:url(' . esc_url( $current_featured_image ) . ')"',
-			$content,
-			1
-		);
+
+		$dom = new DOMDocument();
+		$dom->loadXML( $content );
+
+		foreach ( $dom->getElementsByTagName( 'div' ) as $div ) {
+			$styles = $div->getAttribute( 'style' );
+			$styles = " background-image:url('" . esc_url( $current_featured_image ) . "'); " . $styles;
+			$styles = $div->setAttribute( 'style', $styles );
+			break;
+		}
+
+		$content = $dom->saveHTML();
 	}
 
 	return $content;
