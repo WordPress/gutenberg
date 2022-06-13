@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'concat',
 							'differenceWith',
+							'dropRight',
 							'findIndex',
 							'isArray',
 							'isUndefined',
