@@ -69,6 +69,8 @@ export function useInputAndSelection( props ) {
 		const observerConfig = {
 			childList: true,
 			subtree: true,
+			characterData: true,
+			characterDataOldValue: true,
 		};
 
 		let isComposing = false;
@@ -79,6 +81,7 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onInput( event ) {
+			// console.log( 'disconnect' );
 			observer.disconnect();
 
 			// Do not trigger a change if characters are being composed.
@@ -130,16 +133,21 @@ export function useInputAndSelection( props ) {
 			} );
 
 			mutations.forEach( ( mutation ) => {
-				for ( const addedNode of mutation.addedNodes ) {
-					mutation.target.removeChild( addedNode );
-				}
-				for ( const removedNode of mutation.removedNodes ) {
-					mutation.target.insertBefore(
-						removedNode,
-						mutation.nextSibling
-					);
+				if ( mutation.type === 'characterData' ) {
+					mutation.target.data = mutation.oldValue;
+				} else {
+					for ( const addedNode of mutation.addedNodes ) {
+						mutation.target.removeChild( addedNode );
+					}
+					for ( const removedNode of mutation.removedNodes ) {
+						mutation.target.insertBefore(
+							removedNode,
+							mutation.nextSibling
+						);
+					}
 				}
 			} );
+			mutations.length = 0;
 
 			handleChange( change );
 		}
