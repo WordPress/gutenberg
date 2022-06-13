@@ -19,7 +19,6 @@ const meta: ComponentMeta< typeof ColorIndicator > = {
 	parameters: {
 		controls: {
 			expanded: true,
-			exclude: [ 'heading' ],
 		},
 		docs: { source: { state: 'open' } },
 	},
