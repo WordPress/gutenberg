@@ -144,7 +144,7 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
-	it( 'Should also return null for the menu when menu status is "draft"', () => {
+	it( 'Should return null for the menu when menu status is "draft"', () => {
 		const navigationMenuDraft = { id: 4, title: 'Menu 3', status: 'draft' };
 		const testMenus = [ ...navigationMenus, navigationMenuDraft ];
 		resolveRecords( registry, testMenus );
