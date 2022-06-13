@@ -151,12 +151,14 @@ export function toTree( {
 	let lastCharacterFormats;
 	let lastCharacter;
 
+	const emptyText = isEditableTree ? ZWNBSP : '';
+
 	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
+		append( append( tree, { type: multilineTag } ), emptyText );
 		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
-		append( tree, '' );
+		append( tree, emptyText );
 	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
@@ -264,7 +266,7 @@ export function toTree( {
 					remove( pointer );
 				}
 
-				pointer = append( newNode, '' );
+				pointer = append( newNode, emptyText );
 			} );
 		}
 
@@ -311,7 +313,7 @@ export function toTree( {
 				);
 			}
 			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
+			pointer = append( getParent( pointer ), emptyText );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {
 			pointer = append( getParent( pointer ), {
 				type: 'br',
@@ -323,7 +325,7 @@ export function toTree( {
 				object: true,
 			} );
 			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
+			pointer = append( getParent( pointer ), emptyText );
 		} else if ( ! isText( pointer ) ) {
 			pointer = append( getParent( pointer ), character );
 		} else {
