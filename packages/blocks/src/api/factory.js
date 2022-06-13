@@ -6,7 +6,6 @@ import {
 	every,
 	castArray,
 	some,
-	isObjectLike,
 	filter,
 	first,
 	flatMap,
@@ -541,7 +540,10 @@ export function switchToBlockType( blocks, name ) {
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.
-	if ( ! isObjectLike( transformationResults ) ) {
+	if (
+		transformationResults === null ||
+		typeof transformationResults !== 'object'
+	) {
 		return null;
 	}
 
