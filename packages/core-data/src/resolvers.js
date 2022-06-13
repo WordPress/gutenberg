@@ -327,9 +327,11 @@ export const getAutosaves = ( postType, postId ) => async ( {
 	dispatch,
 	resolveSelect,
 } ) => {
-	const { rest_base: restBase } = await resolveSelect.getPostType( postType );
+	const { rest_base: restBase, rest_namespace: restNamespace } = await resolveSelect.getPostType( postType );
+	const namespace = rest_namespace ?? 'wp/v2';
+
 	const autosaves = await apiFetch( {
-		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+		path: `/${ namespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 	} );
 
 	if ( autosaves && autosaves.length ) {
