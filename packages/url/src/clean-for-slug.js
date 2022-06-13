@@ -23,9 +23,15 @@ export function cleanForSlug( string ) {
 	if ( ! string ) {
 		return '';
 	}
-	return removeAccents( string )
-		.replace( /[\s\./]+/g, '-' )
-		.replace( /[^\p{L}\p{N}_-]+/gu, '' )
-		.toLowerCase()
-		.replace( /(^-+)|(-+$)/g, '' );
+	return (
+		removeAccents( string )
+			// Convert each group of whitespace, periods, and forward slashes to a hyphen.
+			.replace( /[\s\./]+/g, '-' )
+			// Remove anything that's not a letter, number, underscore or hyphen.
+			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
+			// Convert to lowercase
+			.toLowerCase()
+			// Remove any remaining leading or trailing hyphens.
+			.replace( /(^-+)|(-+$)/g, '' )
+	);
 }
