@@ -60,12 +60,10 @@ export function useInputAndSelection( props ) {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
-		const addedNodes = [];
+		const mutations = [];
 		const observer = new defaultView.MutationObserver( ( records ) => {
 			for ( const record of records ) {
-				if ( record.addedNodes ) {
-					addedNodes.push( ...record.addedNodes );
-				}
+				mutations.push( record );
 			}
 		} );
 		const observerConfig = {
@@ -131,8 +129,16 @@ export function useInputAndSelection( props ) {
 				formats: oldActiveFormats,
 			} );
 
-			addedNodes.forEach( ( node ) => {
-				node.parentNode.removeChild( node );
+			mutations.forEach( ( mutation ) => {
+				for ( const addedNode of mutation.addedNodes ) {
+					mutation.target.removeChild( addedNode );
+				}
+				for ( const removedNode of mutation.removedNodes ) {
+					mutation.target.insertBefore(
+						removedNode,
+						mutation.nextSibling
+					);
+				}
 			} );
 
 			handleChange( change );
