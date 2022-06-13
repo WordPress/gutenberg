@@ -268,7 +268,7 @@ _Parameters_
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `RecordKey`: Optional ID of the rest resource to check.
+-   _id_ `GenericRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
 
@@ -286,9 +286,9 @@ Calling this may trigger an OPTIONS request to the REST API via the
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record's id.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record's id.
 
 _Returns_
 
@@ -317,8 +317,8 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `RecordKey`: The id of the parent post.
--   _authorId_ `RecordKey`: The id of the author.
+-   _postId_ `GenericRecordKey`: The id of the parent post.
+-   _authorId_ `GenericRecordKey`: The id of the author.
 
 _Returns_
 
@@ -335,7 +335,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `RecordKey`: The id of the parent post.
+-   _postId_ `GenericRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -396,9 +396,9 @@ Returns the specified entity record, merged with its edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -426,7 +426,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
+-   _kind_ `Kind`: Entity kind.
 
 _Returns_
 
@@ -439,7 +439,7 @@ Returns the loaded entities for the given kind.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
+-   _kind_ `Kind`: Entity kind.
 
 _Returns_
 
@@ -454,8 +454,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
 
 _Returns_
 
@@ -468,8 +468,8 @@ Returns the entity config given its kind and name.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
 
 _Returns_
 
@@ -484,14 +484,14 @@ entity object if it exists and is received.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _key_ `RecordKey`: Record's key
--   _query_ `EntityQuery< any >`: Optional query.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _key_ `KeyOf< R >`: Record's key
+-   _query_ Optional query.
 
 _Returns_
 
--   `EntityRecord | undefined`: Record.
+-   Record.
 
 ### getEntityRecordEdits
 
@@ -500,9 +500,9 @@ Returns the specified entity record's edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -519,9 +519,9 @@ They are defined in the entity's config.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -534,13 +534,13 @@ Returns the Entity's records.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `EntityQuery< any >`: Optional terms query.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _query_ Optional terms query.
 
 _Returns_
 
--   `Array< EntityRecord > | undefined`: Records.
+-   Records.
 
 ### getLastEntityDeleteError
 
@@ -549,9 +549,9 @@ Returns the specified entity record's last delete error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -564,9 +564,9 @@ Returns the specified entity record's last save error.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -580,9 +580,9 @@ with its attributes mapped to their raw values.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _key_ `RecordKey`: Record's key.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _key_ `KeyOf< K, N >`: Record's key.
 
 _Returns_
 
@@ -668,9 +668,9 @@ and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 
@@ -684,9 +684,9 @@ or false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _query_ `EntityQuery< any >`: Optional terms query.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _query_ `EntityQuery< C >`: Optional terms query.
 
 _Returns_
 
@@ -700,7 +700,7 @@ _Parameters_
 
 -   _state_ `State`: State tree.
 -   _postType_ `string`: The type of the parent post.
--   _postId_ `RecordKey`: The id of the parent post.
+-   _postId_ `GenericRecordKey`: The id of the parent post.
 
 _Returns_
 
@@ -739,9 +739,9 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -754,9 +754,9 @@ Returns true if the specified entity record is deleting, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -800,9 +800,9 @@ Returns true if the specified entity record is saving, and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _recordId_ `RecordKey`: Record ID.
+-   _kind_ `K`: Entity kind.
+-   _name_ `N`: Entity name.
+-   _recordId_ `KeyOf< K, N >`: Record ID.
 
 _Returns_
 

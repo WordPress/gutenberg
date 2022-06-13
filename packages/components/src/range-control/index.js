@@ -3,7 +3,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp, isFinite, noop } from 'lodash';
+import { clamp, isFinite } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,6 +34,8 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
+
+const noop = () => {};
 
 function RangeControl(
 	{

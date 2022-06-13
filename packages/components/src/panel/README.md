@@ -161,7 +161,7 @@ Props that are passed to the `Button` component in the `PanelBodyTitle` within t
 
 #### PanelRow
 
-The is a generic container for panel content. Default styles add a top margin and arrange items in a flex row.
+The `PanelRow` is a generic container for panel content. Default styles add a top margin and arrange items in a flex row.
 
 ##### Props
 

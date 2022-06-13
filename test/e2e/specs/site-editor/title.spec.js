@@ -13,11 +13,11 @@ test.describe( 'Site editor title', () => {
 	} );
 
 	test( 'displays the selected template name in the title for the index template', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
 		// Navigate to a template.
-		await pageUtils.visitSiteEditor( {
+		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
@@ -30,11 +30,11 @@ test.describe( 'Site editor title', () => {
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
 		// Navigate to a template part.
-		await pageUtils.visitSiteEditor( {
+		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
@@ -47,10 +47,10 @@ test.describe( 'Site editor title', () => {
 	} );
 
 	test( "displays the selected template part's name in the secondary title when a template part is selected from List View", async ( {
+		admin,
 		page,
-		pageUtils,
 	} ) => {
-		await pageUtils.visitSiteEditor( {
+		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );

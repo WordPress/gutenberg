@@ -78,8 +78,23 @@ module.exports = {
 					},
 					{
 						name: 'lodash',
-						importNames: [ 'memoize' ],
-						message: 'Please use `memize` instead.',
+						importNames: [
+							'concat',
+							'differenceWith',
+							'findIndex',
+							'isArray',
+							'isUndefined',
+							'memoize',
+							'negate',
+							'noop',
+							'random',
+							'reverse',
+							'stubFalse',
+							'stubTrue',
+							'sum',
+						],
+						message:
+							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
 					},
 					{
 						name: 'reakit',

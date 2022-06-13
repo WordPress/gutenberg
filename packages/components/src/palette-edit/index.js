@@ -156,7 +156,8 @@ function Option( {
 			</HStack>
 			{ isEditing && (
 				<Popover
-					position="bottom left"
+					placement="left-start"
+					offset={ 20 }
 					className="components-palette-edit__popover"
 				>
 					{ ! isGradient && (

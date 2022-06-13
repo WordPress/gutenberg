@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalElementButtonClassName,
+} from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
@@ -63,7 +72,10 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className="wp-block-file__button"
+						className={ classnames(
+							'wp-block-file__button',
+							__experimentalElementButtonClassName
+						) }
 						download={ true }
 						aria-describedby={ describedById }
 					>

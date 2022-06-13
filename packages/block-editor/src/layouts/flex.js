@@ -11,6 +11,7 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
+import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -109,14 +110,21 @@ export default {
 	save: function FlexLayoutStyle( { selector, layout, style, blockName } ) {
 		const { orientation = 'horizontal' } = layout;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const fallbackValue =
+			getBlockSupport( blockName, [
+				'spacing',
+				'blockGap',
+				'__experimentalDefault',
+			] ) || '0.5em';
+
 		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
-				: 'var( --wp--style--block-gap, 0.5em )';
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackValue )
+				: `var( --wp--style--block-gap, ${ fallbackValue } )`;
 		const justifyContent =
 			justifyContentMap[ layout.justifyContent ] ||
 			justifyContentMap.left;
@@ -143,7 +151,7 @@ export default {
 				${ appendSelectors( selector ) } {
 					display: flex;
 					flex-wrap: ${ flexWrap };
-					gap: ${ hasBlockGapStylesSupport ? blockGapValue : '0.5em' };
+					gap: ${ hasBlockGapStylesSupport ? blockGapValue : fallbackValue };
 					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
 				}
 

@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { omit, noop, isFunction } from 'lodash';
+import { omit, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { omit, noop, isFunction } from 'lodash';
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
 function cycleValue( value, total, offset ) {
