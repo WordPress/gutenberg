@@ -45,8 +45,9 @@ const Content = memo(
 		} );
 
 		useLayoutEffect( () => {
-			if ( value.start !== undefined )
+			if ( value.start !== undefined && container.current ) {
 				applySelection( selection, container.current );
+			}
 		}, [ selection, value ] );
 		return nodeListToReact( body.childNodes, createElement );
 	},
@@ -160,7 +161,6 @@ export function useRichText( {
 	 */
 	function handleChange( newRecord ) {
 		record.current = newRecord;
-		applyRecord( newRecord );
 
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
@@ -189,7 +189,7 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
+		applyRecord( newRecord );
 	}
 
 	function handleChangesUponInit( newRecord ) {
