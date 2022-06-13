@@ -44,7 +44,7 @@ export const usePostTypesEntitiesInfo = ( existingTemplates ) => {
 	const postTypes = usePostTypes();
 	const slugsToExcludePerEntity = useMemo( () => {
 		return postTypes?.reduce( ( accumulator, _postType ) => {
-			const slugsWithTemplates = existingTemplates.reduce(
+			const slugsWithTemplates = ( existingTemplates || [] ).reduce(
 				( _accumulator, existingTemplate ) => {
 					const prefix = `single-${ _postType.slug }-`;
 					if ( existingTemplate.slug.startsWith( prefix ) ) {
