@@ -294,9 +294,6 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 
-	if ( blockName === 'core/paragraph' ) {
-		// debugger;
-	}
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
