@@ -214,4 +214,4 @@ The files will automatically be enqueued when specified in the block.json.
 
 This guide showed a couple of different ways to apply styles to your block, by either inline or in its own style sheet. Both of these methods use the `useBlockProps` hook, see the [block wrapper reference documentation](/docs/reference-guides/block-api/block-edit-save.md#block-wrapper-props) for additional details.
 
-See the complete [example-02-stlyesheets](https://github.com/WordPress/gutenberg-examples/tree/trunk/02-stylesheets) code in the [gutenberg-examples repository](https://github.com/WordPress/gutenberg-examples).
+See the complete [example-02-stylesheets](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/02-stylesheets) code in the [gutenberg-examples repository](https://github.com/WordPress/gutenberg-examples).
