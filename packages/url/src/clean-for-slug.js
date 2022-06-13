@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, trim } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * Performs some basic cleanup of a string for use as a post slug.
@@ -23,11 +23,10 @@ export function cleanForSlug( string ) {
 	if ( ! string ) {
 		return '';
 	}
-	return trim(
-		deburr( string )
-			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
-			.toLowerCase(),
-		'-'
-	);
+	return removeAccents( string )
+		.replace( /[\s\./]+/g, '-' )
+		.replace( /[^\p{L}\p{N}_-]+/gu, '' )
+		.toLowerCase()
+		.trim()
+		.replace( /(^-)|(-$)/g, '' );
 }
