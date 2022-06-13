@@ -275,8 +275,13 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'type'        => 'array',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
-				'spacingSizesSizes'                      => array(
+				'spacingSizes'                      => array(
 					'description' => __( 'Active theme spacing sizes.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'spacingScale'                      => array(
+					'description' => __( 'Active theme spacing scale.', 'gutenberg' ),
 					'type'        => 'array',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
