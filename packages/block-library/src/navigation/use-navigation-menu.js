@@ -7,17 +7,56 @@ import { useSelect } from '@wordpress/data';
 export default function useNavigationMenu( ref ) {
 	return useSelect(
 		( select ) => {
-			const menus = selectNavigationMenus( select, ref );
+			const {
+				navigationMenus,
+				isResolvingNavigationMenus,
+				hasResolvedNavigationMenus,
+			} = selectNavigationMenus( select, ref );
+
+			const {
+				navigationMenu,
+				isNavigationMenuResolved,
+				isNavigationMenuMissing,
+			} = selectExistingMenu( select, ref );
+
+			const {
+				canUserCreateNavigationMenu,
+				isResolvingCanUserCreateNavigationMenu,
+				hasResolvedCanUserCreateNavigationMenu,
+			} = selectMenuCreatePermissions( select );
+
+			const {
+				canUserUpdateNavigationMenu,
+				hasResolvedCanUserUpdateNavigationMenu,
+			} = selectMenuUpdatePermissions( select, ref );
+
+			const {
+				canUserDeleteNavigationMenu,
+				hasResolvedCanUserDeleteNavigationMenu,
+			} = selectMenuDeletePermissions( select, ref );
 
 			return {
-				...menus,
-				...selectExistingMenu( select, ref ),
-				...selectMenuCreatePermissions( select ),
-				...selectMenuUpdatePermissions( select, ref ),
-				...selectMenuDeletePermissions( select, ref ),
+				navigationMenus,
+				isResolvingNavigationMenus,
+				hasResolvedNavigationMenus,
+
+				navigationMenu,
+				isNavigationMenuResolved,
+				isNavigationMenuMissing,
+
+				canUserCreateNavigationMenu,
+				isResolvingCanUserCreateNavigationMenu,
+				hasResolvedCanUserCreateNavigationMenu,
+
+				canUserUpdateNavigationMenu,
+				hasResolvedCanUserUpdateNavigationMenu,
+
+				canUserDeleteNavigationMenu,
+				hasResolvedCanUserDeleteNavigationMenu,
+
 				canSwitchNavigationMenu: ref
-					? menus.navigationMenus?.length > 1
-					: menus.navigationMenus?.length > 0,
+					? navigationMenus?.length > 1
+					: navigationMenus?.length > 0,
 			};
 		},
 		[ ref ]
