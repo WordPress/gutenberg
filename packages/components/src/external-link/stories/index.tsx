@@ -17,7 +17,6 @@ const meta: ComponentMeta< typeof ExternalLink > = {
 	parameters: {
 		controls: {
 			expanded: true,
-			exclude: [ 'heading' ],
 		},
 		docs: { source: { state: 'open' } },
 	},
