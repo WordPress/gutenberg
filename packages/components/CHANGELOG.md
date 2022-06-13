@@ -22,7 +22,7 @@
 -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
 -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
 -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
-
+-   `Truncate`: Convert to TypeScript ([#41697](https://github.com/WordPress/gutenberg/pull/41697)).
 
 ## 19.12.0 (2022-06-01)
 
