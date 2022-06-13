@@ -15,11 +15,12 @@ import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 import { useCx } from '../utils/hooks/use-cx';
+import type { TruncateProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
- */
-export default function useTruncate( props ) {
+export default function useTruncate(
+	props: WordPressComponentProps< TruncateProps, 'span' >
+) {
 	const {
 		className,
 		children,
@@ -33,7 +34,7 @@ export default function useTruncate( props ) {
 	const cx = useCx();
 
 	const truncatedContent = truncateContent(
-		typeof children === 'string' ? /** @type {string} */ ( children ) : '',
+		typeof children === 'string' ? children : '',
 		{
 			ellipsis,
 			ellipsizeMode,
@@ -45,14 +46,14 @@ export default function useTruncate( props ) {
 	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
-		const sx = {};
-
-		sx.numberOfLines = css`
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: ${ numberOfLines };
-			display: -webkit-box;
-			overflow: hidden;
-		`;
+		const sx = {
+			numberOfLines: css`
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: ${ numberOfLines };
+				display: -webkit-box;
+				overflow: hidden;
+			`,
+		};
 
 		return cx(
 			shouldTruncate && ! numberOfLines && styles.Truncate,

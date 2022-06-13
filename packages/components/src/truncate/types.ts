@@ -1,14 +1,21 @@
+/**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
 export type TruncateEllisizeMode = 'auto' | 'head' | 'tail' | 'middle' | 'none';
 
-export interface Props {
+export type TruncateProps = {
 	/**
 	 * The ellipsis string when `truncate` is set.
 	 *
-	 * @default '...'
+	 * @default '…'
 	 */
 	ellipsis?: string;
 	/**
-	 * Determines where to truncate.  For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
+	 * Determines where to truncate.  For example, we can truncate text right in
+	 * the middle. To do this, we need to set `ellipsizeMode` to `middle` and a
+	 * text `limit`.
 	 *
 	 * * `auto`: Trims content at the end automatically without a `limit`.
 	 * * `head`: Trims content at the beginning. Requires a `limit`.
@@ -25,11 +32,12 @@ export interface Props {
 	 */
 	limit?: number;
 	/**
-	 * Clamps the text content to the specified `numberOfLines`, adding the `ellipsis` at the end.
+	 * Clamps the text content to the specified `numberOfLines`, adding the
+	 * `ellipsis` at the end.
 	 */
 	numberOfLines?: number;
 	/**
 	 * The children elements.
 	 */
-	children: React.ReactNode;
-}
+	children: ReactNode;
+};
