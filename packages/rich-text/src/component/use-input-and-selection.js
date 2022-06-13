@@ -60,11 +60,29 @@ export function useInputAndSelection( props ) {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
+		const addedNodes = [];
+		const observer = new defaultView.MutationObserver( ( records ) => {
+			for ( const record of records ) {
+				if ( record.addedNodes ) {
+					addedNodes.push( ...record.addedNodes );
+				}
+			}
+		} );
+		const observerConfig = {
+			childList: true,
+			subtree: true,
+		};
 
 		let isComposing = false;
 		let rafId;
 
+		function onBeforeInput() {
+			observer.observe( element, observerConfig );
+		}
+
 		function onInput( event ) {
+			observer.disconnect();
+
 			// Do not trigger a change if characters are being composed.
 			// Browsers  will usually emit a final `input` event when the
 			// characters are composed.
@@ -111,6 +129,10 @@ export function useInputAndSelection( props ) {
 				start,
 				end: currentValue.start,
 				formats: oldActiveFormats,
+			} );
+
+			addedNodes.forEach( ( node ) => {
+				node.parentNode.removeChild( node );
 			} );
 
 			handleChange( change );
@@ -297,6 +319,7 @@ export function useInputAndSelection( props ) {
 			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
 		}
 
+		element.addEventListener( 'beforeinput', onBeforeInput );
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
@@ -313,6 +336,7 @@ export function useInputAndSelection( props ) {
 			handleSelectionChange
 		);
 		return () => {
+			element.removeEventListener( 'beforeinput', onBeforeInput );
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(
 				'compositionstart',
