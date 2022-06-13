@@ -31,7 +31,7 @@ describe( 'Classic', () => {
 		await page.focus( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -82,7 +82,7 @@ describe( 'Classic', () => {
 		await page.waitForSelector( '.mce-content-body img' );
 
 		// Move focus away and verify gallery was inserted.
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		expect( await getEditedPostContent() ).toMatch(
 			/\[gallery ids=\"\d+\"\]/
 		);
