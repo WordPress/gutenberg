@@ -124,7 +124,7 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
-	it( 'Should also return information about a specific menu when ref is given', () => {
+	it( 'Should return information about a specific menu when ref is given', () => {
 		resolveRecords( registry, navigationMenus );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
