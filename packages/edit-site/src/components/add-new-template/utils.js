@@ -9,6 +9,7 @@ import { get } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useMemo } from '@wordpress/element';
 
 export const usePostTypes = () => {
 	const postTypes = useSelect(
@@ -23,20 +24,94 @@ export const usePostTypes = () => {
 	return filteredPostTypes;
 };
 
-export const usePostTypesHaveEntities = () => {
+/**
+ * @typedef {Object} PostTypeEntitiesInfo
+ * @property {boolean}  hasEntities   If a postType has available entities.
+ * @property {number[]} existingPosts An array of the existing entities ids.
+ */
+
+/**
+ * Helper hook that returns information about a post type having
+ * posts that we can create a specific template for.
+ *
+ * First we need to find the existing posts with an associated template,
+ * to query afterwards for any remaing post, by excluding them.
+ *
+ * @param {string[]} existingTemplates The existing templates.
+ * @return {Object<string,PostTypeEntitiesInfo>} An object with the postTypes as `keys` and PostTypeEntitiesInfo as values.
+ */
+export const usePostTypesEntitiesInfo = ( existingTemplates ) => {
 	const postTypes = usePostTypes();
-	const postTypesHaveEntities = useSelect(
+	const slugsToExcludePerEntity = useMemo( () => {
+		return postTypes?.reduce( ( accumulator, _postType ) => {
+			const slugsWithTemplates = existingTemplates.reduce(
+				( _accumulator, existingTemplate ) => {
+					const prefix = `single-${ _postType.slug }-`;
+					if ( existingTemplate.slug.startsWith( prefix ) ) {
+						_accumulator.push(
+							existingTemplate.slug.substring( prefix.length )
+						);
+					}
+					return _accumulator;
+				},
+				[]
+			);
+			if ( slugsWithTemplates.length ) {
+				accumulator[ _postType.slug ] = slugsWithTemplates;
+			}
+			return accumulator;
+		}, {} );
+		// It's important to use `length` as a dependency because `usePostTypes`
+		// returns a new array every time and will triger a rerender.
+		// We can't avoid that because `post types` endpoint doesn't allow filtering
+		// with `viewable` prop right now.
+	}, [ postTypes?.length, existingTemplates ] );
+	const postsToExcludePerEntity = useSelect(
 		( select ) => {
-			return postTypes?.reduce( ( accumulator, { slug } ) => {
-				accumulator[ slug ] = !! select( coreStore ).getEntityRecords(
+			if ( ! slugsToExcludePerEntity ) {
+				return;
+			}
+			const postsToExclude = Object.entries(
+				slugsToExcludePerEntity
+			).reduce( ( accumulator, [ slug, slugsWithTemplates ] ) => {
+				const postsWithTemplates = select( coreStore ).getEntityRecords(
 					'postType',
 					slug,
 					{
-						per_page: 1,
 						_fields: 'id',
 						context: 'view',
+						slug: slugsWithTemplates,
 					}
-				)?.length;
+				);
+				if ( postsWithTemplates?.length ) {
+					accumulator[ slug ] = postsWithTemplates;
+				}
+				return accumulator;
+			}, {} );
+			return postsToExclude;
+		},
+		[ slugsToExcludePerEntity ]
+	);
+	const entitiesInfo = useSelect(
+		( select ) => {
+			return postTypes?.reduce( ( accumulator, { slug } ) => {
+				const existingPosts =
+					postsToExcludePerEntity?.[ slug ]?.map(
+						( { id } ) => id
+					) || [];
+				accumulator[ slug ] = {
+					hasEntities: !! select( coreStore ).getEntityRecords(
+						'postType',
+						slug,
+						{
+							per_page: 1,
+							_fields: 'id',
+							context: 'view',
+							exclude: existingPosts,
+						}
+					)?.length,
+					existingPosts,
+				};
 				return accumulator;
 			}, {} );
 		},
@@ -44,39 +119,9 @@ export const usePostTypesHaveEntities = () => {
 		// returns a new array every time and will triger a rerender.
 		// We can't avoid that because `post types` endpoint doesn't allow filtering
 		// with `viewable` prop right now.
-		[ postTypes?.length ]
+		[ postTypes?.length, postsToExcludePerEntity ]
 	);
-	return postTypesHaveEntities;
-};
-
-export const useExistingEntitiesToExclude = ( entityForSuggestions ) => {
-	const { slugsWithTemplates, type, slug } = entityForSuggestions;
-	const { results, hasResolved } = useSelect( ( select ) => {
-		if ( ! slugsWithTemplates.length ) {
-			return {
-				results: [],
-				hasResolved: true,
-			};
-		}
-		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
-		const selectorArgs = [
-			type,
-			slug,
-			{
-				_fields: 'id',
-				slug: slugsWithTemplates,
-				context: 'view',
-			},
-		];
-		return {
-			results: getEntityRecords( ...selectorArgs ),
-			hasResolved: hasFinishedResolution(
-				'getEntityRecords',
-				selectorArgs
-			),
-		};
-	}, [] );
-	return [ ( results || [] ).map( ( { id } ) => id ), hasResolved ];
+	return entitiesInfo;
 };
 
 export const mapToIHasNameAndId = ( entities, path ) => {

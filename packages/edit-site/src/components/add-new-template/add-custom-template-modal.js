@@ -23,7 +23,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useExistingEntitiesToExclude, mapToIHasNameAndId } from './utils';
+import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
 const BASE_QUERY = {
@@ -67,20 +67,8 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	// Get ids of existing entities to exclude from search results.
-	const [
-		entitiesToExclude,
-		entitiesToExcludeHasResolved,
-	] = useExistingEntitiesToExclude( entityForSuggestions );
 	const { searchResults, searchHasResolved } = useSelect(
 		( select ) => {
-			// Wait for the request of finding the excluded items first.
-			if ( ! entitiesToExcludeHasResolved ) {
-				return {
-					searchResults: EMPTY_ARRAY,
-					searchHasResolved: false,
-				};
-			}
 			const { getEntityRecords, hasFinishedResolution } = select(
 				coreStore
 			);
@@ -91,7 +79,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 					...BASE_QUERY,
 					search,
 					orderby: !! search ? 'relevance' : 'modified',
-					exclude: entitiesToExclude,
+					exclude: entityForSuggestions.postsToExclude,
 					per_page: !! search ? 20 : 10,
 				},
 			];
@@ -103,7 +91,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				),
 			};
 		},
-		[ search, entitiesToExclude, entitiesToExcludeHasResolved ]
+		[ search ]
 	);
 	useEffect( () => {
 		if ( search !== searchInputValue ) {
@@ -128,8 +116,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 				placeholder={ __( 'Search' ) }
 			/>
 			{ !! suggestions?.length && (
-				// TODO: we should add a max-height with overflow here..
-				// also check about a min-height as results might cause layout shift.
 				<Composite
 					{ ...composite }
 					role="listbox"
