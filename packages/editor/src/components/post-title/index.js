@@ -189,7 +189,7 @@ function PostTitle( _, forwardedRef ) {
 	);
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
-	const { ref: richTextRef } = useRichText( {
+	const { ref: richTextRef, children } = useRichText( {
 		value: title,
 		onChange,
 		placeholder: decodedPlaceholder,
@@ -217,6 +217,7 @@ function PostTitle( _, forwardedRef ) {
 			<h1
 				ref={ useMergeRefs( [ richTextRef, ref ] ) }
 				contentEditable
+				suppressContentEditableWarning
 				className={ className }
 				aria-label={ decodedPlaceholder }
 				role="textbox"
@@ -226,7 +227,9 @@ function PostTitle( _, forwardedRef ) {
 				onKeyDown={ onKeyDown }
 				onKeyPress={ onUnselect }
 				onPaste={ onPaste }
-			/>
+			>
+				{ children }
+			</h1>
 		</PostTypeSupportCheck>
 	);
 	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
