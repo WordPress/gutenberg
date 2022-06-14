@@ -26,6 +26,7 @@
 -   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
 -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
 -   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
+-   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
 
 ## 19.12.0 (2022-06-01)
 
