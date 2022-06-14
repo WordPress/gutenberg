@@ -29,15 +29,15 @@ export const __experimentalConvertBlockToStatic =
 				oldBlock.attributes.ref
 			);
 
-	const newBlocks = parse(
-		typeof reusableBlock.content === 'function'
-			? reusableBlock.content( reusableBlock )
-			: reusableBlock.content
-	);
-	registry
-		.dispatch( blockEditorStore )
-		.replaceBlocks( oldBlock.clientId, newBlocks );
-};
+		const newBlocks = parse(
+			typeof reusableBlock.content === 'function'
+				? reusableBlock.content( reusableBlock )
+				: reusableBlock.content
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.replaceBlocks( oldBlock.clientId, newBlocks );
+	};
 
 /**
  * Returns a generator converting one or more static blocks into a reusable block.
