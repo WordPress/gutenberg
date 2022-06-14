@@ -35,9 +35,8 @@ const BaseControlWithTextarea: ComponentStory< typeof BaseControl > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof BaseControl
-> = BaseControlWithTextarea.bind( {} );
+export const Default: ComponentStory< typeof BaseControl > =
+	BaseControlWithTextarea.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	id: 'textarea-default-1',

@@ -94,6 +94,5 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Settings<
-	C extends Context = DefaultContextOf< 'root', 'site' >
-> = OmitNevers< _BaseEntityRecords.Settings< C > >;
+export type Settings< C extends Context = DefaultContextOf< 'root', 'site' > > =
+	OmitNevers< _BaseEntityRecords.Settings< C > >;

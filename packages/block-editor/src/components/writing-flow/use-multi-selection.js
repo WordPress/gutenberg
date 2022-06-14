@@ -74,10 +74,8 @@ export default function useMultiSelection() {
 
 				if ( selection.rangeCount && ! selection.isCollapsed ) {
 					const blockNode = selectedRef.current;
-					const {
-						startContainer,
-						endContainer,
-					} = selection.getRangeAt( 0 );
+					const { startContainer, endContainer } =
+						selection.getRangeAt( 0 );
 
 					if (
 						!! blockNode &&

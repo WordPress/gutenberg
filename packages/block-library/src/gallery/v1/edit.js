@@ -90,27 +90,22 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
-	const {
-		imageSizes,
-		mediaUpload,
-		getMedia,
-		wasBlockJustInserted,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+	const { imageSizes, mediaUpload, getMedia, wasBlockJustInserted } =
+		useSelect( ( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
 
-		return {
-			imageSizes: settings.imageSizes,
-			mediaUpload: settings.mediaUpload,
-			getMedia: select( coreStore ).getMedia,
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		};
-	} );
+			return {
+				imageSizes: settings.imageSizes,
+				mediaUpload: settings.mediaUpload,
+				getMedia: select( coreStore ).getMedia,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+			};
+		} );
 
 	const resizedImages = useMemo( () => {
 		if ( isSelected ) {

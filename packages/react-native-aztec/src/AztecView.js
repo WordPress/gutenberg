@@ -31,9 +31,8 @@ class AztecView extends Component {
 		this._onBackspace = this._onBackspace.bind( this );
 		this._onKeyDown = this._onKeyDown.bind( this );
 		this._onChange = this._onChange.bind( this );
-		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
-			this
-		);
+		this._onHTMLContentWithCursor =
+			this._onHTMLContentWithCursor.bind( this );
 		this._onFocus = this._onFocus.bind( this );
 		this._onBlur = this._onBlur.bind( this );
 		this._onSelectionChange = this._onSelectionChange.bind( this );

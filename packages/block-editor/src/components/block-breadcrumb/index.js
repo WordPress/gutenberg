@@ -22,11 +22,8 @@ import { store as blockEditorStore } from '../../store';
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectedBlockClientId, getBlockParents } =
+			select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),

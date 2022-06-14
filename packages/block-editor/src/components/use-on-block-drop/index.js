@@ -217,11 +217,8 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
 	);
-	const {
-		canInsertBlockType,
-		getBlockIndex,
-		getClientIdsOfDescendants,
-	} = useSelect( blockEditorStore );
+	const { canInsertBlockType, getBlockIndex, getClientIdsOfDescendants } =
+		useSelect( blockEditorStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,

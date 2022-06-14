@@ -377,8 +377,8 @@ describe( 'Searching for a link', () => {
 
 		const searchResultElements = getSearchResults();
 
-		const firstSearchResultItemHTML = first( searchResultElements )
-			.innerHTML;
+		const firstSearchResultItemHTML =
+			first( searchResultElements ).innerHTML;
 		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
 
 		expect( searchResultElements ).toHaveLength(
@@ -501,8 +501,8 @@ describe( 'Searching for a link', () => {
 
 			const searchResultElements = getSearchResults();
 
-			const lastSearchResultItemHTML = last( searchResultElements )
-				.innerHTML;
+			const lastSearchResultItemHTML =
+				last( searchResultElements ).innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
 
 			// We should see a search result for each of the expect search suggestions
@@ -758,12 +758,10 @@ describe( 'Default search suggestions', () => {
 		// Search Input UI.
 		const searchInput = getURLInput();
 
-		const searchResultsWrapper = container.querySelector(
-			'[role="listbox"]'
-		);
-		const initialSearchResultElements = searchResultsWrapper.querySelectorAll(
-			'[role="option"]'
-		);
+		const searchResultsWrapper =
+			container.querySelector( '[role="listbox"]' );
+		const initialSearchResultElements =
+			searchResultsWrapper.querySelectorAll( '[role="option"]' );
 
 		const searchResultsLabel = container.querySelector(
 			`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
@@ -1690,9 +1688,8 @@ describe( 'Selecting links', () => {
 
 			await eventLoopTick();
 
-			const searchResultsWrapper = container.querySelector(
-				'[role="listbox"]'
-			);
+			const searchResultsWrapper =
+				container.querySelector( '[role="listbox"]' );
 
 			const searchResultsLabel = container.querySelector(
 				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
@@ -1784,9 +1781,8 @@ describe( 'Addition Settings UI', () => {
 
 		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found.
 
-		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
-			'for'
-		);
+		const newTabSettingLabelForAttr =
+			newTabSettingLabel.getAttribute( 'for' );
 		const newTabSettingInput = container.querySelector(
 			`#${ newTabSettingLabelForAttr }`
 		);
@@ -1951,8 +1947,7 @@ describe( 'Rich link previews', () => {
 	it( 'should not fetch or display rich previews by default', async () => {
 		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
-				title:
-					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				icon: 'https://s.w.org/favicon.ico?2',
 				description:
 					'Open source software which you can use to easily create a beautiful website, blog, or app.',
@@ -1982,8 +1977,7 @@ describe( 'Rich link previews', () => {
 	it( 'should display a rich preview when data is available', async () => {
 		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
-				title:
-					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				icon: 'https://s.w.org/favicon.ico?2',
 				description:
 					'Open source software which you can use to easily create a beautiful website, blog, or app.',
@@ -2093,8 +2087,7 @@ describe( 'Rich link previews', () => {
 	it( 'should display a fallback when icon is missing from rich data', async () => {
 		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
-				title:
-					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				description:
 					'Open source software which you can use to easily create a beautiful website, blog, or app.',
 				image: 'https://s.w.org/images/home/screen-themes.png?3',
@@ -2136,8 +2129,7 @@ describe( 'Rich link previews', () => {
 		async ( dataItem ) => {
 			mockFetchRichUrlData.mockImplementation( () => {
 				const data = {
-					title:
-						'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+					title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 					icon: 'https://s.w.org/favicon.ico?2',
 					description:
 						'Open source software which you can use to easily create a beautiful website, blog, or app.',
@@ -2163,9 +2155,8 @@ describe( 'Rich link previews', () => {
 				"[aria-label='Currently selected']"
 			);
 
-			const isRichLinkPreview = linkPreview.classList.contains(
-				'is-rich'
-			);
+			const isRichLinkPreview =
+				linkPreview.classList.contains( 'is-rich' );
 			expect( isRichLinkPreview ).toBe( true );
 
 			const missingDataItem = linkPreview.querySelector(
@@ -2202,9 +2193,8 @@ describe( 'Rich link previews', () => {
 				"[aria-label='Currently selected']"
 			);
 
-			const isRichLinkPreview = linkPreview.classList.contains(
-				'is-rich'
-			);
+			const isRichLinkPreview =
+				linkPreview.classList.contains( 'is-rich' );
 
 			expect( isRichLinkPreview ).toBe( false );
 		}
@@ -2231,9 +2221,8 @@ describe( 'Rich link previews', () => {
 			"[aria-label='Currently selected']"
 		);
 
-		const isFetchingRichPreview = linkPreview.classList.contains(
-			'is-fetching'
-		);
+		const isFetchingRichPreview =
+			linkPreview.classList.contains( 'is-fetching' );
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
 		expect( isFetchingRichPreview ).toBe( true );
@@ -2261,9 +2250,8 @@ describe( 'Rich link previews', () => {
 			"[aria-label='Currently selected']"
 		);
 
-		const isFetchingRichPreview = linkPreview.classList.contains(
-			'is-fetching'
-		);
+		const isFetchingRichPreview =
+			linkPreview.classList.contains( 'is-fetching' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 

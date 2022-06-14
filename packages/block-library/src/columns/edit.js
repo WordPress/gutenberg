@@ -163,9 +163,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;

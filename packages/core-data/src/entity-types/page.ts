@@ -140,6 +140,5 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Page<
-	C extends Context = DefaultContextOf< 'postType', 'page' >
-> = OmitNevers< _BaseEntityRecords.Page< C > >;
+export type Page< C extends Context = DefaultContextOf< 'postType', 'page' > > =
+	OmitNevers< _BaseEntityRecords.Page< C > >;

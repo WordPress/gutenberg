@@ -58,9 +58,8 @@ const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof FormTokenField
-> = DefaultTemplate.bind( {} );
+export const Default: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,

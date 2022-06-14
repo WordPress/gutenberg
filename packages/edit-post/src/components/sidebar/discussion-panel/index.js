@@ -52,9 +52,8 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			isEnabled: select( editPostStore ).isEditorPanelEnabled(
-				PANEL_NAME
-			),
+			isEnabled:
+				select( editPostStore ).isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: select( editPostStore ).isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),

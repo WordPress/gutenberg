@@ -57,9 +57,8 @@ const renderBorder = ( {
 	'aria-orientation': orientation = 'horizontal',
 }: Props ) => {
 	return css( {
-		[ orientation === 'vertical'
-			? 'borderRight'
-			: 'borderBottom' ]: '1px solid currentColor',
+		[ orientation === 'vertical' ? 'borderRight' : 'borderBottom' ]:
+			'1px solid currentColor',
 	} );
 };
 
