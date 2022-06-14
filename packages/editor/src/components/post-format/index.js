@@ -49,9 +49,8 @@ export default function PostFormat() {
 
 	const { postFormat, suggestedFormat, supportedFormats } = useSelect(
 		( select ) => {
-			const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-				editorStore
-			);
+			const { getEditedPostAttribute, getSuggestedPostFormat } =
+				select( editorStore );
 			const _postFormat = getEditedPostAttribute( 'format' );
 			const themeSupports = select( coreStore ).getThemeSupports();
 			return {

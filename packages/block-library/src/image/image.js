@@ -92,9 +92,8 @@ export default function Image( {
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const { getMultiSelectedBlockClientIds, getBlockName } = select(
-				blockEditorStore
-			);
+			const { getMultiSelectedBlockClientIds, getBlockName } =
+				select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
 				image:
@@ -111,42 +110,36 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const {
-		canInsertCover,
-		imageEditing,
-		imageSizes,
-		maxWidth,
-		mediaUpload,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getSettings,
-				canInsertBlockType,
-			} = select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getSettings,
+					canInsertBlockType,
+				} = select( blockEditorStore );
 
-			const rootClientId = getBlockRootClientId( clientId );
-			const settings = pick( getSettings(), [
-				'imageEditing',
-				'imageSizes',
-				'maxWidth',
-				'mediaUpload',
-			] );
+				const rootClientId = getBlockRootClientId( clientId );
+				const settings = pick( getSettings(), [
+					'imageEditing',
+					'imageSizes',
+					'maxWidth',
+					'mediaUpload',
+				] );
 
-			return {
-				...settings,
-				canInsertCover: canInsertBlockType(
-					'core/cover',
-					rootClientId
-				),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					...settings,
+					canInsertCover: canInsertBlockType(
+						'core/cover',
+						rootClientId
+					),
+				};
+			},
+			[ clientId ]
+		);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
-	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		noticesStore
-	);
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [

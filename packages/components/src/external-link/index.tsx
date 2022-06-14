@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { compact, uniq } from 'lodash';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -16,12 +17,18 @@ import { external } from '@wordpress/icons';
  */
 import { VisuallyHidden } from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
+import type { ExternalLinkProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export function ExternalLink(
-	{ href, children, className, rel = '', ...additionalProps },
-	ref
+function UnforwardedExternalLink(
+	props: Omit<
+		WordPressComponentProps< ExternalLinkProps, 'a', false >,
+		'target'
+	>,
+	ref: ForwardedRef< HTMLAnchorElement >
 ) {
-	rel = uniq(
+	const { href, children, className, rel = '', ...additionalProps } = props;
+	const optimizedRel = uniq(
 		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
@@ -32,7 +39,7 @@ export function ExternalLink(
 			className={ classes }
 			href={ href }
 			target="_blank"
-			rel={ rel }
+			rel={ optimizedRel }
 			ref={ ref }
 		>
 			{ children }
@@ -51,4 +58,17 @@ export function ExternalLink(
 	);
 }
 
-export default forwardRef( ExternalLink );
+/**
+ * Link to an external resource.
+ *
+ * ```jsx
+ * import { ExternalLink } from '@wordpress/components';
+ *
+ * const MyExternalLink = () => (
+ *   <ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
+ * );
+ * ```
+ */
+export const ExternalLink = forwardRef( UnforwardedExternalLink );
+
+export default ExternalLink;

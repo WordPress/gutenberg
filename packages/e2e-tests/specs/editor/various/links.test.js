@@ -271,9 +271,8 @@ describe( 'Links', () => {
 	const toggleFixedToolbar = async ( isFixed ) => {
 		await page.evaluate( ( _isFixed ) => {
 			const { select, dispatch } = wp.data;
-			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive(
-				'fixedToolbar'
-			);
+			const isCurrentlyFixed =
+				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
 			if ( isCurrentlyFixed !== _isFixed ) {
 				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			}

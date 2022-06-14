@@ -109,17 +109,20 @@ function Gradient( {
 	const { width = 0, height = 0 } = sizes || {};
 	const { isGradient, getGradientType, gradients } = colorsUtils;
 
-	const colorGroup = useMemo( () => getGradientColorGroup( gradientValue ), [
-		gradientValue,
-	] );
+	const colorGroup = useMemo(
+		() => getGradientColorGroup( gradientValue ),
+		[ gradientValue ]
+	);
 
-	const locations = useMemo( () => getColorLocations( colorGroup ), [
-		colorGroup,
-	] );
+	const locations = useMemo(
+		() => getColorLocations( colorGroup ),
+		[ colorGroup ]
+	);
 
-	const colors = useMemo( () => getGradientBaseColors( colorGroup ), [
-		colorGroup,
-	] );
+	const colors = useMemo(
+		() => getGradientBaseColors( colorGroup ),
+		[ colorGroup ]
+	);
 
 	if ( ! gradientValue || ! isGradient( gradientValue ) ) {
 		return null;

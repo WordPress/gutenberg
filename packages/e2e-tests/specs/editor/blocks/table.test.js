@@ -232,9 +232,8 @@ describe( 'Table', () => {
 
 		// Get the bounding client rect for the second cell.
 		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
-			const secondCell = document.querySelectorAll(
-				'.wp-block-table td'
-			)[ 1 ];
+			const secondCell =
+				document.querySelectorAll( '.wp-block-table td' )[ 1 ];
 			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.

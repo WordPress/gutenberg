@@ -28,11 +28,8 @@ afterAll( () => {
 
 describe( 'Spacer block', () => {
 	it( 'inserts block', async () => {
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor();
+		const { getByA11yLabel, getByTestId, getByText } =
+			await initializeEditor();
 
 		fireEvent.press( getByA11yLabel( 'Add block' ) );
 
@@ -56,14 +53,10 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const {
-			getByA11yLabel,
-			getByDisplayValue,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml,
-		} );
+		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
+			await initializeEditor( {
+				initialHtml,
+			} );
 
 		// Select Spacer block
 		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
@@ -87,14 +80,10 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const {
-			getByA11yLabel,
-			getByDisplayValue,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml,
-		} );
+		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
+			await initializeEditor( {
+				initialHtml,
+			} );
 
 		// Select Spacer block
 		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );

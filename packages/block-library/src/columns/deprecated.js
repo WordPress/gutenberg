@@ -97,7 +97,8 @@ export default [
 				'has-text-color': textColor || customTextColor,
 				[ backgroundClass ]: backgroundClass,
 				[ textClass ]: textClass,
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			const style = {
@@ -204,7 +205,8 @@ export default [
 			const { verticalAlignment, columns } = attributes;
 
 			const wrapperClasses = classnames( `has-${ columns }-columns`, {
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			return (

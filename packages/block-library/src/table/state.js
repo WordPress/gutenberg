@@ -79,10 +79,8 @@ export function updateSelectedCell( state, selection, updateCell ) {
 	}
 
 	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
-	const {
-		sectionName: selectionSectionName,
-		rowIndex: selectionRowIndex,
-	} = selection;
+	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } =
+		selection;
 
 	return mapValues( tableSections, ( section, sectionName ) => {
 		if ( selectionSectionName && selectionSectionName !== sectionName ) {
