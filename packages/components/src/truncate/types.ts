@@ -3,7 +3,12 @@
  */
 import type { ReactNode } from 'react';
 
-export type TruncateEllisizeMode = 'auto' | 'head' | 'tail' | 'middle' | 'none';
+export type TruncateEllipsizeMode =
+	| 'auto'
+	| 'head'
+	| 'tail'
+	| 'middle'
+	| 'none';
 
 export type TruncateProps = {
 	/**
@@ -24,7 +29,7 @@ export type TruncateProps = {
 	 *
 	 * @default 'auto'
 	 */
-	ellipsizeMode?: TruncateEllisizeMode;
+	ellipsizeMode?: TruncateEllipsizeMode;
 	/**
 	 * Determines the max characters when `truncate` is set.
 	 *
