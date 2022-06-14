@@ -219,7 +219,7 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
+		forceRender( {} );
 	}
 
 	function applyFromProps() {
@@ -233,7 +233,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
-			forceRender();
+			forceRender( {} );
 		}
 	}, [ value ] );
 
