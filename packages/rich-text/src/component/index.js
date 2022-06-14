@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useRef,
+	useLayoutEffect,
+	useState,
+	createElement,
+	memo,
+} from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 
@@ -9,7 +15,7 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { create } from '../create';
-import { apply } from '../to-dom';
+import { toDom, applySelection } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
@@ -20,6 +26,39 @@ import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 import { useSpace } from './use-space';
+import { nodeListToReact } from '../dom-react';
+
+const Content = memo(
+	( {
+		value,
+		multilineTag,
+		prepareEditableTree,
+		placeholder,
+		container,
+		forceRenderValue,
+	} ) => {
+		const { body, selection } = toDom( {
+			value,
+			multilineTag,
+			prepareEditableTree,
+			placeholder,
+			doc: document,
+		} );
+
+		useLayoutEffect( () => {
+			if (
+				value.start !== undefined &&
+				container.current &&
+				! forceRenderValue.domOnly
+			) {
+				applySelection( selection, container.current );
+			}
+		}, [ selection, value, forceRenderValue ] );
+		return nodeListToReact( body.childNodes, createElement );
+	},
+	( prevProps, nextProps ) =>
+		prevProps.forceRenderValue === nextProps.forceRenderValue
+);
 
 export function useRichText( {
 	value = '',
@@ -38,7 +77,7 @@ export function useRichText( {
 	__unstableAddInvisibleFormats,
 } ) {
 	const registry = useRegistry();
-	const [ , forceRender ] = useReducer( () => ( {} ) );
+	const [ forceRenderValue, forceRender ] = useState( {} );
 	const ref = useRef();
 
 	function createRecord() {
@@ -60,17 +99,8 @@ export function useRichText( {
 		} );
 	}
 
-	function applyRecord( newRecord, { domOnly } = {} ) {
-		apply( {
-			value: newRecord,
-			current: ref.current,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			prepareEditableTree: __unstableAddInvisibleFormats,
-			__unstableDomOnly: domOnly,
-			placeholder,
-		} );
+	function applyRecord( record, options = {} ) {
+		forceRender( options );
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
@@ -136,7 +166,6 @@ export function useRichText( {
 	 */
 	function handleChange( newRecord ) {
 		record.current = newRecord;
-		applyRecord( newRecord );
 
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
@@ -165,7 +194,7 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
+		applyRecord( newRecord );
 	}
 
 	function handleChangesUponInit( newRecord ) {
@@ -190,7 +219,7 @@ export function useRichText( {
 				__unstableText: text,
 			} );
 		} );
-		forceRender();
+		forceRender( {} );
 	}
 
 	function applyFromProps() {
@@ -204,7 +233,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
-			forceRender();
+			forceRender( {} );
 		}
 	}, [ value ] );
 
@@ -247,7 +276,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
+		useSpace( { record, handleChange } ),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
@@ -258,6 +287,16 @@ export function useRichText( {
 		value: record.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		children: (
+			<Content
+				value={ record.current }
+				multilineTag={ multilineTag }
+				prepareEditableTree={ __unstableAddInvisibleFormats }
+				placeholder={ placeholder }
+				forceRenderValue={ forceRenderValue }
+				container={ ref }
+			/>
+		),
 	};
 }
 

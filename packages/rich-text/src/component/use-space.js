@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 import { SPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { insert } from '../insert';
 
 /**
  * For some elements like BUTTON and SUMMARY, the space key doesn't insert a
@@ -12,10 +18,18 @@ import { SPACE } from '@wordpress/keycodes';
  * DO NOT limit this behaviour to specific tag names! It would mean that this
  * behaviour is not widely tested. If there's ever any problems, we should find
  * a different solution entirely or remove it entirely.
+ *
+ * @param {Object} props Passed props.
  */
-export function useSpace() {
+export function useSpace( props ) {
+	const propsRef = useRef( props );
+	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			const { record, handleChange } = propsRef.current;
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+
 			// Don't insert a space if default behaviour is prevented.
 			if ( event.defaultPrevented ) {
 				return;
@@ -53,7 +67,15 @@ export function useSpace() {
 				return;
 			}
 
-			event.target.ownerDocument.execCommand( 'insertText', false, ' ' );
+			handleChange( insert( record.current, ' ' ) );
+
+			// Trigger input rules.
+			element.dispatchEvent(
+				new defaultView.InputEvent( 'input', {
+					inputType: 'insertText',
+				} )
+			);
+
 			event.preventDefault();
 		}
 

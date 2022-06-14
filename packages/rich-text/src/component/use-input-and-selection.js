@@ -60,11 +60,29 @@ export function useInputAndSelection( props ) {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
+		const mutations = [];
+		const observer = new defaultView.MutationObserver( ( records ) => {
+			for ( const record of records ) {
+				mutations.push( record );
+			}
+		} );
+		const observerConfig = {
+			childList: true,
+			subtree: true,
+			characterData: true,
+			characterDataOldValue: true,
+		};
 
 		let isComposing = false;
 		let rafId;
 
+		function onBeforeInput() {
+			observer.observe( element, observerConfig );
+		}
+
 		function onInput( event ) {
+			observer.disconnect();
+
 			// Do not trigger a change if characters are being composed.
 			// Browsers  will usually emit a final `input` event when the
 			// characters are composed.
@@ -112,6 +130,23 @@ export function useInputAndSelection( props ) {
 				end: currentValue.start,
 				formats: oldActiveFormats,
 			} );
+
+			mutations.forEach( ( mutation ) => {
+				if ( mutation.type === 'characterData' ) {
+					mutation.target.data = mutation.oldValue;
+				} else {
+					for ( const addedNode of mutation.addedNodes ) {
+						mutation.target.removeChild( addedNode );
+					}
+					for ( const removedNode of mutation.removedNodes ) {
+						mutation.target.insertBefore(
+							removedNode,
+							mutation.nextSibling
+						);
+					}
+				}
+			} );
+			mutations.length = 0;
 
 			handleChange( change );
 		}
@@ -231,8 +266,8 @@ export function useInputAndSelection( props ) {
 			// It is important that the internal value is updated first,
 			// otherwise the value will be wrong on render!
 			record.current = newValue;
-			applyRecord( newValue, { domOnly: true } );
 			onSelectionChange( start, end );
+			applyRecord( newValue, { domOnly: true } );
 		}
 
 		function onCompositionStart() {
@@ -297,6 +332,7 @@ export function useInputAndSelection( props ) {
 			rafId = defaultView.requestAnimationFrame( handleSelectionChange );
 		}
 
+		element.addEventListener( 'beforeinput', onBeforeInput );
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
@@ -313,6 +349,7 @@ export function useInputAndSelection( props ) {
 			handleSelectionChange
 		);
 		return () => {
+			element.removeEventListener( 'beforeinput', onBeforeInput );
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(
 				'compositionstart',
