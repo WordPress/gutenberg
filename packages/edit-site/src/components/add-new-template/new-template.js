@@ -76,9 +76,8 @@ const TEMPLATE_ICONS = {
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
 	const postTypes = usePostTypes();
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] = useState(
-		false
-	);
+	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
+		useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 	const { existingTemplates, defaultTemplateTypes } = useSelect(
 		( select ) => ( {

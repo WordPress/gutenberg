@@ -78,9 +78,8 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	const debouncedSearch = useDebounce( setSearch, 250 );
 	const { searchResults, searchHasResolved } = useSelect(
 		( select ) => {
-			const { getEntityRecords, hasFinishedResolution } = select(
-				coreStore
-			);
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreStore );
 			const selectorArgs = [
 				entityForSuggestions.type,
 				entityForSuggestions.slug,
