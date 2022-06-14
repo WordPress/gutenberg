@@ -28,7 +28,6 @@ export const Default: ComponentStory< typeof TextHighlight > = Template.bind(
 	{}
 );
 Default.args = {
-	text:
-		'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
+	text: 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
 	highlight: 'Gutenberg',
 };
