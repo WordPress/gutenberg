@@ -81,7 +81,6 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onInput( event ) {
-			// console.log( 'disconnect' );
 			observer.disconnect();
 
 			// Do not trigger a change if characters are being composed.

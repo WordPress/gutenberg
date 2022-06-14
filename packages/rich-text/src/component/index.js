@@ -4,7 +4,7 @@
 import {
 	useRef,
 	useLayoutEffect,
-	useReducer,
+	useState,
 	createElement,
 	memo,
 } from '@wordpress/element';
@@ -35,6 +35,7 @@ const Content = memo(
 		prepareEditableTree,
 		placeholder,
 		container,
+		forceRenderValue,
 	} ) => {
 		const { body, selection } = toDom( {
 			value,
@@ -45,10 +46,14 @@ const Content = memo(
 		} );
 
 		useLayoutEffect( () => {
-			if ( value.start !== undefined && container.current ) {
+			if (
+				value.start !== undefined &&
+				container.current &&
+				! forceRenderValue.domOnly
+			) {
 				applySelection( selection, container.current );
 			}
-		}, [ selection, value ] );
+		}, [ selection, value, forceRenderValue ] );
 		return nodeListToReact( body.childNodes, createElement );
 	},
 	( prevProps, nextProps ) =>
@@ -72,7 +77,7 @@ export function useRichText( {
 	__unstableAddInvisibleFormats,
 } ) {
 	const registry = useRegistry();
-	const [ forceRenderValue, forceRender ] = useReducer( () => ( {} ) );
+	const [ forceRenderValue, forceRender ] = useState( {} );
 	const ref = useRef();
 
 	function createRecord() {
@@ -94,8 +99,8 @@ export function useRichText( {
 		} );
 	}
 
-	function applyRecord() {
-		forceRender();
+	function applyRecord( record, options = {} ) {
+		forceRender( options );
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
@@ -271,7 +276,7 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
+		useSpace( { record, handleChange } ),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
