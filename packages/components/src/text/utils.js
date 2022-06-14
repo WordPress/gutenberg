@@ -102,9 +102,8 @@ export function createHighlighterText( {
 			let highlightClass;
 			if ( typeof highlightClassName === 'object' ) {
 				if ( ! caseSensitive ) {
-					highlightClassName = memoizedLowercaseProps(
-						highlightClassName
-					);
+					highlightClassName =
+						memoizedLowercaseProps( highlightClassName );
 					highlightClass = highlightClassName[ text.toLowerCase() ];
 				} else {
 					highlightClass = highlightClassName[ text ];

@@ -173,12 +173,10 @@ function HierarchicalTermSelector( { slug } ) {
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const { getTaxonomy, getEntityRecords, isResolving } = select(
-				coreStore
-			);
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getTaxonomy, getEntityRecords, isResolving } =
+				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
 
 			return {

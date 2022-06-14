@@ -57,19 +57,20 @@ function useDialog( options ) {
 			return;
 		}
 
-		node.addEventListener( 'keydown', (
-			/** @type {KeyboardEvent} */ event
-		) => {
-			// Close on escape.
-			if (
-				event.keyCode === ESCAPE &&
-				! event.defaultPrevented &&
-				currentOptions.current?.onClose
-			) {
-				event.preventDefault();
-				currentOptions.current.onClose();
+		node.addEventListener(
+			'keydown',
+			( /** @type {KeyboardEvent} */ event ) => {
+				// Close on escape.
+				if (
+					event.keyCode === ESCAPE &&
+					! event.defaultPrevented &&
+					currentOptions.current?.onClose
+				) {
+					event.preventDefault();
+					currentOptions.current.onClose();
+				}
 			}
-		} );
+		);
 	}, [] );
 
 	return [

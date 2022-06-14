@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, noop } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 
+const noop = () => {};
 const SNACKBAR_VARIANTS = {
 	init: {
 		height: 0,

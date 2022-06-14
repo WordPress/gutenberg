@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, reverse } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -89,7 +84,7 @@ export function getClosestTabbable(
 	let focusableNodes = focus.focusable.find( containerElement );
 
 	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
+		focusableNodes.reverse();
 	}
 
 	// Consider as candidates those focusables after the current target. It's
@@ -130,7 +125,7 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return find( focusableNodes, isTabCandidate );
+	return focusableNodes.find( isTabCandidate );
 }
 
 export default function useArrowNav() {
@@ -231,7 +226,8 @@ export default function useArrowNav() {
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+				const selectionEndClientId =
+					getMultiSelectedBlocksEndClientId();
 				const selectionBeforeEndClientId = getPreviousBlockClientId(
 					selectionEndClientId || selectedBlockClientId
 				);

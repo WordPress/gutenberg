@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { has } from 'lodash';
+import { has, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,49 @@ import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
+
+/**
+ * Generates the utility classnames for the given blocks layout attributes.
+ * This method was primarily added to reintroduce classnames that were removed
+ * in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719), rather
+ * than providing an extensive list of all possible layout classes. The plan is to
+ * have the style engine generate a more extensive list of utility classnames which
+ * will then replace this method.
+ *
+ * @param { Array } attributes Array of block attributes.
+ *
+ * @return { Array } Array of CSS classname strings.
+ */
+function getLayoutClasses( attributes ) {
+	const layoutClassnames = [];
+
+	if ( ! attributes.layout ) {
+		return layoutClassnames;
+	}
+
+	if ( attributes?.layout?.orientation ) {
+		layoutClassnames.push(
+			`is-${ kebabCase( attributes.layout.orientation ) }`
+		);
+	}
+
+	if ( attributes?.layout?.justifyContent ) {
+		layoutClassnames.push(
+			`is-content-justification-${ kebabCase(
+				attributes.layout.justifyContent
+			) }`
+		);
+	}
+
+	if (
+		attributes?.layout?.flexWrap &&
+		attributes.layout.flexWrap === 'nowrap'
+	) {
+		layoutClassnames.push( 'is-nowrap' );
+	}
+
+	return layoutClassnames;
+}
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
@@ -212,9 +255,16 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
-		} );
+		const layoutClasses = shouldRenderLayoutStyles
+			? getLayoutClasses( attributes )
+			: null;
+		const className = classnames(
+			props?.className,
+			{
+				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+			},
+			layoutClasses
+		);
 
 		return (
 			<>

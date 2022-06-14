@@ -9,7 +9,6 @@ import deprecated from '@wordpress/deprecated';
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Status } from './constants';
-import useEntityRecords from './use-entity-records';
 
 export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
