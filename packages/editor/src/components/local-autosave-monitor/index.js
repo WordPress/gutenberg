@@ -54,8 +54,8 @@ function useAutosaveNotice() {
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			hasRemoteAutosave: !! select( editorStore ).getEditorSettings()
-				.autosave,
+			hasRemoteAutosave:
+				!! select( editorStore ).getEditorSettings().autosave,
 		} ),
 		[]
 	);
@@ -124,22 +124,17 @@ function useAutosaveNotice() {
  * Custom hook which ejects a local autosave after a successful save occurs.
  */
 function useAutosavePurge() {
-	const {
-		postId,
-		isEditedPostNew,
-		isDirty,
-		isAutosaving,
-		didError,
-	} = useSelect(
-		( select ) => ( {
-			postId: select( editorStore ).getCurrentPostId(),
-			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			isDirty: select( editorStore ).isEditedPostDirty(),
-			isAutosaving: select( editorStore ).isAutosavingPost(),
-			didError: select( editorStore ).didPostSaveRequestFail(),
-		} ),
-		[]
-	);
+	const { postId, isEditedPostNew, isDirty, isAutosaving, didError } =
+		useSelect(
+			( select ) => ( {
+				postId: select( editorStore ).getCurrentPostId(),
+				isEditedPostNew: select( editorStore ).isEditedPostNew(),
+				isDirty: select( editorStore ).isEditedPostDirty(),
+				isAutosaving: select( editorStore ).isAutosavingPost(),
+				didError: select( editorStore ).didPostSaveRequestFail(),
+			} ),
+			[]
+		);
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
@@ -177,8 +172,8 @@ function LocalAutosaveMonitor() {
 
 	const { localAutosaveInterval } = useSelect(
 		( select ) => ( {
-			localAutosaveInterval: select( editorStore ).getEditorSettings()
-				.localAutosaveInterval,
+			localAutosaveInterval:
+				select( editorStore ).getEditorSettings().localAutosaveInterval,
 		} ),
 		[]
 	);

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { Context } from './helpers';
-import { EntityRecord } from './index';
+import type { EntityRecord } from './index';
 
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
@@ -48,7 +48,10 @@ export type EntityType<
 
 type RequiredConfigKeys = 'name' | 'kind' | 'key' | 'baseURLParams';
 
-interface EntityConfig< R extends EntityRecord< C >, C extends Context > {
+export interface EntityConfig<
+	R extends EntityRecord< C >,
+	C extends Context
+> {
 	/** Path in WP REST API from which to request records of this entity. */
 	baseURL: string;
 

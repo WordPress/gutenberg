@@ -3,7 +3,6 @@
  */
 import {
 	last,
-	take,
 	clone,
 	uniq,
 	map,
@@ -90,12 +89,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	const [ inputOffsetFromEnd, setInputOffsetFromEnd ] = useState( 0 );
 	const [ isActive, setIsActive ] = useState( false );
 	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] = useState(
-		-1
-	);
-	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] = useState(
-		false
-	);
+	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] =
+		useState( -1 );
+	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] =
+		useState( false );
 
 	const prevSuggestions = usePrevious< string[] >( suggestions );
 	const prevValue = usePrevious< ( string | TokenItem )[] >( value );
@@ -498,7 +495,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			_suggestions = startsWithMatch.concat( containsMatch );
 		}
 
-		return take( _suggestions, _maxSuggestions );
+		return _suggestions.slice( 0, _maxSuggestions );
 	}
 
 	function getSelectedSuggestion() {
@@ -529,9 +526,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	function updateSuggestions( resetSelectedSuggestion = true ) {
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
-		const matchingSuggestions = getMatchingSuggestions(
-			incompleteTokenValue
-		);
+		const matchingSuggestions =
+			getMatchingSuggestions( incompleteTokenValue );
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		setIsExpanded(

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop, times } from 'lodash';
+import { times } from 'lodash';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+
+const noop = () => {};
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -1088,9 +1090,8 @@ describe( 'block factory', () => {
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					textBlocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( textBlocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
@@ -1130,9 +1131,8 @@ describe( 'block factory', () => {
 					} );
 				} );
 
-				const availableBlocks = getPossibleBlockTransformations(
-					blocks
-				);
+				const availableBlocks =
+					getPossibleBlockTransformations( blocks );
 
 				expect( availableBlocks ).toHaveLength( 1 );
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );

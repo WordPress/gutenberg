@@ -57,9 +57,8 @@ export default function Header( {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();

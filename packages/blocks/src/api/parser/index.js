@@ -65,13 +65,11 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
  */
 function convertLegacyBlocks( rawBlock ) {
-	const [
-		correctName,
-		correctedAttributes,
-	] = convertLegacyBlockNameAndAttributes(
-		rawBlock.blockName,
-		rawBlock.attrs
-	);
+	const [ correctName, correctedAttributes ] =
+		convertLegacyBlockNameAndAttributes(
+			rawBlock.blockName,
+			rawBlock.attrs
+		);
 	return {
 		...rawBlock,
 		blockName: correctName,

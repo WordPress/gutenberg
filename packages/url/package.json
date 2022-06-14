@@ -28,7 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"lodash": "^4.17.21"
+		"remove-accents": "^0.4.2"
 	},
 	"publishConfig": {
 		"access": "public"

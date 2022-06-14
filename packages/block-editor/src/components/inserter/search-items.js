@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, differenceWith, find, words } from 'lodash';
+import { deburr, find, words } from 'lodash';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -47,11 +47,11 @@ export const getNormalizedSearchTerms = ( input = '' ) => {
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
-	return differenceWith(
-		unmatchedTerms,
-		getNormalizedSearchTerms( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
+	return unmatchedTerms.filter(
+		( term ) =>
+			! getNormalizedSearchTerms( unprocessedTerms ).some(
+				( unprocessedTerm ) => unprocessedTerm.includes( term )
+			)
 	);
 };
 

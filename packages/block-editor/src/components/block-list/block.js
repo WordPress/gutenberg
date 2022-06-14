@@ -269,10 +269,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const { getMultiSelectedBlockClientIds } = select(
-				blockEditorStore
-			);
-			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+			const { getMultiSelectedBlockClientIds } =
+				select( blockEditorStore );
+			const multiSelectedBlockClientIds =
+				getMultiSelectedBlockClientIds();
 			const { clientId } = ownProps;
 			const clientIds = multiSelectedBlockClientIds.length
 				? multiSelectedBlockClientIds
@@ -292,9 +292,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				blockEditorStore
-			);
+			const { getPreviousBlockClientId, getNextBlockClientId } =
+				select( blockEditorStore );
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -302,9 +301,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
-				const previousBlockClientId = getPreviousBlockClientId(
-					clientId
-				);
+				const previousBlockClientId =
+					getPreviousBlockClientId( clientId );
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				}

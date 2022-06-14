@@ -17,10 +17,8 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		[ attributes.slug ]
 	);
 
-	const {
-		replaceBlocks,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { replaceBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern's contents to the post.

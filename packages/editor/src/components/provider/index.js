@@ -34,9 +34,8 @@ function EditorProvider( {
 		return { postId: post.id, postType: post.type };
 	}, [ post.id, post.type ] );
 	const { selection, isReady } = useSelect( ( select ) => {
-		const { getEditorSelection, __unstableIsEditorReady } = select(
-			editorStore
-		);
+		const { getEditorSelection, __unstableIsEditorReady } =
+			select( editorStore );
 		return {
 			isReady: __unstableIsEditorReady(),
 			selection: getEditorSelection(),
