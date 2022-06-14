@@ -63,16 +63,13 @@ class VideoEdit extends Component {
 		};
 
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
@@ -213,12 +210,8 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const {
-			setAttributes,
-			attributes,
-			isSelected,
-			wasBlockJustInserted,
-		} = this.props;
+		const { setAttributes, attributes, isSelected, wasBlockJustInserted } =
+			this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 

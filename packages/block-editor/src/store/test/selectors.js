@@ -575,18 +575,18 @@ describe( 'selectors', () => {
 					controlledInnerBlocks: {},
 				},
 			};
-			expect(
-				getClientIdsOfDescendants( state, [ 'uuid-10' ] )
-			).toEqual( [
-				'uuid-12',
-				'uuid-16',
-				'uuid-14',
-				'uuid-18',
-				'uuid-24',
-				'uuid-26',
-				'uuid-28',
-				'uuid-30',
-			] );
+			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
+				[
+					'uuid-12',
+					'uuid-16',
+					'uuid-14',
+					'uuid-18',
+					'uuid-24',
+					'uuid-26',
+					'uuid-28',
+					'uuid-30',
+				]
+			);
 		} );
 	} );
 
@@ -1282,9 +1282,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				4,
-				3,
-				2,
+				4, 3, 2,
 			] );
 		} );
 
@@ -1314,9 +1312,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
-				9,
-				8,
-				7,
+				9, 8, 7,
 			] );
 		} );
 	} );
@@ -2914,9 +2910,9 @@ describe( 'selectors', () => {
 				'core/block/1',
 				'core/block/2',
 			] );
-			expect(
-				secondBlockSecondCall.map( ( item ) => item.id )
-			).toEqual( [ 'core/test-block-b' ] );
+			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual(
+				[ 'core/test-block-b' ]
+			);
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {

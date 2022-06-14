@@ -20,8 +20,7 @@ ruleTester.run( 'i18n-no-collapsible-whitespace', rule, {
 			code: `__( 'Hello World…' )`,
 		},
 		{
-			code:
-				'__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
+			code: '__( `A long string ` +\n `spread over ` +\n  `multiple lines.` );',
 		},
 	],
 	invalid: [
@@ -54,8 +53,7 @@ ruleTester.run( 'i18n-no-collapsible-whitespace', rule, {
 			errors: [ { messageId: 'noCollapsibleWhitespace' } ],
 		},
 		{
-			code:
-				"__( 'A string with consecutive spaces.  These two are after a full stop.' );",
+			code: "__( 'A string with consecutive spaces.  These two are after a full stop.' );",
 			errors: [ { messageId: 'noCollapsibleWhitespace' } ],
 		},
 	],

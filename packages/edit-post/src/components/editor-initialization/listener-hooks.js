@@ -24,9 +24,8 @@ import {
 export const useBlockSelectionListener = ( postId ) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
-			hasBlockSelection: !! select(
-				blockEditorStore
-			).getBlockSelectionStart(),
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			isEditorSidebarOpened: select( STORE_NAME ).isEditorSidebarOpened(),
 		} ),
 		[ postId ]

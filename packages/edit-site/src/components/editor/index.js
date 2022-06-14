@@ -119,10 +119,8 @@ function Editor( { onError } ) {
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const [
-		isEntitiesSavedStatesOpen,
-		setIsEntitiesSavedStatesOpen,
-	] = useState( false );
+	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
+		useState( false );
 	const openEntitiesSavedStates = useCallback(
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
@@ -217,7 +215,8 @@ function Editor( { onError } ) {
 										<InterfaceSkeleton
 											labels={ {
 												...interfaceLabels,
-												secondarySidebar: secondarySidebarLabel,
+												secondarySidebar:
+													secondarySidebarLabel,
 											} }
 											className={
 												showIconLabels &&

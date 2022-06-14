@@ -135,11 +135,8 @@ describe( 'Post Editor Performance', () => {
 		}
 		await page.tracing.stop();
 		traceResults = JSON.parse( readFile( traceFile ) );
-		const [
-			keyDownEvents,
-			keyPressEvents,
-			keyUpEvents,
-		] = getTypingEventDurations( traceResults );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
 		if (
 			keyDownEvents.length === keyPressEvents.length &&
 			keyPressEvents.length === keyUpEvents.length
@@ -243,11 +240,8 @@ describe( 'Post Editor Performance', () => {
 			await page.keyboard.type( 'p' );
 			await page.tracing.stop();
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const [
-				keyDownEvents,
-				keyPressEvents,
-				keyUpEvents,
-			] = getTypingEventDurations( traceResults );
+			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+				getTypingEventDurations( traceResults );
 			if (
 				keyDownEvents.length === keyPressEvents.length &&
 				keyPressEvents.length === keyUpEvents.length
@@ -287,9 +281,8 @@ describe( 'Post Editor Performance', () => {
 			await page.tracing.stop();
 
 			traceResults = JSON.parse( readFile( traceFile ) );
-			const [ mouseOverEvents, mouseOutEvents ] = getHoverEventDurations(
-				traceResults
-			);
+			const [ mouseOverEvents, mouseOutEvents ] =
+				getHoverEventDurations( traceResults );
 			for ( let k = 0; k < mouseOverEvents.length; k++ ) {
 				results.inserterHover.push(
 					mouseOverEvents[ k ] + mouseOutEvents[ k ]

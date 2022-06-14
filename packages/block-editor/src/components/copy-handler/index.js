@@ -144,10 +144,8 @@ export function useClipboardHandler() {
 					if ( shouldHandleWholeBlocks ) {
 						blocks = getBlocksByClientId( selectedBlockClientIds );
 					} else {
-						const [
-							head,
-							tail,
-						] = __unstableGetSelectedBlocksWithPartialSelection();
+						const [ head, tail ] =
+							__unstableGetSelectedBlocksWithPartialSelection();
 						const inBetweenBlocks = getBlocksByClientId(
 							selectedBlockClientIds.slice(
 								1,
@@ -178,7 +176,8 @@ export function useClipboardHandler() {
 					return;
 				}
 				const {
-					__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
+					__experimentalCanUserUseUnfilteredHTML:
+						canUserUseUnfilteredHTML,
 				} = getSettings();
 				const { plainText, html } = getPasteEventData( event );
 				const blocks = pasteHandler( {
