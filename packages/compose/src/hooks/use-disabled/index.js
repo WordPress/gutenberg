@@ -70,9 +70,8 @@ export default function useDisabled( {
 
 			const disable = () => {
 				if ( node.style.getPropertyValue( 'user-select' ) !== 'none' ) {
-					const previousValue = node.style.getPropertyValue(
-						'user-select'
-					);
+					const previousValue =
+						node.style.getPropertyValue( 'user-select' );
 					node.style.setProperty( 'user-select', 'none' );
 					node.style.setProperty( '-webkit-user-select', 'none' );
 					updates.push( () => {
@@ -110,9 +109,8 @@ export default function useDisabled( {
 						focusable.nodeName === 'A' &&
 						focusable.getAttribute( 'tabindex' ) !== '-1'
 					) {
-						const previousValue = focusable.getAttribute(
-							'tabindex'
-						);
+						const previousValue =
+							focusable.getAttribute( 'tabindex' );
 						focusable.setAttribute( 'tabindex', '-1' );
 						updates.push( () => {
 							if ( ! focusable.isConnected ) {
@@ -158,9 +156,10 @@ export default function useDisabled( {
 						focusable instanceof
 							node.ownerDocument.defaultView.HTMLElement
 					) {
-						const previousValue = focusable.style.getPropertyValue(
-							'pointer-events'
-						);
+						const previousValue =
+							focusable.style.getPropertyValue(
+								'pointer-events'
+							);
 						focusable.style.setProperty( 'pointer-events', 'none' );
 						updates.push( () => {
 							if ( ! focusable.isConnected ) {

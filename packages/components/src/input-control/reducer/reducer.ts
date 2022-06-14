@@ -145,27 +145,29 @@ export function useInputControlStateReducer(
 		mergeInitialState( initialState )
 	);
 
-	const createChangeEvent = ( type: actions.ChangeEventAction[ 'type' ] ) => (
-		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
-		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
-	) => {
-		dispatch( {
-			type,
-			payload: { value: nextValue, event },
-		} as actions.InputAction );
-	};
+	const createChangeEvent =
+		( type: actions.ChangeEventAction[ 'type' ] ) =>
+		(
+			nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
+			event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
+		) => {
+			dispatch( {
+				type,
+				payload: { value: nextValue, event },
+			} as actions.InputAction );
+		};
 
-	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
-		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
-	) => {
-		dispatch( { type, payload: { event } } );
-	};
+	const createKeyEvent =
+		( type: actions.KeyEventAction[ 'type' ] ) =>
+		( event: actions.KeyEventAction[ 'payload' ][ 'event' ] ) => {
+			dispatch( { type, payload: { event } } );
+		};
 
-	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
-		payload: actions.DragEventAction[ 'payload' ]
-	) => {
-		dispatch( { type, payload } );
-	};
+	const createDragEvent =
+		( type: actions.DragEventAction[ 'type' ] ) =>
+		( payload: actions.DragEventAction[ 'payload' ] ) => {
+			dispatch( { type, payload } );
+		};
 
 	/**
 	 * Actions for the reducer

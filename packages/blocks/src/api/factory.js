@@ -6,7 +6,6 @@ import {
 	every,
 	castArray,
 	some,
-	isObjectLike,
 	filter,
 	first,
 	flatMap,
@@ -345,12 +344,10 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms(
-		blocks
-	);
-	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms(
-		blocks
-	);
+	const blockTypesForFromTransforms =
+		getBlockTypesForPossibleFromTransforms( blocks );
+	const blockTypesForToTransforms =
+		getBlockTypesForPossibleToTransforms( blocks );
 
 	return uniq( [
 		...blockTypesForFromTransforms,
@@ -519,9 +516,8 @@ export function switchToBlockType( blocks, name ) {
 
 	if ( transformation.isMultiBlock ) {
 		if ( has( transformation, '__experimentalConvert' ) ) {
-			transformationResults = transformation.__experimentalConvert(
-				blocksArray
-			);
+			transformationResults =
+				transformation.__experimentalConvert( blocksArray );
 		} else {
 			transformationResults = transformation.transform(
 				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
@@ -529,9 +525,8 @@ export function switchToBlockType( blocks, name ) {
 			);
 		}
 	} else if ( has( transformation, '__experimentalConvert' ) ) {
-		transformationResults = transformation.__experimentalConvert(
-			firstBlock
-		);
+		transformationResults =
+			transformation.__experimentalConvert( firstBlock );
 	} else {
 		transformationResults = transformation.transform(
 			firstBlock.attributes,
@@ -541,7 +536,10 @@ export function switchToBlockType( blocks, name ) {
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.
-	if ( ! isObjectLike( transformationResults ) ) {
+	if (
+		transformationResults === null ||
+		typeof transformationResults !== 'object'
+	) {
 		return null;
 	}
 

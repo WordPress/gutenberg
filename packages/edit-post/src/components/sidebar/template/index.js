@@ -48,12 +48,8 @@ export function TemplatePanel() {
 			getCurrentPostId,
 			getCurrentPostType,
 		} = select( editorStore );
-		const {
-			getPostType,
-			getEntityRecord,
-			getEntityRecords,
-			canUser,
-		} = select( coreStore );
+		const { getPostType, getEntityRecord, getEntityRecords, canUser } =
+			select( coreStore );
 
 		const currentPostId = getCurrentPostId();
 		const currentPostType = getCurrentPostType();
