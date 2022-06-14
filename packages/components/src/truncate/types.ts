@@ -39,6 +39,8 @@ export type TruncateProps = {
 	/**
 	 * Clamps the text content to the specified `numberOfLines`, adding the
 	 * `ellipsis` at the end.
+	 *
+	 * @default 0
 	 */
 	numberOfLines?: number;
 	/**

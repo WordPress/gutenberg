@@ -24,15 +24,14 @@ function Example() {
 
 ## Props
 
-##### ellipsis
-
-**Type**: `string`
+##### `ellipsis`: `string`
 
 The ellipsis string when `truncate` is set.
 
-##### ellipsizeMode
+-   Required: No
+-   Default: `…`
 
-**Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
+##### `ellipsizeMode`: `'auto' | 'head' | 'tail' | 'middle' | 'none'`
 
 Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
 
@@ -41,17 +40,22 @@ Determines where to truncate. For example, we can truncate text right in the mid
 -   `middle`: Trims content in the middle. Requires a `limit`.
 -   `tail`: Trims content at the end. Requires a `limit`.
 
-##### limit
+-   Required: No
+-   Default: `auto`
 
-**Type**: `number`
+##### `limit`: `number`
 
 Determines the max characters when `truncate` is set.
 
-##### numberOfLines
+-   Required: No
+-   Default: `0`
 
-**Type**: `number`
+##### `numberOfLines`: `number`
 
 Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+
+-   Required: No
+-   Default: `0`
 
 ```jsx
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
