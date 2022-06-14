@@ -146,17 +146,24 @@ export function toTree( {
 	const multilineFormat = { type: multilineTag };
 	const activeFormats = getActiveFormats( value );
 	const deepestActiveFormat = activeFormats[ activeFormats.length - 1 ];
+	const emptyNodes = [];
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
 	let lastCharacter;
 
+	function appendEmpty( parent ) {
+		const node = append( parent, '' );
+		emptyNodes.push( node );
+		return node;
+	}
+
 	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
+		appendEmpty( append( tree, { type: multilineTag } ) );
 		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
-		append( tree, '' );
+		appendEmpty( tree );
 	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
@@ -260,11 +267,14 @@ export function toTree( {
 					} )
 				);
 
-				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
-					remove( pointer );
-				}
+				emptyNodes.forEach( ( node ) => {
+					if ( getText( node ).length === 0 ) {
+						remove( node );
+					}
+				} );
+				emptyNodes.length = 0;
 
-				pointer = append( newNode, '' );
+				pointer = appendEmpty( newNode );
 			} );
 		}
 
@@ -311,7 +321,7 @@ export function toTree( {
 				);
 			}
 			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
+			pointer = appendEmpty( getParent( pointer ) );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {
 			pointer = append( getParent( pointer ), {
 				type: 'br',
@@ -323,7 +333,7 @@ export function toTree( {
 				object: true,
 			} );
 			// Ensure pointer is text node.
-			pointer = append( getParent( pointer ), '' );
+			pointer = appendEmpty( getParent( pointer ) );
 		} else if ( ! isText( pointer ) ) {
 			pointer = append( getParent( pointer ), character );
 		} else {
