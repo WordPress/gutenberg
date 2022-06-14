@@ -738,6 +738,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "CustomSelectControlItem",
+		"slug": "custom-select-control-item",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControl",
+		"slug": "custom-select-control",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
