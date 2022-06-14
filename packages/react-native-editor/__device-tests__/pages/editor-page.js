@@ -498,7 +498,6 @@ class EditorPage {
 	// =========================
 
 	async getParagraphBlockWrapperAtPosition( position = 1 ) {
-		// iOS needs a click to get the text element
 		const blockLocator = isAndroid()
 			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
 			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;

@@ -323,7 +323,7 @@ const longPressMiddleOfElement = async ( driver, element ) => {
 	const y = location.y + size.height / 8;
 	const action = new wd.TouchAction( driver )
 		.press( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( 6000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
 		.release();
 	await action.perform();
 };
