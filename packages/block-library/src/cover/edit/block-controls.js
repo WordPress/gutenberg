@@ -14,19 +14,19 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES, IMAGE_BACKGROUND_TYPE } from '../shared';
+import { ALLOWED_MEDIA_TYPES } from '../shared';
 
 export default function CoverBlockControls( {
 	attributes,
 	setAttributes,
 	onSelectMedia,
 	currentSettings,
+	toggleUseFeaturedImage,
 } ) {
 	const {
 		contentPosition,
 		id,
 		useFeaturedImage,
-		dimRatio,
 		minHeight,
 		minHeightUnit,
 	} = attributes;
@@ -63,17 +63,6 @@ export default function CoverBlockControls( {
 		} );
 	};
 
-	const toggleUseFeaturedImage = () => {
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-		} );
-	};
 	return (
 		<>
 			<BlockControls group="block">
