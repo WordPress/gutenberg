@@ -45,8 +45,8 @@ function getGalleryBlockV2Enabled() {
  */
 export function isGalleryV2Enabled() {
 	// The logic for the native version is located in a different if statement
-	// due to the fact that the `process.env.IS_GUTENBERG_PLUGIN` constant
-	// should only be used as the condition in an if statement.
+	// due to a lint rule that prohibits a single conditional combining
+	// `process.env.IS_GUTENBERG_PLUGIN` with a native platform check.
 	if ( Platform.isNative ) {
 		return getGalleryBlockV2Enabled();
 	}
