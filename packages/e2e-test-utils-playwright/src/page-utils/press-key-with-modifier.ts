@@ -122,10 +122,8 @@ export async function pressKeyWithModifier(
 		shiftAlt: ( _isApple: () => boolean ) =>
 			_isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
-	const mappedModifiers = overWrittenModifiers[ modifier ](
-		isAppleOS
-	).map( ( keycode ) =>
-		keycode === CTRL ? 'Control' : capitalize( keycode )
+	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS ).map(
+		( keycode ) => ( keycode === CTRL ? 'Control' : capitalize( keycode ) )
 	);
 
 	await this.page.keyboard.press(

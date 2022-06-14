@@ -180,7 +180,8 @@ export default function CustomSelectControl( {
 										'is-highlighted':
 											index === highlightedIndex,
 										'has-hint': !! item.__experimentalHint,
-										'is-next-36px-default-size': __next36pxDefaultSize,
+										'is-next-36px-default-size':
+											__next36pxDefaultSize,
 									}
 								),
 								style: item.style,

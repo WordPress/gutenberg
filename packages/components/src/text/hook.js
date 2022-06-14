@@ -89,7 +89,10 @@ export default function useText( props ) {
 			display,
 			fontSize: getFontSize( size ),
 			/* eslint-disable jsdoc/valid-types */
-			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			fontWeight:
+				/** @type {import('react').CSSProperties['fontWeight']} */ (
+					weight
+				),
 			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,

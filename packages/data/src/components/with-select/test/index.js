@@ -50,9 +50,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.data }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 		let testRenderer;
 		act( () => {
 			testRenderer = TestRenderer.create(
@@ -268,9 +267,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.count }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -367,9 +365,8 @@ describe( 'withSelect', () => {
 
 		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		act( () => {
 			TestRenderer.create(
@@ -492,9 +489,8 @@ describe( 'withSelect', () => {
 				<div>{ JSON.stringify( props ) }</div>
 			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -561,9 +557,8 @@ describe( 'withSelect', () => {
 				<div>{ props.count || 'Unknown' }</div>
 			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {
@@ -691,9 +686,8 @@ describe( 'withSelect', () => {
 			.fn()
 			.mockImplementation( ( props ) => <div>{ props.value }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )(
-			OriginalComponent
-		);
+		const DataBoundComponent =
+			withSelect( mapSelectToProps )( OriginalComponent );
 
 		let testRenderer;
 		act( () => {

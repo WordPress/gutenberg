@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
@@ -41,10 +36,8 @@ export default function WidgetAreasBlockEditorProvider( {
 		keepCaretInsideBlock,
 	} = useSelect(
 		( select ) => ( {
-			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
-				true
-			),
+			hasUploadPermissions:
+				select( coreStore ).canUser( 'create', 'media' ) ?? true,
 			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
 			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS

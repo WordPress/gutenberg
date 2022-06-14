@@ -7,11 +7,6 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * Defined behavior of a plugin type.
  *
  * @typedef {Object} WPPlugin
@@ -135,7 +130,7 @@ export function registerPlugin( name, settings ) {
 
 	const { render, scope } = settings;
 
-	if ( ! isFunction( render ) ) {
+	if ( typeof render !== 'function' ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);

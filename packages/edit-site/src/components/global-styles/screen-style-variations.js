@@ -97,9 +97,10 @@ function Variation( { variation } ) {
 function ScreenStyleVariations() {
 	const { variations } = useSelect( ( select ) => {
 		return {
-			variations: select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations(),
+			variations:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 

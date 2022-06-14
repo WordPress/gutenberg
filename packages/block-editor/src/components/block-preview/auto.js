@@ -24,14 +24,10 @@ function AutoBlockPreview( {
 	__experimentalPadding,
 	__experimentalMinHeight,
 } ) {
-	const [
-		containerResizeListener,
-		{ width: containerWidth },
-	] = useResizeObserver();
-	const [
-		contentResizeListener,
-		{ height: contentHeight },
-	] = useResizeObserver();
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 	const { styles, assets } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {

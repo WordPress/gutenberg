@@ -175,8 +175,7 @@ describe( 'fetchLinkSuggestions', () => {
 				{
 					id: 54,
 					title: 'Some Test Media Title',
-					url:
-						'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
 					kind: 'media',
 				},
@@ -225,8 +224,7 @@ describe( 'fetchLinkSuggestions', () => {
 				{
 					id: 54,
 					title: 'Some Test Media Title',
-					url:
-						'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
 					kind: 'media',
 				},
