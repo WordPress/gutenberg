@@ -15,6 +15,9 @@
 		},
 		"textAlign": {
 			"type": "string"
+		},
+		"fontSize": {
+			"type": "string"
 		}
 	},
 	"supports": {
