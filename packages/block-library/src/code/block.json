@@ -50,5 +50,7 @@
 			}
 		}
 	},
+	"allowForPostTypes": [ "page" ],
+	"allowForTemplates": [ "archive" ],
 	"style": "wp-block-code"
 }

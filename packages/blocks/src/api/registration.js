@@ -209,6 +209,8 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'styles',
 		'example',
 		'variations',
+		'allowForPostTypes',
+		'allowForTemplates',
 	];
 
 	const settings = pick( metadata, allowedFields );
