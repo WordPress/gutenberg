@@ -20,4 +20,10 @@ The component accepts the following props. Any other props will be passed throug
 
 The content to be displayed within the link.
 
--   Required: No
+-   Required: Yes
+
+### `href`: `string`
+
+The URL of the external resource.
+
+-   Required: Yes
