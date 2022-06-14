@@ -42,10 +42,8 @@ import { usePostTypes, usePostTypesEntitiesInfo } from './utils';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
-// TODO: check why we need info from `__experimentalGetDefaultTemplateTypes` and here in js..
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
-	// TODO: Info about this need to be change from `post` to make it clear we are creating `single` template.
 	'single',
 	'page',
 	'index',
@@ -141,8 +139,6 @@ export default function NewTemplate( { postType } ) {
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
-	// TODO: rename to missingDefaultTemplates(or combine these arrays like`missingPostTypeTemplates`).
-	// Also it's weird that we don't have a single source of truth for the default templates. Needs looking..
 	const missingTemplates = filter(
 		defaultTemplateTypes,
 		( template ) =>
@@ -201,7 +197,6 @@ export default function NewTemplate( { postType } ) {
 		},
 		[]
 	);
-	// TODO: better handling here.
 	if ( ! missingTemplates.length && ! extraTemplates.length ) {
 		return null;
 	}
