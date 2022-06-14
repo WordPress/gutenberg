@@ -652,10 +652,18 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
+
 		if (
 			contentWithoutRootTag === this.value &&
 			realStart === this.selectionStart &&
 			realEnd === this.selectionEnd
+		) {
+			return;
+		}
+
+		if (
+			contentWithoutRootTag !== this.value &&
+			this.lastAztecEventType === 'selection change'
 		) {
 			return;
 		}
