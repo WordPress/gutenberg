@@ -12,6 +12,7 @@ import BlockEditVisuallyButton from './block-edit-visually-button';
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	return (
 		<ToolbarGroup>
+			<BlockEditVisuallyButton clientIds={ clientIds } { ...props } />
 			<ToolbarItem>
 				{ ( toggleProps ) => (
 					<BlockSettingsDropdown
@@ -21,7 +22,6 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
 					/>
 				) }
 			</ToolbarItem>
-			<BlockEditVisuallyButton clientIds={ clientIds } { ...props } />
 		</ToolbarGroup>
 	);
 }
