@@ -85,6 +85,7 @@ module.exports = {
 							'findIndex',
 							'isArray',
 							'isFinite',
+							'isFunction',
 							'isUndefined',
 							'memoize',
 							'negate',

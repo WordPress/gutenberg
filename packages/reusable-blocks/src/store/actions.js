@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -33,7 +28,7 @@ export const __experimentalConvertBlockToStatic = ( clientId ) => ( {
 		);
 
 	const newBlocks = parse(
-		isFunction( reusableBlock.content )
+		typeof reusableBlock.content === 'function'
 			? reusableBlock.content( reusableBlock )
 			: reusableBlock.content
 	);
