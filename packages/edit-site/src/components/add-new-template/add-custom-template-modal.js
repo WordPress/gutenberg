@@ -28,7 +28,7 @@ import { mapToIHasNameAndId } from './utils';
 const EMPTY_ARRAY = [];
 const BASE_QUERY = {
 	order: 'asc',
-	_fields: 'id,title,slug',
+	_fields: 'id,title,slug,link',
 	context: 'view',
 };
 
@@ -39,12 +39,14 @@ function SuggestionListItem( {
 	entityForSuggestions,
 	composite,
 } ) {
+	const baseCssClass =
+		'edit-site-custom-template-modal__suggestions_list__list-item';
 	return (
 		<CompositeItem
 			role="option"
 			as={ Button }
 			{ ...composite }
-			className="edit-site-custom-template-modal__suggestions_list__list-item"
+			className={ baseCssClass }
 			onClick={ () => {
 				const title = `${ entityForSuggestions.labels.singular }: ${ suggestion.name }`;
 				onSelect( {
@@ -54,7 +56,14 @@ function SuggestionListItem( {
 				} );
 			} }
 		>
-			<TextHighlight text={ suggestion.name } highlight={ search } />
+			<span className={ `${ baseCssClass }__title` }>
+				<TextHighlight text={ suggestion.name } highlight={ search } />
+			</span>
+			{ suggestion.link && (
+				<span className={ `${ baseCssClass }__info` }>
+					{ suggestion.link }
+				</span>
+			) }
 		</CompositeItem>
 	);
 }

@@ -72,6 +72,9 @@
 		display: block;
 		width: 100%;
 		text-align: left;
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+		height: auto;
 
 		mark {
 			@include mark-style();
@@ -83,6 +86,33 @@
 			mark {
 				color: var(--wp-admin-theme-color);
 			}
+		}
+
+		&:focus {
+			background-color: $gray-100;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
+		}
+
+		&__title,
+		&__info {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: block;
+		}
+
+		&__title {
+			font-weight: 500;
+			margin-bottom: 0.2em;
+		}
+
+		&__info {
+			color: $gray-700;
+			font-size: 0.9em;
+			line-height: 1.3;
+			word-break: break-all;
 		}
 	}
 }
