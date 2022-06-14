@@ -5,6 +5,7 @@ import {
 	act,
 	changeTextOfRichText,
 	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
 	openBlockSettings,
@@ -60,9 +61,9 @@ setupCoreBlocks();
 
 describe( 'Gallery block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel } = await addGalleryBlock();
+		const screen = await addGalleryBlock();
 
-		expect( getByA11yLabel( /Gallery Block\. Row 1/ ) ).toBeVisible();
+		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
