@@ -401,7 +401,6 @@ describe( 'Navigation', () => {
 				{
 					match: ( request ) =>
 						request.method() === 'GET' &&
-						request.url().includes( `rest_route` ) &&
 						request.url().includes( `navigation` ) &&
 						request.url().includes( testNavId ),
 					onRequestMatch: ( request ) => {
