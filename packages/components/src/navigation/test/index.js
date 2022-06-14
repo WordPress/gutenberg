@@ -55,20 +55,11 @@ const TestNavigationControlled = () => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
-	// Mock navigation link.
-	const MockLink = ( { href, children } ) => (
-		<button
-			href={ href }
-			// Since we're not actually navigating pages, simulate it with onClick.
-			onClick={ ( event ) => {
-				event.preventDefault();
-				const item = href.replace( 'https://example.com/', '' );
-				setActiveItem( item );
-			} }
-		>
-			{ children }
-		</button>
-	);
+	const onMockLinkClick = ( event ) => {
+		event.preventDefault();
+		const item = event.target.href.replace( 'https://example.com/', '' );
+		setActiveItem( item );
+	};
 
 	return (
 		<>
@@ -79,16 +70,18 @@ const TestNavigationControlled = () => {
 				onActivateMenu={ setActiveMenu }
 			>
 				<NavigationMenu title="Home">
-					<NavigationItem item="item-1" title="Item 1">
-						<MockLink href="https://example.com/item-1">
-							Item 1
-						</MockLink>
-					</NavigationItem>
-					<NavigationItem item="item-2">
-						<MockLink href="https://example.com/item-2">
-							Item 2
-						</MockLink>
-					</NavigationItem>
+					<NavigationItem
+						item="item-1"
+						title="Item 1"
+						href="https://example.com/item-1"
+						onClick={ onMockLinkClick }
+					/>
+					<NavigationItem
+						item="item-2"
+						title="Item 2"
+						href="https://example.com/item-2"
+						onClick={ onMockLinkClick }
+					/>
 					<NavigationItem
 						item="item-sub-menu"
 						navigateToMenu="sub-menu"
@@ -175,8 +168,10 @@ describe( 'Navigation', () => {
 		expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
 		expect( menuItems[ 2 ] ).toHaveTextContent( 'Category' );
 		expect( menuItems[ 3 ] ).toHaveTextContent( 'customize me' );
-		expect( menuItems[ 0 ] ).not.toHaveClass( 'is-active' );
-		expect( menuItems[ 1 ] ).toHaveClass( 'is-active' );
+
+		expect(
+			screen.getByRole( 'link', { current: 'page' } )
+		).toHaveTextContent( 'Item 2' );
 	} );
 
 	it( 'should render anchor links when menu item supplies an href', () => {
@@ -266,14 +261,14 @@ describe( 'Navigation', () => {
 			screen.getByRole( 'heading', { name: 'Home' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Item 1' } ).parentElement
-		).toHaveClass( 'is-active' );
+			screen.getByRole( 'link', { current: 'page' } )
+		).toHaveTextContent( 'Item 1' );
 
 		// click Item 2, check it's selected
-		await user.click( screen.getByRole( 'button', { name: 'Item 2' } ) );
+		await user.click( screen.getByRole( 'link', { name: 'Item 2' } ) );
 		expect(
-			screen.getByRole( 'button', { name: 'Item 2' } ).parentElement
-		).toHaveClass( 'is-active' );
+			screen.getByRole( 'link', { current: 'page' } )
+		).toHaveTextContent( 'Item 2' );
 
 		// click sub-menu, check new menu is shown
 		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
@@ -284,8 +279,8 @@ describe( 'Navigation', () => {
 		// click Child 1, check it's selected
 		await user.click( screen.getByRole( 'button', { name: 'Child 1' } ) );
 		expect(
-			screen.getByRole( 'button', { name: 'Child 1' } ).parentElement
-		).toHaveClass( 'is-active' );
+			screen.getByRole( 'button', { current: 'page' } )
+		).toHaveTextContent( 'Child 1' );
 
 		// click nested sub-menu, check nested sub-menu is shown
 		await user.click(
@@ -300,8 +295,8 @@ describe( 'Navigation', () => {
 			screen.getByRole( 'button', { name: 'Sub-Child 2' } )
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Sub-Child 2' } ).parentElement
-		).toHaveClass( 'is-active' );
+			screen.getByRole( 'button', { current: 'page' } )
+		).toHaveTextContent( 'Sub-Child 2' );
 
 		// click back, check sub-menu is shown
 		await user.click( screen.getByRole( 'button', { name: 'Sub-Menu' } ) );
@@ -335,7 +330,7 @@ describe( 'Navigation', () => {
 			screen.getByRole( 'heading', { name: 'Sub-Menu' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Child 2' } ).parentElement
-		).toHaveClass( 'is-active' );
+			screen.getByRole( 'button', { current: 'page' } )
+		).toHaveTextContent( 'Child 2' );
 	} );
 } );
