@@ -7,7 +7,12 @@ import { isEmpty, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	getColorClassName,
+	useInnerBlocksProps,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -73,8 +78,11 @@ export default [
 	{
 		attributes: {
 			...baseAttributes,
-			customBackgroundColor: {
+			mediaUrl: {
 				type: 'string',
+				source: 'attribute',
+				selector: 'figure video,figure img',
+				attribute: 'src',
 			},
 			mediaLink: {
 				type: 'string',
@@ -116,7 +124,6 @@ export default [
 				type: 'object',
 			},
 		},
-		migrate: migrateCustomColors,
 		save( { attributes } ) {
 			const {
 				isStackedOnMobile,
@@ -191,16 +198,18 @@ export default [
 			};
 
 			return (
-				<div className={ className } style={ style }>
+				<div { ...useBlockProps.save( { className, style } ) }>
 					<figure
 						className="wp-block-media-text__media"
 						style={ backgroundStyles }
 					>
 						{ ( mediaTypeRenders[ mediaType ] || noop )() }
 					</figure>
-					<div className="wp-block-media-text__content">
-						<InnerBlocks.Content />
-					</div>
+					<div
+						{ ...useInnerBlocksProps.save( {
+							className: 'wp-block-media-text__content',
+						} ) }
+					/>
 				</div>
 			);
 		},
