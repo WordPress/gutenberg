@@ -59,7 +59,7 @@ const TestNavigationControlled = () => {
 	const MockLink = ( { href, children } ) => (
 		<button
 			href={ href }
-			// Since we're not actually navigating pages, simulate it with on onClick.
+			// Since we're not actually navigating pages, simulate it with onClick.
 			onClick={ ( event ) => {
 				event.preventDefault();
 				const item = href.replace( 'https://example.com/', '' );
