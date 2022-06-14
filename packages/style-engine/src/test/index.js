@@ -81,6 +81,27 @@ describe( 'generate', () => {
 			} )
 		).toEqual( 'color: var(--wp--preset--color--ham-sandwich);' );
 	} );
+
+	it( 'should handle hover pseudo selector for text color only', () => {
+		expect(
+			generate(
+				{
+					states: {
+						hover: {
+							color: {
+								text: 'var:preset|color|ham-sandwich',
+							},
+						},
+					},
+				},
+				{
+					selector: '.my-selector a',
+				}
+			)
+		).toEqual(
+			'.my-selector a:hover { color: var(--wp--preset--color--ham-sandwich); }'
+		);
+	} );
 } );
 
 describe( 'getCSSRules', () => {
@@ -106,6 +127,67 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'padding',
 				value: '10px',
+			},
+		] );
+	} );
+
+	it( 'should generate hover pseudo selector for text color only', () => {
+		expect(
+			getCSSRules(
+				{
+					color: {
+						text: 'hotpink',
+					},
+					states: {
+						hover: {
+							color: {
+								text: 'blue',
+							},
+						},
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'color',
+				value: 'hotpink',
+			},
+			{
+				selector: '.some-selector:hover',
+				key: 'color',
+				value: 'blue',
+			},
+		] );
+	} );
+
+	it( 'should generate empty hover pseudo selector (for text color only) when selector option is not provided', () => {
+		expect(
+			getCSSRules( {
+				color: {
+					text: 'hotpink',
+				},
+				states: {
+					hover: {
+						color: {
+							text: 'blue',
+						},
+					},
+				},
+			} )
+		).toEqual( [
+			{
+				selector: undefined,
+				key: 'color',
+				value: 'hotpink',
+			},
+			{
+				selector: ':hover',
+				key: 'color',
+				value: 'blue',
 			},
 		] );
 	} );

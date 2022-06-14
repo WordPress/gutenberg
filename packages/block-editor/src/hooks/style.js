@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, has, isEmpty, kebabCase, omit } from 'lodash';
+import { get, has, isEmpty, kebabCase, omit, set } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -60,8 +60,9 @@ function compileStyleValue( uncompiledValue ) {
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param {Object} styles Styles configuration.
+ * @param {Object} styles  Styles configuration.
  *
+ * @param          options
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
@@ -98,28 +99,67 @@ export function getInlineStyles( styles = {} ) {
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( styles );
+
 	extraRules.forEach( ( rule ) => {
-		output[ rule.key ] = rule.value;
+		let pseudoSelector = '';
+		// Key value data structure cannot represent pseudo selectors.
+		// Create a nested "states" key for pseudo selector rules.
+		if ( rule?.selector?.startsWith( ':' ) ) {
+			// Primitive check for pseudo selector. In future
+			// we should make this a formal prop of the style rule from getCSSRules.
+			pseudoSelector = rule.selector.replace( ':', '' );
+			set( output, [ 'states', pseudoSelector, rule.key ], rule.value );
+		} else {
+			output[ rule.key ] = rule.value;
+		}
 	} );
 
 	return output;
+}
+
+function generateElementStyleSelector(
+	selector,
+	element,
+	styles,
+	pseudoSelector = ''
+) {
+	return [
+		`.editor-styles-wrapper .${ selector } ${ element }${ pseudoSelector } {`,
+		...Object.entries( styles ).map(
+			( [ cssProperty, value ] ) =>
+				`\t${ kebabCase( cssProperty ) }: ${ value };`
+		),
+		'}',
+	];
 }
 
 function compileElementsStyles( selector, elements = {} ) {
 	return Object.entries( elements )
 		.map( ( [ element, styles ] ) => {
 			const elementStyles = getInlineStyles( styles );
+
 			if ( ! isEmpty( elementStyles ) ) {
 				// The .editor-styles-wrapper selector is required on elements styles. As it is
 				// added to all other editor styles, not providing it causes reset and global
 				// styles to override element styles because of higher specificity.
 				return [
-					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] } {`,
-					...Object.entries( elementStyles ).map(
-						( [ cssProperty, value ] ) =>
-							`\t${ kebabCase( cssProperty ) }: ${ value };`
+					// Default selectors
+					...generateElementStyleSelector(
+						selector,
+						ELEMENTS[ element ],
+						omit( elementStyles, [ 'states' ] )
 					),
-					'}',
+					// State "pseudo selectors"
+					...Object.keys( elementStyles?.states )?.flatMap(
+						( stateKey ) => {
+							return generateElementStyleSelector(
+								selector,
+								ELEMENTS[ element ],
+								elementStyles?.states[ stateKey ],
+								`:${ stateKey }`
+							);
+						}
+					),
 				].join( '\n' );
 			}
 			return '';

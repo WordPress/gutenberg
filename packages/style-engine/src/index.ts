@@ -35,6 +35,7 @@ export function generate( style: Style, options: StyleOptions ): string {
 	}
 
 	const groupedRules = groupBy( rules, 'selector' );
+
 	const selectorRules = Object.keys( groupedRules ).reduce(
 		( acc: string[], subSelector: string ) => {
 			acc.push(
@@ -68,7 +69,12 @@ export function getCSSRules(
 	const rules: GeneratedCSSRule[] = [];
 	styleDefinitions.forEach( ( definition: StyleDefinition ) => {
 		if ( typeof definition.generate === 'function' ) {
-			rules.push( ...definition.generate( style, options ) );
+			const generatedRules = definition.generate( style, options );
+
+			// May generate rules for associated "states" (e.g. :hover, :focus .etc)
+			generatedRules?.flat().forEach( ( rule ) => {
+				rules.push( rule );
+			} );
 		}
 	} );
 
