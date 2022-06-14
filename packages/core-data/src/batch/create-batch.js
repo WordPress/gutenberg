@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isFunction, zip } from 'lodash';
+import { zip } from 'lodash';
 
 /**
  * Internal dependencies
@@ -88,7 +88,7 @@ export default function createBatch( processor = defaultProcessor ) {
 					pending.delete( id );
 				} );
 
-			if ( isFunction( inputOrThunk ) ) {
+			if ( typeof inputOrThunk === 'function' ) {
 				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
 					pending.delete( id );
 				} );

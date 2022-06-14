@@ -76,6 +76,5 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Type<
-	C extends Context = DefaultContextOf< 'root', 'postType' >
-> = OmitNevers< _BaseEntityRecords.Type< C > >;
+export type Type< C extends Context = DefaultContextOf< 'root', 'postType' > > =
+	OmitNevers< _BaseEntityRecords.Type< C > >;

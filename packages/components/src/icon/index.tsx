@@ -68,10 +68,10 @@ function Icon< P >( {
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, ( {
+			return createElement( icon, {
 				size,
 				...additionalProps,
-			} as unknown ) as P );
+			} as unknown as P );
 		}
 
 		return ( icon as ( ...args: any[] ) => JSX.Element )( {

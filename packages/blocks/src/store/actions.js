@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
+import { castArray, isPlainObject, omit, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,16 @@ const LEGACY_CATEGORY_MAPPING = {
 	formatting: 'text',
 	layout: 'design',
 };
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 /**
  * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
@@ -148,21 +158,20 @@ export function addBlockTypes( blockTypes ) {
  *
  * @param {WPBlockType} blockType Unprocessed block type settings.
  */
-export const __experimentalRegisterBlockType = ( blockType ) => ( {
-	dispatch,
-	select,
-} ) => {
-	dispatch( {
-		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
-		blockType,
-	} );
+export const __experimentalRegisterBlockType =
+	( blockType ) =>
+	( { dispatch, select } ) => {
+		dispatch( {
+			type: 'ADD_UNPROCESSED_BLOCK_TYPE',
+			blockType,
+		} );
 
-	const processedBlockType = processBlockType( blockType, { select } );
-	if ( ! processedBlockType ) {
-		return;
-	}
-	dispatch.addBlockTypes( processedBlockType );
-};
+		const processedBlockType = processBlockType( blockType, { select } );
+		if ( ! processedBlockType ) {
+			return;
+		}
+		dispatch.addBlockTypes( processedBlockType );
+	};
 
 /**
  * Signals that all block types should be computed again.
@@ -178,32 +187,32 @@ export const __experimentalRegisterBlockType = ( blockType ) => ( {
  *   7. Filter G.
  * In this scenario some filters would not get applied for all blocks because they are registered too late.
  */
-export const __experimentalReapplyBlockTypeFilters = () => ( {
-	dispatch,
-	select,
-} ) => {
-	const unprocessedBlockTypes = select.__experimentalGetUnprocessedBlockTypes();
+export const __experimentalReapplyBlockTypeFilters =
+	() =>
+	( { dispatch, select } ) => {
+		const unprocessedBlockTypes =
+			select.__experimentalGetUnprocessedBlockTypes();
 
-	const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
-		( accumulator, blockName ) => {
-			const result = processBlockType(
-				unprocessedBlockTypes[ blockName ],
-				{ select }
-			);
-			if ( result ) {
-				accumulator.push( result );
-			}
-			return accumulator;
-		},
-		[]
-	);
+		const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
+			( accumulator, blockName ) => {
+				const result = processBlockType(
+					unprocessedBlockTypes[ blockName ],
+					{ select }
+				);
+				if ( result ) {
+					accumulator.push( result );
+				}
+				return accumulator;
+			},
+			[]
+		);
 
-	if ( ! processedBlockTypes.length ) {
-		return;
-	}
+		if ( ! processedBlockTypes.length ) {
+			return;
+		}
 
-	dispatch.addBlockTypes( processedBlockTypes );
-};
+		dispatch.addBlockTypes( processedBlockTypes );
+	};
 
 /**
  * Returns an action object used to remove a registered block type.

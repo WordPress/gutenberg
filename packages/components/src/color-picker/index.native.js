@@ -36,10 +36,13 @@ function ColorPicker( {
 	const didMount = useRef( false );
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-	const { h: initH, s: initS, v: initV } =
-		! isGradientColor && activeColor
-			? colord( activeColor ).toHsv()
-			: { h: 0, s: 50, v: 50 };
+	const {
+		h: initH,
+		s: initS,
+		v: initV,
+	} = ! isGradientColor && activeColor
+		? colord( activeColor ).toHsv()
+		: { h: 0, s: 50, v: 50 };
 	const [ hue, setHue ] = useState( initH );
 	const [ sat, setSaturation ] = useState( initS / 100 );
 	const [ val, setValue ] = useState( initV / 100 );

@@ -52,9 +52,8 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( editorStore );
 	const { getPostType } = select( coreStore );
-	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-		editPostStore
-	);
+	const { isEditorPanelEnabled, isEditorPanelOpened } =
+		select( editPostStore );
 
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
