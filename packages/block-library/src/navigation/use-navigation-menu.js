@@ -64,9 +64,8 @@ export default function useNavigationMenu( ref ) {
 }
 
 function selectNavigationMenus( select ) {
-	const { getEntityRecords, hasFinishedResolution, isResolving } = select(
-		coreStore
-	);
+	const { getEntityRecords, hasFinishedResolution, isResolving } =
+		select( coreStore );
 
 	const args = [
 		'postType',
@@ -91,11 +90,8 @@ function selectExistingMenu( select, ref ) {
 		};
 	}
 
-	const {
-		getEntityRecord,
-		getEditedEntityRecord,
-		hasFinishedResolution,
-	} = select( coreStore );
+	const { getEntityRecord, getEditedEntityRecord, hasFinishedResolution } =
+		select( coreStore );
 
 	const args = [ 'postType', 'wp_navigation', ref ];
 	const navigationMenu = getEntityRecord( ...args );
