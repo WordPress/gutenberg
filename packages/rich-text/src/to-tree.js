@@ -266,7 +266,10 @@ export function toTree( {
 					remove( pointer );
 				}
 
-				pointer = append( newNode, emptyText );
+				pointer = append(
+					newNode,
+					character === LINE_SEPARATOR ? '' : emptyText
+				);
 			} );
 		}
 
