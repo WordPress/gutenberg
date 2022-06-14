@@ -126,9 +126,8 @@ class DependencyExtractionWebpackPlugin {
 					compilation.hooks.processAssets.tap(
 						{
 							name: this.constructor.name,
-							stage:
-								compiler.webpack.Compilation
-									.PROCESS_ASSETS_STAGE_ANALYSE,
+							stage: compiler.webpack.Compilation
+								.PROCESS_ASSETS_STAGE_ANALYSE,
 						},
 						() => this.addAssets( compilation, compiler )
 					);
@@ -175,9 +174,8 @@ class DependencyExtractionWebpackPlugin {
 
 			const processModule = ( { userRequest } ) => {
 				if ( this.externalizedDeps.has( userRequest ) ) {
-					const scriptDependency = this.mapRequestToDependency(
-						userRequest
-					);
+					const scriptDependency =
+						this.mapRequestToDependency( userRequest );
 					entrypointExternalizedWpDeps.add( scriptDependency );
 				}
 			};
@@ -198,11 +196,8 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			const {
-				hashFunction,
-				hashDigest,
-				hashDigestLength,
-			} = compilation.outputOptions;
+			const { hashFunction, hashDigest, hashDigestLength } =
+				compilation.outputOptions;
 
 			// Go through the assets and hash the sources. We can't just use
 			// `entrypointChunk.contentHash` because that's not updated when
@@ -282,8 +277,9 @@ class DependencyExtractionWebpackPlugin {
 			// The type indicates the option may be `undefined`.
 			// However, at this point in compilation, webpack has filled the options in if
 			// they were not provided.
-			const outputFolder = /** @type {{path:string}} */ ( compiler.options
-				.output ).path;
+			const outputFolder = /** @type {{path:string}} */ (
+				compiler.options.output
+			).path;
 
 			const assetsFilePath = path.resolve(
 				outputFolder,

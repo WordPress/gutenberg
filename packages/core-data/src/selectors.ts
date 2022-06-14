@@ -116,9 +116,12 @@ const EMPTY_OBJECT = {};
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
-	( select ) => ( state: State, url: string ): boolean => {
-		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
-	}
+	( select ) =>
+		( state: State, url: string ): boolean => {
+			return select( STORE_NAME ).isResolving( 'getEmbedPreview', [
+				url,
+			] );
+		}
 );
 
 /**
@@ -569,14 +572,16 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const dirtyRecords = [];
+		const dirtyRecords: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
 					< N extends Name >( name: N ) => {
-						const primaryKeys = ( Object.keys(
-							records[ kind ][ name ].edits
-						) as KeyOf< K, N >[] ).filter(
+						const primaryKeys = (
+							Object.keys(
+								records[ kind ][ name ].edits
+							) as KeyOf< K, N >[]
+						 ).filter(
 							( primaryKey ) =>
 								// The entity record must exist (not be deleted),
 								// and it must have edits.
@@ -610,11 +615,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								dirtyRecords.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									],
 									title:
 										entityConfig?.getTitle?.(
 											entityRecord
@@ -646,14 +649,16 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 		const {
 			entities: { records },
 		} = state;
-		const recordsBeingSaved = [];
+		const recordsBeingSaved: DirtyEntityRecord[] = [];
 		( Object.keys( records ) as Kind[] ).forEach(
 			< K extends Kind >( kind: K ) => {
 				( Object.keys( records[ kind ] ) as Name[] ).forEach(
 					< N extends Name >( name: N ) => {
-						const primaryKeys = ( Object.keys(
-							records[ kind ][ name ].saving
-						) as KeyOf< K, N >[] ).filter( ( primaryKey ) =>
+						const primaryKeys = (
+							Object.keys(
+								records[ kind ][ name ].saving
+							) as KeyOf< K, N >[]
+						 ).filter( ( primaryKey ) =>
 							isSavingEntityRecord(
 								state,
 								kind,
@@ -678,11 +683,9 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 								recordsBeingSaved.push( {
 									// We avoid using primaryKey because it's transformed into a string
 									// when it's used as an object key.
-									key:
-										entityRecord[
-											entityConfig.key ||
-												DEFAULT_ENTITY_KEY
-										],
+									key: entityRecord[
+										entityConfig.key || DEFAULT_ENTITY_KEY
+									],
 									title:
 										entityConfig?.getTitle?.(
 											entityRecord
@@ -1200,16 +1203,17 @@ export function getAutosave(
  * @return True if the REST request was completed. False otherwise.
  */
 export const hasFetchedAutosaves = createRegistrySelector(
-	( select ) => (
-		state: State,
-		postType: string,
-		postId: GenericRecordKey
-	): boolean => {
-		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
-			postType,
-			postId,
-		] );
-	}
+	( select ) =>
+		(
+			state: State,
+			postType: string,
+			postId: GenericRecordKey
+		): boolean => {
+			return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
+				postType,
+				postId,
+			] );
+		}
 );
 
 /**

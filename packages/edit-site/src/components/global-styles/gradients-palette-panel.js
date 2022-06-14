@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -19,6 +14,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { useSetting } from './hooks';
 import Subtitle from './subtitle';
+
+const noop = () => {};
 
 export default function GradientPalettePanel( { name } ) {
 	const [ themeGradients, setThemeGradients ] = useSetting(

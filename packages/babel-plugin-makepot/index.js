@@ -332,10 +332,8 @@ module.exports = () => {
 								forEach(
 									sortedTranslations,
 									( translation ) => {
-										const {
-											msgctxt = '',
-											msgid,
-										} = translation;
+										const { msgctxt = '', msgid } =
+											translation;
 										if (
 											! memo.hasOwnProperty( msgctxt )
 										) {
@@ -349,16 +347,17 @@ module.exports = () => {
 												memo[ msgctxt ][ msgid ]
 											)
 										) {
-											translation.comments.reference = uniq(
-												[
-													memo[ msgctxt ][ msgid ]
-														.comments.reference,
-													translation.comments
-														.reference,
-												]
-													.join( '\n' )
-													.split( '\n' )
-											).join( '\n' );
+											translation.comments.reference =
+												uniq(
+													[
+														memo[ msgctxt ][ msgid ]
+															.comments.reference,
+														translation.comments
+															.reference,
+													]
+														.join( '\n' )
+														.split( '\n' )
+												).join( '\n' );
 										}
 
 										memo[ msgctxt ][ msgid ] = translation;

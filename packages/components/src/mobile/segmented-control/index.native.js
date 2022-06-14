@@ -9,7 +9,7 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { take, values, map, reduce } from 'lodash';
+import { values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -65,9 +65,8 @@ const SegmentedControls = ( {
 	addonRight,
 } ) => {
 	const selectedSegmentIndex = selectedIndex || 0;
-	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
-		selectedSegmentIndex
-	);
+	const [ activeSegmentIndex, setActiveSegmentIndex ] =
+		useState( selectedSegmentIndex );
 	const [ segmentsDimensions, setSegmentsDimensions ] = useState( {
 		[ activeSegmentIndex ]: { width: 0, height: 0 },
 	} );
@@ -103,7 +102,7 @@ const SegmentedControls = ( {
 			? styles.containerIOS
 			: styles.container;
 		const widths = map( values( segmentsDimensions ), 'width' );
-		const widthsDistance = take( widths, index );
+		const widthsDistance = widths.slice( 0, index );
 		const widthsDistanceSum = reduce(
 			widthsDistance,
 			( sum, n ) => sum + n

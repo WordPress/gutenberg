@@ -51,33 +51,28 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		templateId,
-		page,
-		blockTypes,
-	} = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+	const { storedSettings, templateType, templateId, page, blockTypes } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getEditedPostType,
+					getEditedPostId,
+					getPage,
+				} = select( editSiteStore );
 
-			const { getBlockTypes } = select( blocksStore );
+				const { getBlockTypes } = select( blocksStore );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpen ),
-				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
-				blockTypes: getBlockTypes(),
-				page: getPage(),
-			};
-		},
-		[ setIsInserterOpen ]
-	);
+				return {
+					storedSettings: getSettings( setIsInserterOpen ),
+					templateType: getEditedPostType(),
+					templateId: getEditedPostId(),
+					blockTypes: getBlockTypes(),
+					page: getPage(),
+				};
+			},
+			[ setIsInserterOpen ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -89,9 +84,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories: select(
-				coreStore
-			).getBlockPatternCategories(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		} ),
 		[]
 	);

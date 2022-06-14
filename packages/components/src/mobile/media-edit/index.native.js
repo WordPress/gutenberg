@@ -39,9 +39,8 @@ export class MediaEdit extends Component {
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getMediaOptionsItems = this.getMediaOptionsItems.bind( this );
-		this.getDestructiveButtonIndex = this.getDestructiveButtonIndex.bind(
-			this
-		);
+		this.getDestructiveButtonIndex =
+			this.getDestructiveButtonIndex.bind( this );
 	}
 
 	getMediaOptionsItems() {

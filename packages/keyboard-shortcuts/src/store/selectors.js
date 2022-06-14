@@ -136,11 +136,9 @@ export const getAllShortcutKeyCombinations = createSelector(
  */
 export const getAllShortcutRawKeyCombinations = createSelector(
 	( state, name ) => {
-		return getAllShortcutKeyCombinations(
-			state,
-			name
-		).map( ( combination ) =>
-			getKeyCombinationRepresentation( combination, 'raw' )
+		return getAllShortcutKeyCombinations( state, name ).map(
+			( combination ) =>
+				getKeyCombinationRepresentation( combination, 'raw' )
 		);
 	},
 	( state, name ) => [ state[ name ] ]

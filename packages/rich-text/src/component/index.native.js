@@ -109,9 +109,8 @@ export class RichText extends Component {
 		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change.
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
-			this
-		);
+		this.onSelectionChangeFromAztec =
+			this.onSelectionChangeFromAztec.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
 		this.handleSuggestionFunc = this.handleSuggestionFunc.bind( this );
@@ -125,12 +124,10 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
-		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
-			this
-		);
-		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
-			this
-		);
+		this.manipulateEventCounterToForceNativeToRefresh =
+			this.manipulateEventCounterToForceNativeToRefresh.bind( this );
+		this.shouldDropEventFromAztec =
+			this.shouldDropEventFromAztec.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -1271,9 +1268,8 @@ const withFormatTypes = ( WrappedComponent ) => ( props ) => {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock, getSettings } = select(
-			'core/block-editor'
-		);
+		const { getBlockParents, getBlock, getSettings } =
+			select( 'core/block-editor' );
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
 		const parentBlockStyles = get( parentBlock, [

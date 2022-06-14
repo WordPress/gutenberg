@@ -334,7 +334,8 @@ describe( 'selectors', () => {
 				deepFreeze( {
 					...createBlockVariationsState( variations ),
 					blockTypes: {
-						[ blockTypeWithTestAttributes.name ]: blockTypeWithTestAttributes,
+						[ blockTypeWithTestAttributes.name ]:
+							blockTypeWithTestAttributes,
 					},
 				} );
 			const stateFunction = createBlockVariationsStateWithTestBlockType( [
@@ -440,9 +441,8 @@ describe( 'selectors', () => {
 					},
 				];
 
-				const state = createBlockVariationsStateWithTestBlockType(
-					variations
-				);
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
 
 				expect(
 					getActiveBlockVariation( state, blockName, {
@@ -493,9 +493,8 @@ describe( 'selectors', () => {
 					},
 				];
 
-				const state = createBlockVariationsStateWithTestBlockType(
-					variations
-				);
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
 
 				expect(
 					getActiveBlockVariation( state, blockName, {

@@ -141,9 +141,10 @@ test.describe( 'Post Editor Template mode', () => {
 
 				// Test deletion dialog.
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -168,14 +169,16 @@ test.describe( 'Post Editor Template mode', () => {
 				await editor.openDocumentSettingsSidebar();
 
 				// Move focus to the "Post" panel in the editor sidebar.
-				const postPanel = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=button[name="Post"i]'
-				);
+				const postPanel =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=button[name="Post"i]'
+					);
 				await postPanel.click();
 
-				const templateSelect = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i]'
-				);
+				const templateSelect =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=combobox[name="Template:"i]'
+					);
 				await expect( templateSelect ).toHaveValue(
 					`wp-custom-template-${ viewport }-viewport-deletion-test`
 				);
@@ -207,9 +210,10 @@ test.describe( 'Post Editor Template mode', () => {
 				await postEditorTemplateMode.saveTemplateWithoutPublishing();
 
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -239,10 +243,12 @@ test.describe( 'Post Editor Template mode', () => {
 					await page.reload();
 				}
 
-				const templateOptions = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i] >> role=menuitem'
-				);
-				const availableTemplates = await templateOptions.allTextContents();
+				const templateOptions =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=combobox[name="Template:"i] >> role=menuitem'
+					);
+				const availableTemplates =
+					await templateOptions.allTextContents();
 
 				expect( availableTemplates ).not.toContain(
 					`${ viewport } Viewport Deletion Test`
@@ -296,8 +302,9 @@ class PostEditorTemplateMode {
 
 		await this.expandTemplatePanel();
 
+		// Only match the beginning of Edit template: because it contains the template name or slug afterwards.
 		await this.editorSettingsSidebar
-			.locator( 'role=button[name="Edit"i]' )
+			.locator( 'role=button[name^="Edit template: "i]' )
 			.click();
 
 		// Check that we switched properly to edit mode.
@@ -335,7 +342,7 @@ class PostEditorTemplateMode {
 		await this.expandTemplatePanel();
 
 		const newTemplateButton = this.editorSettingsSidebar.locator(
-			'role=button[name="New"i]'
+			'role=button[name="New template"i]'
 		);
 		await newTemplateButton.click();
 

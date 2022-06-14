@@ -55,8 +55,7 @@ WithLongLabels.args = {
 		},
 		{
 			key: 'reallylonglabel3',
-			name:
-				'That really is ok though because you should stress test your UIs.',
+			name: 'That really is ok though because you should stress test your UIs.',
 		},
 	],
 };
