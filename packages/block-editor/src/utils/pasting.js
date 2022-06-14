@@ -25,9 +25,9 @@ export function getPasteEventData( { clipboardData } ) {
 		}
 	}
 
-	const files = getFilesFromDataTransfer(
-		clipboardData
-	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type ) );
+	const files = getFilesFromDataTransfer( clipboardData ).filter(
+		( { type } ) => /^image\/(?:jpe?g|png|gif|webp)$/.test( type )
+	);
 
 	if (
 		files.length &&

@@ -34,9 +34,8 @@ const meta: ComponentMeta< typeof TreeSelect > = {
 export default meta;
 
 const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
-	const [ selection, setSelection ] = useState<
-		ComponentProps< typeof TreeSelect >[ 'selectedId' ]
-	>();
+	const [ selection, setSelection ] =
+		useState< ComponentProps< typeof TreeSelect >[ 'selectedId' ] >();
 
 	return (
 		<TreeSelect

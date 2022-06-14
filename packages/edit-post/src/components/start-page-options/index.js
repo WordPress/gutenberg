@@ -19,13 +19,11 @@ import { store as editPostStore } from '../../store';
 
 function PatternSelection( { onChoosePattern } ) {
 	const { blockPatterns } = useSelect( ( select ) => {
-		const { __experimentalGetPatternsByBlockTypes } = select(
-			blockEditorStore
-		);
+		const { __experimentalGetPatternsByBlockTypes } =
+			select( blockEditorStore );
 		return {
-			blockPatterns: __experimentalGetPatternsByBlockTypes(
-				'core/post-content'
-			),
+			blockPatterns:
+				__experimentalGetPatternsByBlockTypes( 'core/post-content' ),
 		};
 	}, [] );
 	const shownBlockPatterns = useAsyncList( blockPatterns );
@@ -57,17 +55,15 @@ export default function StartPageOptions() {
 			if ( modalState !== START_PAGE_MODAL_STATES.INITIAL ) {
 				return false;
 			}
-			const { __experimentalGetPatternsByBlockTypes } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const {
 				getCurrentPostType,
 				getEditedPostContent,
 				isEditedPostSaveable,
 			} = select( editorStore );
-			const { isEditingTemplate, isFeatureActive } = select(
-				editPostStore
-			);
+			const { isEditingTemplate, isFeatureActive } =
+				select( editPostStore );
 			return (
 				getCurrentPostType() === 'page' &&
 				! isEditedPostSaveable() &&

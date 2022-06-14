@@ -139,10 +139,8 @@ describe( 'updateBlocksLayouts', () => {
 	} );
 
 	it( "adds a new block's layout data at root level with inner blocks", () => {
-		const {
-			findBlockLayoutByClientId,
-			updateBlocksLayouts,
-		} = DEFAULT_BLOCK_LIST_CONTEXT;
+		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
 			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
 		};
@@ -180,10 +178,8 @@ describe( 'updateBlocksLayouts', () => {
 	} );
 
 	it( "adds a new block's layout data at deep level", () => {
-		const {
-			findBlockLayoutByClientId,
-			updateBlocksLayouts,
-		} = DEFAULT_BLOCK_LIST_CONTEXT;
+		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
 			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
 		};
@@ -208,10 +204,8 @@ describe( 'updateBlocksLayouts', () => {
 	} );
 
 	it( "deletes a block's layout data at root level", () => {
-		const {
-			findBlockLayoutByClientId,
-			updateBlocksLayouts,
-		} = DEFAULT_BLOCK_LIST_CONTEXT;
+		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
 			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
 		};
@@ -230,10 +224,8 @@ describe( 'updateBlocksLayouts', () => {
 	} );
 
 	it( "deletes a block's layout data at a deep level", () => {
-		const {
-			findBlockLayoutByClientId,
-			updateBlocksLayouts,
-		} = DEFAULT_BLOCK_LIST_CONTEXT;
+		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+			DEFAULT_BLOCK_LIST_CONTEXT;
 		const currentBlockLayouts = {
 			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
 		};

@@ -27,8 +27,7 @@ export const fauxEntitySuggestions = [
 	},
 	{
 		id: uniqueId(),
-		title:
-			'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+		title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
 		type: 'post',
 		info: '1 month ago',
 		url: `?p=${ uniqueId() }`,

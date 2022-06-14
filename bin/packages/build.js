@@ -69,9 +69,8 @@ function isFileImportedInStyleEntry( file, importStatements ) {
 function findStyleEntriesThatImportFile( file ) {
 	const entriesWithImport = stylesheetEntryPoints.reduce(
 		( acc, entryPoint ) => {
-			const styleEntryImportStatements = parseImportStatements(
-				entryPoint
-			);
+			const styleEntryImportStatements =
+				parseImportStatements( entryPoint );
 
 			if (
 				isFileImportedInStyleEntry( file, styleEntryImportStatements )
@@ -161,9 +160,10 @@ function createBlockJsonEntryTransform() {
 	return new Transform( {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
-				file
-			);
+			const matches =
+				/block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
+					file
+				);
 			const blockName = matches ? matches[ 1 ] : undefined;
 
 			// Only block.json files in the block-library folder are subject to this transform.

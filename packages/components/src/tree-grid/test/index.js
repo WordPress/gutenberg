@@ -35,9 +35,8 @@ describe( 'TreeGrid', () => {
 	] );
 
 	beforeAll( () => {
-		window.Element.prototype.getClientRects = jest.fn(
-			mockedGetClientRects
-		);
+		window.Element.prototype.getClientRects =
+			jest.fn( mockedGetClientRects );
 	} );
 
 	afterAll( () => {

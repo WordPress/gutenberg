@@ -51,11 +51,10 @@ export interface DataEmitter {
 
 // Type Helpers.
 
-type ActionCreatorsOf<
-	Config extends AnyConfig
-> = Config extends ReduxStoreConfig< any, infer ActionCreators, any >
-	? { [ name in keyof ActionCreators ]: Function | Generator }
-	: never;
+type ActionCreatorsOf< Config extends AnyConfig > =
+	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
+		? { [ name in keyof ActionCreators ]: Function | Generator }
+		: never;
 
 type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	any,

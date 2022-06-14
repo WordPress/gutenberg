@@ -68,9 +68,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories: select(
-				coreStore
-			).getBlockPatternCategories(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		} ),
 		[]
 	);

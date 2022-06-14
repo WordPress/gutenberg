@@ -20,9 +20,8 @@ export function MoreExamplesStory() {
 		return () => clearTimeout( timeout );
 	} );
 	const [ backButtonBadge, setBackButtonBadge ] = useState( 1 );
-	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] = useState(
-		1
-	);
+	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] =
+		useState( 1 );
 
 	return (
 		<Navigation activeItem={ activeItem } className="navigation-story">

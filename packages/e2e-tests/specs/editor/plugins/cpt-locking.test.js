@@ -103,9 +103,8 @@ describe( 'cpt locking', () => {
 
 		it( 'should show invalid template notice if the blocks do not match the templte', async () => {
 			const content = await getEditedPostContent();
-			const [ , contentWithoutImage ] = content.split(
-				'<!-- /wp:image -->'
-			);
+			const [ , contentWithoutImage ] =
+				content.split( '<!-- /wp:image -->' );
 			await setPostContent( contentWithoutImage );
 			const noticeContent = await page.waitForSelector(
 				'.editor-template-validation-notice .components-notice__content'
