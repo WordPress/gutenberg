@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2` ([#40542](https://github.com/WordPress/gutenberg/pull/40542)).
+
 ## 23.2.0 (2022-06-01)
 
 ### Bug Fix
@@ -29,10 +33,6 @@
 ### New Features
 
 -   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
-
-### Enhancements
-
--   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2`.
 
 ## 22.5.0 (2022-04-21)
 
