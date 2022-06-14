@@ -26,6 +26,10 @@ export function useSpace( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			const { record, handleChange } = propsRef.current;
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+
 			// Don't insert a space if default behaviour is prevented.
 			if ( event.defaultPrevented ) {
 				return;
@@ -63,8 +67,15 @@ export function useSpace( props ) {
 				return;
 			}
 
-			const { record, handleChange } = propsRef.current;
 			handleChange( insert( record.current, ' ' ) );
+
+			// Trigger input rules.
+			element.dispatchEvent(
+				new defaultView.InputEvent( 'input', {
+					inputType: 'insertText',
+				} )
+			);
+
 			event.preventDefault();
 		}
 
