@@ -119,42 +119,42 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css' => 'border-top-left-radius: 99px; border-top-right-radius: 98px; border-bottom-left-radius: 97px; border-bottom-right-radius: 96px; padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
 				),
 			),
-// @TODO failing because we removed the safecss_filter_attr() to test this branch.
-//			'inline_valid_typography_style'                => array(
-//				'block_styles'    => array(
-//					'typography' => array(
-//						'fontSize'       => 'clamp(2em, 2vw, 4em)',
-//						'fontFamily'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
-//						'fontStyle'      => 'italic',
-//						'fontWeight'     => '800',
-//						'lineHeight'     => '1.3',
-//						'textDecoration' => 'underline',
-//						'textTransform'  => 'uppercase',
-//						'letterSpacing'  => '2',
-//					),
-//				),
-//				'options'         => null,
-//				'expected_output' => array(
-//					'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
-//				),
-//			),
+			// @TODO failing because we removed the safecss_filter_attr() to test this branch.
+			// 'inline_valid_typography_style'                => array(
+			// 'block_styles'    => array(
+			// 'typography' => array(
+			// 'fontSize'       => 'clamp(2em, 2vw, 4em)',
+			// 'fontFamily'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+			// 'fontStyle'      => 'italic',
+			// 'fontWeight'     => '800',
+			// 'lineHeight'     => '1.3',
+			// 'textDecoration' => 'underline',
+			// 'textTransform'  => 'uppercase',
+			// 'letterSpacing'  => '2',
+			// ),
+			// ),
+			// 'options'         => null,
+			// 'expected_output' => array(
+			// 'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+			// ),
+			// ),
 
-			'style_block_with_selector'                    => array(
-				'block_styles'    => array(
-					'spacing' => array(
-						'padding' => array(
-							'top'    => '42px',
-							'left'   => '2%',
-							'bottom' => '44px',
-							'right'  => '5rem',
+				'style_block_with_selector'                => array(
+					'block_styles'    => array(
+						'spacing' => array(
+							'padding' => array(
+								'top'    => '42px',
+								'left'   => '2%',
+								'bottom' => '44px',
+								'right'  => '5rem',
+							),
 						),
 					),
+					'options'         => array( 'selector' => '.wp-selector > p' ),
+					'expected_output' => array(
+						'css' => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
+					),
 				),
-				'options'         => array( 'selector' => '.wp-selector > p' ),
-				'expected_output' => array(
-					'css' => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
-				),
-			),
 
 			'with_valid_css_value_preset_style_property'   => array(
 				'block_styles'    => array(
@@ -245,51 +245,51 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'classnames' => 'has-text-color has-background',
 				),
 			),
-// @TODO failing because we removed the safecss_filter_attr() to test this branch.
-//			'invalid_classnames_options'                   => array(
-//				'block_styles'    => array(
-//					'typography' => array(
-//						'fontSize'   => array(
-//							'tomodachi' => 'friends',
-//						),
-//						'fontFamily' => array(
-//							'oishii' => 'tasty',
-//						),
-//					),
-//				),
-//				'options'         => array(),
-//				'expected_output' => array(),
-//			),
+			// @TODO failing because we removed the safecss_filter_attr() to test this branch.
+			// 'invalid_classnames_options'                   => array(
+			// 'block_styles'    => array(
+			// 'typography' => array(
+			// 'fontSize'   => array(
+			// 'tomodachi' => 'friends',
+			// ),
+			// 'fontFamily' => array(
+			// 'oishii' => 'tasty',
+			// ),
+			// ),
+			// ),
+			// 'options'         => array(),
+			// 'expected_output' => array(),
+			// ),
 
-			'inline_valid_box_model_style_with_sides'      => array(
-				'block_styles'    => array(
-					'border' => array(
-						'top'    => array(
-							'color' => '#fe1',
-							'width' => '1.5rem',
-							'style' => 'dashed',
-						),
-						'right'  => array(
-							'color' => '#fe2',
-							'width' => '1.4rem',
-							'style' => 'solid',
-						),
-						'bottom' => array(
-							'color' => '#fe3',
-							'width' => '1.3rem',
-						),
-						'left'   => array(
-							'color' => 'var:preset|color|swampy-yellow',
-							'width' => '0.5rem',
-							'style' => 'dotted',
+				'inline_valid_box_model_style_with_sides'  => array(
+					'block_styles'    => array(
+						'border' => array(
+							'top'    => array(
+								'color' => '#fe1',
+								'width' => '1.5rem',
+								'style' => 'dashed',
+							),
+							'right'  => array(
+								'color' => '#fe2',
+								'width' => '1.4rem',
+								'style' => 'solid',
+							),
+							'bottom' => array(
+								'color' => '#fe3',
+								'width' => '1.3rem',
+							),
+							'left'   => array(
+								'color' => 'var:preset|color|swampy-yellow',
+								'width' => '0.5rem',
+								'style' => 'dotted',
+							),
 						),
 					),
+					'options'         => array(),
+					'expected_output' => array(
+						'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
+					),
 				),
-				'options'         => array(),
-				'expected_output' => array(
-					'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
-				),
-			),
 
 			'inline_invalid_box_model_style_with_sides'    => array(
 				'block_styles'    => array(
@@ -329,12 +329,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 								'text'       => '#fff',
 								'background' => '#000',
 							),
-							'states' => array(
-								'hover' => array(
-									'color' => array(
-										'text'       => '#000',
-										'background' => '#fff',
-									),
+							':hover' => array(
+								'color' => array(
+									'text'       => '#000',
+									'background' => '#fff',
 								),
 							),
 						),
@@ -349,37 +347,33 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'elements_and_element_states_with_selector'    => array(
 				'block_styles'    => array(
 					'elements' => array(
-						'link' => array(
+						'link'   => array(
 							'color'  => array(
 								'text'       => '#fff',
 								'background' => '#000',
 							),
-							'states' => array(
-								'hover' => array(
-									'color' => array(
-										'text'       => '#000',
-										'background' => '#fff',
-									),
+							':hover' => array(
+								'color' => array(
+									'text'       => '#000',
+									'background' => '#fff',
 								),
-								'focus' => array(
-									'color' => array(
-										'text'       => '#000',
-										'background' => '#fff',
-									),
+							),
+							':focus' => array(
+								'color' => array(
+									'text'       => '#000',
+									'background' => '#fff',
 								),
 							),
 						),
 						'button' => array(
-							'color'  => array(
+							'color'     => array(
 								'text'       => '#fff',
 								'background' => '#000',
 							),
-							'states' => array(
-								'disabled' => array(
-									'color' => array(
-										'text'       => '#999',
-										'background' => '#fff',
-									),
+							':disabled' => array(
+								'color' => array(
+									'text'       => '#999',
+									'background' => '#fff',
 								),
 							),
 						),
@@ -402,12 +396,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 							'effects' => array(
 								'transition' => 'all 0.5s ease-out',
 							),
-							'states'  => array(
-								'hover' => array(
-									'color' => array(
-										'text'       => 'var:preset|color|pineapple',
-										'background' => 'var:preset|color|goldenrod',
-									),
+							':hover'  => array(
+								'color' => array(
+									'text'       => 'var:preset|color|pineapple',
+									'background' => 'var:preset|color|goldenrod',
 								),
 							),
 						),

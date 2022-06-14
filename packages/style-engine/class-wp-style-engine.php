@@ -156,12 +156,12 @@ class WP_Style_Engine {
 			'link'   => array(
 				'path'     => array( 'elements', 'link' ),
 				'selector' => 'a',
-				'states'   => array( 'hover', 'focus' ),
+				'states'   => array( ':hover', ':focus' ),
 			),
 			'button' => array(
 				'path'     => array( 'elements', 'button' ),
 				'selector' => 'button',
-				'states'   => array( 'hover', 'focus', 'disabled' ),
+				'states'   => array( ':hover', ':focus', ':disabled' ),
 			),
 		),
 		'spacing'    => array(
@@ -551,37 +551,37 @@ class WP_Style_Engine {
 				$css_output[] = $generated_elements_styles['css'];
 			}
 
+
 			// States.
-			if ( array_key_exists( 'states', $element_definition ) ) {
-				foreach ( $element_definition['states'] as $the_state ) {
+			foreach ( $element_definition['states'] as $state_pseudo_selector ) {
 
-					// Dynamically generate the state definitions based on the state keys provided.
-					$state_definition = array(
-						'path'     => array_merge( $element_definition['path'], array( 'states', $the_state ) ),
-						'selector' => "{$element_definition['selector']}:{$the_state}",
+				// Dynamically generate the state definitions based on the hard coded
+				// "allow list" of psuedo selectors for the given element.
+				$state_definition = array(
+					'path'     => array_merge( $element_definition['path'], array( $state_pseudo_selector ) ),
+					'selector' => $element_definition['selector'] . $state_pseudo_selector,
+				);
 
-					);
+				$state_styles = _wp_array_get( $element_styles, $state_definition['path'], null );
 
-					$state_styles = _wp_array_get( $element_styles, $state_definition['path'], null );
+				if ( empty( $state_styles ) ) {
+					continue;
+				}
 
-					if ( empty( $state_styles ) ) {
-						continue;
-					}
+				$state_options = array_merge(
+					$options,
+					array(
+						'selector' => isset( $options['selector'] ) ? "{$options['selector']} {$state_definition['selector']}" : $state_definition['selector'],
+					)
+				);
 
-					$state_options = array_merge(
-						$options,
-						array(
-							'selector' => isset( $options['selector'] ) ? "{$options['selector']} {$state_definition['selector']}" : $state_definition['selector'],
-						)
-					);
+				$generated_state_styles = self::get_instance()->generate( $state_styles, $state_options );
 
-					$generated_state_styles = self::get_instance()->generate( $state_styles, $state_options );
-
-					if ( isset( $generated_state_styles['css'] ) ) {
-						$css_output[] = $generated_state_styles['css'];
-					}
+				if ( isset( $generated_state_styles['css'] ) ) {
+					$css_output[] = $generated_state_styles['css'];
 				}
 			}
+
 		}
 
 		if ( ! empty( $css_output ) ) {
