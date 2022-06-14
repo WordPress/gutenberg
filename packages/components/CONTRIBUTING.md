@@ -594,7 +594,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 
 	9. Use JSDocs syntax for each TypeScript property that is part of the public API of a component. The docs used here should be aligned with the component’s README. Add `@default` values where appropriate.
 	10. Prefer `unknown` to `any`, and in general avoid it when possible.
-8. On the component's main export, add a JSDoc comment that includes the main description and `@example` code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/943cec92f21fedcd256502ea72d9903941f3b05a/packages/components/src/unit-control/index.tsx#L290-L306))
+8. On the component's main named export, add a JSDoc comment that includes the main description and the example code snippet from the README ([example](https://github.com/WordPress/gutenberg/blob/43d9c82922619c1d1ff6b454f86f75c3157d3de6/packages/components/src/date-time/date-time/index.tsx#L193-L217)). _At the time of writing, the `@example` JSDoc keyword is not recognized by StoryBook's docgen, so please avoid using it_.
 9. Make sure that:
 	1. tests still pass;
 	2. storybook examples work as expected.
