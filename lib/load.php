@@ -151,14 +151,6 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 
-add_filter(
-	'safe_style_css',
-	function( $safe_rules ) {
-		$safe_rules[] = 'transition';
-		return $safe_rules;
-	}
-);
-
 // Copied package PHP files.
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';

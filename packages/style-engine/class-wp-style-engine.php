@@ -144,14 +144,6 @@ class WP_Style_Engine {
 				),
 			),
 		),
-		'effects'    => array(
-			'transition' => array(
-				'property_keys' => array(
-					'default' => 'transition',
-				),
-				'path'          => array( 'effects', 'transition' ),
-			),
-		),
 		'elements'   => array(
 			'link'   => array(
 				'path'     => array( 'elements', 'link' ),

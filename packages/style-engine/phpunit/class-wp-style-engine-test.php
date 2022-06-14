@@ -385,7 +385,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'elements_and_element_states_with_css_vars_and_transitions' => array(
+			'elements_and_element_states_with_css_vars' => array(
 				'block_styles'    => array(
 					'elements' => array(
 						'button' => array(
@@ -393,10 +393,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 								'text'       => 'var:preset|color|roastbeef',
 								'background' => '#000',
 							),
-							'effects' => array(
-								'transition' => 'all 0.5s ease-out',
-							),
-							':hover'  => array(
+							':hover' => array(
 								'color' => array(
 									'text'       => 'var:preset|color|pineapple',
 									'background' => 'var:preset|color|goldenrod',
@@ -410,7 +407,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css_vars' => true,
 				),
 				'expected_output' => array(
-					'css' => '.der-beste-button button { color: var(--wp--preset--color--roastbeef); background-color: #000; transition: all 0.5s ease-out; } .der-beste-button button:hover { color: var(--wp--preset--color--pineapple); background-color: var(--wp--preset--color--goldenrod); }',
+					'css' => '.der-beste-button button { color: var(--wp--preset--color--roastbeef); background-color: #000; } .der-beste-button button:hover { color: var(--wp--preset--color--pineapple); background-color: var(--wp--preset--color--goldenrod); }',
 				),
 			),
 		);
