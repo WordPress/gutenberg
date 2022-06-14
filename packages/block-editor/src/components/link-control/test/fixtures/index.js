@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId, take } from 'lodash';
+import { uniqueId } from 'lodash';
 
 export const fauxEntitySuggestions = [
 	{
@@ -40,7 +40,7 @@ export const fetchFauxEntitySuggestions = (
 	{ isInitialSuggestions } = {}
 ) => {
 	const suggestions = isInitialSuggestions
-		? take( fauxEntitySuggestions, 3 )
+		? fauxEntitySuggestions.slice( 0, 3 )
 		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };

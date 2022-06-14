@@ -3,7 +3,6 @@
  */
 import {
 	last,
-	take,
 	clone,
 	uniq,
 	map,
@@ -496,7 +495,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			_suggestions = startsWithMatch.concat( containsMatch );
 		}
 
-		return take( _suggestions, _maxSuggestions );
+		return _suggestions.slice( 0, _maxSuggestions );
 	}
 
 	function getSelectedSuggestion() {

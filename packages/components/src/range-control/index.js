@@ -3,7 +3,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp, isFinite, noop } from 'lodash';
+import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,6 +34,8 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
+
+const noop = () => {};
 
 function RangeControl(
 	{
@@ -121,7 +123,7 @@ function RangeControl(
 
 	const id = useInstanceId( RangeControl, 'inspector-range-control' );
 	const describedBy = !! help ? `${ id }__help` : undefined;
-	const enableTooltip = showTooltipProp !== false && isFinite( value );
+	const enableTooltip = showTooltipProp !== false && Number.isFinite( value );
 
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );

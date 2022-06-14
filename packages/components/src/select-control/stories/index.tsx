@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SelectControl from '..';
+import SelectControl from '../';
 
 const meta: ComponentMeta< typeof SelectControl > = {
 	title: 'Components/SelectControl',

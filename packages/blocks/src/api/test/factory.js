@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { noop, times } from 'lodash';
+import { times } from 'lodash';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+
+const noop = () => {};
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {

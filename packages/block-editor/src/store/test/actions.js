@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -23,6 +22,8 @@ import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+
+const noop = () => {};
 
 const {
 	clearSelectedBlock,

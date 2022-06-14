@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, noop } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -12,6 +12,8 @@ import unwrap from './unwrap';
 import { isPhrasingContent } from '../phrasing-content';
 import insertAfter from './insert-after';
 import isElement from './is-element';
+
+const noop = () => {};
 
 /* eslint-disable jsdoc/valid-types */
 /**

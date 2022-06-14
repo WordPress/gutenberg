@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +17,8 @@ import {
  */
 import { Edit } from '../edit';
 import { BlockContextProvider } from '../../block-context';
+
+const noop = () => {};
 
 describe( 'Edit', () => {
 	afterEach( () => {
