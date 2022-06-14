@@ -4,7 +4,7 @@
 	"name": "core/image",
 	"title": "Image",
 	"category": "media",
-	"usesContext": [ "allowResize", "imageCrop", "fixedHeight" ],
+	"usesContext": [ "postId", "postType", "allowResize", "imageCrop", "fixedHeight" ],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
@@ -17,6 +17,10 @@
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "src"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		},
 		"alt": {
 			"type": "string",

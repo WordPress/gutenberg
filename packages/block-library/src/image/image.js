@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
 	PanelBody,
+	Placeholder,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -40,7 +41,7 @@ import {
 } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -58,6 +59,7 @@ export default function Image( {
 	temporaryURL,
 	attributes: {
 		url = '',
+		useFeaturedImage,
 		alt,
 		caption,
 		align,
@@ -82,6 +84,8 @@ export default function Image( {
 	containerRef,
 	context,
 	clientId,
+	postId,
+	postType,
 } ) {
 	const imageRef = useRef();
 	const captionRef = useRef();
@@ -111,6 +115,36 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const media = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+	const mediaUrl = media?.source_url;
+
+	// instead of destructuring the attributes
+	// we define the url and background type
+	// depending on the value of the useFeaturedImage flag
+	// to preview in edit the dynamic featured image
+	url = useFeaturedImage ? mediaUrl : url;
+
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			id: undefined,
+			url: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+		} );
+	};
+
 	const {
 		canInsertCover,
 		imageEditing,
@@ -361,6 +395,8 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onToggleFeaturedImage={ toggleUseFeaturedImage }
+						useFeaturedImage={ useFeaturedImage }
 					/>
 				</BlockControls>
 			) }
@@ -565,40 +601,53 @@ export default function Image( {
 	}
 
 	return (
-		<ImageEditingProvider
-			id={ id }
-			url={ url }
-			naturalWidth={ naturalWidth }
-			naturalHeight={ naturalHeight }
-			clientWidth={ clientWidth }
-			onSaveImage={ ( imageAttributes ) =>
-				setAttributes( imageAttributes )
-			}
-			isEditing={ isEditingImage }
-			onFinishEditing={ () => setIsEditingImage( false ) }
-		>
-			{ /* Hide controls during upload to avoid component remount,
-				which causes duplicated image upload. */ }
-			{ ! temporaryURL && controls }
-			{ img }
-			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
+		<>
+			{ ! url && useFeaturedImage && (
+				<>
+					<Placeholder
+						className="wp-block-image__image--placeholder-image"
+						withIllustration={ true }
+					/>
+					{ controls }
+				</>
 			) }
-		</ImageEditingProvider>
+			{ url && (
+				<ImageEditingProvider
+					id={ id }
+					url={ url }
+					naturalWidth={ naturalWidth }
+					naturalHeight={ naturalHeight }
+					clientWidth={ clientWidth }
+					onSaveImage={ ( imageAttributes ) =>
+						setAttributes( imageAttributes )
+					}
+					isEditing={ isEditingImage }
+					onFinishEditing={ () => setIsEditingImage( false ) }
+				>
+					{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+					{ ! temporaryURL && controls }
+					{ img }
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+						<RichText
+							ref={ captionRef }
+							tagName="figcaption"
+							aria-label={ __( 'Image caption text' ) }
+							placeholder={ __( 'Add caption' ) }
+							value={ caption }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
+							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
+				</ImageEditingProvider>
+			) }
+		</>
 	);
 }

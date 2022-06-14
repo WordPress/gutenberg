@@ -96,6 +96,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	context: { postId, postType },
 } ) {
 	const {
 		url = '',
@@ -106,6 +107,7 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		useFeaturedImage,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -309,7 +311,7 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ ( temporaryURL || url ) && (
+			{ ( temporaryURL || url || useFeaturedImage ) && (
 				<Image
 					temporaryURL={ temporaryURL }
 					attributes={ attributes }
@@ -323,6 +325,8 @@ export function ImageEdit( {
 					containerRef={ ref }
 					context={ context }
 					clientId={ clientId }
+					postId={ postId }
+					postType={ postType }
 				/>
 			) }
 			{ ! url && (
@@ -333,18 +337,20 @@ export function ImageEdit( {
 					/>
 				</BlockControls>
 			) }
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				notices={ noticeUI }
-				onError={ onUploadError }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
+			{ ! useFeaturedImage && (
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					notices={ noticeUI }
+					onError={ onUploadError }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			) }
 		</figure>
 	);
 }
