@@ -11,6 +11,20 @@ exports[`recordToDom should create a value with formatting 1`] = `
 </body>
 `;
 
+exports[`recordToDom should create a value with formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    4,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should create a value with formatting for split tags 1`] = `
 <body>
   <em
@@ -20,6 +34,20 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
   </em>
   
 </body>
+`;
+
+exports[`recordToDom should create a value with formatting for split tags 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should create a value with formatting with attributes 1`] = `
@@ -34,6 +62,20 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
 </body>
 `;
 
+exports[`recordToDom should create a value with formatting with attributes 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    4,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
   
@@ -42,6 +84,17 @@ exports[`recordToDom should create a value with image object 1`] = `
   />
   
 </body>
+`;
+
+exports[`recordToDom should create a value with image object 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
@@ -53,10 +106,22 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
     <img
       src=""
     />
-    
   </em>
   
 </body>
+`;
+
+exports[`recordToDom should create a value with image object and formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
@@ -74,6 +139,19 @@ exports[`recordToDom should create a value with image object and text after 1`] 
 </body>
 `;
 
+exports[`recordToDom should create a value with image object and text after 2`] = `
+Object {
+  "endPath": Array [
+    1,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should create a value with image object and text before 1`] = `
 <body>
   te
@@ -82,10 +160,21 @@ exports[`recordToDom should create a value with image object and text before 1`]
     <img
       src=""
     />
-    
   </em>
   
 </body>
+`;
+
+exports[`recordToDom should create a value with image object and text before 2`] = `
+Object {
+  "endPath": Array [
+    1,
+    2,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should create a value with nested formatting 1`] = `
@@ -101,10 +190,38 @@ exports[`recordToDom should create a value with nested formatting 1`] = `
 </body>
 `;
 
+exports[`recordToDom should create a value with nested formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    0,
+    4,
+  ],
+  "startPath": Array [
+    0,
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should create a value without formatting 1`] = `
 <body>
   test
 </body>
+`;
+
+exports[`recordToDom should create a value without formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    4,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should create an empty value 1`] = `
@@ -114,11 +231,33 @@ exports[`recordToDom should create an empty value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should create an empty value 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
   ﻿
 </body>
+`;
+
+exports[`recordToDom should create an empty value from empty tags 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should disarm on* attribute 1`] = `
@@ -131,6 +270,17 @@ exports[`recordToDom should disarm on* attribute 1`] = `
 </body>
 `;
 
+exports[`recordToDom should disarm on* attribute 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should disarm script 1`] = `
 <body>
   
@@ -139,6 +289,17 @@ exports[`recordToDom should disarm script 1`] = `
   />
   
 </body>
+`;
+
+exports[`recordToDom should disarm script 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should filter format boundary attributes 1`] = `
@@ -152,6 +313,20 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
 </body>
 `;
 
+exports[`recordToDom should filter format boundary attributes 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    4,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle br 1`] = `
 <body>
   
@@ -163,6 +338,17 @@ exports[`recordToDom should handle br 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle br 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle br with formatting 1`] = `
 <body>
   <em
@@ -172,11 +358,23 @@ exports[`recordToDom should handle br with formatting 1`] = `
     <br
       data-rich-text-line-break="true"
     />
-    
   </em>
   
   ﻿
 </body>
+`;
+
+exports[`recordToDom should handle br with formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should handle br with text 1`] = `
@@ -189,18 +387,40 @@ exports[`recordToDom should handle br with text 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle br with text 2`] = `
+Object {
+  "endPath": Array [
+    2,
+  ],
+  "startPath": Array [
+    0,
+    2,
+  ],
+}
+`;
+
 exports[`recordToDom should handle double br 1`] = `
 <body>
   a
   <br
     data-rich-text-line-break="true"
   />
-  
   <br
     data-rich-text-line-break="true"
   />
   b
 </body>
+`;
+
+exports[`recordToDom should handle double br 2`] = `
+Object {
+  "endPath": Array [
+    3,
+  ],
+  "startPath": Array [
+    2,
+  ],
+}
 `;
 
 exports[`recordToDom should handle empty list value 1`] = `
@@ -212,6 +432,19 @@ exports[`recordToDom should handle empty list value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle empty list value 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
@@ -219,6 +452,19 @@ exports[`recordToDom should handle empty multiline value 1`] = `
     ﻿
   </p>
 </body>
+`;
+
+exports[`recordToDom should handle empty multiline value 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should handle middle empty list value 1`] = `
@@ -234,6 +480,19 @@ exports[`recordToDom should handle middle empty list value 1`] = `
     ﻿
   </li>
 </body>
+`;
+
+exports[`recordToDom should handle middle empty list value 2`] = `
+Object {
+  "endPath": Array [
+    1,
+    1,
+  ],
+  "startPath": Array [
+    1,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should handle multiline list value 1`] = `
@@ -263,6 +522,24 @@ exports[`recordToDom should handle multiline list value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle multiline list value 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    1,
+    1,
+    1,
+    0,
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle multiline value 1`] = `
 <body>
   <p>
@@ -274,12 +551,41 @@ exports[`recordToDom should handle multiline value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle multiline value 2`] = `
+Object {
+  "endPath": Array [
+    1,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle multiline value with element selection 1`] = `
 <body>
   <li>
     one
   </li>
 </body>
+`;
+
+exports[`recordToDom should handle multiline value with element selection 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    3,
+  ],
+  "startPath": Array [
+    0,
+    0,
+    3,
+  ],
+}
 `;
 
 exports[`recordToDom should handle multiline value with empty 1`] = `
@@ -292,6 +598,19 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
     ﻿
   </p>
 </body>
+`;
+
+exports[`recordToDom should handle multiline value with empty 2`] = `
+Object {
+  "endPath": Array [
+    1,
+    1,
+  ],
+  "startPath": Array [
+    1,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should handle nested empty list value 1`] = `
@@ -308,18 +627,45 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle nested empty list value 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    1,
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    1,
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
   <br
     data-rich-text-line-break="true"
   />
-  
   <br
     data-rich-text-line-break="true"
   />
   b
 </body>
+`;
+
+exports[`recordToDom should handle selection before br 2`] = `
+Object {
+  "endPath": Array [
+    2,
+  ],
+  "startPath": Array [
+    2,
+  ],
+}
 `;
 
 exports[`recordToDom should ignore formats at line separator 1`] = `
@@ -338,10 +684,29 @@ exports[`recordToDom should ignore formats at line separator 1`] = `
 </body>
 `;
 
+exports[`recordToDom should ignore formats at line separator 2`] = `
+Object {
+  "endPath": Array [],
+  "startPath": Array [],
+}
+`;
+
 exports[`recordToDom should ignore manually added object replacement character 1`] = `
 <body>
   test
 </body>
+`;
+
+exports[`recordToDom should ignore manually added object replacement character 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    4,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should ignore manually added object replacement character with formatting 1`] = `
@@ -353,6 +718,20 @@ exports[`recordToDom should ignore manually added object replacement character w
   </em>
   
 </body>
+`;
+
+exports[`recordToDom should ignore manually added object replacement character with formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should not error with overlapping formats (1) 1`] = `
@@ -371,6 +750,23 @@ exports[`recordToDom should not error with overlapping formats (1) 1`] = `
   </a>
   
 </body>
+`;
+
+exports[`recordToDom should not error with overlapping formats (1) 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    0,
+    0,
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should not error with overlapping formats (2) 1`] = `
@@ -395,10 +791,39 @@ exports[`recordToDom should not error with overlapping formats (2) 1`] = `
 </body>
 `;
 
+exports[`recordToDom should not error with overlapping formats (2) 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    0,
+    1,
+  ],
+  "startPath": Array [
+    0,
+    0,
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
   🍒
 </body>
+`;
+
+exports[`recordToDom should preserve emoji 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    2,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;
 
 exports[`recordToDom should preserve emoji in formatting 1`] = `
@@ -412,10 +837,37 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
 </body>
 `;
 
+exports[`recordToDom should preserve emoji in formatting 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    0,
+    2,
+  ],
+  "startPath": Array [
+    0,
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should preserve non breaking space 1`] = `
 <body>
   test  test
 </body>
+`;
+
+exports[`recordToDom should preserve non breaking space 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    5,
+  ],
+  "startPath": Array [
+    0,
+    5,
+  ],
+}
 `;
 
 exports[`recordToDom should remove padding 1`] = `
@@ -425,8 +877,31 @@ exports[`recordToDom should remove padding 1`] = `
 </body>
 `;
 
+exports[`recordToDom should remove padding 2`] = `
+Object {
+  "endPath": Array [
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
+`;
+
 exports[`recordToDom should replace characters to format HTML with space 1`] = `
 <body>
    
 </body>
+`;
+
+exports[`recordToDom should replace characters to format HTML with space 2`] = `
+Object {
+  "endPath": Array [
+    0,
+    1,
+  ],
+  "startPath": Array [
+    1,
+  ],
+}
 `;

@@ -201,16 +201,6 @@ export function toTree( {
 
 		let pointer = getLastChild( tree );
 
-		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
-			let node = pointer;
-
-			while ( ! isText( node ) ) {
-				node = getLastChild( node );
-			}
-
-			append( getParent( node ), ZWNBSP );
-		}
-
 		// Set selection for the start of line.
 		if ( lastCharacter === LINE_SEPARATOR ) {
 			let node = pointer;
@@ -226,6 +216,16 @@ export function toTree( {
 			if ( onEndIndex && end === i ) {
 				onEndIndex( tree, node );
 			}
+		}
+
+		if ( shouldInsertPadding && character === LINE_SEPARATOR ) {
+			let node = pointer;
+
+			while ( ! isText( node ) ) {
+				node = getLastChild( node );
+			}
+
+			append( getParent( node ), ZWNBSP );
 		}
 
 		if ( characterFormats ) {
@@ -285,7 +285,8 @@ export function toTree( {
 			continue;
 		}
 
-		// If there is selection at 0, handle it before characters are inserted.
+		// If there is selection at 0, handle it before characters are inserted,
+		// but after formatting is added.
 		if ( i === 0 ) {
 			if ( onStartIndex && start === 0 ) {
 				onStartIndex( tree, pointer );
@@ -320,8 +321,6 @@ export function toTree( {
 					} )
 				);
 			}
-			// Ensure pointer is text node.
-			pointer = appendEmpty( getParent( pointer ) );
 		} else if ( ! preserveWhiteSpace && character === '\n' ) {
 			pointer = append( getParent( pointer ), {
 				type: 'br',
@@ -332,8 +331,6 @@ export function toTree( {
 					: undefined,
 				object: true,
 			} );
-			// Ensure pointer is text node.
-			pointer = appendEmpty( getParent( pointer ) );
 		} else if ( ! isText( pointer ) ) {
 			pointer = append( getParent( pointer ), character );
 		} else {

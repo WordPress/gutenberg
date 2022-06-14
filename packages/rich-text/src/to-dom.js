@@ -25,7 +25,11 @@ function createPathToNode( node, rootNode, path ) {
 		i++;
 	}
 
-	path = [ i, ...path ];
+	if ( ! path ) {
+		path = [ i + 1 ];
+	} else {
+		path = [ i, ...path ];
+	}
 
 	if ( parentNode !== rootNode ) {
 		path = createPathToNode( parentNode, rootNode, path );
@@ -139,14 +143,16 @@ export function toDom( {
 		remove,
 		appendText,
 		onStartIndex( body, pointer ) {
-			startPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+			const offset = pointer.nodeValue
+				? [ pointer.nodeValue.length ]
+				: null;
+			startPath = createPathToNode( pointer, body, offset );
 		},
 		onEndIndex( body, pointer ) {
-			endPath = createPathToNode( pointer, body, [
-				pointer.nodeValue.length,
-			] );
+			const offset = pointer.nodeValue
+				? [ pointer.nodeValue.length ]
+				: null;
+			endPath = createPathToNode( pointer, body, offset );
 		},
 		isEditableTree,
 		placeholder,
