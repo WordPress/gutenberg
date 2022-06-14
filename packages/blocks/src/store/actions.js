@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
+import { castArray, isPlainObject, omit, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,16 @@ const LEGACY_CATEGORY_MAPPING = {
 	formatting: 'text',
 	layout: 'design',
 };
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 /**
  * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
