@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,8 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { useControlledState } from '../utils/hooks';
+
+const noop = () => {};
 
 /**
  * A float supported clamp function for a specific value.

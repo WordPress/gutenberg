@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { values, noop, omit } from 'lodash';
+import { values, omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -33,6 +33,8 @@ import {
 	lastBlockAttributesChange,
 	lastBlockInserted,
 } from '../reducer';
+
+const noop = () => {};
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {

@@ -51,9 +51,8 @@ export default function QuickInserter( {
 
 	const { setInserterIsOpened, insertionIndex } = useSelect(
 		( select ) => {
-			const { getSettings, getBlockIndex, getBlockCount } = select(
-				blockEditorStore
-			);
+			const { getSettings, getBlockIndex, getBlockCount } =
+				select( blockEditorStore );
 			const settings = getSettings();
 			const index = getBlockIndex( clientId );
 			const blockCount = getBlockCount();

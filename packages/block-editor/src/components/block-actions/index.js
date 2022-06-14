@@ -31,9 +31,8 @@ export default function BlockActions( {
 		canMoveBlocks,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
-		blocksStore
-	);
+	const { getDefaultBlockName, getGroupingBlockName } =
+		useSelect( blocksStore );
 
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );

@@ -566,10 +566,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return element.toString();
 	}
 
-	const {
-		type,
-		props,
-	} = /** @type {{type?: any, props?: any}} */ ( element );
+	const { type, props } = /** @type {{type?: any, props?: any}} */ (
+		element
+	);
 
 	switch ( type ) {
 		case StrictMode:
@@ -696,10 +695,9 @@ export function renderComponent(
 	context,
 	legacyContext = {}
 ) {
-	const instance = new /** @type {import('react').ComponentClass} */ ( Component )(
-		props,
-		legacyContext
-	);
+	const instance = new /** @type {import('react').ComponentClass} */ (
+		Component
+	)( props, legacyContext );
 
 	if (
 		typeof (
@@ -710,7 +708,9 @@ export function renderComponent(
 	) {
 		Object.assign(
 			legacyContext,
-			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext()
+			/** @type {{getChildContext?: () => unknown}} */ (
+				instance
+			).getChildContext()
 		);
 	}
 

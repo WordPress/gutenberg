@@ -145,7 +145,7 @@ const BlockPatternSetup = ( {
 	clientId,
 	blockName,
 	filterPatternsFn,
-	startBlankComponent,
+	startBlankComponent = null,
 	onBlockPatternSelect,
 } ) => {
 	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
@@ -153,10 +153,8 @@ const BlockPatternSetup = ( {
 	const [ showBlank, setShowBlank ] = useState( false );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
-	const [
-		contentResizeListener,
-		{ height: contentHeight },
-	] = useResizeObserver();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 
 	if ( ! patterns?.length || showBlank ) {
 		return startBlankComponent;

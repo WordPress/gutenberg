@@ -99,8 +99,8 @@ class Editor extends Component {
 			}
 		);
 
-		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
-			( payload ) => {
+		this.subscriptionParentFeaturedImageIdNativeUpdated =
+			subscribeFeaturedImageIdNativeUpdated( ( payload ) => {
 				editEntityRecord(
 					'postType',
 					postType,
@@ -110,8 +110,7 @@ class Editor extends Component {
 						undoIgnore: true,
 					}
 				);
-			}
-		);
+			} );
 	}
 
 	componentWillUnmount() {

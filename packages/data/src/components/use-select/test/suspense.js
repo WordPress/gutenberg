@@ -50,17 +50,21 @@ function createRegistryWithStore() {
 	const sleep = ( ms ) => new Promise( ( r ) => setTimeout( () => r(), ms ) );
 
 	const resolvers = {
-		getToken: () => async ( { dispatch } ) => {
-			await sleep( 10 );
-			dispatch( { type: 'RECEIVE_TOKEN', token: 'token' } );
-		},
-		getData: ( token ) => async ( { dispatch } ) => {
-			await sleep( 10 );
-			if ( ! token ) {
-				throw 'missing token in resolver';
-			}
-			dispatch( { type: 'RECEIVE_DATA', data: 'therealdata' } );
-		},
+		getToken:
+			() =>
+			async ( { dispatch } ) => {
+				await sleep( 10 );
+				dispatch( { type: 'RECEIVE_TOKEN', token: 'token' } );
+			},
+		getData:
+			( token ) =>
+			async ( { dispatch } ) => {
+				await sleep( 10 );
+				if ( ! token ) {
+					throw 'missing token in resolver';
+				}
+				dispatch( { type: 'RECEIVE_DATA', data: 'therealdata' } );
+			},
 		getThatFails: () => async () => {
 			await sleep( 10 );
 			throw 'resolution failed';

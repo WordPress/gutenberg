@@ -30,10 +30,8 @@ export const getAssociatedGuide = createSelector(
 					tipIds,
 					keys( state.preferences.dismissedTips )
 				);
-				const [
-					currentTipId = null,
-					nextTipId = null,
-				] = nonDismissedTips;
+				const [ currentTipId = null, nextTipId = null ] =
+					nonDismissedTips;
 				return { tipIds, currentTipId, nextTipId };
 			}
 		}
