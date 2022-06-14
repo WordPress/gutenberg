@@ -80,6 +80,7 @@ module.exports = {
 						name: 'lodash',
 						importNames: [
 							'concat',
+							'defaultTo',
 							'differenceWith',
 							'dropRight',
 							'findIndex',
