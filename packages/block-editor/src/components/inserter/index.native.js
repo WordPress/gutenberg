@@ -282,9 +282,8 @@ export class Inserter extends Component {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock(
-						insertionType
-					),
+					shouldReplaceBlock:
+						this.shouldReplaceBlock( insertionType ),
 					insertionIndex: this.getInsertionIndex( insertionType ),
 				},
 				onToggle
@@ -324,11 +323,8 @@ export class Inserter extends Component {
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { clientId, isAppender } = this.props;
-		const {
-			destinationRootClientId,
-			shouldReplaceBlock,
-			insertionIndex,
-		} = this.state;
+		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } =
+			this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -385,9 +381,8 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const {
-				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getBlockEditorSettings();
+			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } =
+				getBlockEditorSettings();
 
 			// If post title is selected insert as first block.
 			if ( shouldInsertAtTheTop ) {

@@ -29,9 +29,8 @@ export default function PostVisibility( { onClose } ) {
 	const { editPost, savePost } = useDispatch( editorStore );
 
 	const [ hasPassword, setHasPassword ] = useState( !! password );
-	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] = useState(
-		false
-	);
+	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] =
+		useState( false );
 
 	const setPublic = () => {
 		editPost( {

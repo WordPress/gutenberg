@@ -83,9 +83,8 @@ export function BlockSettingsDropdown( {
 				hasReducedUI: getSettings().hasReducedUI,
 				onlyBlock: 1 === getBlockCount(),
 				parentBlockType: getBlockType( parentBlockName ),
-				previousBlockClientId: getPreviousBlockClientId(
-					firstBlockClientId
-				),
+				previousBlockClientId:
+					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
@@ -109,9 +108,8 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock

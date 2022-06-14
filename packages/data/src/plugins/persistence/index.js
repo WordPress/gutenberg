@@ -63,10 +63,8 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
+		options;
 
 	let data;
 

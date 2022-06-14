@@ -67,9 +67,8 @@ export function getGapBoxControlValueFromStyle( blockGapValue ) {
  * @return {string|null}                    The concatenated gap value (row and column).
  */
 export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
-	const blockGapBoxControlValue = getGapBoxControlValueFromStyle(
-		blockGapValue
-	);
+	const blockGapBoxControlValue =
+		getGapBoxControlValueFromStyle( blockGapValue );
 	if ( ! blockGapBoxControlValue ) {
 		return null;
 	}

@@ -68,8 +68,7 @@ describe( 'Migrate quote block', () => {
 
 	it( 'should keep the formats of the value', () => {
 		const [ attributes, innerBlocks ] = migrateToQuoteV2( {
-			value:
-				'<p><strong>Bold</strong></p><p> and </p><p><em>italic</em></p>',
+			value: '<p><strong>Bold</strong></p><p> and </p><p><em>italic</em></p>',
 			citation: 'Author',
 		} );
 		expect( attributes ).toEqual( {

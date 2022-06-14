@@ -54,6 +54,7 @@
 		"src/dropdown/**/*",
 		"src/dropdown-menu/**/*",
 		"src/elevation/**/*",
+		"src/external-link/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/form-token-field/**/*",

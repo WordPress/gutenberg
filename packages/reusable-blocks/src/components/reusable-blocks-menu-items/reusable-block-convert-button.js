@@ -43,9 +43,8 @@ export default function ReusableBlockConvertButton( {
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } = select(
-				blockEditorStore
-			);
+			const { getBlocksByClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -81,13 +80,11 @@ export default function ReusableBlockConvertButton( {
 		[ clientIds ]
 	);
 
-	const {
-		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( store );
+	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
+		useDispatch( store );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {

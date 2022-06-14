@@ -30,9 +30,8 @@ const PANEL_NAME = 'page-attributes';
 export function PageAttributes() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-			editPostStore
-		);
+		const { isEditorPanelEnabled, isEditorPanelOpened } =
+			select( editPostStore );
 		const { getPostType } = select( coreStore );
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),

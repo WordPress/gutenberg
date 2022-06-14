@@ -55,6 +55,6 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	areCustomFieldsEnabled: !! select( editorStore ).getEditorSettings()
-		.enableCustomFields,
+	areCustomFieldsEnabled:
+		!! select( editorStore ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );

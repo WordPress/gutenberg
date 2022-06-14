@@ -74,14 +74,11 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByText,
-		} = await initializeEditor( {
-			initialHtml: '',
-			capabilities: { reusableBlock: true },
-		} );
+		const { getByA11yLabel, getByTestId, getByText } =
+			await initializeEditor( {
+				initialHtml: '',
+				capabilities: { reusableBlock: true },
+			} );
 
 		// Open the inserter menu.
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );

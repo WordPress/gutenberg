@@ -31,9 +31,8 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -46,9 +45,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		[ clientId ]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',

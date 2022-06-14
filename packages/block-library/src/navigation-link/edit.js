@@ -225,20 +225,28 @@ export const updateNavigationLinkBlockAttributes = (
 	} = blockAttributes;
 
 	const {
-		title = '', // the title of any provided Post.
-		url = '',
+		title: newLabel = '', // the title of any provided Post.
+		url: newUrl = '',
 
 		opensInNewTab,
 		id,
 		kind: newKind = originalKind,
 		type: newType = originalType,
 	} = updatedValue;
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
-	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
-	const escapeTitle =
-		title !== '' &&
-		normalizedTitle !== normalizedURL &&
-		originalLabel !== title;
+
+	const newLabelWithoutHttp = newLabel.replace( /http(s?):\/\//gi, '' );
+	const newUrlWithoutHttp = newUrl.replace( /http(s?):\/\//gi, '' );
+
+	const useNewLabel =
+		newLabel &&
+		newLabel !== originalLabel &&
+		// LinkControl without the title field relies
+		// on the check below. Specifically, it assumes that
+		// the URL is the same as a title.
+		// This logic a) looks suspicious and b) should really
+		// live in the LinkControl and not here. It's a great
+		// candidate for future refactoring.
+		newLabelWithoutHttp !== newUrlWithoutHttp;
 
 	// Unfortunately this causes the escaping model to be inverted.
 	// The escaped content is stored in the block attributes (and ultimately in the database),
@@ -249,9 +257,9 @@ export const updateNavigationLinkBlockAttributes = (
 	// See also:
 	// - https://github.com/WordPress/gutenberg/pull/41063
 	// - https://github.com/WordPress/gutenberg/pull/18617.
-	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+	const label = useNewLabel
+		? escape( newLabel )
+		: originalLabel || escape( newUrlWithoutHttp );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -265,7 +273,7 @@ export const updateNavigationLinkBlockAttributes = (
 
 	setAttributes( {
 		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
+		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
@@ -447,10 +455,8 @@ export default function NavigationLinkEdit( {
 		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const {
-		replaceBlock,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -658,10 +664,8 @@ export default function NavigationLinkEdit( {
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
+			[ getColorClassName( 'background-color', backgroundColor ) ]:
+				!! backgroundColor,
 		} ),
 		style: {
 			color: ! textColor && customTextColor,

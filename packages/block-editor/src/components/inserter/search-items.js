@@ -49,9 +49,9 @@ export const getNormalizedSearchTerms = ( input = '' ) => {
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 	return unmatchedTerms.filter(
 		( term ) =>
-			! getNormalizedSearchTerms(
-				unprocessedTerms
-			).some( ( unprocessedTerm ) => unprocessedTerm.includes( term ) )
+			! getNormalizedSearchTerms( unprocessedTerms ).some(
+				( unprocessedTerm ) => unprocessedTerm.includes( term )
+			)
 	);
 };
 
