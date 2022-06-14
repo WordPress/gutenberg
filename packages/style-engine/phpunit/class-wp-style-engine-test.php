@@ -347,7 +347,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'elements_and_element_states_with_selector'    => array(
 				'block_styles'    => array(
 					'elements' => array(
-						'link'   => array(
+						'link' => array(
 							'color'  => array(
 								'text'       => '#fff',
 								'background' => '#000',
@@ -365,31 +365,19 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'button' => array(
-							'color'     => array(
-								'text'       => '#fff',
-								'background' => '#000',
-							),
-							':disabled' => array(
-								'color' => array(
-									'text'       => '#999',
-									'background' => '#fff',
-								),
-							),
-						),
 					),
 				),
 				'options'         => array( 'selector' => '.la-sinistra' ),
 				'expected_output' => array(
-					'css' => '.la-sinistra a { color: #fff; background-color: #000; } .la-sinistra a:hover { color: #000; background-color: #fff; } .la-sinistra a:focus { color: #000; background-color: #fff; } .la-sinistra button { color: #fff; background-color: #000; } .la-sinistra button:disabled { color: #999; background-color: #fff; }',
+					'css' => '.la-sinistra a { color: #fff; background-color: #000; } .la-sinistra a:hover { color: #000; background-color: #fff; }',
 				),
 			),
 
-			'elements_and_element_states_with_css_vars' => array(
+			'elements_and_element_states_with_css_vars'    => array(
 				'block_styles'    => array(
 					'elements' => array(
-						'button' => array(
-							'color'   => array(
+						'link' => array(
+							'color'  => array(
 								'text'       => 'var:preset|color|roastbeef',
 								'background' => '#000',
 							),
@@ -403,13 +391,65 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => array(
-					'selector' => '.der-beste-button',
+					'selector' => '.der-beste-link',
 					'css_vars' => true,
 				),
 				'expected_output' => array(
-					'css' => '.der-beste-button button { color: var(--wp--preset--color--roastbeef); background-color: #000; } .der-beste-button button:hover { color: var(--wp--preset--color--pineapple); background-color: var(--wp--preset--color--goldenrod); }',
+					'css' => '.der-beste-link a { color: var(--wp--preset--color--roastbeef); background-color: #000; } .der-beste-link a:hover { color: var(--wp--preset--color--pineapple); background-color: var(--wp--preset--color--goldenrod); }',
 				),
 			),
+
+			'elements_and_unsupported_element_states'      => array(
+				'block_styles'    => array(
+					'elements' => array(
+						'link' => array(
+							'color'  => array(
+								'text'       => '#fff',
+								'background' => '#000',
+							),
+							// Not a supported pseudo selector (yet!)
+							':focus' => array(
+								'color' => array(
+									'text'       => '#000',
+									'background' => '#fff',
+								),
+							),
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					// Should not contain the `:focus` rule.
+					'css' => 'a { color: #fff; background-color: #000; }',
+				),
+			),
+
+			'unsupported_elements_with_states'      => array(
+				'block_styles'    => array(
+					'elements' => array(
+						// Only `link` has state support at this time.
+						'button' => array(
+							'color'  => array(
+								'text'       => '#fff',
+								'background' => '#000',
+							),
+							':hover' => array(
+								// Should be ignored.
+								'color' => array(
+									'text'       => '#000',
+									'background' => '#fff',
+								),
+							),
+						),
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					// Should not contain the `:hover` rule.
+					'css' => 'button { color: #fff; background-color: #000; }',
+				),
+			),
+
 		);
 	}
 }
