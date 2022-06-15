@@ -174,11 +174,16 @@ const reduxStore = createStore();
 
 const boundSelectors = mapValues(
 	existingSelectors,
-	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
+	( selector ) =>
+		( ...args ) =>
+			selector( reduxStore.getState(), ...args )
 );
 
-const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
-	reduxStore.dispatch( action( ...args ) )
+const boundActions = mapValues(
+	existingActions,
+	( action ) =>
+		( ...args ) =>
+			reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
@@ -431,7 +436,9 @@ that allows to select data from the store's `state`, a registry selector
 has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+( select ) =>
+	( state, ...selectorArgs ) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
