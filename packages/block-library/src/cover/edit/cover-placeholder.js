@@ -17,6 +17,7 @@ export default function CoverPlaceholder( {
 	onError,
 	style,
 	toggleUseFeaturedImage,
+	hasFeaturedImage,
 } ) {
 	return (
 		<MediaPlaceholder
@@ -32,6 +33,7 @@ export default function CoverPlaceholder( {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
+			hasFeaturedImage={ hasFeaturedImage }
 			onError={ onError }
 			style={ style }
 		>

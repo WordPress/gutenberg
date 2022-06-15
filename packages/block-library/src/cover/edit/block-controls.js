@@ -23,13 +23,8 @@ export default function CoverBlockControls( {
 	currentSettings,
 	toggleUseFeaturedImage,
 } ) {
-	const {
-		contentPosition,
-		id,
-		useFeaturedImage,
-		minHeight,
-		minHeightUnit,
-	} = attributes;
+	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
+		attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );

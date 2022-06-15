@@ -72,6 +72,7 @@ export function MediaPlaceholder( {
 	onCancel,
 	onSelectURL,
 	onToggleFeaturedImage,
+	hasFeaturedImage,
 	onDoubleClick,
 	onFilesPreUpload = noop,
 	onHTMLDrop = noop,
@@ -316,6 +317,7 @@ export function MediaPlaceholder( {
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
 						variant="tertiary"
+						disabled={ ! hasFeaturedImage }
 					>
 						{ __( 'Use featured image' ) }
 					</Button>
