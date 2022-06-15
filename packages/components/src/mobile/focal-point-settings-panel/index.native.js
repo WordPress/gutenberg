@@ -56,7 +56,7 @@ const FocalPointSettingsPanelMemo = memo(
 				</NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
-					onChange={ useCallback( () => setPosition, [] ) }
+					onChange={ useCallback( () => setPosition(), [] ) }
 					shouldEnableBottomSheetScroll={
 						shouldEnableBottomSheetScroll
 					}
