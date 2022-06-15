@@ -517,7 +517,11 @@ describe( 'List', () => {
 		await page.keyboard.type( '3' );
 		await clickBlockToolbarButton( 'Ordered' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const content = await page.$eval(
+			'.wp-block-list',
+			( el ) => el.innerHTML
+		);
+		expect( content ).toMatchSnapshot();
 	} );
 
 	it( 'should not change the contents when you change the list type to Unordered', async () => {
@@ -529,6 +533,10 @@ describe( 'List', () => {
 		await page.keyboard.type( 'c' );
 		await clickBlockToolbarButton( 'Unordered' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const content = await page.$eval(
+			'.wp-block-list',
+			( el ) => el.innerHTML
+		);
+		expect( content ).toMatchSnapshot();
 	} );
 } );
