@@ -221,7 +221,7 @@ const variations = [
 		name: 'pocketcasts',
 		title: 'Pocket Casts',
 		icon: embedPocketCastsIcon,
-		keywords: [ __( 'pocketcasts' ), __( 'podcast' ), __( 'audio' ) ],
+		keywords: [ __( 'podcast' ), __( 'audio' ) ],
 		description: __( 'Embed a podcast player from Pocket Casts.' ),
 		patterns: [ /^https:\/\/pca.st\/\w+/i ],
 		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
