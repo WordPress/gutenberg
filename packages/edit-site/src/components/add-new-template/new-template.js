@@ -164,7 +164,6 @@ export default function NewTemplate( { postType } ) {
 					__( 'Single %s' ),
 					singularName
 				),
-				// title: `Single ${ singularName }`,
 				description: sprintf(
 					// translators: %s: Name of the post type e.g: "Post".
 					__( 'Displays a single %s.' ),
