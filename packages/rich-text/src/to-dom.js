@@ -143,15 +143,17 @@ export function toDom( {
 		remove,
 		appendText,
 		onStartIndex( body, pointer ) {
-			const offset = pointer.nodeValue
-				? [ pointer.nodeValue.length ]
-				: null;
+			const offset =
+				typeof pointer.nodeValue !== 'undefined'
+					? [ pointer.nodeValue.length ]
+					: null;
 			startPath = createPathToNode( pointer, body, offset );
 		},
 		onEndIndex( body, pointer ) {
-			const offset = pointer.nodeValue
-				? [ pointer.nodeValue.length ]
-				: null;
+			const offset =
+				typeof pointer.nodeValue !== 'undefined'
+					? [ pointer.nodeValue.length ]
+					: null;
 			endPath = createPathToNode( pointer, body, offset );
 		},
 		isEditableTree,
