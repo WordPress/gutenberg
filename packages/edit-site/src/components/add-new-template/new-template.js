@@ -150,7 +150,7 @@ export default function NewTemplate( { postType } ) {
 			const {
 				slug,
 				labels: { singular_name: singularName },
-				menu_icon: icon,
+				icon,
 				name,
 			} = _postType;
 			const hasGeneralTemplate = existingTemplateSlugs?.includes(
@@ -169,7 +169,12 @@ export default function NewTemplate( { postType } ) {
 					__( 'Displays a single %s.' ),
 					singularName
 				),
-				icon,
+				// `icon` is the `menu_icon` property of a post type. We
+				// only handle `dashicons` for now, even if the `menu_icon`
+				// also supports urls and svg as values.
+				icon: icon?.startsWith( 'dashicons-' )
+					? icon.slice( 10 )
+					: null,
 			};
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {
