@@ -5,6 +5,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import BaseInputControl from '../';
@@ -83,17 +88,29 @@ describe( 'InputControl', () => {
 		it( 'should work as a controlled component', async () => {
 			const user = setupUser();
 			const spy = jest.fn();
-			const { rerender } = render(
-				<InputControl value="one" onChange={ spy } />
-			);
+			const Example = () => {
+				const [ state, setState ] = useState( 'one' );
+				const onChange = ( value ) => {
+					setState( value );
+					spy( value );
+				};
+				const onKeyDown = ( { key } ) => {
+					if ( key === 'Escape' ) setState( 'three' );
+				};
+				return (
+					<InputControl
+						value={ state }
+						onChange={ onChange }
+						onKeyDown={ onKeyDown }
+					/>
+				);
+			};
+			render( <Example /> );
 			const input = getInput();
 
 			await user.type( input, '2' );
-			// Clicking document.body to trigger a blur event on the input.
-			await user.click( document.body );
-
-			// Updating the value via props.
-			rerender( <InputControl value="three" onChange={ spy } /> );
+			// Make a controlled update.
+			await user.keyboard( '{Escape}' );
 
 			expect( input ).toHaveValue( 'three' );
 			/*
