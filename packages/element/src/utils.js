@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isArray, isNumber, isString } from 'lodash';
+import { isNumber, isString } from 'lodash';
 
 /**
  * Checks if the provided WP element is empty.
@@ -14,7 +14,7 @@ export const isEmptyElement = ( element ) => {
 		return false;
 	}
 
-	if ( isString( element ) || isArray( element ) ) {
+	if ( isString( element ) || Array.isArray( element ) ) {
 		return ! element.length;
 	}
 

@@ -12,7 +12,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import Listener from './listener';
 
 /**
@@ -71,7 +71,9 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 			handleEvent( /** @type {any} */ event ) {
 				const handler =
 					eventTypesToHandlers[
-						/** @type {keyof GlobalEventHandlersEventMap} */ ( event.type )
+						/** @type {keyof GlobalEventHandlersEventMap} */ (
+							event.type
+						)
 						/* eslint-enable jsdoc/no-undefined-types */
 					];
 				if ( typeof this.wrappedRef[ handler ] === 'function' ) {

@@ -146,6 +146,40 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
+ * Generates the utility classnames for the given blocks layout attributes.
+ * This method was primarily added to reintroduce classnames that were removed
+ * in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719), rather
+ * than providing an extensive list of all possible layout classes. The plan is to
+ * have the style engine generate a more extensive list of utility classnames which
+ * will then replace this method.
+ *
+ * @param array $block_attributes Array of block attributes.
+ *
+ * @return array Array of CSS classname strings.
+ */
+function gutenberg_get_layout_classes( $block_attributes ) {
+	$class_names = array();
+
+	if ( empty( $block_attributes['layout'] ) ) {
+		return $class_names;
+	}
+
+	if ( ! empty( $block_attributes['layout']['orientation'] ) ) {
+		$class_names[] = 'is-' . sanitize_title( $block_attributes['layout']['orientation'] );
+	}
+
+	if ( ! empty( $block_attributes['layout']['justifyContent'] ) ) {
+		$class_names[] = 'is-content-justification-' . sanitize_title( $block_attributes['layout']['justifyContent'] );
+	}
+
+	if ( ! empty( $block_attributes['layout']['flexWrap'] ) && 'nowrap' === $block_attributes['layout']['flexWrap'] ) {
+		$class_names[] = 'is-nowrap';
+	}
+
+	return $class_names;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -172,8 +206,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$class_name = wp_unique_id( 'wp-container-' );
-	$gap_value  = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+	$container_class = wp_unique_id( 'wp-container-' );
+	$class_names     = gutenberg_get_layout_classes( $block['attrs'] );
+	$class_names[]   = $container_class;
+
+	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
@@ -190,12 +227,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$class_name", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$style                         = gutenberg_get_layout_style( ".$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( $class_name ) . ' ',
+		'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
 		$block_content,
 		1
 	);

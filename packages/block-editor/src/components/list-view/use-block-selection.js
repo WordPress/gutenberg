@@ -20,9 +20,8 @@ import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
 
 export default function useBlockSelection() {
-	const { clearSelectedBlock, multiSelect, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { clearSelectedBlock, multiSelect, selectBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockName,
 		getBlockParents,
@@ -134,8 +133,9 @@ export default function useBlockSelection() {
 
 			let label;
 			if ( selectionDiff.length === 1 ) {
-				const title = getBlockType( getBlockName( selectionDiff[ 0 ] ) )
-					?.title;
+				const title = getBlockType(
+					getBlockName( selectionDiff[ 0 ] )
+				)?.title;
 				if ( title ) {
 					label = sprintf(
 						/* translators: %s: block name */

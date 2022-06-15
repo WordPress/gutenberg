@@ -100,14 +100,10 @@ export function onBlockDrop(
  * @return {Function} The event handler for a block drop event.
  */
 export default function useOnBlockDrop() {
-	const { getBlockIndex, getClientIdsOfDescendants } = useSelect(
-		blockEditorStore
-	);
-	const {
-		insertBlocks,
-		moveBlocksToPosition,
-		clearSelectedBlock,
-	} = useDispatch( blockEditorStore );
+	const { getBlockIndex, getClientIdsOfDescendants } =
+		useSelect( blockEditorStore );
+	const { insertBlocks, moveBlocksToPosition, clearSelectedBlock } =
+		useDispatch( blockEditorStore );
 
 	return onBlockDrop(
 		getBlockIndex,

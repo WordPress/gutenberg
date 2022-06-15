@@ -366,20 +366,20 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const monthInput = ( screen.getByLabelText(
-			'Month'
-		) as HTMLInputElement ).value;
+		const monthInput = (
+			screen.getByLabelText( 'Month' ) as HTMLInputElement
+		 ).value;
 		const dayInput = ( screen.getByLabelText( 'Day' ) as HTMLInputElement )
 			.value;
-		const yearInput = ( screen.getByLabelText(
-			'Year'
-		) as HTMLInputElement ).value;
-		const hoursInput = ( screen.getByLabelText(
-			'Hours'
-		) as HTMLInputElement ).value;
-		const minutesInput = ( screen.getByLabelText(
-			'Minutes'
-		) as HTMLInputElement ).value;
+		const yearInput = (
+			screen.getByLabelText( 'Year' ) as HTMLInputElement
+		 ).value;
+		const hoursInput = (
+			screen.getByLabelText( 'Hours' ) as HTMLInputElement
+		 ).value;
+		const minutesInput = (
+			screen.getByLabelText( 'Minutes' ) as HTMLInputElement
+		 ).value;
 
 		expect( Number.isNaN( parseInt( monthInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( dayInput, 10 ) ) ).toBe( false );

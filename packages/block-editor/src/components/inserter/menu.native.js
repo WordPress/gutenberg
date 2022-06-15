@@ -162,13 +162,15 @@ function InserterMenu( {
 		[ setFilterValue ]
 	);
 
-	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
-		setShowTabs,
-	] );
+	const onKeyboardShow = useCallback(
+		() => setShowTabs( false ),
+		[ setShowTabs ]
+	);
 
-	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
-		setShowTabs,
-	] );
+	const onKeyboardHide = useCallback(
+		() => setShowTabs( true ),
+		[ setShowTabs ]
+	);
 
 	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
 	const isFullScreen = ! isIOS && showSearchForm;
