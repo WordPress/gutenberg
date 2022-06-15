@@ -2,8 +2,6 @@
  * External dependencies
  */
 const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
-const { existsSync } = require( 'fs' );
-const { resolve } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -14,7 +12,6 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
-const CLIError = require( './cli-error' );
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
