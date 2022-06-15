@@ -80,12 +80,12 @@ function render_block_core_search( $attributes ) {
 	}
 
 	if ( $show_button ) {
-		$button_classes = array();
+		$button_classes         = array();
 		$button_internal_markup = '';
 		if ( ! empty( $color_classes ) ) {
 			$button_classes[] = $color_classes;
 		}
-		$aria_label             = '';
+		$aria_label = '';
 
 		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 			$button_classes[] = $border_color_classes;
@@ -95,7 +95,7 @@ function render_block_core_search( $attributes ) {
 				$button_internal_markup = wp_kses_post( $attributes['buttonText'] );
 			}
 		} else {
-			$aria_label      = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
+			$aria_label       = sprintf( 'aria-label="%s"', esc_attr( wp_strip_all_tags( $attributes['buttonText'] ) ) );
 			$button_classes[] = 'has-icon';
 
 			$button_internal_markup =
