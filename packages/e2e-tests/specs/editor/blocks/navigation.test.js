@@ -399,11 +399,14 @@ describe( 'Navigation', () => {
 			// relying on variable factors such as network conditions.
 			await setUpResponseMocking( [
 				{
-					match: ( request ) =>
-						request.method() === 'GET' &&
-						request.url().includes( `rest_route` ) &&
-						request.url().includes( `navigation` ) &&
-						request.url().includes( testNavId ),
+					match: ( request ) => {
+						return (
+							[ 'GET', 'OPTIONS' ].includes( request.method() ) &&
+							decodeURIComponent( request.url() ).includes(
+								`navigation/${ testNavId }`
+							)
+						);
+					},
 					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
@@ -417,7 +420,9 @@ describe( 'Navigation', () => {
 					},
 				},
 			] );
-
+			/*
+Expected mock function not to be called but it was called with: ["POST", "http://localhost:8889/wp-admin/admin-ajax.php", "http://localhost:8889/wp-admin/admin-ajax.php"],["GET", "http://localhost:8889/wp-admin/post-new.php", "http://localhost:8889/wp-admin/post-new.php"],["GET", "http://localhost:8889/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.16", "http://localhost:8889/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.16"],["GET", "http://localhost:8889/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.1-alpha-53506", "http://localhost:8889/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.1-alpha-53506"],["GET", "http://localhost:8889/wp-includes/js/imgareaselect/imgareaselect.css?ver=0.9.8", "http://localhost:8889/wp-includes/js/imgareaselect/imgareaselect.css?ver=0.9.8"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/components/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/components/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-editor/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/nux/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/nux/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/reusable-blocks/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/reusable-blocks/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/editor/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/editor/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/reset.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/reset.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/edit-post/classic.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/edit-post/classic.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/editor.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/editor.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/edit-post/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/edit-post/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-directory/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-directory/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/format-library/style.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/format-library/style.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/themes/twentytwentyone/assets/css/custom-color-overrides.css?ver=1.6", "http://localhost:8889/wp-content/themes/twentytwentyone/assets/css/custom-color-overrides.css?ver=1.6"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/theme.css?ver=1655290402", "http://localhost:8889/wp-content/plugins/gutenberg/build/block-library/theme.css?ver=1655290402"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/blob/index.min.js?ver=bccaf46e493181a8db9a", "http://localhost:8889/wp-content/plugins/gutenberg/build/blob/index.min.js?ver=bccaf46e493181a8db9a"],["GET", "http://localhost:8889/wp-content/plugins/gutenberg/build/autop/index.min.js?ver=b1a2f86387be4fa46f89", "http://loca
+ */
 			await createNewPost();
 			await clickOnMoreMenuItem( 'Code editor' );
 			const codeEditorInput = await page.waitForSelector(
