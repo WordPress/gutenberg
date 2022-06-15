@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.13.0 (2022-06-15)
+
 ### Bug Fix
 
 -   `Tooltip`: Opt in to `__unstableShift` to ensure that the Tooltip is always within the viewport. ([#41524](https://github.com/WordPress/gutenberg/pull/41524))
