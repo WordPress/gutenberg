@@ -184,6 +184,7 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			await user.type( input, ' now' );
+			// Clicking document.body to trigger a blur event on the input.
 			await user.click( document.body );
 
 			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
