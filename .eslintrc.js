@@ -84,6 +84,7 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'findIndex',
+							'flatten',
 							'isArray',
 							'isFinite',
 							'isFunction',
