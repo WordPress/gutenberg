@@ -91,7 +91,7 @@ function ColorPicker( {
 		setColor( currentColor );
 	}, [ currentColor, setColor ] );
 
-	const { current: bottomSheetInitializer } = useRef( () => {
+	useEffect( () => {
 		shouldEnableBottomSheetMaxHeight( false );
 		onHandleClosingBottomSheet( () => {
 			if ( savedColor ) {
@@ -104,8 +104,12 @@ function ColorPicker( {
 		if ( onHandleHardwareButtonPress ) {
 			onHandleHardwareButtonPress( onButtonPress );
 		}
-	} );
-	useEffect( bottomSheetInitializer, [ bottomSheetInitializer ] );
+		// TODO: Revisit this to discover if there's a good reason for omitting
+		// the hook’s dependencies and running it a single time. Ideally there
+		// may be a way to refactor and obviate the disabled lint rule. If not,
+		// this comment should be replaced by one that explains the reasoning.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
 		setHue( h );
