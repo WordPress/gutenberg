@@ -41,7 +41,7 @@ const TEMPLATE = [
 								'core/comment-author-name',
 								{
 									style: {
-										typography: { fontSize: '1rem' },
+										typography: { fontSize: 'small' },
 									},
 								},
 							],
@@ -64,7 +64,7 @@ const TEMPLATE = [
 										{
 											style: {
 												typography: {
-													fontSize: '1rem',
+													fontSize: 'small',
 												},
 											},
 										},
@@ -74,7 +74,7 @@ const TEMPLATE = [
 										{
 											style: {
 												typography: {
-													fontSize: '1rem',
+													fontSize: 'small',
 												},
 											},
 										},
@@ -86,7 +86,7 @@ const TEMPLATE = [
 								'core/comment-reply-link',
 								{
 									style: {
-										typography: { fontSize: '1rem' },
+										typography: { fontSize: 'small' },
 									},
 								},
 							],
