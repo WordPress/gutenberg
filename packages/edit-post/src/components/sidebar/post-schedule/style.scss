@@ -2,15 +2,20 @@
 	width: 100%;
 	position: relative;
 	justify-content: flex-start;
+	align-items: flex-start;
 
 	span {
 		display: block;
 		width: 45%;
+		flex-shrink: 0;
+		padding: 6px 0;
 	}
 }
 
 .components-button.edit-post-post-schedule__toggle {
-	text-align: right;
+	text-align: left;
+	white-space: normal;
+	height: auto;
 }
 
 .edit-post-post-schedule__dialog .components-popover__content {
