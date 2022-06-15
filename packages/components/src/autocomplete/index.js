@@ -12,6 +12,7 @@ import {
 	useState,
 	useRef,
 	useMemo,
+	useCallback,
 } from '@wordpress/element';
 import {
 	ENTER,
@@ -210,13 +211,16 @@ function useAutocomplete( {
 	 *
 	 * @param {Array} options
 	 */
-	function onChangeOptions( options ) {
-		setSelectedIndex(
-			options.length === filteredOptions.length ? selectedIndex : 0
-		);
-		setFilteredOptions( options );
-		announce( options );
-	}
+	const onChangeOptions = useCallback(
+		( options ) => {
+			setSelectedIndex(
+				options.length === filteredOptions.length ? selectedIndex : 0
+			);
+			setFilteredOptions( options );
+			announce( options );
+		},
+		[ announce, filteredOptions.length, selectedIndex ]
+	);
 
 	function handleKeyDown( event ) {
 		backspacing.current = event.keyCode === BACKSPACE;
