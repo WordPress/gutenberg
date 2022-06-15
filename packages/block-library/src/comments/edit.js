@@ -40,9 +40,7 @@ const TEMPLATE = [
 							[
 								'core/comment-author-name',
 								{
-									style: {
-										typography: { fontSize: 'small' },
-									},
+									fontSize: 'small',
 								},
 							],
 							[
@@ -62,21 +60,13 @@ const TEMPLATE = [
 									[
 										'core/comment-date',
 										{
-											style: {
-												typography: {
-													fontSize: 'small',
-												},
-											},
+											fontSize: 'small',
 										},
 									],
 									[
 										'core/comment-edit-link',
 										{
-											style: {
-												typography: {
-													fontSize: 'small',
-												},
-											},
+											fontSize: 'small',
 										},
 									],
 								],
@@ -85,9 +75,7 @@ const TEMPLATE = [
 							[
 								'core/comment-reply-link',
 								{
-									style: {
-										typography: { fontSize: 'small' },
-									},
+									fontSize: 'small',
 								},
 							],
 						],
