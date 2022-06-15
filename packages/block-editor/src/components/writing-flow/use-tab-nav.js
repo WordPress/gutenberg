@@ -132,6 +132,14 @@ export default function useTabNav() {
 			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
 
 			if ( next.current === focusCaptureBeforeRef.current ) {
+				if (
+					isInSameBlock(
+						event.target,
+						focus.tabbable.findPrevious( event.target )
+					)
+				) {
+					focus.tabbable.findPrevious( event.target ).focus();
+				}
 				event.preventDefault();
 				return;
 			}
