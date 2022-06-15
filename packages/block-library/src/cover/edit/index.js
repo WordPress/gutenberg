@@ -211,7 +211,7 @@ function CoverEdit( {
 		overlayColor,
 	};
 
-	const coverBlockControls = (
+	const blockControls = (
 		<CoverBlockControls
 			attributes={ attributes }
 			setAttributes={ setAttributes }
@@ -220,7 +220,7 @@ function CoverEdit( {
 		/>
 	);
 
-	const coverInspectorControls = (
+	const inspectorControls = (
 		<CoverInspectorControls
 			attributes={ attributes }
 			setAttributes={ setAttributes }
@@ -234,8 +234,8 @@ function CoverEdit( {
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				{ coverBlockControls }
-				{ coverInspectorControls }
+				{ blockControls }
+				{ inspectorControls }
 				<div
 					{ ...blockProps }
 					className={ classnames(
@@ -294,8 +294,8 @@ function CoverEdit( {
 
 	return (
 		<>
-			{ coverBlockControls }
-			{ coverInspectorControls }
+			{ blockControls }
+			{ inspectorControls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
