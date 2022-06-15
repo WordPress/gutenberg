@@ -76,7 +76,7 @@ describe( 'InputControl', () => {
 			await user.type( input, ' there' );
 
 			expect( input ).toHaveValue( 'Hello there' );
-			expect( spy ).toHaveBeenCalledTimes( 6 );
+			expect( spy ).toHaveBeenCalledTimes( ' there'.length );
 			expect( spy ).toHaveBeenLastCalledWith( 'Hello there' );
 		} );
 
