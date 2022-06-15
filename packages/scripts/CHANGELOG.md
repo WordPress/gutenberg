@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.3.0 (2022-06-15)
+
 ### Enhancements
 
 -   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2` ([#40542](https://github.com/WordPress/gutenberg/pull/40542)).
