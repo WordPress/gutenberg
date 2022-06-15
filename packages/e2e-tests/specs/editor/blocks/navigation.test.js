@@ -388,7 +388,7 @@ describe( 'Navigation', () => {
 			expect( loadingSpinner ).toBeNull();
 		} );
 
-		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
+		it.only( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
 			const testNavId = 1;
 
 			let resolveNavigationRequest;
@@ -399,14 +399,23 @@ describe( 'Navigation', () => {
 			// relying on variable factors such as network conditions.
 			await setUpResponseMocking( [
 				{
-					match: ( request ) =>
-						request.method() === 'GET' &&
-						request.url().includes( `navigation` ) &&
-						request.url().includes( testNavId ),
+					match: ( request ) => {
+						console.log(
+							request.method(), request.url(), decodeURIComponent( request.url() )
+						)
+						return (
+							request.method() === 'GET' &&
+							decodeURIComponent( request.url() ).includes(
+								`navigation/${ testNavId }`
+							)
+						)
+					},
 					onRequestMatch: ( request ) => {
 						// The Promise simulates a REST API request whose resolultion
 						// the test has full control over.
 						return new Promise( ( resolve ) => {
+							console.log( request );
+							console.log( request.url() );
 							// Assign the resolution function to the var in the
 							// upper scope to afford control over resolution.
 							resolveNavigationRequest = resolve;
