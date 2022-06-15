@@ -184,27 +184,30 @@ function useAutocomplete( {
 		setAutocompleterUI( null );
 	}
 
-	function announce( options ) {
-		if ( ! debouncedSpeak ) {
-			return;
-		}
-		if ( !! options.length ) {
-			debouncedSpeak(
-				sprintf(
-					/* translators: %d: number of results. */
-					_n(
-						'%d result found, use up and down arrow keys to navigate.',
-						'%d results found, use up and down arrow keys to navigate.',
+	const announce = useCallback(
+		( options ) => {
+			if ( ! debouncedSpeak ) {
+				return;
+			}
+			if ( !! options.length ) {
+				debouncedSpeak(
+					sprintf(
+						/* translators: %d: number of results. */
+						_n(
+							'%d result found, use up and down arrow keys to navigate.',
+							'%d results found, use up and down arrow keys to navigate.',
+							options.length
+						),
 						options.length
 					),
-					options.length
-				),
-				'assertive'
-			);
-		} else {
-			debouncedSpeak( __( 'No results.' ), 'assertive' );
-		}
-	}
+					'assertive'
+				);
+			} else {
+				debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		},
+		[ debouncedSpeak ]
+	);
 
 	/**
 	 * Load options for an autocompleter.
