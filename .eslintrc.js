@@ -83,6 +83,7 @@ module.exports = {
 							'defaultTo',
 							'differenceWith',
 							'dropRight',
+							'each',
 							'findIndex',
 							'isArray',
 							'isFinite',

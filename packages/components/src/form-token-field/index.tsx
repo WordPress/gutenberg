@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	last,
-	clone,
-	uniq,
-	map,
-	difference,
-	each,
-	identity,
-	some,
-} from 'lodash';
+import { last, clone, uniq, map, difference, identity, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -481,7 +472,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		} else {
 			match = match.toLocaleLowerCase();
 
-			each( _suggestions, ( suggestion ) => {
+			_suggestions.forEach( ( suggestion ) => {
 				const index = suggestion.toLocaleLowerCase().indexOf( match );
 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
 					if ( index === 0 ) {
