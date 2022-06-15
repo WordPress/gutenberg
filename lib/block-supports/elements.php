@@ -87,35 +87,26 @@ function gutenberg_render_elements_support( $block_content, $block ) {
  * @return null
  */
 function gutenberg_render_elements_support_styles( $pre_render, $block ) {
-	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
-
-	/*
-	* For now we only care about link color.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
-	*/
+	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$element_block_styles          = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
-	if ( $skip_link_color_serialization ) {
+	if ( empty( $element_block_styles ) || $skip_link_color_serialization ) {
 		return null;
 	}
-	$class_name        = gutenberg_get_elements_class_name( $block );
-	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
+	$class_name = '.' . gutenberg_get_elements_class_name( $block );
+	$styles     = gutenberg_style_engine_generate(
+		array(
+			'elements' => $element_block_styles,
+		),
+		array(
+			'selector' => $class_name,
+			'css_vars' => true,
+		)
+	);
 
-	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_generate(
-			$link_block_styles,
-			array(
-				'selector' => ".$class_name a",
-				'css_vars' => true,
-			)
-		);
-
-		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
-		}
+	if ( ! empty( $styles['css'] ) ) {
+		gutenberg_enqueue_block_support_styles( $styles['css'] );
 	}
 
 	return null;
