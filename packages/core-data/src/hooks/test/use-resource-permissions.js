@@ -24,6 +24,14 @@ describe( 'useResourcePermissions', () => {
 
 		registry = createRegistry();
 		registry.register( coreDataStore );
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: {
+				get: () => ( {
+					allow: 'POST',
+				} ),
+			},
+		} ) );
 	} );
 
 	afterEach( () => {
@@ -32,11 +40,6 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'retrieves the relevant permissions for a key-less resource', async () => {
-		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST',
-			},
-		} ) );
 		let data;
 		const TestComponent = () => {
 			data = useResourcePermissions( 'widgets' );
@@ -72,11 +75,6 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'retrieves the relevant permissions for a resource with a key', async () => {
-		triggerFetch.mockImplementation( () => ( {
-			headers: {
-				Allow: 'POST',
-			},
-		} ) );
 		let data;
 		const TestComponent = () => {
 			data = useResourcePermissions( 'widgets', 1 );
