@@ -47,8 +47,7 @@ export type WordPressComponent<
 	selector: `.${ string }`;
 };
 
-export type WordPressComponentFromProps<
-	Props
-> = Props extends WordPressComponentProps< infer P, infer T, infer I >
-	? WordPressComponent< T, P, I >
-	: never;
+export type WordPressComponentFromProps< Props > =
+	Props extends WordPressComponentProps< infer P, infer T, infer I >
+		? WordPressComponent< T, P, I >
+		: never;

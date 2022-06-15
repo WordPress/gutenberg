@@ -3,22 +3,22 @@
  */
 import { render, screen } from '@testing-library/react';
 import { create, act } from 'react-test-renderer';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../control';
 
-const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
-	element
-) => {
-	return (
-		element.type === 'button' &&
-		element.props[ 'aria-label' ] &&
-		element.props[ 'aria-label' ].startsWith( ariaLabelStart )
-	);
-};
+const noop = () => {};
+
+const getButtonWithAriaLabelStartPredicate =
+	( ariaLabelStart ) => ( element ) => {
+		return (
+			element.type === 'button' &&
+			element.props[ 'aria-label' ] &&
+			element.props[ 'aria-label' ].startsWith( ariaLabelStart )
+		);
+	};
 
 const getTabWithTestPredicate = ( text ) => ( element ) => {
 	return (

@@ -46,11 +46,11 @@ export default function Dropdown( props ) {
 
 	useEffect(
 		() => () => {
-			if ( onToggle ) {
+			if ( onToggle && isOpen ) {
 				onToggle( false );
 			}
 		},
-		[ onToggle ]
+		[ onToggle, isOpen ]
 	);
 
 	function toggle() {

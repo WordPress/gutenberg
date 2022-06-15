@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +12,8 @@ import { more } from '@wordpress/icons';
  * Internal dependencies
  */
 import { MenuItem } from '../';
+
+const noop = () => {};
 
 describe( 'MenuItem', () => {
 	it( 'should match snapshot when only label provided', () => {

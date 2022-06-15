@@ -47,8 +47,9 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ ( payload
-		.commits[ 0 ] );
+	const commit = /** @type {WebhookPayloadPushCommit} */ (
+		payload.commits[ 0 ]
+	);
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(

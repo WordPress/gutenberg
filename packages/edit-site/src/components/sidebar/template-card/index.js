@@ -16,9 +16,8 @@ export default function TemplateCard() {
 	const { title, description, icon } = useSelect( ( select ) => {
 		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
 		const { getEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();

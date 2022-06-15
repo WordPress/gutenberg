@@ -105,9 +105,8 @@ async function run() {
 				}
 			}
 
-			const { meta, testResults: prevTestResults } = parseIssueBody(
-				body
-			);
+			const { meta, testResults: prevTestResults } =
+				parseIssueBody( body );
 
 			// Concat the test results list with the latest test results.
 			const formattedTestResults = [

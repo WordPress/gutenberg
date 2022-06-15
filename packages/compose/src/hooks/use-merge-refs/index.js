@@ -20,7 +20,8 @@ function assignRef( ref, value ) {
 		ref( value );
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
 		/* eslint-disable jsdoc/no-undefined-types */
-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current = value;
+		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
+			value;
 		/* eslint-enable jsdoc/no-undefined-types */
 	}
 }

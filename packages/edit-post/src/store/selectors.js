@@ -24,8 +24,10 @@ const EMPTY_OBJECT = {};
  *
  * @return {string} Editing mode.
  */
-export const getEditorMode = createRegistrySelector( ( select ) => () =>
-	select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ?? 'visual'
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
+		'visual'
 );
 
 /**
@@ -37,9 +39,10 @@ export const getEditorMode = createRegistrySelector( ( select ) => () =>
  */
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
 		return includes(
 			[ 'edit-post/document', 'edit-post/block' ],
 			activeGeneralSidebar
@@ -56,9 +59,10 @@ export const isEditorSidebarOpened = createRegistrySelector(
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-post' );
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/edit-post'
+			);
 		return (
 			!! activeGeneralSidebar &&
 			! includes(
@@ -463,11 +467,8 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const {
-		rootClientId,
-		insertionIndex,
-		filterValue,
-	} = state.blockInserterPanel;
+	const { rootClientId, insertionIndex, filterValue } =
+		state.blockInserterPanel;
 	return { rootClientId, insertionIndex, filterValue };
 }
 
@@ -511,9 +512,8 @@ export function areMetaBoxesInitialized( state ) {
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
-		const currentTemplate = select( editorStore ).getEditedPostAttribute(
-			'template'
-		);
+		const currentTemplate =
+			select( editorStore ).getEditedPostAttribute( 'template' );
 		if ( currentTemplate ) {
 			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )

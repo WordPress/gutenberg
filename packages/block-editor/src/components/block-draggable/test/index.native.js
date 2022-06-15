@@ -192,9 +192,8 @@ describe( 'BlockDraggable', () => {
 					const paragraphBlock = getByA11yLabel(
 						/Paragraph Block\. Row 1/
 					);
-					const spacerBlock = getByA11yLabel(
-						/Spacer Block\. Row 3/
-					);
+					const spacerBlock =
+						getByA11yLabel( /Spacer Block\. Row 3/ );
 
 					// Select Paragraph block and start editing text
 					fireEvent.press( paragraphBlock );
@@ -222,9 +221,8 @@ describe( 'BlockDraggable', () => {
 
 					// We select the first Image block as the Gallery block
 					// also contains Image blocks.
-					const imageBlock = getAllByA11yLabel(
-						/Image Block\. Row 2/
-					)[ 0 ];
+					const imageBlock =
+						getAllByA11yLabel( /Image Block\. Row 2/ )[ 0 ];
 					// Start dragging from block's content
 					fireLongPress( imageBlock, 'draggable-trigger-content' );
 					expect( getDraggableChip( screen ) ).toBeVisible();
@@ -246,9 +244,8 @@ describe( 'BlockDraggable', () => {
 
 					// We select the first Image block as the Gallery block
 					// also contains Image blocks.
-					const imageBlock = getAllByA11yLabel(
-						/Image Block\. Row 2/
-					)[ 0 ];
+					const imageBlock =
+						getAllByA11yLabel( /Image Block\. Row 2/ )[ 0 ];
 					fireEvent.press( imageBlock );
 
 					// Start dragging from block's content
@@ -339,9 +336,10 @@ describe( 'BlockDraggable', () => {
 					const galleryBlock = getByA11yLabel(
 						/Gallery Block\. Row 4/
 					);
-					const galleryItem = within( galleryBlock ).getByA11yLabel(
-						/Image Block\. Row 2/
-					);
+					const galleryItem =
+						within( galleryBlock ).getByA11yLabel(
+							/Image Block\. Row 2/
+						);
 					fireEvent.press( galleryBlock );
 					fireEvent.press( galleryItem );
 
@@ -396,9 +394,8 @@ describe( 'BlockDraggable', () => {
 						'block-draggable-wrapper'
 					);
 
-					const spacerBlock = getByA11yLabel(
-						/Spacer Block\. Row 3/
-					);
+					const spacerBlock =
+						getByA11yLabel( /Spacer Block\. Row 3/ );
 					await waitForStoreResolvers( () =>
 						fireEvent.press( spacerBlock )
 					);

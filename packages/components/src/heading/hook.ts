@@ -51,10 +51,11 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
 export function useHeading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >
 ) {
-	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
-		props,
-		'Heading'
-	);
+	const {
+		as: asProp,
+		level = 2,
+		...otherProps
+	} = useContextSystem( props, 'Heading' );
 
 	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
 

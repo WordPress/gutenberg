@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { concat, find } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -300,11 +300,13 @@ function GalleryEdit( props ) {
 
 		replaceInnerBlocks(
 			clientId,
-			concat( existingImageBlocks, newBlocks ).sort(
-				( a, b ) =>
-					newOrderMap[ a.attributes.id ] -
-					newOrderMap[ b.attributes.id ]
-			)
+			existingImageBlocks
+				.concat( newBlocks )
+				.sort(
+					( a, b ) =>
+						newOrderMap[ a.attributes.id ] -
+						newOrderMap[ b.attributes.id ]
+				)
 		);
 	}
 

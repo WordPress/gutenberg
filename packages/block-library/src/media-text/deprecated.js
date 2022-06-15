@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, isEmpty, omit } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 import { imageFillStyles } from './media-container';
 
 const DEFAULT_MEDIA_WIDTH = 50;
+const noop = () => {};
 
 const migrateCustomColors = ( attributes ) => {
 	if ( ! attributes.customBackgroundColor ) {
@@ -173,7 +174,8 @@ export default [
 				'has-background': backgroundClass || customBackgroundColor,
 				[ backgroundClass ]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
 			const backgroundStyles = imageFill
@@ -268,7 +270,8 @@ export default [
 				'has-media-on-the-right': 'right' === mediaPosition,
 				[ backgroundClass ]: backgroundClass,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
 			const backgroundStyles = imageFill
