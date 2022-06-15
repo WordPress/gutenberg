@@ -168,7 +168,7 @@ function ComboboxControl( {
 
 	const handleOnReset = () => {
 		onChange( null );
-		inputContainer.current.input.focus();
+		inputContainer.current.focus();
 	};
 
 	// Update current selections when the filter input changes.
