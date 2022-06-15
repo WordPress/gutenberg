@@ -498,39 +498,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	);
 
 	/**
-	 * Given the block settings, it extracts the CSS Custom Properties
-	 * for the presets and adds them to the $declarations array
-	 * following the format:
-	 *
-	 * ```php
-	 * array(
-	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
-	 * )
-	 * ```
-	 *
-	 * @param array $settings Settings to process.
-	 * @param array $origins  List of origins to process.
-	 * @return array Returns the modified $declarations.
-	 */
-	protected static function compute_preset_vars( $settings, $origins ) {
-		$declarations = array();
-
-		foreach ( static::PRESETS_METADATA as $preset_metadata ) {
-			$values_by_slug = static::get_settings_values_by_slug( $settings, $preset_metadata, $origins );
-
-			foreach ( $values_by_slug as $slug => $value ) {
-				$declarations[] = array(
-					'name'  => static::replace_slug_in_string( $preset_metadata['css_vars'], $slug ),
-					'value' => $value,
-				);
-			}
-		}
-
-		return $declarations;
-	}
-
-	/**
 	 * Transform the spacing scale values into an array of spacing scale presets.
 	 *
 	 * @param array $spacing_scale scale Array of values used to create the scale of spacing presets.
