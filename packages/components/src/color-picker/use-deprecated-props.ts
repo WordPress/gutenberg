@@ -110,18 +110,13 @@ export function useDeprecatedProps(
 	const isUsingLegacy = isLegacyProps( props );
 	const { onChangeComplete } = props as LegacyProps;
 	const { onChange: onChangeProp } = props as ColorPickerProps;
-	const onChange = useCallback(
+	const legacyChangeHandler = useCallback(
 		( color: string ) => {
-			if ( isUsingLegacy ) {
-				return onChangeComplete(
-					transformColorStringToLegacyColor( color )
-				);
-			}
-
-			return onChangeProp?.( color );
+			onChangeComplete( transformColorStringToLegacyColor( color ) );
 		},
-		[ onChangeComplete, onChangeProp, isUsingLegacy ]
+		[ onChangeComplete ]
 	);
+	const onChange = isUsingLegacy ? legacyChangeHandler : onChangeProp;
 
 	const { color: colorProp } = props;
 	const color = isUsingLegacy
