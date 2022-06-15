@@ -33,9 +33,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	/**
 	 * Given an element name, returns a class name.
 	 *
-	 * @param string $element The name of the element
+	 * @param string $element The name of the element.
 	 *
-	 * @return string The name of the class
+	 * @return string The name of the class.
 	 */
 	public static function get_element_class_name( $element ) {
 		return array_key_exists( $element, WP_Theme_JSON_Gutenberg::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? WP_Theme_JSON_Gutenberg::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
