@@ -145,14 +145,10 @@ class WP_Style_Engine {
 			),
 		),
 		'elements'   => array(
-			'link'   => array(
+			'link' => array(
 				'path'     => array( 'elements', 'link' ),
 				'selector' => 'a',
 				'states'   => array( ':hover' ),
-			),
-			'button' => array(
-				'path'     => array( 'elements', 'button' ),
-				'selector' => 'button',
 			),
 		),
 		'spacing'    => array(
@@ -542,29 +538,20 @@ class WP_Style_Engine {
 				$css_output[] = $generated_elements_styles['css'];
 			}
 
-			// Handle states if the given element supports pseudo selector "states"
-			// in its allow list.
 			if ( ! empty( $element_definition['states'] ) ) {
-
-				foreach ( $element_definition['states'] as $state_pseudo_selector ) {
-
-					// Dynamically generate the state definitions based on the hard coded
-					// "allow list" of psuedo selectors for the given element.
-					$state_definition = array(
-						'path'     => array_merge( $element_definition['path'], array( $state_pseudo_selector ) ),
-						'selector' => $element_definition['selector'] . $state_pseudo_selector,
-					);
-
-					$state_styles = _wp_array_get( $element_styles, $state_definition['path'], null );
+				foreach ( $element_definition['states'] as $state_selector ) {
+					// Try to fetch "state" styles in the incoming element's style object.
+					$state_styles = _wp_array_get( $element_styles, array_merge( $element_definition['path'], array( $state_selector ) ), null );
 
 					if ( empty( $state_styles ) ) {
 						continue;
 					}
 
-					$state_options = array_merge(
+					$element_state_selector = "{$element_definition['selector']}$state_selector";
+					$state_options          = array_merge(
 						$options,
 						array(
-							'selector' => isset( $options['selector'] ) ? "{$options['selector']} {$state_definition['selector']}" : $state_definition['selector'],
+							'selector' => isset( $options['selector'] ) ? "{$options['selector']} $element_state_selector" : $element_state_selector,
 						)
 					);
 
