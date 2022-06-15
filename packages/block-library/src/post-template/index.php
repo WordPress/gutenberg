@@ -54,28 +54,29 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			// Unset all the query block query args that cannot be set by the user
 			// when inherit is set to on.
 			$block_provided_query_args = array_keys( $query_args );
-			$user_visible_query_args = [
-				'ignore_sticky_posts', // Ignore sticky posts
-				'post__in', // Only sticky posts
-				'post__not_in' // Exclude sticky posts
-			];
-			foreach( $block_provided_query_args as $i => $query_args_key ) {
-				if( ! in_array( $query_args_key, $user_visible_query_args ) ) {
+			$user_visible_query_args   = array(
+				'ignore_sticky_posts', // Ignore sticky posts.
+				'post__in', // Only sticky posts.
+				'post__not_in', // Exclude sticky posts.
+			);
+			foreach ( $block_provided_query_args as $query_args_key ) {
+				if ( ! in_array( $query_args_key, $user_visible_query_args, true ) ) {
 					unset( $query_args[ $query_args_key ] );
 				}
 			}
-			
 
-			// merge the user settings into the defaults of the query
+			// merge the user settings into the defaults of the query.
 			$query_args = wp_parse_args( $query_args, $wp_query->query_vars );
-			
-			// Unset the `s` query arg because it is automagically filled by
-			// `WP_Query::fill_query_vars` and makes the query believe 
-			// it is a search query when it is not
+
+			/*
+			* Unset the `s` query arg because it is automagically filled by
+			* `WP_Query::fill_query_vars` and makes the query believe
+			* it is a search query when it is not.
+			*/
 			if ( ! is_search() ) {
 				unset( $query_args['s'] );
 			}
-			
+
 			if ( empty( $query_args['post_type'] ) && is_singular() ) {
 				$query_args['post_type'] = get_post_type( get_the_ID() );
 			}
