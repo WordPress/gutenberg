@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
-
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -18,6 +16,16 @@ import {
 	getCategories,
 	getActiveBlockVariation,
 } from '../selectors';
+
+const keyBy = ( arr, key ) =>
+	( arr || [] ).reduce(
+		( r, x ) => ( { ...r, [ key ? x[ key ] : x ]: x } ),
+		{}
+	);
+const omit = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
 
 describe( 'selectors', () => {
 	describe( 'getBlockSupport', () => {

@@ -1,7 +1,6 @@
-/**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
+export const uniqueId = () =>
+	// eslint-disable-next-line no-restricted-syntax
+	Math.floor( Math.random() * Number.MAX_SAFE_INTEGER );
 
 export const fauxEntitySuggestions = [
 	{

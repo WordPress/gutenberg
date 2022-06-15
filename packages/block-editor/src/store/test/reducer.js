@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { values, omit } from 'lodash';
+import { omit } from 'lodash';
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -666,7 +666,7 @@ describe( 'state', () => {
 				} );
 
 				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-				expect( values( state.byClientId )[ 0 ].clientId ).toBe(
+				expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
 					'bananas'
 				);
 				expect( state.order ).toEqual( {
@@ -729,7 +729,9 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
-			expect( values( state.byClientId )[ 1 ].clientId ).toBe( 'ribs' );
+			expect( Object.values( state.byClientId )[ 1 ].clientId ).toBe(
+				'ribs'
+			);
 			expect( state.order ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
@@ -773,10 +775,12 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( state.byClientId )[ 0 ].name ).toBe(
 				'core/freeform'
 			);
-			expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'wings' );
+			expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
+				'wings'
+			);
 			expect( state.order ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
@@ -930,15 +934,15 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
-			expect( values( originalState.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( originalState.byClientId )[ 0 ].name ).toBe(
 				'core/test-block'
 			);
-			expect( values( replacedState.byClientId )[ 0 ].name ).toBe(
+			expect( Object.values( replacedState.byClientId )[ 0 ].name ).toBe(
 				'core/freeform'
 			);
-			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe(
-				'chicken'
-			);
+			expect(
+				Object.values( replacedState.byClientId )[ 0 ].clientId
+			).toBe( 'chicken' );
 			expect( replacedState.order ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],

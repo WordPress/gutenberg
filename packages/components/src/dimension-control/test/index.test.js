@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
-import { uniqueId } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -24,10 +24,7 @@ describe( 'DimensionControl', () => {
 	describe( 'rendering', () => {
 		it( 'renders with defaults', () => {
 			const wrapper = shallow(
-				<DimensionControl
-					instanceId={ uniqueId() }
-					label={ 'Padding' }
-				/>
+				<DimensionControl instanceId={ uuid() } label={ 'Padding' } />
 			);
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -35,7 +32,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders with icon and default icon label', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ uuid() }
 					label={ 'Margin' }
 					icon={ plus }
 				/>
@@ -46,7 +43,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders with icon and custom icon label', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ uuid() }
 					label={ 'Margin' }
 					icon={ plus }
 					iconLabel={ 'Tablet Devices' }
@@ -76,7 +73,7 @@ describe( 'DimensionControl', () => {
 
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ uuid() }
 					label={ 'Custom Dimension' }
 					sizes={ customSizes }
 				/>
@@ -89,7 +86,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with correct args on size change', () => {
 			const wrapper = mount(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ uuid() }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>
@@ -121,7 +118,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
 			const wrapper = mount(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ uuid() }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>
