@@ -65,7 +65,7 @@ function getPrecision( value ) {
  *
  * @return {number} The clamped value.
  */
-export function clamp( value = 0, min = -Infinity, max = Infinity ) {
+export function clamp( value, min, max ) {
 	const baseValue = getNumber( value );
 	return Math.max( min, Math.min( baseValue, max ) );
 }
