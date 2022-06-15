@@ -16,7 +16,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -124,17 +124,13 @@ export function useDeprecatedProps(
 	);
 
 	const { color: colorProp } = props;
-	const color = useMemo( () => {
-		return isUsingLegacy
-			? getColorFromLegacyProps( colorProp )
-			: ( colorProp as ColorPickerProps[ 'color' ] );
-	}, [ colorProp, isUsingLegacy ] );
+	const color = isUsingLegacy
+		? getColorFromLegacyProps( colorProp )
+		: ( colorProp as ColorPickerProps[ 'color' ] );
 
 	const { disableAlpha } = props as LegacyProps;
 	const { enableAlpha: enableAlphaProp } = props as ColorPickerProps;
-	const enableAlpha = useMemo( () => {
-		return isUsingLegacy ? ! disableAlpha : enableAlphaProp;
-	}, [ disableAlpha, enableAlphaProp, isUsingLegacy ] );
+	const enableAlpha = isUsingLegacy ? ! disableAlpha : enableAlphaProp;
 
 	return {
 		...( isUsingLegacy ? {} : props ),
