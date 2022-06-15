@@ -69,7 +69,7 @@ export default function Edit( {
 				{ dateI18n( format || siteFormat, date ) }
 			</time>
 		) : (
-			date
+			<time>{ date }</time>
 		);
 
 	if ( isLink ) {
