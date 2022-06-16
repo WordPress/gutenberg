@@ -109,7 +109,6 @@ function ButtonColorItem( { name, parentMenu } ) {
 	);
 }
 
-
 function ScreenColors( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 

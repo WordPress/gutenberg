@@ -89,7 +89,9 @@ function ContextScreens( { name } ) {
 				<ScreenLinkColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/button' }>
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/button' }
+			>
 				<ScreenButtonColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
