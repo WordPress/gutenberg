@@ -50,7 +50,7 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await page.click( 'role=button[name="Styles"i]' );
-		await siteEditorStyleVariations.openOtherStyles();
+		await siteEditorStyleVariations.browseStyles();
 
 		const variations = page.locator(
 			'.edit-site-global-styles-variations_item'
@@ -158,15 +158,15 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator( 'role=button[name="Color: Foreground"i]' )
-		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
+		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
 
 		await expect(
 			page.locator( 'role=button[name="Color: Background"i]' )
-		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
+		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
 
 		await expect(
 			page.locator( 'role=button[name="Color: Awesome pink"i]' )
-		).toHaveCSS( 'background', /rgba\(204, 0, 255, 0\.77\)/ );
+		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
 	} );
 
 	test( 'should reflect style variations in the styles applied to the editor', async ( {
@@ -190,10 +190,10 @@ test.describe( 'Global styles variations', () => {
 		} );
 		expect( paragraphColor ).toBe( 'rgb(25, 25, 17)' );
 		const body = frame.locator( 'css=body' );
-		const backgroundColor = await body.evaluate( ( el ) => {
-			return window.getComputedStyle( el ).backgroundColor;
-		} );
-		expect( backgroundColor ).toBe( 'rgb(255, 239, 11)' );
+		await expect( body ).toHaveCSS(
+			'background-color',
+			'rgb(255, 239, 11)'
+		);
 	} );
 } );
 
@@ -206,7 +206,7 @@ class SiteEditorStyleVariations {
 		this.requestUtils = requestUtils;
 	}
 
-	async openOtherStyles() {
+	async browseStyles() {
 		await this.page
 			.locator( 'role=button[name="Browse styles"i]' )
 			.waitFor( { state: 'attached' } ); // Wait for the element to appear after the navigation animation.
@@ -216,7 +216,7 @@ class SiteEditorStyleVariations {
 
 	async applyVariation( label ) {
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.openOtherStyles();
+		await this.browseStyles();
 		await this.page.click( `role=button[name="${ label }"i]` );
 	}
 
