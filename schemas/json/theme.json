@@ -233,7 +233,7 @@
 							"default": true
 						},
 						"spacingSizes": {
-							"description": "Space size presets for the space size selector.\nGenerates a single class (`.has-{slug}-space-size`) and custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
 								"type": "object",
@@ -255,7 +255,7 @@
 							}
 						},
 						"spacingScale": {
-							"description": "Space size presets for the space size selector.\nGenerates a single class (`.has-{slug}-space-size`) and custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "object",
 							"properties": {
 								"operator": {
