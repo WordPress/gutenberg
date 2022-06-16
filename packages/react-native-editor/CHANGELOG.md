@@ -11,6 +11,11 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
+
 ## 1.78.0
 
 -   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
