@@ -278,6 +278,14 @@ function useAutocomplete( {
 		}
 	}, [ record ] );
 
+	// Used to track the number of filtered options for the subsequent useEffect
+	// This way, filteredOptions.length (which is part of state) isn't a dependency
+	// and cannot contribute to an infinite loop.
+	const filteredOptionsLengthRef = useRef();
+	useEffect( () => {
+		filteredOptionsLengthRef.current = filteredOptions.length;
+	}, [ filteredOptions.length ] );
+
 	useEffect( () => {
 		if ( ! textContent ) {
 			reset();
@@ -309,7 +317,7 @@ function useAutocomplete( {
 				// it will be caught by this guard.
 				if ( tooDistantFromTrigger ) return false;
 
-				const mismatch = filteredOptions.length === 0;
+				const mismatch = filteredOptionsLengthRef.current === 0;
 				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
 				// We need to allow the effect to run when not backspacing and if there
 				// was a mismatch. i.e when typing a trigger + the match string or when
@@ -375,14 +383,7 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
-	}, [
-		textContent,
-		AutocompleterUI,
-		autocompleter,
-		completers,
-		record,
-		filteredOptions.length,
-	] );
+	}, [ textContent, AutocompleterUI, autocompleter, completers, record ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 	const { className } = autocompleter || {};
