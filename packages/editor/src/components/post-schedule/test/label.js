@@ -11,7 +11,7 @@ import { getFullPostScheduleLabel, getPostScheduleLabel } from '../label';
 describe( 'getFullPostScheduleLabel', () => {
 	it( 'should show a date', () => {
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
-		expect( label ).toBe( 'April 28, 2022 3:30 pm UTC+0' );
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+0' ); // Unused, for backwards compatibility.
 	} );
 
 	it( "should show site's timezone abbr", () => {
@@ -23,7 +23,7 @@ describe( 'getFullPostScheduleLabel', () => {
 		} );
 
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
-		expect( label ).toBe( 'April 28, 2022 3:30 pm AEST' );
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm AEST' );
 
 		setSettings( settings );
 	} );
@@ -37,7 +37,7 @@ describe( 'getFullPostScheduleLabel', () => {
 		} );
 
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
-		expect( label ).toBe( 'April 28, 2022 3:30 pm UTC+10' );
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
 
 		setSettings( settings );
 	} );
@@ -63,7 +63,7 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-04-28T15:30:00', { now } );
-		expect( label ).toBe( 'April 28, 2022 3:30 pm UTC+0' );
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+0' );
 	} );
 
 	it( "should show today if date is same day as now and user timezone equals site's timezone", () => {
@@ -80,7 +80,7 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-04-28T15:30:00', { now } );
-		expect( label ).toBe( 'Today at 3:30 pm' );
+		expect( label ).toBe( 'Today at 3:30\xa0pm' );
 
 		setSettings( settings );
 	} );
@@ -99,7 +99,7 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-04-29T15:30:00', { now } );
-		expect( label ).toBe( 'Tomorrow at 3:30 pm' );
+		expect( label ).toBe( 'Tomorrow at 3:30\xa0pm' );
 
 		setSettings( settings );
 	} );
@@ -118,7 +118,7 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-12-25T15:30:00', { now } );
-		expect( label ).toBe( 'December 25 3:30 pm' );
+		expect( label ).toBe( 'December 25 3:30\xa0pm' );
 
 		setSettings( settings );
 	} );
@@ -137,7 +137,7 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2023-04-28T15:30:00', { now } );
-		expect( label ).toBe( 'April 28, 2023 3:30 pm' );
+		expect( label ).toBe( 'April 28, 2023 3:30\xa0pm' );
 
 		setSettings( settings );
 	} );

@@ -51,7 +51,7 @@ function formatDatePickerValues(
 ) {
 	const dayTrimmed = trimLeadingZero( day );
 	const hoursTrimmed = trimLeadingZero( hours );
-	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes } ${ amOrPm } ${ timezone }`;
+	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes }\xa0${ amOrPm } ${ timezone }`;
 }
 
 async function getPublishingDate() {
