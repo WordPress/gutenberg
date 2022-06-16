@@ -12,7 +12,7 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
@@ -32,7 +32,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
@@ -60,7 +60,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await page.keyboard.type( 'WordPress' );
 
-		// Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
@@ -116,7 +116,7 @@ test.describe( 'Buttons', () => {
 			page.locator( 'role=link[name=/^wordpress\\.org/]' )
 		).toBeFocused();
 
-		// Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
