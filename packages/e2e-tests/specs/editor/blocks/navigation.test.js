@@ -401,7 +401,7 @@ describe( 'Navigation', () => {
 				{
 					match: ( request ) => {
 						return decodeURIComponent( request.url() ).includes(
-							`navigation/${ testNavId }`
+							`navigation/`
 						);
 					},
 					onRequestMatch: ( request ) => {
