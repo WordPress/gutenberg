@@ -109,7 +109,7 @@ test.describe( 'RTL', () => {
 
 	test( 'should arrow navigate between blocks', async ( {
 		editor,
-		page
+		page,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 
@@ -124,13 +124,13 @@ test.describe( 'RTL', () => {
 
 		// Move to the previous block with two lines in the current block.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.press( 'Shift+Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 		await page.keyboard.type( ARABIC_ONE );
 
 		// Move to the next block with two lines in the current block.
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( ARABIC_ZERO );
-		await page.press( 'Shift+Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
