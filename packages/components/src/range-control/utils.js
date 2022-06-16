@@ -1,8 +1,4 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +9,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { useControlledState } from '../utils/hooks';
+import { clamp } from '../utils/math';
 
 const noop = () => {};
 
