@@ -1,8 +1,11 @@
 .wp-block-image {
 	img {
-		height: auto;
 		max-width: 100%;
 		vertical-align: bottom;
+
+		&[width][height] {
+			height: auto;
+		}
 	}
 
 	&:not(.is-style-rounded) {
