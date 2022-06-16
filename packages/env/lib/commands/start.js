@@ -30,7 +30,7 @@ const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
 
 /**
- * @typedef {import('../config').Config} Config
+ * @typedef {import('../config').WPConfig} WPConfig
  */
 const CONFIG_CACHE_KEY = 'config_checksum';
 
