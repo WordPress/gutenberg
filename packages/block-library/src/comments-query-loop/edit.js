@@ -37,7 +37,12 @@ const TEMPLATE = [
 						'core/column',
 						{},
 						[
-							[ 'core/comment-author-name' ],
+							[
+								'core/comment-author-name',
+								{
+									fontSize: 'small',
+								},
+							],
 							[
 								'core/group',
 								{
@@ -52,12 +57,27 @@ const TEMPLATE = [
 									},
 								},
 								[
-									[ 'core/comment-date' ],
-									[ 'core/comment-edit-link' ],
+									[
+										'core/comment-date',
+										{
+											fontSize: 'small',
+										},
+									],
+									[
+										'core/comment-edit-link',
+										{
+											fontSize: 'small',
+										},
+									],
 								],
 							],
 							[ 'core/comment-content' ],
-							[ 'core/comment-reply-link' ],
+							[
+								'core/comment-reply-link',
+								{
+									fontSize: 'small',
+								},
+							],
 						],
 					],
 				],
