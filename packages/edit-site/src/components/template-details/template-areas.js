@@ -64,7 +64,7 @@ function TemplatePartItemMore( {
 						) }
 						onClick={ clearCustomizations }
 					>
-						{ __( 'Clear customizations' ) }
+						{ __( 'Delete custom template part' ) }
 					</MenuItem>
 				</MenuGroup>
 			) }
