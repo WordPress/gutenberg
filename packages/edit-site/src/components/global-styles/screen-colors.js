@@ -41,6 +41,7 @@ function BackgroundColorItem( { name, parentMenu } ) {
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
 						colorValue={ gradientValue ?? backgroundColor }
+						data-testid="background-color-indicator"
 					/>
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
@@ -65,7 +66,10 @@ function TextColorItem( { name, parentMenu } ) {
 		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
+					<ColorIndicator
+						colorValue={ color }
+						data-testid="text-color-indicator"
+					/>
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>

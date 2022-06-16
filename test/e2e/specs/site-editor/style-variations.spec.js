@@ -43,30 +43,34 @@ test.describe( 'Global styles variations', () => {
 	test( 'should have three variations available with the first one being active', async ( {
 		admin,
 		page,
-		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
 		await page.click( 'role=button[name="Styles"i]' );
-		await siteEditorStyleVariations.browseStyles();
+		await page.click( 'role=button[name="Browse styles"i]' );
 
+		// TODO: instead of locating these elements by class,
+		//  we could update the source code to group them in a <section> or other container,
+		//  then add `aria-labelledby` and `aria-describedby` etc to provide accessible information,
 		const variations = page.locator(
 			'.edit-site-global-styles-variations_item'
 		);
 
 		await expect( variations ).toHaveCount( 3 );
 
-		// To avoid having to assert class names, https://github.com/WordPress/gutenberg/pull/41591
-		// adds aria-label and aria-current attributes to the style variation buttons.
-		// Once that PR is merged we can refactor this, e.g., await expect( variations.first() ).toHaveAttribute( 'aria-current', true );
-		await expect( await variations.first() ).toHaveClass( /is\-active/ );
-		await expect( await variations.nth( 1 ) ).not.toHaveClass(
-			/is\-active/
+		await expect( variations.first() ).toHaveAttribute(
+			'aria-current',
+			'true'
 		);
-		await expect( await variations.nth( 2 ) ).not.toHaveClass(
-			/is\-active/
+		await expect( variations.nth( 1 ) ).toHaveAttribute(
+			'aria-current',
+			'false'
+		);
+		await expect( variations.nth( 2 ) ).toHaveAttribute(
+			'aria-current',
+			'false'
 		);
 	} );
 
@@ -80,29 +84,32 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
-		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
-
-		await siteEditorStyleVariations.openColorsPanel();
+		await page.click(
+			'role=button[name="Navigate to the previous view"i]'
+		);
+		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors background styles"] .component-color-indicator'
+				'css=[aria-label="Colors background styles"] [data-testid="background-color-indicator"]'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors text styles"] .component-color-indicator'
+				'css=[aria-label="Colors text styles"] [data-testid="text-color-indicator"]'
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
-		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
-		await siteEditorStyleVariations.openTypographyPanel();
-		await siteEditorStyleVariations.openTextPanel();
-
-		expect( await siteEditorStyleVariations.getFontSizeHint() ).toBe(
-			'Medium(px)'
+		await page.click(
+			'role=button[name="Navigate to the previous view"i]'
 		);
+		await page.click( 'role=button[name="Typography styles"i]' );
+		await page.click( 'role=button[name="Typography Text styles"i]' );
+
+		await expect(
+			page.locator( 'css=.components-font-size-picker__header__hint' )
+		).toHaveText( 'Medium(px)' );
 	} );
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
@@ -115,31 +122,40 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyYellowVariation();
-		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
-		await siteEditorStyleVariations.openColorsPanel();
+		await page.click(
+			'role=button[name="Navigate to the previous view"i]'
+		);
+		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors background styles"] .component-color-indicator'
+				'css=[aria-label="Colors background styles"] [data-testid="background-color-indicator"]'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors text styles"] .component-color-indicator'
+				'css=[aria-label="Colors text styles"] [data-testid="text-color-indicator"]'
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
-		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
-		await siteEditorStyleVariations.openTypographyPanel();
-		await siteEditorStyleVariations.openTextPanel();
+		await page.click(
+			'role=button[name="Navigate to the previous view"i]'
+		);
+		await page.click( 'role=button[name="Typography styles"i]' );
+		await page.click( 'role=button[name="Typography Text styles"i]' );
 
-		expect( await siteEditorStyleVariations.getFontSizeHint() ).toBe(
-			'(Custom)'
-		);
-		expect( await siteEditorStyleVariations.getCustomFontSizeValue() ).toBe(
-			'15'
-		);
+		// TODO: to avoid use classnames to locate these elements,
+		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
+		await expect(
+			page.locator( 'css=.components-font-size-picker__header__hint' )
+		).toHaveText( '(Custom)' );
+
+		await expect(
+			page.locator(
+				'css=.components-font-size-picker input[aria-label="Custom"]'
+			)
+		).toHaveValue( '15' );
 	} );
 
 	test( 'should apply a color palette in a variation', async ( {
@@ -152,9 +168,11 @@ test.describe( 'Global styles variations', () => {
 			postType: 'wp_template',
 		} );
 		await siteEditorStyleVariations.applyPinkVariation();
-		await siteEditorStyleVariations.openPreviousGlobalStylesPanel();
-		await siteEditorStyleVariations.openColorsPanel();
-		await page.click( `role=button[name="Color palettes"i]` );
+		await page.click(
+			'role=button[name="Navigate to the previous view"i]'
+		);
+		await page.click( 'role=button[name="Colors styles"i]' );
+		await page.click( 'role=button[name="Color palettes"i]' );
 
 		await expect(
 			page.locator( 'role=button[name="Color: Foreground"i]' )
@@ -182,13 +200,9 @@ test.describe( 'Global styles variations', () => {
 		const frame = page.frameLocator(
 			'css=.edit-site-visual-editor iframe'
 		);
-		const paragraph = frame.locator(
-			'xpath=//p[text()="My awesome paragraph"]'
-		);
-		const paragraphColor = await paragraph.evaluate( ( el ) => {
-			return window.getComputedStyle( el ).color;
-		} );
-		expect( paragraphColor ).toBe( 'rgb(25, 25, 17)' );
+		const paragraph = frame.locator( 'text="My awesome paragraph"' );
+		await expect( paragraph ).toHaveCSS( 'color', 'rgb(25, 25, 17)' );
+
 		const body = frame.locator( 'css=body' );
 		await expect( body ).toHaveCSS(
 			'background-color',
@@ -206,17 +220,9 @@ class SiteEditorStyleVariations {
 		this.requestUtils = requestUtils;
 	}
 
-	async browseStyles() {
-		await this.page
-			.locator( 'role=button[name="Browse styles"i]' )
-			.waitFor( { state: 'attached' } ); // Wait for the element to appear after the navigation animation.
-
-		await this.page.click( 'role=button[name="Browse styles"i]' );
-	}
-
 	async applyVariation( label ) {
 		await this.page.click( 'role=button[name="Styles"i]' );
-		await this.browseStyles();
+		await this.page.click( 'role=button[name="Browse styles"i]' );
 		await this.page.click( `role=button[name="${ label }"i]` );
 	}
 
@@ -226,41 +232,5 @@ class SiteEditorStyleVariations {
 
 	async applyYellowVariation() {
 		await this.applyVariation( 'yellow' );
-	}
-
-	async openColorsPanel() {
-		await this.openGlobalStylesPanel( 'Colors styles' );
-	}
-
-	async openTypographyPanel() {
-		await this.openGlobalStylesPanel( 'Typography styles' );
-	}
-
-	async openTextPanel() {
-		await this.openGlobalStylesPanel( 'Typography Text styles' );
-	}
-
-	async getFontSizeHint() {
-		const element = this.page.locator(
-			'css=.components-font-size-picker__header__hint'
-		);
-		return await element.evaluate( ( el ) => el.textContent );
-	}
-
-	async getCustomFontSizeValue() {
-		const element = this.page.locator(
-			'css=.components-font-size-picker input[aria-label="Custom"]'
-		);
-		return await element.evaluate( ( el ) => el.value );
-	}
-
-	async openPreviousGlobalStylesPanel() {
-		await this.page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
-	}
-
-	async openGlobalStylesPanel( panelName ) {
-		await this.page.click( `role=button[name="${ panelName }"i]` );
 	}
 }
