@@ -504,6 +504,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return array An array of spacing preset sizes.
 	 */
 	protected static function get_spacing_sizes( $spacing_scale ) {
+		if ( ! isset( $spacing_scale['firstStep'] )
+			|| ! isset( $spacing_scale['units'] )
+			|| ! isset( $spacing_scale['operator'] )
+			|| ! isset( $spacing_scale['increment'] )
+			|| ! isset( $spacing_scale['steps'] )
+			|| ! is_numeric( $spacing_scale['increment'] )
+			|| ! is_numeric( $spacing_scale['steps'] )
+			|| ! is_numeric( $spacing_scale['firstStep'] )
+			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
+				return null;
+		}
+
 		$spacing_sizes   = array();
 		$spacing_sizes[] = array(
 			'name' => 0,
@@ -615,7 +627,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			// Generate the default spacing sizes presets.
 			$spacing_size_defaults = static::get_spacing_sizes( _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() ) );
-			_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_size_defaults );
+			if ( $spacing_size_defaults ) {
+				_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_size_defaults );
+			}
 		}
 
 	}
