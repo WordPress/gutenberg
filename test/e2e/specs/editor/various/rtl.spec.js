@@ -109,8 +109,7 @@ test.describe( 'RTL', () => {
 
 	test( 'should arrow navigate between blocks', async ( {
 		editor,
-		page,
-		pageUtils,
+		page
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 
