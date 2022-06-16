@@ -125,7 +125,7 @@ test.describe( 'RTL', () => {
 
 		// Move to the previous block with two lines in the current block.
 		await page.keyboard.press( 'ArrowRight' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await page.press( 'Shift+Enter' );
 		await page.keyboard.type( ARABIC_ONE );
 
 		// Move to the next block with two lines in the current block.
