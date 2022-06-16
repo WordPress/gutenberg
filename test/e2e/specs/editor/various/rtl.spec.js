@@ -40,7 +40,7 @@ test.describe( 'RTL', () => {
 		// Expect: ARABIC_ZERO + ARABIC_ONE + ARABIC_TWO (<p>٠١٢</p>).
 		// N.b.: HTML is LTR, so direction will be reversed!
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
@@ -57,7 +57,7 @@ test.describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
@@ -79,7 +79,7 @@ test.describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Backspace' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
@@ -98,7 +98,7 @@ test.describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Delete' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
@@ -117,7 +117,7 @@ test.describe( 'RTL', () => {
 		await page.keyboard.type( ARABIC_ZERO );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ARABIC_ONE );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 		await page.keyboard.type( ARABIC_TWO );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -133,7 +133,7 @@ test.describe( 'RTL', () => {
 		await page.keyboard.type( ARABIC_ZERO );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
-		//Check the content
+		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
@@ -151,7 +151,7 @@ test.describe( 'RTL', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		page.click( 'role=button[name="Add default block"i]' );
 
 		// Wait for rich text editor to load.
 		await page.waitForSelector( '.block-editor-rich-text__editable' );
