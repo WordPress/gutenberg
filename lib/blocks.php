@@ -195,7 +195,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	$stylesheet_url    = gutenberg_url( $style_path );
 	$stylesheet_path   = gutenberg_dir_path() . $style_path;
-	$stylesheet_path   = is_rtl() ? str_replace( 'style.css', 'style-rtl.css', $style_path ) : $style_path;
+	$stylesheet_path   = is_rtl() ? str_replace( 'style.css', 'style-rtl.css', $stylesheet_path ) : $stylesheet_path;
 
 	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
