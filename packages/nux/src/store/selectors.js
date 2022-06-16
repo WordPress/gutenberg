@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { includes, difference, keys, has } from 'lodash';
+import { includes, difference, has } from 'lodash';
 
 /**
  * An object containing information about a guide.
@@ -28,7 +28,7 @@ export const getAssociatedGuide = createSelector(
 			if ( includes( tipIds, tipId ) ) {
 				const nonDismissedTips = difference(
 					tipIds,
-					keys( state.preferences.dismissedTips )
+					Object.keys( state.preferences.dismissedTips )
 				);
 				const [ currentTipId = null, nextTipId = null ] =
 					nonDismissedTips;
