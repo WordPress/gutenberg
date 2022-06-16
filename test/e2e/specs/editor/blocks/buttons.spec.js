@@ -85,7 +85,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
 		await expect(
-			page.locator( 'role=link[name=/^https:\\/\\/example\\.com/]' )
+			page.locator( 'role=link[name=/^example\\.com/]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 
@@ -96,7 +96,7 @@ test.describe( 'Buttons', () => {
 
 		// The link control should still be visible when a URL is set.
 		await expect(
-			page.locator( 'role=link[name=/^https:\\/\\/example\\.com/]' )
+			page.locator( 'role=link[name=/^example\\.com/]' )
 		).toBeVisible();
 	} );
 
@@ -113,7 +113,7 @@ test.describe( 'Buttons', () => {
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
 		await expect(
-			page.locator( 'role=link[name=/^https:\\/\\/wordpress\\.org/]' )
+			page.locator( 'role=link[name=/^wordpress\\.org/]' )
 		).toBeFocused();
 
 		// Check the content
