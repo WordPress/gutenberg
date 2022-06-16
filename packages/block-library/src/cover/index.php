@@ -44,17 +44,21 @@ function render_block_core_cover( $attributes, $content ) {
 		}
 		$current_featured_image = get_the_post_thumbnail_url();
 
-		$dom = new DOMDocument();
-		$dom->loadXML( $content );
+		$styles = 'background-image:url(' . esc_url( $current_featured_image ) . '); ';
 
-		foreach ( $dom->getElementsByTagName( 'div' ) as $div ) {
-			$styles = $div->getAttribute( 'style' );
-			$styles = " background-image:url('" . esc_url( $current_featured_image ) . "'); " . $styles;
-			$styles = $div->setAttribute( 'style', $styles );
-			break;
+		if ( isset( $attributes['minHeight'] ) ) {
+			$height_unit = $attributes['minHeightUnit'] ?? 'px';
+			$height		 = " min-height:{$attributes['minHeight']}{$height_unit}";
+
+			$styles .= $height;
 		}
 
-		$content = $dom->saveHTML();
+		$content = preg_replace(
+			'/class=\".*?\"/',
+			'${0} style="' . $styles . '"',
+			$content,
+			1
+		);
 	}
 
 	return $content;
