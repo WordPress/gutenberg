@@ -85,6 +85,7 @@ Settings related to spacing.
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
 | spacingSizes | array |  | name, size, slug |
+| spacingScale | object |  |  |
 
 ---
 
