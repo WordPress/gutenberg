@@ -55,22 +55,19 @@ class BottomSheet extends Component {
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
-		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
-			this
-		);
+		this.onShouldSetBottomSheetMaxHeight =
+			this.onShouldSetBottomSheetMaxHeight.bind( this );
 
 		this.setIsFullScreen = this.setIsFullScreen.bind( this );
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onHeaderLayout = this.onHeaderLayout.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
-		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
-			this
-		);
+		this.onHandleClosingBottomSheet =
+			this.onHandleClosingBottomSheet.bind( this );
 		this.onHardwareButtonPress = this.onHardwareButtonPress.bind( this );
-		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
-			this
-		);
+		this.onHandleHardwareButtonPress =
+			this.onHandleHardwareButtonPress.bind( this );
 		this.keyboardShow = this.keyboardShow.bind( this );
 		this.keyboardHide = this.keyboardHide.bind( this );
 
@@ -568,15 +565,15 @@ class BottomSheet extends Component {
 					>
 						<BottomSheetProvider
 							value={ {
-								shouldEnableBottomSheetScroll: this
-									.onShouldEnableScroll,
-								shouldEnableBottomSheetMaxHeight: this
-									.onShouldSetBottomSheetMaxHeight,
+								shouldEnableBottomSheetScroll:
+									this.onShouldEnableScroll,
+								shouldEnableBottomSheetMaxHeight:
+									this.onShouldSetBottomSheetMaxHeight,
 								isBottomSheetContentScrolling: isScrolling,
-								onHandleClosingBottomSheet: this
-									.onHandleClosingBottomSheet,
-								onHandleHardwareButtonPress: this
-									.onHandleHardwareButtonPress,
+								onHandleClosingBottomSheet:
+									this.onHandleClosingBottomSheet,
+								onHandleHardwareButtonPress:
+									this.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,

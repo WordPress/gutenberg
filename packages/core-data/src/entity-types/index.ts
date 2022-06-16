@@ -89,23 +89,21 @@ export interface PerPackageEntityConfig< C extends Context > {
 /**
  * A union of all the registered entities.
  */
-type EntityConfig<
-	C extends Context = any
-> = PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
+type EntityConfig< C extends Context = any > =
+	PerPackageEntityConfig< C >[ keyof PerPackageEntityConfig< C > ];
 
 /**
  * A union of all known record types.
  */
-export type EntityRecord<
-	C extends Context = any
-> = EntityConfig< C >[ 'record' ];
+export type EntityRecord< C extends Context = any > =
+	EntityConfig< C >[ 'record' ];
 
 /**
  * An entity corresponding to a specified record type.
  */
 export type EntityConfigOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined
+	N extends Name | undefined = undefined
 > = RecordOrKind extends EntityRecord
 	? Extract< EntityConfig, { record: RecordOrKind } >
 	: Extract< EntityConfig, { config: { kind: RecordOrKind; name: N } } >;
@@ -113,16 +111,14 @@ export type EntityConfigOf<
 /**
  * Name of the requested entity.
  */
-export type NameOf<
-	R extends EntityRecord
-> = EntityConfigOf< R >[ 'config' ][ 'name' ];
+export type NameOf< R extends EntityRecord > =
+	EntityConfigOf< R >[ 'config' ][ 'name' ];
 
 /**
  * Kind of the requested entity.
  */
-export type KindOf<
-	R extends EntityRecord
-> = EntityConfigOf< R >[ 'config' ][ 'kind' ];
+export type KindOf< R extends EntityRecord > =
+	EntityConfigOf< R >[ 'config' ][ 'kind' ];
 
 /**
  * Primary key type of the requested entity, sourced from PerPackageEntities.
@@ -131,7 +127,7 @@ export type KindOf<
  */
 export type KeyOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined,
+	N extends Name | undefined = undefined,
 	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
 > = ( E[ 'key' ] extends keyof E[ 'record' ]
 	? E[ 'record' ][ E[ 'key' ] ]
@@ -146,7 +142,7 @@ export type KeyOf<
  */
 export type DefaultContextOf<
 	RecordOrKind extends EntityRecord | Kind,
-	N extends Name = undefined
+	N extends Name | undefined = undefined
 > = EntityConfigOf< RecordOrKind, N >[ 'defaultContext' ];
 
 /**

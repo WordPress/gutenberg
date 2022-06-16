@@ -56,9 +56,8 @@ function Editor( {
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, getEntityRecords } =
+				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -75,8 +74,8 @@ function Editor( {
 			} else {
 				postObject = getEntityRecord( 'postType', postType, postId );
 			}
-			const supportsTemplateMode = getEditorSettings()
-				.supportsTemplateMode;
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 
 			return {
@@ -104,9 +103,8 @@ function Editor( {
 		[ postType, postId ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		editPostStore
-	);
+	const { updatePreferredStyleVariations, setIsInserterOpened } =
+		useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {

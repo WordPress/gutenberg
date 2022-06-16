@@ -100,14 +100,10 @@ function FlatTermSelector( { slug } ) {
 		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const {
-				getEntityRecords,
-				getTaxonomy,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy

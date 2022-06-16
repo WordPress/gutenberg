@@ -138,7 +138,9 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			await page.click( '.edit-post-post-schedule__toggle' );
 
 			// Clear the date.
-			await page.click( '.block-editor-publish-date-time-picker__reset' );
+			await page.click(
+				'.block-editor-publish-date-time-picker button[aria-label="Now"]'
+			);
 
 			const publishingDate = await getPublishingDate();
 

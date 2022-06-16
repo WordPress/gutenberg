@@ -42,9 +42,8 @@ export default function useOutdentListItem( clientId ) {
 			const listParentId = getBlockRootClientId( clientId );
 			const listAttributes = getBlockAttributes( listParentId );
 			const listItemParentId = getBlockRootClientId( listParentId );
-			const listItemParentAttributes = getBlockAttributes(
-				listItemParentId
-			);
+			const listItemParentAttributes =
+				getBlockAttributes( listItemParentId );
 
 			const index = getBlockIndex( clientId );
 			const siblingBlocks = getBlock( listParentId ).innerBlocks;

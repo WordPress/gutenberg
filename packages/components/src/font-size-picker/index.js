@@ -103,9 +103,11 @@ function FontSizePicker(
 		return hint;
 	}, [
 		showCustomValueControl,
-		selectedOption?.slug,
+		selectedOption?.name,
+		selectedOption?.size,
 		value,
 		isCustomValue,
+		shouldUseSelectControl,
 		fontSizesContainComplexValues,
 	] );
 

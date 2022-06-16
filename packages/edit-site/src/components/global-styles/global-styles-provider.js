@@ -48,9 +48,8 @@ const cleanEmptyObject = ( object ) => {
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId = select(
-			coreStore
-		).__experimentalGetCurrentGlobalStylesId();
+		const _globalStylesId =
+			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 		const record = _globalStylesId
 			? select( coreStore ).getEditedEntityRecord(
 					'root',
@@ -108,11 +107,8 @@ function useGlobalStylesBaseConfig() {
 }
 
 function useGlobalStylesContext() {
-	const [
-		isUserConfigReady,
-		userConfig,
-		setUserConfig,
-	] = useGlobalStylesUserConfig();
+	const [ isUserConfigReady, userConfig, setUserConfig ] =
+		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {

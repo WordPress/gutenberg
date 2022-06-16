@@ -39,30 +39,29 @@ const createMockClassList = ( classes ) => {
 	};
 };
 
-const mapElements = ( orientation ) => (
-	{ top, right, bottom, left },
-	index
-) => {
-	return {
-		dataset: { block: index + 1 },
-		getBoundingClientRect() {
-			return orientation === 'vertical'
-				? {
-						top,
-						right,
-						bottom,
-						left,
-				  }
-				: {
-						top: left,
-						bottom: right,
-						left: top,
-						right: bottom,
-				  };
-		},
-		classList: createMockClassList( 'wp-block' ),
+const mapElements =
+	( orientation ) =>
+	( { top, right, bottom, left }, index ) => {
+		return {
+			dataset: { block: index + 1 },
+			getBoundingClientRect() {
+				return orientation === 'vertical'
+					? {
+							top,
+							right,
+							bottom,
+							left,
+					  }
+					: {
+							top: left,
+							bottom: right,
+							left: top,
+							right: bottom,
+					  };
+			},
+			classList: createMockClassList( 'wp-block' ),
+		};
 	};
-};
 
 const verticalElements = elementData.map( mapElements( 'vertical' ) );
 // Flip the elementData to make a horizontal block list.

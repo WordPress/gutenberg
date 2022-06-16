@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,6 +11,8 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 export function BlockModeToggle( {
 	blockType,
@@ -39,9 +36,8 @@ export function BlockModeToggle( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getBlockMode, getSettings } = select(
-			blockEditorStore
-		);
+		const { getBlock, getBlockMode, getSettings } =
+			select( blockEditorStore );
 		const block = getBlock( clientId );
 		const isCodeEditingEnabled = getSettings().codeEditingEnabled;
 

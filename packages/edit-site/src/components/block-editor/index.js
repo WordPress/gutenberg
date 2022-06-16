@@ -51,12 +51,8 @@ const LAYOUT = {
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { storedSettings, templateType, templateId, page } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getEditedPostId,
-				getPage,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
+				select( editSiteStore );
 
 			return {
 				storedSettings: getSettings( setIsInserterOpen ),
@@ -78,9 +74,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories: select(
-				coreStore
-			).getBlockPatternCategories(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		} ),
 		[]
 	);
