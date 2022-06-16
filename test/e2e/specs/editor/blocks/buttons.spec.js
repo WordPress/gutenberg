@@ -51,15 +51,13 @@ test.describe( 'Buttons', () => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
+		await expect(
+			page.locator( 'role=combobox[name="URL"i]' )
+		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
-		await page.waitForFunction(
-			() =>
-				document.activeElement ===
-				document.querySelector( '.block-editor-rich-text__editable' )
-		);
+		await expect(
+			page.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await page.keyboard.type( 'WordPress' );
 
 		// Check the content
@@ -81,30 +79,25 @@ test.describe( 'Buttons', () => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForFunction(
-			() => !! document.activeElement.closest( '.block-editor-url-input' )
-		);
+		await expect(
+			page.locator( 'role=combobox[name="URL"i]' )
+		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
-		await page.waitForFunction(
-			() =>
-				document.activeElement ===
-				document.querySelector(
-					'.block-editor-link-control a[href="https://example.com"]'
-				)
-		);
+		await expect(
+			page.locator( 'role=link[name=/^https:\\/\\/example\\.com/]' )
+		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 
 		// Focus should move from the link control to the button block's text.
-		await page.waitForFunction(
-			() =>
-				document.activeElement ===
-				document.querySelector( '[aria-label="Button text"]' )
-		);
+		await expect(
+			page.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 
 		// The link control should still be visible when a URL is set.
-		const linkControl = await page.locator( '.block-editor-link-control' );
-		expect( linkControl ).toBeTruthy();
+		await expect(
+			page.locator( 'role=link[name=/^https:\\/\\/example\\.com/]' )
+		).toBeVisible();
 	} );
 
 	test( 'can jump to the link editor using the keyboard shortcut', async ( {
@@ -119,9 +112,9 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
+		await expect(
+			page.locator( 'role=link[name=/^https:\\/\\/wordpress\\.org/]' )
+		).toBeFocused();
 
 		// Check the content
 		const content = await editor.getEditedPostContent();
