@@ -1,10 +1,5 @@
 // @ts-nocheck
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -14,6 +9,8 @@ import { forwardRef } from '@wordpress/element';
  */
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
+
+const noop = () => {};
 
 function InputRange(
 	{

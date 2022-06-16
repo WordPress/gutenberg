@@ -48,9 +48,8 @@ describe( 'Unsupported block', () => {
 			getByA11yLabel( /Unsupported Block\. Row 1/ )
 		);
 
-		const translatedTableTitle = within( missingBlock ).getByText(
-			'Tabla'
-		);
+		const translatedTableTitle =
+			within( missingBlock ).getByText( 'Tabla' );
 
 		expect( translatedTableTitle ).toBeDefined();
 	} );

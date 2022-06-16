@@ -18,9 +18,8 @@ export default function CopyContentMenuItem() {
 	const { createNotice } = useDispatch( noticesStore );
 	const getText = useSelect( ( select ) => {
 		return () => {
-			const { getEditedPostId, getEditedPostType } = select(
-				editSiteStore
-			);
+			const { getEditedPostId, getEditedPostType } =
+				select( editSiteStore );
 			const { getEditedEntityRecord } = select( coreStore );
 			const record = getEditedEntityRecord(
 				'postType',
@@ -49,5 +48,5 @@ export default function CopyContentMenuItem() {
 
 	const ref = useCopyToClipboard( getText, onSuccess );
 
-	return <MenuItem ref={ ref }>{ __( 'Copy all content' ) }</MenuItem>;
+	return <MenuItem ref={ ref }>{ __( 'Copy all blocks' ) }</MenuItem>;
 }

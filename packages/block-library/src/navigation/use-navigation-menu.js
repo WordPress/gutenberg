@@ -8,93 +8,163 @@ export default function useNavigationMenu( ref ) {
 	return useSelect(
 		( select ) => {
 			const {
-				getEntityRecord,
-				getEditedEntityRecord,
-				getEntityRecords,
-				hasFinishedResolution,
-				isResolving,
-				canUser,
-			} = select( coreStore );
+				navigationMenus,
+				isResolvingNavigationMenus,
+				hasResolvedNavigationMenus,
+			} = selectNavigationMenus( select, ref );
 
-			const navigationMenuSingleArgs = [
-				'postType',
-				'wp_navigation',
-				ref,
-			];
-			const rawNavigationMenu = ref
-				? getEntityRecord( ...navigationMenuSingleArgs )
-				: null;
-			let navigationMenu = ref
-				? getEditedEntityRecord( ...navigationMenuSingleArgs )
-				: null;
+			const {
+				navigationMenu,
+				isNavigationMenuResolved,
+				isNavigationMenuMissing,
+			} = selectExistingMenu( select, ref );
 
-			// getEditedEntityRecord will return the post regardless of status.
-			// Therefore if the found post is not published then we should ignore it.
-			if ( navigationMenu?.status !== 'publish' ) {
-				navigationMenu = null;
-			}
+			const {
+				canUserCreateNavigationMenu,
+				isResolvingCanUserCreateNavigationMenu,
+				hasResolvedCanUserCreateNavigationMenu,
+			} = selectMenuCreatePermissions( select );
 
-			const hasResolvedNavigationMenu = ref
-				? hasFinishedResolution(
-						'getEditedEntityRecord',
-						navigationMenuSingleArgs
-				  )
-				: false;
+			const {
+				canUserUpdateNavigationMenu,
+				hasResolvedCanUserUpdateNavigationMenu,
+			} = selectMenuUpdatePermissions( select, ref );
 
-			const navigationMenuMultipleArgs = [
-				'postType',
-				'wp_navigation',
-				{ per_page: -1, status: 'publish' },
-			];
-			const navigationMenus = getEntityRecords(
-				...navigationMenuMultipleArgs
-			);
-
-			const canSwitchNavigationMenu = ref
-				? navigationMenus?.length > 1
-				: navigationMenus?.length > 0;
+			const {
+				canUserDeleteNavigationMenu,
+				hasResolvedCanUserDeleteNavigationMenu,
+			} = selectMenuDeletePermissions( select, ref );
 
 			return {
-				isNavigationMenuResolved: hasResolvedNavigationMenu,
-				isNavigationMenuMissing:
-					! ref ||
-					( hasResolvedNavigationMenu && ! rawNavigationMenu ),
-				canSwitchNavigationMenu,
-				isResolvingNavigationMenus: isResolving(
-					'getEntityRecords',
-					navigationMenuMultipleArgs
-				),
-				hasResolvedNavigationMenus: hasFinishedResolution(
-					'getEntityRecords',
-					navigationMenuMultipleArgs
-				),
-				navigationMenu,
 				navigationMenus,
-				canUserUpdateNavigationMenu: ref
-					? canUser( 'update', 'navigation', ref )
-					: undefined,
-				hasResolvedCanUserUpdateNavigationMenu: hasFinishedResolution(
-					'canUser',
-					[ 'update', 'navigation', ref ]
-				),
-				canUserDeleteNavigationMenu: ref
-					? canUser( 'delete', 'navigation', ref )
-					: undefined,
-				hasResolvedCanUserDeleteNavigationMenu: hasFinishedResolution(
-					'canUser',
-					[ 'delete', 'navigation', ref ]
-				),
-				canUserCreateNavigationMenu: canUser( 'create', 'navigation' ),
-				isResolvingCanUserCreateNavigationMenu: isResolving(
-					'canUser',
-					[ 'create', 'navigation' ]
-				),
-				hasResolvedCanUserCreateNavigationMenu: hasFinishedResolution(
-					'canUser',
-					[ 'create', 'navigation' ]
-				),
+				isResolvingNavigationMenus,
+				hasResolvedNavigationMenus,
+
+				navigationMenu,
+				isNavigationMenuResolved,
+				isNavigationMenuMissing,
+
+				canUserCreateNavigationMenu,
+				isResolvingCanUserCreateNavigationMenu,
+				hasResolvedCanUserCreateNavigationMenu,
+
+				canUserUpdateNavigationMenu,
+				hasResolvedCanUserUpdateNavigationMenu,
+
+				canUserDeleteNavigationMenu,
+				hasResolvedCanUserDeleteNavigationMenu,
+
+				canSwitchNavigationMenu: ref
+					? navigationMenus?.length > 1
+					: navigationMenus?.length > 0,
 			};
 		},
 		[ ref ]
 	);
+}
+
+function selectNavigationMenus( select ) {
+	const { getEntityRecords, hasFinishedResolution, isResolving } =
+		select( coreStore );
+
+	const args = [
+		'postType',
+		'wp_navigation',
+		{ per_page: -1, status: 'publish' },
+	];
+	return {
+		navigationMenus: getEntityRecords( ...args ),
+		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
+		hasResolvedNavigationMenus: hasFinishedResolution(
+			'getEntityRecords',
+			args
+		),
+	};
+}
+
+function selectExistingMenu( select, ref ) {
+	if ( ! ref ) {
+		return {
+			isNavigationMenuResolved: false,
+			isNavigationMenuMissing: true,
+		};
+	}
+
+	const { getEntityRecord, getEditedEntityRecord, hasFinishedResolution } =
+		select( coreStore );
+
+	const args = [ 'postType', 'wp_navigation', ref ];
+	const navigationMenu = getEntityRecord( ...args );
+	const editedNavigationMenu = getEditedEntityRecord( ...args );
+	const hasResolvedNavigationMenu = hasFinishedResolution(
+		'getEditedEntityRecord',
+		args
+	);
+
+	return {
+		isNavigationMenuResolved: hasResolvedNavigationMenu,
+		isNavigationMenuMissing: hasResolvedNavigationMenu && ! navigationMenu,
+
+		// getEditedEntityRecord will return the post regardless of status.
+		// Therefore if the found post is not published then we should ignore it.
+		navigationMenu:
+			editedNavigationMenu.status === 'publish'
+				? editedNavigationMenu
+				: null,
+	};
+}
+
+function selectMenuCreatePermissions( select ) {
+	const { hasFinishedResolution, isResolving, canUser } = select( coreStore );
+
+	const args = [ 'create', 'navigation' ];
+	return {
+		canUserCreateNavigationMenu: !! canUser( ...args ),
+		isResolvingCanUserCreateNavigationMenu: !! isResolving(
+			'canUser',
+			args
+		),
+		hasResolvedCanUserCreateNavigationMenu: !! hasFinishedResolution(
+			'canUser',
+			args
+		),
+	};
+}
+
+function selectMenuUpdatePermissions( select, ref ) {
+	if ( ! ref ) {
+		return {
+			canUserUpdateNavigationMenu: false,
+			hasResolvedCanUserUpdateNavigationMenu: false,
+		};
+	}
+
+	const { hasFinishedResolution, canUser } = select( coreStore );
+	const args = [ 'update', 'navigation', ref ];
+	return {
+		canUserUpdateNavigationMenu: !! canUser( ...args ),
+		hasResolvedCanUserUpdateNavigationMenu: !! hasFinishedResolution(
+			'canUser',
+			args
+		),
+	};
+}
+
+function selectMenuDeletePermissions( select, ref ) {
+	if ( ! ref ) {
+		return {
+			canUserDeleteNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: false,
+		};
+	}
+
+	const { hasFinishedResolution, canUser } = select( coreStore );
+	const args = [ 'delete', 'navigation', ref ];
+	return {
+		canUserDeleteNavigationMenu: !! canUser( ...args ),
+		hasResolvedCanUserDeleteNavigationMenu: !! hasFinishedResolution(
+			'canUser',
+			args
+		),
+	};
 }

@@ -63,7 +63,7 @@ export function useDragCursor(
 			// @ts-expect-error
 			document.documentElement.style.cursor = null;
 		}
-	}, [ isDragging ] );
+	}, [ isDragging, dragCursor ] );
 
 	return dragCursor;
 }

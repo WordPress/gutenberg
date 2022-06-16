@@ -108,9 +108,8 @@ const BlockMoverButton = forwardRef(
 			[ clientIds, direction ]
 		);
 
-		const { moveBlocksDown, moveBlocksUp } = useDispatch(
-			blockEditorStore
-		);
+		const { moveBlocksDown, moveBlocksUp } =
+			useDispatch( blockEditorStore );
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
 

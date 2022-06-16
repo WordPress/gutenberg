@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,6 +36,8 @@ import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 const MediaReplaceFlow = ( {
 	mediaURL,

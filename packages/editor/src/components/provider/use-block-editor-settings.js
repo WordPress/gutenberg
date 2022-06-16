@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo, unionBy } from 'lodash';
+import { pick, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,10 +52,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: -1 }
 				  )
 				: [], // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
+			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
 		};
@@ -71,9 +68,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
 			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories: select(
-				coreStore
-			).getBlockPatternCategories(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		} ),
 		[]
 	);

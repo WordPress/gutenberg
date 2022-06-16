@@ -32,19 +32,20 @@ export function useNavigatorButton(
 	const escapedPath = escapeAttribute( path );
 
 	const { goTo } = useNavigator();
-	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
-		( e ) => {
-			e.preventDefault();
-			goTo( escapedPath, {
-				focusTargetSelector: cssSelectorForAttribute(
-					attributeName,
-					escapedPath
-				),
-			} );
-			onClick?.( e );
-		},
-		[ goTo, onClick ]
-	);
+	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
+		useCallback(
+			( e ) => {
+				e.preventDefault();
+				goTo( escapedPath, {
+					focusTargetSelector: cssSelectorForAttribute(
+						attributeName,
+						escapedPath
+					),
+				} );
+				onClick?.( e );
+			},
+			[ goTo, onClick ]
+		);
 
 	return {
 		as,

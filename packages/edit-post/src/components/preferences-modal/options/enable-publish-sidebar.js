@@ -12,9 +12,8 @@ export default compose(
 		isChecked: select( editorStore ).isPublishSidebarEnabled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { enablePublishSidebar, disablePublishSidebar } = dispatch(
-			editorStore
-		);
+		const { enablePublishSidebar, disablePublishSidebar } =
+			dispatch( editorStore );
 		return {
 			onChange: ( isEnabled ) =>
 				isEnabled ? enablePublishSidebar() : disablePublishSidebar(),

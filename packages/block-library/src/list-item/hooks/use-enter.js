@@ -19,9 +19,8 @@ import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } = useSelect(
-		blockEditorStore
-	);
+	const { getBlock, getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const [ canOutdent, outdentListItem ] = useOutdentListItem(

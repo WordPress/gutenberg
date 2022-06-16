@@ -138,8 +138,8 @@ export default function useSearchHandler(
 
 		return {
 			pageOnFront: getSettings().pageOnFront,
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	}, [] );
 

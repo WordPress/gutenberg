@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { omit, noop, isFunction } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { omit, noop, isFunction } from 'lodash';
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+const noop = () => {};
 const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
 
 function cycleValue( value, total, offset ) {
@@ -52,7 +53,7 @@ class NavigableContainer extends Component {
 		const { forwardedRef } = this.props;
 		this.container = ref;
 
-		if ( isFunction( forwardedRef ) ) {
+		if ( typeof forwardedRef === 'function' ) {
 			forwardedRef( ref );
 		} else if ( forwardedRef && 'current' in forwardedRef ) {
 			forwardedRef.current = ref;

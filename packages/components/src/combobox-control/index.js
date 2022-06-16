@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, deburr } from 'lodash';
+import { deburr } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -28,6 +28,8 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import { Flex, FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+
+const noop = () => {};
 
 const DetectOutside = withFocusOutside(
 	class extends Component {
@@ -166,7 +168,7 @@ function ComboboxControl( {
 
 	const handleOnReset = () => {
 		onChange( null );
-		inputContainer.current.input.focus();
+		inputContainer.current.focus();
 	};
 
 	// Update current selections when the filter input changes.
