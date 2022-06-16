@@ -42,7 +42,7 @@ test.describe( 'Template Revert', () => {
 
 		// The revert button isn't visible anymore.
 		await expect(
-			page.locator( 'role=menuitem[name=/Clear customizations/i]' )
+			page.locator( 'role=menuitem[name=/Delete custom template/i]' )
 		).not.toBeVisible();
 	} );
 
@@ -279,7 +279,9 @@ class TemplateRevertUtils {
 
 	async revertTemplate() {
 		await this.page.click( 'role=button[name="Show template details"i]' );
-		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
+		await this.page.click(
+			'role=menuitem[name=/Delete custom template/i]'
+		);
 		await this.page.waitForSelector(
 			'role=button[name="Dismiss this notice"i] >> text="Template reverted."'
 		);
