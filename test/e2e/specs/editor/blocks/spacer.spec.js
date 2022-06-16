@@ -27,6 +27,7 @@ test.describe( 'Spacer', () => {
 		await page.keyboard.press( 'Enter' );
 
 		const resizableHandle = page.locator(
+			// Because there are no other accessible attributes we can query for the resize handles
 			'role=document[name="Block: Spacer"i] >> css=.block-library-spacer__resize-container .components-resizable-box__handle'
 		);
 		const elementPoint = await resizableHandle.boundingBox();
