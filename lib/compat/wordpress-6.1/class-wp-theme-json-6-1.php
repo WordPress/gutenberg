@@ -38,7 +38,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The name of the class.
 	 */
 	public static function get_element_class_name( $element ) {
-		return array_key_exists( $element, WP_Theme_JSON_Gutenberg::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? WP_Theme_JSON_Gutenberg::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
+		return array_key_exists( $element, static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
 	}
 
 	/**
