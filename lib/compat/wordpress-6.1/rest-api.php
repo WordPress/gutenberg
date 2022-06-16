@@ -22,28 +22,15 @@ add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_part
 
 
 /**
- * Updates WP_REST_Post_Types_Controller schema by adding the
- * post type's `icon`(menu_icon).
+ * Add the post type's `icon`(menu_icon) in the response.
+ * When we backport this change we will need to add the
+ * `icon` to WP_REST_Post_Types_Controller schema.
+ *
+ * @param WP_REST_Response $response  The response object.
+ * @param WP_Post_Type     $post_type The original post type object.
  */
-function gutenberg_update_post_types_rest_response() {
-	$post_types = get_post_types( array( 'show_in_rest' => true ), 'objects' );
-	register_rest_field(
-		'type',
-		'icon',
-		array(
-			'get_callback'    => function ( $post_type ) use ( $post_types ) {
-				if ( isset( $post_types[ $post_type['slug'] ] ) ) {
-					return $post_types[ $post_type['slug'] ]->menu_icon;
-				}
-			},
-			'update_callback' => null,
-			'schema'          => array(
-				'description' => __( 'The url to the icon to be used for this menu or the name of the icon from the iconfont.', 'gutenberg' ),
-				'type'        => 'string',
-				'context'     => array( 'view', 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
+function gutenberg_update_post_types_rest_response( $response, $post_type ) {
+	$response->data['icon'] = $post_type->menu_icon;
+	return $response;
 }
-add_action( 'rest_api_init', 'gutenberg_update_post_types_rest_response' );
+add_filter( 'rest_prepare_post_type', 'gutenberg_update_post_types_rest_response', 10, 2 );
