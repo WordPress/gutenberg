@@ -513,8 +513,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			|| ! is_numeric( $spacing_scale['steps'] )
 			|| ! is_numeric( $spacing_scale['firstStep'] )
 			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
+			if ( ! empty( $spacing_scale ) ) {
 				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid' ), E_USER_NOTICE );
-				return null;
+			}
+			return null;
 		}
 
 		$spacing_sizes   = array();
@@ -533,13 +535,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		for ( $x = 1; $x <= $spacing_scale['steps'] - 1; $x++ ) {
 			$current_step = '+' === $spacing_scale['operator']
-				? $current_step + $spacing_scale['increment'] . $spacing_scale['units']
-				: $current_step * $spacing_scale['increment'] . $spacing_scale['units'];
+				? $current_step + $spacing_scale['increment']
+				: $current_step * $spacing_scale['increment'];
 
 			$spacing_sizes[] = array(
 				'name' => $x + 1,
 				'slug' => ( $x + 1 ) * 10,
-				'size' => $current_step,
+				'size' => $current_step . $spacing_scale['units'],
 			);
 		}
 
