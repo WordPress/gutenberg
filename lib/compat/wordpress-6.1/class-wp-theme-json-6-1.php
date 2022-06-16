@@ -513,6 +513,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			|| ! is_numeric( $spacing_scale['steps'] )
 			|| ! is_numeric( $spacing_scale['firstStep'] )
 			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
+				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid' ), E_USER_NOTICE );
 				return null;
 		}
 
