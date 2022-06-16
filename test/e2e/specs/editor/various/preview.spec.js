@@ -181,7 +181,7 @@ test.describe( 'Preview', () => {
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
 		await page.click( 'role=button[name="Switch to draft"i]' );
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
+		await page.click( 'role=dialog[name="Preview options"i] >> role=button[name="OK"i]' );
 
 		// Change the title.
 		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
