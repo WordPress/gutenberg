@@ -16,7 +16,7 @@ import {
 	useCallback,
 	useRef,
 } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useCopyToClipboard } from '@wordpress/compose';
 
@@ -42,7 +42,8 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+	const copyMenuItemLabel = _n( 'Copy block', 'Copy blocks', blocks.length );
+	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
 export function BlockSettingsDropdown( {
@@ -83,9 +84,8 @@ export function BlockSettingsDropdown( {
 				hasReducedUI: getSettings().hasReducedUI,
 				onlyBlock: 1 === getBlockCount(),
 				parentBlockType: getBlockType( parentBlockName ),
-				previousBlockClientId: getPreviousBlockClientId(
-					firstBlockClientId
-				),
+				previousBlockClientId:
+					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 			};
@@ -109,9 +109,8 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock

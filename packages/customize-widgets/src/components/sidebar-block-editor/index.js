@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -50,10 +45,8 @@ export default function SidebarBlockEditor( {
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
-			hasUploadPermissions: defaultTo(
-				select( coreStore ).canUser( 'create', 'media' ),
-				true
-			),
+			hasUploadPermissions:
+				select( coreStore ).canUser( 'create', 'media' ) ?? true,
 			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
 				'fixedToolbar'

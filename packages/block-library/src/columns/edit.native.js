@@ -347,14 +347,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks } = dispatch( blockEditorStore );
-			const { getBlocks, getBlockAttributes } = registry.select(
-				blockEditorStore
-			);
+			const { getBlocks, getBlockAttributes } =
+				registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -414,12 +412,10 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks, selectBlock } = dispatch(
-				blockEditorStore
-			);
-			const { getBlocks, getBlockAttributes } = registry.select(
-				blockEditorStore
-			);
+			const { replaceInnerBlocks, selectBlock } =
+				dispatch( blockEditorStore );
+			const { getBlocks, getBlockAttributes } =
+				registry.select( blockEditorStore );
 
 			// Get verticalAlignment from Columns block to set the same to new Column.
 			const { verticalAlignment } = getBlockAttributes( clientId );

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalElementButtonClassName } from '@wordpress/block-editor';
+import { __experimentalGetElementClassName } from '@wordpress/block-editor';
 import { useDisabled, useInstanceId } from '@wordpress/compose';
 
 const CommentsForm = () => {
@@ -36,7 +36,7 @@ const CommentsForm = () => {
 						className={ classnames(
 							'submit',
 							'wp-block-button__link',
-							__experimentalElementButtonClassName
+							__experimentalGetElementClassName( 'button' )
 						) }
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }

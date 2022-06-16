@@ -25,12 +25,10 @@ function setContentEditableWrapper( node, value ) {
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useDragSelection() {
-	const { startMultiSelect, stopMultiSelect } = useDispatch(
-		blockEditorStore
-	);
-	const { isSelectionEnabled, hasMultiSelection } = useSelect(
-		blockEditorStore
-	);
+	const { startMultiSelect, stopMultiSelect } =
+		useDispatch( blockEditorStore );
+	const { isSelectionEnabled, hasMultiSelection } =
+		useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -61,9 +59,8 @@ export default function useDragSelection() {
 					const selection = defaultView.getSelection();
 
 					if ( selection.rangeCount ) {
-						const {
-							commonAncestorContainer,
-						} = selection.getRangeAt( 0 );
+						const { commonAncestorContainer } =
+							selection.getRangeAt( 0 );
 
 						if (
 							anchorElement.contains( commonAncestorContainer )

@@ -218,6 +218,5 @@ declare module './base-entity-records' {
 	}
 }
 
-export type Theme<
-	C extends Context = DefaultContextOf< 'root', 'theme' >
-> = OmitNevers< _BaseEntityRecords.Theme< C > >;
+export type Theme< C extends Context = DefaultContextOf< 'root', 'theme' > > =
+	OmitNevers< _BaseEntityRecords.Theme< C > >;

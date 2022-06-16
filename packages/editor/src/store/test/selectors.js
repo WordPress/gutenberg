@@ -2871,9 +2871,8 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'assigns an icon to each area', () => {
-			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
-				state
-			);
+			const templatePartAreas =
+				__experimentalGetDefaultTemplatePartAreas( state );
 			templatePartAreas.forEach( ( area ) =>
 				expect( area.icon ).not.toBeNull()
 			);

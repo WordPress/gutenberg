@@ -79,12 +79,18 @@ module.exports = {
 					{
 						name: 'lodash',
 						importNames: [
+							'clamp',
 							'concat',
+							'defaultTo',
 							'differenceWith',
 							'dropRight',
+							'each',
 							'findIndex',
+							'flatten',
 							'isArray',
 							'isFinite',
+							'isFunction',
+							'isObjectLike',
 							'isUndefined',
 							'memoize',
 							'negate',
@@ -95,6 +101,8 @@ module.exports = {
 							'stubTrue',
 							'sum',
 							'sumBy',
+							'take',
+							'trim',
 						],
 						message:
 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',

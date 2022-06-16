@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
+import { flatMap, isEmpty } from 'lodash';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
@@ -32,6 +32,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	}
 
 	return mergedProps;
+}
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
 }
 
 function DropdownMenu( {

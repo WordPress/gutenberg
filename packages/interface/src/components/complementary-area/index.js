@@ -44,9 +44,8 @@ function useAdjustComplementaryListener(
 ) {
 	const previousIsSmall = useRef( false );
 	const shouldOpenWhenNotSmall = useRef( false );
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	useEffect( () => {
 		// If the complementary area is active and the editor is switching from a big to a small window size.
 		if ( isActive && isSmall && ! previousIsSmall.current ) {
@@ -100,9 +99,8 @@ function ComplementaryArea( {
 } ) {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
-			const { getActiveComplementaryArea, isItemPinned } = select(
-				interfaceStore
-			);
+			const { getActiveComplementaryArea, isItemPinned } =
+				select( interfaceStore );
 			const _activeArea = getActiveComplementaryArea( scope );
 			return {
 				isActive: _activeArea === identifier,
@@ -217,9 +215,8 @@ function ComplementaryArea( {
 	);
 }
 
-const ComplementaryAreaWrapped = withComplementaryAreaContext(
-	ComplementaryArea
-);
+const ComplementaryAreaWrapped =
+	withComplementaryAreaContext( ComplementaryArea );
 
 ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
 

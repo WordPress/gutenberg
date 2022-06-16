@@ -63,9 +63,9 @@ export default function getRectangleFromRange( range ) {
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
 		assertIsDefined( parentNode, 'parentNode' );
-		const index = /** @type {Node[]} */ ( Array.from(
-			parentNode.childNodes
-		) ).indexOf( startContainer );
+		const index = /** @type {Node[]} */ (
+			Array.from( parentNode.childNodes )
+		).indexOf( startContainer );
 
 		assertIsDefined( ownerDocument, 'ownerDocument' );
 		range = ownerDocument.createRange();
