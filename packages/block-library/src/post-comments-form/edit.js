@@ -16,8 +16,7 @@ import {
 import { Button } from '@wordpress/components';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,7 +30,7 @@ export default function PostCommentsFormEdit( {
 } ) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ commentStatus ] = useEntityProp(
+	const [ commentStatus, setCommentStatus ] = useEntityProp(
 		'postType',
 		postType,
 		'comment_status',
@@ -42,7 +41,6 @@ export default function PostCommentsFormEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const { editPost } = useDispatch( editorStore );
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
@@ -71,10 +69,7 @@ export default function PostCommentsFormEdit( {
 				),
 				postType
 			);
-			const enableComments = () =>
-				editPost( {
-					comment_status: 'open',
-				} );
+			const enableComments = () => setCommentStatus( 'open' );
 			actions = [
 				<Button
 					key="enableComments"
