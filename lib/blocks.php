@@ -192,7 +192,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$style_path        = is_rtl() ? str_replace( '.css', '-rtl.css', $style_path ) : $style_path;
+	$style_path        = is_rtl() ? str_replace( 'style.css', 'style-rtl.css', $style_path ) : $style_path;
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
