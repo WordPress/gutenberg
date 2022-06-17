@@ -110,13 +110,10 @@ describe( 'Gallery block', () => {
 	// is addressed.
 	it.skip( 'displays media options picker when selecting the block', async () => {
 		// Initialize with an empty gallery
-		const {
-			getByA11yLabel,
-			getByText,
-			getByTestId,
-		} = await initializeEditor( {
-			initialHtml: generateGalleryBlock( 0 ),
-		} );
+		const { getByA11yLabel, getByText, getByTestId } =
+			await initializeEditor( {
+				initialHtml: generateGalleryBlock( 0 ),
+			} );
 
 		// Tap on Gallery block
 		fireEvent.press( getByText( 'ADD MEDIA' ) );
@@ -208,9 +205,8 @@ describe( 'Gallery block', () => {
 		fireEvent.press( galleryItem );
 
 		// Set gallery item caption
-		const captionField = within( galleryItem ).getByPlaceholderText(
-			'Add caption'
-		);
+		const captionField =
+			within( galleryItem ).getByPlaceholderText( 'Add caption' );
 		setCaption(
 			captionField,
 			'<strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption'
@@ -223,10 +219,8 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc005
 	it( 'successfully uploads items', async () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
@@ -263,10 +257,8 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc006
 	it( 'handles failed uploads', async () => {
 		const { notifyUploadingState, notifyFailedState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
@@ -319,10 +311,8 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc007
 	it( 'takes a photo', async () => {
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
@@ -360,10 +350,8 @@ describe( 'Gallery block', () => {
 			}.jpeg`,
 		} ) );
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		let otherMediaOptionsCallback;
 		getOtherMediaOptions.mockImplementation( ( filter, callback ) => {
@@ -417,10 +405,8 @@ describe( 'Gallery block', () => {
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc009
 	it( 'cancels uploads', async () => {
 		const { notifyUploadingState, notifyResetState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		// Initialize with an empty gallery
 		const { galleryBlock, getByText } = await initializeWithGalleryBlock();
@@ -506,10 +492,8 @@ describe( 'Gallery block', () => {
 			localUrl: `file:///IMG_${ index + 1 }.JPG`,
 		} ) );
 		const { notifyUploadingState, notifySucceedState } = setupMediaUpload();
-		const {
-			expectMediaPickerCall,
-			mediaPickerCallback,
-		} = setupMediaPicker();
+		const { expectMediaPickerCall, mediaPickerCallback } =
+			setupMediaPicker();
 
 		let otherMediaOptionsCallback;
 		getOtherMediaOptions.mockImplementation( ( filter, callback ) => {

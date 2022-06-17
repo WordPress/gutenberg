@@ -40,10 +40,10 @@ function useSortedBlockTypes() {
 		type.push( block );
 		return blocks;
 	};
-	const {
-		core: coreItems,
-		noncore: nonCoreItems,
-	} = blockItems.reduce( groupByType, { core: [], noncore: [] } );
+	const { core: coreItems, noncore: nonCoreItems } = blockItems.reduce(
+		groupByType,
+		{ core: [], noncore: [] }
+	);
 	return [ ...coreItems, ...nonCoreItems ];
 }
 

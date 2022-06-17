@@ -48,9 +48,8 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( ref );
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -85,18 +84,16 @@ export default function ReusableBlockEdit( {
 				'wp_block',
 				ref
 			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
+			const hasResolvedBlock = select( coreStore ).hasFinishedResolution(
+				'getEntityRecord',
+				[ 'postType', 'wp_block', ref ]
+			);
 			return {
 				hasResolved: hasResolvedBlock,
-				isEditing: select(
-					reusableBlocksStore
-				).__experimentalIsEditingReusableBlock( clientId ),
+				isEditing:
+					select(
+						reusableBlocksStore
+					).__experimentalIsEditingReusableBlock( clientId ),
 				isMissing: hasResolvedBlock && ! persistedBlock,
 			};
 		},
@@ -104,9 +101,8 @@ export default function ReusableBlockEdit( {
 	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(

@@ -553,8 +553,8 @@ describe( 'createRegistry', () => {
 
 		it( 'should run the registry selectors properly', () => {
 			const selector1 = () => 'result1';
-			const selector2 = createRegistrySelector( ( select ) => () =>
-				select( 'reducer1' ).selector1()
+			const selector2 = createRegistrySelector(
+				( select ) => () => select( 'reducer1' ).selector1()
 			);
 			registry.registerStore( 'reducer1', {
 				reducer: () => 'state1',
@@ -576,8 +576,8 @@ describe( 'createRegistry', () => {
 
 		it( 'should run the registry selector from a non-registry selector', () => {
 			const selector1 = () => 'result1';
-			const selector2 = createRegistrySelector( ( select ) => () =>
-				select( 'reducer1' ).selector1()
+			const selector2 = createRegistrySelector(
+				( select ) => () => select( 'reducer1' ).selector1()
 			);
 			const selector3 = () => selector2();
 			registry.registerStore( 'reducer1', {
@@ -656,9 +656,8 @@ describe( 'createRegistry', () => {
 			const secondListener = jest.fn();
 
 			subscribeWithUnsubscribe( firstListener );
-			const secondUnsubscribe = subscribeWithUnsubscribe(
-				secondListener
-			);
+			const secondUnsubscribe =
+				subscribeWithUnsubscribe( secondListener );
 
 			store.dispatch( { type: 'dummy' } );
 

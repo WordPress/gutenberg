@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, trim } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * Object map tracking anchors.
@@ -32,11 +32,14 @@ const getTextWithoutMarkup = ( text ) => {
  */
 const getSlug = ( content ) => {
 	// Get the slug.
-	return trim(
-		deburr( getTextWithoutMarkup( content ) )
+	return (
+		removeAccents( getTextWithoutMarkup( content ) )
+			// Convert anything that's not a letter or number to a hyphen.
 			.replace( /[^\p{L}\p{N}]+/gu, '-' )
-			.toLowerCase(),
-		'-'
+			// Convert to lowercase
+			.toLowerCase()
+			// Remove any remaining leading or trailing hyphens.
+			.replace( /(^-+)|(-+$)/g, '' )
 	);
 };
 

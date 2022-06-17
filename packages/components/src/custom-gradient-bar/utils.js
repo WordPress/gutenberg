@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	MINIMUM_DISTANCE_BETWEEN_POINTS,
-	MINIMUM_ABSOLUTE_LEFT_POSITION,
-	INSERT_POINT_WIDTH,
-} from './constants';
+import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
 
 /**
  * Control point for the gradient bar.
@@ -171,29 +167,21 @@ export function updateControlPointColorByPosition(
 /**
  * Gets the horizontal coordinate when dragging a control point with the mouse.
  *
- * @param {number}  mouseXCoordinate       Horizontal coordinate of the mouse position.
- * @param {Element} containerElement       Container for the gradient picker.
- * @param {number}  positionedElementWidth Width of the positioned element.
+ * @param {number}  mouseXCoordinate Horizontal coordinate of the mouse position.
+ * @param {Element} containerElement Container for the gradient picker.
  *
  * @return {number} Whole number percentage from the left.
  */
 export function getHorizontalRelativeGradientPosition(
 	mouseXCoordinate,
-	containerElement,
-	positionedElementWidth
+	containerElement
 ) {
 	if ( ! containerElement ) {
 		return;
 	}
 	const { x, width } = containerElement.getBoundingClientRect();
-	const absolutePositionValue =
-		mouseXCoordinate -
-		x -
-		MINIMUM_ABSOLUTE_LEFT_POSITION -
-		positionedElementWidth / 2;
-	const availableWidth =
-		width - MINIMUM_ABSOLUTE_LEFT_POSITION - INSERT_POINT_WIDTH;
+	const absolutePositionValue = mouseXCoordinate - x;
 	return Math.round(
-		clampPercent( ( absolutePositionValue * 100 ) / availableWidth )
+		clampPercent( ( absolutePositionValue * 100 ) / width )
 	);
 }

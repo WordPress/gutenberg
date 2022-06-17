@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 9.3.0 (2022-06-15)
+
+### Bug fix
+
+-   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
+
+## 9.2.0 (2022-06-01)
+
 ## 9.1.0 (2022-05-18)
 
 ## 9.0.0 (2022-05-04)

@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { noop, get, omit, pick } from 'lodash';
+import { get, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,6 +37,8 @@ import {
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { store as blocksStore } from '../../store';
+
+const noop = () => {};
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {

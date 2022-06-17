@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 23.3.0 (2022-06-15)
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2` ([#40542](https://github.com/WordPress/gutenberg/pull/40542)).
+
+## 23.2.0 (2022-06-01)
+
+### Bug Fix
+
+-   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
+
 ## 23.1.0 (2022-05-18)
 
 ### New Feature
@@ -20,7 +32,7 @@
 -   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
 -   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
 
-### New Feature
+### New Features
 
 -   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
 

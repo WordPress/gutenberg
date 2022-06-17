@@ -96,9 +96,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		// If the previous query didn't run or find any element to focus, fallback
 		// to the first tabbable element in the screen (or the screen itself).
 		if ( ! elementToFocus ) {
-			const firstTabbable = ( focus.tabbable.find(
-				wrapperRef.current
-			) as HTMLElement[] )[ 0 ];
+			const firstTabbable = (
+				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
+			 )[ 0 ];
 
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}

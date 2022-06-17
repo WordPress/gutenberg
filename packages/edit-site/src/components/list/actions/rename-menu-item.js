@@ -19,12 +19,10 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const [ title, setTitle ] = useState( () => template.title.rendered );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
-		coreStore
-	);
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	if ( ! template.is_custom ) {
 		return null;

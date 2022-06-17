@@ -185,7 +185,7 @@
 							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/meta-block-3-add/"
 						},
 						"default": {
-							"description": "TA block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
+							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
 					},
 					"required": [ "type" ]

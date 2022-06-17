@@ -1,7 +1,22 @@
 /**
+ * External dependencies
+ */
+import type { FocusEventHandler } from 'react';
+
+/**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import type { InputChangeCallback } from './types';
 
 /**
  * Gets a CSS cursor value based on a drag direction.
@@ -48,7 +63,46 @@ export function useDragCursor(
 			// @ts-expect-error
 			document.documentElement.style.cursor = null;
 		}
-	}, [ isDragging ] );
+	}, [ isDragging, dragCursor ] );
 
 	return dragCursor;
+}
+
+export function useDraft( props: {
+	value: string | undefined;
+	onBlur?: FocusEventHandler;
+	onChange: InputChangeCallback;
+} ) {
+	const refPreviousValue = useRef( props.value );
+	const [ draft, setDraft ] = useState< {
+		value?: string;
+		isStale?: boolean;
+	} >( {} );
+	const value = draft.value !== undefined ? draft.value : props.value;
+
+	// Determines when to discard the draft value to restore controlled status.
+	// To do so, it tracks the previous value and marks the draft value as stale
+	// after each render.
+	useLayoutEffect( () => {
+		const { current: previousValue } = refPreviousValue;
+		refPreviousValue.current = props.value;
+		if ( draft.value !== undefined && ! draft.isStale )
+			setDraft( { ...draft, isStale: true } );
+		else if ( draft.isStale && props.value !== previousValue )
+			setDraft( {} );
+	}, [ props.value, draft ] );
+
+	const onChange: InputChangeCallback = ( nextValue, extra ) => {
+		// Mutates the draft value to avoid an extra effect run.
+		setDraft( ( current ) =>
+			Object.assign( current, { value: nextValue, isStale: false } )
+		);
+		props.onChange( nextValue, extra );
+	};
+	const onBlur: FocusEventHandler = ( event ) => {
+		setDraft( {} );
+		props.onBlur?.( event );
+	};
+
+	return { value, onBlur, onChange };
 }

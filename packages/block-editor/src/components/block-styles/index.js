@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, debounce } from 'lodash';
+import { debounce } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -38,6 +38,8 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
 // relative to the editor pane.
 // The value is the equivalent of the container's right position.
 const DEFAULT_POSITION_TOP = 16;
+
+const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( {
