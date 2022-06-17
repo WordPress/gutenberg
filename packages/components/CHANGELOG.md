@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComboboxControl` & `FormTokenField`: Add `__next36pxDefaultSize` flag for larger default size ([#40746](https://github.com/WordPress/gutenberg/pull/40746)).
+
 ### Internal
 
 -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
