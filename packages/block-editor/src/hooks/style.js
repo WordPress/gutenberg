@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, has, omit } from 'lodash';
+import { get, has, isEmpty, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -305,41 +305,47 @@ const withElementsStyles = createHigherOrderComponent(
 			'link'
 		);
 
+		let styles = [];
+
 		// Remove values based on whether serialization has been skipped for a specific style.
 		const rawElementsStyles = props.attributes.style?.elements;
-		const filteredElementsStyles = {
-			...rawElementsStyles,
-			link: {
-				...rawElementsStyles?.link,
-				color: ! skipLinkColorSerialization
-					? rawElementsStyles?.link?.color
-					: undefined,
-			},
-		};
 
-		const styles = Object.entries( filteredElementsStyles ).reduce(
-			( acc, [ elementName, elementStyles ] ) => {
-				const cssRule = generateStyles( elementStyles, {
-					// The .editor-styles-wrapper selector is required on elements styles. As it is
-					// added to all other editor styles, not providing it causes reset and global
-					// styles to override element styles because of higher specificity.
-					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
-				} );
+		if ( ! isEmpty( rawElementsStyles ) ) {
+			const filteredElementsStyles = {
+				...rawElementsStyles,
+				link: {
+					...rawElementsStyles?.link,
+					color: ! skipLinkColorSerialization
+						? rawElementsStyles?.link?.color
+						: undefined,
+				},
+			};
 
-				if ( !! cssRule ) {
-					acc.push( cssRule );
-				}
+			styles = Object.entries( filteredElementsStyles ).reduce(
+				( acc, [ elementName, elementStyles ] ) => {
+					const cssRule = generateStyles( elementStyles, {
+						// The .editor-styles-wrapper selector is required on elements styles. As it is
+						// added to all other editor styles, not providing it causes reset and global
+						// styles to override element styles because of higher specificity.
+						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+					} );
 
-				return acc;
-			},
-			[]
-		);
+					if ( !! cssRule ) {
+						acc.push( cssRule );
+					}
+
+					return acc;
+				},
+				[]
+			);
+		}
 
 		const element = useContext( BlockList.__unstableElementContext );
+		const hasElementStyles = styles.length;
 
 		return (
 			<>
-				{ styles &&
+				{ hasElementStyles &&
 					element &&
 					createPortal(
 						<style
@@ -353,7 +359,7 @@ const withElementsStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					className={
-						styles
+						hasElementStyles
 							? classnames(
 									props.className,
 									blockElementsContainerIdentifier
