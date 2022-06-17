@@ -17,6 +17,10 @@
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	const __EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
 
+	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
+		'link' => array( ':hover', ':focus' ),
+	);
+
 	const ELEMENTS = array(
 		'link'   => 'a',
 		'h1'     => 'h1',
@@ -67,17 +71,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$schema_styles_elements         = array();
 		$schema_styles_pseudo_selectors = array();
 
-		// TODO - convert to constant
-		$valid_element_pseudo_selectors = array(
-			'link' => array( ':hover', ':focus' ),
-		);
-
 		// Set allowed element pseudo selectors based on per element allow list.
 		foreach ( $valid_element_names as $element ) {
 			$schema_styles_elements[ $element ] = $styles_non_top_level;
 
-			if ( array_key_exists( $element, $valid_element_pseudo_selectors ) ) {
-				foreach ( $valid_element_pseudo_selectors[ $element ] as $selector ) {
+			if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
+				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $selector ) {
 					$schema_styles_elements[ $element ][ $selector ] = $styles_non_top_level;
 				}
 			}
@@ -123,6 +122,36 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $output;
 	}
 
+	/**
+	 * Processes a style node and returns the same node
+	 * without the insecure styles.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param array $input Node to process.
+	 * @return array
+	 */
+	protected static function remove_insecure_styles( $input ) {
+		$output       = array();
+		$declarations = static::compute_style_properties( $input );
+
+
+
+		foreach ( $declarations as $declaration ) {
+			if ( static::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
+				$path = static::PROPERTIES_METADATA[ $declaration['name'] ];
+
+				// Check the value isn't an array before adding so as to not
+				// double up shorthand and longhand styles.
+				$value = _wp_array_get( $input, $path, array() );
+				if ( ! is_array( $value ) ) {
+					_wp_array_set( $output, $path, $value );
+				}
+			}
+		}
+		return $output;
+	}
+
 		/**
 		 * Removes insecure data from theme.json.
 		 *
@@ -151,6 +180,22 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 
 			$output = static::remove_insecure_styles( $input );
+
+			// Get a reference to element name from path.
+			// $metadata['path'] = array('styles','elements','link');
+			$current_element = $metadata['path'][ count( $metadata['path'] ) - 1 ];
+
+			// $output is stripped of pseudo selectors. Readd and process them
+			// for insecure styles here.
+			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
+
+				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_selector ) {
+					if ( isset( $input[ $pseudo_selector ] ) ) {
+						$output[ $pseudo_selector ] = static::remove_insecure_styles( $input[ $pseudo_selector ] );
+					}
+				}
+			}
+
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}

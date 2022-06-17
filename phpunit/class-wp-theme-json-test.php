@@ -2051,7 +2051,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						),
 						':hover' => array(
 							'color' => array(
-								'text' => 'red',
+								'text'       => 'red',
+								'background' => 'blue',
 							),
 						),
 					),
