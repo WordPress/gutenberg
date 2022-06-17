@@ -538,13 +538,22 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$declarations = static::compute_style_properties( $node, $settings );
 
+
+
+		$psuedo_matches = array();
+		preg_match( '/[a-z]+(:[a-z]+)/', $selector, $psuedo_matches );
+		$pseudo_selector = $psuedo_matches[1] ?? null;
+
+		// Get a reference to element name from path.
+		// $block_metadata['path'] = array('styles','elements','link');
+		$current_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ];
+
+
+		// If the current selector is a psuedo selector that's defined in the allow list for the current
+		// element then compute the style properties.
 		$declarations_pseudo_selectors = array();
-
-		$is_pseudo_selector = str_contains( $selector, ':' );
-
-		// TODO - loop all pseudo selectors on $node and also compute their style properties
-		if ( $is_pseudo_selector && isset( $node[':hover'] ) ) {
-			$declarations_pseudo_selectors = static::compute_style_properties( $node[':hover'], $settings );
+		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
+			$declarations_pseudo_selectors = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
 		}
 
 		$block_rules = '';
@@ -571,16 +580,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= 'body { margin: 0; }';
 		}
 
-		// 2. Generate the rules that use the general selector.
+		// 2. Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
 
-
-		// 2.5. Generate the rules for any pseudo selectors.
+		// 2.5. Generate and append the rules for any pseudo selectors.
 		if ( ! empty( $declarations_pseudo_selectors ) ) {
 			$block_rules .= static::to_ruleset( $selector, $declarations_pseudo_selectors );
 		}
 
-		// 3. Generate the rules that use the duotone selector.
+		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
 			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
 			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
