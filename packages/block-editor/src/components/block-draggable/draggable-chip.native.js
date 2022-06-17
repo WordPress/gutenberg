@@ -41,7 +41,7 @@ export default function BlockDraggableChip( { icon } ) {
 	);
 
 	return (
-		<View style={ [ containerStyle, shadowStyle ] }>
+		<View style={ [ containerStyle, shadowStyle ] } testID="draggable-chip">
 			<BlockIcon icon={ dragHandle } />
 			{ icon && <BlockIcon icon={ icon } /> }
 		</View>

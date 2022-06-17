@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -18,7 +18,6 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
-import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 
@@ -77,7 +76,6 @@ function SelectedBlockPopover( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
-	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
@@ -119,14 +117,6 @@ function SelectedBlockPopover( {
 		return null;
 	}
 
-	function onFocus() {
-		setIsInserterShown( true );
-	}
-
-	function onBlur() {
-		setIsInserterShown( false );
-	}
-
 	return (
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
@@ -137,31 +127,6 @@ function SelectedBlockPopover( {
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
 		>
-			{ shouldShowContextualToolbar && (
-				<div
-					onFocus={ onFocus }
-					onBlur={ onBlur }
-					// While ideally it would be enough to capture the
-					// bubbling focus event from the Inserter, due to the
-					// characteristics of click focusing of `button`s in
-					// Firefox and Safari, it is not reliable.
-					//
-					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-					tabIndex={ -1 }
-					className={ classnames(
-						'block-editor-block-list__block-popover-inserter',
-						{
-							'is-visible': isInserterShown,
-						}
-					) }
-				>
-					<Inserter
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						__experimentalIsQuick
-					/>
-				</div>
-			) }
 			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar
 					// If the toolbar is being shown because of being forced

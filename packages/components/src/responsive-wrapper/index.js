@@ -15,10 +15,8 @@ function ResponsiveWrapper( {
 	children,
 	isInline = false,
 } ) {
-	const [
-		containerResizeListener,
-		{ width: containerWidth },
-	] = useResizeObserver();
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}

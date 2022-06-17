@@ -215,16 +215,17 @@ export function SocialLinksEdit( props ) {
 					__experimentalIsRenderedInSidebar
 					title={ __( 'Color' ) }
 					colorSettings={ colorSettings }
-				/>
-				{ ! logosOnly && (
-					<ContrastChecker
-						{ ...{
-							textColor: iconColorValue,
-							backgroundColor: iconBackgroundColorValue,
-						} }
-						isLargeText={ false }
-					/>
-				) }
+				>
+					{ ! logosOnly && (
+						<ContrastChecker
+							{ ...{
+								textColor: iconColorValue,
+								backgroundColor: iconBackgroundColorValue,
+							} }
+							isLargeText={ false }
+						/>
+					) }
+				</PanelColorSettings>
 			</InspectorControls>
 			<ul { ...innerBlocksProps } />
 		</Fragment>

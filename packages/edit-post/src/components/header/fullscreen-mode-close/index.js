@@ -30,9 +30,8 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
-			const { getEntityRecord, getPostType, isResolving } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, isResolving } =
+				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 

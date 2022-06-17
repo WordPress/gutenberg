@@ -99,9 +99,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		const { getBlock, getBlockName, getBlockParents } = select(
-			blockEditorStore
-		);
+		const { getBlock, getBlockName, getBlockParents } =
+			select( blockEditorStore );
 		const blockParents = getBlockParents( clientId );
 		const widgetAreaClientId = blockParents.find(
 			( parentClientId ) =>
@@ -152,28 +151,29 @@ export const getEditedWidgetAreas = createRegistrySelector(
  * @return {Array}  List of all blocks representing reference widgets
  */
 export const getReferenceWidgetBlocks = createRegistrySelector(
-	( select ) => ( state, referenceWidgetName = null ) => {
-		const results = [];
-		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		for ( const _widgetArea of widgetAreas ) {
-			const post = select( coreStore ).getEditedEntityRecord(
-				KIND,
-				POST_TYPE,
-				buildWidgetAreaPostId( _widgetArea.id )
-			);
-			for ( const block of post.blocks ) {
-				if (
-					block.name === 'core/legacy-widget' &&
-					( ! referenceWidgetName ||
-						block.attributes?.referenceWidgetName ===
-							referenceWidgetName )
-				) {
-					results.push( block );
+	( select ) =>
+		( state, referenceWidgetName = null ) => {
+			const results = [];
+			const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
+			for ( const _widgetArea of widgetAreas ) {
+				const post = select( coreStore ).getEditedEntityRecord(
+					KIND,
+					POST_TYPE,
+					buildWidgetAreaPostId( _widgetArea.id )
+				);
+				for ( const block of post.blocks ) {
+					if (
+						block.name === 'core/legacy-widget' &&
+						( ! referenceWidgetName ||
+							block.attributes?.referenceWidgetName ===
+								referenceWidgetName )
+					) {
+						results.push( block );
+					}
 				}
 			}
+			return results;
 		}
-		return results;
-	}
 );
 
 /**

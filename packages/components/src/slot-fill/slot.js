@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { isFunction, isString, map, negate } from 'lodash';
+import { isString, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,16 @@ import {
  * Internal dependencies
  */
 import SlotFillContext from './context';
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 class SlotComponent extends Component {
 	constructor() {
@@ -79,7 +89,7 @@ class SlotComponent extends Component {
 			// In some cases fills are rendered only when some conditions apply.
 			// This ensures that we only use non-empty fills when rendering, i.e.,
 			// it allows us to render wrappers only when the fills are actually present.
-			negate( isEmptyElement )
+			( element ) => ! isEmptyElement( element )
 		);
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;

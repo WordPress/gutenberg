@@ -20,7 +20,7 @@ export interface SelectControlProps
 			| 'size'
 			| 'suffix'
 		>,
-		Pick< BaseControlProps, 'help' > {
+		Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > {
 	/**
 	 * If this property is added, multiple values can be selected. The value passed should be an array.
 	 *

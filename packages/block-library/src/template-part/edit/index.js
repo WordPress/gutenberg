@@ -46,22 +46,18 @@ export default function TemplatePartEdit( {
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		templatePartId
-	);
-	const [
-		isTemplatePartSelectionOpen,
-		setIsTemplatePartSelectionOpen,
-	] = useState( false );
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( templatePartId );
+	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
+		useState( false );
 
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
 	const { isResolved, innerBlocks, isMissing, area } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } = select(
-				coreStore
-			);
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -162,19 +158,21 @@ export default function TemplatePartEdit( {
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && hasReplacements && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<ToolbarButton
-							onClick={ () =>
-								setIsTemplatePartSelectionOpen( true )
-							}
-						>
-							{ __( 'Replace' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+			{ isEntityAvailable &&
+				hasReplacements &&
+				( area === 'header' || area === 'footer' ) && (
+					<BlockControls>
+						<ToolbarGroup className="wp-block-template-part__block-control-group">
+							<ToolbarButton
+								onClick={ () =>
+									setIsTemplatePartSelectionOpen( true )
+								}
+							>
+								{ __( 'Replace' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
 					tagName={ TagName }

@@ -7,6 +7,7 @@ const {
 	isEditorVisible,
 	isElementVisible,
 	longPressMiddleOfElement,
+	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
@@ -56,11 +57,7 @@ class EditorPage {
 		if ( ! isAndroid() ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
 
-			const textBlock = await waitForVisible(
-				this.driver,
-				textBlockLocator
-			);
-			await textBlock.click();
+			await clickIfClickable( this.driver, textBlockLocator );
 		}
 
 		const blockLocator = isAndroid()
@@ -107,17 +104,15 @@ class EditorPage {
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
 				return lastElementFound;
 			}
-			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute(
-				this.accessibilityIdKey
-			);
+			const firstBlockAccessibilityId =
+				await firstBlockVisible.getAttribute( this.accessibilityIdKey );
 			const firstBlockRowMatch = /Row (\d+)\./.exec(
 				firstBlockAccessibilityId
 			);
 			const firstBlockRow =
 				firstBlockRowMatch && Number( firstBlockRowMatch[ 1 ] );
-			const lastBlockAccessibilityId = await lastBlockVisible.getAttribute(
-				this.accessibilityIdKey
-			);
+			const lastBlockAccessibilityId =
+				await lastBlockVisible.getAttribute( this.accessibilityIdKey );
 			const lastBlockRowMatch = /Row (\d+)\./.exec(
 				lastBlockAccessibilityId
 			);
@@ -150,9 +145,12 @@ class EditorPage {
 
 	async getLastBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
-		await waitForVisible( this.driver, firstBlockLocator );
-		const elements = await this.driver.elementsByXPath( firstBlockLocator );
-		return elements[ elements.length - 1 ];
+		return await waitForVisible(
+			this.driver,
+			firstBlockLocator,
+			25,
+			'lastElement'
+		);
 	}
 
 	async hasBlockAtPosition( position = 1, blockName = '' ) {
@@ -163,9 +161,8 @@ class EditorPage {
 	}
 
 	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
-		const emptyAreaBelowLastBlock = await this.driver.elementByAccessibilityId(
-			'Add paragraph block'
-		);
+		const emptyAreaBelowLastBlock =
+			await this.driver.elementByAccessibilityId( 'Add paragraph block' );
 		await emptyAreaBelowLastBlock.click();
 	}
 
@@ -227,9 +224,7 @@ class EditorPage {
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
-		const base64String = Buffer.from( html ).toString( 'base64' );
-
-		await this.driver.setClipboard( base64String, 'plaintext' );
+		await setClipboard( this.driver, html );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 
@@ -244,12 +239,10 @@ class EditorPage {
 			// Sometimes double tap is not enough for paste menu to appear, so we also long press.
 			await longPressMiddleOfElement( this.driver, htmlContentView );
 
-			const pasteButton = await waitForVisible(
+			await clickIfClickable(
 				this.driver,
 				'//XCUIElementTypeMenuItem[@name="Paste"]'
 			);
-
-			await pasteButton.click();
 		}
 
 		await toggleHtmlMode( this.driver, false );
@@ -263,10 +256,11 @@ class EditorPage {
 		if ( isAndroid() ) {
 			return await this.driver.hideDeviceKeyboard();
 		}
-		const hideKeyboardToolbarButton = await this.driver.elementByXPath(
+
+		await clickIfClickable(
+			this.driver,
 			'//XCUIElementTypeButton[@name="Hide keyboard"]'
 		);
-		await hideKeyboardToolbarButton.click();
 	}
 
 	async dismissAndroidClipboardSmartSuggestion() {
@@ -500,6 +494,15 @@ class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
+	async getParagraphBlockWrapperAtPosition( position = 1 ) {
+		// iOS needs a click to get the text element
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[contains(@content-desc, "Paragraph Block. Row ${ position }")]`
+			: `(//XCUIElementTypeButton[contains(@name, "Paragraph Block. Row ${ position }")])`;
+
+		return await waitForVisible( this.driver, blockLocator );
+	}
+
 	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -637,11 +640,7 @@ class EditorPage {
 			? `//android.widget.Button[@content-desc="WordPress Media Library"]`
 			: `//XCUIElementTypeButton[@name="WordPress Media Library"]`;
 
-		const mediaLibraryButton = await waitForVisible(
-			this.driver,
-			mediaLibraryLocator
-		);
-		await mediaLibraryButton.click();
+		await clickIfClickable( this.driver, mediaLibraryLocator );
 	}
 
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
@@ -661,11 +660,10 @@ class EditorPage {
 
 			await swipeDown( this.driver );
 		} else {
-			const cancelButton = await waitForVisible(
+			await clickIfClickable(
 				this.driver,
 				'//XCUIElementTypeButton[@name="Cancel"]'
 			);
-			await cancelButton.click();
 		}
 	}
 
@@ -695,13 +693,11 @@ class EditorPage {
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
-		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
-		const hideSearchHeadingToggle = await waitForVisible(
+		const hideSearchHeadingToggleLocator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
+		return await clickIfClickable(
 			this.driver,
-			locator
+			hideSearchHeadingToggleLocator
 		);
-
-		return await hideSearchHeadingToggle.click();
 	}
 
 	async changeSearchButtonPositionSetting( block, buttonPosition ) {
@@ -709,17 +705,11 @@ class EditorPage {
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
 
-		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
-		let optionMenuButton = await waitForVisible( this.driver, locator );
-		await optionMenuButton.click();
+		const optionMenuLocator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
+		await clickIfClickable( this.driver, optionMenuLocator );
 
 		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
-		optionMenuButton = await waitForVisible(
-			this.driver,
-			optionMenuButtonLocator
-		);
-
-		return await optionMenuButton.click();
+		return await clickIfClickable( this.driver, optionMenuButtonLocator );
 	}
 
 	async toggleSearchIconOnlySetting( block ) {
@@ -727,10 +717,8 @@ class EditorPage {
 
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
-		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
-		const useIconButton = await waitForVisible( this.driver, locator );
-
-		return await useIconButton.click();
+		const useIconButtonLocator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
+		return await clickIfClickable( this.driver, useIconButtonLocator );
 	}
 
 	async isSearchSettingsVisible() {
@@ -777,6 +765,29 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
+
+	// =========================
+	// Shortcode Block functions
+	// =========================
+
+	async getShortBlockTextInputAtPosition( blockName, position = 1 ) {
+		// iOS needs a click to get the text element
+		if ( ! isAndroid() ) {
+			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")])`;
+
+			const textBlock = await waitForVisible(
+				this.driver,
+				textBlockLocator
+			);
+			await textBlock.click();
+		}
+
+		const blockLocator = isAndroid()
+			? `//android.view.ViewGroup[@content-desc="Shortcode Block. Row ${ position }"]/android.view.ViewGroup/android.view.ViewGroup/android.widget.EditText`
+			: `//XCUIElementTypeButton[contains(@name, "Shortcode Block. Row ${ position }")]//XCUIElementTypeTextView`;
+
+		return await waitForVisible( this.driver, blockLocator );
+	}
 }
 
 const blockNames = {
@@ -796,6 +807,7 @@ const blockNames = {
 	separator: 'Separator',
 	spacer: 'Spacer',
 	verse: 'Verse',
+	shortcode: 'Shortcode',
 };
 
 module.exports = { initializeEditorPage, blockNames };

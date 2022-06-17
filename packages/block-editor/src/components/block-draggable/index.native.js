@@ -71,11 +71,8 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
 const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const [ draggedBlockIcon, setDraggedBlockIcon ] = useState();
 
-	const {
-		selectBlock,
-		startDraggingBlocks,
-		stopDraggingBlocks,
-	} = useDispatch( blockEditorStore );
+	const { selectBlock, startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch( blockEditorStore );
 
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
@@ -112,12 +109,8 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 		draggingScrollHandler( event );
 	};
 
-	const {
-		onBlockDragOver,
-		onBlockDragEnd,
-		onBlockDrop,
-		targetBlockIndex,
-	} = useBlockDropZone();
+	const { onBlockDragOver, onBlockDragEnd, onBlockDrop, targetBlockIndex } =
+		useBlockDropZone();
 
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
@@ -270,6 +263,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 				onDragStart={ startDragging }
 				onDragOver={ updateDragging }
 				onDragEnd={ stopDragging }
+				testID="block-draggable-wrapper"
 			>
 				{ children( { onScroll: scrollHandler } ) }
 			</Draggable>
@@ -302,6 +296,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
  * @param {string}      props.clientId           Client id of the block.
  * @param {string}      [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
  * @param {boolean}     [props.enabled]          Enables the draggable trigger.
+ * @param {string}      [props.testID]           Id used for querying the long-press gesture handler in tests.
  *
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */
@@ -310,12 +305,12 @@ const BlockDraggable = ( {
 	children,
 	draggingClientId,
 	enabled = true,
+	testID,
 } ) => {
 	const wasBeingDragged = useRef( false );
 	const [ isEditingText, setIsEditingText ] = useState( false );
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
-		false
-	);
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
 
 	const draggingAnimation = {
 		opacity: useSharedValue( 1 ),
@@ -446,6 +441,7 @@ const BlockDraggable = ( {
 				android: DEFAULT_LONG_PRESS_MIN_DURATION,
 			} ) }
 			onLongPress={ onLongPressDraggable }
+			testID={ testID }
 		>
 			<Animated.View style={ wrapperStyles }>
 				{ children( { isDraggable: true } ) }

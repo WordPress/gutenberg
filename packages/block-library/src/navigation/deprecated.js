@@ -33,11 +33,8 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const {
-		itemsJustification,
-		orientation,
-		...updatedAttributes
-	} = attributes;
+	const { itemsJustification, orientation, ...updatedAttributes } =
+		attributes;
 
 	if ( itemsJustification || orientation ) {
 		Object.assign( updatedAttributes, {

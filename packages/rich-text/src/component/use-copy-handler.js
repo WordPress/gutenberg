@@ -17,11 +17,8 @@ export function useCopyHandler( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onCopy( event ) {
-			const {
-				record,
-				multilineTag,
-				preserveWhiteSpace,
-			} = propsRef.current;
+			const { record, multilineTag, preserveWhiteSpace } =
+				propsRef.current;
 			if (
 				isCollapsed( record.current ) ||
 				! element.contains( element.ownerDocument.activeElement )

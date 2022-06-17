@@ -100,14 +100,10 @@ function FlatTermSelector( { slug } ) {
 		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const {
-				getEntityRecords,
-				getTaxonomy,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
@@ -177,7 +173,7 @@ function FlatTermSelector( { slug } ) {
 	// while core data makes REST API requests.
 	useEffect( () => {
 		if ( hasResolvedTerms ) {
-			const newValues = terms.map( ( term ) =>
+			const newValues = ( terms ?? [] ).map( ( term ) =>
 				unescapeString( term.name )
 			);
 
@@ -202,7 +198,10 @@ function FlatTermSelector( { slug } ) {
 	}
 
 	function onChange( termNames ) {
-		const availableTerms = [ ...terms, ...( searchResults ?? [] ) ];
+		const availableTerms = [
+			...( terms ?? [] ),
+			...( searchResults ?? [] ),
+		];
 		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
 		const newTermNames = uniqueTerms.filter(
 			( termName ) =>

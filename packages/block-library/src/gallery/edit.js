@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { concat, find } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -204,10 +204,11 @@ function GalleryEdit( props ) {
 				: undefined;
 		}
 		return {
-			...pickRelevantMediaFiles( imageAttributes, sizeSlug ),
+			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
+			caption: imageAttributes.caption,
 			sizeSlug,
 		};
 	}
@@ -299,11 +300,13 @@ function GalleryEdit( props ) {
 
 		replaceInnerBlocks(
 			clientId,
-			concat( existingImageBlocks, newBlocks ).sort(
-				( a, b ) =>
-					newOrderMap[ a.attributes.id ] -
-					newOrderMap[ b.attributes.id ]
-			)
+			existingImageBlocks
+				.concat( newBlocks )
+				.sort(
+					( a, b ) =>
+						newOrderMap[ a.attributes.id ] -
+						newOrderMap[ b.attributes.id ]
+				)
 		);
 	}
 

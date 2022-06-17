@@ -45,9 +45,8 @@ const TEMPLATE = [ [ 'core/list-item' ] ];
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { updateBlockAttributes, replaceInnerBlocks } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
@@ -74,9 +73,8 @@ function useMigrateOnLoad( attributes, clientId ) {
 function useOutdentList( clientId ) {
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
-			const { getBlockRootClientId, getBlock } = innerSelect(
-				blockEditorStore
-			);
+			const { getBlockRootClientId, getBlock } =
+				innerSelect( blockEditorStore );
 			const parentId = getBlockRootClientId( clientId );
 			return {
 				canOutdent:
@@ -87,9 +85,8 @@ function useOutdentList( clientId ) {
 		[ clientId ]
 	);
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlockRootClientId, getBlockAttributes, getBlock } = useSelect(
-		blockEditorStore
-	);
+	const { getBlockRootClientId, getBlockAttributes, getBlock } =
+		useSelect( blockEditorStore );
 
 	return [
 		canOutdent,
@@ -134,6 +131,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
+		templateInsertUpdatesSelection: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, reversed, start } = attributes;

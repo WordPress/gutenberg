@@ -47,9 +47,8 @@ class GalleryImage extends Component {
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onEdit = this.onEdit.bind( this );
-		this.onSelectImageFromLibrary = this.onSelectImageFromLibrary.bind(
-			this
-		);
+		this.onSelectImageFromLibrary =
+			this.onSelectImageFromLibrary.bind( this );
 		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
 		this.state = {
 			isEditing: false,
@@ -84,11 +83,8 @@ class GalleryImage extends Component {
 	}
 
 	componentDidUpdate() {
-		const {
-			image,
-			url,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = this.props;
+		const { image, url, __unstableMarkNextChangeAsNotPersistent } =
+			this.props;
 		if ( image && ! url ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			this.props.setAttributes( {
@@ -273,9 +269,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			blockEditorStore
-		);
+		const { __unstableMarkNextChangeAsNotPersistent } =
+			dispatch( blockEditorStore );
 		return {
 			__unstableMarkNextChangeAsNotPersistent,
 		};

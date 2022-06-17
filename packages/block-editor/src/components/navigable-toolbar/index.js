@@ -29,7 +29,12 @@ function hasFocusWithin( container ) {
 function focusFirstTabbableIn( container ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
 	if ( firstTabbable ) {
-		firstTabbable.focus();
+		firstTabbable.focus( {
+			// When focusing newly mounted toolbars,
+			// the position of the popover is often not right on the first render
+			// This prevents the layout shifts when focusing the dialogs.
+			preventScroll: true,
+		} );
 	}
 }
 
@@ -64,8 +69,7 @@ function useIsAccessibleToolbar( ref ) {
 				since: '5.6',
 				alternative:
 					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
-				link:
-					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
+				link: 'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
 			} );
 		}
 		setIsAccessibleToolbar( onlyToolbarItem );
@@ -119,7 +123,12 @@ function useToolbarFocus(
 				const items = getAllToolbarItemsIn( ref.current );
 				const index = initialIndex || 0;
 				if ( items[ index ] && hasFocusWithin( ref.current ) ) {
-					items[ index ].focus();
+					items[ index ].focus( {
+						// When focusing newly mounted toolbars,
+						// the position of the popover is often not right on the first render
+						// This prevents the layout shifts when focusing the dialogs.
+						preventScroll: true,
+					} );
 				}
 			} );
 		}

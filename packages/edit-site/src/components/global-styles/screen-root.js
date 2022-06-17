@@ -28,9 +28,10 @@ import StylesPreview from './preview';
 function ScreenRoot() {
 	const { variations } = useSelect( ( select ) => {
 		return {
-			variations: select(
-				coreStore
-			).__experimentalGetCurrentThemeGlobalStylesVariations(),
+			variations:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 

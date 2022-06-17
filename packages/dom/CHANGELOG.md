@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.11.0 (2022-06-15)
+
+## 3.10.0 (2022-06-01)
+
+## 3.9.0 (2022-05-18)
+
 ### Deprecation
 
 - Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).

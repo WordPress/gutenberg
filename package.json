@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "13.2.0-rc.2",
+	"version": "13.5.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -15,7 +15,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=10.0.0",
+		"node": ">=14.0.0",
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
@@ -86,7 +86,7 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@actions/core": "1.4.0",
+		"@actions/core": "1.8.0",
 		"@actions/github": "5.0.0",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -96,23 +96,25 @@
 		"@emotion/jest": "11.7.1",
 		"@emotion/native": "11.0.0",
 		"@octokit/rest": "16.26.0",
-		"@playwright/test": "1.20.0",
+		"@octokit/types": "6.34.0",
+		"@octokit/webhooks-types": "5.6.0",
+		"@playwright/test": "1.22.2",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.2",
-		"@storybook/addon-a11y": "6.4.9",
-		"@storybook/addon-actions": "6.4.19",
-		"@storybook/addon-controls": "6.4.9",
-		"@storybook/addon-docs": "6.4.9",
+		"@storybook/addon-a11y": "6.5.7",
+		"@storybook/addon-actions": "6.5.7",
+		"@storybook/addon-controls": "6.5.7",
+		"@storybook/addon-docs": "6.5.7",
 		"@storybook/addon-knobs": "6.2.9",
-		"@storybook/addon-storysource": "6.4.9",
-		"@storybook/addon-toolbars": "6.4.9",
-		"@storybook/addon-viewport": "6.4.9",
-		"@storybook/builder-webpack5": "6.4.9",
-		"@storybook/manager-webpack5": "6.4.9",
-		"@storybook/react": "6.4.9",
-		"@testing-library/jest-dom": "5.16.1",
-		"@testing-library/react": "11.2.2",
-		"@testing-library/react-native": "9.0.0",
-		"@testing-library/user-event": "14.1.1",
+		"@storybook/addon-storysource": "6.5.7",
+		"@storybook/addon-toolbars": "6.5.7",
+		"@storybook/addon-viewport": "6.5.7",
+		"@storybook/builder-webpack5": "6.5.7",
+		"@storybook/manager-webpack5": "6.5.7",
+		"@storybook/react": "6.5.7",
+		"@testing-library/jest-dom": "5.16.4",
+		"@testing-library/react": "12.1.5",
+		"@testing-library/react-native": "9.1.0",
+		"@testing-library/user-event": "14.2.0",
 		"@types/classnames": "2.3.1",
 		"@types/eslint": "7.28.0",
 		"@types/estree": "0.0.50",
@@ -122,10 +124,11 @@
 		"@types/npm-package-arg": "6.1.1",
 		"@types/prettier": "2.4.4",
 		"@types/qs": "6.9.7",
-		"@types/react-dates": "17.1.10",
+		"@types/react-dates": "21.8.3",
 		"@types/requestidlecallback": "0.3.4",
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
+		"@types/unzipper": "0.10.5",
 		"@types/uuid": "8.3.1",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
@@ -151,6 +154,7 @@
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
 		"@wordpress/readable-js-assets-webpack-plugin": "file:packages/readable-js-assets-webpack-plugin",
+		"@wordpress/report-flaky-tests": "file:packages/report-flaky-tests",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"ajv": "8.7.1",
@@ -191,7 +195,7 @@
 		"jest-watch-typeahead": "1.0.0",
 		"jsdom": "16.7.0",
 		"lerna": "3.22.1",
-		"lint-staged": "9.2.5",
+		"lint-staged": "10.0.1",
 		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
 		"metro-react-native-babel-preset": "0.66.2",
@@ -203,7 +207,7 @@
 		"patch-package": "6.2.2",
 		"postcss": "8.4.5",
 		"postcss-loader": "6.2.1",
-		"prettier": "npm:wp-prettier@2.2.1-beta-1",
+		"prettier": "npm:wp-prettier@2.6.2",
 		"progress": "2.0.3",
 		"react": "17.0.2",
 		"react-dom": "17.0.2",
@@ -248,7 +252,7 @@
 		"changelog": "node ./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
-		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
+		"check-local-changes": "node ./bin/check-local-changes.js",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "rimraf node_modules packages/*/node_modules",
@@ -302,19 +306,21 @@
 		"prepare": "husky install"
 	},
 	"lint-staged": {
+		"*.{js,json,ts,tsx,yml,yaml}": [
+			"wp-scripts format"
+		],
+		"*.{js,ts,tsx}": [
+			"wp-scripts lint-js"
+		],
+		"*.scss": [
+			"wp-scripts lint-style"
+		],
 		"package-lock.json": [
 			"npm run lint-lockfile",
 			"node ./bin/check-latest-npm.js"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
-		],
-		"*.scss": [
-			"wp-scripts lint-style"
-		],
-		"*.{js,ts,tsx,yml}": [
-			"wp-scripts format",
-			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"

@@ -101,9 +101,8 @@ export default function useBlockDropZone( {
 	);
 
 	const { getBlockListSettings } = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(

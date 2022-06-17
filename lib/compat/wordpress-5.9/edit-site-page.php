@@ -122,6 +122,10 @@ function gutenberg_edit_site_init( $hook ) {
 		'__unstableHomeTemplate'   => gutenberg_resolve_home_template(),
 	);
 
+	// Add additional back-compat patterns registered by `current_screen` et al.
+	$custom_settings['__experimentalAdditionalBlockPatterns']          = WP_Block_Patterns_Registry::get_instance()->get_all_registered( true );
+	$custom_settings['__experimentalAdditionalBlockPatternCategories'] = WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered( true );
+
 	/**
 	 * Make the WP Screen object aware that this is a block editor page.
 	 * Since custom blocks check whether the screen is_block_editor,
