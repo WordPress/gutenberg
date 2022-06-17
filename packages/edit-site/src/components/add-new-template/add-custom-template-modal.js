@@ -16,9 +16,8 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -76,31 +75,19 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 250 );
-	const { searchResults, searchHasResolved } = useSelect(
-		( select ) => {
-			const { getEntityRecords, hasFinishedResolution } =
-				select( coreStore );
-			const selectorArgs = [
-				entityForSuggestions.type,
-				entityForSuggestions.slug,
-				{
-					...BASE_QUERY,
-					search,
-					orderby: !! search ? 'relevance' : 'modified',
-					exclude: entityForSuggestions.postsToExclude,
-					per_page: !! search ? 20 : 10,
-				},
-			];
-			return {
-				searchResults: getEntityRecords( ...selectorArgs ),
-				searchHasResolved: hasFinishedResolution(
-					'getEntityRecords',
-					selectorArgs
-				),
-			};
-		},
-		[ search ]
-	);
+	const query = {
+		...BASE_QUERY,
+		search,
+		orderby: search ? 'relevance' : 'modified',
+		exclude: entityForSuggestions.postsToExclude,
+		per_page: search ? 20 : 10,
+	};
+	const { records: searchResults, hasResolved: searchHasResolved } =
+		useEntityRecords(
+			entityForSuggestions.type,
+			entityForSuggestions.slug,
+			query
+		);
 	useEffect( () => {
 		if ( search !== searchInputValue ) {
 			debouncedSearch( searchInputValue );
@@ -141,7 +128,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 					) ) }
 				</Composite>
 			) }
-			{ !! search && ! suggestions?.length && (
+			{ search && ! suggestions?.length && (
 				<p className="edit-site-custom-template-modal__no-results">
 					{ __( 'No results were found.' ) }
 				</p>
@@ -180,15 +167,11 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 					>
 						<FlexItem
 							isBlock
-							onClick={ () =>
-								onSelect( {
-									slug: entityForSuggestions.template.slug,
-									title: entityForSuggestions.template.title,
-									description:
-										entityForSuggestions.template
-											.description,
-								} )
-							}
+							onClick={ () => {
+								const { slug, title, description } =
+									entityForSuggestions.template;
+								onSelect( { slug, title, description } );
+							} }
 						>
 							<Heading level={ 5 }>{ __( 'General' ) }</Heading>
 							<Text as="span">

@@ -16,12 +16,13 @@ export const usePostTypes = () => {
 		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
 		[]
 	);
-	const excludedPostTypes = [ 'attachment', 'page' ];
-	const filteredPostTypes = postTypes?.filter(
-		( { viewable, slug } ) =>
-			viewable && ! excludedPostTypes.includes( slug )
-	);
-	return filteredPostTypes;
+	return useMemo( () => {
+		const excludedPostTypes = [ 'attachment', 'page' ];
+		return postTypes?.filter(
+			( { viewable, slug } ) =>
+				viewable && ! excludedPostTypes.includes( slug )
+		);
+	}, [ postTypes ] );
 };
 
 /**
@@ -61,11 +62,7 @@ export const usePostTypesEntitiesInfo = ( existingTemplates ) => {
 			}
 			return accumulator;
 		}, {} );
-		// It's important to use `length` as a dependency because `usePostTypes`
-		// returns a new array every time and will triger a rerender.
-		// We can't avoid that because `post types` endpoint doesn't allow filtering
-		// with `viewable` prop right now.
-	}, [ postTypes?.length, existingTemplates ] );
+	}, [ postTypes, existingTemplates ] );
 	const postsToExcludePerEntity = useSelect(
 		( select ) => {
 			if ( ! slugsToExcludePerEntity ) {
@@ -115,11 +112,7 @@ export const usePostTypesEntitiesInfo = ( existingTemplates ) => {
 				return accumulator;
 			}, {} );
 		},
-		// It's important to use `length` as a dependency because `usePostTypes`
-		// returns a new array every time and will triger a rerender.
-		// We can't avoid that because `post types` endpoint doesn't allow filtering
-		// with `viewable` prop right now.
-		[ postTypes?.length, postsToExcludePerEntity ]
+		[ postTypes, postsToExcludePerEntity ]
 	);
 	return entitiesInfo;
 };

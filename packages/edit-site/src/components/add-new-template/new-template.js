@@ -249,7 +249,7 @@ export default function NewTemplate( { postType } ) {
 										info={ description }
 										key={ slug }
 										onClick={ () =>
-											!! onClick
+											onClick
 												? onClick( template )
 												: createTemplate( template )
 										}
