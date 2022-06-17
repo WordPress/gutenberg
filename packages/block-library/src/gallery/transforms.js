@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every, toString } from 'lodash';
+import { filter, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -160,7 +160,7 @@ const transforms = {
 				return createBlock( 'core/gallery', {
 					images: validImages.map(
 						( { id, url, alt, caption } ) => ( {
-							id: toString( id ),
+							id: id.toString(),
 							url,
 							alt,
 							caption,
@@ -182,7 +182,7 @@ const transforms = {
 					shortcode: ( { named: { ids } } ) => {
 						if ( ! isGalleryV2Enabled() ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: toString( id ),
+								id: id.toString(),
 							} ) );
 						}
 					},
