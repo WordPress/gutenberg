@@ -52,9 +52,9 @@ document.addEventListener( 'click', function ( event ) {
 // Close on focus outside or escape key.
 document.addEventListener( 'keyup', function ( event ) {
 	const submenuBlocks = document.querySelectorAll(
-		'.wp-block-navigation-item.has-child'
+		'.wp-block-navigation-submenu'
 	);
-	submenuBlocks.forEach( function ( block ) {
+	submenuBlocks.forEach( ( block ) => {
 		if (
 			! block.contains( event.target ) ||
 			( block.contains( event.target ) && event.key === 'Escape' )
