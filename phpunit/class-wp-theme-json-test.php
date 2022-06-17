@@ -2016,6 +2016,52 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	function test_remove_invalid_element_pseudo_selectors() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'color'  => array(
+								'text'       => 'hotpink',
+								'background' => 'yellow',
+							),
+							':hover' => array(
+								'color' => array(
+									'text'       => 'red',
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			),
+			true
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'elements' => array(
+					'link' => array(
+						'color'  => array(
+							'text'       => 'hotpink',
+							'background' => 'yellow',
+						),
+						':hover' => array(
+							'color' => array(
+								'text' => 'red',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_get_custom_templates() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
