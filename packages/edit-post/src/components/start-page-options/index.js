@@ -3,7 +3,7 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -17,15 +17,32 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { store as editPostStore } from '../../store';
 
-function PatternSelection( { onChoosePattern } ) {
-	const { blockPatterns } = useSelect( ( select ) => {
-		const { __experimentalGetPatternsByBlockTypes } =
-			select( blockEditorStore );
+function useStartPatterns() {
+	const { blockPatterns, postType } = useSelect( ( select ) => {
+		const { __experimentalGetPatternsByBlockTypes } = select(
+			blockEditorStore
+		);
+		const { getCurrentPostType } = select( editorStore );
 		return {
-			blockPatterns:
-				__experimentalGetPatternsByBlockTypes( 'core/post-content' ),
+			blockPatterns: __experimentalGetPatternsByBlockTypes(
+				'core/post-content'
+			),
+			postType: getCurrentPostType(),
 		};
 	}, [] );
+	return useMemo( () => {
+		return blockPatterns.filter( ( pattern ) => {
+			return (
+				( postType === 'page' && ! pattern.start_content_post_types ) ||
+				( Array.isArray( pattern.start_content_post_types ) &&
+					pattern.start_content_post_types.includes( postType ) )
+			);
+		} );
+	}, [ postType, blockPatterns ] );
+}
+
+function PatternSelection( { onChoosePattern } ) {
+	const blockPatterns = useStartPatterns();
 	const shownBlockPatterns = useAsyncList( blockPatterns );
 	const { resetEditorBlocks } = useDispatch( editorStore );
 	return (
@@ -50,31 +67,30 @@ export default function StartPageOptions() {
 	const [ modalState, setModalState ] = useState(
 		START_PAGE_MODAL_STATES.INITIAL
 	);
+	const blockPatterns = useStartPatterns();
+	const hasStartPattern = blockPatterns.length > 0;
 	const shouldOpenModel = useSelect(
 		( select ) => {
-			if ( modalState !== START_PAGE_MODAL_STATES.INITIAL ) {
+			if (
+				! hasStartPattern ||
+				modalState !== START_PAGE_MODAL_STATES.INITIAL
+			) {
 				return false;
 			}
-			const { __experimentalGetPatternsByBlockTypes } =
-				select( blockEditorStore );
-			const {
-				getCurrentPostType,
-				getEditedPostContent,
-				isEditedPostSaveable,
-			} = select( editorStore );
-			const { isEditingTemplate, isFeatureActive } =
-				select( editPostStore );
+			const { getEditedPostContent, isEditedPostSaveable } = select(
+				editorStore
+			);
+			const { isEditingTemplate, isFeatureActive } = select(
+				editPostStore
+			);
 			return (
-				getCurrentPostType() === 'page' &&
 				! isEditedPostSaveable() &&
 				'' === getEditedPostContent() &&
 				! isEditingTemplate() &&
-				! isFeatureActive( 'welcomeGuide' ) &&
-				__experimentalGetPatternsByBlockTypes( 'core/post-content' )
-					.length >= 1
+				! isFeatureActive( 'welcomeGuide' )
 			);
 		},
-		[ modalState ]
+		[ modalState, hasStartPattern ]
 	);
 
 	useEffect( () => {
