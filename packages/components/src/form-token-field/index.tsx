@@ -30,6 +30,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import Token from './token';
 import TokenInput from './token-input';
+import { TokensAndInputWrapper } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 
@@ -71,6 +72,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
+		__next36pxDefaultSize = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -660,7 +662,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				{ renderTokensAndInput() }
+				<TokensAndInputWrapper
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					hasTokens={ !! value.length }
+				>
+					{ renderTokensAndInput() }
+				</TokensAndInputWrapper>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }
