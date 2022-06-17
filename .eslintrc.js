@@ -90,6 +90,7 @@ module.exports = {
 							'isArray',
 							'isFinite',
 							'isFunction',
+							'isNumber',
 							'isObjectLike',
 							'isUndefined',
 							'keys',

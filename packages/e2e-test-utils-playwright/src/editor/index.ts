@@ -12,6 +12,7 @@ import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
+import { publishPost } from './publish-post';
 import { selectBlocks } from './select-blocks';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
@@ -58,6 +59,7 @@ export class Editor {
 	insertBlock = insertBlock;
 	openDocumentSettingsSidebar = openDocumentSettingsSidebar;
 	openPreviewPage = openPreviewPage;
+	publishPost = publishPost;
 	saveSiteEditorEntities = saveSiteEditorEntities;
 	selectBlocks = selectBlocks;
 	showBlockToolbar = showBlockToolbar;

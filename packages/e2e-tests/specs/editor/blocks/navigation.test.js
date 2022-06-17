@@ -400,11 +400,8 @@ describe( 'Navigation', () => {
 			await setUpResponseMocking( [
 				{
 					match: ( request ) => {
-						return (
-							[ 'GET', 'OPTIONS' ].includes( request.method() ) &&
-							decodeURIComponent( request.url() ).includes(
-								`navigation/${ testNavId }`
-							)
+						return decodeURIComponent( request.url() ).includes(
+							`navigation/`
 						);
 					},
 					onRequestMatch: ( request ) => {
