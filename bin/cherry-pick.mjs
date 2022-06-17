@@ -28,18 +28,20 @@ const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
  * * Reports the results
  */
 async function main() {
+	if ( !GITHUB_CLI_AVAILABLE ) {
+		await reportGhUnavailable();
+	}
+
 	console.log( `You are on branch "${BRANCH}".` );
 	console.log( `This script will:` );
 	console.log( `• Cherry-pick the merged PRs labeled as "${LABEL}" to this branch` );
 	console.log( `• Push this branch` );
 	console.log( `• Comment on each PR` );
 	console.log( `• Remove the label from each PR` );
+	console.log( `The last two actions will be performed USING YOUR GITHUB ACCOUNT that` )
+	console.log( `you've linked to your GitHub CLI (gh command)` )
 	console.log( `` );
 	await promptDoYouWantToProceed();
-
-	if ( !GITHUB_CLI_AVAILABLE ) {
-		await reportGhUnavailable();
-	}
 
 	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
 	cli( 'git', ['pull', 'origin', BRANCH, '--rebase'], true );
