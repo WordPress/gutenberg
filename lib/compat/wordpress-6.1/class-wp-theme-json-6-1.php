@@ -538,19 +538,17 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$declarations = static::compute_style_properties( $node, $settings );
 
-
-
-		$psuedo_matches = array();
-		preg_match( '/[a-z]+(:[a-z]+)/', $selector, $psuedo_matches );
-		$pseudo_selector = $psuedo_matches[1] ?? null;
+		// Attempt to parse the pseudo selector (e.g. ":hover") from the $selector ("a:hover").
+		$pseudo_matches = array();
+		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
+		$pseudo_selector = $pseudo_matches[0] ?? null;
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
 		$current_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ];
 
-
-		// If the current selector is a psuedo selector that's defined in the allow list for the current
-		// element then compute the style properties.
+		// If the current selector is a pseudo selector that's defined in the allow list for the current
+		// element then compute the style properties for it.
 		$declarations_pseudo_selectors = array();
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
 			$declarations_pseudo_selectors = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
