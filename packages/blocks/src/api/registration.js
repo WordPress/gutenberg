@@ -178,7 +178,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
 			pickBy(
 				definitions[ blockName ],
-				( value ) => value !== null && typeof value !== 'undefined'
+				( value ) => value !== null && value !== undefined
 			),
 			( value, key ) => camelCase( key )
 		);
