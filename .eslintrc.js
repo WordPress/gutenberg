@@ -103,6 +103,7 @@ module.exports = {
 							'sum',
 							'sumBy',
 							'take',
+							'toString',
 							'trim',
 						],
 						message:
