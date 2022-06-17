@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ColorPicker`: Change the inputs to the new 36px height ([#41795](https://github.com/WordPress/gutenberg/pull/41795)).
+
 ### Internal
 
 -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
