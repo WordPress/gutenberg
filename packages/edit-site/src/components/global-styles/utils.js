@@ -77,7 +77,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
 	'elements.button.color.text': 'color',
-	'elements.button.color.background': 'background',
+	'elements.button.backgroundColor': 'background-color',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',

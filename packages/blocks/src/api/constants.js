@@ -118,7 +118,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'button', 'color', 'text' ],
 		support: [ 'color', 'button' ],
 	},
-	buttonBackground: {
+	buttonBackgroundColor: {
 		value: [ 'elements', 'button', 'color', 'background' ],
 		support: [ 'color', 'button' ],
 	},

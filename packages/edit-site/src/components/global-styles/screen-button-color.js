@@ -8,6 +8,7 @@ import { __experimentalColorGradientControl as ColorGradientControl } from '@wor
  * Internal dependencies
  */
 import ScreenHeader from './header';
+import Subtitle from './subtitle';
 import {
 	getSupportedGlobalStylesPanels,
 	useSetting,
@@ -37,11 +38,11 @@ function ScreenButtonColor( { name } ) {
 	);
 
 	const [ buttonBgColor, setButtonBgColor ] = useStyle(
-		'elements.button.backgound.color',
+		'elements.button.color.background',
 		name
 	);
 	const [ userButtonBgColor ] = useStyle(
-		'elements.button.backgound.color',
+		'elements.button.color.background',
 		name,
 		'user'
 	);
@@ -59,7 +60,7 @@ function ScreenButtonColor( { name } ) {
 				) }
 			/>
 
-			<h2>{ __( 'Set text color' ) }</h2>
+			<Subtitle>{ __( 'Set text color' ) }</Subtitle>
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
@@ -73,7 +74,7 @@ function ScreenButtonColor( { name } ) {
 				clearable={ buttonTextColor === userButtonTextColor }
 			/>
 
-			<h2>{ __( 'Set background color' ) }</h2>
+			<Subtitle>{ __( 'Set background color' ) }</Subtitle>
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
