@@ -11,4 +11,5 @@
 .edit-post-post-visibility__dialog .components-popover__content {
 	// sidebar width - padding - horizontal borders
 	width: $sidebar-width - $grid-unit-20 - $border-width * 2;
+	padding: $grid-unit-20;
 }

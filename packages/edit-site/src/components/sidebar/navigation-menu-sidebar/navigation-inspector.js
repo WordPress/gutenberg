@@ -35,9 +35,8 @@ export default function NavigationInspector() {
 			getBlock,
 		} = select( blockEditorStore );
 
-		const { getEntityRecords, hasFinishedResolution, isResolving } = select(
-			coreStore
-		);
+		const { getEntityRecords, hasFinishedResolution, isResolving } =
+			select( coreStore );
 
 		const navigationMenusQuery = [
 			'postType',
@@ -46,14 +45,12 @@ export default function NavigationInspector() {
 		];
 
 		// Get the active Navigation block (if present).
-		const selectedNavId = __experimentalGetActiveBlockIdByBlockNames(
-			'core/navigation'
-		);
+		const selectedNavId =
+			__experimentalGetActiveBlockIdByBlockNames( 'core/navigation' );
 
 		// Get all Navigation blocks currently within the editor canvas.
-		const navBlockIds = __experimentalGetGlobalBlocksByName(
-			'core/navigation'
-		);
+		const navBlockIds =
+			__experimentalGetGlobalBlocksByName( 'core/navigation' );
 		const idToRef = {};
 		navBlockIds.forEach( ( id ) => {
 			idToRef[ id ] = getBlock( id )?.attributes?.ref;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -38,6 +33,8 @@ import { useControlledState } from '../utils/hooks';
 const defaultInputProps = {
 	min: 0,
 };
+
+const noop = () => {};
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );

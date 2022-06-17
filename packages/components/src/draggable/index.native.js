@@ -142,7 +142,16 @@ const Draggable = ( {
 
 	const providerValue = useMemo( () => {
 		return { panGestureRef, isDragging, isPanActive, draggingId };
-	}, [] );
+	}, [
+		// `isDragging`, `isPanActive` and `draggingId` are created using the
+		// `useSharedValue` hook provided by the `react-native-reanimated`, which in
+		// theory should guarantee that the value of these variables remains stable.
+		// ESLint can't pick this up, and that's why they have to be specified as
+		// dependencies for this hook call.
+		isDragging,
+		isPanActive,
+		draggingId,
+	] );
 
 	return (
 		<GestureDetector gesture={ panGesture }>
@@ -180,9 +189,8 @@ const DraggableTrigger = ( {
 	onLongPressEnd,
 	testID,
 } ) => {
-	const { panGestureRef, isDragging, isPanActive, draggingId } = useContext(
-		Context
-	);
+	const { panGestureRef, isDragging, isPanActive, draggingId } =
+		useContext( Context );
 
 	const gestureHandler = useAnimatedGestureHandler( {
 		onActive: () => {

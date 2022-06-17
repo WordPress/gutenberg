@@ -26,9 +26,8 @@ export default function SiteExport() {
 			const contentDisposition = response.headers.get(
 				'content-disposition'
 			);
-			const contentDispositionMatches = contentDisposition.match(
-				/=(.+)\.zip/
-			);
+			const contentDispositionMatches =
+				contentDisposition.match( /=(.+)\.zip/ );
 			const fileName = contentDispositionMatches[ 1 ]
 				? contentDispositionMatches[ 1 ]
 				: 'edit-site-export';

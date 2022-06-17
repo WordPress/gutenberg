@@ -84,13 +84,11 @@ describe( 'Cover', () => {
 		const backgroundDim = await page.waitForSelector(
 			'.wp-block-cover .has-background-dim'
 		);
-		const [
-			backgroundDimColor,
-			backgroundDimOpacity,
-		] = await page.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		}, backgroundDim );
+		const [ backgroundDimColor, backgroundDimOpacity ] =
+			await page.evaluate( ( el ) => {
+				const computedStyle = window.getComputedStyle( el );
+				return [ computedStyle.backgroundColor, computedStyle.opacity ];
+			}, backgroundDim );
 
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );
@@ -210,13 +208,11 @@ describe( 'Cover', () => {
 		const backgroundDim = await page.waitForSelector(
 			'.wp-block-cover .has-background-dim'
 		);
-		const [
-			backgroundDimColor,
-			backgroundDimOpacity,
-		] = await page.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		}, backgroundDim );
+		const [ backgroundDimColor, backgroundDimOpacity ] =
+			await page.evaluate( ( el ) => {
+				const computedStyle = window.getComputedStyle( el );
+				return [ computedStyle.backgroundColor, computedStyle.opacity ];
+			}, backgroundDim );
 
 		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
 		expect( backgroundDimOpacity ).toBe( '0.5' );

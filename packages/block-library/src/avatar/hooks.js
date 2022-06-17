@@ -76,12 +76,15 @@ export function useUserAvatar( { userId, postId, postType } ) {
 		},
 		[ postType, postId, userId ]
 	);
-	const avatarUrls = authorDetails
-		? Object.values( authorDetails.avatar_urls )
-		: null;
-	const sizes = authorDetails
-		? Object.keys( authorDetails.avatar_urls )
-		: null;
+
+	const avatarUrls =
+		authorDetails && authorDetails?.avatar_urls
+			? Object.values( authorDetails.avatar_urls )
+			: null;
+	const sizes =
+		authorDetails && authorDetails?.avatar_urls
+			? Object.keys( authorDetails.avatar_urls )
+			: null;
 	const { minSize, maxSize } = getAvatarSizes( sizes );
 	const defaultAvatar = useDefaultAvatar();
 	return {

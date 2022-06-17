@@ -127,7 +127,7 @@ export class MediaUpload extends Component {
 			id: URL_MEDIA_SOURCE,
 			value: URL_MEDIA_SOURCE,
 			label: __( 'Insert from URL' ),
-			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE ],
+			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: globe,
 		};
 

@@ -386,14 +386,12 @@ export default compose(
 				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-			const { getBlockSelectionEnd, getBlock } = select(
-				blockEditorStore
-			);
+			const { getBlockSelectionEnd, getBlock } =
+				select( blockEditorStore );
 			const { createSuccessNotice } = dispatch( noticesStore );
 
-			const {
-				__experimentalConvertBlockToStatic: convertBlockToStatic,
-			} = dispatch( reusableBlocksStore );
+			const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+				dispatch( reusableBlocksStore );
 
 			return {
 				createSuccessNotice,

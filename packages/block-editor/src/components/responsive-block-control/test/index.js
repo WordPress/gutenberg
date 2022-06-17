@@ -97,8 +97,9 @@ describe( 'Basic rendering', () => {
 			)
 		);
 
-		const toggleState = container.querySelector( 'input[type="checkbox"]' )
-			.checked;
+		const toggleState = container.querySelector(
+			'input[type="checkbox"]'
+		).checked;
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'

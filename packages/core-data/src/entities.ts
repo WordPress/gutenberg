@@ -515,7 +515,7 @@ export const getMethodName = (
 	const nameSuffix =
 		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && 'plural' in entityConfig && entityConfig?.plural
+		usePlural && 'plural' in entityConfig! && entityConfig?.plural
 			? upperFirst( camelCase( entityConfig.plural ) )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
@@ -528,22 +528,21 @@ export const getMethodName = (
  *
  * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
-export const getOrLoadEntitiesConfig = ( kind ) => async ( {
-	select,
-	dispatch,
-} ) => {
-	let configs = select.getEntitiesConfig( kind );
-	if ( configs && configs.length !== 0 ) {
+export const getOrLoadEntitiesConfig =
+	( kind ) =>
+	async ( { select, dispatch } ) => {
+		let configs = select.getEntitiesConfig( kind );
+		if ( configs && configs.length !== 0 ) {
+			return configs;
+		}
+
+		const loader = find( additionalEntityConfigLoaders, { kind } );
+		if ( ! loader ) {
+			return [];
+		}
+
+		configs = await loader.loadEntities();
+		dispatch( addEntities( configs ) );
+
 		return configs;
-	}
-
-	const loader = find( additionalEntityConfigLoaders, { kind } );
-	if ( ! loader ) {
-		return [];
-	}
-
-	configs = await loader.loadEntities();
-	dispatch( addEntities( configs ) );
-
-	return configs;
-};
+	};

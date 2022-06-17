@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,9 @@ import { closeSmall } from '@wordpress/icons';
  */
 import Button from '../button';
 import { VisuallyHidden } from '../visually-hidden';
+import type { TokenProps } from './types';
+
+const noop = () => {};
 
 export default function Token( {
 	value,
@@ -30,7 +32,7 @@ export default function Token( {
 	messages,
 	termPosition,
 	termsCount,
-} ) {
+}: TokenProps ) {
 	const instanceId = useInstanceId( Token );
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,

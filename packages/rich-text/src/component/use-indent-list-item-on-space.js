@@ -18,11 +18,8 @@ export function useIndentListItemOnSpace( props ) {
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-			const {
-				multilineTag,
-				createRecord,
-				handleChange,
-			} = propsRef.current;
+			const { multilineTag, createRecord, handleChange } =
+				propsRef.current;
 
 			if (
 				// Only override when no modifiers are pressed.
