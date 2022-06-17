@@ -49,13 +49,16 @@ document.addEventListener( 'click', function ( event ) {
 		}
 	} );
 } );
-// Close on focus outside.
+// Close on focus outside or escape key.
 document.addEventListener( 'keyup', function ( event ) {
 	const submenuBlocks = document.querySelectorAll(
-		'.wp-block-navigation-submenu'
+		'.wp-block-navigation-item.has-child'
 	);
-	submenuBlocks.forEach( ( block ) => {
-		if ( ! block.contains( event.target ) ) {
+	submenuBlocks.forEach( function ( block ) {
+		if (
+			! block.contains( event.target ) ||
+			( block.contains( event.target ) && event.key === 'Escape' )
+		) {
 			closeSubmenus( block );
 		}
 	} );
