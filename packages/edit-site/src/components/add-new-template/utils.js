@@ -39,7 +39,7 @@ export const usePostTypes = () => {
  * to query afterwards for any remaing post, by excluding them.
  *
  * @param {string[]} existingTemplates The existing templates.
- * @return {Object<string,PostTypeEntitiesInfo>} An object with the postTypes as `keys` and PostTypeEntitiesInfo as values.
+ * @return {Record<string,PostTypeEntitiesInfo>} An object with the postTypes as `keys` and PostTypeEntitiesInfo as values.
  */
 export const usePostTypesEntitiesInfo = ( existingTemplates ) => {
 	const postTypes = usePostTypes();
