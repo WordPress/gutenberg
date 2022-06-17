@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { _x, _n } from '@wordpress/i18n';
+import { _x, _n, __, sprintf } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,13 +35,25 @@ export default function TimeToRead() {
 	const minutesToRead = Math.round(
 		wordCount( content, wordCountType ) / AVERAGE_READING_RATE
 	);
+	const minutesToReadString =
+		minutesToRead === 0
+			? createInterpolateElement( __( '<span>< 1</span> minute' ), {
+					span: <span className="table-of-contents__number" />,
+			  } )
+			: createInterpolateElement(
+					sprintf(
+						/* translators: %s is the number of minutes the post will take to read. */
+						_n(
+							'<span>%d</span> minute',
+							'<span>%d</span> minutes',
+							minutesToRead
+						),
+						minutesToRead
+					),
+					{
+						span: <span className="table-of-contents__number" />,
+					}
+			  );
 
-	return (
-		<span className="time-to-read">
-			<span className="table-of-contents__number">
-				{ minutesToRead }{ ' ' }
-			</span>
-			{ _n( 'minute', 'minutes', minutesToRead ) }
-		</span>
-	);
+	return <span className="time-to-read">{ minutesToReadString }</span>;
 }
