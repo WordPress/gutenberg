@@ -8,6 +8,15 @@ describe( 'generate', () => {
 		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
+	it( 'should generate empty style with empty keys', () => {
+		expect(
+			generate( {
+				spacing: undefined,
+				color: undefined,
+			} )
+		).toEqual( '' );
+	} );
+
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
 			generate( {
@@ -75,19 +84,16 @@ describe( 'generate', () => {
 	it( 'should parse preset values', () => {
 		expect(
 			generate( {
-				elements: {
-					link: {
-						color: {
-							text: 'var:preset|color|ham-sandwich',
-						},
-						spacing: { margin: '3px' },
-					},
+				color: {
+					text: 'var:preset|color|ham-sandwich',
 				},
+				spacing: { margin: '3px' },
 			} )
 		).toEqual(
 			'color: var(--wp--preset--color--ham-sandwich); margin: 3px;'
 		);
 	} );
+
 
 	it( 'should parse border rules', () => {
 		expect(
@@ -286,21 +292,17 @@ describe( 'getCSSRules', () => {
 		] );
 	} );
 
-	it( 'should handle styles for elements with CSS vars', () => {
+	it( 'should handle styles with CSS vars', () => {
 		expect(
 			getCSSRules(
 				{
-					elements: {
-						link: {
-							color: {
-								text: 'var:preset|color|bomba-picante',
-							},
-							spacing: { padding: '11px' },
-						},
+					color: {
+						text: 'var:preset|color|bomba-picante',
 					},
+					spacing: { padding: '11px' },
 				},
 				{
-					selector: '.some-selector',
+					selector: '.some-selector a',
 				}
 			)
 		).toEqual( [
