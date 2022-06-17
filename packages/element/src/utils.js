@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNumber, isString } from 'lodash';
+import { isString } from 'lodash';
 
 /**
  * Checks if the provided WP element is empty.
@@ -10,7 +10,7 @@ import { isNumber, isString } from 'lodash';
  * @return {boolean} True when an element is considered empty.
  */
 export const isEmptyElement = ( element ) => {
-	if ( isNumber( element ) ) {
+	if ( typeof element === 'number' ) {
 		return false;
 	}
 

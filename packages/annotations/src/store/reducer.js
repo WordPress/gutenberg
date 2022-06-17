@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNumber, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 /**
  * Filters an array based on the predicate, but keeps the reference the same if
@@ -28,8 +28,8 @@ function filterWithReference( collection, predicate ) {
  */
 function isValidAnnotationRange( annotation ) {
 	return (
-		isNumber( annotation.start ) &&
-		isNumber( annotation.end ) &&
+		typeof annotation.start === 'number' &&
+		typeof annotation.end === 'number' &&
 		annotation.start <= annotation.end
 	);
 }
