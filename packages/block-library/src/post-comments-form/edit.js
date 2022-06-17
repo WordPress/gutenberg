@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -75,7 +75,10 @@ export default function PostCommentsFormEdit( {
 					onClick={ () => setCommentStatus( 'open' ) }
 					variant="primary"
 				>
-					{ __( 'Enable comments' ) }
+					{ _x(
+						'Enable comments',
+						'action that affects the current post'
+					) }
 				</Button>,
 			];
 			showPlaceholder = false;
