@@ -132,7 +132,7 @@ async function fetchPRs() {
 }
 
 /**
- * A utility functino for GET requesting GitHub API.
+ * A utility function for GET requesting GitHub API.
  *
  * @param {string} path The API path to request.
  * @return {Promise<Object>} Parsed response JSON.
