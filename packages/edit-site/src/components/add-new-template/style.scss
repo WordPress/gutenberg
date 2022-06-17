@@ -77,7 +77,8 @@
 		height: auto;
 
 		mark {
-			@include mark-style();
+			font-weight: 700;
+			background: none;
 		}
 
 		&:hover {
