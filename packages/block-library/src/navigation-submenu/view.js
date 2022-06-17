@@ -3,6 +3,7 @@ const closeSubmenus = ( element ) => {
 		.querySelectorAll( '[aria-expanded="true"]' )
 		.forEach( ( toggle ) => {
 			toggle.setAttribute( 'aria-expanded', 'false' );
+			toggle.focus();
 		} );
 };
 
