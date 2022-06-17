@@ -15,8 +15,6 @@
  * @access private
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
-	const __EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
-
 	const ELEMENTS = array(
 		'link'   => 'a',
 		'h1'     => 'h1',
@@ -27,6 +25,24 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'h6'     => 'h6',
 		'button' => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
 	);
+
+	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
+		'button' => 'wp-element-button',
+	);
+
+	/**
+	 * Given an element name, returns a class name.
+	 *
+	 * @param string $element The name of the element.
+	 *
+	 * @return string The name of the class.
+	 *
+	 * @since 6.1.0
+	 */
+	public static function get_element_class_name( $element ) {
+		return array_key_exists( $element, static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
+	}
+
 	/**
 	 * Returns the metadata for each block.
 	 *

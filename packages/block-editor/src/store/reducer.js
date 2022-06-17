@@ -9,7 +9,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	keys,
 	isEqual,
 	isEmpty,
 	identity,
@@ -148,7 +147,7 @@ function getMutateSafeObject( original, working ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	return isEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -428,7 +427,7 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = keys(
+				const updatedBlockUids = Object.keys(
 					omitBy( newState.attributes, ( attributes, clientId ) => {
 						return (
 							newState.byClientId[ clientId ].name !==

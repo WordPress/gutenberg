@@ -92,6 +92,7 @@ module.exports = {
 							'isFunction',
 							'isObjectLike',
 							'isUndefined',
+							'keys',
 							'memoize',
 							'negate',
 							'noop',
