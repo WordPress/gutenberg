@@ -135,8 +135,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$output       = array();
 		$declarations = static::compute_style_properties( $input );
 
-
-
 		foreach ( $declarations as $declaration ) {
 			if ( static::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
 				$path = static::PROPERTIES_METADATA[ $declaration['name'] ];
@@ -150,6 +148,46 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 		return $output;
+	}
+
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
+		if ( null === $origins ) {
+			$origins = static::VALID_ORIGINS;
+		}
+
+		if ( is_string( $types ) ) {
+			// Dispatch error and map old arguments to new ones.
+			_deprecated_argument( __FUNCTION__, '5.9.0' );
+			if ( 'block_styles' === $types ) {
+				$types = array( 'styles', 'presets' );
+			} elseif ( 'css_variables' === $types ) {
+				$types = array( 'variables' );
+			} else {
+				$types = array( 'variables', 'styles', 'presets' );
+			}
+		}
+
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
+
+		$setting_nodes = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		$stylesheet = '';
+
+		if ( in_array( 'variables', $types, true ) ) {
+			$stylesheet .= $this->get_css_variables( $setting_nodes, $origins );
+		}
+
+		if ( in_array( 'styles', $types, true ) ) {
+			$stylesheet .= $this->get_block_classes( $style_nodes );
+
+		}
+
+		if ( in_array( 'presets', $types, true ) ) {
+			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
+		}
+
+		return $stylesheet;
 	}
 
 		/**
@@ -338,11 +376,22 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		);
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
+
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
 					'selector' => static::ELEMENTS[ $element ],
 				);
+
+				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
+					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+						// code...
+						$nodes[] = array(
+							'path'     => array( 'styles', 'elements', $element ),
+							'selector' => static::ELEMENTS[ $element ] . $pseudo_selector,
+						);
+					}
+				}
 			}
 		}
 
@@ -417,6 +466,63 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $nodes;
 	}
 
+		/**
+		 * Given a styles array, it extracts the style properties
+		 * and adds them to the $declarations array following the format:
+		 *
+		 *     array(
+		 *       'name'  => 'property_name',
+		 *       'value' => 'property_value,
+		 *     )
+		 *
+		 * @since 5.8.0
+		 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
+		 *
+		 * @param array $styles    Styles to process.
+		 * @param array $settings  Theme settings.
+		 * @param array $properties Properties metadata.
+		 * @return array Returns the modified $declarations.
+		 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = static::get_property_value( $styles, $value_path );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
+		}
+
+		return $declarations;
+	}
+
 	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
@@ -425,11 +531,23 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$node         = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+
+		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+
 		$selector     = $block_metadata['selector'];
 		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
 		$declarations = static::compute_style_properties( $node, $settings );
-		$block_rules  = '';
+
+		$declarations_pseudo_selectors = array();
+
+		$is_pseudo_selector = str_contains( $selector, ':' );
+
+		// TODO - loop all pseudo selectors on $node and also compute their style properties
+		if ( $is_pseudo_selector && isset( $node[':hover'] ) ) {
+			$declarations_pseudo_selectors = static::compute_style_properties( $node[':hover'], $settings );
+		}
+
+		$block_rules = '';
 
 		// 1. Separate the ones who use the general selector
 		// and the ones who use the duotone selector.
@@ -455,6 +573,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// 2. Generate the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
+
+
+		// 2.5. Generate the rules for any pseudo selectors.
+		if ( ! empty( $declarations_pseudo_selectors ) ) {
+			$block_rules .= static::to_ruleset( $selector, $declarations_pseudo_selectors );
+		}
 
 		// 3. Generate the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
