@@ -4,19 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	siteEditorStyleVariations: async (
-		{ admin, editor, page, pageUtils, requestUtils },
-		use
-	) => {
-		await use(
-			new SiteEditorStyleVariations( {
-				admin,
-				editor,
-				page,
-				pageUtils,
-				requestUtils,
-			} )
-		);
+	siteEditorStyleVariations: async ( { page }, use ) => {
+		await use( new SiteEditorStyleVariations( { page } ) );
 	},
 } );
 
@@ -43,13 +32,14 @@ test.describe( 'Global styles variations', () => {
 	test( 'should have three variations available with the first one being active', async ( {
 		admin,
 		page,
+		siteEditorStyleVariations,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await page.click( 'role=button[name="Styles"i]' );
-		await page.click( 'role=button[name="Browse styles"i]' );
+
+		await siteEditorStyleVariations.browseStyles();
 
 		// TODO: instead of locating these elements by class,
 		//  we could update the source code to group them in a <section> or other container,
@@ -83,7 +73,8 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await siteEditorStyleVariations.applyPinkVariation();
+		await siteEditorStyleVariations.browseStyles();
+		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
 			'role=button[name="Navigate to the previous view"i]'
 		);
@@ -91,13 +82,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors background styles"] [data-testid="background-color-indicator"]'
+				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors text styles"] [data-testid="text-color-indicator"]'
+				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
@@ -121,7 +112,8 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await siteEditorStyleVariations.applyYellowVariation();
+		await siteEditorStyleVariations.browseStyles();
+		await page.click( 'role=button[name="yellow"i]' );
 		await page.click(
 			'role=button[name="Navigate to the previous view"i]'
 		);
@@ -167,7 +159,8 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await siteEditorStyleVariations.applyPinkVariation();
+		await siteEditorStyleVariations.browseStyles();
+		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
 			'role=button[name="Navigate to the previous view"i]'
 		);
@@ -196,10 +189,10 @@ test.describe( 'Global styles variations', () => {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
-		await siteEditorStyleVariations.applyYellowVariation();
-		const frame = page.frameLocator(
-			'css=.edit-site-visual-editor iframe'
-		);
+		await siteEditorStyleVariations.browseStyles();
+		await page.click( 'role=button[name="yellow"i]' );
+
+		const frame = page.frame( 'editor-canvas' );
 		const paragraph = frame.locator( 'text="My awesome paragraph"' );
 		await expect( paragraph ).toHaveCSS( 'color', 'rgb(25, 25, 17)' );
 
@@ -212,25 +205,22 @@ test.describe( 'Global styles variations', () => {
 } );
 
 class SiteEditorStyleVariations {
-	constructor( { admin, editor, page, pageUtils, requestUtils } ) {
-		this.admin = admin;
-		this.editor = editor;
+	constructor( { page } ) {
 		this.page = page;
-		this.pageUtils = pageUtils;
-		this.requestUtils = requestUtils;
 	}
 
-	async applyVariation( label ) {
+	async disableWelcomeGuide() {
+		// Turn off the welcome guide.
+		await this.page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-site', 'welcomeGuideStyles', false );
+		} );
+	}
+
+	async browseStyles() {
+		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.page.click( 'role=button[name="Browse styles"i]' );
-		await this.page.click( `role=button[name="${ label }"i]` );
-	}
-
-	async applyPinkVariation() {
-		await this.applyVariation( 'pink' );
-	}
-
-	async applyYellowVariation() {
-		await this.applyVariation( 'yellow' );
 	}
 }
