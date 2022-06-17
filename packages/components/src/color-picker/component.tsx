@@ -20,7 +20,6 @@ import {
 	contextConnect,
 	WordPressComponentProps,
 } from '../ui/context';
-import { Spacer } from '../spacer';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -111,8 +110,7 @@ const ColorPicker = (
 						colorType={ copyFormat || colorType }
 					/>
 				</AuxiliaryColorArtefactHStackHeader>
-				<Spacer margin={ 4 } />
-				<ColorInputWrapper>
+				<ColorInputWrapper direction="column" gap={ 2 }>
 					<ColorInput
 						colorType={ colorType }
 						color={ safeColordColor }
