@@ -14,6 +14,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 /**
  * @typedef {import('./config').WPConfig} WPConfig
  * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
@@ -95,6 +96,22 @@ async function configureWordPress( environment, config, spinner ) {
 	await dockerCompose.run(
 		environment === 'development' ? 'cli' : 'tests-cli',
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
+		{
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		}
+	);
+
+	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
+	// the directory that the test suite is contained within.
+	// Make sure ABSPATH points to the WordPress install.
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		[
+			'sh',
+			'-c',
+			`sed "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /phpunit/wp-tests-config.php`,
+		],
 		{
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
@@ -246,10 +263,49 @@ async function copyCoreFiles( fromPath, toPath ) {
 	} );
 }
 
+/**
+ * Scans through a WordPress source to find the version of WordPress it contains.
+ *
+ * @param {WPSource} coreSource The WordPress source.
+ * @param {Object}   spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  debug      Indicates whether or not the CLI is in debug mode.
+ * @return {string} The version of WordPress the source is for.
+ */
+async function readWordPressVersion( coreSource, spinner, debug ) {
+	// No source means they're using the bleeding edge.
+	if ( coreSource === null ) {
+		return null;
+	}
+
+	const versionFilePath = path.join(
+		coreSource.path,
+		'wp-includes',
+		'version.php'
+	);
+	const versionFile = await fs.readFile( versionFilePath, {
+		encoding: 'utf-8',
+	} );
+	const versionMatch = versionFile.match(
+		/\$wp_version = '([A-Za-z\-0-9.]+)'/
+	);
+	if ( ! versionMatch ) {
+		throw new Error( `Failed to find version in ${ versionFilePath }` );
+	}
+
+	if ( debug ) {
+		spinner.info(
+			`Found WordPress ${ versionMatch[ 1 ] } in ${ versionFilePath }.`
+		);
+	}
+
+	return versionMatch[ 1 ];
+}
+
 module.exports = {
 	hasSameCoreSource,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
+	readWordPressVersion,
 };
