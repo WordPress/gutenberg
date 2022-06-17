@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState, useEffect } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
@@ -22,9 +22,9 @@ import {
 import { useSelect } from '@wordpress/data';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
-	const isDisabled = useContext( Disabled.Context );
 	const { showPreview } = attributes;
+	const [ isPreview, setIsPreview ] = useState( showPreview );
+	const isDisabled = useContext( Disabled.Context );
 
 	const styles = useSelect( ( select ) => {
 		// Default styles used to unset some of the styles
@@ -44,12 +44,6 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				select( blockEditorStore ).getSettings().styles
 			),
 		];
-	}, [] );
-
-	useEffect( () => {
-		if ( showPreview ) {
-			switchToPreview();
-		}
 	}, [] );
 
 	function switchToPreview() {
