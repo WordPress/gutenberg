@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, has, isEmpty, omit } from 'lodash';
+import { get, has, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -13,6 +13,7 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import {
@@ -100,34 +101,12 @@ export function getInlineStyles( styles = {} ) {
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	// Elements is already handled by compileElementsStyles()
-	const extraRules = getCSSRules( {
-		...styles,
-		elements: undefined,
-	} );
+	const extraRules = getCSSRules( styles );
 	extraRules.forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
-}
-
-function compileElementsStyles( selector, elements = {} ) {
-	if ( isEmpty( elements ) ) {
-		return null;
-	}
-
-	const elementStyles = generateStyles( elements, {
-		// The .editor-styles-wrapper selector is required on elements styles. As it is
-		// added to all other editor styles, not providing it causes reset and global
-		// styles to override element styles because of higher specificity.
-		selector: `.editor-styles-wrapper .${ selector }`,
-	} );
-
-	if ( ! elementStyles ) {
-		return null;
-	}
-
-	return elementStyles;
 }
 
 /**
@@ -326,25 +305,36 @@ const withElementsStyles = createHigherOrderComponent(
 			'link'
 		);
 
-		const rawElementsStyles = props.attributes.style?.elements;
-
 		// Remove values based on whether serialization has been skipped for a specific style.
+		const rawElementsStyles = props.attributes.style?.elements;
 		const filteredElementsStyles = {
-			elements: {
-				...rawElementsStyles,
-				link: {
-					...rawElementsStyles?.link,
-					color: ! skipLinkColorSerialization
-						? rawElementsStyles?.link?.color
-						: undefined,
-				},
+			...rawElementsStyles,
+			link: {
+				...rawElementsStyles?.link,
+				color: ! skipLinkColorSerialization
+					? rawElementsStyles?.link?.color
+					: undefined,
 			},
 		};
 
-		const styles = compileElementsStyles(
-			blockElementsContainerIdentifier,
-			filteredElementsStyles
+		const styles = Object.entries( filteredElementsStyles ).reduce(
+			( acc, [ elementName, elementStyles ] ) => {
+				const cssRule = generateStyles( elementStyles, {
+					// The .editor-styles-wrapper selector is required on elements styles. As it is
+					// added to all other editor styles, not providing it causes reset and global
+					// styles to override element styles because of higher specificity.
+					selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+				} );
+
+				if ( !! cssRule ) {
+					acc.push( cssRule );
+				}
+
+				return acc;
+			},
+			[]
 		);
+
 		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
@@ -354,7 +344,7 @@ const withElementsStyles = createHigherOrderComponent(
 					createPortal(
 						<style
 							dangerouslySetInnerHTML={ {
-								__html: styles,
+								__html: styles.join( ' ' ),
 							} }
 						/>,
 						element
