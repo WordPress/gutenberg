@@ -3,6 +3,7 @@ const closeSubmenus = ( element ) => {
 		.querySelectorAll( '[aria-expanded="true"]' )
 		.forEach( ( toggle ) => {
 			toggle.setAttribute( 'aria-expanded', 'false' );
+			// Always focus the trigger, this becomes especially useful in closing submenus with escape key to ensure focus doesn't get trapped.
 			toggle.focus();
 		} );
 };
