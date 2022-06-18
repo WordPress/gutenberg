@@ -121,13 +121,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors background styles"] [data-testid="background-color-indicator"]'
+				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
 		await expect(
 			page.locator(
-				'css=[aria-label="Colors text styles"] [data-testid="text-color-indicator"]'
+				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
@@ -144,9 +144,7 @@ test.describe( 'Global styles variations', () => {
 		).toHaveText( '(Custom)' );
 
 		await expect(
-			page.locator(
-				'css=.components-font-size-picker input[aria-label="Custom"]'
-			)
+			page.locator( 'role=spinbutton[name="Custom"i]' )
 		).toHaveValue( '15' );
 	} );
 
