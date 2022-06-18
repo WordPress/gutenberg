@@ -850,10 +850,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '3' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
-		const content = await page.$eval(
-			'.wp-block-list',
-			( el ) => el.innerHTML
-		);
+		const content = await page.locator( '.wp-block-list' ).innerHTML();
 		expect( content ).toBe( `<li>1</li><li>2</li><li>3</li>` );
 	} );
 
@@ -869,10 +866,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'c' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
-		const content = await page.$eval(
-			'.wp-block-list',
-			( el ) => el.innerHTML
-		);
+		const content = await page.locator( '.wp-block-list' ).innerHTML();
 		expect( content ).toBe( `<li>a</li><li>b</li><li>c</li>` );
 	} );
 } );
