@@ -1,7 +1,0 @@
-<!-- wp:list -->
-<ul><li>one</li></ul>
-<!-- /wp:list -->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->

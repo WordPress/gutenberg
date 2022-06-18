@@ -1,3 +1,0 @@
-<!-- wp:list {"ordered":true} -->
-<ol><li></li></ol>
-<!-- /wp:list -->
