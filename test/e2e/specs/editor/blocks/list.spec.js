@@ -13,7 +13,7 @@ test.describe( 'List', () => {
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* A list item' );
 
 		// Create a second list item.
@@ -32,7 +32,7 @@ test.describe( 'List', () => {
 		pageUtils,
 	} ) => {
 		// Create a list with the slash block shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.type( '* ' );
@@ -48,7 +48,7 @@ test.describe( 'List', () => {
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '1) A list item' );
 
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -63,7 +63,7 @@ test.describe( 'List', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '1. ' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
 
@@ -78,7 +78,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -93,7 +93,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* ' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
@@ -109,7 +109,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* ' );
 		await editor.showBlockToolbar();
 		await page.keyboard.press( 'Backspace' );
@@ -125,7 +125,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.evaluate( () => delete window.requestIdleCallback );
 		await page.keyboard.type( '* ' );
 		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
@@ -142,7 +142,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Escape' );
 
@@ -157,7 +157,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
@@ -169,7 +169,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
@@ -182,7 +182,7 @@ test.describe( 'List', () => {
 
 	test( 'can be created by typing "/list"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '/list' );
 		await expect(
 			page.locator( 'role=option[name="List"i][selected]' )
@@ -201,7 +201,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'List' );
 
@@ -216,7 +216,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -237,7 +237,7 @@ test.describe( 'List', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -255,7 +255,7 @@ test.describe( 'List', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( '...' );
@@ -431,7 +431,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '1. one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -655,7 +655,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 
 		await page.keyboard.type( '* 1' ); // Should be at level 0.
 		await page.keyboard.press( 'Enter' );
@@ -724,7 +724,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
@@ -745,7 +745,7 @@ test.describe( 'List', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -762,7 +762,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 
 		// Tests the shortcut with a non breaking space.
 		await page.keyboard.type( '* ' );
@@ -780,7 +780,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 
 		// Tests the shortcut with a non breaking space.
 		await page.keyboard.type( '* 1' );
@@ -823,7 +823,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -842,7 +842,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -858,7 +858,7 @@ test.describe( 'List', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( '1. a' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
