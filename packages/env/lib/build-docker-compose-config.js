@@ -26,7 +26,11 @@ const { dbEnv } = require( './config' );
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
-function getMounts( workDirectoryPath, config, wordpressDefault = 'wordpress' ) {
+function getMounts(
+	workDirectoryPath,
+	config,
+	wordpressDefault = 'wordpress'
+) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
 	const directoryMounts = Object.entries( config.mappings ).map(
 		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
@@ -46,9 +50,14 @@ function getMounts( workDirectoryPath, config, wordpressDefault = 'wordpress' ) 
 		config.coreSource ? config.coreSource.path : wordpressDefault
 	}:/var/www/html`;
 
-	const corePHPUnitMount = `${
-		path.join( workDirectoryPath, wordpressDefault === 'wordpress' ? 'WordPress-PHPUnit' : 'tests-WordPress-PHPUnit', 'tests', 'phpunit' )
-	}:/phpunit`;
+	const corePHPUnitMount = `${ path.join(
+		workDirectoryPath,
+		wordpressDefault === 'wordpress'
+			? 'WordPress-PHPUnit'
+			: 'tests-WordPress-PHPUnit',
+		'tests',
+		'phpunit'
+	) }:/phpunit`;
 
 	return [
 		...new Set( [
@@ -70,8 +79,15 @@ function getMounts( workDirectoryPath, config, wordpressDefault = 'wordpress' ) 
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
-	const developmentMounts = getMounts( config.workDirectoryPath, config.env.development );
-	const testsMounts = getMounts( config.workDirectoryPath, config.env.tests, 'tests-wordpress' );
+	const developmentMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.development
+	);
+	const testsMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.tests,
+		'tests-wordpress'
+	);
 
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains

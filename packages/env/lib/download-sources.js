@@ -25,7 +25,7 @@ const rimraf = util.promisify( require( 'rimraf' ) );
  * multiple environments, it will only be downloaded once.
  *
  * @param {WPConfig} config  The wp-env configuration object.
- * @param {Object} spinner   The spinner object to show progress.
+ * @param {Object}   spinner The spinner object to show progress.
  * @return {Promise} Returns a promise which resolves when the downloads finish.
  */
 module.exports = function downloadSources( config, spinner ) {

@@ -135,14 +135,18 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 		// Use the WordPress versions to download the PHPUnit suite.
 		const wpVersions = await Promise.all( [
-			readWordPressVersion( config.env.development.coreSource, spinner, debug ),
+			readWordPressVersion(
+				config.env.development.coreSource,
+				spinner,
+				debug
+			),
 			readWordPressVersion( config.env.tests.coreSource, spinner, debug ),
 		] );
-		await downloadWPPHPUnit( 
-			config, 
-			{ development: wpVersions[0], tests: wpVersions[1] }, 
-			spinner, 
-			debug 
+		await downloadWPPHPUnit(
+			config,
+			{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
+			spinner,
+			debug
 		);
 	}
 
