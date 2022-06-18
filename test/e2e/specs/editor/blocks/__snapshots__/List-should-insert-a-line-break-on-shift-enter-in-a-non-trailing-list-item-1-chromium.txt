@@ -1,3 +1,0 @@
-<!-- wp:list -->
-<ul><li>a</li><li>b<br></li><li>c</li></ul>
-<!-- /wp:list -->

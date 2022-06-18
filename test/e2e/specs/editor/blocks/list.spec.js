@@ -598,12 +598,20 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'c' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should insert a line break on shift+enter', async ( {
@@ -615,7 +623,11 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'a' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>a<br></li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should insert a line break on shift+enter in a non trailing list item', async ( {
@@ -632,7 +644,11 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>a</li><li>b<br></li><li>c</li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should create and remove indented list with keyboard only', async ( {
@@ -647,34 +663,58 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' i' ); // Should be at level 2.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>a<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>a</li><li></li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li><li></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1</li><li></li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list -->`
+		);
 
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should remove list.
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe( '' );
 
 		// That's 9 key presses to create the list, and 9 key presses to remove
 		// the list. ;)
@@ -693,7 +733,11 @@ test.describe( 'List', () => {
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should not indent list on space with modifier', async ( {
@@ -707,7 +751,11 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Space' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1</li><li> </li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should only convert to list when shortcut ends with space', async ( {
@@ -719,7 +767,13 @@ test.describe( 'List', () => {
 		// Tests the shortcut with a non breaking space.
 		await page.keyboard.type( '* ' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		/* eslint-disable no-irregular-whitespace */
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->`
+		);
+		/* eslint-enable no-irregular-whitespace */
 	} );
 
 	test( 'should preserve indentation after merging backward and forward', async ( {
@@ -743,7 +797,11 @@ test.describe( 'List', () => {
 		// Merge the pragraph back. No list items should be joined.
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li><li></li></ul>
+<!-- /wp:list -->`
+		);
 
 		// Again create a new paragraph.
 		await page.keyboard.press( 'Enter' );
@@ -754,7 +812,11 @@ test.describe( 'List', () => {
 		// Merge forward. No list items should be joined.
 		await page.keyboard.press( 'Delete' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>1<ul><li>2</li><li>3</li></ul></li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'first empty list item is graciously removed', async ( {
@@ -769,7 +831,11 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list -->
+<ul><li>2</li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should not change the contents when you change the list type to Ordered', async ( {
@@ -788,7 +854,7 @@ test.describe( 'List', () => {
 			'.wp-block-list',
 			( el ) => el.innerHTML
 		);
-		expect( content ).toMatchSnapshot();
+		expect( content ).toBe( `<li>1</li><li>2</li><li>3</li>` );
 	} );
 
 	test( 'should not change the contents when you change the list type to Unordered', async ( {
@@ -807,6 +873,6 @@ test.describe( 'List', () => {
 			'.wp-block-list',
 			( el ) => el.innerHTML
 		);
-		expect( content ).toMatchSnapshot();
+		expect( content ).toBe( `<li>a</li><li>b</li><li>c</li>` );
 	} );
 } );
