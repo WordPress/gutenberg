@@ -27,8 +27,8 @@ test.describe( 'Spacer', () => {
 		await page.keyboard.press( 'Enter' );
 
 		const resizableHandle = page.locator(
-			// We need to use class name selectors because there are no other accessible attributes that we can query for the resize handles
-			'role=document[name="Block: Spacer"i] >> css=.block-library-spacer__resize-container .components-resizable-box__handle'
+			// Use class name selector until we have `data-testid` for the resize handles.
+			'role=document[name="Block: Spacer"i] >> css=.components-resizable-box__handle'
 		);
 		const elementPoint = await resizableHandle.boundingBox();
 		await page.mouse.move( elementPoint.x, elementPoint.y );
