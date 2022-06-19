@@ -323,7 +323,18 @@ if ( ! function_exists( '_get_block_templates_files' ) ) {
 				);
 
 				if ( 'wp_template_part' === $template_type ) {
-					$template_files[] = _add_block_template_part_area_info( $new_template_item );
+					$default_headers = array(
+						'title' => 'Title',
+						'area'  => 'Area',
+					);
+					$metadata = get_file_data( $template_file, $default_headers );
+					if ( ! empty( $metadata['title'] ) ) {
+						$new_template_item[ 'title' ] = translate_with_gettext_context( $metadata['title'], 'Template part title', $theme_slug );
+					}
+					if ( ! empty( $metadta['area'] ) ) {
+						$new_template_item['area'] = $metadata['area'];
+					}
+					$template_files[] = $new_template_item;
 				}
 
 				if ( 'wp_template' === $template_type ) {
