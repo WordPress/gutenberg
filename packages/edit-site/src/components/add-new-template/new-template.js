@@ -147,12 +147,7 @@ export default function NewTemplate( { postType } ) {
 
 	const extraTemplates = ( postTypes || [] ).reduce(
 		( accumulator, _postType ) => {
-			const {
-				slug,
-				labels: { singular_name: singularName },
-				icon,
-				name,
-			} = _postType;
+			const { slug, labels, icon } = _postType;
 			const hasGeneralTemplate = existingTemplateSlugs?.includes(
 				`single-${ slug }`
 			);
@@ -161,13 +156,13 @@ export default function NewTemplate( { postType } ) {
 				slug: `single-${ slug }`,
 				title: sprintf(
 					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Single %s' ),
-					singularName
+					__( 'Single item: %s' ),
+					labels.singular_name
 				),
 				description: sprintf(
 					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Displays a single %s.' ),
-					singularName
+					__( 'Displays a single item: %s.' ),
+					labels.singular_name
 				),
 				// `icon` is the `menu_icon` property of a post type. We
 				// only handle `dashicons` for now, even if the `menu_icon`
@@ -183,7 +178,7 @@ export default function NewTemplate( { postType } ) {
 					setEntityForSuggestions( {
 						type: 'postType',
 						slug,
-						labels: { singular: singularName, plural: name },
+						labels,
 						hasGeneralTemplate,
 						template,
 						postsToExclude:

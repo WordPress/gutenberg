@@ -47,7 +47,7 @@ function SuggestionListItem( {
 			{ ...composite }
 			className={ baseCssClass }
 			onClick={ () => {
-				const title = `${ entityForSuggestions.labels.singular }: ${ suggestion.name }`;
+				const title = `${ entityForSuggestions.labels.singular_name }: ${ suggestion.name }`;
 				onSelect( {
 					title,
 					description: `Template for ${ title }`,
@@ -146,8 +146,8 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 		<Modal
 			title={ sprintf(
 				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Add %s template' ),
-				entityForSuggestions.labels.singular
+				__( 'Add template: %s' ),
+				entityForSuggestions.labels.singular_name
 			) }
 			className={ baseCssClass }
 			closeLabel={ __( 'Close' ) }
@@ -157,7 +157,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 				<>
 					<p>
 						{ __(
-							'What type of template would you like to create?'
+							'Select whether to create a single template for all items or a specific one.'
 						) }
 					</p>
 					<Flex
@@ -173,14 +173,10 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 								onSelect( { slug, title, description } );
 							} }
 						>
-							<Heading level={ 5 }>{ __( 'General' ) }</Heading>
-							<Text as="span">
-								{ sprintf(
-									// translators: %s: Name of the post type in plural e.g: "Posts".
-									__( 'Design a template for all %s.' ),
-									entityForSuggestions.labels.plural
-								) }
-							</Text>
+							<Heading level={ 5 }>
+								{ entityForSuggestions.labels.all_items }
+							</Heading>
+							<Text as="span">{ __( 'For all items' ) }</Text>
 						</FlexItem>
 						<FlexItem
 							isBlock
@@ -188,15 +184,11 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 								setShowSearchEntities( true );
 							} }
 						>
-							<Heading level={ 5 }>{ __( 'Specific' ) }</Heading>
+							<Heading level={ 5 }>
+								{ entityForSuggestions.labels.singular_name }
+							</Heading>
 							<Text as="span">
-								{ sprintf(
-									// translators: %s: Name of the post type e.g: "Post".
-									__(
-										'Design a template for a specific %s.'
-									),
-									entityForSuggestions.labels.singular
-								) }
+								{ __( 'For a specific item' ) }
 							</Text>
 						</FlexItem>
 					</Flex>
@@ -205,12 +197,8 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 			{ showSearchEntities && (
 				<>
 					<p>
-						{ sprintf(
-							// translators: %s: Name of the post type e.g: "Post".
-							__(
-								'Select the %s you would like to design a template for.'
-							),
-							entityForSuggestions.labels.singular
+						{ __(
+							'This template will be used only for the specific item chosen.'
 						) }
 					</p>
 					<SuggestionList
