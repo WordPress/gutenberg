@@ -23,6 +23,6 @@ export async function saveSiteEditorEntities( this: Editor ) {
 	// not have that classname.
 	// TODO - find a way to improve this selector to use role/name.
 	await this.page.waitForSelector(
-		'.edit-site-save-button__button:not(.is-busy)'
+		'css=.edit-site-save-button__button:not(.is-busy)'
 	);
 }
