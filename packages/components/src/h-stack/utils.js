@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { isNil } from 'lodash';
+import { isValueDefined } from '../utils/values';
 
 /** @type {import('./types').Alignments} */
 const ALIGNMENTS = {
@@ -41,7 +41,7 @@ const V_ALIGNMENTS = {
  */
 /* eslint-enable jsdoc/valid-types */
 export function getAlignmentProps( alignment, direction = 'row' ) {
-	if ( isNil( alignment ) ) {
+	if ( ! isValueDefined( alignment ) ) {
 		return {};
 	}
 	const isVertical = direction === 'column';
