@@ -16,7 +16,7 @@ import { userAutocompleter } from '../components';
 function setDefaultCompleters( completers = [] ) {
 	// Provide copies so filters may directly modify them.
 	completers.push( clone( userAutocompleter ) );
-
+	completers.push( clone( { ...userAutocompleter, triggerPrefix: '+' } ) );
 	return completers;
 }
 
