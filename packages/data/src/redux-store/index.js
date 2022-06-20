@@ -136,8 +136,9 @@ export default function createReduxStore( key, options ) {
 				{
 					...mapValues(
 						metadataSelectors,
-						( selector ) => ( state, ...args ) =>
-							selector( state.metadata, ...args )
+						( selector ) =>
+							( state, ...args ) =>
+								selector( state.metadata, ...args )
 					),
 					...mapValues( options.selectors, ( selector ) => {
 						if ( selector.isRegistrySelector ) {
@@ -308,9 +309,11 @@ function mapSelectors( selectors, store ) {
  * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => {
-		return Promise.resolve( store.dispatch( action( ...args ) ) );
-	};
+	const createBoundAction =
+		( action ) =>
+		( ...args ) => {
+			return Promise.resolve( store.dispatch( action( ...args ) ) );
+		};
 
 	return mapValues( actions, createBoundAction );
 }

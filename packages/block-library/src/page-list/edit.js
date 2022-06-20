@@ -42,10 +42,8 @@ export default function PageListEdit( { context, clientId } ) {
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
-			[ getColorClassName(
-				'color',
-				context.textColor
-			) ]: !! context.textColor,
+			[ getColorClassName( 'color', context.textColor ) ]:
+				!! context.textColor,
 			'has-background': !! context.backgroundColor,
 			[ getColorClassName(
 				'background-color',
@@ -193,7 +191,8 @@ const PageItems = memo( function PageItems( {
 						className={ classnames(
 							'wp-block-pages-list__item__link',
 							{
-								'wp-block-navigation-item__content': isNavigationChild,
+								'wp-block-navigation-item__content':
+									isNavigationChild,
 							}
 						) }
 						href={ page.link }
@@ -214,7 +213,8 @@ const PageItems = memo( function PageItems( {
 							) }
 						<ul
 							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container': isNavigationChild,
+								'wp-block-navigation__submenu-container':
+									isNavigationChild,
 							} ) }
 						>
 							<PageItems

@@ -13,9 +13,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import useOutdentListItem from './use-outdent-list-item';
 
 export default function useBackspace( props ) {
-	const { getSelectionStart, getSelectionEnd } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectionStart, getSelectionEnd } =
+		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const [ canOutdent, outdentListItem ] = useOutdentListItem(

@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+
+export const noop = () => {};
 
 function FormToggle( {
 	className,

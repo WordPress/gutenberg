@@ -3,7 +3,6 @@
  */
 import moment from 'moment';
 import type { Moment } from 'moment';
-import { noop } from 'lodash';
 // Needed to initialise the default datepicker styles.
 // See: https://github.com/airbnb/react-dates#initialize
 import 'react-dates/initialize';
@@ -27,6 +26,7 @@ import { Day, NavPrevButton, NavNextButton } from './styles';
 
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+const noop = () => {};
 
 function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
 	const ref = useRef< HTMLDivElement >( null );
@@ -103,6 +103,7 @@ export function DatePicker( {
 	events,
 	isInvalidDate,
 	onMonthPreviewed,
+	startOfWeek = 0,
 }: DatePickerProps ) {
 	const nodeRef = useRef< HTMLDivElement >( null );
 
@@ -197,6 +198,7 @@ export function DatePicker( {
 				isOutsideRange={ ( date ) => {
 					return !! isInvalidDate && isInvalidDate( date.toDate() );
 				} }
+				firstDayOfWeek={ startOfWeek }
 				onPrevMonthClick={ onMonthPreviewedHandler }
 				onNextMonthClick={ onMonthPreviewedHandler }
 				renderDayContents={ ( day ) => (

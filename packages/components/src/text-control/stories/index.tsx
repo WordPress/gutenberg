@@ -51,14 +51,12 @@ const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
 	);
 };
 
-export const Default: ComponentStory<
-	typeof TextControl
-> = DefaultTemplate.bind( {} );
+export const Default: ComponentStory< typeof TextControl > =
+	DefaultTemplate.bind( {} );
 Default.args = {};
 
-export const WithLabelAndHelpText: ComponentStory<
-	typeof TextControl
-> = DefaultTemplate.bind( {} );
+export const WithLabelAndHelpText: ComponentStory< typeof TextControl > =
+	DefaultTemplate.bind( {} );
 WithLabelAndHelpText.args = {
 	...Default.args,
 	label: 'Label Text',

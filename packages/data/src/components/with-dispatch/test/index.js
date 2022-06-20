@@ -57,8 +57,8 @@ describe( 'withDispatch', () => {
 		} );
 		const testInstance = testRenderer.root;
 
-		const incrementBeforeSetProps = testInstance.findByType( 'button' )
-			.props.onClick;
+		const incrementBeforeSetProps =
+			testInstance.findByType( 'button' ).props.onClick;
 
 		// Verify that dispatch respects props at the time of being invoked by
 		// changing props after the initial mount.
@@ -194,9 +194,8 @@ describe( 'withDispatch', () => {
 				);
 			} );
 
-			const counterUpdateHandler = testRenderer.root.findByType(
-				'button'
-			).props.onClick;
+			const counterUpdateHandler =
+				testRenderer.root.findByType( 'button' ).props.onClick;
 
 			act( () => {
 				counterUpdateHandler();

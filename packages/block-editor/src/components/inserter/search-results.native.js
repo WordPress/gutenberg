@@ -22,9 +22,8 @@ function InserterSearchResults( {
 } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
-			const allItems = select( blockEditorStore ).getInserterItems(
-				rootClientId
-			);
+			const allItems =
+				select( blockEditorStore ).getInserterItems( rootClientId );
 
 			const availableItems = filterInserterItems( allItems, {
 				allowReusable: true,
@@ -36,9 +35,8 @@ function InserterSearchResults( {
 		[ rootClientId, filterValue ]
 	);
 
-	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
-		blockTypes
-	);
+	const { items, trackBlockTypeSelected } =
+		useBlockTypeImpressions( blockTypes );
 
 	if ( ! items || items?.length === 0 ) {
 		return <InserterNoResults />;

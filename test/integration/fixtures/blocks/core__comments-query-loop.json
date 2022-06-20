@@ -80,8 +80,7 @@
 										"isValid": true,
 										"attributes": {
 											"isLink": true,
-											"linkTarget": "_self",
-											"fontSize": "small"
+											"linkTarget": "_self"
 										},
 										"innerBlocks": []
 									},
@@ -107,8 +106,7 @@
 												"name": "core/comment-date",
 												"isValid": true,
 												"attributes": {
-													"isLink": true,
-													"fontSize": "small"
+													"isLink": true
 												},
 												"innerBlocks": []
 											},
@@ -116,8 +114,7 @@
 												"name": "core/comment-edit-link",
 												"isValid": true,
 												"attributes": {
-													"linkTarget": "_self",
-													"fontSize": "small"
+													"linkTarget": "_self"
 												},
 												"innerBlocks": []
 											}
@@ -132,9 +129,7 @@
 									{
 										"name": "core/comment-reply-link",
 										"isValid": true,
-										"attributes": {
-											"fontSize": "small"
-										},
+										"attributes": {},
 										"innerBlocks": []
 									}
 								]

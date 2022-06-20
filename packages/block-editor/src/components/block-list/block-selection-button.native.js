@@ -81,9 +81,8 @@ const BlockSelectionButton = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName, getSettings } = select(
-			blockEditorStore
-		);
+		const { getBlockRootClientId, getBlockName, getSettings } =
+			select( blockEditorStore );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		if ( ! rootClientId ) {

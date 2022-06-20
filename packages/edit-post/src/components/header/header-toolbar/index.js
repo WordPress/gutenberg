@@ -31,9 +31,8 @@ const preventDefault = ( event ) => {
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
-		editPostStore
-	);
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editPostStore );
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -42,15 +41,11 @@ function HeaderToolbar() {
 		isListViewOpen,
 		listViewShortcut,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-		} = select( blockEditorStore );
+		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+			select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
-		const { getEditorMode, isFeatureActive, isListViewOpened } = select(
-			editPostStore
-		);
+		const { getEditorMode, isFeatureActive, isListViewOpened } =
+			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {

@@ -43,9 +43,19 @@ function render_block_core_cover( $attributes, $content ) {
 			update_post_thumbnail_cache();
 		}
 		$current_featured_image = get_the_post_thumbnail_url();
-		$content                = preg_replace(
+
+		$styles = 'background-image:url(' . esc_url( $current_featured_image ) . '); ';
+
+		if ( isset( $attributes['minHeight'] ) ) {
+			$height_unit = empty( $attributes['minHeightUnit'] ) ? 'px' : $attributes['minHeightUnit'];
+			$height      = " min-height:{$attributes['minHeight']}{$height_unit}";
+
+			$styles .= $height;
+		}
+
+		$content = preg_replace(
 			'/class=\".*?\"/',
-			'${0} style="background-image:url(' . esc_url( $current_featured_image ) . ')"',
+			'${0} style="' . $styles . '"',
 			$content,
 			1
 		);

@@ -681,17 +681,15 @@ describe.skip( 'Navigation editor', () => {
 
 			// Get the title/label of the last Nav item inside the Nav block.
 			const lastItemAttributes = await page.evaluate( () => {
-				const { getBlockOrder, getBlocks } = wp.data.select(
-					'core/block-editor'
-				);
+				const { getBlockOrder, getBlocks } =
+					wp.data.select( 'core/block-editor' );
 
 				const lockedNavigationBlock = getBlockOrder()[ 0 ];
 
 				const navItemBlocks = getBlocks( lockedNavigationBlock );
 
-				const { attributes } = navItemBlocks[
-					navItemBlocks.length - 1
-				];
+				const { attributes } =
+					navItemBlocks[ navItemBlocks.length - 1 ];
 
 				return attributes;
 			} );
