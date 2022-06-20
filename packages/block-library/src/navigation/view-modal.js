@@ -28,6 +28,25 @@ function navigationToggleModal( modal ) {
 }
 
 window.addEventListener( 'load', () => {
+	//If the navigation block with modal is duplicated on the page by another
+	//underlying block eg. Gutenslider, we need to ensure the duplicates all have
+	//and are referenced by unique ids.
+
+	let navBlockIndex = 0;
+
+	Array.prototype.forEach.call(
+		document.querySelectorAll(
+			'.wp-block-navigation__responsive-container'
+		),
+		function ( navBlock ) {
+			navBlock.id += '-' + navBlockIndex;
+			navBlock.previousElementSibling.setAttribute(
+				'data-micromodal-trigger',
+				navBlock.id
+			);
+			navBlockIndex++;
+		}
+	);
 	MicroModal.init( {
 		onShow: navigationToggleModal,
 		onClose: navigationToggleModal,
