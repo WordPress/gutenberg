@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -45,8 +45,10 @@ export default function BlockEditVisuallyButton( { clientIds, ...props } ) {
 	}
 
 	return (
-		<ToolbarButton onClick={ onClick } { ...props }>
-			{ __( 'Edit visually' ) }
-		</ToolbarButton>
+		<ToolbarGroup>
+			<ToolbarButton onClick={ onClick } { ...props }>
+				{ __( 'Edit visually' ) }
+			</ToolbarButton>
+		</ToolbarGroup>
 	);
 }
