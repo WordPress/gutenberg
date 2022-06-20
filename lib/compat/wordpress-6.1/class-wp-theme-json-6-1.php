@@ -91,7 +91,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						break;
 					}
 
-					$element_selector[] = $selector . ' ' . $el_selector;
+					$el_selectors = explode( ',', $el_selector );
+					foreach( $el_selectors as $el_selector_item ) {
+						$element_selector[] = $selector . ' ' . $el_selector_item;
+					}
 				}
 				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
