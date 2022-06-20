@@ -29,7 +29,8 @@ test.describe( 'Navigation block', () => {
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 		await page.click( '#submit-posttype-page' );
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 1000 );
+		await page.waitForTimeout( 2000 );
+
 		await page.click( '#save_menu_footer' );
 
 		// Go to the created page
