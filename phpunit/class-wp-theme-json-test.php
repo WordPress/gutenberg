@@ -92,8 +92,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }a{background-color: red;color: green;}a:hover{background-color: green;color: red;}a:focus{background-color: black;color: yellow;}';
-		// $this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$link_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;}a:focus{background-color: black;color: yellow;}';
+
+		$expected = $base_styles . $link_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
