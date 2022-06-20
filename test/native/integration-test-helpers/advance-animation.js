@@ -28,7 +28,7 @@ export const advanceAnimationByTime = ( time = FRAME_TIME ) => {
  *
  * @param {number} count Number of frames to advance timers.
  */
-export const advanceAnimationByFrame = ( count ) => {
+export const advanceAnimationByFrames = ( count ) => {
 	for ( let i = 0; i <= count; i++ ) {
 		jest.advanceTimersByTime( FRAME_TIME );
 	}

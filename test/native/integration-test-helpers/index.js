@@ -1,7 +1,7 @@
 export { addBlock } from './add-block';
 export {
 	advanceAnimationByTime,
-	advanceAnimationByFrame,
+	advanceAnimationByFrames,
 } from './advance-animation';
 export { dismissModal } from './dismiss-modal';
 export { getBlock } from './get-block';
