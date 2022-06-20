@@ -17,9 +17,9 @@ import {
 	getActiveBlockVariation,
 } from '../selectors';
 
-const keyBy = ( arr, key ) =>
-	( arr || [] ).reduce(
-		( r, x ) => ( { ...r, [ key ? x[ key ] : x ]: x } ),
+const keyBlocksByName = ( blocks ) =>
+	blocks.reduce(
+		( result, block ) => ( { ...result, [ block.name ]: block } ),
 		{}
 	);
 
@@ -28,7 +28,7 @@ describe( 'selectors', () => {
 		const blockName = 'block/name';
 		const getState = ( blocks ) => {
 			return deepFreeze( {
-				blockTypes: keyBy( blocks, 'name' ),
+				blockTypes: keyBlocksByName( blocks ),
 			} );
 		};
 
