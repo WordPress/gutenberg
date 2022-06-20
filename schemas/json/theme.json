@@ -263,20 +263,28 @@
 									"type": "string"
 								},
 								"increment": {
-									"description": "The amouunt to increment each step by",
+									"description": "The amount to increment each step by.",
 									"type": "number"
 								},
 								"steps": {
-									"description": "Number of steps to generate in scale",
-									"type": "number"
+									"description": "Number of steps to generate in scale.",
+									"type": "integer"
 								},
 								"firstStep": {
-									"description": "The value to starr scale from",
+									"description": "The value to start scale from.",
 									"type": "number"
 								},
 								"units": {
-									"description": "Units that the scale uses, eg. rem, em, px",
-									"type": "string"
+									"description": "Units that the scale uses, eg. rem, em, px.",
+									"type": "string",
+									"enum": [
+										"px",
+										"em",
+										"rem",
+										"vh",
+										"vw",
+										"%"
+									]
 								}
 							},
 							"additionalProperties": false
