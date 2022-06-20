@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,7 +33,10 @@ export default function NavigationItemBase( props ) {
 	const classes = classnames( 'components-navigation__item', className );
 
 	return (
-		<ItemBaseUI className={ classes } { ...restProps }>
+		<ItemBaseUI
+			className={ classes }
+			{ ...omit( restProps, [ 'title', 'href' ] ) }
+		>
 			{ children }
 		</ItemBaseUI>
 	);
