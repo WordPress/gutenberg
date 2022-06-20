@@ -572,7 +572,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: The name of the block attribute that was previously selected.
+-   `string|void`: The name of the block attribute that was previously selected.
 
 ### RichText
 
