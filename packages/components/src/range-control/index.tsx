@@ -150,16 +150,18 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	};
 
 	const handleOnChange = ( next: string ) => {
-		let nextValue: number | null = parseFloat( next );
+		let nextValue = parseFloat( next );
 		setValue( nextValue );
+
 		/*
 		 * Calls onChange only when nextValue is numeric
 		 * otherwise may queue a reset for the blur event.
 		 */
 		if ( ! isNaN( nextValue ) ) {
 			if ( nextValue < min || nextValue > max ) {
-				nextValue = floatClamp( nextValue, min, max );
+				nextValue = floatClamp( nextValue, min, max ) as number;
 			}
+
 			onChange( nextValue );
 			isResetPendent.current = false;
 		} else if ( allowReset ) {

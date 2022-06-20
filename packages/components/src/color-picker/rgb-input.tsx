@@ -25,8 +25,8 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				label="Red"
 				abbreviation="R"
 				value={ r }
-				onChange={ ( nextR: number ) =>
-					onChange( colord( { r: nextR, g, b, a } ) )
+				onChange={ ( nextR?: number ) =>
+					onChange( colord( { r: nextR as number, g, b, a } ) )
 				}
 			/>
 			<InputWithSlider
@@ -35,8 +35,8 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				label="Green"
 				abbreviation="G"
 				value={ g }
-				onChange={ ( nextG: number ) =>
-					onChange( colord( { r, g: nextG, b, a } ) )
+				onChange={ ( nextG?: number ) =>
+					onChange( colord( { r, g: nextG as number, b, a } ) )
 				}
 			/>
 			<InputWithSlider
@@ -45,8 +45,8 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 				label="Blue"
 				abbreviation="B"
 				value={ b }
-				onChange={ ( nextB: number ) =>
-					onChange( colord( { r, g, b: nextB, a } ) )
+				onChange={ ( nextB?: number ) =>
+					onChange( colord( { r, g, b: nextB as number, a } ) )
 				}
 			/>
 			{ enableAlpha && (
@@ -56,13 +56,13 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 					label="Alpha"
 					abbreviation="A"
 					value={ Math.trunc( a * 100 ) }
-					onChange={ ( nextA: number ) =>
+					onChange={ ( nextA?: number ) =>
 						onChange(
 							colord( {
 								r,
 								g,
 								b,
-								a: nextA / 100,
+								a: ( nextA as number ) / 100,
 							} )
 						)
 					}

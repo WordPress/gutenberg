@@ -152,7 +152,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 *
 		 * @default () => void
 		 */
-		onChange?: ( value: number ) => void;
+		onChange?: ( value?: number ) => void;
 		/**
 		 * Callback for when `RangeControl` input gains focus.
 		 *
@@ -279,7 +279,7 @@ export type useControlledRangeValueProps = {
 
 export type useControlledRangeValueReturn = [
 	number | '' | null,
-	( nextValue: any ) => void
+	( nextValue: number | null ) => void
 ];
 
 export type useMarksArgs = NumericProps & {

@@ -1,4 +1,7 @@
-// @ts-nocheck
+/**
+ * External dependencies
+ */
+import type { MouseEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -86,8 +89,8 @@ export function useControlledRangeValue( {
  */
 export function useDebouncedHoverInteraction( {
 	onHide = noop,
-	onMouseLeave = noop,
-	onMouseMove = noop,
+	onMouseLeave = noop as MouseEventHandler,
+	onMouseMove = noop as MouseEventHandler,
 	onShow = noop,
 	timeout = 300,
 } ) {

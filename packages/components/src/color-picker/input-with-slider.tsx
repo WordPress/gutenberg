@@ -14,7 +14,7 @@ interface InputWithSliderProps {
 	value: number;
 	label: string;
 	abbreviation: string;
-	onChange: ( value: number ) => void;
+	onChange: ( value?: number ) => void;
 }
 
 export const InputWithSlider = ( {

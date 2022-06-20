@@ -243,7 +243,7 @@ Callback for when `RangeControl` input loses focus.
 -   Required: No
 -   Platform: Web
 
-### `onChange`: `FocusEventHandler< HTMLInputElement >`
+### `onChange`: `( value?: number ) => void`
 
 A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occurred. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
 
