@@ -16,6 +16,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import {
+	requestMediaPicker,
 	setFeaturedImage,
 	sendMediaUpload,
 	subscribeMediaUpload,
@@ -48,6 +49,10 @@ jest.mock( 'lodash', () => {
 	const actual = jest.requireActual( 'lodash' );
 	return { ...actual, delay: ( cb ) => cb() };
 } );
+
+function mockGetMedia( media ) {
+	jest.spyOn( select( coreStore ), 'getMedia' ).mockReturnValue( media );
+}
 
 const apiFetchPromise = Promise.resolve( {} );
 
@@ -292,12 +297,6 @@ describe( 'Image Block', () => {
 			);
 		}
 
-		function mockGetMedia( media ) {
-			jest.spyOn( select( coreStore ), 'getMedia' ).mockReturnValueOnce(
-				media
-			);
-		}
-
 		it( 'does not prompt to replace featured image during a new image upload', () => {
 			// Arrange
 			const INITIAL_IMAGE = { id: 1, url: 'mock-url-1' };
@@ -405,5 +404,38 @@ describe( 'Image Block', () => {
 				NEW_IMAGE_RESOLVED.id
 			);
 		} );
+	} );
+
+	it( 'sets src and alt attributes when selecting media', async () => {
+		const IMAGE = { id: 1, url: 'mock-image', alt: 'A beautiful mountain' };
+		requestMediaPicker.mockImplementationOnce(
+			( source, filter, multiple, callback ) => {
+				callback( {
+					id: IMAGE.id,
+					url: IMAGE.url,
+					alt: IMAGE.alt,
+				} );
+			}
+		);
+		mockGetMedia( {
+			id: IMAGE.id,
+			source_url: IMAGE.url,
+		} );
+
+		const initialHtml = `
+		<!-- wp:image -->
+		<figure class="wp-block-image">
+				<img alt="" />
+		</figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( { initialHtml } );
+
+		fireEvent.press( screen.getByText( 'ADD IMAGE' ) );
+		fireEvent.press( screen.getByText( 'WordPress Media Library' ) );
+
+		const expectedHtml = `<!-- wp:image {"id":${ IMAGE.id },"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="${ IMAGE.url }" alt="${ IMAGE.alt }" class="wp-image-${ IMAGE.id }"/></figure>
+<!-- /wp:image -->`;
+		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 } );
