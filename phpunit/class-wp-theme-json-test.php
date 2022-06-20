@@ -697,9 +697,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'background' => 'red',
 							),
 							':hover' => array(
-								'color' => array(
+								'color'      => array(
 									'text'       => 'red',
 									'background' => 'green',
+								),
+								'typography' => array(
+									'textTransform' => 'uppercase',
+									'fontSize'      => '10em',
 								),
 							),
 							':focus' => array(
@@ -716,7 +720,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;}a:focus{background-color: black;color: yellow;}';
+		$element_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;font-size: 10em;text-transform: uppercase;}a:focus{background-color: black;color: yellow;}';
 
 		$expected = $base_styles . $element_styles;
 
