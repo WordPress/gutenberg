@@ -101,6 +101,7 @@ module.exports = {
 							'noop',
 							'random',
 							'reverse',
+							'size',
 							'stubFalse',
 							'stubTrue',
 							'sum',
