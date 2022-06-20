@@ -375,14 +375,7 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
-	}, [
-		textContent,
-		AutocompleterUI,
-		autocompleter,
-		completers,
-		record,
-		filteredOptions.length,
-	] );
+	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 	const { className } = autocompleter || {};

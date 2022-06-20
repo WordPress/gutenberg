@@ -39,7 +39,7 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
-		}, [ onChangeOptions, items ] );
+		}, [ items ] );
 
 		if ( ! items.length > 0 ) {
 			return null;

@@ -71,7 +71,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			} else if ( isVisible && text.length === 0 ) {
 				startAnimation( false );
 			}
-		}, [ onChangeOptions, items, isVisible, text, startAnimation ] );
+		}, [ items, isVisible, text ] );
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
 			styles[ 'components-autocomplete__item-active' ],
@@ -111,7 +111,7 @@ export function getAutoCompleterUI( autocompleter ) {
 					}
 				} );
 			},
-			[ animationValue, isVisible, reset ]
+			[ isVisible ]
 		);
 
 		const contentStyles = {
