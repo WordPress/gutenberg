@@ -2,31 +2,39 @@
  * Internal dependencies
  */
 import {
-	retrieveSelectedAttribute,
-	START_OF_SELECTED_AREA,
+	__experimentalRetrieveSelectedAttribute,
+	__EXPERIMENTAL_START_OF_SELECTED_AREA,
 } from '../selection';
 
-describe( 'retrieveSelectedAttribute', () => {
+describe( '__experimentalRetrieveSelectedAttribute', () => {
 	it( 'returns undefined if block attributes are not an object', () => {
-		expect( retrieveSelectedAttribute( undefined ) ).toBeUndefined();
-		expect( retrieveSelectedAttribute( null ) ).toBeUndefined();
+		expect(
+			__experimentalRetrieveSelectedAttribute( undefined )
+		).toBeUndefined();
+		expect(
+			__experimentalRetrieveSelectedAttribute( null )
+		).toBeUndefined();
 	} );
 
 	it( 'returns the block attribute name if it contains the selection position character', () => {
 		const blockAttributes = {
 			foo: `this is not selected`,
-			bar: `this${ START_OF_SELECTED_AREA }is selected`,
+			bar: `this${ __EXPERIMENTAL_START_OF_SELECTED_AREA }is selected`,
 		};
-		expect( retrieveSelectedAttribute( blockAttributes ) ).toBe( 'bar' );
+		expect(
+			__experimentalRetrieveSelectedAttribute( blockAttributes )
+		).toBe( 'bar' );
 	} );
 
 	it( 'returns the first block attribute that contains the selection position character', () => {
 		const blockAttributes = {
 			foo: `this is not selected`,
-			bar: `this${ START_OF_SELECTED_AREA }is selected`,
-			baz: `this${ START_OF_SELECTED_AREA }is selected`,
+			bar: `this${ __EXPERIMENTAL_START_OF_SELECTED_AREA }is selected`,
+			baz: `this${ __EXPERIMENTAL_START_OF_SELECTED_AREA }is selected`,
 		};
-		expect( retrieveSelectedAttribute( blockAttributes ) ).toBe( 'bar' );
+		expect(
+			__experimentalRetrieveSelectedAttribute( blockAttributes )
+		).toBe( 'bar' );
 	} );
 
 	it( 'returns undefined if no block attribute contains the selection position character', () => {
@@ -34,6 +42,8 @@ describe( 'retrieveSelectedAttribute', () => {
 			foo: `this is not selected`,
 			bar: `this is not selected either`,
 		};
-		expect( retrieveSelectedAttribute( blockAttributes ) ).toBeUndefined();
+		expect(
+			__experimentalRetrieveSelectedAttribute( blockAttributes )
+		).toBeUndefined();
 	} );
 } );
