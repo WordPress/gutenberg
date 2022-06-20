@@ -8,7 +8,6 @@ import { __experimentalColorGradientControl as ColorGradientControl } from '@wor
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import Subtitle from './subtitle';
 import {
 	getSupportedGlobalStylesPanels,
 	useSetting,
@@ -60,7 +59,10 @@ function ScreenButtonColor( { name } ) {
 				) }
 			/>
 
-			<Subtitle>{ __( 'Set text color' ) }</Subtitle>
+			<h4 className="edit-site-global-styles-section-title">
+				{ __( 'Text color' ) }
+			</h4>
+
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
@@ -74,7 +76,10 @@ function ScreenButtonColor( { name } ) {
 				clearable={ buttonTextColor === userButtonTextColor }
 			/>
 
-			<Subtitle>{ __( 'Set background color' ) }</Subtitle>
+			<h4 className="edit-site-global-styles-section-title">
+				{ __( 'Background color' ) }
+			</h4>
+
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }

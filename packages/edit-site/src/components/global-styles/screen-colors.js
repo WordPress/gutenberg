@@ -6,6 +6,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalZStack as ZStack,
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -101,13 +102,14 @@ function ButtonColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper
-					expanded={ false }
-					className={ 'has-multiple-colors' }
-				>
-					<ColorIndicator colorValue={ color } />
-					<ColorIndicator colorValue={ bgColor } />
-				</ColorIndicatorWrapper>
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
 				<FlexItem>{ __( 'Buttons' ) }</FlexItem>
 			</HStack>
 		</NavigationButtonAsItem>
