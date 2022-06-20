@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
+import { extend, pick, isString, isEqual, forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -190,7 +190,8 @@ export const attrs = memize( ( text ) => {
 	// 7. A numeric attribute in double quotes.
 	// 8. A numeric attribute in single quotes.
 	// 9. An unquoted numeric attribute.
-	const pattern = /([\w-]+)\s*=\s*"([^"]*)"(?:\s|$)|([\w-]+)\s*=\s*'([^']*)'(?:\s|$)|([\w-]+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|'([^']*)'(?:\s|$)|(\S+)(?:\s|$)/g;
+	const pattern =
+		/([\w-]+)\s*=\s*"([^"]*)"(?:\s|$)|([\w-]+)\s*=\s*'([^']*)'(?:\s|$)|([\w-]+)\s*=\s*([^\s'"]+)(?:\s|$)|"([^"]*)"(?:\s|$)|'([^']*)'(?:\s|$)|(\S+)(?:\s|$)/g;
 
 	// Map zero-width spaces to actual spaces.
 	text = text.replace( /[\u00a0\u200b]/g, ' ' );
@@ -315,7 +316,9 @@ extend( shortcode.prototype, {
 	 * @return {string} Attribute value.
 	 */
 	get( attr ) {
-		return this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ];
+		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
+			attr
+		];
 	},
 
 	/**
@@ -330,7 +333,8 @@ extend( shortcode.prototype, {
 	 * @return {WPShortcode} Shortcode instance.
 	 */
 	set( attr, value ) {
-		this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ] = value;
+		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
+			value;
 		return this;
 	},
 

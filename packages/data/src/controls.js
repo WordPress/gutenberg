@@ -118,20 +118,25 @@ export const controls = { select, resolveSelect, dispatch };
 
 export const builtinControls = {
 	[ SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) =>
-			registry.select( storeKey )[ selectorName ]( ...args )
+		( registry ) =>
+			( { storeKey, selectorName, args } ) =>
+				registry.select( storeKey )[ selectorName ]( ...args )
 	),
 	[ RESOLVE_SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			const method = registry.select( storeKey )[ selectorName ]
-				.hasResolver
-				? 'resolveSelect'
-				: 'select';
-			return registry[ method ]( storeKey )[ selectorName ]( ...args );
-		}
+		( registry ) =>
+			( { storeKey, selectorName, args } ) => {
+				const method = registry.select( storeKey )[ selectorName ]
+					.hasResolver
+					? 'resolveSelect'
+					: 'select';
+				return registry[ method ]( storeKey )[ selectorName ](
+					...args
+				);
+			}
 	),
 	[ DISPATCH ]: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) =>
-			registry.dispatch( storeKey )[ actionName ]( ...args )
+		( registry ) =>
+			( { storeKey, actionName, args } ) =>
+				registry.dispatch( storeKey )[ actionName ]( ...args )
 	),
 };

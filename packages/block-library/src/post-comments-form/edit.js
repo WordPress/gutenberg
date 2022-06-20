@@ -13,9 +13,11 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { Button } from '@wordpress/components';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -28,7 +30,7 @@ export default function PostCommentsFormEdit( {
 } ) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ commentStatus ] = useEntityProp(
+	const [ commentStatus, setCommentStatus ] = useEntityProp(
 		'postType',
 		postType,
 		'comment_status',
@@ -55,6 +57,7 @@ export default function PostCommentsFormEdit( {
 	);
 
 	let warning = false;
+	let actions;
 	let showPlaceholder = true;
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
@@ -66,6 +69,18 @@ export default function PostCommentsFormEdit( {
 				),
 				postType
 			);
+			actions = [
+				<Button
+					key="enableComments"
+					onClick={ () => setCommentStatus( 'open' ) }
+					variant="primary"
+				>
+					{ _x(
+						'Enable comments',
+						'action that affects the current post'
+					) }
+				</Button>,
+			];
 			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
@@ -95,7 +110,9 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ warning && <Warning>{ warning }</Warning> }
+				{ warning && (
+					<Warning actions={ actions }>{ warning }</Warning>
+				) }
 
 				{ showPlaceholder ? <CommentsForm /> : null }
 			</div>

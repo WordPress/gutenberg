@@ -95,10 +95,12 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 }
 
 export default createHigherOrderComponent(
-	( Component ) => ( { shortcuts, ...props } ) => (
-		<div { ...useNavigateRegions( shortcuts ) }>
-			<Component { ...props } />
-		</div>
-	),
+	( Component ) =>
+		( { shortcuts, ...props } ) =>
+			(
+				<div { ...useNavigateRegions( shortcuts ) }>
+					<Component { ...props } />
+				</div>
+			),
 	'navigateRegions'
 );

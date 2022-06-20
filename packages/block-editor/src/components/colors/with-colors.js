@@ -30,9 +30,8 @@ import useSetting from '../use-setting';
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) => ( props ) =>
+			<WrappedComponent { ...props } colors={ colorsArray } />,
 		'withCustomColorPalette'
 	);
 
@@ -96,9 +95,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 					this.setters = this.createSetters();
 					this.colorUtils = {
-						getMostReadableColor: this.getMostReadableColor.bind(
-							this
-						),
+						getMostReadableColor:
+							this.getMostReadableColor.bind( this ),
 					};
 
 					this.state = {};
@@ -117,9 +115,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 							colorContext,
 							colorAttributeName
 						) => {
-							const upperFirstColorAttributeName = upperFirst(
-								colorAttributeName
-							);
+							const upperFirstColorAttributeName =
+								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
 							settersAccumulator[
 								`set${ upperFirstColorAttributeName }`
@@ -181,9 +178,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 								previousColor === colorObject.color &&
 								previousColorObject
 							) {
-								newState[
-									colorAttributeName
-								] = previousColorObject;
+								newState[ colorAttributeName ] =
+									previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									...colorObject,

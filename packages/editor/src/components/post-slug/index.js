@@ -68,9 +68,8 @@ export class PostSlug extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getCurrentPost, getEditedPostAttribute } = select(
-			editorStore
-		);
+		const { getCurrentPost, getEditedPostAttribute } =
+			select( editorStore );
 
 		const { id } = getCurrentPost();
 		return {

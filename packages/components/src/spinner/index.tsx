@@ -2,24 +2,23 @@
  * External dependencies
  */
 import classNames from 'classnames';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
+import type { WordPressComponentProps } from '../ui/context';
 
 /**
- * @typedef OwnProps
- *
- * @property {string} [className] Class name
+ * WordPress dependencies
  */
-/** @typedef {import('react').ComponentPropsWithoutRef<'svg'> & OwnProps} Props */
+import { forwardRef } from '@wordpress/element';
 
-/**
- * @param {Props} props
- * @return {JSX.Element} Element
- */
-export default function Spinner( { className, ...props } ) {
+export function UnforwardedSpinner(
+	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
+	forwardedRef: ForwardedRef< any >
+) {
 	return (
 		<StyledSpinner
 			className={ classNames( 'components-spinner', className ) }
@@ -28,6 +27,7 @@ export default function Spinner( { className, ...props } ) {
 			role="presentation"
 			focusable="false"
 			{ ...props }
+			ref={ forwardedRef }
 		>
 			{ /* Gray circular background */ }
 			<SpinnerTrack
@@ -45,3 +45,17 @@ export default function Spinner( { className, ...props } ) {
 		</StyledSpinner>
 	);
 }
+/**
+ * `Spinner` is a component used to notify users that their action is being processed.
+ *
+ * @example
+ * ```js
+ *   import { Spinner } from '@wordpress/components';
+ *
+ *   function Example() {
+ *     return <Spinner />;
+ *   }
+ * ```
+ */
+export const Spinner = forwardRef( UnforwardedSpinner );
+export default Spinner;
