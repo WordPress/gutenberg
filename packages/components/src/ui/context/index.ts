@@ -1,3 +1,4 @@
+export { SIZE_VARIANT_CONTEXT } from './constants';
 export {
 	ContextSystemProvider,
 	useComponentsContext,

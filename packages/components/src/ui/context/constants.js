@@ -8,3 +8,11 @@ export const CONTEXT_COMPONENT_NAMESPACE = 'data-wp-c5tc8t';
  * This is attached to Context connected components as a static property.
  */
 export const CONNECT_STATIC_NAMESPACE = '__contextSystemKey__';
+
+export const SIZE_VARIANT_CONTEXT = {
+	'40px': {
+		InputControl: {
+			size: '__unstable-large',
+		},
+	},
+};

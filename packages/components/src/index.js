@@ -55,6 +55,10 @@ export {
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+export {
+	SIZE_VARIANT_CONTEXT as __experimentalSizeVariantContext,
+	ContextSystemProvider as __experimentalContextSystemProvider,
+} from './ui/context';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';

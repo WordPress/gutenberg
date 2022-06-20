@@ -7,6 +7,8 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
+	__experimentalContextSystemProvider as ContextSystemProvider,
+	__experimentalSizeVariantContext as SIZE_VARIANT_CONTEXT,
 	__experimentalStyleProvider as StyleProvider,
 	__experimentalToolsPanelContext as ToolsPanelContext,
 } from '@wordpress/components';
@@ -42,9 +44,13 @@ export default function InspectorControlsFill( {
 					// Provider in this subtree.
 					const value = ! isEmpty( fillProps ) ? fillProps : null;
 					return (
-						<ToolsPanelContext.Provider value={ value }>
-							{ children }
-						</ToolsPanelContext.Provider>
+						<ContextSystemProvider
+							value={ SIZE_VARIANT_CONTEXT[ '40px' ] }
+						>
+							<ToolsPanelContext.Provider value={ value }>
+								{ children }
+							</ToolsPanelContext.Provider>
+						</ContextSystemProvider>
 					);
 				} }
 			</Fill>

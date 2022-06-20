@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import {
+	__experimentalContextSystemProvider as ContextSystemProvider,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalSizeVariantContext as SIZE_VARIANT_CONTEXT,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -97,35 +99,37 @@ function GlobalStylesUI() {
 			className="edit-site-global-styles-sidebar__navigator-provider"
 			initialPath="/"
 		>
-			<GlobalStylesNavigationScreen path="/">
-				<ScreenRoot />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/variations">
-				<ScreenStyleVariations />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/blocks">
-				<ScreenBlockList />
-			</GlobalStylesNavigationScreen>
-
-			{ blocks.map( ( block ) => (
-				<GlobalStylesNavigationScreen
-					key={ 'menu-block-' + block.name }
-					path={ '/blocks/' + block.name }
-				>
-					<ScreenBlock name={ block.name } />
+			<ContextSystemProvider value={ SIZE_VARIANT_CONTEXT[ '40px' ] }>
+				<GlobalStylesNavigationScreen path="/">
+					<ScreenRoot />
 				</GlobalStylesNavigationScreen>
-			) ) }
 
-			<ContextScreens />
+				<GlobalStylesNavigationScreen path="/variations">
+					<ScreenStyleVariations />
+				</GlobalStylesNavigationScreen>
 
-			{ blocks.map( ( block ) => (
-				<ContextScreens
-					key={ 'screens-block-' + block.name }
-					name={ block.name }
-				/>
-			) ) }
+				<GlobalStylesNavigationScreen path="/blocks">
+					<ScreenBlockList />
+				</GlobalStylesNavigationScreen>
+
+				{ blocks.map( ( block ) => (
+					<GlobalStylesNavigationScreen
+						key={ 'menu-block-' + block.name }
+						path={ '/blocks/' + block.name }
+					>
+						<ScreenBlock name={ block.name } />
+					</GlobalStylesNavigationScreen>
+				) ) }
+
+				<ContextScreens />
+
+				{ blocks.map( ( block ) => (
+					<ContextScreens
+						key={ 'screens-block-' + block.name }
+						name={ block.name }
+					/>
+				) ) }
+			</ContextSystemProvider>
 		</NavigatorProvider>
 	);
 }
