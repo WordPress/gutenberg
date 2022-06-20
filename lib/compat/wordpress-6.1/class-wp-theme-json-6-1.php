@@ -378,18 +378,23 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 
 			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
+
+				// Handle element defaults.
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
 					'selector' => static::ELEMENTS[ $element ],
 				);
 
+				// Handle any psuedo selectors for the element.
 				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-						// code...
-						$nodes[] = array(
-							'path'     => array( 'styles', 'elements', $element ),
-							'selector' => static::ELEMENTS[ $element ] . $pseudo_selector,
-						);
+
+						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
+							$nodes[] = array(
+								'path'     => array( 'styles', 'elements', $element ),
+								'selector' => static::ELEMENTS[ $element ] . $pseudo_selector,
+							);
+						}
 					}
 				}
 			}
@@ -534,11 +539,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 
-		$selector     = $block_metadata['selector'];
-		$settings     = _wp_array_get( $this->theme_json, array( 'settings' ) );
-		$declarations = static::compute_style_properties( $node, $settings );
+		$selector = $block_metadata['selector'];
+		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
-		// Attempt to parse the pseudo selector (e.g. ":hover") from the $selector ("a:hover").
+		// Attempt to parse a pseudo selector (e.g. ":hover") from the $selector ("a:hover").
 		$pseudo_matches = array();
 		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
 		$pseudo_selector = $pseudo_matches[0] ?? null;
@@ -549,9 +553,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
+		// Otherwise just compute the styles for the default selector as normal.
 		$declarations_pseudo_selectors = array();
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
-			$declarations_pseudo_selectors = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
+		} else {
+			$declarations = static::compute_style_properties( $node, $settings );
 		}
 
 		$block_rules = '';
@@ -580,11 +587,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// 2. Generate and append the rules that use the general selector.
 		$block_rules .= static::to_ruleset( $selector, $declarations );
-
-		// 2.5. Generate and append the rules for any pseudo selectors.
-		if ( ! empty( $declarations_pseudo_selectors ) ) {
-			$block_rules .= static::to_ruleset( $selector, $declarations_pseudo_selectors );
-		}
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
