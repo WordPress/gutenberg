@@ -32,7 +32,7 @@ describe( 'buildDockerComposeConfig', () => {
 		const { volumes } = dockerConfig.services.wordpress;
 		expect( volumes ).toEqual( [
 			'wordpress:/var/www/html', // WordPress root.
-			'/path/WordPress-PHPUnit/tests/phpunit:/phpunit', // WordPress test library,
+			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit', // WordPress test library,
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins', // Mapped plugins root.
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name', // Mapped plugin.
 		] );
@@ -67,7 +67,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 		let localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
-			'/path/WordPress-PHPUnit/tests/phpunit:/phpunit',
+			'/path/WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
@@ -75,7 +75,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 		localSources = [
 			'/path/to/wp-plugins:/var/www/html/wp-content/plugins',
-			'/path/tests-WordPress-PHPUnit/tests/phpunit:/phpunit',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'/path/to/local/plugin:/var/www/html/wp-content/plugins/test-name',
 			'/path/to/local/theme:/var/www/html/wp-content/themes/test-theme',
 		];
@@ -99,7 +99,7 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
-			'/path/tests-WordPress-PHPUnit/tests/phpunit:/phpunit',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
@@ -122,7 +122,7 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 		const expectedVolumes = [
 			'tests-wordpress:/var/www/html',
-			'/path/tests-WordPress-PHPUnit/tests/phpunit:/phpunit',
+			'/path/tests-WordPress-PHPUnit/tests/phpunit:/wordpress-phpunit',
 			'phpunit-uploads:/var/www/html/wp-content/uploads',
 		];
 		expect( dockerConfig.services.phpunit.volumes ).toEqual(
