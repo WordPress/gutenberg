@@ -19,14 +19,16 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
+	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
-	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, array( 'alt' => $post_title ) );
+	$attr           = $is_link ? array( 'alt' => $post_title ) : array();
+	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
 	if ( ! $featured_image ) {
 		return '';
 	}
 	$wrapper_attributes = get_block_wrapper_attributes();
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+	if ( $is_link ) {
 		$featured_image = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $featured_image );
 	}
 
