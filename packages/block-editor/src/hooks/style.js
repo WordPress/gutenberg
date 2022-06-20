@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { get, has, isEmpty, omit } from 'lodash';
+import { get, has, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useContext, createPortal } from '@wordpress/element';
+import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -305,52 +305,51 @@ const withElementsStyles = createHigherOrderComponent(
 			'link'
 		);
 
-		let styles = [];
+		const styles = useMemo( () => {
+			const rawElementsStyles = props.attributes.style?.elements;
+			const elementCssRules = [];
+			if (
+				rawElementsStyles &&
+				Object.keys( rawElementsStyles ).length > 0
+			) {
+				// Remove values based on whether serialization has been skipped for a specific style.
+				const filteredElementsStyles = {
+					...rawElementsStyles,
+					link: {
+						...rawElementsStyles.link,
+						color: ! skipLinkColorSerialization
+							? rawElementsStyles.link?.color
+							: undefined,
+					},
+				};
 
-		// Remove values based on whether serialization has been skipped for a specific style.
-		const rawElementsStyles = props.attributes.style?.elements;
-
-		if ( ! isEmpty( rawElementsStyles ) ) {
-			const filteredElementsStyles = {
-				...rawElementsStyles,
-				link: {
-					...rawElementsStyles?.link,
-					color: ! skipLinkColorSerialization
-						? rawElementsStyles?.link?.color
-						: undefined,
-				},
-			};
-
-			styles = Object.entries( filteredElementsStyles ).reduce(
-				( acc, [ elementName, elementStyles ] ) => {
+				for ( const [ elementName, elementStyles ] of Object.entries(
+					filteredElementsStyles
+				) ) {
 					const cssRule = generateStyles( elementStyles, {
 						// The .editor-styles-wrapper selector is required on elements styles. As it is
 						// added to all other editor styles, not providing it causes reset and global
 						// styles to override element styles because of higher specificity.
 						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
 					} );
-
 					if ( !! cssRule ) {
-						acc.push( cssRule );
+						elementCssRules.push( cssRule );
 					}
-
-					return acc;
-				},
-				[]
-			);
-		}
+				}
+			}
+			return elementCssRules.length > 0 ? elementCssRules : undefined;
+		}, [ props.attributes.style?.elements ] );
 
 		const element = useContext( BlockList.__unstableElementContext );
-		const hasElementStyles = styles.length;
 
 		return (
 			<>
-				{ hasElementStyles &&
+				{ styles &&
 					element &&
 					createPortal(
 						<style
 							dangerouslySetInnerHTML={ {
-								__html: styles.join( ' ' ),
+								__html: styles.join( '\n' ),
 							} }
 						/>,
 						element
@@ -359,7 +358,7 @@ const withElementsStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					className={
-						hasElementStyles
+						props.attributes.style?.elements
 							? classnames(
 									props.className,
 									blockElementsContainerIdentifier
