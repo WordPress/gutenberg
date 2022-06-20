@@ -86,26 +86,31 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		// The Post Template block has no markup stored in post content, so here,
 		// we generate a wrapper `li` tag to contain the rendered inner blocks.
 
-		// 1. Get the parsed block object.
+		// Get the parsed block object.
 		$block_instance = $block->parsed_block;
 
-		// 2. Get the classes for the post instance.
+		// Get the classes for the post instance.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 
-		// 3. Create the HTML markup for the opening and closing tags of the list item.
+		// Create the HTML markup for the opening and closing tags of the list item.
 		$li_opening_tag = '<li class="' . esc_attr( $post_classes ) . '">';
 		$li_closing_tag = '</li>';
 
-		// 4. Assign this markup to the block instance's innerHTML attribute.
+		// Assign this markup to the block instance's innerHTML attribute.
 		$block_instance['innerHTML'] = $li_opening_tag . $li_closing_tag;
 
-		// 5. Assign the opening tag to the first element of the instance's innerContent array.
-		$block_instance['innerContent'][0] = $li_opening_tag;
+		if ( count( $block_instance['innerContent'] ) > 1 ) {
+			// Assign the opening tag to the first element of the instance's innerContent array.
+			$block_instance['innerContent'][0] = $li_opening_tag;
 
-		// 6. Assign the closing tag to the last element of the instance's innerContent array.
-		$block_instance['innerContent'][ count( $block_instance['innerContent'] ) - 1 ] = $li_closing_tag;
+			// Assign the closing tag to the last element of the instance's innerContent array.
+			$block_instance['innerContent'][ count( $block_instance['innerContent'] ) - 1 ] = $li_closing_tag;
+		} else {
+			// If there are no children in the template, concatenate to a single string.
+			$block_instance['innerContent'] = array( $li_opening_tag . $li_closing_tag );
+		}
 
-		// 7. Render the block using the augmented block object that contains the desired markup.
+		// Render the block using the augmented block object that contains the desired markup.
 		// This ensures that the resulting `$block_content` has the appropriate layout container
 		// class attached to the wrapping `li` element, which avoids the conflict of two competing
 		// layout classes. For background, see: https://github.com/WordPress/gutenberg/issues/41026.
@@ -119,7 +124,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			)
 		)->render( array( 'dynamic' => false ) );
 
-		// 8. Concatenate to the wrapper block's content.
+		// Concatenate to the wrapper block's content.
 		$content .= $block_content;
 	}
 
