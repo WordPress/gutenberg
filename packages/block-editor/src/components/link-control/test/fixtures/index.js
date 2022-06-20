@@ -1,6 +1,6 @@
-export const uniqueId = () =>
-	// eslint-disable-next-line no-restricted-syntax
-	Math.floor( Math.random() * Number.MAX_SAFE_INTEGER );
+let uniqueIdCounter = 1;
+
+export const uniqueId = () => uniqueIdCounter++;
 
 export const fauxEntitySuggestions = [
 	{
