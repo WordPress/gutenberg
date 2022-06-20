@@ -22,10 +22,6 @@ const keyBy = ( arr, key ) =>
 		( r, x ) => ( { ...r, [ key ? x[ key ] : x ]: x } ),
 		{}
 	);
-const omit = ( obj, keys ) =>
-	Object.fromEntries(
-		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
 
 describe( 'selectors', () => {
 	describe( 'getBlockSupport', () => {
@@ -589,11 +585,25 @@ describe( 'selectors', () => {
 
 	describe( 'isMatchingSearchTerm', () => {
 		const name = 'core/paragraph';
-		const blockType = {
+		const category = 'text';
+		const description = 'writing flow';
+
+		const blockTypeBase = {
 			title: 'Paragraph',
-			category: 'text',
 			keywords: [ 'body' ],
-			description: 'writing flow',
+		};
+		const blockType = {
+			...blockTypeBase,
+			category,
+			description,
+		};
+		const blockTypeWithoutCategory = {
+			...blockTypeBase,
+			description,
+		};
+		const blockTypeWithoutDescription = {
+			...blockTypeBase,
+			category,
 		};
 
 		const state = {
@@ -605,11 +615,8 @@ describe( 'selectors', () => {
 		describe.each( [
 			[ 'name', name ],
 			[ 'block type', blockType ],
-			[ 'block type without category', omit( blockType, 'category' ) ],
-			[
-				'block type without description',
-				omit( blockType, 'description' ),
-			],
+			[ 'block type without category', blockTypeWithoutCategory ],
+			[ 'block type without description', blockTypeWithoutDescription ],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(
