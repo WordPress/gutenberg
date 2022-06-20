@@ -92,6 +92,7 @@ function ButtonColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'linkColor' ); // TODO - use a real support
 	const [ color ] = useStyle( 'elements.button.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.button.color.background', name );
 
 	if ( ! hasSupport ) {
 		return null;
@@ -100,8 +101,12 @@ function ButtonColorItem( { name, parentMenu } ) {
 	return (
 		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
+				<ColorIndicatorWrapper
+					expanded={ false }
+					className={ 'has-multiple-colors' }
+				>
 					<ColorIndicator colorValue={ color } />
+					<ColorIndicator colorValue={ bgColor } />
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Buttons' ) }</FlexItem>
 			</HStack>
