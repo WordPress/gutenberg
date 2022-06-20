@@ -2,12 +2,34 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../ui/context';
 import type { ColorIndicatorProps } from './types';
+
+export function UnforwardedColorIndicator(
+	props: WordPressComponentProps< ColorIndicatorProps, 'span', false >,
+	forwardedRef: ForwardedRef< HTMLSpanElement >
+) {
+	const { className, colorValue, ...additionalProps } = props;
+
+	return (
+		<span
+			className={ classnames( 'component-color-indicator', className ) }
+			style={ { background: colorValue } }
+			ref={ forwardedRef }
+			{ ...additionalProps }
+		/>
+	);
+}
 
 /**
  * ColorIndicator is a React component that renders a specific color in a
@@ -20,23 +42,6 @@ import type { ColorIndicatorProps } from './types';
  * const MyColorIndicator = () => <ColorIndicator colorValue="#0073aa" />;
  * ```
  */
-export function ColorIndicator(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to ColorIndicator.
-	props: Omit<
-		WordPressComponentProps< ColorIndicatorProps, 'span', false >,
-		'ref'
-	>
-) {
-	const { className, colorValue, ...additionalProps } = props;
-
-	return (
-		<span
-			className={ classnames( 'component-color-indicator', className ) }
-			style={ { background: colorValue } }
-			{ ...additionalProps }
-		/>
-	);
-}
+export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
 
 export default ColorIndicator;
