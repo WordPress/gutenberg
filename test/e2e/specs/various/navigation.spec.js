@@ -31,10 +31,9 @@ test.describe( 'Navigation block', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 2000 );
 
-		await Promise.all( [
-			page.waitForNavigation(),
-			page.click( '#save_menu_footer' ),
-		] );
+		await page.click( '#save_menu_footer' );
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 2000 );
 
 		// Go to the created page
 		await admin.visitAdminPage( 'edit.php?post_type=page' );
