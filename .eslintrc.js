@@ -87,6 +87,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'findIndex',
+							'findKey',
 							'flatten',
 							'isArray',
 							'isFinite',
