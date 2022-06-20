@@ -562,18 +562,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
 
-### retrieveSelectedAttribute
-
-Retrieve the block attribute that contains the selection position.
-
-_Parameters_
-
--   _blockAttributes_ `Object`: Block attributes.
-
-_Returns_
-
--   `string|void`: The name of the block attribute that was previously selected.
-
 ### RichText
 
 _Related_
@@ -624,12 +612,6 @@ _Properties_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md>
-
-### START_OF_SELECTED_AREA
-
-A robust way to retain selection position through various
-transforms is to insert a special character at the position and
-then recover it.
 
 ### store
 
