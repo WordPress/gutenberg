@@ -63,45 +63,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
-	function test_psuedo_selectors() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'elements' => array(
-						'link' => array(
-							'color'  => array(
-								'text'       => 'green',
-								'background' => 'red',
-							),
-							':hover' => array(
-								'color' => array(
-									'text'       => 'red',
-									'background' => 'green',
-								),
-							),
-							':focus' => array(
-								'color' => array(
-									'text'       => 'yellow',
-									'background' => 'black',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-		$link_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;}a:focus{background-color: black;color: yellow;}';
-
-		$expected = $base_styles . $link_styles;
-
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
-	}
-
 	function test_get_settings_presets_are_keyed_by_origin() {
 		$default_origin = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -722,6 +683,124 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'body{--wp--preset--color--grey: grey;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }p{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
 			$theme_json->get_stylesheet()
 		);
+	}
+
+	function test_get_stylesheet_returns_whitelisted_element_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'color'  => array(
+								'text'       => 'green',
+								'background' => 'red',
+							),
+							':hover' => array(
+								'color' => array(
+									'text'       => 'red',
+									'background' => 'green',
+								),
+							),
+							':focus' => array(
+								'color' => array(
+									'text'       => 'yellow',
+									'background' => 'black',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$element_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;}a:focus{background-color: black;color: yellow;}';
+
+		$expected = $base_styles . $element_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+	}
+
+	function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'h4' => array(
+							'color'  => array(
+								'text'       => 'green',
+								'background' => 'red',
+							),
+							':hover' => array(
+								'color' => array(
+									'text'       => 'red',
+									'background' => 'green',
+								),
+							),
+							':focus' => array(
+								'color' => array(
+									'text'       => 'yellow',
+									'background' => 'black',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$element_styles = 'h4{background-color: red;color: green;}';
+
+		$expected = $base_styles . $element_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+	}
+
+	function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'link' => array(
+							'color'     => array(
+								'text'       => 'green',
+								'background' => 'red',
+							),
+							':hover'    => array(
+								'color' => array(
+									'text'       => 'red',
+									'background' => 'green',
+								),
+							),
+							':levitate' => array(
+								'color' => array(
+									'text'       => 'yellow',
+									'background' => 'black',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$element_styles = 'a{background-color: red;color: green;}a:hover{background-color: green;color: red;}';
+
+		$expected = $base_styles . $element_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+		$this->assertStringNotContainsString( 'a:levitate{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
 	public function test_merge_incoming_data() {
