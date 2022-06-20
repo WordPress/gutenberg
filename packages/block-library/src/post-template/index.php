@@ -96,7 +96,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$li_opening_tag = '<li class="' . esc_attr( $post_classes ) . '">';
 		$li_closing_tag = '</li>';
 
-		// 4. Assign this markup to the block instance's innerHTML
+		// 4. Assign this markup to the block instance's innerHTML attribute.
 		$block_instance['innerHTML'] = $li_opening_tag . $li_closing_tag;
 
 		// 5. Assign the opening tag to the first element of the instance's innerContent array.
