@@ -1,0 +1,35 @@
+.edit-post-post-template {
+	width: 100%;
+	justify-content: flex-start;
+
+	span {
+		display: block;
+		width: 45%;
+	}
+}
+
+.edit-post-post-template__dialog {
+	z-index: z-index(".edit-post-post-template__dialog");
+
+	.components-popover__content {
+		// sidebar width - padding - horizontal borders
+		width: $sidebar-width - $grid-unit-20 - $border-width * 2;
+		padding: $grid-unit-20;
+	}
+}
+
+.edit-post-post-template__modal {
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
