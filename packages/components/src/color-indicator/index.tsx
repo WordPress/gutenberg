@@ -15,7 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../ui/context';
 import type { ColorIndicatorProps } from './types';
 
-export function UnforwardedColorIndicator(
+function UnforwardedColorIndicator(
 	props: WordPressComponentProps< ColorIndicatorProps, 'span', false >,
 	forwardedRef: ForwardedRef< HTMLSpanElement >
 ) {
