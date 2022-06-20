@@ -90,7 +90,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$block_instance = $block->parsed_block;
 
 		// 2. Get the classes for the post instance.
-		$post_classes   = implode( ' ', get_post_class( 'wp-block-post' ) );
+		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 
 		// 3. Create the HTML markup for the opening and closing tags of the list item.
 		$li_opening_tag = '<li class="' . esc_attr( $post_classes ) . '">';
