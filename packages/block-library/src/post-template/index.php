@@ -82,17 +82,46 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$content = '';
 	while ( $query->have_posts() ) {
 		$query->the_post();
+		// For each instance of the loop, we will render an inner Post Template block.
+		// The Post Template block has no markup stored in post content, so here,
+		// we generate a wrapper `li` tag to contain the rendered inner blocks.
+
+		// 1. Get the parsed block object.
+		$block_instance = $block->parsed_block;
+
+		// 2. Get the classes for the post instance.
+		$post_classes   = implode( ' ', get_post_class( 'wp-block-post' ) );
+
+		// 3. Create the HTML markup for the opening and closing tags of the list item.
+		$li_opening_tag = '<li class="' . esc_attr( $post_classes ) . '">';
+		$li_closing_tag = '</li>';
+
+		// 4. Assign this markup to the block instance's innerHTML and innerContent attributes.
+		// The Post Template block will always have a single slot for innerBlocks, so the innerContent
+		// array should safely be a hard-coded array of 3 items: opening tag, null, and closing tag.
+		$block_instance['innerHTML']    = $li_opening_tag . $li_closing_tag;
+		$block_instance['innerContent'] = array(
+			$li_opening_tag,
+			null,
+			$li_closing_tag,
+		);
+
+		// 5. Render the block using the augmented block object that contains the desired markup.
+		// This ensures that the resulting `$block_content` has the appropriate layout container
+		// class attached to the wrapping `li` element, which avoids the conflict of two competing
+		// layout classes. For background, see: https://github.com/WordPress/gutenberg/issues/41026.
 		$block_content = (
 			new WP_Block(
-				$block->parsed_block,
+				$block_instance,
 				array(
 					'postType' => get_post_type(),
 					'postId'   => get_the_ID(),
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
-		$post_classes  = implode( ' ', get_post_class( 'wp-block-post' ) );
-		$content      .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+
+		// 6. Concatenate to the wrapper block's content.
+		$content .= $block_content;
 	}
 
 	wp_reset_postdata();
