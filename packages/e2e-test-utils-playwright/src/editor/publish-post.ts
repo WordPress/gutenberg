@@ -26,7 +26,10 @@ export async function publishPost( this: Editor ) {
 	}
 
 	// Handle saving just the post.
-	await this.page.click(
-		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
-	);
+	await Promise.all( [
+		this.page.waitForNavigation(),
+		this.page.click(
+			'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
+		),
+	] );
 }
