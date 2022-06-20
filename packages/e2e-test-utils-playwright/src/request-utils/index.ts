@@ -18,7 +18,7 @@ import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
-import { deleteAllPosts } from './posts';
+import { createNewPage, deleteAllPosts, deletePage } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
@@ -127,6 +127,8 @@ class RequestUtils {
 	uploadMedia = uploadMedia;
 	deleteMedia = deleteMedia;
 	deleteAllMedia = deleteAllMedia;
+	createNewPage = createNewPage;
+	deletePage = deletePage;
 }
 
 export type { StorageState };

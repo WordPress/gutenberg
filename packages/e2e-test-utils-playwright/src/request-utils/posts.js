@@ -3,6 +3,27 @@
  *
  * @this {import('./index').RequestUtils}
  */
+
+export async function createNewPage( title, status = 'draft' ) {
+	const post = await this.rest( {
+		method: 'POST',
+		path: '/wp/v2/pages',
+		params: {
+			title,
+			status,
+		},
+	} );
+
+	return post;
+}
+
+export async function deletePage( id ) {
+	await this.rest( {
+		method: 'DELETE',
+		path: `/wp/v2/pages/${ id }`,
+	} );
+}
+
 export async function deleteAllPosts() {
 	// List all posts.
 	// https://developer.wordpress.org/rest-api/reference/posts/#list-posts
