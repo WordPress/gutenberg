@@ -29,8 +29,8 @@ describe( 'TextHighlight', () => {
 				const highlightedEls = getMarks( container );
 
 				highlightedEls.forEach( ( el ) => {
-					expect( el.textContent ).toEqual(
-						expect.stringContaining( highlight )
+					expect( el ).toHaveTextContent(
+						new RegExp( `^${ highlight }$` )
 					);
 				} );
 			}
