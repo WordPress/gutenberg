@@ -150,7 +150,7 @@ test.describe( 'RTL', () => {
 		page,
 		pageUtils,
 	} ) => {
-		page.click( 'role=button[name="Add default block"i]' );
+		await page.click( 'role=button[name="Add default block"i]' );
 
 		// Wait for rich text editor to load.
 		await page.waitForSelector( '.block-editor-rich-text__editable' );
