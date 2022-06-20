@@ -76,8 +76,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$schema_styles_elements[ $element ] = $styles_non_top_level;
 
 			if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
-				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $selector ) {
-					$schema_styles_elements[ $element ][ $selector ] = $styles_non_top_level;
+				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+					$schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
 				}
 			}
 		}
@@ -89,6 +89,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
+
 		$schema['styles']             = static::VALID_STYLES;
 		$schema['styles']['blocks']   = $schema_styles_blocks;
 		$schema['styles']['elements'] = $schema_styles_elements;
@@ -464,6 +465,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
 						'selector' => $selectors[ $name ]['elements'][ $element ],
 					);
+
+					// Handle any psuedo selectors for the element.
+					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
+						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
+							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+								$nodes[] = array(
+									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
+									'selector' => $selectors[ $name ]['elements'][ $element ] . $pseudo_selector,
+								);
+							}
+						}
+					}
 				}
 			}
 		}

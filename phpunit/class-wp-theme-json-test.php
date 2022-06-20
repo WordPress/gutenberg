@@ -846,6 +846,53 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'a:levitate{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color'  => array(
+										'text'       => 'green',
+										'background' => 'red',
+									),
+									':hover' => array(
+										'color'      => array(
+											'text'       => 'red',
+											'background' => 'green',
+										),
+										'typography' => array(
+											'textTransform' => 'uppercase',
+											'fontSize' => '10em',
+										),
+									),
+									':focus' => array(
+										'color' => array(
+											'text'       => 'yellow',
+											'background' => 'black',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles = 'body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$element_styles = '.wp-block-group a{background-color: red;color: green;}.wp-block-group a:hover{background-color: green;color: red;font-size: 10em;text-transform: uppercase;}.wp-block-group a:focus{background-color: black;color: yellow;}';
+
+		$expected = $base_styles . $element_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+	}
+
 	public function test_merge_incoming_data() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
