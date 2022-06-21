@@ -38,3 +38,5 @@ export type SelectControlGroupProps = {
 export type SelectControlGroupLabelProps = {
 	children: ReactNode;
 };
+
+export type SelectControlSeparatorProps = {};

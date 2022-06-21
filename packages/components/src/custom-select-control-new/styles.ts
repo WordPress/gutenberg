@@ -111,3 +111,13 @@ export const groupLabel = css`
 	font-weight: 500;
 	opacity: 0.6;
 `;
+
+export const separator = css`
+	border-color: currentcolor;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+	height: 0px;
+	border-top-width: 1px;
+	opacity: 0.25;
+	width: 100%;
+`;
