@@ -328,7 +328,7 @@
 												"type": "string"
 											},
 											"fontWeight": {
-												"description": "CSS font-weight values, list delimited by spaces.",
+												"description": "List of available font weights, separated by a space.",
 												"type": "string"
 											},
 											"fontStyle": {
