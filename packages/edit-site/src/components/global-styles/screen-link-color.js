@@ -26,7 +26,7 @@ function ScreenLinkColor( { name } ) {
 			<ScreenHeader
 				title={ __( 'Links' ) }
 				description={ __(
-					'Manage the fonts and typography used on the links.'
+					'Set the default color used for links across the site.'
 				) }
 			/>
 			<ScreenElementColorpicker

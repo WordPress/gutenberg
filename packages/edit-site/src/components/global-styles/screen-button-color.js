@@ -10,7 +10,7 @@ import ScreenHeader from './header';
 import { useCanCustomizeColor } from './hooks';
 import ScreenElementColorpicker from './screen-element-colorpicker';
 
-function ScreenTextColor( { name } ) {
+function ScreenButtonColor( { name } ) {
 	const canCustomize = useCanCustomizeColor(
 		name,
 		'color.background',
@@ -49,4 +49,4 @@ function ScreenTextColor( { name } ) {
 	);
 }
 
-export default ScreenTextColor;
+export default ScreenButtonColor;
