@@ -21,10 +21,12 @@ export const noop = () => {};
  * const MyFormToggle = () => {
  *   const [ isChecked, setChecked ] = useState( true );
  *
- *   <FormToggle
- *     checked={ isChecked }
- *     onChange={ () => setChecked( ( state ) => ! state ) }
- *   />;
+ *   return (
+ *     <FormToggle
+ *       checked={ isChecked }
+ *       onChange={ () => setChecked( ( state ) => ! state ) }
+ *     />
+ *   );
  * };
  * ```
  */
