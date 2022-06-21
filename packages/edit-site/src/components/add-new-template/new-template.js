@@ -199,7 +199,6 @@ export default function NewTemplate( { postType } ) {
 		return null;
 	}
 	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
-	// TODO: check sorting with new items.
 	missingTemplates?.sort( ( template1, template2 ) => {
 		return (
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) -

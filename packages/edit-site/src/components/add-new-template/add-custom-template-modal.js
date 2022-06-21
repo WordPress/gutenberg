@@ -55,7 +55,11 @@ function SuggestionListItem( {
 				);
 				onSelect( {
 					title,
-					description: `Template for ${ title }`,
+					description: sprintf(
+						// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
+						__( 'Template for %1$s' ),
+						title
+					),
 					slug: `single-${ entityForSuggestions.slug }-${ suggestion.slug }`,
 				} );
 			} }
