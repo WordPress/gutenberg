@@ -52,7 +52,12 @@ const UnforwardedSelectControl = (
 			<SelectLabel state={ selectState } className={ labelClassName }>
 				{ label }
 			</SelectLabel>
-			<Select state={ selectState } className={ selectClassName }>
+			<Select
+				state={ selectState }
+				className={ selectClassName }
+				// TODO: where should the ref be forwarded?
+				ref={ forwardedRef }
+			>
 				{ options?.length ? (
 					<SelectControlCustomSelectLabel
 						options={ options }
