@@ -13,13 +13,13 @@ import { space } from '../ui/utils/space';
 const deprecatedDefaultSize = ( { __next36pxDefaultSize } ) =>
 	! __next36pxDefaultSize &&
 	css`
-		height: 30px;
+		height: 28px; // 30px - 2px vertical borders on parent container
 		padding-left: ${ space( 1 ) };
 		padding-right: ${ space( 1 ) };
 	`;
 
 export const InputWrapperFlex = styled( Flex )`
-	height: 36px;
+	height: 34px; // 36px - 2px vertical borders on parent container
 	padding-left: ${ space( 2 ) };
 	padding-right: ${ space( 2 ) };
 
