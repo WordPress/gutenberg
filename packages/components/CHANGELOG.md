@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
 -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
 -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
 -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
@@ -40,7 +41,6 @@
 -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
 -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
 -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
--   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
 -   `ZStack`: Convert component story to TypeScript and add inline docs ([#41694](https://github.com/WordPress/gutenberg/pull/41694)).
 -   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
 -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
