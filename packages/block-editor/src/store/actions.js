@@ -26,7 +26,10 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
-import { retrieveSelectedAttribute, START_OF_SELECTED_AREA } from '../utils';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../utils/selection';
 
 /**
  * Action which will insert a default block insert action if there

@@ -12,7 +12,10 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
-import { retrieveSelectedAttribute, START_OF_SELECTED_AREA } from '../../utils';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../../utils/selection';
 
 function findSelection( blocks ) {
 	let i = blocks.length;
