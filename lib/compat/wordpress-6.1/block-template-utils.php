@@ -165,6 +165,22 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
 
+function gutenberg_get_template_slugs( $template ) {
+	$limit = 2;
+	if ( strpos( $template, 'single-' ) === 0 || strpos( $template, 'taxonomy-' ) === 0 ) {
+		// E.g. single-post-mypost or taxonomy-recipes-vegetarian.
+		$limit = 3;
+	}
+	$parts = explode( '-', $template, $limit );
+	$type = array_shift( $parts );
+	$slugs = array( $type );
+
+	foreach( $parts as $part ) {
+		array_unshift( $slugs, $slugs[0] . '-' . $part );
+	}
+	return $slugs;
+}
+
 /**
  * Retrieves a single unified template object using its id.
  *
@@ -196,7 +212,9 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		return null;
 	}
 	list( , $slug ) = $parts;
-	$block_template = resolve_block_template( $slug, array(), '' );
+
+	$templates = gutenberg_get_template_slugs( $slug );
+	$block_template = resolve_block_template( $slug, $templates, '' );
 	if ( ! $block_template ) {
 		$block_template = resolve_block_template( 'index', array(), '' );
 	}
