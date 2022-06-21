@@ -91,6 +91,7 @@
 		height: auto;
 		padding-top: $grid-unit;
 		padding-bottom: $grid-unit;
+		text-align: left;
 
 		&.is-open {
 			background: $gray-100;
@@ -105,5 +106,6 @@
 	.component-color-indicator {
 		width: 24px;
 		height: 24px;
+		flex-shrink: 0;
 	}
 }
