@@ -20,6 +20,21 @@ function gutenberg_update_templates_template_parts_rest_controller( $args, $post
 }
 add_filter( 'register_post_type_args', 'gutenberg_update_templates_template_parts_rest_controller', 10, 2 );
 
+
+/**
+ * Add the post type's `icon`(menu_icon) in the response.
+ * When we backport this change we will need to add the
+ * `icon` to WP_REST_Post_Types_Controller schema.
+ *
+ * @param WP_REST_Response $response  The response object.
+ * @param WP_Post_Type     $post_type The original post type object.
+ */
+function gutenberg_update_post_types_rest_response( $response, $post_type ) {
+	$response->data['icon'] = $post_type->menu_icon;
+	return $response;
+}
+add_filter( 'rest_prepare_post_type', 'gutenberg_update_post_types_rest_response', 10, 2 );
+
 /**
  * Registers the block patterns REST API routes.
  */
