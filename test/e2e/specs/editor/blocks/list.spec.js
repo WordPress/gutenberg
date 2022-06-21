@@ -19,7 +19,7 @@ test.describe( 'List', () => {
 		// Create a second list item.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Another list item' );
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>A list item</li><li>Another list item</li></ul>
 <!-- /wp:list -->`
@@ -36,7 +36,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.type( '* ' );
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>test</li></ul>
 <!-- /wp:list -->`
@@ -51,7 +51,7 @@ test.describe( 'List', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '1) A list item' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
 <ol><li>A list item</li></ol>
 <!-- /wp:list -->`
@@ -67,7 +67,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '1. ' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>1. </p>
 <!-- /wp:paragraph -->`
@@ -82,7 +82,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -98,7 +98,7 @@ test.describe( 'List', () => {
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -114,7 +114,7 @@ test.describe( 'List', () => {
 		await editor.showBlockToolbar();
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -131,7 +131,7 @@ test.describe( 'List', () => {
 		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -146,7 +146,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Escape' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -162,7 +162,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe( '' );
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
 	test( 'should not undo asterisk transform with backspace after selection change', async ( {
@@ -177,7 +177,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe( '' );
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
 	test( 'can be created by typing "/list"', async ( { editor, page } ) => {
@@ -190,7 +190,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a list' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>I’m a list</li></ul>
 <!-- /wp:list -->`
@@ -205,7 +205,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'List' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>test</li></ul>
 <!-- /wp:list -->`
@@ -225,7 +225,7 @@ test.describe( 'List', () => {
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'List' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -243,7 +243,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'List' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -266,7 +266,7 @@ test.describe( 'List', () => {
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'List' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one<br>...</li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -280,7 +280,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'Paragraph' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>one</p>
 <!-- /wp:paragraph -->
@@ -302,7 +302,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'Paragraph' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>one</p>
 <!-- /wp:paragraph -->
@@ -323,7 +323,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'List' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -337,7 +337,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await editor.transformBlockTo( 'Quote' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>one</p><p>two</p></blockquote>
 <!-- /wp:quote -->`
@@ -354,7 +354,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li></ul>
 <!-- /wp:list -->
@@ -368,7 +368,7 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -387,7 +387,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li></li><li>two</li></ul>
 <!-- /wp:list -->`
@@ -395,7 +395,7 @@ test.describe( 'List', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li></ul>
 <!-- /wp:list -->
@@ -416,7 +416,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 'two'.length );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one</li><li></li></ul>
 <!-- /wp:list -->
@@ -439,7 +439,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
 <ol><li>one</li></ol>
 <!-- /wp:list -->
@@ -463,7 +463,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -480,7 +480,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>one<ul><li></li></ul></li></ul>
 <!-- /wp:list -->`
@@ -494,7 +494,7 @@ test.describe( 'List', () => {
 		);
 		await button.click();
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
 <ol><li></li></ol>
 <!-- /wp:list -->`
@@ -514,7 +514,7 @@ test.describe( 'List', () => {
 
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ol><li>1</li></ol></li></ul>
 <!-- /wp:list -->`
@@ -532,7 +532,7 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ul><li>1</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -540,7 +540,7 @@ test.describe( 'List', () => {
 
 		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a</li><li>1</li></ul>
 <!-- /wp:list -->`
@@ -561,7 +561,7 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'i' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ul><li>1<ul><li>i</li></ul></li></ul></li></ul>
 <!-- /wp:list -->`
@@ -569,7 +569,7 @@ test.describe( 'List', () => {
 
 		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ul><li>1</li><li>i</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -577,7 +577,7 @@ test.describe( 'List', () => {
 
 		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ul><li>1</li></ul></li><li>i</li></ul>
 <!-- /wp:list -->`
@@ -598,7 +598,7 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( 'c' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
 <!-- /wp:list -->`
@@ -607,7 +607,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'primaryShift', 'm' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -623,7 +623,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'a' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a<br></li></ul>
 <!-- /wp:list -->`
@@ -644,7 +644,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>a</li><li>b<br></li><li>c</li></ul>
 <!-- /wp:list -->`
@@ -663,7 +663,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' i' ); // Should be at level 2.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>a<ul><li>i</li></ul></li></ul></li></ul>
 <!-- /wp:list -->`
@@ -672,7 +672,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>a</li><li></li></ul></li></ul>
 <!-- /wp:list -->`
@@ -680,7 +680,7 @@ test.describe( 'List', () => {
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>a</li></ul></li><li></li></ul>
 <!-- /wp:list -->`
@@ -688,7 +688,7 @@ test.describe( 'List', () => {
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>a</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -697,7 +697,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1</li><li></li></ul>
 <!-- /wp:list -->`
@@ -705,7 +705,7 @@ test.describe( 'List', () => {
 
 		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1</li></ul>
 <!-- /wp:list -->`
@@ -714,7 +714,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' ); // Should remove list.
 
-		expect( await editor.getEditedPostContent() ).toBe( '' );
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
 		// That's 9 key presses to create the list, and 9 key presses to remove
 		// the list. ;)
@@ -733,7 +733,7 @@ test.describe( 'List', () => {
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1</li><li>2<ul><li>a</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -751,7 +751,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Space' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1</li><li> </li></ul>
 <!-- /wp:list -->`
@@ -768,7 +768,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* ' );
 
 		/* eslint-disable no-irregular-whitespace */
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->`
@@ -797,7 +797,7 @@ test.describe( 'List', () => {
 		// Merge the pragraph back. No list items should be joined.
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>2</li><li>3</li></ul></li><li></li></ul>
 <!-- /wp:list -->`
@@ -812,7 +812,7 @@ test.describe( 'List', () => {
 		// Merge forward. No list items should be joined.
 		await page.keyboard.press( 'Delete' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>1<ul><li>2</li><li>3</li></ul></li></ul>
 <!-- /wp:list -->`
@@ -831,7 +831,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await editor.getEditedPostContent() ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul><li>2</li></ul>
 <!-- /wp:list -->`
