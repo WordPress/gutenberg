@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, findKey, first, isObject, last, some } from 'lodash';
+import { castArray, first, isObject, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,6 +26,10 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../utils/selection';
 
 /**
  * Action which will insert a default block insert action if there
@@ -771,10 +775,6 @@ export const __unstableDeleteSelection =
 			...mapRichTextSettings( attributeDefinitionB ),
 		} );
 
-		// A robust way to retain selection position through various transforms
-		// is to insert a special character at the position and then recover it.
-		const START_OF_SELECTED_AREA = '\u0086';
-
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
@@ -822,12 +822,7 @@ export const __unstableDeleteSelection =
 			);
 		}
 
-		const newAttributeKey = findKey(
-			updatedAttributes,
-			( v ) =>
-				typeof v === 'string' &&
-				v.indexOf( START_OF_SELECTED_AREA ) !== -1
-		);
+		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
 		const convertedValue = create( {
@@ -1052,10 +1047,6 @@ export const mergeBlocks =
 			}
 		}
 
-		// A robust way to retain selection position through various transforms
-		// is to insert a special character at the position and then recover it.
-		const START_OF_SELECTED_AREA = '\u0086';
-
 		// Clone the blocks so we don't insert the character in a "live" block.
 		const cloneA = cloneBlock( blockA );
 		const cloneB = cloneBlock( blockB );
@@ -1098,12 +1089,8 @@ export const mergeBlocks =
 		);
 
 		if ( canRestoreTextSelection ) {
-			const newAttributeKey = findKey(
-				updatedAttributes,
-				( v ) =>
-					typeof v === 'string' &&
-					v.indexOf( START_OF_SELECTED_AREA ) !== -1
-			);
+			const newAttributeKey =
+				retrieveSelectedAttribute( updatedAttributes );
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
 			const convertedValue = create( {
 				html: convertedHtml,

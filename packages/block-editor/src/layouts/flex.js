@@ -324,7 +324,7 @@ function OrientationControl( { layout, onChange } ) {
 		<fieldset className="block-editor-hooks__flex-layout-orientation-controls">
 			<legend>{ __( 'Orientation' ) }</legend>
 			<Button
-				label={ 'horizontal' }
+				label={ __( 'Horizontal' ) }
 				icon={ arrowRight }
 				isPressed={ orientation === 'horizontal' }
 				onClick={ () =>
@@ -335,7 +335,7 @@ function OrientationControl( { layout, onChange } ) {
 				}
 			/>
 			<Button
-				label={ 'vertical' }
+				label={ __( 'Vertical' ) }
 				icon={ arrowDown }
 				isPressed={ orientation === 'vertical' }
 				onClick={ () =>

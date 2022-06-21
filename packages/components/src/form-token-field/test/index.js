@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { filter, map } from 'lodash';
 import TestUtils, { act } from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 
@@ -56,7 +55,7 @@ describe( 'FormTokenField', () => {
 		const textNodes = wrapperElement().querySelectorAll(
 			'.components-form-token-field__token-text span[aria-hidden]'
 		);
-		return map( textNodes, ( node ) => node.innerHTML );
+		return Array.from( textNodes ).map( ( node ) => node.innerHTML );
 	}
 
 	function getSuggestionsText( selector ) {
@@ -64,7 +63,7 @@ describe( 'FormTokenField', () => {
 			selector || '.components-form-token-field__suggestion'
 		);
 
-		return map( suggestionNodes, getSuggestionNodeText );
+		return Array.from( suggestionNodes ).map( getSuggestionNodeText );
 	}
 
 	function getSuggestionNodeText( node ) {
@@ -77,13 +76,11 @@ describe( 'FormTokenField', () => {
 		// match).
 		const div = document.createElement( 'div' );
 		div.innerHTML = node.querySelector( 'span' ).outerHTML;
-		return map(
-			filter(
-				div.firstChild.childNodes,
+		return Array.from( div.firstChild.childNodes )
+			.filter(
 				( childNode ) => childNode.nodeType !== childNode.COMMENT_NODE
-			),
-			( childNode ) => childNode.textContent
-		);
+			)
+			.map( ( childNode ) => childNode.textContent );
 	}
 
 	function getSelectedSuggestion() {
