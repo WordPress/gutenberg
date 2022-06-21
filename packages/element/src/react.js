@@ -27,7 +27,6 @@ import {
 	lazy,
 	Suspense,
 } from 'react';
-import { isString } from 'lodash';
 
 /**
  * Object containing a React element.
@@ -231,7 +230,7 @@ export function switchChildrenNodeName( children, nodeName ) {
 	return (
 		children &&
 		Children.map( children, ( elt, index ) => {
-			if ( isString( elt ) ) {
+			if ( typeof elt?.valueOf() === 'string' ) {
 				return createElement( nodeName, { key: index }, elt );
 			}
 			const { children: childrenProp, ...props } = elt.props;
