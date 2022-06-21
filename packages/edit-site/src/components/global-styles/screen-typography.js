@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
@@ -17,7 +17,6 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
-import { elementsWithTypography } from './elements';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -44,8 +43,17 @@ function Item( { name, parentMenu, element, label } ) {
 		return null;
 	}
 
+	const navigationButtonLabel = sprintf(
+		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
+		__( 'Typography %s styles' ),
+		label
+	);
+
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/typography/' + element }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/typography/' + element }
+			aria-label={ navigationButtonLabel }
+		>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -84,15 +92,18 @@ function ScreenTypography( { name } ) {
 					<VStack spacing={ 3 }>
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
-							{ elementsWithTypography.map( ( element ) => (
-								<Item
-									key={ element.name }
-									name={ element.name }
-									parentMenu={ parentMenu }
-									element={ element.name }
-									label={ element.typography.title }
-								/>
-							) ) }
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="text"
+								label={ __( 'Text' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="link"
+								label={ __( 'Links' ) }
+							/>
 						</ItemGroup>
 					</VStack>
 				</div>

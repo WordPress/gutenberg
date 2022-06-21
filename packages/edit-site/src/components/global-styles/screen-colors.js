@@ -33,11 +33,15 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/background' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/background' }
+			aria-label={ __( 'Colors background styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
 						colorValue={ gradientValue ?? backgroundColor }
+						data-testid="background-color-indicator"
 					/>
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Background' ) }</FlexItem>
@@ -56,10 +60,16 @@ function TextColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/text' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/text' }
+			aria-label={ __( 'Colors text styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
+					<ColorIndicator
+						colorValue={ color }
+						data-testid="text-color-indicator"
+					/>
 				</ColorIndicatorWrapper>
 				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
@@ -77,7 +87,10 @@ function LinkColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/link' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/link' }
+			aria-label={ __( 'Colors link styles' ) }
+		>
 			<HStack justify="flex-start">
 				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator colorValue={ color } />
@@ -87,28 +100,6 @@ function LinkColorItem( { name, parentMenu } ) {
 		</NavigationButtonAsItem>
 	);
 }
-
-function ButtonColorItem( { name, parentMenu } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'linkColor' ); // TODO - use a real support
-	const [ color ] = useStyle( 'elements.button.color.text', name );
-
-	if ( ! hasSupport ) {
-		return null;
-	}
-
-	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
-			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
-				</ColorIndicatorWrapper>
-				<FlexItem>{ __( 'Buttons' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
 
 function ScreenColors( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
@@ -138,10 +129,6 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
-								name={ name }
-								parentMenu={ parentMenu }
-							/>
-							<ButtonColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>
