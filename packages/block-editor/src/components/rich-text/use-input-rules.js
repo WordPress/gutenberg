@@ -12,23 +12,20 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
-import {
-	__experimentalRetrieveSelectedAttribute,
-	__EXPERIMENTAL_START_OF_SELECTED_AREA,
-} from '../../utils';
+import { retrieveSelectedAttribute, START_OF_SELECTED_AREA } from '../../utils';
 
 function findSelection( blocks ) {
 	let i = blocks.length;
 
 	while ( i-- ) {
-		const attributeKey = __experimentalRetrieveSelectedAttribute(
+		const attributeKey = retrieveSelectedAttribute(
 			blocks[ i ].attributes
 		);
 
 		if ( attributeKey ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
-			].replace( __EXPERIMENTAL_START_OF_SELECTED_AREA, '' );
+			].replace( START_OF_SELECTED_AREA, '' );
 			return blocks[ i ].clientId;
 		}
 
@@ -79,12 +76,7 @@ export function useInputRules( props ) {
 			}
 
 			const content = toHTMLString( {
-				value: insert(
-					value,
-					__EXPERIMENTAL_START_OF_SELECTED_AREA,
-					0,
-					start
-				),
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
 			} );
 			const block = transformation.transform( content );
 

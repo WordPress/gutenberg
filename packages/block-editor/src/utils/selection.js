@@ -1,7 +1,9 @@
-// A robust way to retain selection position through various
-// transforms is to insert a special character at the position and
-// then recover it.
-export const __EXPERIMENTAL_START_OF_SELECTED_AREA = '\u0086';
+/**
+ * A robust way to retain selection position through various
+ * transforms is to insert a special character at the position and
+ * then recover it.
+ */
+export const START_OF_SELECTED_AREA = '\u0086';
 
 /**
  * Retrieve the block attribute that contains the selection position.
@@ -9,7 +11,7 @@ export const __EXPERIMENTAL_START_OF_SELECTED_AREA = '\u0086';
  * @param {Object} blockAttributes Block attributes.
  * @return {string|void} The name of the block attribute that was previously selected.
  */
-export function __experimentalRetrieveSelectedAttribute( blockAttributes ) {
+export function retrieveSelectedAttribute( blockAttributes ) {
 	if ( ! blockAttributes ) {
 		return;
 	}
@@ -18,7 +20,7 @@ export function __experimentalRetrieveSelectedAttribute( blockAttributes ) {
 		const value = blockAttributes[ name ];
 		return (
 			typeof value === 'string' &&
-			value.indexOf( __EXPERIMENTAL_START_OF_SELECTED_AREA ) !== -1
+			value.indexOf( START_OF_SELECTED_AREA ) !== -1
 		);
 	} );
 }

@@ -26,10 +26,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
-import {
-	__experimentalRetrieveSelectedAttribute,
-	__EXPERIMENTAL_START_OF_SELECTED_AREA,
-} from '../utils';
+import { retrieveSelectedAttribute, START_OF_SELECTED_AREA } from '../utils';
 
 /**
  * Action which will insert a default block insert action if there
@@ -776,12 +773,7 @@ export const __unstableDeleteSelection =
 		} );
 
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
-		valueB = insert(
-			valueB,
-			__EXPERIMENTAL_START_OF_SELECTED_AREA,
-			0,
-			selectionB.offset
-		);
+		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
 		// Clone the blocks so we don't manipulate the original.
 		const cloneA = cloneBlock( blockA, {
@@ -827,8 +819,7 @@ export const __unstableDeleteSelection =
 			);
 		}
 
-		const newAttributeKey =
-			__experimentalRetrieveSelectedAttribute( updatedAttributes );
+		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
 		const convertedValue = create( {
@@ -837,9 +828,7 @@ export const __unstableDeleteSelection =
 				targetBlockType.attributes[ newAttributeKey ]
 			),
 		} );
-		const newOffset = convertedValue.text.indexOf(
-			__EXPERIMENTAL_START_OF_SELECTED_AREA
-		);
+		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 		const newHtml = toHTMLString( {
 			value: newValue,
@@ -1067,7 +1056,7 @@ export const mergeBlocks =
 					html,
 					...mapRichTextSettings( attributeDefinition ),
 				} ),
-				__EXPERIMENTAL_START_OF_SELECTED_AREA,
+				START_OF_SELECTED_AREA,
 				offset,
 				offset
 			);
@@ -1098,7 +1087,7 @@ export const mergeBlocks =
 
 		if ( canRestoreTextSelection ) {
 			const newAttributeKey =
-				__experimentalRetrieveSelectedAttribute( updatedAttributes );
+				retrieveSelectedAttribute( updatedAttributes );
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
 			const convertedValue = create( {
 				html: convertedHtml,
@@ -1107,7 +1096,7 @@ export const mergeBlocks =
 				),
 			} );
 			const newOffset = convertedValue.text.indexOf(
-				__EXPERIMENTAL_START_OF_SELECTED_AREA
+				START_OF_SELECTED_AREA
 			);
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 			const newHtml = toHTMLString( {
