@@ -34,3 +34,7 @@ export type SelectControlArrowProps = {};
 export type SelectControlGroupProps = {
 	children: ReactNode;
 };
+
+export type SelectControlGroupLabelProps = {
+	children: ReactNode;
+};

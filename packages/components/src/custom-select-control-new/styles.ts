@@ -102,3 +102,12 @@ export const item = css`
 export const arrow = css``;
 
 export const group = css``;
+
+export const groupLabel = css`
+	cursor: default;
+	padding: 0.5rem;
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+	font-weight: 500;
+	opacity: 0.6;
+`;
