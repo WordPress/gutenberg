@@ -27,6 +27,18 @@ data class Media(
     }
 
     companion object {
+        private fun convertToType(mimeType: String?): String {
+            val isMediaType = { mediaType: MediaType ->
+                mimeType?.startsWith(mediaType.name.toLowerCase(Locale.ROOT)) == true
+            }
+            val type = when {
+                isMediaType(IMAGE) -> IMAGE
+                isMediaType(VIDEO) -> VIDEO
+                else -> OTHER
+            }.name.toLowerCase(Locale.ROOT)
+            return type;
+        }
+
         @JvmStatic
         fun createRNMediaUsingMimeType(
             id: Int,
@@ -36,15 +48,19 @@ data class Media(
             title: String?,
             alt: String?,
         ): Media {
-            val isMediaType = { mediaType: MediaType ->
-                mimeType?.startsWith(mediaType.name.toLowerCase(Locale.ROOT)) == true
-            }
-            val type = when {
-                isMediaType(IMAGE) -> IMAGE
-                isMediaType(VIDEO) -> VIDEO
-                else -> OTHER
-            }.name.toLowerCase(Locale.ROOT)
+            val type = convertToType(mimeType)
             return Media(id, url, type, caption ?: "", title ?: "", alt ?: "")
+        }
+        @JvmStatic
+        fun createRNMediaUsingMimeType(
+            id: Int,
+            url: String,
+            mimeType: String?,
+            caption: String?,
+            title: String?,
+        ): Media {
+            val type = convertToType(mimeType)
+            return Media(id, url, type, caption ?: "", title ?: "")
         }
     }
 }
