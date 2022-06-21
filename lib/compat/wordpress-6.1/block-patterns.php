@@ -28,6 +28,7 @@
  *   - Categories       (comma-separated values)
  *   - Keywords         (comma-separated values)
  *   - Block Types      (comma-separated values)
+ *   - Post Types       (comma-separated values)
  *   - Inserter         (yes/no)
  *
  * @since 6.0.0
@@ -42,6 +43,7 @@ function gutenberg_register_theme_block_patterns() {
 		'categories'    => 'Categories',
 		'keywords'      => 'Keywords',
 		'blockTypes'    => 'Block Types',
+		'postTypes'     => 'Post Types',
 		'inserter'      => 'Inserter',
 	);
 
@@ -113,7 +115,7 @@ function gutenberg_register_theme_block_patterns() {
 					}
 
 					// For properties of type array, parse data as comma-separated.
-					foreach ( array( 'categories', 'keywords', 'blockTypes' ) as $property ) {
+					foreach ( array( 'categories', 'keywords', 'blockTypes', 'postTypes' ) as $property ) {
 						if ( ! empty( $pattern_data[ $property ] ) ) {
 							$pattern_data[ $property ] = array_filter(
 								preg_split(
