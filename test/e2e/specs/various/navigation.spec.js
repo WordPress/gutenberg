@@ -28,7 +28,10 @@ test.describe( 'Classic menus', () => {
 
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 		await page.click( '#submit-posttype-page' );
-		await page.waitForSelector( '#menu-to-edit .menu-item' );
+
+		await expect(
+			page.locator( '#menu-to-edit .menu-item-title' )
+		).toContainText( `${ pageTitle }` );
 
 		await page.click( '#save_menu_footer' );
 
