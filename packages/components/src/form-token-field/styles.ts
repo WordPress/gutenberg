@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
+import { Flex } from '../flex';
 import { space } from '../ui/utils/space';
 
 type TokensAndInputWrapperProps = {
@@ -24,11 +25,7 @@ const deprecatedPaddings = ( {
 		padding-bottom: ${ space( hasTokens ? 1 : 0.5 ) };
 	`;
 
-export const TokensAndInputWrapper = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: ${ space( 1 ) };
+export const TokensAndInputWrapperFlex = styled( Flex )`
 	padding: 5px ${ space( 1 ) };
 
 	${ deprecatedPaddings }
