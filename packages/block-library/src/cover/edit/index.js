@@ -211,6 +211,18 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			id: undefined,
+			url: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: useFeaturedImage
+				? IMAGE_BACKGROUND_TYPE
+				: undefined,
+		} );
+	};
+
 	const blockControls = (
 		<CoverBlockControls
 			attributes={ attributes }
@@ -232,17 +244,6 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 		/>
 	);
-	const toggleUseFeaturedImage = () => {
-		setAttributes( {
-			id: undefined,
-			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: useFeaturedImage
-				? IMAGE_BACKGROUND_TYPE
-				: undefined,
-		} );
-	};
 
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
