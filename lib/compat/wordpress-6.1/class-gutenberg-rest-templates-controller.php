@@ -96,6 +96,23 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 	}
 
 	/**
+	 * Deletes a single template.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function delete_item( $request ) {
+		$template = get_block_template( $request['id'], $this->post_type );
+		if ( ! $template || $template->id !== $request['id'] ) { // Make sure there is a template for this ID (and not just a fallback one).
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.' ), array( 'status' => 404 ) );
+		}
+
+		return parent::delete_item( $request );
+	}
+
+	/**
 	 * Updates a single template.
 	 *
 	 * @since 5.8.0

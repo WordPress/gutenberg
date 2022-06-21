@@ -195,33 +195,20 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	if ( count( $parts ) < 2 ) {
 		return null;
 	}
-	list( $theme, $slug ) = $parts;
-	$wp_query_args        = array(
-		'post_name__in'  => array( $slug ),
-		'post_type'      => $template_type,
-		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
-		'posts_per_page' => 1,
-		'no_found_rows'  => true,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => $theme,
-			),
-		),
-	);
-	$template_query       = new WP_Query( $wp_query_args );
-	$posts                = $template_query->posts;
-
-	if ( count( $posts ) > 0 ) {
-		$template = gutenberg_build_block_template_result_from_post( $posts[0] );
-
-		if ( ! is_wp_error( $template ) ) {
-			return $template;
-		}
+	list( , $slug ) = $parts;
+	$block_template = resolve_block_template( $slug, array(), '' );
+	if ( ! $block_template ) {
+		$block_template = resolve_block_template( 'index', array(), '' );
 	}
-
-	$block_template = get_block_file_template( $id, $template_type );
+	// This might give us a fallback template with a different ID,
+	// so we have to override it to make sure it's correct.
+	$block_template->id     = $id;
+	$block_template->slug   = $slug;
+	$default_template_types = get_default_block_template_types();
+	if ( array_key_exists( $slug, $default_template_types ) ) {
+		$block_template->title       = $default_template_types[ $slug ]['title'];
+		$block_template->description = $default_template_types[ $slug ]['description'];
+	}
 
 	/**
 	 * Filters the queried block template object after it's been fetched.

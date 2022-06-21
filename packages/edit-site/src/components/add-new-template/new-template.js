@@ -13,7 +13,7 @@ import {
 	NavigableMenu,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import {
@@ -32,7 +32,6 @@ import {
 	tag,
 } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -40,7 +39,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import AddCustomTemplateModal from './add-custom-template-modal';
 import { usePostTypes, usePostTypesEntitiesInfo } from './utils';
 import { useHistory } from '../routes';
-import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -76,64 +74,32 @@ const TEMPLATE_ICONS = {
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
 	const postTypes = usePostTypes();
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
-		useState( false );
+	const [ showCustomTemplateModal, setShowCustomTemplateModal ] = useState(
+		false
+	);
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
-	const { existingTemplates, defaultTemplateTypes } = useSelect(
+	const { existingTemplates, defaultTemplateTypes, theme } = useSelect(
 		( select ) => ( {
 			existingTemplates: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template',
 				{ per_page: -1 }
 			),
-			defaultTemplateTypes:
-				select( editorStore ).__experimentalGetDefaultTemplateTypes(),
+			defaultTemplateTypes: select(
+				editorStore
+			).__experimentalGetDefaultTemplateTypes(),
+			theme: select( coreStore ).getCurrentTheme(),
 		} ),
 		[]
 	);
 	const postTypesEntitiesInfo = usePostTypesEntitiesInfo( existingTemplates );
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template ) {
-		try {
-			const { title, description, slug } = template;
-			const newTemplate = await saveEntityRecord(
-				'postType',
-				'wp_template',
-				{
-					description,
-					// Slugs need to be strings, so this is for template `404`
-					slug: slug.toString(),
-					status: 'publish',
-					title,
-					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					is_wp_suggestion: true,
-				},
-				{ throwOnError: true }
-			);
-
-			// Set template before navigating away to avoid initial stale value.
-			setTemplate( newTemplate.id, newTemplate.slug );
-
-			// Navigate to the created template editor.
-			history.push( {
-				postId: newTemplate.id,
-				postType: newTemplate.type,
-			} );
-
-			// TODO: Add a success notice?
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the template.' );
-
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
+		const { slug } = template;
+		history.push( {
+			postId: theme.stylesheet + '//' + slug.toString(),
+			postType: 'wp_template',
+		} );
 	}
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
