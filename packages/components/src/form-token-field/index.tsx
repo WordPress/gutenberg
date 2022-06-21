@@ -569,9 +569,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const termsCount = tokens.length;
 
 		return (
-			<FlexItem>
+			<FlexItem key={ 'token-' + _value }>
 				<Token
-					key={ 'token-' + _value }
 					value={ _value }
 					status={ status }
 					title={
