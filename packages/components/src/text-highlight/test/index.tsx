@@ -9,6 +9,8 @@ import { render } from '@testing-library/react';
 import TextHighlight from '..';
 
 const getMarks = ( container: Element ) =>
+	// Use querySelectorAll because the `mark` role is not officially supported
+	// yet. This should be changed to `getByRole` when it is.
 	Array.from( container.querySelectorAll( 'mark' ) );
 
 const defaultText =
@@ -55,7 +57,9 @@ describe( 'TextHighlight', () => {
 		} );
 
 		it( 'should highlight occurances of a string regardless of capitalisation', () => {
-			const highlight = 'The'; // Note this occurs in both sentance of lowercase forms.
+			// Note that `The` occurs twice in the default text, once in
+			// lowercase and once capitalized.
+			const highlight = 'The';
 
 			const { container } = render(
 				<TextHighlight text={ defaultText } highlight={ highlight } />
@@ -63,11 +67,11 @@ describe( 'TextHighlight', () => {
 
 			const highlightedEls = getMarks( container );
 
-			// Our component matcher is case insensitive so string. Containing
-			// will return a false failure.
-			const regex = new RegExp( highlight, 'i' );
-
 			expect( highlightedEls ).toHaveLength( 2 );
+
+			// Make sure the matcher is case insensitive, since the test should
+			// match regardless of the case of the string.
+			const regex = new RegExp( highlight, 'i' );
 
 			highlightedEls.forEach( ( el ) => {
 				expect( el.innerHTML ).toMatch( regex );
