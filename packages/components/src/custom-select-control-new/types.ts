@@ -30,3 +30,7 @@ export type SelectControlProps = {
 };
 
 export type SelectControlArrowProps = {};
+
+export type SelectControlGroupProps = {
+	children: ReactNode;
+};
