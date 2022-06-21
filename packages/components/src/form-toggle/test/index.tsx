@@ -32,22 +32,17 @@ const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
 
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render', () => {
-			render( <FormToggle onChange={ noop } /> );
-			expect( getInput() ).not.toBeNull();
-		} );
-
 		it( 'should render a span element with an unchecked checkbox', () => {
 			const { container } = render( <FormToggle onChange={ noop } /> );
 
-			expect( getInput() ).toHaveProperty( 'checked', false );
+			expect( getInput() ).not.toBeChecked();
 			expect( container.firstChild ).toMatchSnapshot();
 		} );
 
-		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
+		it( 'should render a checked checkbox when providing checked prop', () => {
 			render( <FormToggle onChange={ noop } checked /> );
 
-			expect( getInput() ).toHaveProperty( 'checked', true );
+			expect( getInput() ).toBeChecked();
 		} );
 
 		it( 'should render with an additional className', () => {
@@ -88,22 +83,20 @@ describe( 'FormToggle', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			let state = false;
-			const setState = jest.fn( () => ( state = ! state ) );
-
-			render( <ControlledFormToggle onChange={ setState } /> );
+			const onChange = jest.fn();
+			render( <ControlledFormToggle onChange={ onChange } /> );
 
 			const input = getInput();
 
 			await user.click( input );
-			expect( input ).toHaveProperty( 'checked', true );
-			expect( state ).toBe( true );
+			expect( onChange.mock.calls[ 0 ][ 0 ].target ).toBeInTheDocument();
+			expect( input ).toBeChecked();
 
 			await user.click( input );
-			expect( input ).toHaveProperty( 'checked', false );
-			expect( state ).toBe( false );
+			expect( onChange.mock.calls[ 1 ][ 0 ].target ).toBeInTheDocument();
+			expect( input ).not.toBeChecked();
 
-			expect( setState ).toHaveBeenCalledTimes( 2 );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 } );
