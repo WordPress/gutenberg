@@ -29,6 +29,9 @@ test.describe( 'Classic menus', () => {
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 		await page.click( '#submit-posttype-page' );
 
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 5000 );
+
 		await expect(
 			page.locator( '#menu-to-edit .menu-item-title' )
 		).toContainText( `${ pageTitle }` );
