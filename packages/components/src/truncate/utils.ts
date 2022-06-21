@@ -2,9 +2,16 @@
  * Internal dependencies
  */
 import { isValueDefined } from '../utils/values';
+import type { TruncateProps } from './types';
 
 export const TRUNCATE_ELLIPSIS = '…';
-export const TRUNCATE_TYPE = {
+export const TRUNCATE_TYPE: {
+	auto: 'auto';
+	head: 'head';
+	middle: 'middle';
+	tail: 'tail';
+	none: 'none';
+} = {
 	auto: 'auto',
 	head: 'head',
 	middle: 'middle',
@@ -60,7 +67,7 @@ export function truncateMiddle(
 
 export function truncateContent(
 	words: string = '',
-	props: typeof TRUNCATE_DEFAULT_PROPS
+	props: Omit< TruncateProps, 'children' >
 ) {
 	const mergedProps = { ...TRUNCATE_DEFAULT_PROPS, ...props };
 	const { ellipsis, ellipsizeMode, limit } = mergedProps;
@@ -69,8 +76,8 @@ export function truncateContent(
 		return words;
 	}
 
-	let truncateHead;
-	let truncateTail;
+	let truncateHead: number;
+	let truncateTail: number;
 
 	switch ( ellipsizeMode ) {
 		case TRUNCATE_TYPE.head:
