@@ -45,18 +45,16 @@ export default function useTruncate(
 	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
-		const sx = {
-			numberOfLines: css`
-				-webkit-box-orient: vertical;
-				-webkit-line-clamp: ${ numberOfLines };
-				display: -webkit-box;
-				overflow: hidden;
-			`,
-		};
+		const truncateLines = css`
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: ${ numberOfLines };
+			display: -webkit-box;
+			overflow: hidden;
+		`;
 
 		return cx(
 			shouldTruncate && ! numberOfLines && styles.Truncate,
-			shouldTruncate && !! numberOfLines && sx.numberOfLines,
+			shouldTruncate && !! numberOfLines && truncateLines,
 			className
 		);
 	}, [ className, cx, numberOfLines, shouldTruncate ] );
