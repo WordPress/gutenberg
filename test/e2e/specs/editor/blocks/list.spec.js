@@ -203,7 +203,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
-		await editor.transformBlockTo( 'List' );
+		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -223,7 +223,7 @@ test.describe( 'List', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.click( '[data-type="core/paragraph"]:first-of-type' );
 		await page.keyboard.up( 'Shift' );
-		await editor.transformBlockTo( 'List' );
+		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -241,7 +241,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'List' );
+		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -264,7 +264,7 @@ test.describe( 'List', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.click( '[data-type="core/paragraph"]:first-of-type' );
 		await page.keyboard.up( 'Shift' );
-		await editor.transformBlockTo( 'List' );
+		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -278,7 +278,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'Paragraph' );
+		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
@@ -300,7 +300,7 @@ test.describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'Paragraph' );
+		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
@@ -321,7 +321,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'List' );
+		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -335,7 +335,7 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'Quote' );
+		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
