@@ -88,6 +88,10 @@
 	padding: 0;
 
 	> button {
+		height: auto;
+		padding-top: $grid-unit;
+		padding-bottom: $grid-unit;
+
 		&.is-open {
 			background: $gray-100;
 			color: var(--wp-admin-theme-color);
@@ -97,4 +101,9 @@
 
 .block-editor-panel-color-gradient-settings__dropdown {
 	width: 100%;
+
+	.component-color-indicator {
+		width: 24px;
+		height: 24px;
+	}
 }
