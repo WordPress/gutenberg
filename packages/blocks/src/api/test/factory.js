@@ -2,7 +2,6 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { times } from 'lodash';
 
 /**
  * Internal dependencies
@@ -1084,7 +1083,7 @@ describe( 'block factory', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 4, ( index ) => {
+				const textBlocks = [ ...Array( 4 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
@@ -1101,13 +1100,13 @@ describe( 'block factory', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
-				const textBlocks = times( 2, ( index ) => {
+				const textBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
 				} );
 
-				const imageBlocks = times( 2, ( index ) => {
+				const imageBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/image-block', {
 						value: `imageBlock${ index + 1 }`,
 					} );
@@ -1125,7 +1124,7 @@ describe( 'block factory', () => {
 			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 
-				const blocks = times( 1, ( index ) => {
+				const blocks = [ ...Array( 1 ).keys() ].map( ( index ) => {
 					return createBlock( 'core/text-block', {
 						value: `textBlock${ index + 1 }`,
 					} );
@@ -1802,11 +1801,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1864,14 +1865,16 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock(
-					index % 2 ? 'core/text-block' : 'core/image-block',
-					{
-						value: `block-value-${ index + 1 }`,
-					}
-				);
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock(
+						index % 2 ? 'core/text-block' : 'core/image-block',
+						{
+							value: `block-value-${ index + 1 }`,
+						}
+					);
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1925,11 +1928,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `block-value-${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -1983,11 +1988,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/image-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `block-value-${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `block-value-${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,
@@ -2040,11 +2047,13 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 
 			const numOfBlocksToGroup = 4;
-			const blocks = times( numOfBlocksToGroup, ( index ) => {
-				return createBlock( 'core/text-block', {
-					value: `textBlock${ index + 1 }`,
-				} );
-			} );
+			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
+				( index ) => {
+					return createBlock( 'core/text-block', {
+						value: `textBlock${ index + 1 }`,
+					} );
+				}
+			);
 
 			const transformedBlocks = switchToBlockType(
 				blocks,

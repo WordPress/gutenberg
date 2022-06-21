@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -83,7 +78,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {

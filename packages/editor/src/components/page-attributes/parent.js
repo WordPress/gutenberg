@@ -7,7 +7,6 @@ import {
 	debounce,
 	repeat,
 	find,
-	flatten,
 	deburr,
 } from 'lodash';
 
@@ -111,7 +110,7 @@ export function PageAttributesParent() {
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
-			return flatten( sortedNodes );
+			return sortedNodes.flat();
 		};
 
 		let tree = pageItems.map( ( item ) => ( {

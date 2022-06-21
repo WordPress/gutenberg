@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { isNil } from 'lodash';
+import { isValueDefined } from '../utils/values';
 
 export const TRUNCATE_ELLIPSIS = '…';
 export const TRUNCATE_TYPE = {
@@ -37,7 +37,9 @@ export function truncateMiddle(
 	// eslint-disable-next-line no-bitwise
 	const backLength = ~~tailLength;
 	/* istanbul ignore next */
-	const truncateStr = ! isNil( ellipsis ) ? ellipsis : TRUNCATE_ELLIPSIS;
+	const truncateStr = isValueDefined( ellipsis )
+		? ellipsis
+		: TRUNCATE_ELLIPSIS;
 
 	if (
 		( frontLength === 0 && backLength === 0 ) ||

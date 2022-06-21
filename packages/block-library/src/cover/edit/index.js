@@ -211,23 +211,31 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const blockControls = (
+		<CoverBlockControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			onSelectMedia={ onSelectMedia }
+			currentSettings={ currentSettings }
+		/>
+	);
+
+	const inspectorControls = (
+		<CoverInspectorControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			clientId={ clientId }
+			setOverlayColor={ setOverlayColor }
+			coverRef={ ref }
+			currentSettings={ currentSettings }
+		/>
+	);
+
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				<CoverBlockControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					onSelectMedia={ onSelectMedia }
-					currentSettings={ currentSettings }
-				/>
-				<CoverInspectorControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-					setOverlayColor={ setOverlayColor }
-					coverRef={ ref }
-					currentSettings={ currentSettings }
-				/>
+				{ blockControls }
+				{ inspectorControls }
 				<div
 					{ ...blockProps }
 					className={ classnames(
@@ -286,20 +294,8 @@ function CoverEdit( {
 
 	return (
 		<>
-			<CoverBlockControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				onSelectMedia={ onSelectMedia }
-				currentSettings={ currentSettings }
-			/>
-			<CoverInspectorControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-				setOverlayColor={ setOverlayColor }
-				coverRef={ ref }
-				currentSettings={ currentSettings }
-			/>
+			{ blockControls }
+			{ inspectorControls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
