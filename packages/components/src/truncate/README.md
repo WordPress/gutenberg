@@ -45,14 +45,14 @@ Determines where to truncate. For example, we can truncate text right in the mid
 
 ##### `limit`: `number`
 
-Determines the max characters when `truncate` is set.
+Determines the max number of characters to be displayed before the rest of the text gets truncated. Requires `ellipsizeMode` to assume values different from `auto` and `none`.
 
 -   Required: No
 -   Default: `0`
 
 ##### `numberOfLines`: `number`
 
-Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+Clamps the text content to the specified `numberOfLines`, adding an ellipsis at the end. Note: this feature ignores the value of the `ellipsis` prop and always displays the default `…` ellipsis.
 
 -   Required: No
 -   Default: `0`
