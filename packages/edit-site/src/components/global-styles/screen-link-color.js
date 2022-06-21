@@ -31,7 +31,7 @@ function ScreenLinkColor( { name } ) {
 			/>
 			<ScreenElementColorpicker
 				name={ name }
-				element="button"
+				element="link"
 				path="elements.link.color.text"
 			/>
 		</>

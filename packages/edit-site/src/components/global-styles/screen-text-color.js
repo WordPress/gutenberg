@@ -28,7 +28,7 @@ function ScreenTextColor( { name } ) {
 			<ScreenElementColorpicker
 				name={ name }
 				element="button"
-				path="elements.link.color.text"
+				path="color.text"
 			/>
 		</>
 	);

@@ -35,7 +35,7 @@ function ScreenButtonColor( { name } ) {
 			<ScreenElementColorpicker
 				name={ name }
 				element="button"
-				path="elements.button.background.text"
+				path="elements.button.color.text"
 			/>
 			<h4 className="edit-site-global-styles-section-title">
 				{ __( 'Background color' ) }
@@ -43,7 +43,7 @@ function ScreenButtonColor( { name } ) {
 			<ScreenElementColorpicker
 				name={ name }
 				element="button"
-				path="elements.button.background.text"
+				path="elements.button.color.background"
 			/>
 		</>
 	);
