@@ -85,7 +85,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
                 switch (mediaType) {
                     case IMAGE:
-                        rnMediaList.add(createRNMediaUsingMimeType(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snowcapped mountain top in a cloudy sky with red leaved trees in the foreground"));
+                        rnMediaList.add(createRNMediaUsingMimeType(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground"));
                         break;
                     case VIDEO:
                         rnMediaList.add(createRNMediaUsingMimeType(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
