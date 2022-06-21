@@ -2,12 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import {
-	Select,
-	SelectLabel,
-	SelectPopover,
-	SelectArrow,
-} from 'ariakit/select';
+import { Select, SelectLabel, SelectPopover } from 'ariakit/select';
 
 /**
  * WordPress dependencies
@@ -20,7 +15,7 @@ import { forwardRef } from '@wordpress/element';
 
 import { useSelectControl } from './hook';
 import { WordPressComponentProps } from '../../ui/context';
-import { CustomSelectControlItem } from '../';
+import { CustomSelectControlItem, CustomSelectControlArrow } from '../';
 import type { SelectControlOption, SelectControlProps } from '../types';
 
 const SelectControlCustomSelectLabel = ( {
@@ -33,7 +28,7 @@ const SelectControlCustomSelectLabel = ( {
 	<>
 		{ /* Use the label associated to the option's value, fallback to the value itself */ }
 		{ options.find( ( option ) => option.value === value )?.label ?? value }
-		<SelectArrow />
+		<CustomSelectControlArrow />
 	</>
 );
 
@@ -64,7 +59,11 @@ const UnforwardedSelectControl = (
 						value={ selectState.value }
 					/>
 				) : (
-					selectState.value
+					// TODO: add support for custom render function
+					<>
+						{ selectState.value }
+						<CustomSelectControlArrow />
+					</>
 				) }
 			</Select>
 			<SelectPopover state={ selectState } className={ popoverClassName }>

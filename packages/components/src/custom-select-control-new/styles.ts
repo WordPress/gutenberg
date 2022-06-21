@@ -98,3 +98,5 @@ export const item = css`
 		opacity: 0.5;
 	}
 `;
+
+export const arrow = css``;

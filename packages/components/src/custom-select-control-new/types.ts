@@ -20,7 +20,6 @@ export type SelectControlItemProps = SelectControlOptionBase & {
 	children?: ReactNode;
 };
 
-// react component props
 export type SelectControlProps = {
 	value?: string;
 	label?: string;
@@ -29,3 +28,5 @@ export type SelectControlProps = {
 	children?: ReactNode;
 	className?: string;
 };
+
+export type SelectControlArrowProps = {};
