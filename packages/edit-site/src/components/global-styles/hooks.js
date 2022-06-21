@@ -305,3 +305,17 @@ export function useGradientsPerOrigin( name ) {
 		return result;
 	}, [ customGradients, themeGradients, defaultGradients ] );
 }
+
+export function useCanCustomizeColor( name, requiredSetting, requiredSupport ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ solids ] = useSetting( 'color.palette', name );
+	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+
+	const [ isTextEnabled ] = useSetting( requiredSetting, name );
+
+	return (
+		supports.includes( requiredSupport ) &&
+		isTextEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled )
+	);
+}
