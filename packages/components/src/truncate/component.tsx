@@ -6,11 +6,10 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import useTruncate from './hook';
 import type { TruncateProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
 
 function UnconnectedTruncate(
 	props: WordPressComponentProps< TruncateProps, 'span' >,
