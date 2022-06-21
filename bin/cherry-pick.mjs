@@ -6,7 +6,7 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = "Backport to WP Beta/RC";
+const LABEL = process.argv[2] || "Backport to WP Minor Release";
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', ['auth', 'status'] )
 	?.stderr
@@ -35,7 +35,7 @@ async function main() {
 	console.log( `You are on branch "${BRANCH}".` );
 	console.log( `This script will:` );
 	console.log( `• Cherry-pick the merged PRs labeled as "${LABEL}" to this branch` );
-	console.log( `• Push this branch` );
+	console.log( `• Ask whether you want to push this branch` );
 	console.log( `• Comment on each PR` );
 	console.log( `• Remove the label from each PR` );
 	console.log( `The last two actions will be performed USING YOUR GITHUB ACCOUNT that` )
@@ -58,7 +58,8 @@ async function main() {
 
 	if ( successes.length ) {
 		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
-			console.log( `Pushing to origin/${ BRANCH }` );
+			console.log( `About to push to origin/${ BRANCH }` );
+			await promptDoYouWantToProceed();
 			cli( 'git', ['push', 'origin', BRANCH] );
 
 			console.log( `Commenting and removing labels...` );
