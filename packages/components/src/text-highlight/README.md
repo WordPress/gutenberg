@@ -28,9 +28,11 @@ The component accepts the following props.
 The string to search for and highlight within the `text`. Case insensitive. Multiple matches.
 
 -   Required: Yes
+-   Default: `''`
 
 ### `text`: `string`
 
 The string of text to be tested for occurrences of then given `highlight`.
 
 -   Required: Yes
+-   Default: `''`
