@@ -47,7 +47,12 @@ function SuggestionListItem( {
 			{ ...composite }
 			className={ baseCssClass }
 			onClick={ () => {
-				const title = `${ entityForSuggestions.labels.singular_name }: ${ suggestion.name }`;
+				const title = sprintf(
+					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
+					__( '%1$s: %2$s' ),
+					entityForSuggestions.labels.singular_name,
+					suggestion.name
+				);
 				onSelect( {
 					title,
 					description: `Template for ${ title }`,
@@ -107,8 +112,8 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			<SearchControl
 				onChange={ setSearchInputValue }
 				value={ searchInputValue }
-				label={ __( 'Search' ) }
-				placeholder={ __( 'Search' ) }
+				label={ entityForSuggestions.labels.search_items }
+				placeholder={ entityForSuggestions.labels.search_items }
 			/>
 			{ !! suggestions?.length && (
 				<Composite
@@ -130,7 +135,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			) }
 			{ search && ! suggestions?.length && (
 				<p className="edit-site-custom-template-modal__no-results">
-					{ __( 'No results were found.' ) }
+					{ entityForSuggestions.labels.not_found }
 				</p>
 			) }
 		</>
@@ -176,7 +181,12 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							<Heading level={ 5 }>
 								{ entityForSuggestions.labels.all_items }
 							</Heading>
-							<Text as="span">{ __( 'For all items' ) }</Text>
+							<Text as="span">
+								{
+									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									__( 'For all items' )
+								}
+							</Text>
 						</FlexItem>
 						<FlexItem
 							isBlock
@@ -188,7 +198,10 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 								{ entityForSuggestions.labels.singular_name }
 							</Heading>
 							<Text as="span">
-								{ __( 'For a specific item' ) }
+								{
+									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									__( 'For a specific item' )
+								}
 							</Text>
 						</FlexItem>
 					</Flex>
