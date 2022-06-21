@@ -19,14 +19,12 @@ import { store as editPostStore } from '../../store';
 
 function useStartPatterns() {
 	const { blockPatterns, postType } = useSelect( ( select ) => {
-		const { __experimentalGetPatternsByBlockTypes } = select(
-			blockEditorStore
-		);
+		const { __experimentalGetPatternsByBlockTypes } =
+			select( blockEditorStore );
 		const { getCurrentPostType } = select( editorStore );
 		return {
-			blockPatterns: __experimentalGetPatternsByBlockTypes(
-				'core/post-content'
-			),
+			blockPatterns:
+				__experimentalGetPatternsByBlockTypes( 'core/post-content' ),
 			postType: getCurrentPostType(),
 		};
 	}, [] );
@@ -77,12 +75,10 @@ export default function StartPageOptions() {
 			) {
 				return false;
 			}
-			const { getEditedPostContent, isEditedPostSaveable } = select(
-				editorStore
-			);
-			const { isEditingTemplate, isFeatureActive } = select(
-				editPostStore
-			);
+			const { getEditedPostContent, isEditedPostSaveable } =
+				select( editorStore );
+			const { isEditingTemplate, isFeatureActive } =
+				select( editPostStore );
 			return (
 				! isEditedPostSaveable() &&
 				'' === getEditedPostContent() &&

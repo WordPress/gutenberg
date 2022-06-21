@@ -156,31 +156,31 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'title'      => 'block-pattern',
 			'type'       => 'object',
 			'properties' => array(
-				'name'           => array(
+				'name'                        => array(
 					'description' => __( 'The pattern name.' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'title'          => array(
+				'title'                       => array(
 					'description' => __( 'The pattern title, in human readable format.' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'description'    => array(
+				'description'                 => array(
 					'description' => __( 'The pattern detailed description.' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'viewport_width' => array(
+				'viewport_width'              => array(
 					'description' => __( 'The pattern viewport width for inserter preview.' ),
 					'type'        => 'number',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'block_types'    => array(
+				'block_types'                 => array(
 					'description' => __( 'Block types that the pattern is intended to be used with.' ),
 					'type'        => 'array',
 					'readonly'    => true,
@@ -192,25 +192,25 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'categories'     => array(
+				'categories'                  => array(
 					'description' => __( 'The pattern category slugs.' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'keywords'       => array(
+				'keywords'                    => array(
 					'description' => __( 'The pattern keywords.' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'content'        => array(
+				'content'                     => array(
 					'description' => __( 'The pattern content.' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'inserter'       => array(
+				'inserter'                    => array(
 					'description' => __( 'Determines whether the pattern is visible in inserter.' ),
 					'type'        => 'boolean',
 					'readonly'    => true,
