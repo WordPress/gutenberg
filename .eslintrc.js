@@ -103,6 +103,7 @@ module.exports = {
 							'overEvery',
 							'random',
 							'reverse',
+							'size',
 							'stubFalse',
 							'stubTrue',
 							'sum',
