@@ -480,6 +480,8 @@ export const getBlockPatterns =
 				switch ( key ) {
 					case 'block_types':
 						return 'blockTypes';
+					case 'post_types':
+						return 'postTypes';
 					case 'viewport_width':
 						return 'viewportWidth';
 					default:

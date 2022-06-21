@@ -31,9 +31,9 @@ function useStartPatterns() {
 	return useMemo( () => {
 		return blockPatterns.filter( ( pattern ) => {
 			return (
-				( postType === 'page' && ! pattern.start_content_post_types ) ||
-				( Array.isArray( pattern.start_content_post_types ) &&
-					pattern.start_content_post_types.includes( postType ) )
+				( postType === 'page' && ! pattern.postTypes ) ||
+				( Array.isArray( pattern.postTypes ) &&
+					pattern.postTypes.includes( postType ) )
 			);
 		} );
 	}, [ postType, blockPatterns ] );
