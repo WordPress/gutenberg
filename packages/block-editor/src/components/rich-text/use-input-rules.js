@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { findKey } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
@@ -17,21 +12,17 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { preventEventDiscovery } from './prevent-event-discovery';
-
-// A robust way to retain selection position through various
-// transforms is to insert a special character at the position and
-// then recover it.
-const START_OF_SELECTED_AREA = '\u0086';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../../utils/selection';
 
 function findSelection( blocks ) {
 	let i = blocks.length;
 
 	while ( i-- ) {
-		const attributeKey = findKey(
-			blocks[ i ].attributes,
-			( v ) =>
-				typeof v === 'string' &&
-				v.indexOf( START_OF_SELECTED_AREA ) !== -1
+		const attributeKey = retrieveSelectedAttribute(
+			blocks[ i ].attributes
 		);
 
 		if ( attributeKey ) {

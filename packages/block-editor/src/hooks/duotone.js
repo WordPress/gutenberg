@@ -50,21 +50,11 @@ export function getValuesFromColors( colors = [] ) {
 }
 
 /**
- * Values for the SVG `feComponentTransfer`.
+ * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
- */
-
-/**
- * Stylesheet for rendering the duotone filter.
- *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to apply the filter to.
+ * @param {string}   props.id       Unique id for this duotone filter.
  *
  * @return {WPElement} Duotone element.
  */
@@ -78,15 +68,33 @@ ${ selector } {
 }
 
 /**
- * SVG for rendering the duotone filter.
+ * Stylesheet for disabling a global styles duotone filter.
  *
- * @param {Object} props        Duotone props.
- * @param {string} props.id     Unique id for this duotone filter.
- * @param {Values} props.values R, G, B, and A values to filter with.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to disable the filter for.
  *
- * @return {WPElement} Duotone element.
+ * @return {WPElement} Filter none style element.
  */
-function DuotoneFilter( { id, values } ) {
+function DuotoneUnsetStylesheet( { selector } ) {
+	const css = `
+${ selector } {
+	filter: none;
+}
+`;
+	return <style>{ css }</style>;
+}
+
+/**
+ * The SVG part of the duotone filter.
+ *
+ * @param {Object}   props        Duotone props.
+ * @param {string}   props.id     Unique id for this duotone filter.
+ * @param {string[]} props.colors Color strings from dark to light.
+ *
+ * @return {WPElement} Duotone SVG.
+ */
+function DuotoneFilter( { id, colors } ) {
+	const values = getValuesFromColors( colors );
 	return (
 		<SVG
 			xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -151,17 +159,21 @@ function DuotoneFilter( { id, values } ) {
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object} props          Duotone props.
+ * @param {Object} props Duotone props.
  * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, B, and A values to filter with.
+ * @param {string} props.id Unique id for this duotone filter.
+ * @param {string[]|"unset"} props.colors Array of RGB color strings ordered from dark to light.
  *
  * @return {WPElement} Duotone element.
  */
-function InlineDuotone( { selector, id, values } ) {
+function InlineDuotone( { selector, id, colors } ) {
+	if ( colors === 'unset' ) {
+		return <DuotoneUnsetStylesheet selector={ selector } />;
+	}
+
 	return (
 		<>
-			<DuotoneFilter id={ id } values={ values } />
+			<DuotoneFilter id={ id } colors={ colors } />
 			<DuotoneStylesheet id={ id } selector={ selector } />
 		</>
 	);
@@ -324,9 +336,9 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const values = props?.attributes?.style?.color?.duotone;
+		const colors = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! values ) {
+		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
 		}
 
@@ -351,7 +363,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 						<InlineDuotone
 							selector={ selectorsGroup }
 							id={ id }
-							values={ getValuesFromColors( values ) }
+							colors={ colors }
 						/>,
 						element
 					) }
@@ -366,7 +378,7 @@ export function PresetDuotoneFilter( { preset } ) {
 	return (
 		<DuotoneFilter
 			id={ `wp-duotone-${ preset.slug }` }
-			values={ getValuesFromColors( preset.colors ) }
+			colors={ preset.colors }
 		/>
 	);
 }

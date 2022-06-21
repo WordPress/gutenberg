@@ -100,7 +100,7 @@ function AutoBlockPreview( {
 						// See: https://github.com/WordPress/gutenberg/pull/38175.
 						maxHeight: MAX_HEIGHT,
 						minHeight:
-							scale < 1 && __experimentalMinHeight
+							scale !== 0 && scale < 1 && __experimentalMinHeight
 								? __experimentalMinHeight / scale
 								: __experimentalMinHeight,
 					} }
