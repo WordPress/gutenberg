@@ -306,19 +306,15 @@ export function useGradientsPerOrigin( name ) {
 	}, [ customGradients, themeGradients, defaultGradients ] );
 }
 
-export function useCanCustomizeColor(
-	name,
-	isEnabledSetting,
-	isSupportIncluded
-) {
+export function useCanCustomizeColor( name, requiredSetting, requiredSupport ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
 
-	const [ isTextEnabled ] = useSetting( isEnabledSetting, name );
+	const [ isTextEnabled ] = useSetting( requiredSetting, name );
 
 	return (
-		supports.includes( isSupportIncluded ) &&
+		supports.includes( requiredSupport ) &&
 		isTextEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled )
 	);

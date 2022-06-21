@@ -13,7 +13,7 @@ import ScreenElementColorpicker from './screen-element-colorpicker';
 function ScreenLinkColor( { name } ) {
 	const canCustomize = useCanCustomizeColor(
 		name,
-		'color.link',
+		'color.text',
 		'linkColor'
 	);
 
@@ -26,13 +26,12 @@ function ScreenLinkColor( { name } ) {
 			<ScreenHeader
 				title={ __( 'Links' ) }
 				description={ __(
-					'Set the default color used for links across the site.'
+					'Manage the fonts and typography used on the links.'
 				) }
 			/>
-
 			<ScreenElementColorpicker
 				name={ name }
-				element="link"
+				element="button"
 				path="elements.link.color.text"
 			/>
 		</>

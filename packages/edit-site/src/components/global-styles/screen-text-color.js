@@ -25,10 +25,9 @@ function ScreenTextColor( { name } ) {
 					'Set the default color used for text across the site.'
 				) }
 			/>
-
 			<ScreenElementColorpicker
 				name={ name }
-				element="link"
+				element="button"
 				path="elements.link.color.text"
 			/>
 		</>
