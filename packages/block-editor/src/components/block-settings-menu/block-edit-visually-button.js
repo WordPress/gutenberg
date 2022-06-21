@@ -16,12 +16,10 @@ export default function BlockEditVisuallyButton( { clientIds, ...props } ) {
 	const { block, shouldRender } = useSelect(
 		( select ) => {
 			const firstBlockClientId = clientIds[ 0 ];
-			const { isBlockMultiSelected, getBlockMode, getBlock } = select(
-				blockEditorStore
-			);
-			const isSingleSelected = ! isBlockMultiSelected(
-				firstBlockClientId
-			);
+			const { isBlockMultiSelected, getBlockMode, getBlock } =
+				select( blockEditorStore );
+			const isSingleSelected =
+				! isBlockMultiSelected( firstBlockClientId );
 			const isHtmlMode = getBlockMode( firstBlockClientId ) === 'html';
 
 			return {
