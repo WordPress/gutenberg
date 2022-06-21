@@ -10,25 +10,37 @@ import ScreenHeader from './header';
 import { useCanCustomizeColor } from './hooks';
 import ScreenElementColorpicker from './screen-element-colorpicker';
 
-function ScreenButtonColor( { name } ) {
+function ScreenElementColor( {
+	name,
+	title,
+	description,
+	settingPrefix,
+	customizeText,
+	customizeBackground,
+	requiredSetting,
+	requiredSupport,
+} ) {
 	const canCustomize = useCanCustomizeColor(
 		name,
-		'color.background',
-		'buttonColor'
+		requiredSetting,
+		requiredSupport
 	);
 
 	if ( ! canCustomize ) {
 		return null;
 	}
 
+	const sctrions = {
+		text: {
+			header: __( 'Text color' ),
+			setting: `${ settingPrefix }.text`,
+			enabled: customizeText,
+		},
+	};
+
 	return (
 		<>
-			<ScreenHeader
-				title={ __( 'Buttons' ) }
-				description={ __(
-					'Set the default colors used for buttons across the site.'
-				) }
-			/>
+			<ScreenHeader title={ title } description={ description } />
 
 			<h4 className="edit-site-global-styles-section-title">
 				{ __( 'Text color' ) }
@@ -53,4 +65,4 @@ function ScreenButtonColor( { name } ) {
 	);
 }
 
-export default ScreenButtonColor;
+export default ScreenElementColor;

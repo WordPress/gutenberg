@@ -17,6 +17,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import { elementsWithTypography } from './elements';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -83,24 +84,15 @@ function ScreenTypography( { name } ) {
 					<VStack spacing={ 3 }>
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
-							<Item
-								name={ name }
-								parentMenu={ parentMenu }
-								element="text"
-								label={ __( 'Text' ) }
-							/>
-							<Item
-								name={ name }
-								parentMenu={ parentMenu }
-								element="link"
-								label={ __( 'Links' ) }
-							/>
-							<Item
-								name={ name }
-								parentMenu={ parentMenu }
-								element="button"
-								label={ __( 'Buttons' ) }
-							/>
+							{ elementsWithTypography.map( ( element ) => (
+								<Item
+									key={ element.name }
+									name={ element.name }
+									parentMenu={ parentMenu }
+									element={ element.name }
+									label={ element.typography.title }
+								/>
+							) ) }
 						</ItemGroup>
 					</VStack>
 				</div>
