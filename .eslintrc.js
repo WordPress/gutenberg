@@ -88,6 +88,7 @@ module.exports = {
 							'each',
 							'findIndex',
 							'findKey',
+							'findLast',
 							'flatten',
 							'flattenDeep',
 							'isArray',
