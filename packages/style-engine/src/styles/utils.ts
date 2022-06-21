@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, upperFirst } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export function generateRule(
  * @param ruleKeys             An array of CSS property keys and patterns.
  * @param individualProperties The "sides" or individual properties for which to generate rules.
  *
- * @return GeneratedCSSRule[] CSS rules.
+ * @return GeneratedCSSRule[]  CSS rules.
  */
 export function generateBoxRules(
 	style: Style,
@@ -110,7 +110,10 @@ export function generateBoxRules(
  * @return string A CSS var value.
  */
 export function getCSSVarFromStyleValue( styleValue: string ): string {
-	if ( styleValue.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
+	if (
+		typeof styleValue === 'string' &&
+		styleValue.startsWith( VARIABLE_REFERENCE_PREFIX )
+	) {
 		const variable = styleValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -118,4 +121,15 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 		return `var(--wp--${ variable })`;
 	}
 	return styleValue;
+}
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return string A CSS var value.
+ */
+export function upperFirst( [ firstLetter, ...rest ]: string ) {
+	return firstLetter.toUpperCase() + rest.join( '' );
 }

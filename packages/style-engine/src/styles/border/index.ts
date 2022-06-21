@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { camelCase, get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type {
@@ -14,7 +9,7 @@ import type {
 	StyleDefinition,
 	StyleOptions,
 } from '../../types';
-import { generateRule, generateBoxRules } from '../utils';
+import { generateRule, generateBoxRules, upperFirst } from '../utils';
 
 const color = {
 	name: 'color',
@@ -86,7 +81,7 @@ const createBorderGenerateFunction =
 	( style: Style, options: StyleOptions ) => {
 		const styleValue:
 			| BorderIndividualStyles< typeof individualProperty >
-			| undefined = get( style, [ 'border', individualProperty ] );
+			| undefined = style?.border?.[ individualProperty ];
 
 		if ( ! styleValue ) {
 			return [];
@@ -102,9 +97,9 @@ const createBorderGenerateFunction =
 					styleValue.hasOwnProperty( key ) &&
 					typeof borderDefinition.generate === 'function'
 				) {
-					const ruleKey = camelCase(
-						`border-${ individualProperty }-${ key }`
-					);
+					const ruleKey = `border${ upperFirst(
+						individualProperty
+					) }${ upperFirst( key ) }`;
 					acc.push(
 						...borderDefinition.generate(
 							style,
