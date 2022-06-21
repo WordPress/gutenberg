@@ -138,6 +138,7 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
 require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
+require __DIR__ . '/experimental/class-gutenberg-themes-controller.php';
 require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';

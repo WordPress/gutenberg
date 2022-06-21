@@ -28,6 +28,16 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+
+/**
+ * Registers the theme REST API endpoint.
+ */
+function gutenberg_register_theme_controller() {
+	$theme_controller = new Gutenberg_Themes_Controller();
+	$theme_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_theme_controller' );
+
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *
