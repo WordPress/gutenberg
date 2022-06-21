@@ -60,10 +60,13 @@ export const select = css`
 
 // TODO: convert to Flex?
 export const popover = css`
+	/* TODO: add flexibility, e.g.: min(var(--popover-available-height, 300px), 300px); */
+	max-height: 20rem;
 	z-index: 50;
 	display: flex;
-	max-height: 20rem;
 	flex-direction: column;
+	overflow: auto;
+	overscroll-behavior: contain;
 	border-radius: 0.5rem;
 	border-width: 1px;
 	border-style: solid;
@@ -80,7 +83,7 @@ export const popover = css`
 `;
 
 export const item = css`
-	outline: none;
+	outline: none !important;
 	display: flex;
 	cursor: default;
 	scroll-margin: 0.5rem;
