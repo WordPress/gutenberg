@@ -26,7 +26,7 @@ function Example() {
 
 ##### `ellipsis`: `string`
 
-The ellipsis string when `truncate` is set.
+The ellipsis string when truncating the text by the `limit` prop's value.
 
 -   Required: No
 -   Default: `…`
