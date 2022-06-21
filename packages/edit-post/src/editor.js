@@ -125,8 +125,17 @@ function Editor( {
 			defaultAllowedBlockTypes: settings.allowedBlockTypes,
 		};
 
+		const hiddenBlocks = blockTypes
+			.filter(
+				( block ) =>
+					block.allowForPostTypes !== undefined &&
+					! block.allowForPostTypes.includes( postType )
+			)
+			.map( ( { name } ) => name )
+			.concat( hiddenBlockTypes );
+
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( size( hiddenBlocks ) > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -137,7 +146,7 @@ function Editor( {
 
 			result.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+				...hiddenBlocks
 			);
 		}
 
@@ -153,6 +162,7 @@ function Editor( {
 		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
+		template,
 	] );
 
 	const styles = useMemo( () => {

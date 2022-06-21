@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit, unionBy } from 'lodash';
+import { omit, unionBy, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,8 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 
+import { store as blocksStore } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -49,20 +51,28 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { storedSettings, templateType, templateId, page } = useSelect(
-		( select ) => {
-			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
-				select( editSiteStore );
+	const { storedSettings, templateType, templateId, page, blockTypes } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getEditedPostType,
+					getEditedPostId,
+					getPage,
+				} = select( editSiteStore );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpen ),
-				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
-				page: getPage(),
-			};
-		},
-		[ setIsInserterOpen ]
-	);
+				const { getBlockTypes } = select( blocksStore );
+
+				return {
+					storedSettings: getSettings( setIsInserterOpen ),
+					templateType: getEditedPostType(),
+					templateId: getEditedPostId(),
+					blockTypes: getBlockTypes(),
+					page: getPage(),
+				};
+			},
+			[ setIsInserterOpen ]
+		);
 
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -95,17 +105,46 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const settings = useMemo(
-		() => ( {
-			...omit( storedSettings, [
-				'__experimentalAdditionalBlockPatterns',
-				'__experimentalAdditionalBlockPatternCategories',
-			] ),
+	const settings = useMemo( () => {
+		const hiddenBlocks = blockTypes
+			.filter(
+				( block ) =>
+					block.allowForTemplates !== undefined &&
+					! block.allowForTemplates.includes(
+						templateId.split( '//', 2 )[ 1 ]
+					)
+			)
+			.map( ( block ) => block.name );
+
+		const defaultAllowedBlockTypes =
+			true === storedSettings.allowedBlockTypes
+				? blockTypes.map( ( { name } ) => name )
+				: storedSettings.allowedBlockTypes || [];
+
+		return {
+			...omit(
+				{
+					...storedSettings,
+					allowedBlockTypes: without(
+						defaultAllowedBlockTypes,
+						...hiddenBlocks
+					),
+				},
+				[
+					'__experimentalAdditionalBlockPatterns',
+					'__experimentalAdditionalBlockPatternCategories',
+				]
+			),
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-		} ),
-		[ storedSettings, blockPatterns, blockPatternCategories ]
-	);
+		};
+	}, [
+		storedSettings,
+		blockPatterns,
+		blockPatternCategories,
+		blockTypes,
+		templateId,
+	] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
