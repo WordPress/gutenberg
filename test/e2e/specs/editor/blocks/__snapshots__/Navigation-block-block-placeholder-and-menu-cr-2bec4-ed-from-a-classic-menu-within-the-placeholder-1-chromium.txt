@@ -1,0 +1,25 @@
+<!-- wp:navigation-link {"label":"Home","type":"custom","url":"http://localhost:8889/","kind":"custom"} /-->
+
+<!-- wp:navigation-submenu {"label":"About","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} -->
+<!-- wp:navigation-link {"label":"Our team","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+<!-- /wp:navigation-submenu -->
+
+<!-- wp:navigation-submenu {"label":"Shop","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} -->
+<!-- wp:navigation-submenu {"label":"Winter apparel","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} -->
+<!-- wp:navigation-link {"label":"Chunky socks","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+
+<!-- wp:navigation-link {"label":"Hideous hats","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+
+<!-- wp:navigation-link {"label":"Glorious gloves","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+
+<!-- wp:navigation-link {"label":"Jazzy Jumpers","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation-submenu -->
+
+<!-- wp:navigation-link {"label":"Shipping","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+
+<!-- wp:navigation-link {"label":"Contact Us","type":"page","id":[number],"url":"http://localhost:8889/?page_id=[number]","kind":"post-type"} /-->
+
+<!-- wp:navigation-submenu {"label":"WordPress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Google","type":"custom","url":"https://google.com","kind":"custom"} /-->
+<!-- /wp:navigation-submenu -->

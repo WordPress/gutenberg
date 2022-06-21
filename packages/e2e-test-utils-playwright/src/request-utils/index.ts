@@ -10,8 +10,8 @@ import type { APIRequestContext, Cookie } from '@playwright/test';
  * Internal dependencies
  */
 import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
-import type { User } from './login';
-import { login } from './login';
+import type { User } from './user';
+import { createUser, deleteUser, login } from './user';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
@@ -20,6 +20,7 @@ import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
+import { createMenu, deleteAllMenus } from './menus';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
@@ -109,6 +110,8 @@ class RequestUtils {
 		this.baseURL = baseURL;
 	}
 
+	createUser = createUser.bind( this );
+	deleteUser = deleteUser.bind( this );
 	login = login.bind( this );
 	setupRest = setupRest.bind( this );
 	// .bind() drops the generic types. Re-casting it to keep the type signature.
@@ -120,7 +123,9 @@ class RequestUtils {
 	activatePlugin = activatePlugin.bind( this );
 	deactivatePlugin = deactivatePlugin.bind( this );
 	activateTheme = activateTheme.bind( this );
-	deleteAllBlocks = deleteAllBlocks;
+	deleteAllBlocks = deleteAllBlocks.bind( this );
+	createMenu = createMenu.bind( this );
+	deleteAllMenus = deleteAllMenus;
 	createPost = createPost.bind( this );
 	deleteAllPosts = deleteAllPosts.bind( this );
 	createComment = createComment.bind( this );
