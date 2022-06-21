@@ -317,6 +317,33 @@
 									"fontFamily": {
 										"description": "CSS font-family value.",
 										"type": "string"
+									},
+									"fontFace": {
+										"description": "",
+										"type": "array",
+										"items": {
+											"type": "object",
+											"fontFamily": {
+												"description": "CSS font-family value.",
+												"type": "string"
+											},
+											"fontWeight": {
+												"description": "CSS font-weight values, list delimited by spaces.",
+												"type": "string"
+											},
+											"fontStyle": {
+												"description": "CSS font-style value.",
+												"type": "string"
+											},
+											"fontStretch": {
+												"description": "CSS font-stretch value.",
+												"type": "string"
+											},
+											"src": {
+												"description": "Paths or URLs to the font files.",
+												"type": "array"
+											}
+										}
 									}
 								},
 								"additionalProperties": false
