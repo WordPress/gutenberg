@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+
 ## 19.13.0 (2022-06-15)
 
 ### Bug Fix
