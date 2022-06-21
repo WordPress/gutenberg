@@ -100,6 +100,7 @@ module.exports = {
 							'memoize',
 							'negate',
 							'noop',
+							'overEvery',
 							'random',
 							'reverse',
 							'stubFalse',
