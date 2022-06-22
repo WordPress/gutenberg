@@ -466,14 +466,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// $block_metadata['path'] = array('styles','elements','link');
 		// Make sure that $block_metadata['path'] describes an element node, like ['styles', 'element', 'link'].
 		// Skip non-element paths like just ['styles']
-		$is_processing_element = count( $block_metadata['path'] ) === 3 && 'elements' === $block_metadata['path'][1];
-		$current_element       = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
+
+		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
 
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
 		$declarations_pseudo_selectors = array();
-		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
+		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings );
