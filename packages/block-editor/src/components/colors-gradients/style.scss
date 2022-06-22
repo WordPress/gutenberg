@@ -98,6 +98,12 @@
 			color: var(--wp-admin-theme-color);
 		}
 	}
+
+	.block-editor-panel-color-gradient-settings__color-name {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown {
