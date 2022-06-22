@@ -175,7 +175,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$output = static::remove_insecure_styles( $input );
 
 			// Get a reference to element name from path.
-			// $metadata['path'] = array('styles','elements','link');
+			// $metadata['path'] = array('styles','elements','link');.
 			$current_element = $metadata['path'][ count( $metadata['path'] ) - 1 ];
 
 			// $output is stripped of pseudo selectors. Readd and process them
@@ -460,12 +460,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// Attempt to parse a pseudo selector (e.g. ":hover") from the $selector ("a:hover").
 		$pseudo_matches = array();
 		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
-		$pseudo_selector = $pseudo_matches[0] ?? null;
+		$pseudo_selector = $pseudo_matches[0] ? $pseudo_matches[0] : null;
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
 		// Make sure that $block_metadata['path'] describes an element node, like ['styles', 'element', 'link'].
-		// Skip non-element paths like just ['styles']
+		// Skip non-element paths like just ['styles'].
 		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
 
 		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
@@ -473,7 +473,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
-		$declarations_pseudo_selectors = array();
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
 		} else {

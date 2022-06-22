@@ -893,7 +893,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-		function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
+	function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -905,23 +905,23 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'background' => 'red',
 							),
 							':hover' => array(
-								'color'      => array(
+								'color' => array(
 									'text'       => 'red',
 									'background' => 'green',
 								),
-							)
+							),
 						),
 					),
-					'blocks' => array(
+					'blocks'   => array(
 						'core/group' => array(
 							'elements' => array(
 								'link' => array(
 									':hover' => array(
-										'color'      => array(
+										'color' => array(
 											'text'       => 'yellow',
 											'background' => 'black',
 										),
-									)
+									),
 								),
 							),
 						),
