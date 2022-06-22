@@ -5,19 +5,13 @@ import { isValueDefined } from '../utils/values';
 import type { TruncateProps } from './types';
 
 export const TRUNCATE_ELLIPSIS = '…';
-export const TRUNCATE_TYPE: {
-	auto: 'auto';
-	head: 'head';
-	middle: 'middle';
-	tail: 'tail';
-	none: 'none';
-} = {
+export const TRUNCATE_TYPE = {
 	auto: 'auto',
 	head: 'head',
 	middle: 'middle',
 	tail: 'tail',
 	none: 'none',
-};
+} as const;
 
 export const TRUNCATE_DEFAULT_PROPS = {
 	ellipsis: TRUNCATE_ELLIPSIS,
