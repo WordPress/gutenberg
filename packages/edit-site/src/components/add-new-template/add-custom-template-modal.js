@@ -27,7 +27,7 @@ import { mapToIHasNameAndId } from './utils';
 const EMPTY_ARRAY = [];
 const BASE_QUERY = {
 	order: 'asc',
-	_fields: 'id,title,slug,link',
+	_fields: 'id,name,title,slug,link',
 	context: 'view',
 };
 
@@ -47,12 +47,25 @@ function SuggestionListItem( {
 			{ ...composite }
 			className={ baseCssClass }
 			onClick={ () => {
+				const {
+					labels,
+					slug,
+					config: { aliasTemplateSlug, templatePrefix },
+				} = entityForSuggestions;
+				// TODO: check if we can reuse the message and the translators message...(?)
+				// This refers to `where %1$s is the singular name of a post type and %2$s...`part.
 				const title = sprintf(
 					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
 					__( '%1$s: %2$s' ),
-					entityForSuggestions.labels.singular_name,
+					labels.singular_name,
 					suggestion.name
 				);
+				let _slug = `${ aliasTemplateSlug || slug }-${
+					suggestion.slug
+				}`;
+				if ( templatePrefix ) {
+					_slug = templatePrefix + _slug;
+				}
 				onSelect( {
 					title,
 					description: sprintf(
@@ -60,7 +73,7 @@ function SuggestionListItem( {
 						__( 'Template for %1$s' ),
 						title
 					),
-					slug: `single-${ entityForSuggestions.slug }-${ suggestion.slug }`,
+					slug: _slug,
 				} );
 			} }
 		>
@@ -84,11 +97,12 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 250 );
+	const { config, postsToExclude, labels } = entityForSuggestions;
 	const query = {
 		...BASE_QUERY,
 		search,
-		orderby: search ? 'relevance' : 'modified',
-		exclude: entityForSuggestions.postsToExclude,
+		orderby: search ? config.orderBySearch : config.orderBy,
+		exclude: postsToExclude,
 		per_page: search ? 20 : 10,
 	};
 	const { records: searchResults, hasResolved: searchHasResolved } =
@@ -104,7 +118,10 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	}, [ search, searchInputValue ] );
 	const entitiesInfo = useMemo( () => {
 		if ( ! searchResults?.length ) return EMPTY_ARRAY;
-		return mapToIHasNameAndId( searchResults, 'title.rendered' );
+		if ( config.recordNamePath ) {
+			return mapToIHasNameAndId( searchResults, config.recordNamePath );
+		}
+		return searchResults;
 	}, [ searchResults ] );
 	// Update suggestions only when the query has resolved.
 	useEffect( () => {
@@ -116,8 +133,8 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			<SearchControl
 				onChange={ setSearchInputValue }
 				value={ searchInputValue }
-				label={ entityForSuggestions.labels.search_items }
-				placeholder={ entityForSuggestions.labels.search_items }
+				label={ labels.search_items }
+				placeholder={ labels.search_items }
 			/>
 			{ !! suggestions?.length && (
 				<Composite
@@ -139,7 +156,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			) }
 			{ search && ! suggestions?.length && (
 				<p className="edit-site-custom-template-modal__no-results">
-					{ entityForSuggestions.labels.not_found }
+					{ labels.not_found }
 				</p>
 			) }
 		</>
