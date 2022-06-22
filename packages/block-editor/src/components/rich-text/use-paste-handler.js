@@ -261,6 +261,9 @@ export function usePasteHandler( props ) {
  * @return {string} the normalized html
  */
 function removeWindowsFragments( html ) {
+	if ( ! html.includes( '<!--StartFragment-->' ) ) {
+		return html;
+	}
 	const startReg = /.*<!--StartFragment-->/s;
 	const endReg = /<!--EndFragment-->.*/s;
 
