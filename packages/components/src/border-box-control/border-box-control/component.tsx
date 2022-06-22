@@ -62,7 +62,7 @@ const BorderBoxControl = (
 		toggleLinked,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		...otherProps
 	} = useBorderBoxControl( props );
 
@@ -118,7 +118,7 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -136,13 +136,13 @@ const BorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 				/>
 			</HStack>
 		</View>

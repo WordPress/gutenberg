@@ -35,7 +35,7 @@ export function useBorderControl(
 		shouldSanitizeBorder = true,
 		value: border,
 		width,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -65,7 +65,6 @@ export function useBorderControl(
 			const [ parsedValue ] =
 				parseQuantityAndUnitFromRawValue( newWidth );
 			const hasZeroWidth = parsedValue === 0;
-
 			const updatedBorder = { ...border, width: newWidthValue };
 
 			// Setting the border width explicitly to zero will also set the
@@ -121,10 +120,10 @@ export function useBorderControl(
 	const wrapperWidth = isCompact ? '90px' : width;
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
+		const heightStyle = styles.wrapperHeight( __next40pxDefaultSize );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, __next36pxDefaultSize ] );
+	}, [ wrapperWidth, cx, __next40pxDefaultSize ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -143,6 +142,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		__next36pxDefaultSize,
+		__next40pxDefaultSize,
 	};
 }

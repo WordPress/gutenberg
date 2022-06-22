@@ -34,6 +34,20 @@
 		> span {
 			flex: 0 0 auto;
 		}
+
+		&.has-40px-default-size {
+			.components-range-control {
+				.components-base-control__field {
+					height: 40px;
+					display: flex;
+					align-items: center;
+				}
+			}
+
+			.component-border-radius-control__linked-button.has-icon {
+				margin-top: 8px;
+			}
+		}
 	}
 
 	.components-border-radius-control__input-controls-wrapper {
