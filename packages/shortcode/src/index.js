@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
+import { extend, pick, isString, isEqual, forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -316,7 +316,9 @@ extend( shortcode.prototype, {
 	 * @return {string} Attribute value.
 	 */
 	get( attr ) {
-		return this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ];
+		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
+			attr
+		];
 	},
 
 	/**
@@ -331,7 +333,8 @@ extend( shortcode.prototype, {
 	 * @return {WPShortcode} Shortcode instance.
 	 */
 	set( attr, value ) {
-		this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ] = value;
+		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
+			value;
 		return this;
 	},
 

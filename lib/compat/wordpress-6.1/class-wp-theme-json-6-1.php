@@ -15,8 +15,6 @@
  * @access private
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
-	const __EXPERIMENTAL_ELEMENT_BUTTON_CLASS_NAME = 'wp-element-button';
-
 	const ELEMENTS = array(
 		'link'   => 'a',
 		'h1'     => 'h1',
@@ -27,6 +25,24 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'h6'     => 'h6',
 		'button' => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
 	);
+
+	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
+		'button' => 'wp-element-button',
+	);
+
+	/**
+	 * Given an element name, returns a class name.
+	 *
+	 * @param string $element The name of the element.
+	 *
+	 * @return string The name of the class.
+	 *
+	 * @since 6.1.0
+	 */
+	public static function get_element_class_name( $element ) {
+		return array_key_exists( $element, static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
+	}
+
 	/**
 	 * Returns the metadata for each block.
 	 *
@@ -91,7 +107,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						break;
 					}
 
-					$element_selector[] = $selector . ' ' . $el_selector;
+					// This converts selectors like '.wp-element-button, .wp-block-button__link'
+					// to an array, so that the block selector is added to both parts of the selector.
+					$el_selectors = explode( ',', $el_selector );
+					foreach ( $el_selectors as $el_selector_item ) {
+						$element_selector[] = $selector . ' ' . $el_selector_item;
+					}
 				}
 				static::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}

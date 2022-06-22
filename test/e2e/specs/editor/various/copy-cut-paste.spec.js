@@ -371,4 +371,30 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.type( 'Heading' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Paragraph' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		// Partial select from outer blocks.
+		await pageUtils.pressKeyTimes( 'ArrowLeft', 2 );
+		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'c' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'ArrowLeft' );
+		// Sometimes the caret has not moved to the correct position before pressing Enter.
+		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
+		// Create a new code block to paste there.
+		await editor.insertBlock( { name: 'core/code' } );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

@@ -2,17 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import {
-	deburr,
-	filter,
-	findLast,
-	first,
-	flow,
-	get,
-	includes,
-	map,
-	some,
-} from 'lodash';
+import { deburr, filter, flow, get, includes, map, some } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -165,7 +155,11 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 export function getDefaultBlockVariation( state, blockName, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	return findLast( variations, 'isDefault' ) || first( variations );
+	const defaultVariation = [ ...variations ]
+		.reverse()
+		.find( ( { isDefault } ) => !! isDefault );
+
+	return defaultVariation || variations[ 0 ];
 }
 
 /**
