@@ -6,6 +6,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalZStack as ZStack,
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -101,6 +102,33 @@ function LinkColorItem( { name, parentMenu } ) {
 	);
 }
 
+function ButtonColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'buttonColor' );
+	const [ color ] = useStyle( 'elements.button.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.button.color.background', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem>{ __( 'Buttons' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
 function ScreenColors( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
@@ -129,6 +157,10 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<ButtonColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>

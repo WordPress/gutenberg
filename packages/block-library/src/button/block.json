@@ -95,14 +95,6 @@
 				"//": "100% causes an oval, but any explicit but really high value retains the pill shape.",
 				"radius": "9999px"
 			},
-			"color": {
-				"text": "#fff",
-				"background": "#32373c"
-			},
-			"typography": {
-				"fontSize": "1.125em",
-				"textDecoration": "none"
-			},
 			"spacing": {
 				"padding": {
 					"//": "The extra 2px are added to size solids the same as the outline versions.",
