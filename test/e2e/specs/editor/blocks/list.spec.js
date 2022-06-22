@@ -850,8 +850,11 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '3' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
-		const content = await page.locator( '.wp-block-list' ).innerHTML();
-		expect( content ).toBe( `<li>1</li><li>2</li><li>3</li>` );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list {"ordered":true} -->
+<ol><li>1</li><li>2</li><li>3</li></ol>
+<!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should not change the contents when you change the list type to Unordered', async ( {
@@ -866,7 +869,10 @@ test.describe( 'List', () => {
 		await page.keyboard.type( 'c' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
-		const content = await page.locator( '.wp-block-list' ).innerHTML();
-		expect( content ).toBe( `<li>a</li><li>b</li><li>c</li>` );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul><li>a</li><li>b</li><li>c</li></ul>
+<!-- /wp:list -->`
+		);
 	} );
 } );
