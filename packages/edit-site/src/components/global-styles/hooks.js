@@ -311,11 +311,11 @@ export function useCanCustomizeColor( name, requiredSetting, requiredSupport ) {
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
 
-	const [ isTextEnabled ] = useSetting( requiredSetting, name );
+	const [ isSettingEnabled ] = useSetting( requiredSetting, name );
 
 	return (
 		supports.includes( requiredSupport ) &&
-		isTextEnabled &&
+		isSettingEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled )
 	);
 }
