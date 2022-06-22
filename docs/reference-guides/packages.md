@@ -6,20 +6,20 @@ WordPress exposes a list of JavaScript packages and tools for WordPress developm
 
 JavaScript packages are available as a registered script in WordPress and can be accessed using the `wp` global variable.
 
-If you wanted to use the `PlainText` component from the editor module, first you would specify `wp-editor` as a dependency when you enqueue your script:
+If you wanted to use the `PlainText` component from the block editor module, first you would specify `wp-block-editor` as a dependency when you enqueue your script:
 
 ```php
 wp_enqueue_script(
 	'my-custom-block',
 	plugins_url( $block_path, __FILE__ ),
-	array( 'wp-blocks', 'wp-editor', 'wp-element', 'wp-i18n' )
+	array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n' )
 );
 ```
 
 After the dependency is declared, you can access the module in your JavaScript code using the global `wp` like so:
 
 ```js
-const { PlainText } = wp.editor;
+const { PlainText } = wp.blockEditor;
 ```
 
 ## Using the Packages via npm
