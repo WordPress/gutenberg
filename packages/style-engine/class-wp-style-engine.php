@@ -258,6 +258,17 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Returns all registered block supports styles
+	 *
+	 * @access private
+	 *
+	 * @return array All registered block support styles.
+	 */
+	public function get_block_support_styles() {
+		return $this->block_supports_store->get();
+	}
+
+	/**
 	 * Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 	 *
 	 * @param string? $style_value  A single css preset value.
@@ -402,9 +413,10 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_rules              = array();
-		$classnames             = array();
-		$should_return_css_vars = isset( $options['css_vars'] ) && true === $options['css_vars'];
+		$css_rules                   = array();
+		$classnames                  = array();
+		$should_return_css_vars      = isset( $options['css_vars'] ) && true === $options['css_vars'];
+		$should_register_and_enqueue = isset( $options['enqueue'] ) ? $options['enqueue'] : null;
 
 		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
@@ -446,6 +458,19 @@ class WP_Style_Engine {
 				$style_block         .= implode( ' ', $css );
 				$style_block         .= ' }';
 				$styles_output['css'] = $style_block;
+
+				if ( $should_register_and_enqueue ) {
+					// @TODO this could all change. Maybe we'd want to sanitize and build the rules later.
+					// Or return $css_rules here so another method can register.
+					// Just doing it all here for convenience while testing.
+					$this->register_block_support_styles(
+						$selector,
+						array(
+							'rules'            => $css_rules,
+							'sanitized_output' => $styles_output['css'],
+						)
+					);
+				}
 			} else {
 				$styles_output['css'] = implode( ' ', $css );
 			}
@@ -543,18 +568,20 @@ function wp_style_engine_generate( $block_styles, $options = array() ) {
 
 // @TODO Just testing!
 /**
- * Global public interface to register block support styles support.
+ * Global public interface to register block support styles support to be output in the frontend.
  *
  * @access public
  *
- * @param string $key Unique key for a $style_data object.
- * @param array  $style_data Associative array of style information.
+ * @param array $block_styles An array of styles from a block's attributes.
+ * @param array $options An array of options to determine the output.
  * @return void
  */
-function wp_style_engine_register_block_support_styles( $key, $style_data ) {
+function wp_style_engine_enqueue_block_support_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		$style_engine->register_block_support_styles( $key, $style_data );
+		// Get style rules, then register/enqueue.
+		$new_options = array_merge( $options, array( 'enqueue' => true ) );
+		$style_engine->generate( $block_styles, $new_options );
 	}
 }
 

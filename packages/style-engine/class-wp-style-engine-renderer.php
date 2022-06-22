@@ -20,32 +20,24 @@ if ( class_exists( 'WP_Style_Engine_Renderer' ) ) {
  */
 class WP_Style_Engine_Renderer {
 	/**
-	 * Constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		// @TODO some argument to determine how/where the styles are rendered.
-		// For example, we could enqueue specific inline styles like global styles, see: gutenberg_enqueue_global_styles().
-		//
-	}
-
-	/**
 	 * Prints registered styles in the page head or footer.
+	 *
+	 * @TODO this shares code with the styles engine class in generate(). Centralize.
 	 *
 	 * @see $this->enqueue_block_support_styles
 	 */
-	public function render_registered_styles( $styles ) {
-		if ( empty( $styles ) ) {
+	public static function render_registered_block_supports_styles() {
+		$style_engine         = WP_Style_Engine::get_instance();
+		$block_support_styles = $style_engine->get_block_support_styles();
+
+		if ( empty( $block_support_styles ) ) {
 			return;
 		}
 
 		$output = '';
 
-		foreach ( $styles as $selector => $rules ) {
-				$output .= "\t$selector { ";
-				$output .= implode( ' ', $rules );
-				$output .= " }\n";
+		foreach ( $block_support_styles as $style ) {
+				$output .= "{$style['sanitized_output']}\n";
 		}
 
 		echo "<style>\n$output</style>\n";
@@ -64,14 +56,14 @@ class WP_Style_Engine_Renderer {
 	 *
 	 * @see gutenberg_enqueue_block_support_styles()
 	 */
-	private function enqueue_block_support_styles() {
+	public static function enqueue_block_support_styles() {
 		$action_hook_name = 'wp_footer';
 		if ( wp_is_block_theme() ) {
 			$action_hook_name = 'wp_head';
 		}
 		add_action(
 			$action_hook_name,
-			array( $this, 'render_registered_styles' )
+			array( __CLASS__, 'render_registered_block_supports_styles' )
 		);
 	}
 }

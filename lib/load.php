@@ -157,6 +157,14 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenb
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenberg.php';
 }
 
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-store-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-store-gutenberg.php';
+}
+
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-renderer-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-renderer-gutenberg.php';
+}
+
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';

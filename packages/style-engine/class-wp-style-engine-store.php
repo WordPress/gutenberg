@@ -45,6 +45,9 @@ class WP_Style_Engine_Store {
 		if ( ! empty( $store_key ) ) {
 			$this->store_key = $store_key;
 		}
+
+		// Render engine for styles.
+		WP_Style_Engine_Renderer::enqueue_block_support_styles();
 	}
 
 	/**
