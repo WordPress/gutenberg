@@ -114,6 +114,7 @@ module.exports = {
 							'take',
 							'toString',
 							'trim',
+							'uniqWith',
 						],
 						message:
 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
