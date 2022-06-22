@@ -26,8 +26,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"lodash": "^4.17.21"
+		"@babel/runtime": "^7.16.0"
 	},
 	"publishConfig": {
 		"access": "public"
