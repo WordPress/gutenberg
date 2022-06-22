@@ -109,8 +109,12 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		$blocks   = $registry->get_all_registered();
 		$config   = array( 'version' => 1 );
 		foreach ( $blocks as $block_name => $block_type ) {
-			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $block_type->supports['__experimentalStyle'] );
+			if ( is_array( $block_type->style ) ) {
+				foreach ( $block_type->style as $style_override_maybe ) {
+					if ( is_array( $style_override_maybe ) ) {
+						$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $style_override_maybe );
+					}
+				}
 			}
 
 			if (
