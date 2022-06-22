@@ -6,10 +6,18 @@
 
 -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
 
+### Enhancements
+
+-   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+
 ### Internal
 
 -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
 -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+-   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
+-   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+-   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
 
 ## 19.13.0 (2022-06-15)
 
@@ -40,7 +48,6 @@
 -   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
 -   `InputControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
 -   `Modal`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41610](https://github.com/WordPress/gutenberg/pull/41610))
-
 
 ### Experimental
 

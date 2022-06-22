@@ -24,4 +24,8 @@ export const textFormattingShortcuts = [
 		keyCombination: { modifier: 'primary', character: 'u' },
 		description: __( 'Underline the selected text.' ),
 	},
+	{
+		keyCombination: { modifier: 'access', character: 'x' },
+		description: __( 'Make the selected text inline code.' ),
+	},
 ];

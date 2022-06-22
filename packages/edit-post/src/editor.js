@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, size, map, without } from 'lodash';
+import { forEach, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -126,7 +126,7 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).

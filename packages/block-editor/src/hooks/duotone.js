@@ -23,14 +23,37 @@ import {
 } from '../components';
 import BlockList from '../components/block-list';
 import {
-	__unstableGetValuesFromColors as getValuesFromColors,
 	__unstableDuotoneFilter as DuotoneFilter,
 	__unstableDuotoneStylesheet as DuotoneStylesheet,
+	__unstableDuotoneUnsetStylesheet as DuotoneUnsetStylesheet,
 } from '../components/duotone';
 
 const EMPTY_ARRAY = [];
 
 extend( [ namesPlugin ] );
+
+/**
+ * SVG and stylesheet needed for rendering the duotone filter.
+ *
+ * @param {Object} props Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id Unique id for this duotone filter.
+ * @param {string[]|"unset"} props.colors Array of RGB color strings ordered from dark to light.
+ *
+ * @return {WPElement} Duotone element.
+ */
+function InlineDuotone( { selector, id, colors } ) {
+	if ( colors === 'unset' ) {
+		return <DuotoneUnsetStylesheet selector={ selector } />;
+	}
+
+	return (
+		<>
+			<DuotoneFilter id={ id } colors={ colors } />
+			<DuotoneStylesheet id={ id } selector={ selector } />
+		</>
+	);
+}
 
 function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	const disableDefault = ! useSetting( defaultSetting );
@@ -177,35 +200,6 @@ function scopeSelector( scope, selector ) {
 }
 
 /**
- * Values for the SVG `feComponentTransfer`.
- *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
- */
-
-/**
- * SVG and stylesheet needed for rendering the duotone filter.
- *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, B, and A values to filter with.
- *
- * @return {WPElement} Duotone element.
- */
-export function InlineDuotone( { selector, id, values } ) {
-	return (
-		<>
-			<DuotoneFilter id={ id } values={ values } />
-			<DuotoneStylesheet id={ id } selector={ selector } />
-		</>
-	);
-}
-
-/**
  * Override the default block element to include duotone styles.
  *
  * @param {Function} BlockListBlock Original component.
@@ -218,9 +212,9 @@ const withDuotoneStyles = createHigherOrderComponent(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const values = props?.attributes?.style?.color?.duotone;
+		const colors = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! values ) {
+		if ( ! duotoneSupport || ! colors ) {
 			return <BlockListBlock { ...props } />;
 		}
 
@@ -245,7 +239,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 						<InlineDuotone
 							selector={ selectorsGroup }
 							id={ id }
-							values={ getValuesFromColors( values ) }
+							colors={ colors }
 						/>,
 						element
 					) }

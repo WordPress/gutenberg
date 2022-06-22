@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, mapValues } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
@@ -30,7 +25,7 @@ describe( 'createRegistry', () => {
 		return unsubscribe;
 	}
 	function subscribeUntil( predicates ) {
-		predicates = castArray( predicates );
+		predicates = Array.from( predicates );
 
 		return new Promise( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
@@ -749,16 +744,18 @@ describe( 'createRegistry', () => {
 				// representation of the object, the latter applying its
 				// function proxying.
 				expect( _registry ).toMatchObject(
-					mapValues( registry, ( value, key ) => {
-						if ( key === 'stores' ) {
-							return expect.any( Object );
-						}
-						// TODO: Remove this after namsespaces is removed.
-						if ( key === 'namespaces' ) {
-							return registry.stores;
-						}
-						return expect.any( Function );
-					} )
+					Object.fromEntries(
+						Object.entries( registry ).map( ( [ key ] ) => {
+							if ( key === 'stores' ) {
+								return [ key, expect.any( Object ) ];
+							}
+							// TODO: Remove this after namsespaces is removed.
+							if ( key === 'namespaces' ) {
+								return [ key, registry.stores ];
+							}
+							return [ key, expect.any( Function ) ];
+						} )
+					)
 				);
 
 				actualOptions = options;

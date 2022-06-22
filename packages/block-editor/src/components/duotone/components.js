@@ -9,11 +9,11 @@ import { SVG } from '@wordpress/components';
 import { __unstableGetValuesFromColors as getValuesFromColors } from './index';
 
 /**
- * Stylesheet for rendering the duotone filter.
+ * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param {Object} props          Duotone props.
- * @param {string} props.selector Selector to apply the filter to.
- * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to apply the filter to.
+ * @param {string}   props.id       Unique id for this duotone filter.
  *
  * @return {WPElement} Duotone element.
  */
@@ -27,25 +27,33 @@ ${ selector } {
 }
 
 /**
- * Values for the SVG `feComponentTransfer`.
+ * Stylesheet for disabling a global styles duotone filter.
  *
- * @typedef Values {Object}
- * @property {number[]} r Red values.
- * @property {number[]} g Green values.
- * @property {number[]} b Blue values.
- * @property {number[]} a Alpha values.
+ * @param {Object}   props          Duotone props.
+ * @param {string}   props.selector Selector to disable the filter for.
+ *
+ * @return {WPElement} Filter none style element.
  */
+export function DuotoneUnsetStylesheet( { selector } ) {
+	const css = `
+${ selector } {
+	filter: none;
+}
+`;
+	return <style>{ css }</style>;
+}
 
 /**
- * SVG for rendering the duotone filter.
+ * The SVG part of the duotone filter.
  *
- * @param {Object} props        Duotone props.
- * @param {string} props.id     Unique id for this duotone filter.
- * @param {Values} props.values R, G, B, and A values to filter with.
+ * @param {Object}   props        Duotone props.
+ * @param {string}   props.id     Unique id for this duotone filter.
+ * @param {string[]} props.colors Color strings from dark to light.
  *
- * @return {WPElement} Duotone element.
+ * @return {WPElement} Duotone SVG.
  */
-export function DuotoneFilter( { id, values } ) {
+export function DuotoneFilter( { id, colors } ) {
+	const values = getValuesFromColors( colors );
 	return (
 		<SVG
 			xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -119,7 +127,7 @@ export function PresetDuotoneFilter( { preset } ) {
 	return (
 		<DuotoneFilter
 			id={ `wp-duotone-${ preset.slug }` }
-			values={ getValuesFromColors( preset.colors ) }
+			colors={ preset.colors }
 		/>
 	);
 }
