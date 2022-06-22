@@ -271,8 +271,8 @@
 									"description": "Number of steps to generate in scale.",
 									"type": "integer"
 								},
-								"firstStep": {
-									"description": "The value to start scale from.",
+								"mediumStep": {
+									"description": "The value to medium setting in the scale.",
 									"type": "number"
 								},
 								"units": {
