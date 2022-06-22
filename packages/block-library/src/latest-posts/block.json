@@ -84,7 +84,16 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		}
 	},
 	"editorStyle": "wp-block-latest-posts-editor",
 	"style": "wp-block-latest-posts"
