@@ -151,10 +151,7 @@ test.describe( 'RTL', () => {
 		pageUtils,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
-
-		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
-
+		
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
