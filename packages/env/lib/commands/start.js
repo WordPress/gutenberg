@@ -101,7 +101,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		// as docker volumes, simply updating the image will not change those
 		// files. Thus, we need to remove those volumes in order for the files
 		// to be updated when pulling the new images.
-		const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress ${ directoryHash }_wordpress-phpunit ${ directoryHash }_tests-wordpress-phpunit`;
+		const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
 
 		try {
 			if ( config.debug ) {

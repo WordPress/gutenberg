@@ -110,7 +110,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[
 			'sh',
 			'-c',
-			`sed "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
+			`sed -e "/^require.*wp-settings.php/d" -e "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
