@@ -74,9 +74,8 @@ const TEMPLATE_ICONS = {
 export default function NewTemplate( { postType } ) {
 	const history = useHistory();
 	const postTypes = usePostTypes();
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] = useState(
-		false
-	);
+	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
+		useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 	const { existingTemplates, defaultTemplateTypes, theme } = useSelect(
 		( select ) => ( {
@@ -85,9 +84,8 @@ export default function NewTemplate( { postType } ) {
 				'wp_template',
 				{ per_page: -1 }
 			),
-			defaultTemplateTypes: select(
-				editorStore
-			).__experimentalGetDefaultTemplateTypes(),
+			defaultTemplateTypes:
+				select( editorStore ).__experimentalGetDefaultTemplateTypes(),
 			theme: select( coreStore ).getCurrentTheme(),
 		} ),
 		[]
