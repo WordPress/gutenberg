@@ -7,9 +7,6 @@ import { __experimentalColorGradientControl as ColorGradientControl } from '@wor
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import ScreenHeader from './header';
 import {
 	getSupportedGlobalStylesPanels,
