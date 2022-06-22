@@ -472,6 +472,7 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
+				ref &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
