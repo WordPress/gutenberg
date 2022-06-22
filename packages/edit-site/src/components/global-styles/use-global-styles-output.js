@@ -410,25 +410,27 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 			psuedoSelectorStyles.forEach( ( [ pseudoKey, pseudoRule ] ) => {
 				const pseudoDeclarations = getStylesDeclarations( pseudoRule );
 
-				if ( pseudoDeclarations?.length ) {
-					// `selector` maybe provided in a form
-					// where block level selectors have sub element
-					// selectors appended to them as a comma seperated
-					// string.
-					// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-					// Split and append pseudo selector to create
-					// the proper rules to target the elements.
-					const _selector = selector
-						.split( ',' )
-						.map( ( sel ) => sel + pseudoKey )
-						.join( ',' );
-
-					const psuedoRule = `${ _selector }{${ pseudoDeclarations.join(
-						';'
-					) };}`;
-
-					ruleset = ruleset + psuedoRule;
+				if ( ! pseudoDeclarations?.length ) {
+					return;
 				}
+
+				// `selector` maybe provided in a form
+				// where block level selectors have sub element
+				// selectors appended to them as a comma seperated
+				// string.
+				// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
+				// Split and append pseudo selector to create
+				// the proper rules to target the elements.
+				const _selector = selector
+					.split( ',' )
+					.map( ( sel ) => sel + pseudoKey )
+					.join( ',' );
+
+				const psuedoRule = `${ _selector }{${ pseudoDeclarations.join(
+					';'
+				) };}`;
+
+				ruleset = ruleset + psuedoRule;
 			} );
 		}
 	} );
