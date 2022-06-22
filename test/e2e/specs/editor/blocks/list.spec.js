@@ -95,7 +95,7 @@ test.describe( 'List', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '* ' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -128,7 +128,7 @@ test.describe( 'List', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.evaluate( () => delete window.requestIdleCallback );
 		await page.keyboard.type( '* ' );
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -172,7 +172,7 @@ test.describe( 'List', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		await expect( page.locator( '[data-type="core/list"]' ) ).toBeVisible();
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
