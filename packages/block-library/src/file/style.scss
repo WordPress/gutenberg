@@ -12,7 +12,6 @@
 
 	* + .wp-block-file__button {
 		margin-left: 0.75em;
-		display: inline-block;
 	}
 }
 
@@ -27,6 +26,7 @@
 	color: $white;
 	font-size: 0.8em;
 	padding: 0.5em 1em;
+	display: inline-block;
 
 	&:is(a) {
 		text-decoration: none;
