@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -28,7 +33,6 @@ export default function Navigation( {
 	onActivateMenu = noop,
 } ) {
 	const [ menu, setMenu ] = useState( activeMenu );
-	const menuRef = useRef( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
 	const navigationTree = useCreateNavigationTree();
 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
@@ -51,15 +55,15 @@ export default function Navigation( {
 		}
 	}, [] );
 
-	useEffect( () => {
-		menuRef.current = menu;
-	}, [ menu ] );
+	// Used to prevent excessive useEffect fires when navigation is being controlled by parent component
+	const controlledMenuUpdate = useRef( { setActiveMenu, menu } );
+	useLayoutEffect( () => {
+		controlledMenuUpdate.current = { setActiveMenu, menu };
+	} );
 
-	// Used to prevent resetting the `menu` state when navigating between menus
-	const setActiveMenuRef = useRef( setActiveMenu );
 	useEffect( () => {
-		if ( activeMenu !== menuRef.current ) {
-			setActiveMenuRef.current( activeMenu );
+		if ( activeMenu !== controlledMenuUpdate.current.menu ) {
+			controlledMenuUpdate.current.setActiveMenu( activeMenu );
 		}
 	}, [ activeMenu ] );
 
