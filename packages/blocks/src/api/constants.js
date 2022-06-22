@@ -33,6 +33,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderRadius: {
 		value: [ 'border', 'radius' ],
@@ -43,62 +44,77 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			borderBottomLeftRadius: 'bottomLeft',
 			borderBottomRightRadius: 'bottomRight',
 		},
+		useEngine: true,
 	},
 	borderStyle: {
 		value: [ 'border', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderWidth: {
 		value: [ 'border', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderTopColor: {
 		value: [ 'border', 'top', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderTopStyle: {
 		value: [ 'border', 'top', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderTopWidth: {
 		value: [ 'border', 'top', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderRightColor: {
 		value: [ 'border', 'right', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderRightStyle: {
 		value: [ 'border', 'right', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderRightWidth: {
 		value: [ 'border', 'right', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderBottomColor: {
 		value: [ 'border', 'bottom', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderBottomStyle: {
 		value: [ 'border', 'bottom', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderBottomWidth: {
 		value: [ 'border', 'bottom', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	borderLeftColor: {
 		value: [ 'border', 'left', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
+		useEngine: true,
 	},
 	borderLeftStyle: {
 		value: [ 'border', 'left', 'style' ],
 		support: [ '__experimentalBorder', 'style' ],
+		useEngine: true,
 	},
 	borderLeftWidth: {
 		value: [ 'border', 'left', 'width' ],
 		support: [ '__experimentalBorder', 'width' ],
+		useEngine: true,
 	},
 	color: {
 		value: [ 'color', 'text' ],
