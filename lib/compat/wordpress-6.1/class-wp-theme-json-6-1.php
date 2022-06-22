@@ -92,7 +92,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					}
 
 					$el_selectors = explode( ',', $el_selector );
-					foreach( $el_selectors as $el_selector_item ) {
+					foreach ( $el_selectors as $el_selector_item ) {
 						$element_selector[] = $selector . ' ' . $el_selector_item;
 					}
 				}
