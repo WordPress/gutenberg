@@ -173,6 +173,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
+		// Generate the default spacing sizes presets.
+		$result->get_spacing_sizes();
 
 		return $result;
 	}
