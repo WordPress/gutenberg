@@ -18,25 +18,37 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as editPostStore } from '../../store';
 
 function useStartPatterns() {
-	const { blockPatterns, postType } = useSelect( ( select ) => {
-		const { __experimentalGetPatternsByBlockTypes } =
-			select( blockEditorStore );
-		const { getCurrentPostType } = select( editorStore );
-		return {
-			blockPatterns:
-				__experimentalGetPatternsByBlockTypes( 'core/post-content' ),
-			postType: getCurrentPostType(),
-		};
-	}, [] );
+	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
+	// and it has no postTypes declares and the current post type is page or if
+	// the current post type is part of the postTypes declared.
+	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
+		( select ) => {
+			const { __experimentalGetPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const { getCurrentPostType } = select( editorStore );
+			return {
+				// get pa
+				blockPatternsWithPostContentBlockType:
+					__experimentalGetPatternsByBlockTypes(
+						'core/post-content'
+					),
+				postType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
+
 	return useMemo( () => {
-		return blockPatterns.filter( ( pattern ) => {
+		// filter patterns without postTypes declared if the current postType is page
+		// or patterns that declare the current postType in its post type array.
+		return blockPatternsWithPostContentBlockType.filter( ( pattern ) => {
 			return (
 				( postType === 'page' && ! pattern.postTypes ) ||
 				( Array.isArray( pattern.postTypes ) &&
 					pattern.postTypes.includes( postType ) )
 			);
 		} );
-	}, [ postType, blockPatterns ] );
+	}, [ postType, blockPatternsWithPostContentBlockType ] );
 }
 
 function PatternSelection( { onChoosePattern } ) {
