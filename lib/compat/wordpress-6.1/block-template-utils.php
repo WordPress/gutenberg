@@ -172,10 +172,10 @@ function gutenberg_get_template_slugs( $template ) {
 		$limit = 3;
 	}
 	$parts = explode( '-', $template, $limit );
-	$type = array_shift( $parts );
+	$type  = array_shift( $parts );
 	$slugs = array( $type );
 
-	foreach( $parts as $part ) {
+	foreach ( $parts as $part ) {
 		array_unshift( $slugs, $slugs[0] . '-' . $part );
 	}
 	return $slugs;
@@ -213,7 +213,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 	list( , $slug ) = $parts;
 
-	$templates = gutenberg_get_template_slugs( $slug );
+	$templates      = gutenberg_get_template_slugs( $slug );
 	$block_template = resolve_block_template( $slug, $templates, '' );
 	if ( ! $block_template ) {
 		$block_template = resolve_block_template( 'index', array(), '' );
