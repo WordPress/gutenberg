@@ -192,10 +192,10 @@
 			"customSpacingSizes": true,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingScale": {
-				"operator": "+",
-				"increment": 0.5,
-				"steps": 5,
-				"firstStep": 0.5,
+				"operator": "*",
+				"increment": 1.5,
+				"steps": 10,
+				"mediumStep": 1.5,
 				"units": "rem"
 			}
 		},
