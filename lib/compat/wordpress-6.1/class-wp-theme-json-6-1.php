@@ -504,14 +504,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return array An array of spacing preset sizes.
 	 */
 	protected static function get_spacing_sizes( $spacing_scale ) {
-		if ( ! isset( $spacing_scale['firstStep'] )
+		if ( ! is_numeric( $spacing_scale['steps'] )
+			|| ! $spacing_scale['steps'] > 0
+			|| ! isset( $spacing_scale['mediumStep'] )
 			|| ! isset( $spacing_scale['units'] )
 			|| ! isset( $spacing_scale['operator'] )
 			|| ! isset( $spacing_scale['increment'] )
 			|| ! isset( $spacing_scale['steps'] )
 			|| ! is_numeric( $spacing_scale['increment'] )
-			|| ! is_numeric( $spacing_scale['steps'] )
-			|| ! is_numeric( $spacing_scale['firstStep'] )
+			|| ! is_numeric( $spacing_scale['mediumStep'] )
 			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
 			if ( ! empty( $spacing_scale ) ) {
 				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), E_USER_NOTICE );
@@ -519,33 +520,68 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return null;
 		}
 
-		$spacing_sizes   = array();
-		$spacing_sizes[] = array(
-			'name' => 0,
-			'slug' => 0,
-			'size' => 0,
+		$current_step    = $spacing_scale['mediumStep'];
+		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
+
+		$x_count     = null;
+		$below_sizes = array();
+
+		for ( $x = $steps_mid_point - 1; $x > 0; $x-- ) {
+			$current_step = '+' === $spacing_scale['operator']
+				? $current_step - $spacing_scale['increment']
+				: $current_step / $spacing_scale['increment'];
+
+			$below_sizes[] = array(
+				'name' => $x === $steps_mid_point - 1 ? __( 'Small' ) : strval( $x_count ) . __( 'X-Small', 'gutenberg' ),
+				'slug' => $x === $steps_mid_point - 1 ? 'small' : strval( $x_count ) . 'x-small',
+				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
+			);
+			if ( $x === $steps_mid_point - 2 ) {
+				$x_count = 2;
+			}
+			if ( $x < $steps_mid_point - 2 ) {
+				$x_count++;
+			}
+		}
+
+		$below_sizes = array_reverse( $below_sizes );
+		array_unshift(
+			$below_sizes,
+			array(
+				'name' => 0,
+				'slug' => 0,
+				'size' => 0,
+			)
 		);
-		$spacing_sizes[] = array(
-			'name' => 1,
-			'slug' => 10,
-			'size' => $spacing_scale['firstStep'] . $spacing_scale['units'],
+		$below_sizes[] = array(
+			'name' => __( 'Medium', 'gutenberg' ),
+			'slug' => 'medium',
+			'size' => $spacing_scale['mediumStep'] . $spacing_scale['units'],
 		);
 
-		$current_step = $spacing_scale['firstStep'];
-
-		for ( $x = 1; $x <= $spacing_scale['steps'] - 1; $x++ ) {
+		$current_step = $spacing_scale['mediumStep'];
+		$x_count      = null;
+		$above_sizes  = array();
+		for ( $x = $steps_mid_point + 1; $x < $spacing_scale['steps']; $x++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment']
 				: $current_step * $spacing_scale['increment'];
 
-			$spacing_sizes[] = array(
-				'name' => $x + 1,
-				'slug' => ( $x + 1 ) * 10,
-				'size' => $current_step . $spacing_scale['units'],
+			$above_sizes[] = array(
+				'name' => $x === $steps_mid_point + 1 ? __( 'Large' ) : strval( $x_count ) . __( 'X-Large', 'gutenberg' ),
+				'slug' => $x === $steps_mid_point + 1 ? 'large' : strval( $x_count ) . 'x-large',
+				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
+
+			if ( $x === $steps_mid_point + 2 ) {
+				$x_count = 2;
+			}
+			if ( $x > $steps_mid_point + 2 ) {
+				$x_count++;
+			}
 		}
 
-		return $spacing_sizes;
+		return array_merge( $below_sizes, $above_sizes );
 	}
 
 	/**
