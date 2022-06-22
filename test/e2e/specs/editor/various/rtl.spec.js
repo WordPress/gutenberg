@@ -44,8 +44,8 @@ test.describe( 'RTL', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>٠١٢</p>
-<!-- /wp:paragraph -->`
+	<p>٠١٢</p>
+	<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -61,12 +61,12 @@ test.describe( 'RTL', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>٠</p>
-<!-- /wp:paragraph -->
+	<p>٠</p>
+	<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>١</p>
-<!-- /wp:paragraph -->`
+	<!-- wp:paragraph -->
+	<p>١</p>
+	<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -83,8 +83,8 @@ test.describe( 'RTL', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>٠١</p>
-<!-- /wp:paragraph -->`
+	<p>٠١</p>
+	<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -102,8 +102,8 @@ test.describe( 'RTL', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>٠١</p>
-<!-- /wp:paragraph -->`
+	<p>٠١</p>
+	<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -136,12 +136,12 @@ test.describe( 'RTL', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>٠<br>١</p>
-<!-- /wp:paragraph -->
+	<p>٠<br>١</p>
+	<!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>٠<br>١<br>٢</p>
-<!-- /wp:paragraph -->`
+	<!-- wp:paragraph -->
+	<p>٠<br>١<br>٢</p>
+	<!-- /wp:paragraph -->`
 		);
 	} );
 
@@ -151,7 +151,6 @@ test.describe( 'RTL', () => {
 		pageUtils,
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
-		
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
