@@ -532,7 +532,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$below_sizes[] = array(
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small' ) : strval( $x_count ) . __( 'X-Small', 'gutenberg' ),
-				'slug' => $x === $steps_mid_point - 1 ? 'small' : strval( $x_count ) . 'x-small',
+				'slug' => $x * 10,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
 			if ( $x === $steps_mid_point - 2 ) {
@@ -554,7 +554,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		);
 		$below_sizes[] = array(
 			'name' => __( 'Medium', 'gutenberg' ),
-			'slug' => 'medium',
+			'slug' => 50,
 			'size' => $spacing_scale['mediumStep'] . $spacing_scale['units'],
 		);
 
@@ -568,7 +568,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$above_sizes[] = array(
 				'name' => $x === $steps_mid_point + 1 ? __( 'Large' ) : strval( $x_count ) . __( 'X-Large', 'gutenberg' ),
-				'slug' => $x === $steps_mid_point + 1 ? 'large' : strval( $x_count ) . 'x-large',
+				'slug' => $x * 10,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
 
