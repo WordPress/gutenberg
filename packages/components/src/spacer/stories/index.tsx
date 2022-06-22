@@ -33,7 +33,7 @@ const meta: ComponentMeta< typeof Spacer > = {
 	component: Spacer,
 	title: 'Components (Experimental)/Spacer',
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: { type: 'text' } },
 		children: {
 			control: { type: 'text' },
 		},
