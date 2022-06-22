@@ -56,7 +56,16 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"link": true
+			}
+		}
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",
