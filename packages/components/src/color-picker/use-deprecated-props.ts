@@ -107,30 +107,24 @@ const transformColorStringToLegacyColor = memoize(
 export function useDeprecatedProps(
 	props: LegacyProps | ColorPickerProps
 ): ColorPickerProps {
-	const isUsingLegacy = isLegacyProps( props );
 	const { onChangeComplete } = props as LegacyProps;
-	const { onChange: onChangeProp } = props as ColorPickerProps;
 	const legacyChangeHandler = useCallback(
 		( color: string ) => {
 			onChangeComplete( transformColorStringToLegacyColor( color ) );
 		},
 		[ onChangeComplete ]
 	);
-	const onChange = isUsingLegacy ? legacyChangeHandler : onChangeProp;
-
-	const { color: colorProp } = props;
-	const color = isUsingLegacy
-		? getColorFromLegacyProps( colorProp )
-		: ( colorProp as ColorPickerProps[ 'color' ] );
-
-	const { disableAlpha } = props as LegacyProps;
-	const { enableAlpha: enableAlphaProp } = props as ColorPickerProps;
-	const enableAlpha = isUsingLegacy ? ! disableAlpha : enableAlphaProp;
-
+	if ( isLegacyProps( props ) ) {
+		return {
+			color: getColorFromLegacyProps( props.color ),
+			enableAlpha: ! props.disableAlpha,
+			onChange: legacyChangeHandler,
+		};
+	}
 	return {
-		...( isUsingLegacy ? {} : props ),
-		onChange,
-		color,
-		enableAlpha,
+		...props,
+		color: props.color as ColorPickerProps[ 'color' ],
+		enableAlpha: ( props as ColorPickerProps ).enableAlpha,
+		onChange: ( props as ColorPickerProps ).onChange,
 	};
 }
