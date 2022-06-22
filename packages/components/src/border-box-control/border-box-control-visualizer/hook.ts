@@ -18,7 +18,7 @@ export function useBorderBoxControlVisualizer(
 	const {
 		className,
 		value,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
 
@@ -27,12 +27,12 @@ export function useBorderBoxControlVisualizer(
 	const rtlWatchResult = rtl.watch();
 	const classes = useMemo( () => {
 		return cx(
-			styles.borderBoxControlVisualizer( value, __next36pxDefaultSize ),
+			styles.borderBoxControlVisualizer( value, __next40pxDefaultSize ),
 			className
 		);
 		// rtlWatchResult is needed to refresh styles when the writing direction changes
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ cx, className, value, __next36pxDefaultSize, rtlWatchResult ] );
+	}, [ cx, className, value, __next40pxDefaultSize, rtlWatchResult ] );
 
 	return { ...otherProps, className: classes, value };
 }

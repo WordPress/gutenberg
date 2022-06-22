@@ -128,7 +128,7 @@ export type BorderControlProps = ColorProps &
 		 *
 		 * @default false
 		 */
-		__next36pxDefaultSize?: boolean;
+		__next40pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps & {
@@ -170,7 +170,7 @@ export type DropdownProps = ColorProps & {
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 };
 
 export type StylePickerProps = LabelProps & {

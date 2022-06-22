@@ -20,6 +20,7 @@ export default function BoxInputControls( {
 	selectedUnits,
 	setSelectedUnits,
 	values: valuesProp,
+	__next40pxDefaultSize,
 	...props
 } ) {
 	const createHandleOnChange = ( corner ) => ( next ) => {
@@ -54,6 +55,8 @@ export default function BoxInputControls( {
 					bottomRight: valuesProp,
 			  };
 
+	const size = __next40pxDefaultSize ? '__unstable-large' : undefined;
+
 	// Controls are wrapped in tooltips as visible labels aren't desired here.
 	// Tooltip rendering also requires the UnitControl to be wrapped. See:
 	// https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
@@ -80,6 +83,7 @@ export default function BoxInputControls( {
 								onUnitChange={ createHandleOnUnitChange(
 									corner
 								) }
+								size={ size }
 							/>
 						</div>
 					</Tooltip>

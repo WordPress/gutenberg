@@ -60,7 +60,7 @@ const UnconnectedBorderControl = (
 		withSlider,
 		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
+		__next40pxDefaultSize,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -89,7 +89,7 @@ const UnconnectedBorderControl = (
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							__next36pxDefaultSize={ __next36pxDefaultSize }
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 						/>
 					}
 					label={ __( 'Border width' ) }

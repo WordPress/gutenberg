@@ -17,7 +17,7 @@ export function useBorderBoxControlLinkedButton(
 ) {
 	const {
 		className,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlLinkedButton' );
 
@@ -25,10 +25,10 @@ export function useBorderBoxControlLinkedButton(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx(
-			styles.BorderBoxControlLinkedButton( __next36pxDefaultSize ),
+			styles.BorderBoxControlLinkedButton( __next40pxDefaultSize ),
 			className
 		);
-	}, [ className, cx, __next36pxDefaultSize ] );
+	}, [ className, cx, __next40pxDefaultSize ] );
 
 	return { ...otherProps, className: classes };
 }
