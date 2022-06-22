@@ -7,6 +7,10 @@
 		convertWarningsToExceptions="true"
 		beStrictAboutTestsThatDoNotTestAnything="false"
 >
+	<php>
+		<env name="WP_MULTISITE" value="1" />
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./</directory>

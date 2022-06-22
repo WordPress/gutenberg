@@ -299,7 +299,7 @@
 		"pretest-unit-php": "wp-env start",
 		"test-unit-php": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist \"--verbose\"",
 		"pretest-unit-php-multisite": "wp-env start",
-		"test-unit-php-multisite": "wp-env run tests-wordpress WP_MULTISITE=1 /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml \"--verbose\"",
+		"test-unit-php-multisite": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml \"--verbose\"",
 		"prestorybook:build": "npm run build:packages",
 		"storybook:build": "build-storybook -c ./storybook -o ./storybook/build",
 		"prestorybook:dev": "npm run build:packages",
