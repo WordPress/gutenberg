@@ -45,17 +45,13 @@ function trimLeadingZero( str ) {
 	return str[ 0 ] === '0' ? str.slice( 1 ) : str;
 }
 
-function formatDatePickerValues( {
-	year,
-	monthLabel,
-	day,
-	hours,
-	minutes,
-	amOrPm,
-} ) {
+function formatDatePickerValues(
+	{ year, monthLabel, day, hours, minutes, amOrPm },
+	timezone
+) {
 	const dayTrimmed = trimLeadingZero( day );
 	const hoursTrimmed = trimLeadingZero( hours );
-	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes } ${ amOrPm }`;
+	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes }\xa0${ amOrPm } ${ timezone }`;
 }
 
 async function getPublishingDate() {
@@ -70,11 +66,13 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 	( timezone ) => {
 		let oldTimezone;
 		beforeEach( async () => {
+			await page.emulateTimezone( 'America/New_York' ); // Set browser to a timezone that's different to `timezone`.
 			oldTimezone = await changeSiteTimezone( timezone );
 			await createNewPost();
 		} );
 		afterEach( async () => {
 			await changeSiteTimezone( oldTimezone );
+			await page.emulateTimezone( null );
 		} );
 
 		it( 'should show the publishing date as "Immediately" if the date is not altered', async () => {
@@ -98,7 +96,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			const publishingDate = await getPublishingDate();
 
 			expect( publishingDate ).toBe(
-				formatDatePickerValues( datePickerValues )
+				formatDatePickerValues( datePickerValues, timezone )
 			);
 		} );
 
@@ -119,7 +117,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			expect( publishingDate ).not.toEqual( 'Immediately' );
 			// The expected date format will be "Sep 26, 2018 11:52 pm".
 			expect( publishingDate ).toBe(
-				formatDatePickerValues( datePickerValues )
+				formatDatePickerValues( datePickerValues, timezone )
 			);
 		} );
 
@@ -138,7 +136,9 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			await page.click( '.edit-post-post-schedule__toggle' );
 
 			// Clear the date.
-			await page.click( '.block-editor-publish-date-time-picker__reset' );
+			await page.click(
+				'.block-editor-publish-date-time-picker button[aria-label="Now"]'
+			);
 
 			const publishingDate = await getPublishingDate();
 

@@ -129,7 +129,7 @@ export default function Edit( {
 		} else {
 			placeholder = sprintf(
 				/* translators: %s: Number of comments. */
-				_n( '%s responses', '%s responses', commentsCount ),
+				_n( '%s response', '%s responses', commentsCount ),
 				commentsCount
 			);
 		}

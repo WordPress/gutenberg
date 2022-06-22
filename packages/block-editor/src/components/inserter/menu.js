@@ -44,33 +44,28 @@ function InserterMenu(
 		__experimentalFilterValue
 	);
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
-		null
-	);
+	const [ selectedPatternCategory, setSelectedPatternCategory ] =
+		useState( null );
 
-	const [
-		destinationRootClientId,
-		onInsertBlocks,
-		onToggleInsertionPoint,
-	] = useInsertionPoint( {
-		rootClientId,
-		clientId,
-		isAppender,
-		insertionIndex: __experimentalInsertionIndex,
-		shouldFocusBlock,
-	} );
+	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
+		useInsertionPoint( {
+			rootClientId,
+			clientId,
+			isAppender,
+			insertionIndex: __experimentalInsertionIndex,
+			shouldFocusBlock,
+		} );
 	const { showPatterns, hasReusableBlocks } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
 
 			return {
 				showPatterns: !! __experimentalGetAllowedPatterns(
 					destinationRootClientId
 				).length,
-				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-					?.length,
+				hasReusableBlocks:
+					!! getSettings().__experimentalReusableBlocks?.length,
 			};
 		},
 		[ destinationRootClientId ]

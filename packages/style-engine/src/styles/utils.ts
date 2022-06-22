@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { get, upperFirst } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import type { GeneratedCSSRule, Style, Box, StyleOptions } from '../types';
+import type {
+	CssRulesKeys,
+	GeneratedCSSRule,
+	Style,
+	Box,
+	StyleOptions,
+} from '../types';
 import {
 	VARIABLE_REFERENCE_PREFIX,
 	VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE,
@@ -45,18 +51,20 @@ export function generateRule(
 /**
  * Returns a JSON representation of the generated CSS rules taking into account box model properties, top, right, bottom, left.
  *
- * @param  style   Style object.
- * @param  options Options object with settings to adjust how the styles are generated.
- * @param  path    An array of strings representing the path to the style value in the style object.
- * @param  ruleKey A CSS property key.
+ * @param style                Style object.
+ * @param options              Options object with settings to adjust how the styles are generated.
+ * @param path                 An array of strings representing the path to the style value in the style object.
+ * @param ruleKeys             An array of CSS property keys and patterns.
+ * @param individualProperties The "sides" or individual properties for which to generate rules.
  *
- * @return GeneratedCSSRule[] CSS rules.
+ * @return GeneratedCSSRule[]  CSS rules.
  */
 export function generateBoxRules(
 	style: Style,
 	options: StyleOptions,
 	path: string[],
-	ruleKey: string
+	ruleKeys: CssRulesKeys,
+	individualProperties: string[] = [ 'top', 'right', 'bottom', 'left' ]
 ): GeneratedCSSRule[] {
 	const boxStyle: Box | string | undefined = get( style, path );
 	if ( ! boxStyle ) {
@@ -67,17 +75,20 @@ export function generateBoxRules(
 	if ( typeof boxStyle === 'string' ) {
 		rules.push( {
 			selector: options?.selector,
-			key: ruleKey,
+			key: ruleKeys.default,
 			value: boxStyle,
 		} );
 	} else {
-		const sideRules = [ 'top', 'right', 'bottom', 'left' ].reduce(
+		const sideRules = individualProperties.reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
 				const value: string | undefined = get( boxStyle, [ side ] );
 				if ( value ) {
 					acc.push( {
 						selector: options?.selector,
-						key: `${ ruleKey }${ upperFirst( side ) }`,
+						key: ruleKeys?.individual.replace(
+							'%s',
+							upperFirst( side )
+						),
 						value,
 					} );
 				}
@@ -110,4 +121,15 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 		return `var(--wp--${ variable })`;
 	}
 	return styleValue;
+}
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return string A CSS var value.
+ */
+export function upperFirst( [ firstLetter, ...rest ]: string ) {
+	return firstLetter.toUpperCase() + rest.join( '' );
 }

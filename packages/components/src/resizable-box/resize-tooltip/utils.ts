@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
 const { clearTimeout, setTimeout } = window;
+const noop = () => {};
 
 export type Axis = 'x' | 'y';
 

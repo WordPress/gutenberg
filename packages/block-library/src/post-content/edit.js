@@ -118,9 +118,8 @@ function RecursionError() {
 export default function PostContentEdit( { context, attributes } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		contextPostId
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;

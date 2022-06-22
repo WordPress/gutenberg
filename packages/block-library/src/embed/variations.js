@@ -26,6 +26,7 @@ import {
 	embedDailymotionIcon,
 	embedPinterestIcon,
 	embedWolframIcon,
+	embedPocketCastsIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -215,6 +216,15 @@ const variations = [
 		description: __( 'Embed Mixcloud content.' ),
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
+	},
+	{
+		name: 'pocketcasts',
+		title: 'Pocket Casts',
+		icon: embedPocketCastsIcon,
+		keywords: [ __( 'podcast' ), __( 'audio' ) ],
+		description: __( 'Embed a podcast player from Pocket Casts.' ),
+		patterns: [ /^https:\/\/pca.st\/\w+/i ],
+		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
 	},
 	{
 		name: 'reddit',

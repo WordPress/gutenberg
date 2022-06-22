@@ -34,9 +34,8 @@ function EditTemplatePartMenuItem( { selectedClientId, onClose } ) {
 	const { params } = useLocation();
 	const selectedTemplatePart = useSelect(
 		( select ) => {
-			const block = select( blockEditorStore ).getBlock(
-				selectedClientId
-			);
+			const block =
+				select( blockEditorStore ).getBlock( selectedClientId );
 
 			if ( block && isTemplatePart( block ) ) {
 				const { theme, slug } = block.attributes;

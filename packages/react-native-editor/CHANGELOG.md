@@ -11,10 +11,29 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Add 'Insert from URL' option to Video block [#41493]
+
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
+
+## 1.78.0
+
+-   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
+
+## 1.77.1
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
+
 ## 1.77.0
 
 -   [*] [a11y] Improve text read by screen readers for BottomSheetSelectControl [#41036]
 -   [*] Add 'Insert from URL' option to Image block [#40334]
+
+## 1.76.3
+
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
 
 ## 1.76.2
 

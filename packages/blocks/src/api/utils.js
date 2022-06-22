@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { every, has, isString, reduce, maxBy } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -77,7 +77,7 @@ export function isValidIcon( icon ) {
 		!! icon &&
 		( isString( icon ) ||
 			isValidElement( icon ) ||
-			isFunction( icon ) ||
+			typeof icon === 'function' ||
 			icon instanceof Component )
 	);
 }

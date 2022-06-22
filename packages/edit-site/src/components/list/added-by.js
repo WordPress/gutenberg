@@ -106,9 +106,10 @@ function AddedByPlugin( { slug, isCustomized } ) {
 }
 
 function AddedByAuthor( { id } ) {
-	const user = useSelect( ( select ) => select( coreStore ).getUser( id ), [
-		id,
-	] );
+	const user = useSelect(
+		( select ) => select( coreStore ).getUser( id ),
+		[ id ]
+	);
 
 	return (
 		<BaseAddedBy

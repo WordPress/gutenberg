@@ -40,9 +40,8 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectedBlockClientIds, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const {
 		duplicateBlocks,
 		removeBlocks,
