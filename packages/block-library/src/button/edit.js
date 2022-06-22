@@ -25,7 +25,7 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -172,7 +172,7 @@ function ButtonEdit( props ) {
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
 						},
-						__experimentalElementButtonClassName
+						__experimentalGetElementClassName( 'button' )
 					) }
 					style={ {
 						...borderProps.style,
