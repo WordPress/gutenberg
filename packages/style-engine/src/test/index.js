@@ -81,6 +81,57 @@ describe( 'generate', () => {
 			} )
 		).toEqual( 'color: var(--wp--preset--color--ham-sandwich);' );
 	} );
+
+	it( 'should parse border rules', () => {
+		expect(
+			generate( {
+				border: {
+					color: 'var:preset|color|perky-peppermint',
+					width: '0.5em',
+					style: 'dotted',
+					radius: '11px',
+				},
+			} )
+		).toEqual(
+			'border-color: var(--wp--preset--color--perky-peppermint); border-style: dotted; border-width: 0.5em; border-radius: 11px;'
+		);
+	} );
+
+	it( 'should parse individual border rules', () => {
+		expect(
+			generate( {
+				border: {
+					top: {
+						color: 'var:preset|color|sandy-beach',
+						width: '9px',
+						style: 'dashed',
+					},
+					right: {
+						color: 'var:preset|color|leafy-avenue',
+						width: '5rem',
+					},
+					bottom: {
+						color: '#eee',
+						width: '2%',
+						style: 'solid',
+					},
+					left: {
+						color: 'var:preset|color|avocado-blues',
+						width: '100px',
+						style: 'dotted',
+					},
+					radius: {
+						topLeft: '1px',
+						topRight: '2px',
+						bottomLeft: '3px',
+						bottomRight: '4px',
+					},
+				},
+			} )
+		).toEqual(
+			'border-top-left-radius: 1px; border-top-right-radius: 2px; border-bottom-left-radius: 3px; border-bottom-right-radius: 4px; border-top-color: var(--wp--preset--color--sandy-beach); border-top-style: dashed; border-top-width: 9px; border-right-color: var(--wp--preset--color--leafy-avenue); border-right-width: 5rem; border-bottom-color: #eee; border-bottom-style: solid; border-bottom-width: 2%; border-left-color: var(--wp--preset--color--avocado-blues); border-left-style: dotted; border-left-width: 100px;'
+		);
+	} );
 } );
 
 describe( 'getCSSRules', () => {

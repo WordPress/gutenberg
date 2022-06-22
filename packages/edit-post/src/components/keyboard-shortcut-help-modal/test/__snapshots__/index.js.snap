@@ -82,6 +82,13 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             "modifier": "primary",
           },
         },
+        Object {
+          "description": "Make the selected text inline code.",
+          "keyCombination": Object {
+            "character": "x",
+            "modifier": "access",
+          },
+        },
       ]
     }
     title="Text formatting"

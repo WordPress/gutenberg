@@ -1,14 +1,13 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import { useHStack } from '../h-stack';
+import type { VStackProps } from './types';
 
-/**
- *
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- */
-export function useVStack( props ) {
+export function useVStack(
+	props: WordPressComponentProps< VStackProps, 'div' >
+) {
 	const { expanded = false, ...otherProps } = useContextSystem(
 		props,
 		'VStack'
