@@ -187,7 +187,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'post_types'     => array(
-					'description' => __( 'Post types where the pattern is intended to be used as the starting content.' ),
+					'description' => __( ' An array of post types that the pattern is restricted to be used with.' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
