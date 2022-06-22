@@ -464,7 +464,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
-		$current_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ];
+		// Make sure that $block_metadata['path'] describes an element node, like ['styles', 'element', 'link'].
+		// Skip non-element paths like just ['styles']
+		$is_processing_element = count( $block_metadata['path'] ) === 3 && $block_metadata['path'][1] === 'elements';
+		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : nulll;
 
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
