@@ -400,10 +400,10 @@
 											"unicodeRange": {
 												"description": "CSS unicode-range value.",
 												"type": "string"
-											}
-										},
-										"required": [ "fontFamily", "fontWeight",  "src"  ],
-										"additionalProperties": false
+											},
+											"required": [ "fontFamily", "fontWeight",  "src"  ],
+											"additionalProperties": false
+										}
 									}
 								},
 								"additionalProperties": false
