@@ -88,7 +88,7 @@ const Template: ComponentStory< typeof BorderControl > = ( {
 					{ ...props }
 				/>
 			</div>
-			{ /* @ts-ignore Ignore until Popover is converted to TS */ }
+			{ /* @ts-expect-error Ignore until Popover is converted to TS */ }
 			<Popover.Slot />
 		</SlotFillProvider>
 	);
