@@ -57,12 +57,12 @@ export const wrapperWidth = css`
 `;
 
 /*
- * When default control height is 36px the following should be removed.
- * See: InputControl and __next36pxDefaultSize.
+ * When default control height is 40px the following should be removed.
+ * See: InputControl and __next40pxDefaultSize.
  */
-export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
+export const wrapperHeight = ( __next40pxDefaultSize?: boolean ) => {
 	return css`
-		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
+		height: ${ __next40pxDefaultSize ? '40px' : '30px' };
 	`;
 };
 
@@ -106,7 +106,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 
 export const colorIndicatorWrapper = (
 	border?: Border,
-	__next36pxDefaultSize?: boolean
+	__next40pxDefaultSize?: boolean
 ) => {
 	const { style } = border || {};
 
@@ -114,9 +114,9 @@ export const colorIndicatorWrapper = (
 		border-radius: 9999px;
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
-		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
-		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
+		width: ${ __next40pxDefaultSize ? '28px' : '22px' };
+		height: ${ __next40pxDefaultSize ? '28px' : '22px' };
+		padding: ${ __next40pxDefaultSize ? '2px' : '1px' };
 
 		/*
 		 * ColorIndicator
@@ -125,7 +125,7 @@ export const colorIndicatorWrapper = (
 		 * over the active state of the border control dropdown's toggle button.
 		 */
 		& > span {
-			${ ! __next36pxDefaultSize
+			${ ! __next40pxDefaultSize
 				? css`
 						/* Dimensions fit in 30px overall control height. */
 						height: 16px;

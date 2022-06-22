@@ -19,13 +19,13 @@ export const LinkedBorderControl = css`
 `;
 
 export const BorderBoxControlLinkedButton = (
-	__next36pxDefaultSize?: boolean
+	__next40pxDefaultSize?: boolean
 ) => {
 	return css`
 		flex: 0;
 		flex-basis: 24px;
 		line-height: 0;
-		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
+		margin-top: ${ __next40pxDefaultSize ? '8px' : '3px' };
 	`;
 };
 
@@ -46,13 +46,13 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
 
 export const borderBoxControlVisualizer = (
 	borders?: Borders,
-	__next36pxDefaultSize?: boolean
+	__next40pxDefaultSize?: boolean
 ) => {
 	return css`
 		position: absolute;
-		top: ${ __next36pxDefaultSize ? '18px' : '15px' };
+		top: ${ __next40pxDefaultSize ? '20px' : '15px' };
 		right: 30px;
-		bottom: ${ __next36pxDefaultSize ? '18px' : '15px' };
+		bottom: ${ __next40pxDefaultSize ? '20px' : '15px' };
 		left: 30px;
 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
