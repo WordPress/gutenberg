@@ -62,8 +62,8 @@
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 	<rule ref="Generic.Commenting.DocComment.Empty">
-    	<exclude-pattern>phpunit/*</exclude-pattern>
-    </rule>
+		<exclude-pattern>phpunit/*</exclude-pattern>
+	</rule>
 	<rule ref="Generic.Commenting.DocComment.MissingShort">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
