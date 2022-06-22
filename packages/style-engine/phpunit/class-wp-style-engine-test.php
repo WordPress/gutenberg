@@ -7,6 +7,8 @@
  */
 
 require __DIR__ . '/../class-wp-style-engine.php';
+require __DIR__ . '/../class-wp-style-engine-store.php';
+require __DIR__ . '/../class-wp-style-engine-renderer.php';
 
 /**
  * Tests for registering, storing and generating styles.
