@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalTruncate as Truncate,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { forwardRef } from '@wordpress/element';
 import { Icon, lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
@@ -19,6 +24,11 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import BlockTitle from '../block-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
+import { store as blockEditorStore } from '../../store';
+
+// For this list of hard-coded blocks, the block content will be used as the button label.
+// If no content exists, then the block's title will be used as a fallback.
+const CONTENT_LABEL_BLOCKS = [ 'core/heading', 'core/paragraph' ];
 
 function ListViewBlockSelectButton(
 	{
@@ -35,6 +45,24 @@ function ListViewBlockSelectButton(
 	ref
 ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
+
+	// Attempt to get block content as the label for the button.
+	const contentLabel = useSelect(
+		( select ) => {
+			let content;
+			const block = select( blockEditorStore ).getBlock( clientId );
+			if (
+				CONTENT_LABEL_BLOCKS.some(
+					( blockName ) => blockName === block?.name
+				)
+			) {
+				content = stripHTML( block?.attributes?.content );
+			}
+			return content;
+		},
+		[ clientId ]
+	);
+
 	const { isLocked } = useBlockLock( clientId );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
@@ -73,7 +101,16 @@ function ListViewBlockSelectButton(
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<span className="block-editor-list-view-block-select-button__title">
-					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
+					{ contentLabel ? (
+						<Truncate limit={ 35 } ellipsizeMode="tail">
+							{ contentLabel }
+						</Truncate>
+					) : (
+						<BlockTitle
+							clientId={ clientId }
+							maximumLength={ 35 }
+						/>
+					) }
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor">
