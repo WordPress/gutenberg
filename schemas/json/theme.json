@@ -337,7 +337,15 @@
 												"fontWeight": {
 													"description": "List of available font weights, separated by a space.",
 													"type": "string",
-													"default": "400"
+													"default": "400",
+													"oneOf": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "integer"
+														}
+													]
 												},
 												"fontDisplay": {
 													"description": "CSS font-display value.",
