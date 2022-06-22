@@ -402,7 +402,7 @@
 													"type": "string"
 												}
 											},
-											"required": [ "fontFamily", "fontWeight",  "src" ],
+											"required": [ "fontFamily", "fontWeight", "src" ],
 											"additionalProperties": false
 										}
 									}
