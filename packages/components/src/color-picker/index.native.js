@@ -8,7 +8,7 @@ import namesPlugin from 'colord/plugins/names';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -33,7 +33,6 @@ function ColorPicker( {
 	onHandleHardwareButtonPress,
 	bottomLabelText,
 } ) {
-	const didMount = useRef( false );
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 	const {
@@ -83,13 +82,17 @@ function ColorPicker( {
 		v: val * 100,
 	} ).toHex();
 
-	useEffect( () => {
-		if ( ! didMount.current ) {
-			didMount.current = true;
-			return;
-		}
-		setColor( currentColor );
-	}, [ currentColor, setColor ] );
+	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
+		if ( h ) setHue( h );
+		if ( s ) setSaturation( s );
+		if ( v ) setValue( v );
+		const nextColor = colord( {
+			h: h ?? hue,
+			s: s ?? sat * 100,
+			v: v ?? val * 100,
+		} ).toHex();
+		setColor( nextColor );
+	};
 
 	useEffect( () => {
 		shouldEnableBottomSheetMaxHeight( false );
@@ -111,15 +114,6 @@ function ColorPicker( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	function onHuePickerChange( { hue: h } ) {
-		setHue( h );
-	}
-
-	function onSatValPickerChange( { saturation: s, value: v } ) {
-		setSaturation( s );
-		setValue( v );
-	}
-
 	function onButtonPress( action ) {
 		onNavigationBack();
 		onHandleClosingBottomSheet( null );
@@ -134,16 +128,16 @@ function ColorPicker( {
 		<>
 			<HsvColorPicker
 				huePickerHue={ hue }
-				onHuePickerDragMove={ onHuePickerChange }
+				onHuePickerDragMove={ updateColor }
 				onHuePickerPress={
-					! isBottomSheetContentScrolling && onHuePickerChange
+					! isBottomSheetContentScrolling && updateColor
 				}
 				satValPickerHue={ hue }
 				satValPickerSaturation={ sat }
 				satValPickerValue={ val }
-				onSatValPickerDragMove={ onSatValPickerChange }
+				onSatValPickerDragMove={ updateColor }
 				onSatValPickerPress={
-					! isBottomSheetContentScrolling && onSatValPickerChange
+					! isBottomSheetContentScrolling && updateColor
 				}
 				onSatValPickerDragStart={ () => {
 					shouldEnableBottomSheetScroll( false );
