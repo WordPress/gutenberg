@@ -25,7 +25,7 @@ const controls = [
 	'paddingLeft',
 	'paddingRight',
 ].reduce(
-	( acc, prop ) => ( { ...acc, [ prop ]: { control: { type: 'number' } } } ),
+	( acc, prop ) => ( { ...acc, [ prop ]: { control: { type: 'text' } } } ),
 	{}
 );
 
