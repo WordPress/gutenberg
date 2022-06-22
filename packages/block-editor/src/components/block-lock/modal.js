@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	Icon,
 	Modal,
+	ToggleControl,
 } from '@wordpress/components';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -23,16 +24,33 @@ import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 
+function getTemplateLockValue( lock ) {
+	// Prevents all operations.
+	if ( lock.remove && lock.move ) {
+		return 'all';
+	}
+
+	// Prevents inserting or removing blocks, but allows moving existing blocks.
+	if ( lock.remove && ! lock.move ) {
+		return 'insert';
+	}
+
+	return false;
+}
+
 export default function BlockLockModal( { clientId, onClose } ) {
+	const [ applyTemplateLock, setApplyTemplateLock ] = useState( false );
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { isReusable } = useSelect(
+	const { isReusable, hasTemplateLock } = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
+			const blockType = getBlockType( blockName );
 
 			return {
-				isReusable: isReusableBlock( getBlockType( blockName ) ),
+				isReusable: isReusableBlock( blockType ),
+				hasTemplateLock: !! blockType?.attributes?.templateLock,
 			};
 		},
 		[ clientId ]
@@ -69,7 +87,12 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					updateBlockAttributes( [ clientId ], { lock } );
+					updateBlockAttributes( [ clientId ], {
+						lock,
+						templateLock: applyTemplateLock
+							? getTemplateLockValue( lock )
+							: undefined,
+					} );
 					onClose();
 				} }
 			>
@@ -171,6 +194,16 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							/>
 						</li>
 					</ul>
+					{ hasTemplateLock && (
+						<ToggleControl
+							className="block-editor-block-lock-modal__template-lock"
+							label={ __( 'Apply to inner blocks' ) }
+							checked={ applyTemplateLock }
+							onChange={ () =>
+								setApplyTemplateLock( ! applyTemplateLock )
+							}
+						/>
+					) }
 				</div>
 				<Flex
 					className="block-editor-block-lock-modal__actions"
