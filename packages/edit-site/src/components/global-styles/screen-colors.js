@@ -104,7 +104,7 @@ function LinkColorItem( { name, parentMenu } ) {
 
 function ButtonColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const hasSupport = supports.includes( 'linkColor' ); // TODO - use a real support
+	const hasSupport = supports.includes( 'buttonColor' );
 	const [ color ] = useStyle( 'elements.button.color.text', name );
 	const [ bgColor ] = useStyle( 'elements.button.color.background', name );
 

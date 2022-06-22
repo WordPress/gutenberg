@@ -58,8 +58,7 @@
 }
 
 .edit-site-global-styles-section-title {
-	font-size: calc(1.95 * 8px);
-	color: rgb(30, 30, 30);
+	color: $gray-800;
 	font-weight: 600;
 	line-height: 1.2;
 	padding: $grid-unit-20;

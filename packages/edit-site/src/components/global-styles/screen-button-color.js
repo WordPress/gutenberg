@@ -22,9 +22,12 @@ function ScreenButtonColor( { name } ) {
 
 	const colorsPerOrigin = useColorsPerOrigin( name );
 
+	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+
 	const hasButtonColor =
 		supports.includes( 'buttonColor' ) &&
-		( solids.length > 0 || areCustomSolidsEnabled ); // TODO - use the right check
+		isBackgroundEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useStyle(
 		'elements.button.color.text',
