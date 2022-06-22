@@ -851,11 +851,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	/**
 	 * Transform the spacing scale values into an array of spacing scale presets.
-	 *
-	 * @param array $spacing_scale scale Array of values used to create the scale of spacing presets.
-	 * @return array An array of spacing preset sizes.
 	 */
-	protected static function get_spacing_sizes( $spacing_scale ) {
+	public function get_spacing_sizes() {
+		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
+
 		if ( ! is_numeric( $spacing_scale['steps'] )
 			|| ! $spacing_scale['steps'] > 0
 			|| ! isset( $spacing_scale['mediumStep'] )
@@ -933,7 +932,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		return array_merge( $below_sizes, $above_sizes );
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), array_merge( $below_sizes, $above_sizes ) );
 	}
 
 	/**
@@ -1015,13 +1014,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					}
 				}
 			}
-
-			// Generate the default spacing sizes presets.
-			$spacing_size_defaults = static::get_spacing_sizes( _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() ) );
-			if ( $spacing_size_defaults ) {
-				_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_size_defaults );
-			}
 		}
-
 	}
 }
