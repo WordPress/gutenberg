@@ -63,6 +63,9 @@ class WP_Style_Engine {
 					'default' => 'background-color',
 				),
 				'path'          => array( 'color', 'background' ),
+				'css_vars'      => array(
+					'color' => '--wp--preset--color--$slug',
+				),
 				'classnames'    => array(
 					'has-background'             => true,
 					'has-$slug-background-color' => 'color',

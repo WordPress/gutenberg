@@ -529,11 +529,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$node,
 			array(
 				'selector' => $selector,
+				'css_vars' => true,
 				'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 			)
 		);
 
 		if ( isset( $styles['css'] ) ) {
+
 			$block_rules .= $styles['css'];
 		}
 
