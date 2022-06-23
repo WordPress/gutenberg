@@ -116,7 +116,7 @@
 					"//": "The extra 2px are added to size solids the same as the outline versions.",
 					"top": "calc(0.667em + 2px)",
 					"right": "calc(1.333em + 2px)",
-					"bottom": "calc(0.667em + 2px)",
+					"bottom": "calc(0.667em + 200px) !important",
 					"left": "calc(1.333em + 2px)"
 				}
 			}
