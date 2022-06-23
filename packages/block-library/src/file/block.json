@@ -64,8 +64,8 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"link": true
-      }
-    },
+			}
+		},
 		"__experimentalStyle": {
 			"elements": {
 				"button": {
