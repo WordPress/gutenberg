@@ -1,6 +1,15 @@
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
+
 .block-editor-color-gradient-control {
 	.block-editor-color-gradient-control__color-indicator {
 		margin-bottom: $grid-unit-15;
+	}
+
+	> .components-base-control__field {
+		margin-bottom: 0;
 	}
 }
 
@@ -18,11 +27,6 @@
 }
 
 .block-editor-panel-color-gradient-settings {
-
-	// Must equal $color-palette-circle-size from:
-	// @wordpress/components/src/circular-option-picker/style.scss
-	$swatch-size: 28px;
-
 	@media screen and (min-width: $break-medium) {
 		.components-circular-option-picker__swatches {
 			display: grid;
@@ -41,7 +45,8 @@
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	width: $sidebar-width;
+	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $grid-unit-20 * 2 ); // Ensure the popover perfectly wraps the swatches. 
+	padding: $grid-unit-20;
 }
 
 
