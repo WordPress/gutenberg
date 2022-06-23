@@ -226,6 +226,33 @@
 								"type": "string"
 							},
 							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+						},
+						"customSpacingSizes": {
+							"description": "Allow users to set custom space sizes.",
+							"type": "boolean",
+							"default": true
+						},
+						"spacingSizes": {
+							"description": "Space size presets for the space size selector.\nGenerates a single class (`.has-{slug}-space-size`) and custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the space size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the space size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS space-size value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
