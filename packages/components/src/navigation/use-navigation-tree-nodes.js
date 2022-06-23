@@ -16,12 +16,12 @@ export const useNavigationTreeNodes = () => {
 		} ) );
 	}, [] );
 
-	const removeNode = ( key ) => {
+	const removeNode = useCallback( ( key ) => {
 		return setNodes( ( original ) => {
 			const { [ key ]: removedNode, ...remainingNodes } = original;
 			return remainingNodes;
 		} );
-	};
+	}, [] );
 
 	return { nodes, getNode, addNode, removeNode };
 };
