@@ -254,17 +254,26 @@ export function usePasteHandler( props ) {
 }
 
 /**
- * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
- * and any preceeding and trailing whitespace.
+ * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
+ * comments and any preceeding and trailing content.
  *
  * @param {string} html the html to be normalized
  * @return {string} the normalized html
  */
 function removeWindowsFragments( html ) {
-	const startReg = /.*<!--StartFragment-->/s;
-	const endReg = /<!--EndFragment-->.*/s;
+	const startStr = '<!--StartFragment-->';
+	const startIdx = html.indexOf( startStr );
+	if ( startIdx > -1 ) {
+		html = html.substring( startIdx + startStr.length );
+	}
 
-	return html.replace( startReg, '' ).replace( endReg, '' );
+	const endStr = '<!--EndFragment-->';
+	const endIdx = html.indexOf( endStr );
+	if ( endIdx > -1 ) {
+		html = html.substring( 0, endIdx );
+	}
+
+	return html;
 }
 
 /**
