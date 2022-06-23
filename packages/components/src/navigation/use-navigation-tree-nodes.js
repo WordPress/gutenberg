@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 
 export const useNavigationTreeNodes = () => {
 	const [ nodes, setNodes ] = useState( {} );
@@ -14,7 +14,7 @@ export const useNavigationTreeNodes = () => {
 			...original,
 			[ key ]: newNode,
 		} ) );
-	};
+	}, [] );
 
 	const removeNode = ( key ) => {
 		return setNodes( ( original ) => {
