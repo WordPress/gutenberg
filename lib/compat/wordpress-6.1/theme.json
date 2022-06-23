@@ -250,6 +250,11 @@
 					"fontSize": "1.125em",
 					"textDecoration": "none"
 				}
+			},
+			"link": {
+				"typography": {
+					"textDecoration": "underline"
+				}
 			}
 		},
 		"spacing": { "blockGap": "24px" }
