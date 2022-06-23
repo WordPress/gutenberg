@@ -1,7 +1,9 @@
 [
 	{
 		"blockName": "core/comments",
-		"attrs": {},
+		"attrs": {
+			"className": "comments-post-extra"
+		},
 		"innerBlocks": [
 			{
 				"blockName": "core/comments-title",
@@ -52,7 +54,9 @@
 								"innerBlocks": [
 									{
 										"blockName": "core/comment-author-name",
-										"attrs": {},
+										"attrs": {
+											"fontSize": "small"
+										},
 										"innerBlocks": [],
 										"innerHTML": "",
 										"innerContent": []
@@ -75,14 +79,18 @@
 										"innerBlocks": [
 											{
 												"blockName": "core/comment-date",
-												"attrs": {},
+												"attrs": {
+													"fontSize": "small"
+												},
 												"innerBlocks": [],
 												"innerHTML": "",
 												"innerContent": []
 											},
 											{
 												"blockName": "core/comment-edit-link",
-												"attrs": {},
+												"attrs": {
+													"fontSize": "small"
+												},
 												"innerBlocks": [],
 												"innerHTML": "",
 												"innerContent": []
@@ -99,18 +107,7 @@
 									},
 									{
 										"blockName": "core/comment-content",
-										"attrs": {
-											"style": {
-												"elements": {
-													"link": {
-														"color": {
-															"text": "var:preset|color|vivid-cyan-blue"
-														}
-													}
-												}
-											},
-											"textColor": "foreground"
-										},
+										"attrs": {},
 										"innerBlocks": [],
 										"innerHTML": "",
 										"innerContent": []
@@ -118,15 +115,7 @@
 									{
 										"blockName": "core/comment-reply-link",
 										"attrs": {
-											"style": {
-												"elements": {
-													"link": {
-														"color": {
-															"text": "var:preset|color|vivid-cyan-blue"
-														}
-													}
-												}
-											}
+											"fontSize": "small"
 										},
 										"innerBlocks": [],
 										"innerHTML": "",
@@ -163,46 +152,25 @@
 			{
 				"blockName": "core/comments-pagination",
 				"attrs": {},
-				"innerBlocks": [
-					{
-						"blockName": "core/comments-pagination-previous",
-						"attrs": {},
-						"innerBlocks": [],
-						"innerHTML": "",
-						"innerContent": []
-					},
-					{
-						"blockName": "core/comments-pagination-numbers",
-						"attrs": {},
-						"innerBlocks": [],
-						"innerHTML": "",
-						"innerContent": []
-					},
-					{
-						"blockName": "core/comments-pagination-next",
-						"attrs": {},
-						"innerBlocks": [],
-						"innerHTML": "",
-						"innerContent": []
-					}
-				],
-				"innerHTML": "\n    \n    \n    \n    \n    \n    ",
-				"innerContent": [
-					"\n    ",
-					null,
-					"\n    \n    ",
-					null,
-					"\n    \n    ",
-					null,
-					"\n    "
-				]
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			},
+			{
+				"blockName": "core/post-comments-form",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-comments\">\n\n    \n    \n    </div>\n    ",
+		"innerHTML": "\n<div class=\"wp-block-comments wp-block-comments-query-loop comments-post-extra\">\n\n    \n    \n    \n    \n    </div>\n    ",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments\">",
+			"\n<div class=\"wp-block-comments wp-block-comments-query-loop comments-post-extra\">",
 			null,
 			"\n\n    ",
+			null,
+			"\n    \n    ",
 			null,
 			"\n    \n    ",
 			null,

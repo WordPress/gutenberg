@@ -3,7 +3,8 @@
 		"name": "core/comments",
 		"isValid": true,
 		"attributes": {
-			"tagName": "div"
+			"tagName": "div",
+			"className": "comments-post-extra"
 		},
 		"innerBlocks": [
 			{
@@ -62,7 +63,8 @@
 										"isValid": true,
 										"attributes": {
 											"isLink": true,
-											"linkTarget": "_self"
+											"linkTarget": "_self",
+											"fontSize": "small"
 										},
 										"innerBlocks": []
 									},
@@ -88,7 +90,8 @@
 												"name": "core/comment-date",
 												"isValid": true,
 												"attributes": {
-													"isLink": true
+													"isLink": true,
+													"fontSize": "small"
 												},
 												"innerBlocks": []
 											},
@@ -96,7 +99,8 @@
 												"name": "core/comment-edit-link",
 												"isValid": true,
 												"attributes": {
-													"linkTarget": "_self"
+													"linkTarget": "_self",
+													"fontSize": "small"
 												},
 												"innerBlocks": []
 											}
@@ -105,33 +109,14 @@
 									{
 										"name": "core/comment-content",
 										"isValid": true,
-										"attributes": {
-											"textColor": "foreground",
-											"style": {
-												"elements": {
-													"link": {
-														"color": {
-															"text": "var:preset|color|vivid-cyan-blue"
-														}
-													}
-												}
-											}
-										},
+										"attributes": {},
 										"innerBlocks": []
 									},
 									{
 										"name": "core/comment-reply-link",
 										"isValid": true,
 										"attributes": {
-											"style": {
-												"elements": {
-													"link": {
-														"color": {
-															"text": "var:preset|color|vivid-cyan-blue"
-														}
-													}
-												}
-											}
+											"fontSize": "small"
 										},
 										"innerBlocks": []
 									}
@@ -147,26 +132,13 @@
 				"attributes": {
 					"paginationArrow": "none"
 				},
-				"innerBlocks": [
-					{
-						"name": "core/comments-pagination-previous",
-						"isValid": true,
-						"attributes": {},
-						"innerBlocks": []
-					},
-					{
-						"name": "core/comments-pagination-numbers",
-						"isValid": true,
-						"attributes": {},
-						"innerBlocks": []
-					},
-					{
-						"name": "core/comments-pagination-next",
-						"isValid": true,
-						"attributes": {},
-						"innerBlocks": []
-					}
-				]
+				"innerBlocks": []
+			},
+			{
+				"name": "core/post-comments-form",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
 			}
 		]
 	}
