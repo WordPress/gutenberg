@@ -675,6 +675,16 @@ button.wp-block-navigation-item__content {
 	position: relative;
 }
 
+// Adjust dialog top margin when admin-bar is visible.
+.admin-bar .wp-block-navigation__responsive-dialog {
+	margin-top: $admin-bar-height-big;
+
+	// Handle smaller admin-bar.
+	@include break-medium() {
+		margin-top: $admin-bar-height;
+	}
+}
+
 // Prevent scrolling of the parent content when the modal is open.
 html.has-modal-open {
 	overflow: hidden;
