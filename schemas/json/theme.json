@@ -227,7 +227,7 @@
 							},
 							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
 						},
-						"customSpacingSizes": {
+						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
 							"type": "boolean",
 							"default": true
