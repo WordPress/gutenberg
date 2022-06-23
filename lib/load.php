@@ -55,9 +55,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
-	if ( ! class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
-		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
 	}
