@@ -127,7 +127,6 @@ class WP_Inline_Styles_Handler {
 	 * @return array
 	 */
 	public function get_styles_array() {
-		$this->combine_selectors();
 		return $this->styles_array;
 	}
 
@@ -137,7 +136,8 @@ class WP_Inline_Styles_Handler {
 	 * @return string
 	 */
 	public function get_styles() {
-		$css    = '';
+		$css = '';
+		$this->combine_selectors();
 		$styles = $this->get_styles_array();
 		foreach ( $styles as $selector => $rules ) {
 			$css .= "$selector{";
