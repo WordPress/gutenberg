@@ -62,7 +62,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
@@ -75,7 +75,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 		return new WP_Error(
 			'rest_cannot_view',
-			__( 'Sorry, you are not allowed to view the registered block patterns.' ),
+			__( 'Sorry, you are not allowed to view the registered block patterns.', 'gutenberg' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -157,61 +157,61 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'name'           => array(
-					'description' => __( 'The pattern name.' ),
+					'description' => __( 'The pattern name.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'title'          => array(
-					'description' => __( 'The pattern title, in human readable format.' ),
+					'description' => __( 'The pattern title, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'description'    => array(
-					'description' => __( 'The pattern detailed description.' ),
+					'description' => __( 'The pattern detailed description.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'viewport_width' => array(
-					'description' => __( 'The pattern viewport width for inserter preview.' ),
+					'description' => __( 'The pattern viewport width for inserter preview.', 'gutenberg' ),
 					'type'        => 'number',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'block_types'    => array(
-					'description' => __( 'Block types that the pattern is intended to be used with.' ),
+					'description' => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'post_types'     => array(
-					'description' => __( ' An array of post types that the pattern is restricted to be used with.' ),
+					'description' => __( ' An array of post types that the pattern is restricted to be used with.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'categories'     => array(
-					'description' => __( 'The pattern category slugs.' ),
+					'description' => __( 'The pattern category slugs.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'keywords'       => array(
-					'description' => __( 'The pattern keywords.' ),
+					'description' => __( 'The pattern keywords.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'content'        => array(
-					'description' => __( 'The pattern content.' ),
+					'description' => __( 'The pattern content.', 'gutenberg' ),
 					'type'        => 'string',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'inserter'       => array(
-					'description' => __( 'Determines whether the pattern is visible in inserter.' ),
+					'description' => __( 'Determines whether the pattern is visible in inserter.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),

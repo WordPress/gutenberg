@@ -75,7 +75,7 @@ function gutenberg_register_theme_block_patterns() {
 							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %s: file name. */
-								__( 'Could not register file "%s" as a block pattern ("Slug" field missing)' ),
+								__( 'Could not register file "%s" as a block pattern ("Slug" field missing)', 'gutenberg' ),
 								$file
 							),
 							'6.0.0'
@@ -88,7 +88,7 @@ function gutenberg_register_theme_block_patterns() {
 							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %1s: file name; %2s: slug value found. */
-								__( 'Could not register file "%1$s" as a block pattern (invalid slug "%2$s")' ),
+								__( 'Could not register file "%1$s" as a block pattern (invalid slug "%2$s")', 'gutenberg' ),
 								$file,
 								$pattern_data['slug']
 							),
@@ -106,7 +106,7 @@ function gutenberg_register_theme_block_patterns() {
 							'_register_theme_block_patterns',
 							sprintf(
 								/* translators: %1s: file name; %2s: slug value found. */
-								__( 'Could not register file "%s" as a block pattern ("Title" field missing)' ),
+								__( 'Could not register file "%s" as a block pattern ("Title" field missing)', 'gutenberg' ),
 								$file
 							),
 							'6.0.0'
