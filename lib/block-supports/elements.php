@@ -114,7 +114,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		);
 
 		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
+			WP_Inline_Styles_Handler::get_instance()->add_css( $styles['css'] );
 		}
 	}
 
