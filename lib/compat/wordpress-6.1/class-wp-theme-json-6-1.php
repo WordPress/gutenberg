@@ -531,7 +531,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				: $current_step / $spacing_scale['increment'];
 
 			$below_sizes[] = array(
-				'name' => $x === $steps_mid_point - 1 ? __( 'Small' ) : strval( $x_count ) . __( 'X-Small', 'gutenberg' ),
+				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : strval( $x_count ) . __( 'X-Small', 'gutenberg' ),
 				'slug' => $x * 10,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
@@ -567,7 +567,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				: $current_step * $spacing_scale['increment'];
 
 			$above_sizes[] = array(
-				'name' => $x === $steps_mid_point + 1 ? __( 'Large' ) : strval( $x_count ) . __( 'X-Large', 'gutenberg' ),
+				'name' => $x === $steps_mid_point + 1 ? __( 'Large', 'gutenberg' ) : strval( $x_count ) . __( 'X-Large', 'gutenberg' ),
 				'slug' => $x * 10,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
