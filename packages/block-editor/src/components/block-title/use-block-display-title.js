@@ -26,9 +26,14 @@ import { store as blockEditorStore } from '../../store';
  *
  * @param {string}           clientId      Client ID of block.
  * @param {number|undefined} maximumLength The maximum length that the block title string may be before truncated.
+ * @param {string|undefined} context       The context to pass to `getBlockLabel`.
  * @return {?string} Block title.
  */
-export default function useBlockDisplayTitle( clientId, maximumLength ) {
+export default function useBlockDisplayTitle(
+	clientId,
+	maximumLength,
+	context
+) {
 	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -63,7 +68,7 @@ export default function useBlockDisplayTitle( clientId, maximumLength ) {
 	}
 	const blockType = getBlockType( name );
 	const blockLabel = blockType
-		? getBlockLabel( blockType, attributes )
+		? getBlockLabel( blockType, attributes, context )
 		: null;
 
 	const label = reusableBlockTitle || blockLabel;
