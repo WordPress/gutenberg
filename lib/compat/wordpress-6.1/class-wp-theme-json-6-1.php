@@ -460,7 +460,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// Attempt to parse a pseudo selector (e.g. ":hover") from the $selector ("a:hover").
 		$pseudo_matches = array();
 		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
-		$pseudo_selector = $pseudo_matches[0] ? $pseudo_matches[0] : null;
+		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
