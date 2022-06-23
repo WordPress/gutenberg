@@ -80,10 +80,14 @@ function block_core_gallery_render( $attributes, $content ) {
 		$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 	}
 
-	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+	WP_Inline_Styles_Handler::get_instance()->add_selector_styles(
+		".$class",
+		array(
+			'--wp--style--unstable-gallery-gap' => $gap_column,
+			'gap'                               => $gap_value,
+		)
+	);
 
-	gutenberg_enqueue_block_support_styles( $style, 11 );
 	return $content;
 }
 /**
