@@ -149,4 +149,84 @@ class WP_Inline_Styles_Handler {
 		error_log( strlen( $css ) );
 		return $css;
 	}
+
+	/**
+	 * Add styles from CSS.
+	 *
+	 * @param string $css The CSS to parse and add.
+	 *
+	 * @return void
+	 */
+	public function add_css( $css = '' ) {
+		$this->add_array_styles( $this->parse_css( $css ) );
+	}
+
+	/**
+	 * Parse CSS and return an array of selectors and their styles.
+	 *
+	 * @param string $css The CSS to parse.
+	 *
+	 * @return array An array of selectors and their styles.
+	 */
+	private function parse_css( $css = '' ) {
+		$parts  = explode( '}', $css );
+		$styles = array();
+
+		foreach ( $parts as $part ) {
+			$part = trim( $part );
+			if ( ! $part ) {
+				continue;
+			}
+
+			$selector_styles = explode( '{', $part );
+			$selector        = trim( $selector_styles[0] );
+			if ( ! $selector ) {
+				continue;
+			}
+
+			$styles[ $selector ] = $this->parse_style_rules( $selector_styles[1] );
+
+			if ( ! $styles[ $selector ] ) {
+				unset( $styles[ $selector ] );
+				continue;
+			}
+		}
+		return $styles;
+	}
+
+	/**
+	 * Parse a CSS rule and return an array of properties and their values.
+	 *
+	 * @param string $rule The CSS rule to parse.
+	 *
+	 * @return array An array of properties and their values.
+	 */
+	private function parse_style_rules( $rule = '' ) {
+		$rule = trim( $rule );
+		if ( ! $rule ) {
+			return array();
+		}
+
+		$rules = explode( ';', $rule );
+		$style = array();
+
+		foreach ( $rules as $rule ) {
+			$rule = trim( $rule );
+			if ( ! $rule ) {
+				continue;
+			}
+
+			$rule_parts = explode( ':', $rule );
+			$property   = trim( $rule_parts[0] );
+			$value      = trim( $rule_parts[1] );
+
+			if ( ! $property || ! $value ) {
+				continue;
+			}
+
+			$style[ $property ] = $value;
+		}
+
+		return $style;
+	}
 }
