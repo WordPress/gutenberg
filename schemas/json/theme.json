@@ -889,6 +889,17 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"filter": {
+					"description": "Filters to attach to the styles",
+					"type": "object",
+					"properties": {
+						"duotone": {
+							"description": "Sets the duotone filter.",
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -1266,6 +1277,7 @@
 						"color": {},
 						"spacing": {},
 						"typography": {},
+						"filter": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
