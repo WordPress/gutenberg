@@ -24,6 +24,8 @@ test.describe( 'Classic menus', () => {
 			`Menu ${ random }`
 		);
 		await page.check( '#locations-primary' );
+
+		await page.locator( '#save_menu_footer' ).focus();
 		await Promise.all( [
 			page.waitForNavigation(),
 			page.locator( '#save_menu_footer' ).click(),
@@ -32,17 +34,12 @@ test.describe( 'Classic menus', () => {
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 
 		await page.locator( 'input[name="add-post-type-menu-item"]' ).click();
-		await page.waitForSelector(
-			'[data-items-type="posttype-page"] .spinner',
-			{
-				state: 'hidden',
-			}
-		);
 
 		await expect(
 			page.locator( '#menu-to-edit .menu-item-title' )
 		).toContainText( `${ pageTitle }` );
 
+		await page.locator( '#save_menu_footer' ).focus();
 		await Promise.all( [
 			page.waitForNavigation(),
 			page.locator( '#save_menu_footer' ).click(),
