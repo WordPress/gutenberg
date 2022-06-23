@@ -388,7 +388,10 @@ describe( 'Navigation', () => {
 			expect( loadingSpinner ).toBeNull();
 		} );
 
-		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
+		// Skip reason: This test is quite flaky recently.
+		// See https://github.com/WordPress/gutenberg/issues/39231.
+		// eslint-disable-next-line jest/no-disabled-tests
+		it.skip( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
 			const testNavId = 1;
 
 			let resolveNavigationRequest;

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,12 +22,17 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 
+const isMediaEqual = ( media1, media2 ) =>
+	media1.id === media2.id || media1.url === media2.url;
+
 // Remove duplicates after gallery append.
 const dedupMedia = ( media ) =>
-	uniqWith(
-		media,
-		( media1, media2 ) =>
-			media1.id === media2.id || media1.url === media2.url
+	media.reduce(
+		( dedupedMedia, mediaItem ) =>
+			dedupedMedia.some( ( item ) => isMediaEqual( item, mediaItem ) )
+				? dedupedMedia
+				: [ ...dedupedMedia, mediaItem ],
+		[]
 	);
 
 function MediaPlaceholder( props ) {

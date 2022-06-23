@@ -20,4 +20,3 @@ export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { useCachedTruthy } from './use-cached-truthy';
-export { PresetDuotoneFilter } from './duotone';
