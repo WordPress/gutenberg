@@ -265,6 +265,9 @@ function removeWindowsFragments( html ) {
 	const startIdx = html.indexOf( startStr );
 	if ( startIdx > -1 ) {
 		html = html.substring( startIdx + startStr.length );
+	} else {
+		// No point looking for EndFragment
+		return html;
 	}
 
 	const endStr = '<!--EndFragment-->';
