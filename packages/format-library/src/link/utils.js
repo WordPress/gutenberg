@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startsWith, find, partialRight } from 'lodash';
+import { startsWith, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -238,6 +238,11 @@ function walkToBoundary(
 
 	return index;
 }
+
+const partialRight =
+	( fn, ...partialArgs ) =>
+	( ...args ) =>
+		fn( ...args, ...partialArgs );
 
 const walkToStart = partialRight( walkToBoundary, 'backwards' );
 
