@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, RenderResult } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import { render } from '@testing-library/react';
 import { Heading } from '../';
 
 describe( 'props', () => {
-	let base;
+	let base: RenderResult;
 	beforeEach( () => {
 		base = render( <Heading>Code is Poetry</Heading> );
 	} );
@@ -22,8 +22,8 @@ describe( 'props', () => {
 		const { container } = render(
 			<Heading level={ 4 }>Code is Poetry</Heading>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
-			base.container.firstChild
+		expect( container.children[ 0 ] ).toMatchStyleDiffSnapshot(
+			base.container.children[ 0 ]
 		);
 	} );
 
@@ -31,8 +31,8 @@ describe( 'props', () => {
 		const { container } = render(
 			<Heading level="4">Code is Poetry</Heading>
 		);
-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
-			base.container.firstChild
+		expect( container.children[ 0 ] ).toMatchStyleDiffSnapshot(
+			base.container.children[ 0 ]
 		);
 	} );
 
@@ -42,7 +42,7 @@ describe( 'props', () => {
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.tagName ).toBe( 'SPAN' );
+		expect( container.children[ 0 ].tagName ).toBe( 'SPAN' );
 	} );
 
 	test( 'should render a11y props when not using a semantic element', () => {
@@ -51,8 +51,8 @@ describe( 'props', () => {
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.getAttribute( 'role' ) ).toBe( 'heading' );
-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBe( '3' );
+		expect( container.firstChild ).toHaveAttribute( 'role', 'heading' );
+		expect( container.firstChild ).toHaveAttribute( 'aria-level', '3' );
 	} );
 
 	test( 'should not render a11y props when using a semantic element', () => {
@@ -61,7 +61,7 @@ describe( 'props', () => {
 				Code is Poetry
 			</Heading>
 		);
-		expect( container.firstChild.getAttribute( 'role' ) ).toBeNull();
-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBeNull();
+		expect( container.firstChild ).not.toHaveAttribute( 'role' );
+		expect( container.firstChild ).not.toHaveAttribute( 'aria-level' );
 	} );
 } );
