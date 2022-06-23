@@ -146,7 +146,6 @@ class WP_Inline_Styles_Handler {
 			}
 			$css .= '}';
 		}
-		error_log( strlen( $css ) );
 		return $css;
 	}
 
