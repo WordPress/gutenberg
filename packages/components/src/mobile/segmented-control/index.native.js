@@ -105,7 +105,8 @@ const SegmentedControls = ( {
 		);
 		const widthsDistance = widths.slice( 0, index );
 		const widthsDistanceSum = widthsDistance.reduce(
-			( sum, n ) => sum + n
+			( sum, n ) => sum + n,
+			0
 		);
 
 		const endValue = index === 0 ? 0 : widthsDistanceSum;
