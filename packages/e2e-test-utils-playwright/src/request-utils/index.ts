@@ -13,7 +13,14 @@ import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
-import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
+import {
+	setupRest,
+	rest,
+	getMaxBatchSize,
+	batchRest,
+	RestOptions,
+	BatchRequest,
+} from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
@@ -108,25 +115,29 @@ class RequestUtils {
 		this.baseURL = baseURL;
 	}
 
-	login = login;
-	setupRest = setupRest;
-	rest = rest;
-	getMaxBatchSize = getMaxBatchSize;
-	batchRest = batchRest;
-	getPluginsMap = getPluginsMap;
-	activatePlugin = activatePlugin;
-	deactivatePlugin = deactivatePlugin;
-	activateTheme = activateTheme;
+	login = login.bind( this );
+	setupRest = setupRest.bind( this );
+	rest = rest.bind( this ) as < RestResponse = any >(
+		options: RestOptions
+	) => Promise< RestResponse >;
+	getMaxBatchSize = getMaxBatchSize.bind( this );
+	batchRest = batchRest.bind( this ) as < BatchResponse >(
+		requests: BatchRequest[]
+	) => Promise< BatchResponse[] >;
+	getPluginsMap = getPluginsMap.bind( this );
+	activatePlugin = activatePlugin.bind( this );
+	deactivatePlugin = deactivatePlugin.bind( this );
+	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
-	deleteAllPosts = deleteAllPosts;
-	deleteAllWidgets = deleteAllWidgets;
-	addWidgetBlock = addWidgetBlock;
-	deleteAllTemplates = deleteAllTemplates;
-	resetPreferences = resetPreferences;
-	listMedia = listMedia;
-	uploadMedia = uploadMedia;
-	deleteMedia = deleteMedia;
-	deleteAllMedia = deleteAllMedia;
+	deleteAllPosts = deleteAllPosts.bind( this );
+	deleteAllWidgets = deleteAllWidgets.bind( this );
+	addWidgetBlock = addWidgetBlock.bind( this );
+	deleteAllTemplates = deleteAllTemplates.bind( this );
+	resetPreferences = resetPreferences.bind( this );
+	listMedia = listMedia.bind( this );
+	uploadMedia = uploadMedia.bind( this );
+	deleteMedia = deleteMedia.bind( this );
+	deleteAllMedia = deleteAllMedia.bind( this );
 }
 
 export type { StorageState };
