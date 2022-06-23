@@ -40,6 +40,12 @@ const deprecatedFlags = {
 			? undefined
 			: ! settings.disableCustomFontSizes,
 	'typography.lineHeight': ( settings ) => settings.enableCustomLineHeight,
+	'spacing.spacingSizes': ( settings ) =>
+		settings.spacingSizes === undefined ? undefined : settings.spacingSizes,
+	'spacing.customSpaceSize': ( settings ) =>
+		settings.disableCustomSpaceSizes === undefined
+			? undefined
+			: ! settings.disableCustomSpaceSizes,
 	'spacing.units': ( settings ) => {
 		if ( settings.enableCustomUnits === undefined ) {
 			return;
