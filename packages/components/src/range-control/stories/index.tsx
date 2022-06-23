@@ -166,9 +166,8 @@ const marksWithNegatives = [
  * automatically generated or custom mark indicators can be provided by an
  * `Array`.
  */
-export const WithIntegerStepAndMarks: ComponentStory<
-	typeof RangeControl
-> = MarkTemplate.bind( {} );
+export const WithIntegerStepAndMarks: ComponentStory< typeof RangeControl > =
+	MarkTemplate.bind( {} );
 
 WithIntegerStepAndMarks.args = {
 	label: 'Integer Step',
@@ -183,9 +182,8 @@ WithIntegerStepAndMarks.args = {
  * `step` ticks. Marks may be automatically generated or custom mark indicators
  * can be provided by an `Array`.
  */
-export const WithDecimalStepAndMarks: ComponentStory<
-	typeof RangeControl
-> = MarkTemplate.bind( {} );
+export const WithDecimalStepAndMarks: ComponentStory< typeof RangeControl > =
+	MarkTemplate.bind( {} );
 
 WithDecimalStepAndMarks.args = {
 	marks: [
@@ -219,9 +217,8 @@ WithNegativeMinimumAndMarks.args = {
  * indicators can represent negative values as well. Marks may be automatically
  * generated or custom mark indicators can be provided by an `Array`.
  */
-export const WithNegativeRangeAndMarks: ComponentStory<
-	typeof RangeControl
-> = MarkTemplate.bind( {} );
+export const WithNegativeRangeAndMarks: ComponentStory< typeof RangeControl > =
+	MarkTemplate.bind( {} );
 
 WithNegativeRangeAndMarks.args = {
 	marks: marksWithNegatives,
@@ -235,9 +232,8 @@ WithNegativeRangeAndMarks.args = {
  * non-integer values. This may still be used in conjunction with `marks`
  * rendering a visual representation of `step` ticks.
  */
-export const WithAnyStepAndMarks: ComponentStory<
-	typeof RangeControl
-> = MarkTemplate.bind( {} );
+export const WithAnyStepAndMarks: ComponentStory< typeof RangeControl > =
+	MarkTemplate.bind( {} );
 
 WithAnyStepAndMarks.args = {
 	marks: marksBase,
