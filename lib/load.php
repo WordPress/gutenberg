@@ -159,6 +159,7 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenb
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
+require __DIR__ . '/block-supports/descendent-block-styles.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';

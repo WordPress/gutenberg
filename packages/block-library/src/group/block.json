@@ -19,6 +19,7 @@
 	},
 	"supports": {
 		"__experimentalSettings": true,
+		"__experimentalDescendentStyles": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,

@@ -674,4 +674,35 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		return $value;
 	}
+
+	/**
+	 * Function that scopes a selector with another one. This works a bit like
+	 * SCSS nesting except the `&` operator isn't supported.
+	 *
+	 * <code>
+	 * $scope = '.a, .b .c';
+	 * $selector = '> .x, .y';
+	 * $merged = scope_selector( $scope, $selector );
+	 * // $merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+	 * </code>
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param string $scope    Selector to scope to.
+	 * @param string $selector Original selector.
+	 * @return string Scoped selector.
+	 */
+	public static function scope_selector( $scope, $selector ) {
+		$scopes    = explode( ',', $scope );
+		$selectors = explode( ',', $selector );
+
+		$selectors_scoped = array();
+		foreach ( $scopes as $outer ) {
+			foreach ( $selectors as $inner ) {
+				$selectors_scoped[] = trim( $outer ) . ' ' . trim( $inner );
+			}
+		}
+
+		return implode( ', ', $selectors_scoped );
+	}
 }
