@@ -111,17 +111,29 @@ class RangeTextInput extends Component {
 
 	validateInput( text ) {
 		const { min, max, decimalNum } = this.props;
+		let currentTextValue = text;
+
 		let result = min;
-		if ( ! text ) {
+		if ( ! currentTextValue ) {
 			return min;
 		}
 
-		if ( typeof text === 'number' ) {
-			result = Math.max( text, min );
+		if ( typeof currentTextValue === 'string' ) {
+			currentTextValue = toFixed(
+				currentTextValue.replace( ',', '.' ),
+				decimalNum
+			);
+		}
+
+		if ( typeof currentTextValue === 'number' ) {
+			result = Math.max( currentTextValue, min );
 			return max ? Math.min( result, max ) : result;
 		}
 
-		result = Math.max( removeNonDigit( text, decimalNum ), min );
+		result = Math.max(
+			removeNonDigit( currentTextValue, decimalNum ),
+			min
+		);
 		return max ? Math.min( result, max ) : result;
 	}
 
