@@ -29,9 +29,8 @@ export default function useOutdentListItem( clientId ) {
 		},
 		[ clientId ]
 	);
-	const { replaceBlocks, selectionChange, multiSelect } = useDispatch(
-		blockEditorStore
-	);
+	const { replaceBlocks, selectionChange, multiSelect } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockAttributes,
