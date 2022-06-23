@@ -22,7 +22,7 @@ type GridColumns = ResponsiveCSSValue< number >;
 
 type GridRows = ResponsiveCSSValue< number >;
 
-export type Props = {
+export type GridProps = {
 	/**
 	 * Adjusts the block alignment of children.
 	 */
