@@ -24,7 +24,10 @@ test.describe( 'Classic menus', () => {
 			`Menu ${ random }`
 		);
 		await page.check( '#locations-primary' );
-		await page.click( '#save_menu_footer' );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.locator( '#save_menu_footer' ).click(),
+		] );
 
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 
@@ -40,7 +43,10 @@ test.describe( 'Classic menus', () => {
 			page.locator( '#menu-to-edit .menu-item-title' )
 		).toContainText( `${ pageTitle }` );
 
-		await page.click( '#save_menu_footer' );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.locator( '#save_menu_footer' ).click(),
+		] );
 
 		// Go to the created page
 		await page.goto( newPage.guid.rendered );
