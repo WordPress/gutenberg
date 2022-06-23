@@ -90,7 +90,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		// This ensures that for the inner instances of the Post Template block, we do not render any block supports.
 		$block_instance['blockName'] = 'core/null';
 
-		// Render the inner blocks of the Post Template block, with `dynamic` set to `false` to ensure that no wrapper markup is included.
+		// Render the inner blocks of the Post Template block with `dynamic` set to `false` to prevent calling
+		// `render_callback` and ensure that no wrapper markup is included.
 		$block_content = (
 			new WP_Block(
 				$block_instance,
