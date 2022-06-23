@@ -34,5 +34,14 @@ export const useNavigationTreeItem = ( itemId, props ) => {
 		return () => {
 			removeItem( itemId );
 		};
-	}, [ activeMenu, search, addItem, removeItem ] );
+	}, [
+		activeMenu,
+		search,
+		addItem,
+		removeItem,
+		props,
+		group,
+		itemId,
+		menu,
+	] );
 };
