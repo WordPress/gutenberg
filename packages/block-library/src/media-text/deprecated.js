@@ -179,7 +179,8 @@ export default [
 			const className = classnames( {
 				'has-media-on-the-right': 'right' === mediaPosition,
 				'is-stacked-on-mobile': isStackedOnMobile,
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 				'is-image-fill': imageFill,
 			} );
 			const backgroundStyles = imageFill
