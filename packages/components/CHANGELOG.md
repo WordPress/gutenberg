@@ -21,6 +21,7 @@
 -   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
 -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
 -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+-   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
 -   `Spacer`: Convert knobs to controls in Storybook ([#41851](https://github.com/WordPress/gutenberg/pull/41851)).
 
 ## 19.13.0 (2022-06-15)
