@@ -17,6 +17,14 @@
 class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 	/**
+	 * Defines whether remote patterns should be loaded.
+	 *
+	 * @since 6.0.0
+	 * @var bool
+	 */
+	private $remote_patterns_loaded;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -83,10 +91,14 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		// Load block patterns from w.org.
-		_load_remote_block_patterns(); // Patterns with the `core` keyword.
-		_load_remote_featured_patterns(); // Patterns in the `featured` category.
-		gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
+		if ( ! $this->remote_patterns_loaded ) {
+			// Load block patterns from w.org.
+			_load_remote_block_patterns(); // Patterns with the `core` keyword.
+			_load_remote_featured_patterns(); // Patterns in the `featured` category.
+			gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
+
+			$this->remote_patterns_loaded = true;
+		}
 
 		$response = array();
 		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
