@@ -61,7 +61,11 @@ function gutenberg_resolve_assets() {
 
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
-			$style_handles[] = $block_type->style;
+			if ( is_array( $block_type->style ) ) {
+				$style_handles[] = $block_type->style[0];
+			} else {
+				$style_handles[] = $block_type->style;
+			}
 		}
 
 		if ( ! empty( $block_type->editor_style ) ) {
