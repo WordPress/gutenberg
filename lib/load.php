@@ -132,6 +132,7 @@ require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-inline-styles-handler.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
