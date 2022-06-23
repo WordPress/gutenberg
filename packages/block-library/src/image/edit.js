@@ -20,7 +20,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	//MediaReplaceFlow,
+	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -106,14 +106,28 @@ export function isMediaDestroyed( id ) {
 	return attachment.destroyed;
 }
 
+/**
+ * A placeholder component that displays if an image has been deleted or cannot be loaded.
+ *
+ * @param {Object} props Component props.
+ * @param {number} props.id The attachment id.
+ * @param {string} props.url Image url.
+ * @param {Function} props.onClear Clears the image attributes.
+ * @param {Function} props.onSelect Callback for <MediaReplaceFlow /> when an image is selected.
+ * @param {Function} props.onSelectURL Callback for <MediaReplaceFlow /> when an image URL is selected.
+ * @param {Function} props.onUploadError Callback for <MediaReplaceFlow /> when an upload fails.
+ * @param {Function} props.onCloseModal Callback for <MediaReplaceFlow /> when the media library overlay is closed.
+ *
+ * @return {boolean} Whether the image has been destroyed.
+ */
 const ImageErrorPlaceholder = ( {
-	// id,
+	id,
 	url,
 	onClear,
-	// onSelect,
-	// onSelectURL,
-	// onError,
-	// onCloseModal,
+	onSelect,
+	onSelectURL,
+	onUploadError,
+	onCloseModal,
 } ) => (
 	<Placeholder
 		className="wp-block-image__error-placeholder"
@@ -127,28 +141,31 @@ const ImageErrorPlaceholder = ( {
 					'This might be due to a network error, or the image may have been deleted.'
 				) }
 			</p>
-			<HStack justify="flex-start">
-				{
-					// Hiding this for now until I can get it to work :)
-				 }
-				{ /*<MediaReplaceFlow*/ }
-				{ /*	mediaId={ id }*/ }
-				{ /*	mediaURL={ url }*/ }
-				{ /*	allowedTypes={ ALLOWED_MEDIA_TYPES }*/ }
-				{ /*	accept="image/*"*/ }
-				{ /*	onSelect={ onSelect }*/ }
-				{ /*	onSelectURL={ onSelectURL }*/ }
-				{ /*	onError={ onError }*/ }
-				{ /*	onCloseModal={ onCloseModal }*/ }
-				{ /*	buttonVariant="primary"*/ }
-				{ /*/>*/ }
+			<HStack justify="flex-start" spacing={ 2 }>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ ( media ) => {
+						onClear();
+						onSelect( media );
+					} }
+					onSelectURL={ ( selectedUrl ) => {
+						onClear();
+						onSelectURL( selectedUrl );
+					} }
+					onError={ onUploadError }
+					onCloseModal={ onCloseModal }
+					buttonVariant="primary"
+				/>
 				<Button
 					className="wp-block-image__error-placeholder__button"
 					title={ __( 'Clear and replace image' ) }
 					variant="secondary"
 					onClick={ onClear }
 				>
-					{ __( 'Clear and replace image' ) }
+					{ __( 'Clear' ) }
 				</Button>
 			</HStack>
 		</>
@@ -423,7 +440,7 @@ export function ImageEdit( {
 					onClear={ clearImageAttributes }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
+					onUploadError={ onUploadError }
 					onCloseModal={ onCloseModal }
 				/>
 			) }
