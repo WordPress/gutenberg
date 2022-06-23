@@ -33,7 +33,7 @@ test.describe( 'Classic menus', () => {
 
 		await page.click( `[aria-label="Most Recent"] >> text=${ pageTitle }` );
 
-		await page.locator( 'input[name="add-post-type-menu-item"]' ).click();
+		await page.locator( '#submit-posttype-page' ).click();
 
 		await expect(
 			page.locator( '#menu-to-edit .menu-item-title' )
