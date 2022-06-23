@@ -83,9 +83,9 @@ function ColorPicker( {
 	} ).toHex();
 
 	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
-		if ( h ) setHue( h );
-		if ( s ) setSaturation( s );
-		if ( v ) setValue( v );
+		if ( h !== undefined ) setHue( h );
+		if ( s !== undefined ) setSaturation( s );
+		if ( v !== undefined ) setValue( v );
 		const nextColor = colord( {
 			h: h ?? hue,
 			s: s ?? sat * 100,
