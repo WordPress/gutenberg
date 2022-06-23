@@ -64,6 +64,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.0/rest-api.php';
 
 	// WordPress 6.1 compat.
+	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-templates-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/rest-api.php';
 
@@ -132,6 +133,7 @@ require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/block-patterns.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.

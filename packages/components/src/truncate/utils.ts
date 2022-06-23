@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { isValueDefined } from '../utils/values';
+import type { TruncateProps } from './types';
 
 export const TRUNCATE_ELLIPSIS = '…';
 export const TRUNCATE_TYPE = {
@@ -10,7 +11,7 @@ export const TRUNCATE_TYPE = {
 	middle: 'middle',
 	tail: 'tail',
 	none: 'none',
-};
+} as const;
 
 export const TRUNCATE_DEFAULT_PROPS = {
 	ellipsis: TRUNCATE_ELLIPSIS,
@@ -21,13 +22,12 @@ export const TRUNCATE_DEFAULT_PROPS = {
 
 // Source
 // https://github.com/kahwee/truncate-middle
-/**
- * @param {string} word
- * @param {number} headLength
- * @param {number} tailLength
- * @param {string} ellipsis
- */
-export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
+export function truncateMiddle(
+	word: string,
+	headLength: number,
+	tailLength: number,
+	ellipsis: string
+) {
 	if ( typeof word !== 'string' ) {
 		return '';
 	}
@@ -59,12 +59,10 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 	);
 }
 
-/**
- *
- * @param {string}                        words
- * @param {typeof TRUNCATE_DEFAULT_PROPS} props
- */
-export function truncateContent( words = '', props ) {
+export function truncateContent(
+	words: string = '',
+	props: Omit< TruncateProps, 'children' >
+) {
 	const mergedProps = { ...TRUNCATE_DEFAULT_PROPS, ...props };
 	const { ellipsis, ellipsizeMode, limit } = mergedProps;
 
@@ -72,8 +70,8 @@ export function truncateContent( words = '', props ) {
 		return words;
 	}
 
-	let truncateHead;
-	let truncateTail;
+	let truncateHead: number;
+	let truncateTail: number;
 
 	switch ( ellipsizeMode ) {
 		case TRUNCATE_TYPE.head:

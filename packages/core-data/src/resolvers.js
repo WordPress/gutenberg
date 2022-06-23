@@ -1,7 +1,16 @@
 /**
  * External dependencies
  */
-import { find, includes, get, compact, uniq, map, mapKeys } from 'lodash';
+import {
+	camelCase,
+	compact,
+	find,
+	get,
+	includes,
+	map,
+	mapKeys,
+	uniq,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -476,16 +485,7 @@ export const getBlockPatterns =
 			path: '/wp/v2/block-patterns/patterns',
 		} );
 		const patterns = map( restPatterns, ( pattern ) =>
-			mapKeys( pattern, ( value, key ) => {
-				switch ( key ) {
-					case 'block_types':
-						return 'blockTypes';
-					case 'viewport_width':
-						return 'viewportWidth';
-					default:
-						return key;
-				}
-			} )
+			mapKeys( pattern, ( value, key ) => camelCase( key ) )
 		);
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
