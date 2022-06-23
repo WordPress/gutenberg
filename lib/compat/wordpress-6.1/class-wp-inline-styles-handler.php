@@ -44,7 +44,7 @@ class WP_Inline_Styles_Handler {
 			$action_hook_name = 'wp_head';
 		}
 
-		add_action( $action_hook_name, array( $this, 'print_styles' ) );
+		add_action( $action_hook_name, array( $this, 'print_styles' ), 20 );
 	}
 
 	/**
