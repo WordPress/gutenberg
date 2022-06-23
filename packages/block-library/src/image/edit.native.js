@@ -436,6 +436,7 @@ export class ImageEdit extends Component {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
+			alt: media.alt,
 		};
 
 		let additionalAttributes;
