@@ -283,7 +283,14 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					styles: value,
 					selector: blockSelectors[ blockName ].selector
 						.split( ',' )
-						.map( ( sel ) => sel + ' ' + ELEMENTS[ elementName ] )
+						.map( ( sel ) => {
+							const elementSelectors =
+								ELEMENTS[ elementName ].split( ',' );
+							return elementSelectors.map(
+								( elementSelector ) =>
+									sel + ' ' + elementSelector
+							);
+						} )
 						.join( ',' ),
 				} );
 			}
