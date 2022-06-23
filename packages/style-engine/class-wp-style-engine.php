@@ -226,7 +226,12 @@ class WP_Style_Engine {
 	 * Gather internals.
 	 */
 	public function __construct() {
-		$this->block_supports_store = new WP_Style_Engine_Store( 'block_supports' );
+		// @TODO not sure where to instantiate stuff yet.
+		// The hope is to have several "stores" for each layer of the style hierarchy.
+		// This is so we can control the order in which we render.
+		// Each store might have a unique way to render on the frontend, maybe not.
+		$this->block_supports_store = new WP_Style_Engine_Store();
+		WP_Style_Engine_Renderer::enqueue_block_support_styles();
 	}
 
 	/**
@@ -413,7 +418,7 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_rules                   = array();
+		$css_definitions             = array();
 		$classnames                  = array();
 		$should_return_css_vars      = isset( $options['css_vars'] ) && true === $options['css_vars'];
 		$should_register_and_enqueue = isset( $options['enqueue'] ) ? $options['enqueue'] : null;
@@ -430,50 +435,32 @@ class WP_Style_Engine {
 					continue;
 				}
 
-				$classnames = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_rules  = array_merge( $css_rules, static::get_css( $style_value, $style_definition, $should_return_css_vars ) );
+				$classnames      = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
+				$css_definitions = array_merge( $css_definitions, static::get_css( $style_value, $style_definition, $should_return_css_vars ) );
 			}
 		}
 
 		// Build CSS rules output.
 		$selector      = isset( $options['selector'] ) ? $options['selector'] : null;
-		$css           = array();
 		$styles_output = array();
 
-		if ( ! empty( $css_rules ) ) {
-			// Generate inline style rules.
-			foreach ( $css_rules as $rule => $value ) {
-				$filtered_css = esc_html( safecss_filter_attr( "{$rule}: {$value}" ) );
-				if ( ! empty( $filtered_css ) ) {
-					$css[] = $filtered_css . ';';
-				}
-			}
+		if ( $selector && $should_register_and_enqueue ) {
+			// @TODO this could all change. Maybe we'd want to sanitize and build the rules later.
+			// Or return $css_rules here so another method can register.
+			// Just doing it all here for convenience while testing.
+			$this->register_block_support_styles(
+				$selector,
+				$css_definitions
+			);
+			return null;
 		}
 
-		// Return css, if any.
-		if ( ! empty( $css ) ) {
-			// Return an entire rule if there is a selector.
-			if ( $selector ) {
-				$style_block          = "$selector { ";
-				$style_block         .= implode( ' ', $css );
-				$style_block         .= ' }';
-				$styles_output['css'] = $style_block;
-
-				if ( $should_register_and_enqueue ) {
-					// @TODO this could all change. Maybe we'd want to sanitize and build the rules later.
-					// Or return $css_rules here so another method can register.
-					// Just doing it all here for convenience while testing.
-					$this->register_block_support_styles(
-						$selector,
-						array(
-							'rules'            => $css_rules,
-							'sanitized_output' => $styles_output['css'],
-						)
-					);
-				}
-			} else {
-				$styles_output['css'] = implode( ' ', $css );
-			}
+		// Return rendered CSS.
+		// Consider dependency injection of `WP_Style_Engine_Renderer` for testability.
+		if ( $selector ) {
+			$styles_output['css'] = WP_Style_Engine_Renderer::generate_css_rule( $selector, $css_definitions );
+		} else {
+			$styles_output['css'] = WP_Style_Engine_Renderer::generate_inline_property_declarations( $css_definitions );
 		}
 
 		// Return classnames, if any.
