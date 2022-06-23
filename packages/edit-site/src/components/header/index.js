@@ -109,7 +109,7 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<NavigableToolbar
-				className="edit-post-header-toolbar"
+				className="edit-site-header_start"
 				aria-label={ __( 'Document tools' ) }
 			>
 				<div className="edit-site-header__toolbar">
