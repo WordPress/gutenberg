@@ -197,7 +197,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					{ hasTemplateLock && (
 						<ToggleControl
 							className="block-editor-block-lock-modal__template-lock"
-							label={ __( 'Apply to inner blocks' ) }
+							label={ __( 'Apply to all children' ) }
 							checked={ applyTemplateLock }
 							onChange={ () =>
 								setApplyTemplateLock( ! applyTemplateLock )
