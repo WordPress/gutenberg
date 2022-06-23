@@ -76,22 +76,16 @@ function ColorPicker( {
 		styles.footerDark
 	);
 
-	const currentColor = colord( {
-		h: hue,
-		s: sat * 100,
-		v: val * 100,
-	} ).toHex();
+	const combineToHex = ( h = hue, s = sat, v = val ) =>
+		colord( { h, s: s * 100, v: v * 100 } ).toHex();
+
+	const currentColor = combineToHex();
 
 	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
 		if ( h !== undefined ) setHue( h );
 		if ( s !== undefined ) setSaturation( s );
 		if ( v !== undefined ) setValue( v );
-		const nextColor = colord( {
-			h: h ?? hue,
-			s: s ?? sat * 100,
-			v: v ?? val * 100,
-		} ).toHex();
-		setColor( nextColor );
+		setColor( combineToHex( h, s, v ) );
 	};
 
 	useEffect( () => {
