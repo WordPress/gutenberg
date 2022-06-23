@@ -72,9 +72,10 @@ export default function useEnter( props ) {
 				replaceBlocks(
 					topParentListBlock.clientId,
 					[ head, middle, ...tail ],
-					1,
-					0
+					1
 				);
+				// We manually change the selection here because we are replacing
+				// a different block than the selected one.
 				selectionChange( middle.clientId );
 			}
 
