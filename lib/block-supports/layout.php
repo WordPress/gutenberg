@@ -38,9 +38,34 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string                                CSS style.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$style        = '';
+	$styles_array = gutenberg_get_layout_styles_array( $selector, $layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	foreach ( $styles_array as $selector => $rules ) {
+		$style .= "$selector{";
+		foreach ( $rules as $rule => $value ) {
+			$style .= "$rule:$value;";
+		}
+		$style .= '}';
+	}
 
-	$style = '';
+	return $style;
+}
+
+/**
+ * Generates the styles array corresponding to the provided layout.
+ *
+ * @param string  $selector                      CSS selector.
+ * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
+ * @param string  $gap_value                     The block gap value to apply.
+ * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
+ * @param string  $fallback_gap_value            The block gap value to apply.
+ *
+ * @return array                                 An array of selectors and their rules.
+ */
+function gutenberg_get_layout_styles_array( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
+	$layout_type  = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$styles_array = array();
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
@@ -54,26 +79,43 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
-			$style .= '}';
+			$styles_array[ "$selector > :where(:not(.alignleft):not(.alignright))" ] = array(
+				'max-width'    => esc_html( $all_max_width_value ),
+				'margin-left'  => 'auto !important',
+				'margin-right' => 'auto !important',
+			);
 
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			$styles_array[ "$selector > .alignwide" ] = array( 'max-width' => esc_html( $wide_max_width_value ) );
+			$styles_array[ "$selector .alignfull" ]   = array( 'max-width' => 'none' );
 		}
 
-		$style .= "$selector > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }";
-		$style .= "$selector > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }";
-		$style .= "$selector > .aligncenter { margin-left: auto !important; margin-right: auto !important; }";
+		$styles_array[ "$selector > .alignleft" ]   = array(
+			'float'               => 'left',
+			'margin-inline-start' => '0',
+			'margin-inline-end'   => '2em',
+		);
+		$styles_array[ "$selector > .alignright" ]  = array(
+			'float'               => 'right',
+			'margin-inline-start' => '2em',
+			'margin-inline-end'   => '0',
+		);
+		$styles_array[ "$selector > .aligncenter" ] = array(
+			'margin-left'  => 'auto !important',
+			'margin-right' => 'auto !important',
+		);
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
-			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
-			$style    .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
-			$style    .= "$selector > * + * { margin-block-start: $gap_style; margin-block-end: 0; }";
+			$gap_style                           = $gap_value && ! $should_skip_gap_serialization ? $gap_value : 'var( --wp--style--block-gap )';
+			$styles_array[ "$selector > *" ]     = array(
+				'margin-block-start' => '0',
+				'margin-block-end'   => '0',
+			);
+			$styles_array[ "$selector > * + *" ] = array(
+				'margin-block-start' => $gap_style,
+				'margin-block-end'   => '0',
+			);
 		}
 	} elseif ( 'flex' === $layout_type ) {
 		$layout_orientation = isset( $layout['orientation'] ) ? $layout['orientation'] : 'horizontal';
@@ -99,8 +141,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$layout['flexWrap'] :
 			'wrap';
 
-		$style  = "$selector {";
-		$style .= 'display: flex;';
+		$styles_array[ $selector ] = array( 'display' => 'flex' );
 		if ( $has_block_gap_support ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_row    = isset( $gap_value['top'] ) ? $gap_value['top'] : $fallback_gap_value;
@@ -108,12 +149,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
 			$gap_style = $gap_value && ! $should_skip_gap_serialization ? $gap_value : "var( --wp--style--block-gap, $fallback_gap_value )";
-			$style    .= "gap: $gap_style;";
+
+			$styles_array[ $selector ]['gap'] = $gap_style;
 		} else {
-			$style .= "gap: $fallback_gap_value;";
+			$styles_array[ $selector ]['gap'] = $fallback_gap_value;
 		}
 
-		$style .= "flex-wrap: $flex_wrap;";
+		$styles_array[ $selector ]['flex-wrap'] = $flex_wrap;
 		if ( 'horizontal' === $layout_orientation ) {
 			/**
 			 * Add this style only if is not empty for backwards compatibility,
@@ -121,28 +163,27 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * by custom css.
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$styles_array[ $selector ]['justify-content'] = $justify_content_options[ $layout['justifyContent'] ];
 			}
 
 			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
-				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
+				$styles_array[ $selector ]['align-items'] = $vertical_alignment_options[ $layout['verticalAlignment'] ];
 			} else {
-				$style .= 'align-items: center;';
+				$styles_array[ $selector ]['align-items'] = 'center';
 			}
 		} else {
-			$style .= 'flex-direction: column;';
+			$styles_array[ $selector ]['flex-direction'] = 'column';
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$styles_array[ $selector ]['align-items'] = $justify_content_options[ $layout['justifyContent'] ];
 			} else {
-				$style .= 'align-items: flex-start;';
+				$styles_array[ $selector ]['align-items'] = 'flex-start';
 			}
 		}
-		$style .= '}';
 
-		$style .= "$selector > * { margin: 0; }";
+		$styles_array[ "$selector > *" ] = array( 'margin' => '0' );
 	}
 
-	return $style;
+	return $styles_array;
 }
 
 /**
@@ -227,7 +268,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$styles_array                  = gutenberg_get_layout_styles_array( ".$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
@@ -237,7 +278,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	gutenberg_enqueue_block_support_styles( $style );
+	WP_Inline_Styles_Handler::get_instance()->add_array_styles( $styles_array );
 
 	return $content;
 }
