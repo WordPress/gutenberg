@@ -14,6 +14,7 @@ export default function CoverPlaceholder( {
 	disableMediaButtons = false,
 	children,
 	onSelectMedia,
+	onSelectURL,
 	onError,
 	style,
 } ) {
@@ -27,6 +28,7 @@ export default function CoverPlaceholder( {
 				),
 			} }
 			onSelect={ onSelectMedia }
+			onSelectURL={ onSelectURL }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }

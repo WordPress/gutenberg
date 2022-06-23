@@ -79,6 +79,31 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 	};
 }
 
+export function attributesFromUrl( setAttributes, dimRatio ) {
+	return ( newURL ) => {
+		const mediaRegexp = /\.(jpg|jpeg|gif|ico|webp|png|svg)$/;
+		let mediaType;
+
+		if ( newURL.match( mediaRegexp ) !== null ) {
+			mediaType = IMAGE_BACKGROUND_TYPE;
+		} else {
+			mediaType = VIDEO_BACKGROUND_TYPE;
+		}
+
+		setAttributes( {
+			url: newURL,
+			id: undefined,
+			width: undefined,
+			height: undefined,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: mediaType,
+			...( mediaType === VIDEO_BACKGROUND_TYPE
+				? { focalPoint: undefined, hasParallax: undefined }
+				: {} ),
+		} );
+	};
+}
+
 /**
  * Checks of the contentPosition is the center (default) position.
  *
