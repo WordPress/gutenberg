@@ -179,7 +179,6 @@ function gutenberg_block_type_metadata_multiple_view_scripts( $metadata ) {
 }
 add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_scripts' );
 
-
 /**
  * Allow multiple block styles.
  *
@@ -189,10 +188,11 @@ add_filter( 'block_type_metadata', 'gutenberg_block_type_metadata_multiple_view_
  *
  * @return array
  */
-function gutenberg_multiple_block_styles_compat_61_( $metadata ) {
+function gutenberg_multiple_block_styles_compat_6_1( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
 		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
 			foreach ( $metadata[ $key ] as $handle ) {
+				// Do not enqueue style arrays such as { "color": { "text": "#fff" } }.
 				if ( is_array( $handle ) ) {
 					continue;
 				}
@@ -222,6 +222,7 @@ function gutenberg_multiple_block_styles_compat_61_( $metadata ) {
 	}
 	return $metadata;
 }
+
 remove_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
 remove_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
-add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles_compat_61_' );
+add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles_compat_6_1', 9 );
