@@ -132,7 +132,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __( 'Blocks use full width' ) }
+								label={ __( 'Inner blocks use full width' ) }
 								checked={ ! inherit }
 								onChange={ () =>
 									setAttributes( {
@@ -143,7 +143,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 							<p className="block-editor-hooks__layout-controls-helptext">
 								{ !! inherit
 									? __(
-											'Nested blocks use default content width with options for full and wide widths.'
+											'Nested blocks use theme content width with options for full and wide widths.'
 									  )
 									: __(
 											'Nested blocks will fill the width of this container'
