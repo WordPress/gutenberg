@@ -74,7 +74,8 @@ export const _default = () => {
 		isBorderless: select(
 			'CardHeader: isBorderless',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				true: true,
 				false: false,
 			},
@@ -89,7 +90,8 @@ export const _default = () => {
 		size: select(
 			'CardHeader: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
@@ -105,7 +107,8 @@ export const _default = () => {
 		size: select(
 			'CardBody: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
@@ -120,7 +123,8 @@ export const _default = () => {
 		isBorderless: select(
 			'CardFooter: isBorderless',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				true: true,
 				false: false,
 			},
@@ -148,7 +152,8 @@ export const _default = () => {
 		size: select(
 			'CardFooter: size',
 			{
-				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
+				'unset (defaults to the value set on the <Card> parent)':
+					PROP_UNSET,
 				large: 'large',
 				medium: 'medium',
 				small: 'small',

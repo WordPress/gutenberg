@@ -17,11 +17,8 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const {
-		getBlockOrder,
-		getSelectedBlockClientIds,
-		getBlockRootClientId,
-	} = useSelect( blockEditorStore );
+	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 

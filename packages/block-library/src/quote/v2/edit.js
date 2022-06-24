@@ -39,9 +39,8 @@ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
  */
 const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { updateBlockAttributes, replaceInnerBlocks } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
 
@@ -50,9 +49,8 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			return;
 		}
 
-		const [ newAttributes, newInnerBlocks ] = migrateToQuoteV2(
-			attributes
-		);
+		const [ newAttributes, newInnerBlocks ] =
+			migrateToQuoteV2( attributes );
 
 		deprecated( 'Value attribute on the quote block', {
 			since: '6.0',

@@ -3,7 +3,6 @@
  */
 import { Animated, PanResponder, View } from 'react-native';
 import Video from 'react-native-video';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,7 @@ import FocalPoint from './focal-point';
 import Tooltip from './tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
+import { clamp } from '../utils/math';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;

@@ -1,5 +1,163 @@
 == Changelog ==
 
+= 13.5.0 =
+
+## Changelog
+
+### Enhancements
+
+#### Components
+- Use NumberControl as input field. ([41472](https://github.com/WordPress/gutenberg/pull/41472))
+- Convert component to TypeScript. ([41681](https://github.com/WordPress/gutenberg/pull/41681))
+- RadioControl: Convert component to TypeScript. ([41568](https://github.com/WordPress/gutenberg/pull/41568))
+
+#### Media
+- Adds featured image toggle to media replace flow. ([41476](https://github.com/WordPress/gutenberg/pull/41476))
+- Add tooltip on replace image's URL. ([41504](https://github.com/WordPress/gutenberg/pull/41504))
+
+#### Block Library
+- Cover: Adds placeholder when feature image is in use. ([41460](https://github.com/WordPress/gutenberg/pull/41460))
+- Post Navigation Link: Add design controls (color, text decoration, and font family). ([41378](https://github.com/WordPress/gutenberg/pull/41378))
+
+#### Block Editor
+- Copy plain text variant of blocks. ([41366](https://github.com/WordPress/gutenberg/pull/41366))
+- Adds CTA and external link to block inserter flow. ([41112](https://github.com/WordPress/gutenberg/pull/41112))
+
+#### Global Styles
+- Move CSS from the stylesheet to the block definition. ([41689](https://github.com/WordPress/gutenberg/pull/41689))
+
+#### Document Settings
+- Highlight today's date in DatePicker. ([41647](https://github.com/WordPress/gutenberg/pull/41647))
+
+#### Design Tools
+- Cover: Move overlay and opacity controls to color panel. ([41102](https://github.com/WordPress/gutenberg/pull/41102))
+
+### Bug Fixes
+
+#### Block Editor
+- Preferences Panel: Filters hidden blocks to only count those which are still registered. ([41454](https://github.com/WordPress/gutenberg/pull/41454))
+
+#### Components
+- Avoid including null values in blocks list. ([41496](https://github.com/WordPress/gutenberg/pull/41496))
+- CustomGradientBar: Fix insertion and control point positioning to more closely follow cursor. ([41492](https://github.com/WordPress/gutenberg/pull/41492))
+- Fix `ComboboxControl` post-reset focus. ([41737](https://github.com/WordPress/gutenberg/pull/41737))
+- FormTokenField: Added Padding to resolve close button overlap issue. ([41556](https://github.com/WordPress/gutenberg/pull/41556))
+- Tooltip: Fix jitter at edge of screen by enabling __unstableShift. ([41524](https://github.com/WordPress/gutenberg/pull/41524))
+
+#### Block Library
+- Fix JS Error in Avatar Block. ([41354](https://github.com/WordPress/gutenberg/pull/41354))
+- Query Loop: Render `replace` button only if eligible patterns exist. ([41690](https://github.com/WordPress/gutenberg/pull/41690))
+- Comments Title: Plural has been used instead of single in 1st parameter. ([41521](https://github.com/WordPress/gutenberg/pull/41521))
+
+#### Design Tools
+- Fix CSS Selectors rendered by theme.json duotone/filter settings for blocks on public pages. ([41335](https://github.com/WordPress/gutenberg/pull/41335))
+- Webfonts: Increase priority of init hook to account for block reregistration. ([41569](https://github.com/WordPress/gutenberg/pull/41569))
+
+#### Template Editor
+- Include theme's templates in template list in post editor. ([41630](https://github.com/WordPress/gutenberg/pull/41630))
+
+#### Site Editor
+- Theme variations UI: Ensure that equality check takes into account all default theme properties. ([41591](https://github.com/WordPress/gutenberg/pull/41591))
+
+#### CSS & Styling
+- Add utility classnames back to blocks that have layout attributes specified. ([41487](https://github.com/WordPress/gutenberg/pull/41487))
+- Allow for zero values for CSS properties in the style engine. ([41561](https://github.com/WordPress/gutenberg/pull/41561))
+
+### Accessibility
+
+- Fix lack of context on action buttons and improve A11Y for the template action buttons Edit/New. ([41615](https://github.com/WordPress/gutenberg/pull/41615))
+- Fix focus trap on certain input types. ([41538](https://github.com/WordPress/gutenberg/pull/41538))
+- Add label to Preview options dropdown menu. ([41566](https://github.com/WordPress/gutenberg/pull/41566))
+
+### Experiments
+
+- Style engine: Add border to backend. ([40531](https://github.com/WordPress/gutenberg/pull/40531))
+- Style engine: Elements backend support. ([40987](https://github.com/WordPress/gutenberg/pull/40987))
+- Global styles: Merge block CSS with `theme.json` styles. ([34180](https://github.com/WordPress/gutenberg/pull/34180))
+
+### Documentation
+
+- Add missing CHANGELOG entry. ([41745](https://github.com/WordPress/gutenberg/pull/41745))
+- Enhancements to TypeScript migration guidelines. ([41669](https://github.com/WordPress/gutenberg/pull/41669))
+- Add step for build and asset file. ([41511](https://github.com/WordPress/gutenberg/pull/41511))
+- Feature flag refresh. ([41522](https://github.com/WordPress/gutenberg/pull/41522))
+- Update link title and add the correct URL. ([41666](https://github.com/WordPress/gutenberg/pull/41666))
+- Fix typo in block schema description. ([41570](https://github.com/WordPress/gutenberg/pull/41570))
+
+### Code Quality
+
+- Entity-aware type signature for getEntityRecord and getEntityRecords. ([41235](https://github.com/WordPress/gutenberg/pull/41235))
+- Improves the types of createHigherOrderComponent and its usages. ([41138](https://github.com/WordPress/gutenberg/pull/41138))
+- ESLint: Restrict removed Lodash functions. ([41651](https://github.com/WordPress/gutenberg/pull/41651))
+- TypeScript: Add default context types to Entity Records in core-data. ([41595](https://github.com/WordPress/gutenberg/pull/41595))
+- TypeScript: Improve type definitions in @wordpress/core-data. ([41593](https://github.com/WordPress/gutenberg/pull/41593))
+- RNMobile: Update clicks to use clickIfClickable() when possible. ([41367](https://github.com/WordPress/gutenberg/pull/41367))
+
+#### Components
+- Draggable: Add clarifying inline comment after the recent hook dependency changes. ([41658](https://github.com/WordPress/gutenberg/pull/41658))
+- Limit `Dropdown` cleanup to renders where the menu has actually been opened. ([41604](https://github.com/WordPress/gutenberg/pull/41604))
+- Placeholder: Add an illustration option to the Placeholder component. ([41605](https://github.com/WordPress/gutenberg/pull/41605))
+- Refactor `CustomGradientBar` to pass `exhaustive-deps`. ([41463](https://github.com/WordPress/gutenberg/pull/41463))
+- Refactor `DateDayPicker` to pass `exhaustive-deps`. ([41470](https://github.com/WordPress/gutenberg/pull/41470))
+- Refactor `Flex` to pass `exhaustive-deps`. ([41507](https://github.com/WordPress/gutenberg/pull/41507))
+- Refactor `FontSizePicker` to pass `exhaustive-deps`. ([41600](https://github.com/WordPress/gutenberg/pull/41600))
+- Refactor `InputControl` to pass `exhaustive-deps`. ([41601](https://github.com/WordPress/gutenberg/pull/41601))
+- Refactor `Modal` to pass `exhaustive-deps`. ([41610](https://github.com/WordPress/gutenberg/pull/41610))
+- Refactor`Draggable` to pass `exhaustive-deps`. ([41499](https://github.com/WordPress/gutenberg/pull/41499))
+- Refactor`Dropdown` to pass `exhaustive-deps`. ([41505](https://github.com/WordPress/gutenberg/pull/41505))
+- Rewrite `<FormTokenField>` to functional component and Typescript. ([41216](https://github.com/WordPress/gutenberg/pull/41216))
+- TreeSelect Convert to Typescript. ([41536](https://github.com/WordPress/gutenberg/pull/41536))
+- ZStack: Convert component story to TypeScript and add inline documentation. ([41694](https://github.com/WordPress/gutenberg/pull/41694))
+
+#### Block Library
+- Clarify updateNavigationLinkBlockAttributes. ([41657](https://github.com/WordPress/gutenberg/pull/41657))
+- Comment Author and Date blocks: Aligned editor markup with the frontend. ([41631](https://github.com/WordPress/gutenberg/pull/41631))
+- Cover Block: Move components to variables so they can be shared. ([41742](https://github.com/WordPress/gutenberg/pull/41742))
+- Split useNavigationMenu into bite-size functions and add unit tests. ([41139](https://github.com/WordPress/gutenberg/pull/41139))
+- File, Search Blocks: Lower CSS specificity. ([41393](https://github.com/WordPress/gutenberg/pull/41393))
+
+#### Document Settings
+- Extract header used in PostVisibility and PublishDateTimePicker to a new InspectorPopoverHeader component. ([41362](https://github.com/WordPress/gutenberg/pull/41362))
+
+#### Lodash
+- Refactor various Lodash methods. ([41701](https://github.com/WordPress/gutenberg/pull/41701)), ([41626](https://github.com/WordPress/gutenberg/pull/41626)), ([41731](https://github.com/WordPress/gutenberg/pull/41731)), ([41635](https://github.com/WordPress/gutenberg/pull/41635)), ([41672](https://github.com/WordPress/gutenberg/pull/41672)), ([41703](https://github.com/WordPress/gutenberg/pull/41703)), ([41692](https://github.com/WordPress/gutenberg/pull/41692)), ([41653](https://github.com/WordPress/gutenberg/pull/41653)), ([41654](https://github.com/WordPress/gutenberg/pull/41654)), ([41624](https://github.com/WordPress/gutenberg/pull/41624)), ([41688](https://github.com/WordPress/gutenberg/pull/41688)), ([41702](https://github.com/WordPress/gutenberg/pull/41702)), ([41652](https://github.com/WordPress/gutenberg/pull/41652)), ([41674](https://github.com/WordPress/gutenberg/pull/41674)), ([41634](https://github.com/WordPress/gutenberg/pull/41634)), ([41633](https://github.com/WordPress/gutenberg/pull/41633)), ([41632](https://github.com/WordPress/gutenberg/pull/41632)), ([41629](https://github.com/WordPress/gutenberg/pull/41629)), ([41706](https://github.com/WordPress/gutenberg/pull/41706)), ([41625](https://github.com/WordPress/gutenberg/pull/41625)), ([41701](https://github.com/WordPress/gutenberg/pull/41701))
+- Remove various lodash usages. ([41719](https://github.com/WordPress/gutenberg/pull/41719)), ([41687](https://github.com/WordPress/gutenberg/pull/41687))
+
+
+### Tools
+
+#### Build Tooling
+- Bump caniuse-lite version. ([41675](https://github.com/WordPress/gutenberg/pull/41675))
+- Update testing-library dependencies to latest version. ([41710](https://github.com/WordPress/gutenberg/pull/41710))
+- Upgrade wp-prettier to 2.6.2. ([40542](https://github.com/WordPress/gutenberg/pull/40542))
+- Package.json: Bump engines.node version to >=14. ([41599](https://github.com/WordPress/gutenberg/pull/41599))
+
+#### Testing
+- Fixed failing DateTimePicker Unit test. ([41483](https://github.com/WordPress/gutenberg/pull/41483))
+- Remove snapshot from Post Editor Template Mode test and target expected string instead. ([41563](https://github.com/WordPress/gutenberg/pull/41563))
+- Skip some of the Drag & Drop end-to-end on iOS. ([41529](https://github.com/WordPress/gutenberg/pull/41529))
+- Add controlled unit test, use modern Testing Library features. ([41668](https://github.com/WordPress/gutenberg/pull/41668))
+
+#### Components
+- Storybook: Update to the version 6.5. ([41585](https://github.com/WordPress/gutenberg/pull/41585))
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+- @FilipposZ: Block-Editor: Add tooltip on replace image's URL. ([41504](https://github.com/WordPress/gutenberg/pull/41504))
+- @manzurahammed: Block Library: Fix JS Error in Avatar Block. ([41354](https://github.com/WordPress/gutenberg/pull/41354))
+- @msurdi: Avoid including null values in blocks list. ([41496](https://github.com/WordPress/gutenberg/pull/41496))
+- @sebastienserre: Plural has been used instead of single in 1st parameter. ([41521](https://github.com/WordPress/gutenberg/pull/41521))
+- @tharsheblows: Docs: Add step for build and asset file. ([41511](https://github.com/WordPress/gutenberg/pull/41511))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @adamziel @alexstine @andrewserong @chad1008 @ciampo @derekblank @draganescu @FilipposZ @fluiddot @geriux @glendaviesnz @jffng @jostnes @jsnajdr @MaggieCabrera @Mamaduka @manzurahammed @matiasbenedetto @mburridge @mcsf @mirka @msurdi @noisysocks @ntsekouras @oandregal @ramonjd @SavPhill @scruffian @sebastienserre @sunil25393 @t-hamano @tharsheblows @torounit @tyxla @walbo
+
+
 = 13.4.0 =
 
 ## Changelog

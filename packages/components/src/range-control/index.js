@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,6 +19,7 @@ import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
 import { floatClamp, useControlledRangeValue } from './utils';
+import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';

@@ -13,9 +13,9 @@ async function activateTheme(
 	let response = await this.request.get( THEMES_URL );
 	const html = await response.text();
 	const matchGroup = html.match(
-		new RegExp(
-			`action=activate&amp;stylesheet=${ themeSlug }&amp;_wpnonce=[a-z0-9]+`
-		)
+		`action=activate&amp;stylesheet=${ encodeURIComponent(
+			themeSlug
+		) }&amp;_wpnonce=[a-z0-9]+`
 	);
 
 	if ( ! matchGroup ) {

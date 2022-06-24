@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, size, map, without } from 'lodash';
+import { forEach, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -56,9 +56,8 @@ function Editor( {
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } = select(
-				coreStore
-			);
+			const { getEntityRecord, getPostType, getEntityRecords } =
+				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -75,8 +74,8 @@ function Editor( {
 			} else {
 				postObject = getEntityRecord( 'postType', postType, postId );
 			}
-			const supportsTemplateMode = getEditorSettings()
-				.supportsTemplateMode;
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 
 			return {
@@ -104,9 +103,8 @@ function Editor( {
 		[ postType, postId ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		editPostStore
-	);
+	const { updatePreferredStyleVariations, setIsInserterOpened } =
+		useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -128,7 +126,7 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).

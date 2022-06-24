@@ -113,10 +113,8 @@ export default function useBlockDropZone( {
 	const targetBlockIndex = useSharedValue( null );
 
 	const { getBlockListSettings, getSettings } = useSelect( blockEditorStore );
-	const {
-		blocksLayouts,
-		getBlockLayoutsOrderedByYCoord,
-	} = useBlockListContext();
+	const { blocksLayouts, getBlockLayoutsOrderedByYCoord } =
+		useBlockListContext();
 
 	const getSortedBlocksLayouts = useCallback( () => {
 		return getBlockLayoutsOrderedByYCoord( blocksLayouts.current );
