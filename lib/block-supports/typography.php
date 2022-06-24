@@ -239,11 +239,16 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
-	$coerce_to            = isset( $options['coerce_to'] ) ? $options['coerce_to'] : '';
-	$root_font_size_value = isset( $options['root_size_value'] ) ? $options['root_size_value'] : 16;
-	$acceptable_units     = isset( $options['acceptable_units'] ) ? $options['acceptable_units'] : array( 'rem', 'px', 'em' );
 
-	$acceptable_units_group = implode( '|', $acceptable_units );
+	$defaults = array(
+		'coerce_to'        => '',
+		'root_size_value'  => 16,
+		'acceptable_units' => array( 'rem', 'px', 'em' ),
+	);
+
+	$options = wp_parse_args( $options, $defaults );
+
+	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
 	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
@@ -257,14 +262,14 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	$unit  = $matches[2];
 
 	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
-	if ( 'px' === $coerce_to && ( 'em' === $unit || 'rem' === $unit ) ) {
-		$value = $value * $root_font_size_value;
-		$unit  = $coerce_to;
+	if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
+		$value = $value * $options['root_size_value'];
+		$unit  = $options['coerce_to'];
 	}
 
-	if ( 'px' === $unit && ( 'em' === $coerce_to || 'rem' === $coerce_to ) ) {
-		$value = $value / $root_font_size_value;
-		$unit  = $coerce_to;
+	if ( 'px' === $unit && ( 'em' === $options['coerce_to'] || 'rem' === $options['coerce_to'] ) ) {
+		$value = $value / $options['root_size_value'];
+		$unit  = $options['coerce_to'];
 	}
 
 	return array(
