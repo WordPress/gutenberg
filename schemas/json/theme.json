@@ -909,11 +909,32 @@
 				}
 			]
 		},
+
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
 				"link": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"type": "object",
+					"anyOf": [
+						{
+							"$ref": "#/definitions/stylesPropertiesComplete"
+						},
+						{
+							"type": "object",
+							"properties": {
+								":hover": {
+									"$ref": "#/definitions/stylesProperties"
+								},
+								":focus": {
+									"$ref": "#/definitions/stylesProperties"
+								},
+								":active": {
+									"$ref": "#/definitions/stylesProperties"
+								}
+							},
+							"additionalProperties": false
+						}
+					]
 				},
 				"h1": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
