@@ -104,6 +104,7 @@ module.exports = {
 							'noop',
 							'nth',
 							'overEvery',
+							'partialRight',
 							'random',
 							'reverse',
 							'size',
