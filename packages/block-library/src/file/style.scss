@@ -1,6 +1,10 @@
 .wp-block-file {
 	margin-bottom: 1.5em;
 
+	&:not(.wp-element-button) {
+		font-size: 0.8em;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
