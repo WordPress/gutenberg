@@ -207,7 +207,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
 	} else {
-		wp_register_style( "wp-block-{$block_name}", false, array( 'global-styles' ), );
+		wp_register_style( "wp-block-{$block_name}", false, array( 'global-styles' ) );
 	}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
