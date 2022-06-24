@@ -247,7 +247,9 @@
 					"background": "#32373c"
 				},
 				"typography": {
-					"fontSize": "1.125em",
+					"fontSize": "inherit",
+					"fontFamily": "inherit",
+					"lineHeight": "inherit",
 					"textDecoration": "none"
 				}
 			},
