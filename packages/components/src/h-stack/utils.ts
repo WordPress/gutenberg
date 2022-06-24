@@ -47,8 +47,6 @@ export function getAlignmentProps(
 	const isVertical = direction === 'column';
 	const props = isVertical ? V_ALIGNMENTS : H_ALIGNMENTS;
 
-	// alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
-
 	const alignmentProps =
 		alignment in props
 			? props[ alignment as keyof typeof props ]

@@ -6,7 +6,7 @@ import { View } from '../view';
 import { useHStack } from './hook';
 import type { Props } from './types';
 
-function HStack(
+function UnconnectedHStack(
 	props: WordPressComponentProps< Props, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) {
@@ -38,7 +38,6 @@ function HStack(
  * }
  * ```
  */
+export const HStack = contextConnect( UnconnectedHStack, 'HStack' );
 
-const ConnectedHStack = contextConnect( HStack, 'HStack' );
-
-export default ConnectedHStack;
+export default HStack;
