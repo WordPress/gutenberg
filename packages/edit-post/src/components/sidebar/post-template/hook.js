@@ -12,80 +12,92 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { store as editPostStore } from '../../../store';
 
 export default function usePostTemplateForm() {
-	const isViewable = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		return getPostType( getCurrentPostType() )?.viewable ?? false;
+	const {
+		isVisible,
+		isPostsPage,
+		availableTemplates,
+		fetchedTemplates,
+		templateAttribute,
+		canCreate,
+		canEdit,
+	} = useSelect( ( select ) => {
+		const currentPostType = select( editorStore ).getCurrentPostType();
+
+		const isViewable =
+			select( coreStore ).getPostType( currentPostType )?.viewable ??
+			false;
+
+		const settings = select( editorStore ).getEditorSettings();
+
+		const canUserCreateTemplates = select( coreStore ).canUser(
+			'create',
+			'templates'
+		);
+
+		const _isVisible =
+			isViewable &&
+			( settings.availableTemplates?.length ||
+				( settings.supportsTemplateMode && canUserCreateTemplates ) );
+
+		if ( ! _isVisible ) {
+			return { isVisible: false };
+		}
+
+		const _isPostsPage =
+			select( editorStore ).getCurrentPostId() ===
+			settings?.page_for_posts;
+
+		const _fetchedTemplates = select( coreStore ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				post_type: currentPostType,
+				per_page: -1,
+			}
+		);
+
+		const _templateAttribute =
+			select( editorStore ).getEditedPostAttribute( 'template' );
+
+		const _canCreate = canUserCreateTemplates && ! _isPostsPage;
+
+		const _canEdit =
+			canUserCreateTemplates &&
+			settings.supportsTemplateMode &&
+			!! select( editPostStore ).getEditedPostTemplate();
+
+		return {
+			isVisible: true,
+			isPostsPage: _isPostsPage,
+			availableTemplates: settings.availableTemplates,
+			fetchedTemplates: _fetchedTemplates,
+			templateAttribute: _templateAttribute,
+			canCreate: _canCreate,
+			canEdit: _canEdit,
+		};
 	}, [] );
-
-	const settings = useSelect(
-		( select ) => select( editorStore ).getEditorSettings(),
-		[]
-	);
-
-	const canUserCreateTemplate = useSelect(
-		( select ) => select( coreStore ).canUser( 'create', 'templates' ),
-		[]
-	);
-
-	const currentPostId = useSelect(
-		( select ) => select( editorStore ).getCurrentPostId(),
-		[]
-	);
-
-	const templates = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
-		const { getEntityRecords } = select( coreStore );
-		return getEntityRecords( 'postType', 'wp_template', {
-			post_type: getCurrentPostType(),
-			per_page: -1,
-		} );
-	}, [] );
-
-	const templateAttribute = useSelect(
-		( select ) =>
-			select( editorStore ).getEditedPostAttribute( 'template' ),
-		[]
-	);
-
-	const template = useSelect(
-		( select ) => select( editPostStore ).getEditedPostTemplate(),
-		[]
-	);
 
 	const { editPost } = useDispatch( editorStore );
 
 	const { __unstableSwitchToTemplateMode } = useDispatch( editPostStore );
 
-	const isVisible =
-		isViewable &&
-		( settings.availableTemplates?.length ||
-			( settings.supportsTemplateMode && canUserCreateTemplate ) );
-
-	const isPostsPage = currentPostId === settings?.page_for_posts;
-
 	const options = useMemo(
 		() =>
 			Object.entries( {
-				...settings.availableTemplates,
+				...availableTemplates,
 				...Object.fromEntries(
-					( templates ?? [] ).map( ( { slug, title } ) => [
+					( fetchedTemplates ?? [] ).map( ( { slug, title } ) => [
 						slug,
 						title.rendered,
 					] )
 				),
 			} ).map( ( [ slug, title ] ) => ( { value: slug, label: title } ) ),
-		[ settings.availableTemplates, templates ]
+		[ availableTemplates, fetchedTemplates ]
 	);
 
 	const selectedOption =
 		options.find( ( option ) => option.value === templateAttribute ) ??
 		options.find( ( option ) => ! option.value ); // The default option has '' value.
-
-	const canCreate = canUserCreateTemplate && ! isPostsPage;
-
-	const canEdit =
-		canUserCreateTemplate && settings.supportsTemplateMode && !! template;
 
 	const onChange = useCallback( ( slug ) => {
 		editPost( {
