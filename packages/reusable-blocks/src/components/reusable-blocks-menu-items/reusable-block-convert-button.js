@@ -140,6 +140,8 @@ export default function ReusableBlockConvertButton( {
 									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
+									/* eslint-disable-next-line jsx-a11y/no-autofocus */
+									autoFocus={ true }
 								/>
 								<Flex
 									className="reusable-blocks-menu-items__convert-modal-actions"
