@@ -88,6 +88,11 @@
 			"__experimentalDefaultControls": {
 				"radius": true
 			}
+		},
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
 		}
 	},
 	"styles": [

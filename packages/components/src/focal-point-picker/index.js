@@ -272,14 +272,8 @@ export class FocalPointPicker extends Component {
 		};
 	}
 	render() {
-		const {
-			autoPlay,
-			className,
-			help,
-			instanceId,
-			label,
-			url,
-		} = this.props;
+		const { autoPlay, className, help, instanceId, label, url } =
+			this.props;
 		const { bounds, isDragging, percentages } = this.state;
 		const iconCoordinates = this.iconCoordinates();
 

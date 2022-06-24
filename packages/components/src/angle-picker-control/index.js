@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { FlexBlock, FlexItem } from '../flex';
-import NumberControl from '../input-control';
+import NumberControl from '../number-control';
 import AngleCircle from './angle-circle';
 import { Root } from './styles/angle-picker-control-styles';
 import { space } from '../ui/utils/space';

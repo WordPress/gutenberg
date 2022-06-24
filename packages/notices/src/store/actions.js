@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
@@ -18,6 +13,8 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                               triggered by user.
  *
  */
+
+let uniqueId = 0;
 
 /**
  * Returns an action object used in signalling that a notice is to be created.
@@ -54,7 +51,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
-		id = uniqueId( context ),
+		id = `${ context }${ ++uniqueId }`,
 		actions = [],
 		type = 'default',
 		__unstableHTML,

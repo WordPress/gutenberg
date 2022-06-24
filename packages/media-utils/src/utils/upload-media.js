@@ -9,7 +9,6 @@ import {
 	has,
 	includes,
 	map,
-	noop,
 	omit,
 	some,
 	startsWith,
@@ -21,6 +20,8 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
+
+const noop = () => {};
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.

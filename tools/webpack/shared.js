@@ -12,10 +12,8 @@ const postcss = require( 'postcss' );
  */
 const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 
-const {
-	NODE_ENV: mode = 'development',
-	WP_DEVTOOL: devtool = 'source-map',
-} = process.env;
+const { NODE_ENV: mode = 'development', WP_DEVTOOL: devtool = 'source-map' } =
+	process.env;
 
 const baseConfig = {
 	target: 'browserslist',

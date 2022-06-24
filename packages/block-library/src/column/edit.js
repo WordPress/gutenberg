@@ -50,9 +50,8 @@ function ColumnEdit( {
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const { getBlockOrder, getBlockRootClientId } =
+				select( blockEditorStore );
 
 			const rootId = getBlockRootClientId( clientId );
 

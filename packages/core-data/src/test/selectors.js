@@ -611,8 +611,7 @@ describe( 'isPreviewEmbedFallback()', () => {
 		const state = deepFreeze( {
 			embedPreviews: {
 				'http://example.com/': {
-					html:
-						'<a href="http://example.com/">http://example.com/</a>',
+					html: '<a href="http://example.com/">http://example.com/</a>',
 				},
 			},
 		} );

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,10 +15,12 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { ItemBaseUI } from '../styles/navigation-styles';
 
+let uniqueId = 0;
+
 export default function NavigationItemBase( props ) {
 	const { children, className, ...restProps } = props;
 
-	const [ itemId ] = useState( uniqueId( 'item-' ) );
+	const [ itemId ] = useState( `item-${ ++uniqueId }` );
 
 	useNavigationTreeItem( itemId, props );
 	const { navigationTree } = useNavigationContext();
