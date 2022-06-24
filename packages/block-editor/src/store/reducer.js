@@ -690,9 +690,8 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 		} );
 
 		// We need to re-attach the controlled inner blocks to the blocks tree and
-		// preserve their block order.
-		// Otherwise, an inner block controller's blocks will be deleted entirely
-		// from its entity..
+		// preserve their block order. Otherwise, an inner block controller's blocks
+		// will be deleted entirely from its entity.
 		stateAfterInsert.order = {
 			...stateAfterInsert.order,
 			...reduce(
