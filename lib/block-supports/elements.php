@@ -105,11 +105,11 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
 	if ( $link_block_styles ) {
-		gutenberg_style_engine_enqueue_block_support_styles(
+		gutenberg_style_engine_enqueue_styles(
 			$link_block_styles,
 			array(
 				'selector' => ".$class_name a",
-				'css_vars' => true,
+				'layer'    => 'block-supports',
 			)
 		);
 

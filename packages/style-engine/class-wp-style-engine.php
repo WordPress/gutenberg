@@ -35,7 +35,16 @@ class WP_Style_Engine {
 	 *
 	 * @var WP_Style_Engine_Store|null
 	 */
-	private $block_supports_store = null;
+	private $styles_store = null;
+
+	/**
+	 * An ordered list of style layers from least specific to most specific.
+	 * The layers loosely represent a cascade layer system.
+	 * The layer name will also be the key to retrieve the corresponding styles from the store.
+	 */
+	const STYLE_LAYERS = array(
+		'block-supports', // User-defined block-level overrides.
+	);
 
 	/**
 	 * Style definitions that contain the instructions to
@@ -226,11 +235,11 @@ class WP_Style_Engine {
 	 * Gather internals.
 	 */
 	public function __construct() {
-		// @TODO not sure where to instantiate stuff yet.
+		// @TODO not sure where to instantiate stuff or whether to dependency inject yet.
 		// The hope is to have several "stores" for each layer of the style hierarchy.
 		// This is so we can control the order in which we render.
 		// Each store might have a unique way to render on the frontend, maybe not.
-		$this->block_supports_store = new WP_Style_Engine_Store();
+		$this->styles_store = new WP_Style_Engine_Store( self::STYLE_LAYERS );
 		WP_Style_Engine_Renderer::enqueue_block_support_styles();
 	}
 
@@ -254,12 +263,13 @@ class WP_Style_Engine {
 	 *
 	 * @access private
 	 *
+	 * @param string $layer Unique key for a layer.
 	 * @param string $key Unique key for a $style_data object.
 	 * @param array  $style_data Associative array of style information.
 	 * @return void
 	 */
-	public function register_block_support_styles( $key, $style_data ) {
-		$this->block_supports_store->register( $key, $style_data );
+	public function register_styles( $layer, $key, $style_data ) {
+		$this->styles_store->register( $layer, $key, $style_data );
 	}
 
 	/**
@@ -267,10 +277,11 @@ class WP_Style_Engine {
 	 *
 	 * @access private
 	 *
+	 * @param string $layer Unique key for a layer.
 	 * @return array All registered block support styles.
 	 */
-	public function get_block_support_styles() {
-		return $this->block_supports_store->get();
+	public function get_registered_styles( $layer ) {
+		return $this->styles_store->get( $layer );
 	}
 
 	/**
@@ -422,6 +433,7 @@ class WP_Style_Engine {
 		$classnames                  = array();
 		$should_return_css_vars      = isset( $options['css_vars'] ) && true === $options['css_vars'];
 		$should_register_and_enqueue = isset( $options['enqueue'] ) ? $options['enqueue'] : null;
+		$registry_layer_key          = isset( $options['layer'] ) && in_array( $options['layer'], self::STYLE_LAYERS, true ) ? $options['layer'] : null;
 
 		// Collect CSS and classnames.
 		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
@@ -444,11 +456,12 @@ class WP_Style_Engine {
 		$selector      = isset( $options['selector'] ) ? $options['selector'] : null;
 		$styles_output = array();
 
-		if ( $selector && $should_register_and_enqueue ) {
+		if ( $registry_layer_key && $selector && $should_register_and_enqueue ) {
 			// @TODO this could all change. Maybe we'd want to sanitize and build the rules later.
 			// Or return $css_rules here so another method can register.
 			// Just doing it all here for convenience while testing.
-			$this->register_block_support_styles(
+			$this->register_styles(
+				$registry_layer_key,
 				$selector,
 				$css_definitions
 			);
@@ -563,11 +576,15 @@ function wp_style_engine_generate( $block_styles, $options = array() ) {
  * @param array $options An array of options to determine the output.
  * @return void
  */
-function wp_style_engine_enqueue_block_support_styles( $block_styles, $options = array() ) {
+function wp_style_engine_enqueue_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		// Get style rules, then register/enqueue.
-		$new_options = array_merge( $options, array( 'enqueue' => true ) );
+		$defaults     = array(
+			'enqueue'  => true,
+			'css_vars' => true,
+		);
+		$new_options  = wp_parse_args( $options, $defaults );
+
 		$style_engine->generate( $block_styles, $new_options );
 	}
 }

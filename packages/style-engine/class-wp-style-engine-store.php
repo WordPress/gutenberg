@@ -29,34 +29,50 @@ class WP_Style_Engine_Store {
 	private $registered_styles = array();
 
 	/**
+	 * Gather internals.
+	 */
+	public function __construct( $layers = array() ) {
+		foreach ( $layers as $layer ) {
+			$this->registered_styles[ $layer ] = array();
+		}
+	}
+
+	/**
 	 * Register a style
 	 *
+	 * @param string $layer Unique key for a layer.
 	 * @param string $key Unique key for a $style_data object.
 	 * @param array  $style_data Associative array of style information.
 	 * @return void
 	 */
-	public function register( $key, $style_data ) {
-		if ( empty( $key ) || empty( $style_data ) ) {
+	public function register( $layer, $key, $style_data ) {
+		if ( empty( $layer ) || empty( $key ) || empty( $style_data ) ) {
 			return;
 		}
 
-		if ( isset( $this->registered_styles[ $key ] ) ) {
-			$style_data = array_unique( array_merge( $this->registered_styles[ $key ], $style_data ) );
+		if ( isset( $this->registered_styles[ $layer ][ $key ] ) ) {
+			$style_data = array_unique( array_merge( $this->registered_styles[ $layer ][ $key ], $style_data ) );
 		}
-		$this->registered_styles[ $key ] = $style_data;
+		$this->registered_styles[ $layer ][ $key ] = $style_data;
 	}
 
 	/**
 	 * Retrieves style data from the store.
 	 *
+	 * @param string $layer Unique key for a layer.
 	 * @param string $key Optional unique key for a $style_data object to return a single style object.
 	 *
 	 * @return array Registered styles
 	 */
-	public function get( $key = null ) {
-		if ( isset( $this->registered_styles[ $key ] ) ) {
-			return $this->registered_styles[ $key ];
+	public function get( $layer = null, $key = null ) {
+		if ( isset( $this->registered_styles[ $layer ][ $key ] ) ) {
+			return $this->registered_styles[ $layer ][ $key ];
 		}
+
+		if ( isset( $this->registered_styles[ $layer ] ) ) {
+			return $this->registered_styles[ $layer ];
+		}
+
 		return $this->registered_styles;
 	}
 }

@@ -30,7 +30,7 @@ class WP_Style_Engine_Renderer {
 	 */
 	public static function render_registered_block_supports_styles() {
 		$style_engine         = WP_Style_Engine::get_instance();
-		$block_support_styles = $style_engine->get_block_support_styles();
+		$block_support_styles = $style_engine->get_registered_styles( 'block-supports' );
 
 		if ( empty( $block_support_styles ) ) {
 			return;
