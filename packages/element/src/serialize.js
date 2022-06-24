@@ -28,14 +28,7 @@
 /**
  * External dependencies
  */
-import {
-	isEmpty,
-	castArray,
-	omit,
-	startsWith,
-	kebabCase,
-	isPlainObject,
-} from 'lodash';
+import { kebabCase, isPlainObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -508,7 +501,7 @@ function getNormalAttributeName( attribute ) {
  * @return {string} Normalized property name.
  */
 function getNormalStylePropertyName( property ) {
-	if ( startsWith( property, '--' ) ) {
+	if ( property.startsWith( '--' ) ) {
 		return property;
 	}
 
@@ -579,7 +572,7 @@ export function renderElement( element, context, legacyContext = {} ) {
 			const { children, ...wrapperProps } = props;
 
 			return renderNativeComponent(
-				isEmpty( wrapperProps ) ? null : 'div',
+				! Object.keys( wrapperProps ).length ? null : 'div',
 				{
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
@@ -653,7 +646,9 @@ export function renderNativeComponent(
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
 		content = renderChildren( props.value, context, legacyContext );
-		props = omit( props, 'value' );
+		// eslint-disable-next-line no-unused-vars
+		const { value, ...restProps } = props;
+		props = restProps;
 	} else if (
 		props.dangerouslySetInnerHTML &&
 		typeof props.dangerouslySetInnerHTML.__html === 'string'
@@ -731,7 +726,7 @@ export function renderComponent(
 function renderChildren( children, context, legacyContext = {} ) {
 	let result = '';
 
-	children = castArray( children );
+	children = Array.isArray( children ) ? children : [ children ];
 
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];
