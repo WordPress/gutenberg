@@ -915,21 +915,24 @@
 			"properties": {
 				"link": {
 					"type": "object",
-					"anyOf": [
+					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesComplete"
+							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"type": "object",
 							"properties": {
+								"border": {},
+								"color": {},
+								"spacing": {},
+								"typography": {},
 								":hover": {
-									"$ref": "#/definitions/stylesProperties"
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":focus": {
-									"$ref": "#/definitions/stylesProperties"
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
-									"$ref": "#/definitions/stylesProperties"
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
 							"additionalProperties": false
