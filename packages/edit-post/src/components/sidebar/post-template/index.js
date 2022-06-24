@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,6 +33,15 @@ export default function PostTemplate() {
 						className="edit-post-post-template__toggle"
 						variant="tertiary"
 						aria-expanded={ isOpen }
+						aria-label={
+							selectedOption
+								? sprintf(
+										// translators: %s: Name of the currently selected template.
+										__( 'Select template: %s' ),
+										selectedOption.label
+								  )
+								: __( 'Select template' )
+						}
 						onClick={ onToggle }
 					>
 						{ selectedOption?.label ?? __( '(none)' ) }
