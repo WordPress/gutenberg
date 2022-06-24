@@ -15,7 +15,6 @@
  * @access private
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
-<<<<<<< HEAD
 
 	/**
 	 * Whitelist which defines which pseudo selectors are enabled for
@@ -26,8 +25,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'link' => array( ':hover', ':focus', ':active' ),
 	);
 
-=======
->>>>>>> 4e177980fb (Elements: Add an API make it easier to get class names (#41753))
 	const ELEMENTS = array(
 		'link'   => 'a',
 		'h1'     => 'h1',
@@ -56,7 +53,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return array_key_exists( $element, static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES ) ? static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $element ] : '';
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Sanitizes the input according to the schemas.
 	 *
@@ -226,9 +222,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $theme_json;
 	}
 
-
-=======
->>>>>>> 4e177980fb (Elements: Add an API make it easier to get class names (#41753))
 	/**
 	 * Returns the metadata for each block.
 	 *
