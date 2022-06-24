@@ -80,6 +80,11 @@
 .edit-site-screen-button-color__control,
 .edit-site-screen-background-color__control {
 	padding: $grid-unit-20;
+
+	.block-editor-color-gradient-control__tabs {
+		margin: - $grid-unit-20;
+		margin-bottom: $grid-unit-20;
+	}
 }
 
 .edit-site-global-styles-variations_item {

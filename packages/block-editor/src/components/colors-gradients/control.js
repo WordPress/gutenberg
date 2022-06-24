@@ -11,8 +11,7 @@ import { useState } from '@wordpress/element';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	TabPanel,
 	ColorPalette,
 	GradientPicker,
 } from '@wordpress/components';
@@ -78,22 +77,24 @@ function ColorGradientControlInner( {
 						</legend>
 					) }
 					{ canChooseAColor && canChooseAGradient && (
-						<ToggleGroupControl
-							value={ currentTab }
-							onChange={ setCurrentTab }
-							label={ __( 'Select color type' ) }
-							hideLabelFromVision
-							isBlock
+						<TabPanel
+							className="block-editor-color-gradient-control__tabs"
+							onSelect={ setCurrentTab }
+							tabs={ [
+								{
+									name: 'color',
+									title: 'Solid color',
+									value: 'color',
+								},
+								{
+									name: 'gradient',
+									title: 'Gradient',
+									value: 'gradient',
+								},
+							] }
 						>
-							<ToggleGroupControlOption
-								value="color"
-								label={ __( 'Solid' ) }
-							/>
-							<ToggleGroupControlOption
-								value="gradient"
-								label={ __( 'Gradient' ) }
-							/>
-						</ToggleGroupControl>
+						{ ( tab ) => <p className="screen-reader-text">Selected tab: { tab.title }</p> }
+						</TabPanel>
 					) }
 					{ ( currentTab === 'color' || ! canChooseAGradient ) && (
 						<ColorPalette

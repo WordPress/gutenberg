@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	TabPanel,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -26,23 +25,24 @@ function ScreenColorPalette( { name } ) {
 					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
 				) }
 			/>
-			<ToggleGroupControl
-				className="edit-site-screen-color-palette-toggle"
-				value={ currentTab }
-				onChange={ setCurrentTab }
-				label={ __( 'Select palette type' ) }
-				hideLabelFromVision
-				isBlock
+			<TabPanel
+				className="block-editor-color-gradient-control__tabs"
+				onSelect={ setCurrentTab }
+				tabs={ [
+					{
+						name: 'solid',
+						title: 'Solid color',
+						value: 'solid',
+					},
+					{
+						name: 'gradient',
+						title: 'Gradient',
+						value: 'gradient',
+					},
+				] }
 			>
-				<ToggleGroupControlOption
-					value="solid"
-					label={ __( 'Solid' ) }
-				/>
-				<ToggleGroupControlOption
-					value="gradient"
-					label={ __( 'Gradient' ) }
-				/>
-			</ToggleGroupControl>
+			{ ( tab ) => <p className="screen-reader-text">Selected tab: { tab.title }</p> }
+			</TabPanel>
 			{ currentTab === 'solid' && <ColorPalettePanel name={ name } /> }
 			{ currentTab === 'gradient' && (
 				<GradientPalettePanel name={ name } />
