@@ -227,16 +227,21 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  *
  * @access private
  *
- * @param string $raw_value            Raw size value from theme.json.
- * @param string $coerce_to            Coerce the value to rem or px. Default `'rem'`.
- * @param number $root_font_size_value Value of root font size for rem|em <-> px conversion.
- * @param array  $acceptable_units     An array of font size units.
- * @return array                       An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
+ * @param string $raw_value Raw size value from theme.json.
+ * @param array  $options    array(
+ *      'coerce_to'        => (string) Coerce the value to rem or px. Default `'rem'`.
+ *      'root_size_value'  => (number) Value of root font size for rem|em <-> px conversion. Default `16`.
+ *      'acceptable_units' => (array)  An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
+ *  );.
+ * @return array An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
  */
-function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = '', $root_font_size_value = 16, $acceptable_units = array( 'rem', 'px', 'em' ) ) {
+function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( empty( $raw_value ) ) {
 		return null;
 	}
+	$coerce_to            = isset( $options['coerce_to'] ) ? $options['coerce_to'] : '';
+	$root_font_size_value = isset( $options['root_size_value'] ) ? $options['root_size_value'] : 16;
+	$acceptable_units     = isset( $options['acceptable_units'] ) ? $options['acceptable_units'] : array( 'rem', 'px', 'em' );
 
 	$acceptable_units_group = implode( '|', $acceptable_units );
 	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
@@ -273,22 +278,36 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $coerce_to = '', $
  *
  * @access private
  *
- * @param string $minimum_viewport_width_raw Minimum viewport size from which type will have fluidity.
- * @param string $maximum_viewport_width_raw Maximum size up to which type will have fluidity.
- * @param string $minimum_font_size_raw      Minimum font size for any clamp() calculation.
- * @param string $maximum_font_size_raw      Maximum font size for any clamp() calculation.
- * @param number $scale_factor               A scale factor to determine how fast a font scales within boundaries.
+ * @param array $args array(
+ *     'maximum_viewport_width' => (string) Maximum size up to which type will have fluidity.
+ *     'minimum_viewport_width' => (string) Minimum viewport size from which type will have fluidity.
+ *     'maximum_font_size'      => (string) Maximum font size for any clamp() calculation.
+ *     'minimum_font_size'      => (string) Minimum font size for any clamp() calculation.
+ *     'scale_factor'           => (number) A scale factor to determine how fast a font scales within boundaries.
+ * );.
  * @return string|null A font-size value using clamp().
  */
-function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_raw, $maximum_viewport_width_raw, $minimum_font_size_raw, $maximum_font_size_raw, $scale_factor ) {
+function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
+	$maximum_viewport_width_raw = isset( $args['maximum_viewport_width'] ) ? $args['maximum_viewport_width'] : null;
+	$minimum_viewport_width_raw = isset( $args['minimum_viewport_width'] ) ? $args['minimum_viewport_width'] : null;
+	$maximum_font_size_raw      = isset( $args['maximum_font_size'] ) ? $args['maximum_font_size'] : null;
+	$minimum_font_size_raw      = isset( $args['minimum_font_size'] ) ? $args['minimum_font_size'] : null;
+	$scale_factor               = isset( $args['scale_factor'] ) ? $args['scale_factor'] : null;
+
+	// Grab the minimum font size and normalize it in order to use the value for calculations.
 	$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
 
-	// We get a 'preferred' unit to keep units consistent when calculating.
-	// Otherwise the result will not be accurate.
+	// We get a 'preferred' unit to keep units consistent when calculating,
+	// otherwise the result will not be accurate.
 	$font_size_unit = $minimum_font_size['unit'];
 
 	// Grab the maximum font size and normalize it in order to use the value for calculations.
-	$maximum_font_size = gutenberg_get_typography_value_and_unit( $maximum_font_size_raw, $font_size_unit );
+	$maximum_font_size = gutenberg_get_typography_value_and_unit(
+		$maximum_font_size_raw,
+		array(
+			'coerce_to' => $font_size_unit,
+		)
+	);
 
 	// Protect against unsupported units.
 	if ( ! $maximum_font_size || ! $minimum_font_size ) {
@@ -296,11 +315,26 @@ function gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_
 	}
 
 	// Use rem for accessible fluid target font scaling.
-	$minimum_font_size_rem = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw, 'rem' );
+	$minimum_font_size_rem = gutenberg_get_typography_value_and_unit(
+		$minimum_font_size_raw,
+		array(
+			'coerce_to' => 'rem',
+		)
+	);
 
 	// Viewport widths defined for fluid typography. Normalize units.
-	$maximum_viewport_width = gutenberg_get_typography_value_and_unit( $maximum_viewport_width_raw, $font_size_unit );
-	$minimum_viewport_width = gutenberg_get_typography_value_and_unit( $minimum_viewport_width_raw, $font_size_unit );
+	$maximum_viewport_width = gutenberg_get_typography_value_and_unit(
+		$maximum_viewport_width_raw,
+		array(
+			'coerce_to' => $font_size_unit,
+		)
+	);
+	$minimum_viewport_width = gutenberg_get_typography_value_and_unit(
+		$minimum_viewport_width_raw,
+		array(
+			'coerce_to' => $font_size_unit,
+		)
+	);
 
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
@@ -385,7 +419,15 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		}
 	}
 
-	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value( $minimum_viewport_width_raw, $maximum_viewport_width_raw, $minimum_font_size_raw, $maximum_font_size_raw, $default_scale_factor );
+	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(
+		array(
+			'minimum_viewport_width' => $minimum_viewport_width_raw,
+			'maximum_viewport_width' => $maximum_viewport_width_raw,
+			'minimum_font_size'      => $minimum_font_size_raw,
+			'maximum_font_size'      => $maximum_font_size_raw,
+			'scale_factor'           => $default_scale_factor,
+		)
+	);
 
 	if ( ! empty( $fluid_font_size_value ) ) {
 		return $fluid_font_size_value;
