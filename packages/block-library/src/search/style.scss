@@ -62,7 +62,8 @@
 		}
 	}
 
-	.wp-block-search__button {
+	// For lower specificity.
+	:where(.wp-block-search__button) {
 		padding: 0.125em 0.5em;
 	}
 }
