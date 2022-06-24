@@ -348,9 +348,8 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2', } = await resolveSelect.getPostType(
-			postType
-		);
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			await resolveSelect.getPostType( postType );
 		const autosaves = await apiFetch( {
 			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
