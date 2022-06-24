@@ -891,7 +891,7 @@
 					"additionalProperties": false
 				},
 				"filter": {
-					"description": "Filters to attach to the styles",
+					"description": "CSS and SVG filter styles.",
 					"type": "object",
 					"properties": {
 						"duotone": {
