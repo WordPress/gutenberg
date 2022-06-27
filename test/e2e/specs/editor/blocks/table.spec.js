@@ -15,32 +15,26 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Check for existence of the column count field.
-		const columnCountLabel = page.locator(
+		const columnCountInput = page.locator(
 			'role=spinbutton[name="Column count"i]'
 		);
-		await expect( columnCountLabel ).toHaveCount( 1 );
+		await expect( columnCountInput ).toBeVisible();
 
 		// Modify the column count.
-		await columnCountLabel.click();
-		const currentColumnCount = await page.evaluate(
-			() => document.activeElement.value
-		);
-		expect( currentColumnCount ).toBe( '2' );
+		await columnCountInput.click();
+		await expect( columnCountInput ).toHaveValue( '2' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '5' );
 
 		// Check for existence of the row count field.
-		const rowCountLabel = page.locator(
+		const rowCountInput = page.locator(
 			'role=spinbutton[name="Row count"i]'
 		);
-		await expect( rowCountLabel ).toHaveCount( 1 );
+		await expect( rowCountInput ).toBeVisible();
 
 		// Modify the row count.
-		await rowCountLabel.click();
-		const currentRowCount = await page.evaluate(
-			() => document.activeElement.value
-		);
-		expect( currentRowCount ).toBe( '2' );
+		await rowCountInput.click();
+		await expect( rowCountInput ).toHaveValue( '2' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '10' );
 
@@ -88,15 +82,15 @@ test.describe( 'Table', () => {
 		const footerSwitchSelector = 'role=checkbox[name="Footer section"i]';
 
 		// Expect the header and footer switches not to be present before the table has been created.
-		await expect( page.locator( headerSwitchSelector ) ).toHaveCount( 0 );
-		await expect( page.locator( footerSwitchSelector ) ).toHaveCount( 0 );
+		await expect( page.locator( headerSwitchSelector ) ).toBeHidden();
+		await expect( page.locator( footerSwitchSelector ) ).toBeHidden();
 
 		// // Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Expect the header and footer switches to be present now that the table has been created.
-		await expect( page.locator( headerSwitchSelector ) ).toHaveCount( 1 );
-		await expect( page.locator( footerSwitchSelector ) ).toHaveCount( 1 );
+		await expect( page.locator( headerSwitchSelector ) ).toBeVisible();
+		await expect( page.locator( footerSwitchSelector ) ).toBeVisible();
 
 		// // Toggle on the switches and add some content.
 		await page.locator( headerSwitchSelector ).check();
