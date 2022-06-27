@@ -674,8 +674,8 @@ button.wp-block-navigation-item__content {
 	position: relative;
 }
 
-// Adjust dialog top margin when admin-bar is visible.
-.admin-bar .wp-block-navigation__responsive-dialog {
+// Adjust open dialog top margin when admin-bar is visible.
+.has-modal-open .admin-bar .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.
