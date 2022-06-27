@@ -42,8 +42,6 @@ export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 		replaceBlock( block.clientId, recoverBlock( block ) );
 	};
 
-	attemptBlockRecovery();
-
 	return (
 		<TouchableWithoutFeedback
 			onPress={ attemptBlockRecovery }
