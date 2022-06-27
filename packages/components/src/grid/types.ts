@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type ResponsiveCSSValue< T > = Array< T | undefined > | T;
 
@@ -32,6 +32,10 @@ export type GridProps = {
 	 */
 	alignment?: GridAlignment;
 	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+	/**
 	 * Adjusts the number of columns of the `Grid`.
 	 *
 	 * @default 2
@@ -42,15 +46,15 @@ export type GridProps = {
 	 */
 	columnGap?: CSSProperties[ 'gridColumnGap' ];
 	/**
-	 * Changes the CSS display from `grid` to `inline-grid`.
-	 */
-	isInline?: boolean;
-	/**
 	 * Gap between each child.
 	 *
 	 * @default 3
 	 */
 	gap?: number;
+	/**
+	 * Changes the CSS display from `grid` to `inline-grid`.
+	 */
+	isInline?: boolean;
 	/**
 	 * Adjusts the inline alignment of children.
 	 */
@@ -71,8 +75,4 @@ export type GridProps = {
 	 * Adjusts the CSS grid `template-rows`.
 	 */
 	templateRows?: CSSProperties[ 'gridTemplateRows' ];
-	/**
-	 * The children elements.
-	 */
-	children: React.ReactNode;
 };
