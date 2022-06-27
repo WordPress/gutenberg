@@ -580,3 +580,76 @@ if ( function_exists( 'wp_render_typography_support' ) ) {
 	remove_filter( 'render_block', 'wp_render_typography_support' );
 }
 add_filter( 'render_block', 'gutenberg_render_typography_support', 10, 2 );
+
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'typography',
+	array(
+		'fontSize'       => array(
+			'property_keys' => array(
+				'default' => 'font-size',
+			),
+			'path'          => array( 'typography', 'fontSize' ),
+			'classnames'    => array(
+				'has-$slug-font-size' => 'font-size',
+			),
+		),
+		'fontFamily'     => array(
+			'property_keys' => array(
+				'default' => 'font-family',
+			),
+			'path'          => array( 'typography', 'fontFamily' ),
+			'classnames'    => array(
+				'has-$slug-font-family' => 'font-family',
+			),
+		),
+		'fontStyle'      => array(
+			'property_keys' => array(
+				'default' => 'font-style',
+			),
+			'path'          => array( 'typography', 'fontStyle' ),
+		),
+		'fontWeight'     => array(
+			'property_keys' => array(
+				'default' => 'font-weight',
+			),
+			'path'          => array( 'typography', 'fontWeight' ),
+		),
+		'lineHeight'     => array(
+			'property_keys' => array(
+				'default' => 'line-height',
+			),
+			'path'          => array( 'typography', 'lineHeight' ),
+		),
+		'textColumns'    => array(
+			'property_keys' => array(
+				'default' => 'column-count',
+			),
+			'path'          => array( 'typography', 'textColumns' ),
+		),
+		'textDecoration' => array(
+			'property_keys' => array(
+				'default' => 'text-decoration',
+			),
+			'path'          => array( 'typography', 'textDecoration' ),
+		),
+		'textTransform'  => array(
+			'property_keys' => array(
+				'default' => 'text-transform',
+			),
+			'path'          => array( 'typography', 'textTransform' ),
+		),
+		'letterSpacing'  => array(
+			'property_keys' => array(
+				'default' => 'letter-spacing',
+			),
+			'path'          => array( 'typography', 'letterSpacing' ),
+		),
+		'writingMode'    => array(
+			'property_keys' => array(
+				'default' => 'writing-mode',
+			),
+			'path'          => array( 'typography', 'writingMode' ),
+		),
+	)
+);

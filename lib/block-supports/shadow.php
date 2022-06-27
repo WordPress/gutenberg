@@ -75,3 +75,18 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_shadow_support',
 	)
 );
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'shadow',
+	array(
+		'shadow' => array(
+			'property_keys' => array(
+				'default' => 'box-shadow',
+			),
+			'path'          => array( 'shadow' ),
+			'css_vars'      => array(
+				'shadow' => '--wp--preset--shadow--$slug',
+			),
+		),
+	)
+);
