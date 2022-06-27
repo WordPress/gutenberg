@@ -646,7 +646,6 @@ export function renderNativeComponent(
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
 		content = renderChildren( props.value, context, legacyContext );
-		// eslint-disable-next-line no-unused-vars
 		const { value, ...restProps } = props;
 		props = restProps;
 	} else if (
