@@ -32,6 +32,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	const ELEMENTS = array(
 		'link'    => 'a',
+		'heading' => 'h1, h2, h3, h4, h5, h6',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
 		'h3'      => 'h3',
