@@ -223,6 +223,6 @@ function gutenberg_multiple_block_styles_compat_6_1( $metadata ) {
 	return $metadata;
 }
 
-remove_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
+remove_filter( 'block_type_metadata', '_wp_multiple_block_styles' );
 remove_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
 add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles_compat_6_1', 9 );
