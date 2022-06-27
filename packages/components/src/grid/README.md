@@ -39,6 +39,12 @@ Adjusts the horizontal and vertical alignment of children.
 
 -   Required: No
 
+##### `columnGap`: `CSSProperties['gridColumnGap']`
+
+Adjusts the `grid-column-gap`.
+
+-   Required: No
+
 ##### `columns`: `number | number[]`
 
 Adjusts the number of columns of the `Grid`.
