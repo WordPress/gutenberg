@@ -41,7 +41,19 @@ class Tests_Block_Template_Utils_6_1 extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_gutenberg_get_block_template_type_for_slug() {
+	public function test_gutenberg_get_block_template_type_for_slug_generic() {
+		$template_slug = 'single-' . self::$post->post_type;
+		$template_info = gutenberg_get_block_template_type_for_slug( $template_slug );
+		$this->assertSame(
+			array(
+				'title'       => 'Single item: Post',
+				'description' => 'Displays a single item: Post.',
+			),
+			$template_info
+		);
+	}
+
+	public function test_gutenberg_get_block_template_type_for_slug_individual() {
 		$template_slug = 'single-' . self::$post->post_type . '-' . self::$post->post_name;
 		$template_info = gutenberg_get_block_template_type_for_slug( $template_slug );
 		$this->assertSame(
