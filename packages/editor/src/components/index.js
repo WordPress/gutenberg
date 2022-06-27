@@ -41,7 +41,10 @@ export { default as PostPublishPanel } from './post-publish-panel';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';
-export { default as PostScheduleLabel } from './post-schedule/label';
+export {
+	default as PostScheduleLabel,
+	usePostScheduleLabel,
+} from './post-schedule/label';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';

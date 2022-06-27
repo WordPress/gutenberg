@@ -160,8 +160,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				title: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			};
 			updateNavigationLinkBlockAttributes(
 				linkSuggestion,
@@ -173,8 +172,7 @@ describe( 'edit', () => {
 				opensInNewTab: false,
 				label: 'Portfolio Category',
 				type: 'portfolio_category',
-				url:
-					'http://wordpress.local/portfolio_category/Portfolio-category/',
+				url: 'http://wordpress.local/portfolio_category/Portfolio-category/',
 			} );
 		} );
 

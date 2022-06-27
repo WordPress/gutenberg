@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import { isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { CONFIG, reduceMotion } from '../utils';
 import { useCx } from '../utils/hooks/use-cx';
+import { isValueDefined } from '../utils/values';
 
 /**
  * @param {number} value
@@ -49,13 +49,13 @@ export function useElevation( props ) {
 
 	const classes = useMemo( () => {
 		/** @type {number | undefined} */
-		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+		let hoverValue = isValueDefined( hover ) ? hover : value * 2;
 		/** @type {number | undefined} */
-		let activeValue = ! isNil( active ) ? active : value / 2;
+		let activeValue = isValueDefined( active ) ? active : value / 2;
 
 		if ( ! isInteractive ) {
-			hoverValue = ! isNil( hover ) ? hover : undefined;
-			activeValue = ! isNil( active ) ? active : undefined;
+			hoverValue = isValueDefined( hover ) ? hover : undefined;
+			activeValue = isValueDefined( active ) ? active : undefined;
 		}
 
 		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
@@ -76,7 +76,7 @@ export function useElevation( props ) {
 			reduceMotion( 'transition' )
 		);
 
-		if ( ! isNil( hoverValue ) ) {
+		if ( isValueDefined( hoverValue ) ) {
 			sx.hover = css`
 				*:hover > & {
 					box-shadow: ${ getBoxShadow( hoverValue ) };
@@ -84,7 +84,7 @@ export function useElevation( props ) {
 			`;
 		}
 
-		if ( ! isNil( activeValue ) ) {
+		if ( isValueDefined( activeValue ) ) {
 			sx.active = css`
 				*:active > & {
 					box-shadow: ${ getBoxShadow( activeValue ) };
@@ -92,7 +92,7 @@ export function useElevation( props ) {
 			`;
 		}
 
-		if ( ! isNil( focus ) ) {
+		if ( isValueDefined( focus ) ) {
 			sx.focus = css`
 				*:focus > & {
 					box-shadow: ${ getBoxShadow( focus ) };

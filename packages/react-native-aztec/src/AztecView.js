@@ -31,9 +31,8 @@ class AztecView extends Component {
 		this._onBackspace = this._onBackspace.bind( this );
 		this._onKeyDown = this._onKeyDown.bind( this );
 		this._onChange = this._onChange.bind( this );
-		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
-			this
-		);
+		this._onHTMLContentWithCursor =
+			this._onHTMLContentWithCursor.bind( this );
 		this._onFocus = this._onFocus.bind( this );
 		this._onBlur = this._onBlur.bind( this );
 		this._onSelectionChange = this._onSelectionChange.bind( this );
@@ -215,7 +214,6 @@ class AztecView extends Component {
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, ...otherProps } = this.props;
 		// `style` has to be destructured separately, without `otherProps`, because of:
 		// https://github.com/WordPress/gutenberg/issues/23611

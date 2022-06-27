@@ -67,24 +67,29 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle = ( settings ) => ( { onToggle, isOpen } ) => {
-	const { colorValue, label } = settings;
+const renderToggle =
+	( settings ) =>
+	( { onToggle, isOpen } ) => {
+		const { colorValue, label } = settings;
 
-	const toggleProps = {
-		onClick: onToggle,
-		className: classnames(
-			'block-editor-panel-color-gradient-settings__dropdown',
-			{ 'is-open': isOpen }
-		),
-		'aria-expanded': isOpen,
+		const toggleProps = {
+			onClick: onToggle,
+			className: classnames(
+				'block-editor-panel-color-gradient-settings__dropdown',
+				{ 'is-open': isOpen }
+			),
+			'aria-expanded': isOpen,
+		};
+
+		return (
+			<Button { ...toggleProps }>
+				<LabeledColorIndicator
+					colorValue={ colorValue }
+					label={ label }
+				/>
+			</Button>
+		);
 	};
-
-	return (
-		<Button { ...toggleProps }>
-			<LabeledColorIndicator colorValue={ colorValue } label={ label } />
-		</Button>
-	);
-};
 
 // Renders a collection of color controls as dropdowns. Depending upon the
 // context in which these dropdowns are being rendered, they may be wrapped
@@ -109,6 +114,7 @@ export default function ColorGradientSettingsDropdown( {
 		popoverProps = {
 			placement: 'left-start',
 			offset: 36,
+			__unstableShift: true,
 		};
 	}
 

@@ -11,6 +11,7 @@ import {
 	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -72,18 +73,22 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<table
-			{ ...useBlockProps.save( {
-				className: classes === '' ? undefined : classes,
-				style: { ...colorProps.style, ...borderProps.style },
-			} ) }
-		>
+		<figure { ...useBlockProps.save() }>
+			<table
+				className={ classes === '' ? undefined : classes }
+				style={ { ...colorProps.style, ...borderProps.style } }
+			>
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
+			</table>
 			{ hasCaption && (
-				<RichText.Content tagName="caption" value={ caption } />
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+					className={ __experimentalGetElementClassName( 'caption' ) }
+				/>
 			) }
-			<Section type="head" rows={ head } />
-			<Section type="body" rows={ body } />
-			<Section type="foot" rows={ foot } />
-		</table>
+		</figure>
 	);
 }

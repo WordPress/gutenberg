@@ -75,14 +75,14 @@ function TemplatePartItem( {
 	clientId,
 	closeTemplateDetailsDropdown,
 } ) {
-	const { selectBlock, toggleBlockHighlight } = useDispatch(
-		blockEditorStore
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 	const templatePartArea = useSelect(
 		( select ) => {
-			const defaultAreas = select(
-				editorStore
-			).__experimentalGetDefaultTemplatePartAreas();
+			const defaultAreas =
+				select(
+					editorStore
+				).__experimentalGetDefaultTemplatePartAreas();
 
 			return defaultAreas.find(
 				( defaultArea ) => defaultArea.area === templatePart.area

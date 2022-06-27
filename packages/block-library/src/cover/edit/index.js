@@ -10,7 +10,7 @@ import namesPlugin from 'colord/plugins/names';
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Placeholder, Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
 	withColors,
@@ -120,9 +120,8 @@ function CoverEdit( {
 		? IMAGE_BACKGROUND_TYPE
 		: attributes.backgroundType;
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes, dimRatio );
@@ -212,23 +211,31 @@ function CoverEdit( {
 		overlayColor,
 	};
 
-	if ( ! hasInnerBlocks && ! hasBackground ) {
+	const blockControls = (
+		<CoverBlockControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			onSelectMedia={ onSelectMedia }
+			currentSettings={ currentSettings }
+		/>
+	);
+
+	const inspectorControls = (
+		<CoverInspectorControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			clientId={ clientId }
+			setOverlayColor={ setOverlayColor }
+			coverRef={ ref }
+			currentSettings={ currentSettings }
+		/>
+	);
+
+	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				<CoverBlockControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					onSelectMedia={ onSelectMedia }
-					currentSettings={ currentSettings }
-				/>
-				<CoverInspectorControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-					setOverlayColor={ setOverlayColor }
-					coverRef={ ref }
-					currentSettings={ currentSettings }
-				/>
+				{ blockControls }
+				{ inspectorControls }
 				<div
 					{ ...blockProps }
 					className={ classnames(
@@ -279,29 +286,16 @@ function CoverEdit( {
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			'has-custom-content-position': ! isContentPositionCenter(
-				contentPosition
-			),
+			'has-custom-content-position':
+				! isContentPositionCenter( contentPosition ),
 		},
 		getPositionClassName( contentPosition )
 	);
 
 	return (
 		<>
-			<CoverBlockControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				onSelectMedia={ onSelectMedia }
-				currentSettings={ currentSettings }
-			/>
-			<CoverInspectorControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-				setOverlayColor={ setOverlayColor }
-				coverRef={ ref }
-				currentSettings={ currentSettings }
-			/>
+			{ blockControls }
+			{ inspectorControls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
@@ -324,25 +318,34 @@ function CoverEdit( {
 					showHandle={ isSelected }
 				/>
 
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__background',
-						dimRatioToClass( dimRatio ),
-						{
-							[ overlayColor.class ]: overlayColor.class,
-							'has-background-dim': dimRatio !== undefined,
-							// For backwards compatibility. Former versions of the Cover Block applied
-							// `.wp-block-cover__gradient-background` in the presence of
-							// media, a gradient and a dim.
-							'wp-block-cover__gradient-background':
-								url && gradientValue && dimRatio !== 0,
-							'has-background-gradient': gradientValue,
-							[ gradientClass ]: gradientClass,
-						}
-					) }
-					style={ { backgroundImage: gradientValue, ...bgStyle } }
-				/>
+				{ ( ! useFeaturedImage || url ) && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							dimRatioToClass( dimRatio ),
+							{
+								[ overlayColor.class ]: overlayColor.class,
+								'has-background-dim': dimRatio !== undefined,
+								// For backwards compatibility. Former versions of the Cover Block applied
+								// `.wp-block-cover__gradient-background` in the presence of
+								// media, a gradient and a dim.
+								'wp-block-cover__gradient-background':
+									url && gradientValue && dimRatio !== 0,
+								'has-background-gradient': gradientValue,
+								[ gradientClass ]: gradientClass,
+							}
+						) }
+						style={ { backgroundImage: gradientValue, ...bgStyle } }
+					/>
+				) }
+
+				{ ! url && useFeaturedImage && (
+					<Placeholder
+						className="wp-block-cover__image--placeholder-image"
+						withIllustration={ true }
+					/>
+				) }
 
 				{ url &&
 					isImageBackground &&

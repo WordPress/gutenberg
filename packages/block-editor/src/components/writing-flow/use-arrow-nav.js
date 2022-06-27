@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, reverse } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -43,9 +38,25 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 		return true;
 	}
 
-	// Native inputs should not navigate horizontally.
 	const { tagName } = element;
-	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
+
+	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
+	if ( tagName === 'INPUT' ) {
+		const simpleInputTypes = [
+			'button',
+			'checkbox',
+			'color',
+			'file',
+			'image',
+			'radio',
+			'reset',
+			'submit',
+		];
+		return simpleInputTypes.includes( element.getAttribute( 'type' ) );
+	}
+
+	// Native textareas should not navigate horizontally.
+	return tagName !== 'TEXTAREA';
 }
 
 /**
@@ -73,7 +84,7 @@ export function getClosestTabbable(
 	let focusableNodes = focus.focusable.find( containerElement );
 
 	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
+		focusableNodes.reverse();
 	}
 
 	// Consider as candidates those focusables after the current target. It's
@@ -114,7 +125,7 @@ export function getClosestTabbable(
 		return true;
 	}
 
-	return find( focusableNodes, isTabCandidate );
+	return focusableNodes.find( isTabCandidate );
 }
 
 export default function useArrowNav() {
@@ -215,7 +226,8 @@ export default function useArrowNav() {
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+				const selectionEndClientId =
+					getMultiSelectedBlocksEndClientId();
 				const selectionBeforeEndClientId = getPreviousBlockClientId(
 					selectionEndClientId || selectedBlockClientId
 				);

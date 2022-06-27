@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
+
+const noop = () => {};
 
 function ActionItemSlot( {
 	name,

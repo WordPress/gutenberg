@@ -3,7 +3,6 @@
  */
 import './hooks';
 export {
-	PresetDuotoneFilter as __unstablePresetDuotoneFilter,
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,

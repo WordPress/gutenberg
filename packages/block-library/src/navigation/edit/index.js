@@ -79,8 +79,8 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 	setColor( getComputedStyle( colorsDetectionElement ).color );
 
 	let backgroundColorNode = colorsDetectionElement;
-	let backgroundColor = getComputedStyle( backgroundColorNode )
-		.backgroundColor;
+	let backgroundColor =
+		getComputedStyle( backgroundColorNode ).backgroundColor;
 	while (
 		backgroundColor === 'rgba(0, 0, 0, 0)' &&
 		backgroundColorNode.parentNode &&
@@ -88,8 +88,8 @@ function detectColors( colorsDetectionElement, setColor, setBackground ) {
 			backgroundColorNode.parentNode.ELEMENT_NODE
 	) {
 		backgroundColorNode = backgroundColorNode.parentNode;
-		backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
+		backgroundColor =
+			getComputedStyle( backgroundColorNode ).backgroundColor;
 	}
 
 	setBackground( backgroundColor );
@@ -147,12 +147,10 @@ function Navigation( {
 		name: 'block-library/core/navigation/delete',
 	} );
 
-	const [
-		showNavigationMenuCreateNotice,
-		hideNavigationMenuCreateNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/create',
-	} );
+	const [ showNavigationMenuCreateNotice, hideNavigationMenuCreateNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/create',
+		} );
 
 	const {
 		create: createNavigationMenu,
@@ -199,16 +197,16 @@ function Navigation( {
 		hasSubmenus,
 	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlocks, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
+			const { getBlock, getBlocks, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 
 			// This relies on the fact that `getBlock` won't return controlled
 			// inner blocks, while `getBlocks` does. It might be more stable to
 			// introduce a selector like `getUncontrolledInnerBlocks`, just in
 			// case `getBlock` is fixed.
 			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
-			const _hasUncontrolledInnerBlocks = !! _uncontrolledInnerBlocks?.length;
+			const _hasUncontrolledInnerBlocks =
+				!! _uncontrolledInnerBlocks?.length;
 			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
 				? EMPTY_ARRAY
 				: getBlocks( clientId );
@@ -233,14 +231,11 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const [
-		hasSavedUnsavedInnerBlocks,
-		setHasSavedUnsavedInnerBlocks,
-	] = useState( false );
+	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
+		useState( false );
 
-	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
-		false
-	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
+		useState( false );
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
@@ -335,10 +330,8 @@ function Navigation( {
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': 'never' !== overlayMenu,
 				'has-text-color': !! textColor.color || !! textColor?.class,
-				[ getColorClassName(
-					'color',
-					textColor?.slug
-				) ]: !! textColor?.slug,
+				[ getColorClassName( 'color', textColor?.slug ) ]:
+					!! textColor?.slug,
 				'has-background':
 					!! backgroundColor.color || backgroundColor.class,
 				[ getColorClassName(
@@ -360,10 +353,8 @@ function Navigation( {
 	const overlayClassnames = classnames( {
 		'has-text-color':
 			!! overlayTextColor.color || !! overlayTextColor?.class,
-		[ getColorClassName(
-			'color',
-			overlayTextColor?.slug
-		) ]: !! overlayTextColor?.slug,
+		[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
+			!! overlayTextColor?.slug,
 		'has-background':
 			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
 		[ getColorClassName(
@@ -481,6 +472,7 @@ function Navigation( {
 
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
+				ref &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
@@ -506,19 +498,16 @@ function Navigation( {
 	] );
 
 	const navigationSelectorRef = useRef();
-	const [
-		shouldFocusNavigationSelector,
-		setShouldFocusNavigationSelector,
-	] = useState( false );
+	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
+		useState( false );
 	const handleSelectNavigation = useCallback(
 		( navPostOrClassicMenu ) => {
 			if ( ! navPostOrClassicMenu ) {
 				return;
 			}
 
-			const isClassicMenu = navPostOrClassicMenu.hasOwnProperty(
-				'auto_add'
-			);
+			const isClassicMenu =
+				navPostOrClassicMenu.hasOwnProperty( 'auto_add' );
 
 			if ( isClassicMenu ) {
 				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
