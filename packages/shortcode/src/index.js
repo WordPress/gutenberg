@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -288,7 +287,7 @@ const shortcode = Object.assign(
 			this.attrs = attributes;
 			// Handle a flat object of attributes.
 		} else {
-			forEach( attributes, ( value, key ) => {
+			Object.entries( attributes ).forEach( ( [ key, value ] ) => {
 				this.set( key, value );
 			} );
 		}
@@ -345,7 +344,7 @@ Object.assign( shortcode.prototype, {
 	string() {
 		let text = '[' + this.tag;
 
-		forEach( this.attrs.numeric, ( value ) => {
+		this.attrs.numeric.forEach( ( value ) => {
 			if ( /\s/.test( value ) ) {
 				text += ' "' + value + '"';
 			} else {
@@ -353,7 +352,7 @@ Object.assign( shortcode.prototype, {
 			}
 		} );
 
-		forEach( this.attrs.named, ( value, name ) => {
+		Object.entries( this.attrs.named ).forEach( ( [ name, value ] ) => {
 			text += ' ' + name + '="' + value + '"';
 		} );
 
