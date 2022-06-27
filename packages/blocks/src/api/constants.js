@@ -130,6 +130,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
 	},
+	buttonColor: {
+		value: [ 'elements', 'button', 'color', 'text' ],
+		support: [ 'color', 'button' ],
+	},
+	buttonBackgroundColor: {
+		value: [ 'elements', 'button', 'color', 'background' ],
+		support: [ 'color', 'button' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],

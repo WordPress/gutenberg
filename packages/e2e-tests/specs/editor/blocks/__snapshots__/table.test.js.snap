@@ -2,7 +2,7 @@
 
 exports[`Table allows a caption to be added 1`] = `
 "<!-- wp:table -->
-<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table><figcaption>Caption!</figcaption></figure>
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table><figcaption class=\\"wp-element-caption\\">Caption!</figcaption></figure>
 <!-- /wp:table -->"
 `;
 

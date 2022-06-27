@@ -114,6 +114,15 @@
 			"default": {
 				"type": "flex"
 			}
+		},
+		"__experimentalStyle": {
+			"elements": {
+				"link": {
+					"color": {
+						"text": "inherit"
+					}
+				}
+			}
 		}
 	},
 	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],

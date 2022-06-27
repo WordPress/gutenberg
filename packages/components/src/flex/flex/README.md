@@ -1,9 +1,5 @@
 # Flex
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
 
 ## Usage
@@ -12,20 +8,19 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import {
-	__experimentalFlex as Flex,
-	__experimentalFlexBlock as FlexBlock,
-	__experimentalFlexItem as FlexItem,
-	__experimentalText as Text,
+	Flex,
+	FlexBlock,
+	FlexItem,
 } from '@wordpress/components';
 
 function Example() {
 	return (
 		<Flex>
 			<FlexItem>
-				<Text>Code</Text>
+				<p>Code</p>
 			</FlexItem>
 			<FlexBlock>
-				<Text>Poetry</Text>
+				<p>Poetry</p>
 			</FlexBlock>
 		</Flex>
 	);
