@@ -66,7 +66,7 @@ function render_block_core_cover( $attributes, $content ) {
 		 */
 		$inner_container_start = '/<div\b[^>]+wp-block-cover__inner-container[\s|"][^>]*>/U';
 		if ( 1 === preg_match( $inner_container_start, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$offset = $matches[0][1];
+			$offset  = $matches[0][1];
 			$content = substr( $content, 0, $offset ) . $image . substr( $content, $offset );
 		}
 	}
