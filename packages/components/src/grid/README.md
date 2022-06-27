@@ -45,7 +45,7 @@ Adjusts the `grid-column-gap`.
 
 -   Required: No
 
-##### `columns`: `number | number[]`
+##### `columns`: `number`
 
 Adjusts the number of columns of the `Grid`.
 
@@ -77,7 +77,7 @@ Adjusts the `grid-row-gap`.
 
 -   Required: No
 
-##### `rows`: `number | number[]`
+##### `rows`: `number`
 
 Adjusts the number of rows of the `Grid`.
 

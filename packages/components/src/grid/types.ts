@@ -3,7 +3,10 @@
  */
 import type { CSSProperties, ReactNode } from 'react';
 
-type ResponsiveCSSValue< T > = Array< T | undefined > | T;
+/**
+ * Internal dependencies
+ */
+import type { ResponsiveCSSValue } from '../ui/utils/types';
 
 type GridAlignment =
 	| 'bottom'
@@ -17,10 +20,6 @@ type GridAlignment =
 	| 'top'
 	| 'topLeft'
 	| 'topRight';
-
-type GridColumns = ResponsiveCSSValue< number >;
-
-type GridRows = ResponsiveCSSValue< number >;
 
 export type GridProps = {
 	/**
@@ -40,7 +39,7 @@ export type GridProps = {
 	 *
 	 * @default 2
 	 */
-	columns?: GridColumns;
+	columns?: ResponsiveCSSValue< number >;
 	/**
 	 * Adjusts the `grid-column-gap`.
 	 */
@@ -66,7 +65,7 @@ export type GridProps = {
 	/**
 	 * Adjusts the number of rows of the `Grid`.
 	 */
-	rows?: GridRows;
+	rows?: ResponsiveCSSValue< number >;
 	/**
 	 * Adjusts the CSS grid `template-columns`.
 	 */
