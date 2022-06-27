@@ -49,7 +49,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	if ( $use_global_query ) {
 		global $wp_query;
 		$query = $wp_query;
-	}  else {
+	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 		$query      = new WP_Query( $query_args );
 	}
