@@ -274,7 +274,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$block_template->id   = $id;
 	$block_template->slug = $slug;
 
-	$template_type_info          = gutenberg_get_block_template_type_for_slug();
+	$template_type_info          = gutenberg_get_block_template_type_for_slug( $slug );
 	$block_template->title       = $template_type_info['title'];
 	$block_template->description = $template_type_info['description'];
 
