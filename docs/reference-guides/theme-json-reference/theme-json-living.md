@@ -174,7 +174,7 @@ Typography styles.
 
 ### filter
 
-Filters to attach to the styles
+CSS and SVG filter styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
