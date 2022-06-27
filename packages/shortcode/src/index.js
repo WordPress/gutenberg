@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isString, isEqual, forEach } from 'lodash';
+import { isString, isEqual, forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -262,12 +262,8 @@ export function fromMatch( match ) {
  */
 const shortcode = Object.assign(
 	function ( options ) {
-		Object.assign(
-			this,
-			pick( options || {}, 'tag', 'attrs', 'type', 'content' )
-		);
-
-		const attributes = this.attrs;
+		const { tag, attrs: attributes, type, content } = options || {};
+		Object.assign( this, { tag, type, content } );
 
 		// Ensure we have a correctly formatted `attrs` object.
 		this.attrs = {
