@@ -27,10 +27,9 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
+			setUserConfig,
+		] ),
 	];
 };
 
@@ -183,9 +182,17 @@ export function getSupportedGlobalStylesPanels( name ) {
 
 	const supportKeys = [];
 
-	// TODO: In order to remove the block gap CSS variable from `STYLE_PROPERTY`, we need to update the logic here.
-	// Before landing this change, let's find a better place for this type of check so that it's a little more declarative?
-	if ( blockType?.supports?.spacing?.blockGap ) {
+	// Check for blockGap support.
+	// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
+	// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		blockType?.supports?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.__experimentalSkipSerialization !==
+			true &&
+		! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+			( spacingType ) => spacingType === 'blockGap'
+		)
+	) {
 		supportKeys.push( 'blockGap' );
 	}
 
