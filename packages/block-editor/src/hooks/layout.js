@@ -146,7 +146,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 											'Nested blocks use theme content width with options for full and wide widths.'
 									  )
 									: __(
-											'Nested blocks will fill the width of this container'
+											'Nested blocks will fill the width of this container.'
 									  ) }
 							</p>
 						</>
