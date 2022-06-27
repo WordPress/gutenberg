@@ -20,6 +20,8 @@ import { isValueEmpty } from '../utils/values';
 
 export function NumberControl(
 	{
+		/** @type {('default'|'large')} */
+		__unstableSize = 'default',
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
@@ -178,6 +180,7 @@ export function NumberControl(
 			min={ min }
 			ref={ ref }
 			required={ required }
+			size={ __unstableSize === 'large' ? '__unstable-large' : 'default' }
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
