@@ -31,9 +31,16 @@ import {
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
+import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
+
+const SUPPORT_FEATURES = {
+	__experimentalBorder: 'border',
+	color: 'color',
+	spacing: 'spacing',
+	typography: 'typography',
+};
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -403,6 +410,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
 				selector: blockSelectors[ blockName ].selector,
 				styles: blockStyles,
+				featureSelectors: blockSelectors[ blockName ].featureSelectors,
 			} );
 		}
 
@@ -522,7 +530,33 @@ export const toStyles = (
 			styles,
 			fallbackGapValue,
 			hasLayoutSupport,
+			featureSelectors,
 		} ) => {
+			// Process styles for block support features with custom feature level
+			// CSS selectors set.
+			if ( featureSelectors ) {
+				Object.entries( featureSelectors ).forEach(
+					( [ featureName, featureSelector ] ) => {
+						if ( styles?.[ featureName ] ) {
+							const featureStyles = {
+								[ featureName ]: styles[ featureName ],
+							};
+							const featureDeclarations =
+								getStylesDeclarations( featureStyles );
+							delete styles[ featureName ];
+
+							if ( !! featureDeclarations.length ) {
+								ruleset =
+									ruleset +
+									`${ featureSelector }{${ featureDeclarations.join(
+										';'
+									) } }`;
+							}
+						}
+					}
+				);
+			}
+
 			const duotoneStyles = {};
 			if ( styles?.filter ) {
 				duotoneStyles.filter = styles.filter;
@@ -579,7 +613,7 @@ export const toStyles = (
 
 						// `selector` maybe provided in a form
 						// where block level selectors have sub element
-						// selectors appended to them as a comma seperated
+						// selectors appended to them as a comma separated
 						// string.
 						// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
 						// Split and append pseudo selector to create
@@ -645,7 +679,7 @@ export function toSvgFilters( tree, blockSelectors ) {
 	} );
 }
 
-const getBlockSelectors = ( blockTypes ) => {
+export const getBlockSelectors = ( blockTypes ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
@@ -657,9 +691,29 @@ const getBlockSelectors = ( blockTypes ) => {
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+
+		// For each block support feature add any custom selectors.
+		const featureSelectors = {};
+		Object.entries( SUPPORT_FEATURES ).forEach(
+			( [ featureKey, featureName ] ) => {
+				const featureSelector =
+					blockType?.supports?.[ featureKey ]?.__experimentalSelector;
+
+				if ( featureSelector ) {
+					featureSelectors[ featureName ] = scopeSelector(
+						selector,
+						featureSelector
+					);
+				}
+			}
+		);
+
 		result[ name ] = {
 			duotoneSelector,
 			fallbackGapValue,
+			featureSelectors: Object.keys( featureSelectors ).length
+				? featureSelectors
+				: undefined,
 			hasLayoutSupport,
 			name,
 			selector,
