@@ -83,36 +83,44 @@ function segmentHTMLToShortcodeBlock(
 			] );
 		}
 
-		const attributes = mapValues(
-			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
+		const blockType = getBlockType( transformation.blockName );
+		let block;
+		if ( typeof transformation.__experimentalTransform === 'function' ) {
 			// Passing all of `match` as second argument is intentionally broad
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			( schema ) => schema.shortcode( match.shortcode.attrs, match )
-		);
+			block = transformation.__experimentalTransform(
+				match.shortcode.attrs,
+				match
+			);
+		} else {
+			const attributes = mapValues(
+				pickBy(
+					transformation.attributes,
+					( schema ) => schema.shortcode
+				),
+				// Passing all of `match` as second argument is intentionally broad
+				// but shouldn't be too relied upon.
+				//
+				// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+				( schema ) => schema.shortcode( match.shortcode.attrs, match )
+			);
 
-		const blockType = getBlockType( transformation.blockName );
-		if ( ! blockType ) {
-			return [ HTML ];
+			blockType.attributes = transformation.attributes;
+
+			block = createBlock(
+				transformation.blockName,
+				getBlockAttributes(
+					blockType,
+					match.shortcode.content,
+					attributes
+				)
+			);
 		}
-
-		const transformationBlockType = {
-			...blockType,
-			attributes: transformation.attributes,
-		};
-
-		let block = createBlock(
-			transformation.blockName,
-			getBlockAttributes(
-				transformationBlockType,
-				match.shortcode.content,
-				attributes
-			)
-		);
 		block.originalContent = match.shortcode.content;
 		// Applying the built-in fixes can enhance the attributes with missing content like "className".
-		block = applyBuiltInValidationFixes( block, transformationBlockType );
+		block = applyBuiltInValidationFixes( block, blockType );
 
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML ),

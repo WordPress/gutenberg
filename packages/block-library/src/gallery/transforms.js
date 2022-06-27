@@ -195,16 +195,6 @@ const transforms = {
 						}
 					},
 				},
-				shortCodeTransforms: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: parseInt( id ),
-							} ) );
-						}
-					},
-				},
 				columns: {
 					type: 'number',
 					shortcode: ( { named: { columns = '3' } } ) => {
@@ -234,6 +224,21 @@ const transforms = {
 						}
 					},
 				},
+			},
+			__experimentalTransform( { named: { ids } } ) {
+				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
+					parseInt( id, 10 )
+				);
+
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{},
+					imageIds.map( ( imageId ) =>
+						createBlock( 'core/image', { id: imageId } )
+					)
+				);
+
+				return galleryBlock;
 			},
 			isMatch( { named } ) {
 				return undefined !== named.ids;
