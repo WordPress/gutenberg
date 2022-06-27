@@ -14,10 +14,10 @@ import {
 	WordPressComponentProps,
 } from '../ui/context';
 import { DividerView } from './styles';
-import type { Props } from './types';
+import type { DividerProps } from './types';
 
 function UnconnectedDivider(
-	props: WordPressComponentProps< Props, 'hr', false >,
+	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );
@@ -34,7 +34,6 @@ function UnconnectedDivider(
 /**
  * `Divider` is a layout component that separates groups of related content.
  *
- * @example
  * ```js
  * import {
  * 		__experimentalDivider as Divider,
