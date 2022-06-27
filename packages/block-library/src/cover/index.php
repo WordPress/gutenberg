@@ -69,7 +69,6 @@ function render_block_core_cover( $attributes, $content ) {
 			$offset = $matches[0][1];
 			$content = substr( $content, 0, $offset ) . $image . substr( $content, $offset );
 		}
-
 	}
 
 	return $content;
