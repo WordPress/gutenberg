@@ -181,6 +181,57 @@ function gutenberg_get_template_slugs( $template ) {
 	return $slugs;
 }
 
+function gutenberg_get_block_template_type_for_slug( $slug ) {
+	$slug_parts = explode( '-', $slug, 3 );
+
+	if ( count( $slug_parts ) > 1 ) {
+		if ( 'single' === $slug_parts [0] ) {
+			// Get CPT labels
+			$post_type = get_post_type_object( $slug_parts[1] );
+			$labels    = $post_type->labels;
+
+			if ( count( $slug_parts ) > 2 ) {
+				// Now we look for the CPT with slug as defined in $slug_parts[2]
+				$post  = get_page_by_path( $slug_parts[2], OBJECT, $slug_parts[1] );
+				$title = sprintf(
+					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
+					__( '%1$s: %2$s' ),
+					$labels->singular_name,
+					$post->post_title
+				);
+				$description = sprintf(
+						// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
+					__( 'Template for %1$s' ),
+					$title
+				);
+			} else {
+				$title = sprintf(
+					// translators: %s: Name of the post type e.g: "Post".
+					__( 'Single item: %s' ),
+					$labels->singular_name
+				);
+				$description = sprintf(
+					// translators: %s: Name of the post type e.g: "Post".
+					__( 'Displays a single item: %s.' ),
+					$labels->singular_name
+				);
+			}
+		}
+	} else {
+		$default_template_types = get_default_block_template_types();
+
+		if ( array_key_exists( $slug, $default_template_types ) ) {
+			$title       = $default_template_types[ $slug ]['title'];
+			$description = $default_template_types[ $slug ]['description'];
+		}
+	}
+
+	return array(
+		'title'       => $title,
+		'description' => $description,
+	);
+}
+
 /**
  * Retrieves a single unified template object using its id.
  *
@@ -220,48 +271,12 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 	// This might give us a fallback template with a different ID,
 	// so we have to override it to make sure it's correct.
-	$block_template->id     = $id;
-	$block_template->slug   = $slug;
-	$default_template_types = get_default_block_template_types();
+	$block_template->id   = $id;
+	$block_template->slug = $slug;
 
-	$slug_parts = explode( '-', $slug, 3 );
-	if ( count( $slug_parts ) > 1 ) {
-		if ( 'single' === $slug_parts [0] ) {
-			// Get CPT labels
-			$post_type = get_post_type_object( $slug_parts[1] );
-			$labels    = $post_type->labels;
-
-			if ( count( $slug_parts ) > 2 ) {
-				// Now we look for the CPT with slug as defined in $slug_parts[2]
-				$post                  = get_page_by_path( $slug_parts[2], OBJECT, $slug_parts[1] );
-				$block_template->title = sprintf(
-					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
-					__( '%1$s: %2$s' ),
-					$labels->singular_name,
-					$post->post_title
-				);
-				$block_template->description = sprintf(
-						// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
-					__( 'Template for %1$s' ),
-					$block_template->title
-				);
-			} else {
-				$block_template->title = sprintf(
-					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Single item: %s' ),
-					$labels->singular_name
-				);
-				$block_template->description = sprintf(
-					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Displays a single item: %s.' ),
-					$labels->singular_name
-				);
-			}
-		}
-	} elseif ( array_key_exists( $slug, $default_template_types ) ) {
-		$block_template->title       = $default_template_types[ $slug ]['title'];
-		$block_template->description = $default_template_types[ $slug ]['description'];
-	}
+	$template_type_info          = gutenberg_get_block_template_type_for_slug();
+	$block_template->title       = $template_type_info['title'];
+	$block_template->description = $template_type_info['description'];
 
 	/**
 	 * Filters the queried block template object after it's been fetched.
