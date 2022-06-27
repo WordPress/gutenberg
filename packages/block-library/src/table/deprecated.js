@@ -10,6 +10,9 @@ import {
 	RichText,
 	getColorClassName,
 	useBlockProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
 const supports = {
@@ -421,6 +424,220 @@ const deprecated = [
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
 				</table>
+			);
+		},
+	},
+	{
+		attributes: {
+			hasFixedLayout: {
+				type: 'boolean',
+				default: false,
+			},
+			caption: {
+				type: 'string',
+				source: 'html',
+				selector: 'figcaption',
+				default: '',
+			},
+			head: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'thead tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+							align: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'data-align',
+							},
+						},
+					},
+				},
+			},
+			body: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'tbody tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+							align: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'data-align',
+							},
+						},
+					},
+				},
+			},
+			foot: {
+				type: 'array',
+				default: [],
+				source: 'query',
+				selector: 'tfoot tr',
+				query: {
+					cells: {
+						type: 'array',
+						default: [],
+						source: 'query',
+						selector: 'td,th',
+						query: {
+							content: {
+								type: 'string',
+								source: 'html',
+							},
+							tag: {
+								type: 'string',
+								default: 'td',
+								source: 'tag',
+							},
+							scope: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'scope',
+							},
+							align: {
+								type: 'string',
+								source: 'attribute',
+								attribute: 'data-align',
+							},
+						},
+					},
+				},
+			},
+		},
+		supports: {
+			anchor: true,
+			align: true,
+			__experimentalSelector: '.wp-block-table > table',
+		},
+		save: ( { attributes } ) => {
+			const { hasFixedLayout, head, body, foot, caption } = attributes;
+			const isEmpty = ! head.length && ! body.length && ! foot.length;
+
+			if ( isEmpty ) {
+				return null;
+			}
+
+			const colorProps = getColorClassesAndStyles( attributes );
+			const borderProps = getBorderClassesAndStyles( attributes );
+
+			const classes = classnames(
+				colorProps.className,
+				borderProps.className,
+				{
+					'has-fixed-layout': hasFixedLayout,
+				}
+			);
+
+			const hasCaption = ! RichText.isEmpty( caption );
+
+			const Section = ( { type, rows } ) => {
+				if ( ! rows.length ) {
+					return null;
+				}
+
+				const Tag = `t${ type }`;
+
+				return (
+					<Tag>
+						{ rows.map( ( { cells }, rowIndex ) => (
+							<tr key={ rowIndex }>
+								{ cells.map(
+									(
+										{ content, tag, scope, align },
+										cellIndex
+									) => {
+										const cellClasses = classnames( {
+											[ `has-text-align-${ align }` ]:
+												align,
+										} );
+
+										return (
+											<RichText.Content
+												className={
+													cellClasses
+														? cellClasses
+														: undefined
+												}
+												data-align={ align }
+												tagName={ tag }
+												value={ content }
+												key={ cellIndex }
+												scope={
+													tag === 'th'
+														? scope
+														: undefined
+												}
+											/>
+										);
+									}
+								) }
+							</tr>
+						) ) }
+					</Tag>
+				);
+			};
+
+			return (
+				<figure { ...useBlockProps.save() }>
+					<table
+						className={ classes === '' ? undefined : classes }
+						style={ { ...colorProps.style, ...borderProps.style } }
+					>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+					{ hasCaption && (
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+						/>
+					) }
+				</figure>
 			);
 		},
 	},
