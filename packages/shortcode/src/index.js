@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, isEqual, forEach } from 'lodash';
+import { isEqual, forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -276,7 +276,7 @@ const shortcode = Object.assign(
 		}
 
 		// Parse a string of attributes.
-		if ( isString( attributes ) ) {
+		if ( typeof attributes === 'string' ) {
 			this.attrs = attrs( attributes );
 			// Identify a correctly formatted `attrs` object.
 		} else if (
