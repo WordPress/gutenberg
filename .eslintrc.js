@@ -86,6 +86,7 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'extend',
 							'findIndex',
 							'findKey',
 							'findLast',
