@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { extend, pick, isString, isEqual, forEach } from 'lodash';
+import { pick, isString, isEqual, forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -260,9 +260,9 @@ export function fromMatch( match ) {
  *
  * @return {WPShortcode} Shortcode instance.
  */
-const shortcode = extend(
+const shortcode = Object.assign(
 	function ( options ) {
-		extend(
+		Object.assign(
 			this,
 			pick( options || {}, 'tag', 'attrs', 'type', 'content' )
 		);
@@ -304,7 +304,7 @@ const shortcode = extend(
 	}
 );
 
-extend( shortcode.prototype, {
+Object.assign( shortcode.prototype, {
 	/**
 	 * Get a shortcode attribute.
 	 *
