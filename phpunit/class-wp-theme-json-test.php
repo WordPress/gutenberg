@@ -2821,4 +2821,119 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( $expected, $actual );
 	}
+
+	/**
+	 * Testing that dynamic properties in theme.json return the value they refrence, e.g.
+	 * array( 'ref' => 'styles.color.background' ) => "#ffffff".
+	 */
+	function test_get_property_value_valid() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'color'    => array(
+						'background' => '#ffffff',
+						'text'       => '#000000',
+					),
+					'elements' => array(
+						'button' => array(
+							'color' => array(
+								'background' => array( 'ref' => 'styles.color.text' ),
+								'text'       => array( 'ref' => 'styles.color.background' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }body{background-color: #ffffff;color: #000000;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-element-button, .wp-block-button__link{background-color: #000000;color: #ffffff;}';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * Testing that dynamic properties in theme.json that
+	 * refer to other dynamic properties in a loop
+	 * then they should be left untouched.
+	 *
+	 * @expectedIncorrectUsage get_property_value
+	 */
+	function test_get_property_value_loop() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'color'    => array(
+						'background' => '#ffffff',
+						'text'       => array( 'ref' => 'styles.elements.button.color.background' ),
+					),
+					'elements' => array(
+						'button' => array(
+							'color' => array(
+								'background' => array( 'ref' => 'styles.color.text' ),
+								'text'       => array( 'ref' => 'styles.color.background' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }body{background-color: #ffffff;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-element-button, .wp-block-button__link{color: #ffffff;}';
+		$this->assertSame( $expected, $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * Testing that dynamic properties in theme.json that
+	 * refer to other dynamic properties then they should be left unprocessed.
+	 *
+	 * @expectedIncorrectUsage get_property_value
+	 */
+	function test_get_property_value_recursion() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'color'    => array(
+						'background' => '#ffffff',
+						'text'       => array( 'ref' => 'styles.color.background' ),
+					),
+					'elements' => array(
+						'button' => array(
+							'color' => array(
+								'background' => array( 'ref' => 'styles.color.text' ),
+								'text'       => array( 'ref' => 'styles.color.background' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }body{background-color: #ffffff;color: #ffffff;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-element-button, .wp-block-button__link{color: #ffffff;}';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+	}
+
+	/**
+	 * Testing that dynamic properties in theme.json that
+	 * refer to themselves then they should be left unprocessed.
+	 *
+	 * @expectedIncorrectUsage get_property_value
+	 */
+	function test_get_property_value_self() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'color' => array(
+						'background' => '#ffffff',
+						'text'       => array( 'ref' => 'styles.color.text' ),
+					),
+				),
+			)
+		);
+
+		$expected = 'body { margin: 0; }body{background-color: #ffffff;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+	}
 }

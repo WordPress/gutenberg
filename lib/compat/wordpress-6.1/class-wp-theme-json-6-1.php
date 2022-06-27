@@ -25,19 +25,26 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		'link' => array( ':hover', ':focus', ':active' ),
 	);
 
+	/*
+	 * The valid elements that can be found under styles.
+	 *
+	 * @var string[]
+	 */
 	const ELEMENTS = array(
-		'link'   => 'a',
-		'h1'     => 'h1',
-		'h2'     => 'h2',
-		'h3'     => 'h3',
-		'h4'     => 'h4',
-		'h5'     => 'h5',
-		'h6'     => 'h6',
-		'button' => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
+		'link'    => 'a',
+		'h1'      => 'h1',
+		'h2'      => 'h2',
+		'h3'      => 'h3',
+		'h4'      => 'h4',
+		'h5'      => 'h5',
+		'h6'      => 'h6',
+		'button'  => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
+		'caption' => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption', // The block classes are necessary to target older content that won't use the new class names.
 	);
 
 	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
-		'button' => 'wp-element-button',
+		'button'  => 'wp-element-button',
+		'caption' => 'wp-element-caption',
 	);
 
 	/**
@@ -221,7 +228,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		return $theme_json;
 	}
-
 
 	/**
 	 * Returns the metadata for each block.
@@ -451,7 +457,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-
 		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 
 		$selector = $block_metadata['selector'];
@@ -474,9 +479,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
-			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json );
 		} else {
-			$declarations = static::compute_style_properties( $node, $settings );
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
 		}
 
 		$block_rules = '';
@@ -553,5 +558,120 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 * @param array $theme_json Theme JSON array.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = static::get_property_value( $styles, $value_path, $theme_json );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
+		}
+
+		return $declarations;
+	}
+
+	/**
+	 * Returns the style property for the given path.
+	 *
+	 * It also converts CSS Custom Property stored as
+	 * "var:preset|color|secondary" to the form
+	 * "--wp--preset--color--secondary".
+	 *
+	 * It also converts references to a path to the value
+	 * stored at that location, e.g.
+	 * { "ref": "style.color.background" } => "#fff".
+	 *
+	 * @param array $styles Styles subtree.
+	 * @param array $path   Which property to process.
+	 * @param array $theme_json Theme JSON array.
+	 * @return string Style property value.
+	 */
+	protected static function get_property_value( $styles, $path, $theme_json = null ) {
+		$value = _wp_array_get( $styles, $path, '' );
+
+		// This converts references to a path to the value at that path
+		// where the values is an array with a "ref" key, pointing to a path.
+		// For example: { "ref": "style.color.background" } => "#fff".
+		if ( is_array( $value ) && array_key_exists( 'ref', $value ) ) {
+			$value_path = explode( '.', $value['ref'] );
+			$ref_value  = _wp_array_get( $theme_json, $value_path );
+			// Only use the ref value if we find anything.
+			if ( ! empty( $ref_value ) && is_string( $ref_value ) ) {
+				$value = $ref_value;
+			}
+
+			if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
+				$path_string      = json_encode( $path );
+				$ref_value_string = json_encode( $ref_value );
+				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
+			}
+		}
+
+		if ( '' === $value || is_array( $value ) ) {
+			return $value;
+		}
+
+		// Convert custom CSS properties.
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
+
+		return $value;
 	}
 }

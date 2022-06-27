@@ -176,6 +176,4 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 
 		return $result;
 	}
-
-
 }

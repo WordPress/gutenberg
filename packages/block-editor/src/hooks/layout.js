@@ -130,15 +130,26 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout' ) }>
 					{ showInheritToggle && (
-						<ToggleControl
-							label={ __( 'Inherit default layout' ) }
-							checked={ !! inherit }
-							onChange={ () =>
-								setAttributes( {
-									layout: { inherit: ! inherit },
-								} )
-							}
-						/>
+						<>
+							<ToggleControl
+								label={ __( 'Inner blocks use full width' ) }
+								checked={ ! inherit }
+								onChange={ () =>
+									setAttributes( {
+										layout: { inherit: ! inherit },
+									} )
+								}
+							/>
+							<p className="block-editor-hooks__layout-controls-helptext">
+								{ !! inherit
+									? __(
+											'Nested blocks use theme content width with options for full and wide widths.'
+									  )
+									: __(
+											'Nested blocks will fill the width of this container.'
+									  ) }
+							</p>
+						</>
 					) }
 
 					{ ! inherit && allowSwitching && (
