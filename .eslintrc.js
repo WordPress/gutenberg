@@ -116,6 +116,7 @@ module.exports = {
 							'take',
 							'toString',
 							'trim',
+							'truncate',
 							'uniqWith',
 							'values',
 						],
