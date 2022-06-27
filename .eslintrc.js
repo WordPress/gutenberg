@@ -82,6 +82,7 @@ module.exports = {
 							'chunk',
 							'clamp',
 							'concat',
+							'defaults',
 							'defaultTo',
 							'differenceWith',
 							'dropRight',
