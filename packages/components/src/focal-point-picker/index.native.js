@@ -3,7 +3,6 @@
  */
 import { Animated, PanResponder, View } from 'react-native';
 import Video from 'react-native-video';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,7 @@ import FocalPoint from './focal-point';
 import Tooltip from './tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
+import { clamp } from '../utils/math';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
@@ -105,7 +105,7 @@ function FocalPointPicker( props ) {
 					// coordinates to workaround a bug affecting Android's PanResponder.
 					// Specifically, dragging the handle outside the bounds of the image
 					// results in inaccurate locationX and locationY coordinates to be
-					// reported. https://git.io/JtWmi
+					// reported. https://github.com/facebook/react-native/issues/15290#issuecomment-435494944
 					const x = pageX - locationPageOffsetX;
 					const y = pageY - locationPageOffsetY;
 					onChange( {
@@ -116,7 +116,7 @@ function FocalPointPicker( props ) {
 					} );
 					// Slider (child of RangeCell) is uncontrolled, so we must increment a
 					// key to re-mount and sync the pan gesture values to the sliders
-					// https://git.io/JTe4A
+					// https://github.com/callstack/react-native-slider/tree/v3.0.3#value
 					setSliderKey( ( prevState ) => prevState + 1 );
 				},
 			} ),
@@ -193,7 +193,7 @@ function FocalPointPicker( props ) {
 		setVideoNaturalSize( { height, width } );
 		setDisplayPlaceholder( false );
 		// Avoid invisible, paused video on Android, presumably related to
-		// https://git.io/Jt6Dr
+		// https://github.com/react-native-video/react-native-video/issues/1979
 		videoRef?.current.seek( 0 );
 	};
 	const onXCoordinateChange = ( x ) =>

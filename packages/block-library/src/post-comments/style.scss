@@ -1,4 +1,22 @@
 .wp-block-post-comments {
+	/* utility classes */
+	.alignleft {
+		float: left;
+	}
+
+	.alignright {
+		float: right;
+	}
+	/* end utility classes */
+
+	.navigation {
+		&::after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+	}
+
 	.commentlist {
 		clear: both;
 		list-style: none;
@@ -86,6 +104,14 @@
 		}
 	}
 
+	.comment-reply-title {
+		margin-bottom: 0;
+		:where(small) {
+			font-size: var(--wp--preset--font-size--medium, smaller);
+			margin-left: 0.5em;
+		}
+	}
+
 	.reply {
 		font-size: 0.875em;
 		margin-bottom: 1.4em;
@@ -102,8 +128,12 @@
 	input:not([type="submit"]):not([type="checkbox"]) {
 		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
+}
 
-	input[type="submit"] {
-		border: none;
-	}
+
+// Using :where to give this a low specificity so that element styles take precedence.
+// Needed for backwards compatibility.
+// Styles copied from button block styles.
+:where(.wp-block-post-comments input[type="submit"]) {
+	border: none;
 }

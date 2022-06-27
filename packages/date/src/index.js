@@ -41,6 +41,7 @@ import 'moment-timezone/moment-timezone-utils';
  * @property {MomentLocaleSpecification['weekdaysShort']} weekdaysShort Locale weekdays short.
  * @property {MeridiemConfig}                             meridiem      Meridiem config.
  * @property {MomentLocaleSpecification['relativeTime']}  relative      Relative time config.
+ * @property {0|1|2|3|4|5|6}                              startOfWeek   Day that the week starts on.
  */
 /* eslint-enable jsdoc/valid-types */
 
@@ -118,6 +119,7 @@ let settings = {
 			y: 'a year',
 			yy: '%d years',
 		},
+		startOfWeek: 0,
 	},
 	formats: {
 		time: 'g: i a',
@@ -198,7 +200,7 @@ export function setSettings( dateSettings ) {
 /**
  * Returns the currently defined date settings.
  *
- * @return {Object} Settings, including locale data.
+ * @return {DateSettings} Settings, including locale data.
  */
 export function __experimentalGetSettings() {
 	return settings;

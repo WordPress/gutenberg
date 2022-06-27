@@ -13,7 +13,7 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -87,7 +87,7 @@ function PullQuoteEdit( {
 							textAlign="center"
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
-									createBlock( 'core/paragraph' )
+									createBlock( getDefaultBlockName() )
 								)
 							}
 						/>

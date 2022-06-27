@@ -30,18 +30,6 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( get_option( 'gutenberg-experiments' ) ) {
-		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
-			add_submenu_page(
-				'gutenberg',
-				__( 'Navigation (beta)', 'gutenberg' ),
-				__( 'Navigation (beta)', 'gutenberg' ),
-				'edit_theme_options',
-				'gutenberg-navigation',
-				'gutenberg_navigation_page'
-			);
-		}
-	}
 	if ( current_user_can( 'edit_posts' ) ) {
 		add_submenu_page(
 			'gutenberg',

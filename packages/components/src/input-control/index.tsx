@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classNames from 'classnames';
 import type { ForwardedRef } from 'react';
 
@@ -17,6 +16,9 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { useDraft } from './utils';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
@@ -52,6 +54,12 @@ export function UnforwardedInputControl(
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
+	const draftHookProps = useDraft( {
+		value,
+		onBlur: props.onBlur,
+		onChange,
+	} );
+
 	return (
 		<InputBase
 			__unstableInputWidth={ __unstableInputWidth }
@@ -75,14 +83,13 @@ export function UnforwardedInputControl(
 				id={ id }
 				isFocused={ isFocused }
 				isPressEnterToChange={ isPressEnterToChange }
-				onChange={ onChange }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
 				size={ size }
 				stateReducer={ stateReducer }
-				value={ value }
+				{ ...draftHookProps }
 			/>
 		</InputBase>
 	);

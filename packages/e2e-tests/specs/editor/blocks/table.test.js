@@ -232,9 +232,8 @@ describe( 'Table', () => {
 
 		// Get the bounding client rect for the second cell.
 		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
-			const secondCell = document.querySelectorAll(
-				'.wp-block-table td'
-			)[ 1 ];
+			const secondCell =
+				document.querySelectorAll( '.wp-block-table td' )[ 1 ];
 			// Page.evaluate can only return a serializable value to the
 			// parent process, so destructure and restructure the result
 			// into an object.
@@ -269,7 +268,6 @@ describe( 'Table', () => {
 		// Create the table.
 		await clickButton( createButtonLabel );
 
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '2' );
@@ -279,5 +277,19 @@ describe( 'Table', () => {
 		await page.keyboard.type( '4' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not have focus loss after creation', async () => {
+		// Insert table block.
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickButton( createButtonLabel );
+
+		// Focus should be in first td.
+		const isInTd = await page.waitForSelector(
+			'td[contentEditable="true"]'
+		);
+		await expect( isInTd ).toHaveFocus();
 	} );
 } );

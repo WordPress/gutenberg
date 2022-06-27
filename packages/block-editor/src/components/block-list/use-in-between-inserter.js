@@ -27,9 +27,8 @@ export function useInBetweenInserter() {
 		getSelectedBlockClientIds,
 		getTemplateLock,
 	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -110,7 +109,7 @@ export function useInBetweenInserter() {
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
 				const parentOverlay = element.parentElement?.closest(
-					'.block-editor-block-content-overlay.overlay-active'
+					'.block-editor-block-content-overlay'
 				);
 				if ( parentOverlay ) {
 					return;

@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -39,9 +39,8 @@ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
  */
 const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } = useDispatch(
-		blockEditorStore
-	);
+	const { updateBlockAttributes, replaceInnerBlocks } =
+		useDispatch( blockEditorStore );
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
 
@@ -50,9 +49,8 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			return;
 		}
 
-		const [ newAttributes, newInnerBlocks ] = migrateToQuoteV2(
-			attributes
-		);
+		const [ newAttributes, newInnerBlocks ] =
+			migrateToQuoteV2( attributes );
 
 		deprecated( 'Value attribute on the quote block', {
 			since: '6.0',
@@ -128,7 +126,9 @@ export default function QuoteEdit( {
 						}
 						className="wp-block-quote__citation"
 						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
 						}
 						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
 					/>

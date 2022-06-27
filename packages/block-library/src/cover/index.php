@@ -14,51 +14,23 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
-	if ( false === $attributes['useFeaturedImage'] ) {
+	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
 
-	$current_featured_image = get_the_post_thumbnail_url();
-
-	if ( false === $current_featured_image ) {
-		return $content;
-	}
-
-	$is_img_element      = ! ( $attributes['hasParallax'] || $attributes['isRepeated'] );
-	$is_image_background = 'image' === $attributes['backgroundType'];
-
-	if ( $is_image_background && ! $is_img_element ) {
-		$content = preg_replace(
-			'/class=\".*?\"/',
-			'${0} style="background-image:url(' . esc_url( $current_featured_image ) . ')"',
-			$content,
-			1
+	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
+		$attr = array(
+			'class'           => 'wp-block-cover__image-background',
+			'data-object-fit' => 'cover',
 		);
-	}
 
-	if ( $is_image_background && $is_img_element ) {
-		$object_position = '';
 		if ( isset( $attributes['focalPoint'] ) ) {
-			$object_position = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' .
-			round( $attributes['focalPoint']['y'] * 100 ) . '%';
+			$object_position              = round( $attributes['focalPoint']['x'] * 100 ) . '%' . ' ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
+			$attr['data-object-position'] = $object_position;
+			$attr['style']                = 'object-position: ' . $object_position;
 		}
 
-		$image_template = '<img
-			class="wp-block-cover__image-background"
-			alt="%s"
-			src="%s"
-			style="object-position: %s"
-			data-object-fit="cover"
-			data-object-position="%s"
-		/>';
-
-		$image = sprintf(
-			$image_template,
-			esc_attr( get_the_post_thumbnail_caption() ),
-			esc_url( $current_featured_image ),
-			esc_attr( $object_position ),
-			esc_attr( $object_position )
-		);
+		$image = get_the_post_thumbnail( null, 'post-thumbnail', $attr );
 
 		/*
 		 * Inserts the featured image between the (1st) cover 'background' `span` and 'inner_container' `div`,
@@ -69,6 +41,27 @@ function render_block_core_cover( $attributes, $content ) {
 			$offset  = $matches[0][1];
 			$content = substr( $content, 0, $offset ) . $image . substr( $content, $offset );
 		}
+	} else {
+		if ( in_the_loop() ) {
+			update_post_thumbnail_cache();
+		}
+		$current_featured_image = get_the_post_thumbnail_url();
+
+		$styles = 'background-image:url(' . esc_url( $current_featured_image ) . '); ';
+
+		if ( isset( $attributes['minHeight'] ) ) {
+			$height_unit = empty( $attributes['minHeightUnit'] ) ? 'px' : $attributes['minHeightUnit'];
+			$height      = " min-height:{$attributes['minHeight']}{$height_unit}";
+
+			$styles .= $height;
+		}
+
+		$content = preg_replace(
+			'/class=\".*?\"/',
+			'${0} style="' . $styles . '"',
+			$content,
+			1
+		);
 	}
 
 	return $content;

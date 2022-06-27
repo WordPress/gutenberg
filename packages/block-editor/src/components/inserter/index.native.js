@@ -67,7 +67,7 @@ const defaultRenderToggle = ( {
 			extraProps={ {
 				hint: __( 'Double tap to add a block' ),
 				// testID is present to disambiguate this element for native UI tests. It's not
-				// usually required for components. See: https://git.io/JeQ7G.
+				// usually required for components. See: https://github.com/WordPress/gutenberg/pull/18832#issuecomment-561411389.
 				testID: 'add-block-button',
 				onLongPress,
 			} }
@@ -282,9 +282,8 @@ export class Inserter extends Component {
 			this.setState(
 				{
 					destinationRootClientId: this.props.destinationRootClientId,
-					shouldReplaceBlock: this.shouldReplaceBlock(
-						insertionType
-					),
+					shouldReplaceBlock:
+						this.shouldReplaceBlock( insertionType ),
 					insertionIndex: this.getInsertionIndex( insertionType ),
 				},
 				onToggle
@@ -324,11 +323,8 @@ export class Inserter extends Component {
 	 */
 	renderContent( { onClose, isOpen } ) {
 		const { clientId, isAppender } = this.props;
-		const {
-			destinationRootClientId,
-			shouldReplaceBlock,
-			insertionIndex,
-		} = this.state;
+		const { destinationRootClientId, shouldReplaceBlock, insertionIndex } =
+			this.state;
 		return (
 			<InserterMenu
 				isOpen={ isOpen }
@@ -385,9 +381,8 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const {
-				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getBlockEditorSettings();
+			const { __experimentalShouldInsertAtTheTop: shouldInsertAtTheTop } =
+				getBlockEditorSettings();
 
 			// If post title is selected insert as first block.
 			if ( shouldInsertAtTheTop ) {

@@ -22,6 +22,7 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -90,10 +91,8 @@ function FileEdit( {
 		[ id ]
 	);
 
-	const {
-		toggleSelection,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
+	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor.
@@ -301,7 +300,12 @@ function FileEdit( {
 							<RichText
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ 'wp-block-file__button' }
+								className={ classnames(
+									'wp-block-file__button',
+									__experimentalGetElementClassName(
+										'button'
+									)
+								) }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }

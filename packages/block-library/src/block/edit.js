@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	__experimentalBlockContentOverlay as BlockContentOverlay,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -31,9 +31,8 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		ref
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -46,9 +45,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		[ clientId ]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -62,19 +60,24 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const blockProps = useBlockProps();
-
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
 		{
-			value: blocks,
-			onInput,
-			onChange,
-			renderAppender: blocks?.length
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-		}
+			className: hasBlockOverlay
+				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
+				: 'block-library-block__reusable-block-container',
+		},
+		{ __unstableIsDisabled: hasBlockOverlay }
 	);
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -108,36 +111,28 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider>
-			<div { ...blockProps }>
-				{ canRemove && (
-					<BlockControls>
-						<ToolbarGroup>
-							<ToolbarButton
-								onClick={ () =>
-									convertBlockToStatic( clientId )
-								}
-								label={ __( 'Convert to regular blocks' ) }
-								icon={ ungroup }
-								showTooltip
-							/>
-						</ToolbarGroup>
-					</BlockControls>
-				) }
-				<InspectorControls>
-					<PanelBody>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
+			{ canRemove && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => convertBlockToStatic( clientId ) }
+							label={ __( 'Convert to regular blocks' ) }
+							icon={ ungroup }
+							showTooltip
 						/>
-					</PanelBody>
-				</InspectorControls>
-				<BlockContentOverlay
-					clientId={ clientId }
-					wrapperProps={ innerBlocksProps }
-					className="block-library-block__reusable-block-container"
-				/>
-			</div>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<div { ...innerBlocksProps } />
 		</RecursionProvider>
 	);
 }

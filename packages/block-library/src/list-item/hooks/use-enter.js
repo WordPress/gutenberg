@@ -15,19 +15,15 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import useIndentListItem from './use-indent-list-item';
+import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props ) {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const {
-		getBlock,
-		getBlockRootClientId,
-		getBlockParents,
-		getBlockIndex,
-	} = useSelect( blockEditorStore );
+	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+	const { getBlock, getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	const [ canIndent, indentListItem ] = useIndentListItem(
+	const [ canOutdent, outdentListItem ] = useOutdentListItem(
 		propsRef.current.clientId
 	);
 	return useRefEffect(
@@ -41,16 +37,13 @@ export default function useEnter( props ) {
 					return;
 				}
 				event.preventDefault();
-				if ( canIndent ) {
-					indentListItem();
+				if ( canOutdent ) {
+					outdentListItem();
 					return;
 				}
 				// Here we are in top level list so we need to split.
-				const blockRootClientId = getBlockRootClientId( clientId );
-				const blockParents = getBlockParents( clientId );
-				const topParentListBlockClientId = blockParents[ 0 ];
 				const topParentListBlock = getBlock(
-					topParentListBlockClientId
+					getBlockRootClientId( clientId )
 				);
 				const blockIndex = getBlockIndex( clientId );
 				const head = cloneBlock( {
@@ -77,11 +70,13 @@ export default function useEnter( props ) {
 					  ]
 					: [];
 				replaceBlocks(
-					blockRootClientId,
+					topParentListBlock.clientId,
 					[ head, middle, ...tail ],
-					1,
-					0
+					1
 				);
+				// We manually change the selection here because we are replacing
+				// a different block than the selected one.
+				selectionChange( middle.clientId );
 			}
 
 			element.addEventListener( 'keydown', onKeyDown );
@@ -89,6 +84,6 @@ export default function useEnter( props ) {
 				element.removeEventListener( 'keydown', onKeyDown );
 			};
 		},
-		[ canIndent ]
+		[ canOutdent ]
 	);
 }

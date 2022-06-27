@@ -145,21 +145,17 @@ const BlockPatternSetup = ( {
 	clientId,
 	blockName,
 	filterPatternsFn,
-	startBlankComponent,
 	onBlockPatternSelect,
 } ) => {
 	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
-	const [ showBlank, setShowBlank ] = useState( false );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
-	const [
-		contentResizeListener,
-		{ height: contentHeight },
-	] = useResizeObserver();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 
-	if ( ! patterns?.length || showBlank ) {
-		return startBlankComponent;
+	if ( ! patterns?.length ) {
+		return null;
 	}
 
 	const onBlockPatternSelectDefault = ( blocks ) => {
@@ -168,11 +164,6 @@ const BlockPatternSetup = ( {
 	};
 	const onPatternSelectCallback =
 		onBlockPatternSelect || onBlockPatternSelectDefault;
-	const onStartBlank = startBlankComponent
-		? () => {
-				setShowBlank( true );
-		  }
-		: undefined;
 	return (
 		<>
 			{ contentResizeListener }
@@ -202,7 +193,6 @@ const BlockPatternSetup = ( {
 							patterns[ activeSlide ].blocks
 						);
 					} }
-					onStartBlank={ onStartBlank }
 				/>
 			</div>
 		</>

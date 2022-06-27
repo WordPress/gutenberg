@@ -32,7 +32,6 @@ function gutenberg_is_experiment_enabled( $name ) {
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 5.9 compat.
-	require_once __DIR__ . '/compat/wordpress-5.9/class-gutenberg-rest-templates-controller.php';
 	require_once __DIR__ . '/compat/wordpress-5.9/class-wp-rest-global-styles-controller.php';
 	require_once __DIR__ . '/compat/wordpress-5.9/rest-active-global-styles.php';
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
@@ -56,13 +55,15 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
-	if ( ! class_exists( 'WP_REST_Block_Patterns_Controller' ) ) {
-		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-patterns-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
 	}
 	require_once __DIR__ . '/compat/wordpress-6.0/rest-api.php';
+
+	// WordPress 6.1 compat.
+	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-templates-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.1/rest-api.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
@@ -98,7 +99,6 @@ require __DIR__ . '/compat/wordpress-5.9/theme.php';
 require __DIR__ . '/compat/wordpress-5.9/admin-menu.php';
 require __DIR__ . '/compat/wordpress-5.9/edit-site-page.php';
 require __DIR__ . '/compat/wordpress-5.9/block-template.php';
-require __DIR__ . '/compat/wordpress-5.9/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-5.9/default-theme-supports.php';
 require __DIR__ . '/compat/wordpress-5.9/move-theme-editor-menu-item.php';
 require __DIR__ . '/compat/wordpress-5.9/navigation.php';
@@ -112,7 +112,7 @@ require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
 require __DIR__ . '/compat/wordpress-6.0/blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.0/functions.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.0/block-template.php';
@@ -123,11 +123,20 @@ require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
+require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
+require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
+require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
+require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
+require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/block-patterns.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
+require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-webfonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';

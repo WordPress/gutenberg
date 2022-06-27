@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -129,9 +130,8 @@ class NativeEditorProvider extends Component {
 				const blockName = 'core/' + payload.mediaType;
 				const newBlock = createBlock( blockName, {
 					id: payload.mediaId,
-					[ payload.mediaType === 'image'
-						? 'url'
-						: 'src' ]: payload.mediaUrl,
+					[ payload.mediaType === 'image' ? 'url' : 'src' ]:
+						payload.mediaUrl,
 				} );
 
 				const indexAfterSelected = this.props.selectedBlockIndex + 1;
@@ -142,14 +142,16 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
-			( { galleryWithImageBlocks, ...editorSettings } ) => {
-				if ( typeof galleryWithImageBlocks === 'boolean' ) {
-					window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
+		this.subscriptionParentUpdateEditorSettings =
+			subscribeUpdateEditorSettings(
+				( { galleryWithImageBlocks, ...editorSettings } ) => {
+					if ( typeof galleryWithImageBlocks === 'boolean' ) {
+						window.wp.galleryBlockV2Enabled =
+							galleryWithImageBlocks;
+					}
+					updateSettings( this.getThemeColors( editorSettings ) );
 				}
-				updateSettings( this.getThemeColors( editorSettings ) );
-			}
-		);
+			);
 
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
 			( payload ) => {
@@ -317,13 +319,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			post, // eslint-disable-line no-unused-vars
-			capabilities,
-			settings,
-			...props
-		} = this.props;
+		const { children, post, capabilities, settings, ...props } = this.props;
 		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
@@ -333,7 +329,7 @@ class NativeEditorProvider extends Component {
 					settings={ editorSettings }
 					{ ...props }
 				>
-					{ children }
+					<SafeAreaProvider>{ children }</SafeAreaProvider>
 				</EditorProvider>
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }

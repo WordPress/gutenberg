@@ -604,7 +604,17 @@ To ensure that the editor stays performant as we add features, we monitor the im
 -   The time it takes for the browser to respond when typing.
 -   The time it takes to select a block.
 
-Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+Performance tests are end-to-end tests running the editor and capturing these measures. Make sure you have an e2e testing environment ready.
+
+To set up the e2e testing environment, checkout the Gutenberg repository and switch to the branch that you would like to test. Run the following command to prepare the environment. 
+
+```
+nvm use && npm install
+npm run build:packages
+npm run wp-env start
+```
+
+To run the tests run the following command:
 
 ```
 npm run test-performance

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
-import { size, map, without } from 'lodash';
+import { map, without } from 'lodash';
 import { I18nManager } from 'react-native';
 
 /**
@@ -62,7 +62,7 @@ class Editor extends Component {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			if ( settings.allowedBlockTypes === undefined ) {
 				// If no specific flags for allowedBlockTypes are set, assume `true`
 				// meaning allow all block types.
@@ -92,12 +92,15 @@ class Editor extends Component {
 			() => {
 				if ( this.postTitleRef ) {
 					this.postTitleRef.focus();
+				} else {
+					// If the post title ref is not available, we postpone setting focus to when it's available.
+					this.focusTitleWhenAvailable = true;
 				}
 			}
 		);
 
-		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
-			( payload ) => {
+		this.subscriptionParentFeaturedImageIdNativeUpdated =
+			subscribeFeaturedImageIdNativeUpdated( ( payload ) => {
 				editEntityRecord(
 					'postType',
 					postType,
@@ -107,8 +110,7 @@ class Editor extends Component {
 						undoIgnore: true,
 					}
 				);
-			}
-		);
+			} );
 	}
 
 	componentWillUnmount() {
@@ -122,6 +124,11 @@ class Editor extends Component {
 	}
 
 	setTitleRef( titleRef ) {
+		if ( this.focusTitleWhenAvailable && ! this.postTitleRef ) {
+			this.focusTitleWhenAvailable = false;
+			titleRef.focus();
+		}
+
 		this.postTitleRef = titleRef;
 	}
 

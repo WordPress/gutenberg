@@ -2,41 +2,47 @@
  * Internal dependencies
  */
 import isTextField from './is-text-field';
-import isNumberInput from './is-number-input';
+import isHTMLInputElement from './is-html-input-element';
 
 /**
- * Check whether the given element, assumed an input field or textarea,
- * contains a (uncollapsed) selection of text.
+ * Check whether the given input field or textarea contains a (uncollapsed)
+ * selection of text.
  *
- * Note: this is perhaps an abuse of the term "selection", since these elements
- * manage selection differently and aren't covered by Selection#collapsed.
+ * CAVEAT: Only specific text-based HTML inputs support the selection APIs
+ * needed to determine whether they have a collapsed or uncollapsed selection.
+ * This function defaults to returning `true` when the selection cannot be
+ * inspected, such as with `<input type="time">`. The rationale is that this
+ * should cause the block editor to defer to the browser's native selection
+ * handling (e.g. copying and pasting), thereby reducing friction for the user.
  *
- * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
+ * See: https://html.spec.whatwg.org/multipage/input.html#do-not-apply
  *
  * @param {Element} element The HTML element.
  *
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
 export default function inputFieldHasUncollapsedSelection( element ) {
-	if ( ! isTextField( element ) && ! isNumberInput( element ) ) {
+	if ( ! isHTMLInputElement( element ) && ! isTextField( element ) ) {
 		return false;
 	}
-	try {
-		const {
-			selectionStart,
-			selectionEnd,
-		} = /** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
 
-		return selectionStart !== null && selectionStart !== selectionEnd;
+	// Safari throws a type error when trying to get `selectionStart` and
+	// `selectionEnd` on non-text <input> elements, so a try/catch construct is
+	// necessary.
+	try {
+		const { selectionStart, selectionEnd } =
+			/** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
+		return (
+			// `null` means the input type doesn't implement selection, thus we
+			// cannot determine whether the selection is collapsed, so we
+			// default to true.
+			selectionStart === null ||
+			// when not null, compare the two points
+			selectionStart !== selectionEnd
+		);
 	} catch ( error ) {
-		// Safari throws an exception when trying to get `selectionStart`
-		// on non-text <input> elements (which, understandably, don't
-		// have the text selection API). We catch this via a try/catch
-		// block, as opposed to a more explicit check of the element's
-		// input types, because of Safari's non-standard behavior. This
-		// also means we don't have to worry about the list of input
-		// types that support `selectionStart` changing as the HTML spec
-		// evolves over time.
-		return false;
+		// This is Safari's way of saying that the input type doesn't implement
+		// selection, so we default to true.
+		return true;
 	}
 }

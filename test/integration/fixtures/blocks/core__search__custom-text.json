@@ -8,7 +8,8 @@
 			"placeholder": "Custom placeholder",
 			"buttonText": "Custom button text",
 			"buttonPosition": "button-outside",
-			"buttonUseIcon": false
+			"buttonUseIcon": false,
+			"query": {}
 		},
 		"innerBlocks": []
 	}

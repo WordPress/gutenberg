@@ -20,16 +20,17 @@ import {
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
-const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
+const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 export const useGlobalStylesReset = () => {
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
-			setUserConfig,
-		] ),
+		useCallback(
+			() => setUserConfig( () => EMPTY_CONFIG ),
+			[ setUserConfig ]
+		),
 	];
 };
 
@@ -158,6 +159,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',

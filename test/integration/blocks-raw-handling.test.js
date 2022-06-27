@@ -78,8 +78,7 @@ describe( 'Blocks raw handling', () => {
 						},
 						transform: () => {
 							return createBlock( 'core/embed', {
-								url:
-									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );
 						},
 					},
@@ -196,8 +195,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should parse HTML in plainText', () => {
 		const filtered = pasteHandler( {
-			HTML:
-				'&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
+			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
 			plainText: '<p>Some <strong>bold</strong> text.</p>',
 			mode: 'AUTO',
 		} );
@@ -347,8 +345,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should handle a citation in the middle of the content', () => {
 		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
 			mode: 'AUTO',
 		} )
 			.map( getBlockContent )
@@ -388,8 +385,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
 		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
 			.map( getBlockContent )

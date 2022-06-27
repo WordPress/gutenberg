@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -14,6 +9,8 @@ import { forwardRef } from '@wordpress/element';
  */
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 function InserterLibrary(
 	{

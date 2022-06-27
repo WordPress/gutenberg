@@ -174,11 +174,16 @@ const reduxStore = createStore();
 
 const boundSelectors = mapValues(
 	existingSelectors,
-	( selector ) => ( ...args ) => selector( reduxStore.getState(), ...args )
+	( selector ) =>
+		( ...args ) =>
+			selector( reduxStore.getState(), ...args )
 );
 
-const boundActions = mapValues( existingActions, ( action ) => ( ...args ) =>
-	reduxStore.dispatch( action( ...args ) )
+const boundActions = mapValues(
+	existingActions,
+	( action ) =>
+		( ...args ) =>
+			reduxStore.dispatch( action( ...args ) )
 );
 
 const genericStore = {
@@ -369,11 +374,11 @@ const store = createReduxStore( 'demo', {
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ `ReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `ReduxStoreConfig<State,Actions,Selectors>`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   `StoreDescriptor`: Store Object.
+-   `StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>`: Store Object.
 
 ### createRegistry
 
@@ -431,7 +436,9 @@ that allows to select data from the store's `state`, a registry selector
 has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => result;
+( select ) =>
+	( state, ...selectorArgs ) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
@@ -662,6 +669,20 @@ _Parameters_
 
 -   _listener_ `Function`: Callback function.
 
+### suspendSelect
+
+Given the name of a registered store, returns an object containing the store's
+selectors pre-bound to state so that you only need to supply additional arguments,
+and modified so that they throw promises in case the selector is not resolved yet.
+
+_Parameters_
+
+-   _storeNameOrDescriptor_ `string|StoreDescriptor`: Unique namespace identifier for the store or the store descriptor.
+
+_Returns_
+
+-   `Object`: Object containing the store's suspense-wrapped selectors.
+
 ### use
 
 Extends a registry to inherit functionality provided by a given plugin. A
@@ -820,12 +841,26 @@ function Paste( { children } ) {
 
 _Parameters_
 
--   _mapSelect_ `Function|StoreDescriptor|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
--   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseSelectReturn<T>`: A custom react hook.
+
+### useSuspenseSelect
+
+A variant of the `useSelect` hook that has the same API, but will throw a
+suspense Promise if any of the called selectors is in an unresolved state.
+
+_Parameters_
+
+-   _mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
+-   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
+
+_Returns_
+
+-   `Object`: Data object returned by the `mapSelect` function.
 
 ### withDispatch
 

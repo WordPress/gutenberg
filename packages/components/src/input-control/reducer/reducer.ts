@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import type { SyntheticEvent } from 'react';
+import type { SyntheticEvent, ChangeEvent, PointerEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useReducer } from '@wordpress/element';
+import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +18,7 @@ import {
 	initialStateReducer,
 } from './state';
 import * as actions from './actions';
+import type { InputChangeCallback } from '../types';
 
 /**
  * Prepares initialState for the reducer.
@@ -108,9 +109,7 @@ function inputControlStateReducer(
 				break;
 		}
 
-		if ( action.payload.event ) {
-			nextState._event = action.payload.event;
-		}
+		nextState._event = action.payload.event;
 
 		/**
 		 * Send the nextState + action to the composedReducers via
@@ -131,58 +130,44 @@ function inputControlStateReducer(
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param  stateReducer An external state reducer.
- * @param  initialState The initial state for the reducer.
+ * @param  stateReducer    An external state reducer.
+ * @param  initialState    The initial state for the reducer.
+ * @param  onChangeHandler A handler for the onChange event.
  * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(
 	stateReducer: StateReducer = initialStateReducer,
-	initialState: Partial< InputState > = initialInputControlState
+	initialState: Partial< InputState > = initialInputControlState,
+	onChangeHandler: InputChangeCallback
 ) {
 	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
 
-	const createChangeEvent = ( type: actions.ChangeEventAction[ 'type' ] ) => (
-		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
-		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
-	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
+	const createChangeEvent =
+		( type: actions.ChangeEventAction[ 'type' ] ) =>
+		(
+			nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
+			event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
+		) => {
+			dispatch( {
+				type,
+				payload: { value: nextValue, event },
+			} as actions.InputAction );
+		};
 
-		dispatch( {
-			type,
-			payload: { value: nextValue, event },
-		} as actions.InputAction );
-	};
+	const createKeyEvent =
+		( type: actions.KeyEventAction[ 'type' ] ) =>
+		( event: actions.KeyEventAction[ 'payload' ][ 'event' ] ) => {
+			dispatch( { type, payload: { event } } );
+		};
 
-	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
-		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
-	) => {
-		/**
-		 * Persist allows for the (Synthetic) event to be used outside of
-		 * this function call.
-		 * https://reactjs.org/docs/events.html#event-pooling
-		 */
-		if ( event && event.persist ) {
-			event.persist();
-		}
-
-		dispatch( { type, payload: { event } } );
-	};
-
-	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
-		payload: actions.DragEventAction[ 'payload' ]
-	) => {
-		dispatch( { type, payload } );
-	};
+	const createDragEvent =
+		( type: actions.DragEventAction[ 'type' ] ) =>
+		( payload: actions.DragEventAction[ 'payload' ] ) => {
+			dispatch( { type, payload } );
+		};
 
 	/**
 	 * Actions for the reducer
@@ -200,6 +185,37 @@ export function useInputControlStateReducer(
 	const pressUp = createKeyEvent( actions.PRESS_UP );
 	const pressDown = createKeyEvent( actions.PRESS_DOWN );
 	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
+
+	const currentState = useRef( state );
+	const refProps = useRef( { value: initialState.value, onChangeHandler } );
+	useLayoutEffect( () => {
+		currentState.current = state;
+		refProps.current = { value: initialState.value, onChangeHandler };
+	} );
+	useLayoutEffect( () => {
+		if (
+			currentState.current._event !== undefined &&
+			state.value !== refProps.current.value &&
+			! state.isDirty
+		) {
+			refProps.current.onChangeHandler( state.value ?? '', {
+				event: currentState.current._event as
+					| ChangeEvent< HTMLInputElement >
+					| PointerEvent< HTMLInputElement >,
+			} );
+		}
+	}, [ state.value, state.isDirty ] );
+	useLayoutEffect( () => {
+		if (
+			initialState.value !== currentState.current.value &&
+			! currentState.current.isDirty
+		) {
+			dispatch( {
+				type: actions.RESET,
+				payload: { value: initialState.value },
+			} );
+		}
+	}, [ initialState.value ] );
 
 	return {
 		change,
