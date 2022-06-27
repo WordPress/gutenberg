@@ -13,7 +13,7 @@ import {
 	NavigableMenu,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import {
@@ -39,6 +39,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import AddCustomTemplateModal from './add-custom-template-modal';
 import { usePostTypes, usePostTypesEntitiesInfo } from './utils';
 import { useHistory } from '../routes';
+import { store as editSiteStore } from '../../store';
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
@@ -92,10 +93,17 @@ export default function NewTemplate( { postType } ) {
 	);
 	const postTypesEntitiesInfo = usePostTypesEntitiesInfo( existingTemplates );
 
+	const { setTemplate } = useDispatch( editSiteStore );
+
 	async function createTemplate( template ) {
 		const { slug } = template;
+		const templateId = theme.stylesheet + '//' + slug.toString();
+
+		// Set template before navigating away to avoid initial stale value.
+		setTemplate( templateId, slug );
+
 		history.push( {
-			postId: theme.stylesheet + '//' + slug.toString(),
+			postId: templateId,
 			postType: 'wp_template',
 		} );
 	}
