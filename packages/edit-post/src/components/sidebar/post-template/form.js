@@ -82,7 +82,7 @@ export default function PostTemplateForm( { onClose } ) {
 			<InspectorPopoverHeader
 				title={ __( 'Template' ) }
 				help={ __(
-					'Templates define the way your content is displayed when viewing your site.'
+					'Templates define the way content is displayed when viewing your site.'
 				) }
 				actions={
 					canCreate
