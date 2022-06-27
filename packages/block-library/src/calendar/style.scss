@@ -2,13 +2,9 @@
 	text-align: center;
 
 	th,
-	tbody td {
+	td {
 		padding: 0.25em;
-		border: 1px solid $gray-300;
-	}
-
-	tfoot td {
-		border: none;
+		border: 1px solid;
 	}
 
 	table {
@@ -16,17 +12,11 @@
 		border-collapse: collapse;
 	}
 
-	table th {
-		font-weight: 400;
-		background: $gray-300;
+	thead {
+		border-bottom: 3px solid;
 	}
 
 	a {
 		text-decoration: underline;
-	}
-
-	table tbody,
-	table caption {
-		color: #40464d;
 	}
 }
