@@ -24,7 +24,7 @@
 }
 
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
-.wp-block-file__button {
+:where(.wp-block-file__button) {
 	border-radius: 2em;
 	padding: 0.5em 1em;
 

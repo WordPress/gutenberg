@@ -66,7 +66,6 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 
 	const onSetRadialGradient = () => {
-		// eslint-disable-next-line no-unused-vars
 		const { orientation, ...restGradientAST } = gradientAST;
 		onChange(
 			serializeGradient( {

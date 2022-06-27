@@ -9,7 +9,6 @@ export const useNavigationTreeNodes = () => {
 	const getNode = ( key ) => nodes[ key ];
 
 	const addNode = ( key, value ) => {
-		// eslint-disable-next-line no-unused-vars
 		const { children, ...newNode } = value;
 		return setNodes( ( original ) => ( {
 			...original,
@@ -19,7 +18,6 @@ export const useNavigationTreeNodes = () => {
 
 	const removeNode = ( key ) => {
 		return setNodes( ( original ) => {
-			// eslint-disable-next-line no-unused-vars
 			const { [ key ]: removedNode, ...remainingNodes } = original;
 			return remainingNodes;
 		} );
