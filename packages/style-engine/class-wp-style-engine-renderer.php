@@ -30,7 +30,7 @@ class WP_Style_Engine_Renderer {
 	 */
 	public static function render_registered_block_supports_styles() {
 		$style_engine         = WP_Style_Engine::get_instance();
-		$block_support_styles = $style_engine->get_registered_styles( 'block-supports' );
+		$block_support_styles = $style_engine->get_registered_styles();
 
 		if ( empty( $block_support_styles ) ) {
 			return;
@@ -39,7 +39,7 @@ class WP_Style_Engine_Renderer {
 		$output = '';
 
 		foreach ( $block_support_styles as $selector => $css_definitions ) {
-			$output .= self::generate_css_rule( $selector, $css_definitions, true );
+			$output .= self::generate_css_rule( $selector, $css_definitions, array( 'prettify' => true ) );
 		}
 
 		echo "<style>\n$output</style>\n";
@@ -79,46 +79,89 @@ class WP_Style_Engine_Renderer {
 	}
 
 	/**
-	 * Creates a string consisting of a CSS rule
+	 * Creates a string consisting of a CSS rule.
 	 *
-	 * @param string  $selector A CSS selector, e.g., `.some-class-name`.
-	 * @param array   $css_definitions An collection of CSS definitions `[ [ 'color' => 'red' ] ]`.
-	 * @param boolean $should_prettify Whether to print spaces and carriage returns.
+	 * @param string $selector A CSS selector, e.g., `.some-class-name`.
+	 * @param array  $css_definitions An collection of CSS definitions `[ [ 'color' => 'red' ] ]`.
+	 * @param array  $options array(
+	 *      'prettify' => (boolean) Whether to add carriage returns and indenting.
+	 *      'indent' => (number) The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
+	 *  );.
 	 *
 	 * @return string A CSS rule, e.g. `'.some-selector { color: red; font-size:12px }'`
 	 */
-	public static function generate_css_rule( $selector, $css_definitions, $should_prettify = false ) {
+	public static function generate_css_rule( $selector, $css_definitions, $options = array() ) {
 		$css_rule_block = '';
 
 		if ( ! $selector || empty( $css_definitions ) ) {
 			return $css_rule_block;
 		}
 
-		$css_rule_block = $should_prettify ? "$selector {\n" : "$selector { ";
+		$defaults       = array(
+			'prettify' => false,
+			'indent'   => 0,
+		);
+		$options        = wp_parse_args( $options, $defaults );
+		$indent         = str_repeat( "\t", $options['indent'] );
+		$css_rule_block = $options['prettify'] ? "$indent$selector {\n" : "$selector { ";
 
 		foreach ( $css_definitions as $definition => $value ) {
 			$filtered_css = self::sanitize_property_declaration( "{$definition}: {$value}" );
 			if ( ! empty( $filtered_css ) ) {
-				if ( $should_prettify ) {
-					$css_rule_block .= "\t$filtered_css;\n";
+				if ( $options['prettify'] ) {
+					$css_rule_block .= "\t$indent$filtered_css;\n";
 				} else {
 					$css_rule_block .= $filtered_css . ';';
 				}
 			}
 		}
-		$css_rule_block .= $should_prettify ? "}\n" : ' }';
+		$css_rule_block .= $options['prettify'] ? "$indent}\n" : ' }';
 		return $css_rule_block;
 	}
 
-	// @TODO The following method takes over the work of enqueuing block support styles for now.
-	// Later we'd want to identify which styles we're rendering, e.g., is this a global styles ruleset,
-	// so we can create appropriate "layers" / control specificity.
-	// We could create separate blocks for each layer, e.g.,
-	// wp_register_style( 'global-styles-layer', false, array(), true, true );
-	// wp_add_inline_style( 'global-styles-layer', $styles );
-	// wp_enqueue_style( 'global-styles-layer' );
-	// Or build them and print them all out in one.
-	// Just how, I don't know right now :D.
+	// @TODO Using cascade layers should be opt-in.
+	/**
+	 * Builds layers and styles rules from registered layers and styles for output.
+	 */
+	public static function enqueue_cascade_layers() {
+		$style_engine      = WP_Style_Engine::get_instance();
+		$registered_layers = $style_engine->get_registered_styles();
+
+		if ( empty( $registered_layers ) ) {
+			return;
+		}
+
+		$layer_output  = array();
+		$styles_output = '';
+
+		foreach ( $style_engine::STYLE_LAYERS as $layer_name ) {
+			if ( ! isset( $registered_layers[ $layer_name ] ) || empty( $registered_layers[ $layer_name ] ) ) {
+				continue;
+			}
+
+			$layer_output[] = $layer_name;
+			$styles_output .= "@layer {$layer_name} {\n";
+
+			foreach ( $registered_layers[ $layer_name ] as $selector => $css_definitions ) {
+				$styles_output .= self::generate_css_rule(
+					$selector,
+					$css_definitions,
+					array(
+						'prettify' => true,
+						'indent'   => 1,
+					)
+				);
+			}
+			$styles_output .= '}';
+		}
+
+		if ( ! empty( $styles_output ) ) {
+			$layer_output = '@layer ' . implode( ', ', $layer_output ) . ";\n";
+			wp_register_style( 'wp-styles-layers', false, array(), true, true );
+			wp_add_inline_style( 'wp-styles-layers', $layer_output . $styles_output );
+			wp_enqueue_style( 'wp-styles-layers' );
+		}
+	}
 
 	/**
 	 * Taken from gutenberg_enqueue_block_support_styles()
@@ -135,14 +178,15 @@ class WP_Style_Engine_Renderer {
 	 *
 	 * @param int $priority To set the priority for the add_action.
 	 */
-	public static function enqueue_block_support_styles( $priority = 10 ) {
+	public static function enqueue_registered_styles( $priority = 10 ) {
 		$action_hook_name = 'wp_footer';
 		if ( wp_is_block_theme() ) {
 			$action_hook_name = 'wp_head';
 		}
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_cascade_layers' ) );
 		add_action(
 			$action_hook_name,
-			array( __CLASS__, 'render_registered_block_supports_styles' ),
+			array( __CLASS__, 'enqueue_cascade_layers' ),
 			$priority
 		);
 	}

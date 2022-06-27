@@ -43,23 +43,25 @@ class WP_Style_Engine_Store {
 	 * @param string $layer Unique key for a layer.
 	 * @param string $key Unique key for a $style_data object.
 	 * @param array  $style_data Associative array of style information.
-	 * @return void
+	 * @return boolean Whether registration was successful.
 	 */
 	public function register( $layer, $key, $style_data ) {
 		if ( empty( $layer ) || empty( $key ) || empty( $style_data ) ) {
-			return;
+			return false;
 		}
 
 		if ( isset( $this->registered_styles[ $layer ][ $key ] ) ) {
 			$style_data = array_unique( array_merge( $this->registered_styles[ $layer ][ $key ], $style_data ) );
 		}
 		$this->registered_styles[ $layer ][ $key ] = $style_data;
+		return true;
 	}
 
 	/**
-	 * Retrieves style data from the store.
+	 * Retrieves style data from the store. If neither $layer nor $key are provided,
+	 * this method will return everything in the store.
 	 *
-	 * @param string $layer Unique key for a layer.
+	 * @param string $layer Optional unique key for a layer to return all styles for a layer.
 	 * @param string $key Optional unique key for a $style_data object to return a single style object.
 	 *
 	 * @return array Registered styles

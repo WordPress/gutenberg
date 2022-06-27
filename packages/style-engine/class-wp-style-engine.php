@@ -2,6 +2,7 @@
 /**
  * WP_Style_Engine
  *
+ * Singleton.
  * Generates classnames and block styles.
  *
  * @package Gutenberg
@@ -39,8 +40,11 @@ class WP_Style_Engine {
 
 	/**
 	 * An ordered list of style layers from least specific to most specific.
-	 * The layers loosely represent a cascade layer system.
+	 * The layers loosely represent a cascade layer system. See: https://developer.mozilla.org/en-US/docs/Web/CSS/@layer
 	 * The layer name will also be the key to retrieve the corresponding styles from the store.
+	 * Using a "store" for each layer of the style hierarchy, one can control the order in which they're rendered.
+	 *
+	 * @TODO are static, named layers dynamic enough? Or should we define numerically according specificity? E.g., @wp-layer-1?
 	 */
 	const STYLE_LAYERS = array(
 		'block-supports', // User-defined block-level overrides.
@@ -235,12 +239,9 @@ class WP_Style_Engine {
 	 * Gather internals.
 	 */
 	public function __construct() {
-		// @TODO not sure where to instantiate stuff or whether to dependency inject yet.
-		// The hope is to have several "stores" for each layer of the style hierarchy.
-		// This is so we can control the order in which we render.
-		// Each store might have a unique way to render on the frontend, maybe not.
+		// @TODO not sure where keep as singleton or whether to dependency inject yet.
 		$this->styles_store = new WP_Style_Engine_Store( self::STYLE_LAYERS );
-		WP_Style_Engine_Renderer::enqueue_block_support_styles();
+		WP_Style_Engine_Renderer::enqueue_registered_styles();
 	}
 
 	/**
@@ -280,7 +281,7 @@ class WP_Style_Engine {
 	 * @param string $layer Unique key for a layer.
 	 * @return array All registered block support styles.
 	 */
-	public function get_registered_styles( $layer ) {
+	public function get_registered_styles( $layer = null ) {
 		return $this->styles_store->get( $layer );
 	}
 

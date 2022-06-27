@@ -112,10 +112,6 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 				'layer'    => 'block-supports',
 			)
 		);
-
-//		if ( ! empty( $styles['css'] ) ) {
-//			gutenberg_enqueue_block_support_styles( $styles['css'] );
-//		}
 	}
 
 	return null;
