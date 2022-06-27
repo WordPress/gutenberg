@@ -1,33 +1,31 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	getEditedPostContent,
-	pressKeyWithModifier,
-	activatePlugin,
-	deactivatePlugin,
-} from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // Avoid using three, as it looks too much like two with some fonts.
 const ARABIC_ZERO = '٠';
 const ARABIC_ONE = '١';
 const ARABIC_TWO = '٢';
 
-describe( 'RTL', () => {
-	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-plugin-activate-rtl' );
+test.describe( 'RTL', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-activate-rtl'
+		);
 	} );
 
-	beforeEach( async () => {
-		await createNewPost();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-plugin-activate-rtl' );
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-activate-rtl'
+		);
 	} );
 
-	it( 'should arrow navigate', async () => {
+	test( 'should arrow navigate', async ( { editor, page } ) => {
 		await page.keyboard.press( 'Enter' );
 
 		// We need at least three characters as arrow navigation *from* the
@@ -41,10 +39,17 @@ describe( 'RTL', () => {
 
 		// Expect: ARABIC_ZERO + ARABIC_ONE + ARABIC_TWO (<p>٠١٢</p>).
 		// N.b.: HTML is LTR, so direction will be reversed!
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p>٠١٢</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 
-	it( 'should split', async () => {
+	test( 'should split', async ( { editor, page } ) => {
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -52,10 +57,20 @@ describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p>٠</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>١</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 
-	it( 'should merge backward', async () => {
+	test( 'should merge backward', async ( { editor, page } ) => {
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -64,10 +79,16 @@ describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p>٠١</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 
-	it( 'should merge forward', async () => {
+	test( 'should merge forward', async ( { editor, page } ) => {
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -77,16 +98,25 @@ describe( 'RTL', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Delete' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p>٠١</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 
-	it( 'should arrow navigate between blocks', async () => {
+	test( 'should arrow navigate between blocks', async ( {
+		editor,
+		page,
+	} ) => {
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ARABIC_ONE );
-		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 		await page.keyboard.type( ARABIC_TWO );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -94,26 +124,36 @@ describe( 'RTL', () => {
 
 		// Move to the previous block with two lines in the current block.
 		await page.keyboard.press( 'ArrowRight' );
-		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 		await page.keyboard.type( ARABIC_ONE );
 
 		// Move to the next block with two lines in the current block.
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( ARABIC_ZERO );
-		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Shift+Enter' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// Check the content.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe(
+			`<!-- wp:paragraph -->
+<p>٠<br>١</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>٠<br>١<br>٢</p>
+<!-- /wp:paragraph -->`
+		);
 	} );
 
-	it( 'should navigate inline boundaries', async () => {
-		await page.keyboard.press( 'Enter' );
-
-		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
-
-		await pressKeyWithModifier( 'primary', 'b' );
+	test( 'should navigate inline boundaries', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );
-		await pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_TWO );
 
 		// Insert a character at each boundary position.
@@ -121,7 +161,7 @@ describe( 'RTL', () => {
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( ARABIC_ZERO );
 
-			expect( await getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 			await page.keyboard.press( 'Backspace' );
 		}
