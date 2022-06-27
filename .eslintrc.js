@@ -103,6 +103,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'once',
 							'overEvery',
 							'partialRight',
 							'random',
