@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { TouchableWithoutFeedback } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -40,12 +45,20 @@ export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 	attemptBlockRecovery();
 
 	return (
-		<Warning
-			title={ blockTitle }
-			message={ __( 'Problem displaying block' ) }
-			icon={ icon }
+		<TouchableWithoutFeedback
+			onPress={ attemptBlockRecovery }
 			accessible={ true }
-			accessibilityLabel={ accessibilityLabel }
-		/>
+			accessibilityRole={ 'button' }
+		>
+			<Warning
+				title={ blockTitle }
+				// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+				message={ __(
+					'Problem displaying block. \nTap to attempt block recovery.'
+				) }
+				icon={ icon }
+				accessibilityLabel={ accessibilityLabel }
+			/>
+		</TouchableWithoutFeedback>
 	);
 }
