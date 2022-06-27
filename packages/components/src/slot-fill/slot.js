@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-import { isFunction, isString, map } from 'lodash';
+import { isString, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,16 @@ import {
  * Internal dependencies
  */
 import SlotFillContext from './context';
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
 
 class SlotComponent extends Component {
 	constructor() {

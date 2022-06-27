@@ -10,11 +10,23 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
 -   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [**] RichText - Improve performance by dropping events during quick typing [#41682]
+
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
+
+## 1.78.0
+
+-   [*] Bump react-native-gesture-handler to version 2.3.2 [#41337]
 
 ## 1.77.1
 
--   [***] Fixes a crash on iOS related to JSI and Reanimated [#41482]
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
 
 ## 1.77.0
 
@@ -23,7 +35,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.76.3
 
--   [***] Fixes a crash on iOS related to JSI and Reanimated [#41482]
+-   [***] Fix crash on iOS related to JSI and Reanimated [#41482]
 
 ## 1.76.2
 

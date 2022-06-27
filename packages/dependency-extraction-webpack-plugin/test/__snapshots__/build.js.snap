@@ -32,17 +32,12 @@ Array [
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '3b0a96e3e47e0db92969');
+"<?php return array('dependencies' => array('wp-blob'), 'version' => 'c8be4fceac30d1d00ca7');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
-  Object {
-    "externalType": "window",
-    "request": "lodash",
-    "userRequest": "lodash",
-  },
   Object {
     "externalType": "window",
     "request": Array [

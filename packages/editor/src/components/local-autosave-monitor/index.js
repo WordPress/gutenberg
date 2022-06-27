@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { once, uniqueId, omit } from 'lodash';
+import { uniqueId, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,23 +27,28 @@ const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
 	: window.requestAnimationFrame;
 
+let hasStorageSupport;
 /**
  * Function which returns true if the current environment supports browser
  * sessionStorage, or false otherwise. The result of this function is cached and
  * reused in subsequent invocations.
  */
-const hasSessionStorageSupport = once( () => {
-	try {
-		// Private Browsing in Safari 10 and earlier will throw an error when
-		// attempting to set into sessionStorage. The test here is intentional in
-		// causing a thrown error as condition bailing from local autosave.
-		window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
-		window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
-		return true;
-	} catch ( error ) {
-		return false;
+const hasSessionStorageSupport = () => {
+	if ( typeof hasStorageSupport === 'undefined' ) {
+		try {
+			// Private Browsing in Safari 10 and earlier will throw an error when
+			// attempting to set into sessionStorage. The test here is intentional in
+			// causing a thrown error as condition bailing from local autosave.
+			window.sessionStorage.setItem( '__wpEditorTestSessionStorage', '' );
+			window.sessionStorage.removeItem( '__wpEditorTestSessionStorage' );
+			hasStorageSupport = true;
+		} catch ( error ) {
+			hasStorageSupport = false;
+		}
 	}
-} );
+
+	return hasStorageSupport;
+};
 
 /**
  * Custom hook which manages the creation of a notice prompting the user to
@@ -54,8 +59,8 @@ function useAutosaveNotice() {
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			hasRemoteAutosave: !! select( editorStore ).getEditorSettings()
-				.autosave,
+			hasRemoteAutosave:
+				!! select( editorStore ).getEditorSettings().autosave,
 		} ),
 		[]
 	);
@@ -124,22 +129,17 @@ function useAutosaveNotice() {
  * Custom hook which ejects a local autosave after a successful save occurs.
  */
 function useAutosavePurge() {
-	const {
-		postId,
-		isEditedPostNew,
-		isDirty,
-		isAutosaving,
-		didError,
-	} = useSelect(
-		( select ) => ( {
-			postId: select( editorStore ).getCurrentPostId(),
-			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			isDirty: select( editorStore ).isEditedPostDirty(),
-			isAutosaving: select( editorStore ).isAutosavingPost(),
-			didError: select( editorStore ).didPostSaveRequestFail(),
-		} ),
-		[]
-	);
+	const { postId, isEditedPostNew, isDirty, isAutosaving, didError } =
+		useSelect(
+			( select ) => ( {
+				postId: select( editorStore ).getCurrentPostId(),
+				isEditedPostNew: select( editorStore ).isEditedPostNew(),
+				isDirty: select( editorStore ).isEditedPostDirty(),
+				isAutosaving: select( editorStore ).isAutosavingPost(),
+				didError: select( editorStore ).didPostSaveRequestFail(),
+			} ),
+			[]
+		);
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
@@ -177,8 +177,8 @@ function LocalAutosaveMonitor() {
 
 	const { localAutosaveInterval } = useSelect(
 		( select ) => ( {
-			localAutosaveInterval: select( editorStore ).getEditorSettings()
-				.localAutosaveInterval,
+			localAutosaveInterval:
+				select( editorStore ).getEditorSettings().localAutosaveInterval,
 		} ),
 		[]
 	);

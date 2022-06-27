@@ -71,7 +71,10 @@ export function getAutoCompleterUI( autocompleter ) {
 			} else if ( isVisible && text.length === 0 ) {
 				startAnimation( false );
 			}
-		}, [ onChangeOptions, items, isVisible, text, startAnimation ] );
+			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// See https://github.com/WordPress/gutenberg/pull/41820
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [ items, isVisible, text ] );
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
 			styles[ 'components-autocomplete__item-active' ],
@@ -111,7 +114,10 @@ export function getAutoCompleterUI( autocompleter ) {
 					}
 				} );
 			},
-			[ animationValue, isVisible, reset ]
+			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// See https://github.com/WordPress/gutenberg/pull/41820
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[ isVisible ]
 		);
 
 		const contentStyles = {

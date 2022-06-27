@@ -30,9 +30,8 @@ function ComplementaryAreaToggle( {
 			identifier,
 		[ identifier ]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }

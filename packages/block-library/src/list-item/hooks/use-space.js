@@ -12,9 +12,8 @@ import { useSelect } from '@wordpress/data';
 import useIndentListItem from './use-indent-list-item';
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd } = useSelect(
-		blockEditorStore
-	);
+	const { getSelectionStart, getSelectionEnd } =
+		useSelect( blockEditorStore );
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 
 	return useRefEffect(

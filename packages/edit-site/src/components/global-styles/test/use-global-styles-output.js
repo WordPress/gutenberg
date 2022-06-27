@@ -40,6 +40,20 @@ describe( 'global styles renderer', () => {
 										fontSize: '23px',
 									},
 								},
+								link: {
+									':hover': {
+										color: {
+											background: 'green',
+											text: 'yellow',
+										},
+									},
+									':focus': {
+										color: {
+											background: 'green',
+											text: 'yellow',
+										},
+									},
+								},
 							},
 						},
 					},
@@ -48,6 +62,18 @@ describe( 'global styles renderer', () => {
 							color: {
 								background: 'yellow',
 								text: 'yellow',
+							},
+							':hover': {
+								color: {
+									background: 'hotpink',
+									text: 'black',
+								},
+							},
+							':focus': {
+								color: {
+									background: 'hotpink',
+									text: 'black',
+								},
 							},
 						},
 					},
@@ -58,6 +84,7 @@ describe( 'global styles renderer', () => {
 					selector: '.my-heading1, .my-heading2',
 				},
 			};
+
 			expect( getNodesWithStyles( tree, blockSelectors ) ).toEqual( [
 				{
 					styles: {
@@ -73,6 +100,18 @@ describe( 'global styles renderer', () => {
 						color: {
 							background: 'yellow',
 							text: 'yellow',
+						},
+						':hover': {
+							color: {
+								background: 'hotpink',
+								text: 'black',
+							},
+						},
+						':focus': {
+							color: {
+								background: 'hotpink',
+								text: 'black',
+							},
 						},
 					},
 					selector: ELEMENTS.link,
@@ -101,6 +140,23 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 h2, .my-heading2 h2',
+				},
+				{
+					styles: {
+						':hover': {
+							color: {
+								background: 'green',
+								text: 'yellow',
+							},
+						},
+						':focus': {
+							color: {
+								background: 'green',
+								text: 'yellow',
+							},
+						},
+					},
+					selector: '.my-heading1 a, .my-heading2 a',
 				},
 			] );
 		} );
@@ -318,6 +374,21 @@ describe( 'global styles renderer', () => {
 								fontSize: '42px',
 							},
 						},
+						link: {
+							color: {
+								text: 'blue',
+							},
+							':hover': {
+								color: {
+									text: 'orange',
+								},
+							},
+							':focus': {
+								color: {
+									text: 'orange',
+								},
+							},
+						},
 					},
 					blocks: {
 						'core/group': {
@@ -345,6 +416,16 @@ describe( 'global styles renderer', () => {
 									color: {
 										text: 'hotpink',
 									},
+									':hover': {
+										color: {
+											text: 'red',
+										},
+									},
+									':focus': {
+										color: {
+											text: 'red',
+										},
+									},
 								},
 							},
 						},
@@ -358,27 +439,12 @@ describe( 'global styles renderer', () => {
 				},
 				'core/heading': {
 					selector: 'h1,h2,h3,h4,h5,h6',
-					elements: {
-						link:
-							'h1 ' +
-							ELEMENTS.link +
-							',h2 ' +
-							ELEMENTS.link +
-							',h3 ' +
-							ELEMENTS.link +
-							',h4 ' +
-							ELEMENTS.link +
-							',h5 ' +
-							ELEMENTS.link +
-							',h6 ' +
-							ELEMENTS.link,
-					},
 				},
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
-					'body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}' +
+					'body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);

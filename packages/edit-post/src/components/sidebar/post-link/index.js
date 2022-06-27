@@ -139,9 +139,8 @@ export default compose( [
 			getEditedPostAttribute,
 			getEditedPostSlug,
 		} = select( editorStore );
-		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-			editPostStore
-		);
+		const { isEditorPanelEnabled, isEditorPanelOpened } =
+			select( editPostStore );
 		const { getPostType } = select( coreStore );
 
 		const { link } = getCurrentPost();

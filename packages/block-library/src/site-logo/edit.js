@@ -369,9 +369,8 @@ export default function LogoEdit( {
 		mediaItemData,
 		isRequestingMediaItem,
 	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
-			coreStore
-		);
+		const { canUser, getEntityRecord, getEditedEntityRecord } =
+			select( coreStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		const _siteLogo = siteSettings?.site_logo;

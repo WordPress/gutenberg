@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
@@ -13,6 +8,8 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
  */
 import { MediaPlaceholder } from './styles/focal-point-picker-style';
 import { isVideoType } from './utils';
+
+const noop = () => {};
 
 export default function Media( {
 	alt,

@@ -4,10 +4,45 @@
 
 ### Bug Fix
 
+-   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
+
+### Enhancements
+
+-   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
+
+### Internal
+
+-   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+-   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+-   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
+-   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `Truncate`: Convert to TypeScript ([#41697](https://github.com/WordPress/gutenberg/pull/41697)).
+-   `FocalPointPicker`: Refactor away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   `RangeControl`: Refactor away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   Refactor components `utils` away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   `BoxControl`: Refactor utils away from `_.isNumber()` ([#41776](https://github.com/WordPress/gutenberg/pull/41776/)).
+-   `Elevation`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
+-   `HStack`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
+-   `Truncate`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
+-   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+-   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+-   `Spacer`: Convert knobs to controls in Storybook ([#41851](https://github.com/WordPress/gutenberg/pull/41851)).
+-   `Navigation`: Refactor away from Lodash functions ([#41865](https://github.com/WordPress/gutenberg/pull/41865/)).
+-   `CustomGradientPicker`: Refactor away from Lodash ([#41901](https://github.com/WordPress/gutenberg/pull/41901/)).
+-   `SegmentedControl`: Refactor away from `_.values()` ([#41905](https://github.com/WordPress/gutenberg/pull/41905/)).
+-   `DimensionControl`: Refactor docs away from `_.partialRight()` ([#41909](https://github.com/WordPress/gutenberg/pull/41909/)).
+
+## 19.13.0 (2022-06-15)
+
+### Bug Fix
+
 -   `Tooltip`: Opt in to `__unstableShift` to ensure that the Tooltip is always within the viewport. ([#41524](https://github.com/WordPress/gutenberg/pull/41524))
 -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
 -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
 -   `FormTokenField`: Added Padding to resolve close button overlap issue ([#41556](https://github.com/WordPress/gutenberg/pull/41556)).
+-   `ComboboxControl`: fix the autofocus behavior after resetting the value. ([#41737](https://github.com/WordPress/gutenberg/pull/41737)).
 
 ### Enhancements
 
@@ -22,7 +57,16 @@
 -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
 -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
 -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
+-   `ZStack`: Convert component story to TypeScript and add inline docs ([#41694](https://github.com/WordPress/gutenberg/pull/41694)).
+-   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
+-   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
+-   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
+-   `InputControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
+-   `Modal`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41610](https://github.com/WordPress/gutenberg/pull/41610))
 
+### Experimental
+
+-   `Navigation`: improve unit tests by using `@testing-library/user-event` and modern `@testing-library` assertions; add unit test for controlled component ([#41668](https://github.com/WordPress/gutenberg/pull/41668)).
 
 ## 19.12.0 (2022-06-01)
 

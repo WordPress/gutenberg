@@ -45,10 +45,8 @@ export default function BlockTypesList( {
 	}, [] );
 
 	function calculateItemWidth() {
-		const {
-			paddingLeft: itemPaddingLeft,
-			paddingRight: itemPaddingRight,
-		} = InserterButton.Styles.modalItem;
+		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } =
+			InserterButton.Styles.modalItem;
 		const { width } = InserterButton.Styles.modalIconWrapper;
 		return width + itemPaddingLeft + itemPaddingRight;
 	}

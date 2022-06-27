@@ -56,9 +56,8 @@ export default compose( [
 	withSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } = select(
-			editPostStore
-		);
+		const { isEditorPanelRemoved, isEditorPanelOpened } =
+			select( editPostStore );
 		return {
 			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),

@@ -23,8 +23,14 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').DataRegistry} DataRegistry */
-/** @typedef {import('../types').StoreDescriptor} StoreDescriptor */
-/** @typedef {import('../types').ReduxStoreConfig} ReduxStoreConfig */
+/**
+ * @typedef {import('../types').StoreDescriptor<C>} StoreDescriptor
+ * @template C
+ */
+/**
+ * @typedef {import('../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
+ * @template State,Actions,Selectors
+ */
 
 const trimUndefinedValues = ( array ) => {
 	const result = [ ...array ];
@@ -83,12 +89,13 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}           key     Unique namespace identifier.
- * @param {ReduxStoreConfig} options Registered store options, with properties
- *                                   describing reducer, actions, selectors,
- *                                   and resolvers.
+ * @template State,Actions,Selectors
+ * @param {string}                                    key     Unique namespace identifier.
+ * @param {ReduxStoreConfig<State,Actions,Selectors>} options Registered store options, with properties
+ *                                                            describing reducer, actions, selectors,
+ *                                                            and resolvers.
  *
- * @return {StoreDescriptor} Store Object.
+ * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {
@@ -136,8 +143,9 @@ export default function createReduxStore( key, options ) {
 				{
 					...mapValues(
 						metadataSelectors,
-						( selector ) => ( state, ...args ) =>
-							selector( state.metadata, ...args )
+						( selector ) =>
+							( state, ...args ) =>
+								selector( state.metadata, ...args )
 					),
 					...mapValues( options.selectors, ( selector ) => {
 						if ( selector.isRegistrySelector ) {
@@ -308,9 +316,11 @@ function mapSelectors( selectors, store ) {
  * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
-	const createBoundAction = ( action ) => ( ...args ) => {
-		return Promise.resolve( store.dispatch( action( ...args ) ) );
-	};
+	const createBoundAction =
+		( action ) =>
+		( ...args ) => {
+			return Promise.resolve( store.dispatch( action( ...args ) ) );
+		};
 
 	return mapValues( actions, createBoundAction );
 }

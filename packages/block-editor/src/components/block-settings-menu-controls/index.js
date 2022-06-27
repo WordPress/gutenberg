@@ -20,7 +20,7 @@ import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
 } from '../convert-to-group-buttons';
-import { BlockLockMenuItem } from '../block-lock';
+import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
@@ -47,7 +47,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		[ clientIds ]
 	);
 
-	const showLockButton = selectedClientIds.length === 1;
+	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
+	const showLockButton = selectedClientIds.length === 1 && canLock;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
