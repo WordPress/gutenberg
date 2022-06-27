@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, forEach } from 'lodash';
+import { forEach } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -275,12 +275,15 @@ const shortcode = Object.assign(
 			return;
 		}
 
+		const attributeTypes = [ 'named', 'numeric' ];
+
 		// Parse a string of attributes.
 		if ( typeof attributes === 'string' ) {
 			this.attrs = attrs( attributes );
 			// Identify a correctly formatted `attrs` object.
 		} else if (
-			isEqual( Object.keys( attributes ), [ 'named', 'numeric' ] )
+			attributes.length === attributeTypes.length &&
+			attributeTypes.every( ( t, key ) => t === attributes[ key ] )
 		) {
 			this.attrs = attributes;
 			// Handle a flat object of attributes.
