@@ -181,7 +181,7 @@ test.describe( 'Post Editor Template mode', () => {
 					'role=combobox[name="Template"i]'
 				);
 				await expect( templateSelect ).toHaveValue(
-					`wp-custom-template-${ viewport }-viewport-deletion-test`
+					`${ viewport }-viewport-deletion-test`
 				);
 			} );
 

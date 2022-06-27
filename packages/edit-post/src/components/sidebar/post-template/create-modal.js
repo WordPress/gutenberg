@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -18,6 +13,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -89,7 +85,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 			] );
 
 		await __unstableCreateTemplate( {
-			slug: 'wp-custom-template-' + kebabCase( title || DEFAULT_TITLE ),
+			slug: cleanForSlug( title || DEFAULT_TITLE ),
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
 		} );
