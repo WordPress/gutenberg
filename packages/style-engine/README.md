@@ -12,6 +12,36 @@ npm install @wordpress/style-engine --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Glossary
+
+A guide to the terms and variable names referenced by the Style Engine package.
+
+<dl>
+  <dt>Block style</dt>
+  <dd>An object from a block's style attribute that contains a block's style values. E.g., <code>{ spacing: { margin: '10px' }, color: { ... }, ...  }</code></dd>
+  <dt>Global styles</dt>
+  <dd>A merged block styles object containing values from a theme's theme.json and user styles settings.</dd>
+  <dt>CSS declaration or (CSS property declaration)</dt>
+  <dd>When a CSS property is paired with a CSS value, this pairing is called a CSS declaration. </dd>
+  <dt>CSS declarations block</dt>
+  <dd>A set of CSS declarations usually paired with CSS selectors to create a CSS rule.</dd>
+  <dt>CSS property</dt>
+  <dd></dd>
+  <dt>CSS rule</dt>
+  <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces</dd>
+  <dt>CSS selector</dt>
+  <dd></dd>
+  <dt>CSS value</dt>
+  <dd></dd>
+  <dt>CSS var</dt>
+  <dd></dd>
+  <dt>Inline styles</dt>
+  <dd>Inline styles are CSS declarations that affect a single HTML element, contained within a style attribute</dd>
+</dl>
+
+### Block style
+
+
 ## Important
 
 This Package is considered experimental at the moment. The idea is to have a package used to generate styles based on a style object that is consistent between: backend, frontend, block style object and theme.json.
