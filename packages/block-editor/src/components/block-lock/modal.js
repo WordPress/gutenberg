@@ -199,6 +199,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all children' ) }
 							checked={ applyTemplateLock }
+							disabled={ lock.move && ! lock.remove }
 							onChange={ () =>
 								setApplyTemplateLock( ! applyTemplateLock )
 							}
