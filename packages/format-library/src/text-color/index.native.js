@@ -72,12 +72,14 @@ function TextColorEdit( {
 	const allowCustomControl = useSetting( 'color.custom' );
 	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
-		setIsAddingColor,
-	] );
-	const disableIsAddingColor = useCallback( () => setIsAddingColor( false ), [
-		setIsAddingColor,
-	] );
+	const enableIsAddingColor = useCallback(
+		() => setIsAddingColor( true ),
+		[ setIsAddingColor ]
+	);
+	const disableIsAddingColor = useCallback(
+		() => setIsAddingColor( false ),
+		[ setIsAddingColor ]
+	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(

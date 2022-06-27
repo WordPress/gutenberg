@@ -7,7 +7,6 @@ import {
 	debounce,
 	repeat,
 	find,
-	flatten,
 	deburr,
 } from 'lodash';
 
@@ -52,12 +51,10 @@ export function PageAttributesParent() {
 	const [ fieldValue, setFieldValue ] = useState( false );
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } = select(
-				coreStore
-			);
-			const { getCurrentPostId, getEditedPostAttribute } = select(
-				editorStore
-			);
+			const { getPostType, getEntityRecords, getEntityRecord } =
+				select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const pageId = getEditedPostAttribute( 'parent' );
 			const pType = getPostType( postTypeSlug );
@@ -113,7 +110,7 @@ export function PageAttributesParent() {
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
-			return flatten( sortedNodes );
+			return sortedNodes.flat();
 		};
 
 		let tree = pageItems.map( ( item ) => ( {

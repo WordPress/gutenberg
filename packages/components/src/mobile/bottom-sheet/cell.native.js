@@ -37,9 +37,8 @@ class BottomSheetCell extends Component {
 			isScreenReaderEnabled: false,
 		};
 
-		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
-			this
-		);
+		this.handleScreenReaderToggled =
+			this.handleScreenReaderToggled.bind( this );
 
 		this.isCurrent = false;
 	}

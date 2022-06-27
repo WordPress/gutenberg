@@ -115,6 +115,7 @@ const Popover = (
 		__unstableSlotName = SLOT_NAME,
 		__unstableObserveElement,
 		__unstableForcePosition,
+		__unstableShift = false,
 		...contentProps
 	},
 	ref
@@ -134,26 +135,29 @@ const Popover = (
 		? positionToPlacement( position )
 		: placement;
 
+	const ownerDocument = useMemo( () => {
+		if ( anchorRef?.top ) {
+			return anchorRef?.top.ownerDocument;
+		} else if ( anchorRef?.startContainer ) {
+			return anchorRef.startContainer.ownerDocument;
+		} else if ( anchorRef?.current ) {
+			return anchorRef.current.ownerDocument;
+		} else if ( anchorRef ) {
+			// This one should be deprecated.
+			return anchorRef.ownerDocument;
+		} else if ( anchorRect && anchorRect?.ownerDocument ) {
+			return anchorRect.ownerDocument;
+		} else if ( getAnchorRect ) {
+			return getAnchorRect()?.ownerDocument ?? document;
+		}
+
+		return document;
+	}, [ anchorRef, anchorRect, getAnchorRect ] );
+
 	/**
 	 * Offsets the the position of the popover when the anchor is inside an iframe.
 	 */
 	const frameOffset = useMemo( () => {
-		let ownerDocument = document;
-		if ( anchorRef?.top ) {
-			ownerDocument = anchorRef?.top.ownerDocument;
-		} else if ( anchorRef?.startContainer ) {
-			ownerDocument = anchorRef.startContainer.ownerDocument;
-		} else if ( anchorRef?.current ) {
-			ownerDocument = anchorRef.current.ownerDocument;
-		} else if ( anchorRef ) {
-			// This one should be deprecated.
-			ownerDocument = anchorRef.ownerDocument;
-		} else if ( anchorRect && anchorRect?.ownerDocument ) {
-			ownerDocument = anchorRect.ownerDocument;
-		} else if ( getAnchorRect ) {
-			ownerDocument = getAnchorRect()?.ownerDocument ?? document;
-		}
-
 		const { defaultView } = ownerDocument;
 		const { frameElement } = defaultView;
 
@@ -171,7 +175,7 @@ const Popover = (
 				};
 			},
 		};
-	}, [ anchorRef, anchorRect, getAnchorRect ] );
+	}, [ ownerDocument ] );
 
 	const middlewares = [
 		frameOffset,
@@ -190,12 +194,13 @@ const Popover = (
 						} );
 					},
 			  } ),
-		,
-		shift( {
-			crossAxis: true,
-			limiter: limitShift(),
-			padding: 1, // Necessary to avoid flickering at the edge of the viewport.
-		} ),
+		__unstableShift
+			? shift( {
+					crossAxis: true,
+					limiter: limitShift(),
+					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+			  } )
+			: undefined,
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
 	const anchorRefFallback = useRef( null );
@@ -271,13 +276,12 @@ const Popover = (
 			usedRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect();
-					return {
-						...rect,
-						x: rect.x ?? rect.left,
-						y: rect.y ?? rect.top,
-						height: rect.height ?? rect.bottom - rect.top,
-						width: rect.width ?? rect.right - rect.left,
-					};
+					return new window.DOMRect(
+						rect.x ?? rect.left,
+						rect.y ?? rect.top,
+						rect.width ?? rect.right - rect.left,
+						rect.height ?? rect.bottom - rect.top
+					);
 				},
 			};
 		} else if ( anchorRefFallback.current ) {
@@ -309,6 +313,16 @@ const Popover = (
 			observer.disconnect();
 		};
 	}, [ __unstableObserveElement ] );
+
+	// If we're using getAnchorRect, we need to update the position as we scroll the iframe.
+	useLayoutEffect( () => {
+		if ( ownerDocument === document ) {
+			return;
+		}
+
+		ownerDocument.addEventListener( 'scroll', update );
+		return () => ownerDocument.removeEventListener( 'scroll', update );
+	}, [ ownerDocument ] );
 
 	/** @type {false | string} */
 	const animateClassName =

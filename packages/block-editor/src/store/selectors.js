@@ -4,7 +4,6 @@
 import {
 	castArray,
 	first,
-	isArray,
 	isBoolean,
 	last,
 	map,
@@ -412,8 +411,8 @@ export function getBlockSelectionEnd( state ) {
  * @return {number} Number of blocks selected in the post.
  */
 export function getSelectedBlockCount( state ) {
-	const multiSelectedBlockCount = getMultiSelectedBlockClientIds( state )
-		.length;
+	const multiSelectedBlockCount =
+		getMultiSelectedBlockClientIds( state ).length;
 
 	if ( multiSelectedBlockCount ) {
 		return multiSelectedBlockCount;
@@ -774,9 +773,8 @@ export function getMultiSelectedBlockClientIds( state ) {
  */
 export const getMultiSelectedBlocks = createSelector(
 	( state ) => {
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds(
-			state
-		);
+		const multiSelectedBlockClientIds =
+			getMultiSelectedBlockClientIds( state );
 		if ( ! multiSelectedBlockClientIds.length ) {
 			return EMPTY_ARRAY;
 		}
@@ -1450,7 +1448,7 @@ const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( isBoolean( list ) ) {
 		return list;
 	}
-	if ( isArray( list ) ) {
+	if ( Array.isArray( list ) ) {
 		// TODO: when there is a canonical way to detect that we are editing a post
 		// the following check should be changed to something like:
 		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
@@ -1843,42 +1841,48 @@ const calculateFrecency = ( time, count ) => {
  * @param {string} options.buildScope The scope for which the item is going to be used.
  * @return {Function} Function returns an item to be shown in a specific context (Inserter|Transforms list).
  */
-const buildBlockTypeItem = ( state, { buildScope = 'inserter' } ) => (
-	blockType
-) => {
-	const id = blockType.name;
+const buildBlockTypeItem =
+	( state, { buildScope = 'inserter' } ) =>
+	( blockType ) => {
+		const id = blockType.name;
 
-	let isDisabled = false;
-	if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-		isDisabled = some(
-			getBlocksByClientId( state, getClientIdsWithDescendants( state ) ),
-			{ name: blockType.name }
+		let isDisabled = false;
+		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
+			isDisabled = some(
+				getBlocksByClientId(
+					state,
+					getClientIdsWithDescendants( state )
+				),
+				{ name: blockType.name }
+			);
+		}
+
+		const { time, count = 0 } = getInsertUsage( state, id ) || {};
+		const blockItemBase = {
+			id,
+			name: blockType.name,
+			title: blockType.title,
+			icon: blockType.icon,
+			isDisabled,
+			frecency: calculateFrecency( time, count ),
+		};
+		if ( buildScope === 'transform' ) return blockItemBase;
+
+		const inserterVariations = getBlockVariations(
+			blockType.name,
+			'inserter'
 		);
-	}
-
-	const { time, count = 0 } = getInsertUsage( state, id ) || {};
-	const blockItemBase = {
-		id,
-		name: blockType.name,
-		title: blockType.title,
-		icon: blockType.icon,
-		isDisabled,
-		frecency: calculateFrecency( time, count ),
+		return {
+			...blockItemBase,
+			initialAttributes: {},
+			description: blockType.description,
+			category: blockType.category,
+			keywords: blockType.keywords,
+			variations: inserterVariations,
+			example: blockType.example,
+			utility: 1, // Deprecated.
+		};
 	};
-	if ( buildScope === 'transform' ) return blockItemBase;
-
-	const inserterVariations = getBlockVariations( blockType.name, 'inserter' );
-	return {
-		...blockItemBase,
-		initialAttributes: {},
-		description: blockType.description,
-		category: blockType.category,
-		keywords: blockType.keywords,
-		variations: inserterVariations,
-		example: blockType.example,
-		utility: 1, // Deprecated.
-	};
-};
 
 /**
  * Determines the items that appear in the inserter. Includes both static
@@ -1928,7 +1932,8 @@ export const getInserterItems = createSelector(
 		 * - prepended ^\s*
 		 *
 		 */
-		const blockParserTokenizer = /^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
+		const blockParserTokenizer =
+			/^\s*<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/;
 
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			let icon = symbol;
@@ -1948,12 +1953,8 @@ export const getInserterItems = createSelector(
 						: reusableBlock.content;
 				const rawBlockMatch = content.match( blockParserTokenizer );
 				if ( rawBlockMatch ) {
-					const [
-						,
-						,
-						namespace = 'core/',
-						blockName,
-					] = rawBlockMatch;
+					const [ , , namespace = 'core/', blockName ] =
+						rawBlockMatch;
 					const referencedBlockType = getBlockType(
 						namespace + blockName
 					);
@@ -2020,10 +2021,10 @@ export const getInserterItems = createSelector(
 			type.push( block );
 			return blocks;
 		};
-		const {
-			core: coreItems,
-			noncore: nonCoreItems,
-		} = items.reduce( groupByType, { core: [], noncore: [] } );
+		const { core: coreItems, noncore: nonCoreItems } = items.reduce(
+			groupByType,
+			{ core: [], noncore: [] }
+		);
 		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
@@ -2615,9 +2616,8 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 			return selectedBlockClientId;
 		}
 		// Check if first selected block is a child of a valid entity area.
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds(
-			state
-		);
+		const multiSelectedBlockClientIds =
+			getMultiSelectedBlockClientIds( state );
 		const entityAreaParents = getBlockParentsByBlockName(
 			state,
 			selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],

@@ -375,6 +375,9 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
+		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+		// See https://github.com/WordPress/gutenberg/pull/41820
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};

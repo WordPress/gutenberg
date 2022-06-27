@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	Modal,
@@ -31,9 +31,8 @@ function PostTemplateActions( { isPostsPage } ) {
 	const [ title, setTitle ] = useState( '' );
 	const { template, supportsTemplateMode, defaultTemplate } = useSelect(
 		( select ) => {
-			const { getCurrentPostType, getEditorSettings } = select(
-				editorStore
-			);
+			const { getCurrentPostType, getEditorSettings } =
+				select( editorStore );
 			const { getPostType } = select( coreStore );
 			const { getEditedPostTemplate } = select( editPostStore );
 
@@ -50,10 +49,8 @@ function PostTemplateActions( { isPostsPage } ) {
 		},
 		[]
 	);
-	const {
-		__unstableCreateTemplate,
-		__unstableSwitchToTemplateMode,
-	} = useDispatch( editPostStore );
+	const { __unstableCreateTemplate, __unstableSwitchToTemplateMode } =
+		useDispatch( editPostStore );
 
 	if ( ! supportsTemplateMode ) {
 		return null;
@@ -124,6 +121,11 @@ function PostTemplateActions( { isPostsPage } ) {
 					<Button
 						variant="link"
 						onClick={ () => __unstableSwitchToTemplateMode() }
+						label={ sprintf(
+							// Translators: 1: The title or the slug of the currently selected template.
+							__( 'Edit template: %s' ),
+							template?.title.toLowerCase() ?? template.slug
+						) }
 					>
 						{ __( 'Edit' ) }
 					</Button>
@@ -132,6 +134,7 @@ function PostTemplateActions( { isPostsPage } ) {
 					<Button
 						variant="link"
 						onClick={ () => setIsModalOpen( true ) }
+						label={ _x( 'New template', 'action' ) }
 					>
 						{
 							/* translators: button to create a new template */

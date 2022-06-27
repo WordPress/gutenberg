@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Enable `no-unused-vars`'s setting `ignoreRestSiblings` to allow unused variables when destructuring with rest properties ([#41897](https://github.com/WordPress/gutenberg/pull/41897)).
+
 ## 12.2.0 (2022-05-04)
 
 ### Bug Fix

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -113,7 +113,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
 				},
-				( value ) => ! isUndefined( value )
+				( value ) => typeof value !== 'undefined'
 			);
 
 			return {
@@ -450,13 +450,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						excerptElement.innerText ||
 						'';
 
-					const {
-						url: imageSourceUrl,
-						alt: featuredImageAlt,
-					} = getFeaturedImageDetails( post, featuredImageSizeSlug );
+					const { url: imageSourceUrl, alt: featuredImageAlt } =
+						getFeaturedImageDetails( post, featuredImageSizeSlug );
 					const imageClasses = classnames( {
 						'wp-block-latest-posts__featured-image': true,
-						[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+						[ `align${ featuredImageAlign }` ]:
+							!! featuredImageAlign,
 					} );
 					const renderFeaturedImage =
 						displayFeaturedImage && imageSourceUrl;

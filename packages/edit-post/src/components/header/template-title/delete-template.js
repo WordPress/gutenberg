@@ -30,9 +30,8 @@ export default function DeleteTemplate() {
 	const { updateEditorSettings, editPost } = useDispatch( editorStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { template } = useSelect( ( select ) => {
-		const { isEditingTemplate, getEditedPostTemplate } = select(
-			editPostStore
-		);
+		const { isEditingTemplate, getEditedPostTemplate } =
+			select( editPostStore );
 		const _isEditing = isEditingTemplate();
 		return {
 			template: _isEditing ? getEditedPostTemplate() : null,

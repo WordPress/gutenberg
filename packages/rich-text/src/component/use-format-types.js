@@ -68,15 +68,14 @@ export function useFormatTypes( {
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {
 				if ( type.__experimentalGetPropsForEditableTreePreparation ) {
-					accumulator[
-						type.name
-					] = type.__experimentalGetPropsForEditableTreePreparation(
-						select,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
-					);
+					accumulator[ type.name ] =
+						type.__experimentalGetPropsForEditableTreePreparation(
+							select,
+							{
+								richTextIdentifier: identifier,
+								blockClientId: clientId,
+							}
+						);
 				}
 
 				return accumulator;
@@ -115,13 +114,14 @@ export function useFormatTypes( {
 			let dispatchers = {};
 
 			if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
-				dispatchers = type.__experimentalGetPropsForEditableTreeChangeHandler(
-					dispatch,
-					{
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					}
-				);
+				dispatchers =
+					type.__experimentalGetPropsForEditableTreeChangeHandler(
+						dispatch,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
 			}
 
 			changeHandlers.push(

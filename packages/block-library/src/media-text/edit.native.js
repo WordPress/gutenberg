@@ -395,11 +395,8 @@ class MediaTextEdit extends Component {
 export default compose(
 	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlockParents,
-			getSettings,
-		} = select( blockEditorStore );
+		const { getSelectedBlockClientId, getBlockParents, getSettings } =
+			select( blockEditorStore );
 
 		const parents = getBlockParents( clientId, true );
 
