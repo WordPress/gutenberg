@@ -82,6 +82,12 @@ function LinkColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'linkColor' );
 	const [ color ] = useStyle( 'elements.link.color.text', name );
+	const [ colorHover ] = useStyle( 'elements.link.:hover.color.text', name );
+	const [ colorFocus ] = useStyle( 'elements.link.:focus.color.text', name );
+	const [ colorActive ] = useStyle(
+		'elements.link.:active.color.text',
+		name
+	);
 
 	if ( ! hasSupport ) {
 		return null;
@@ -93,9 +99,20 @@ function LinkColorItem( { name, parentMenu } ) {
 			aria-label={ __( 'Colors link styles' ) }
 		>
 			<HStack justify="flex-start">
-				<ColorIndicatorWrapper expanded={ false }>
-					<ColorIndicator colorValue={ color } />
-				</ColorIndicatorWrapper>
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ colorHover } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ colorFocus } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ colorActive } />
+					</ColorIndicatorWrapper>
+				</ZStack>
 				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
 		</NavigationButtonAsItem>
