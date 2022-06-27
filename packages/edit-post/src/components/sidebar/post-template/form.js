@@ -1,27 +1,80 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { addCard } from '@wordpress/icons';
 import { Notice, SelectControl, Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import { store as editPostStore } from '../../../store';
 import PostTemplateCreateModal from './create-modal';
 
-export default function PostTemplateForm( {
-	isPostsPage,
-	selectedOption,
-	options,
-	canCreate,
-	canEdit,
-	onChange,
-	onEdit,
-	onClose,
-} ) {
+export default function PostTemplateForm( { onClose } ) {
+	const {
+		isPostsPage,
+		availableTemplates,
+		fetchedTemplates,
+		selectedTemplateSlug,
+		canCreate,
+		canEdit,
+	} = useSelect( ( select ) => {
+		const settings = select( editorStore ).getEditorSettings();
+		const _isPostsPage =
+			select( editorStore ).getCurrentPostId() ===
+			settings?.page_for_posts;
+		const canCreateTemplates = select( coreStore ).canUser(
+			'create',
+			'templates'
+		);
+		return {
+			isPostsPage: _isPostsPage,
+			availableTemplates: settings.availableTemplates,
+			fetchedTemplates: select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{
+					post_type: select( editorStore ).getCurrentPostType(),
+					per_page: -1,
+				}
+			),
+			selectedTemplateSlug:
+				select( editorStore ).getEditedPostAttribute( 'template' ),
+			canCreate: canCreateTemplates && ! _isPostsPage,
+			canEdit:
+				canCreateTemplates &&
+				settings.supportsTemplateMode &&
+				!! select( editPostStore ).getEditedPostTemplate(),
+		};
+	}, [] );
+
+	const options = useMemo(
+		() =>
+			Object.entries( {
+				...availableTemplates,
+				...Object.fromEntries(
+					( fetchedTemplates ?? [] ).map( ( { slug, title } ) => [
+						slug,
+						title.rendered,
+					] )
+				),
+			} ).map( ( [ slug, title ] ) => ( { value: slug, label: title } ) ),
+		[ availableTemplates, fetchedTemplates ]
+	);
+
+	const selectedOption =
+		options.find( ( option ) => option.value === selectedTemplateSlug ) ??
+		options.find( ( option ) => ! option.value ); // The default option has '' value.
+
+	const { editPost } = useDispatch( editorStore );
+	const { __unstableSwitchToTemplateMode } = useDispatch( editPostStore );
+
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 
 	return (
@@ -58,12 +111,17 @@ export default function PostTemplateForm( {
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }
 					options={ options }
-					onChange={ onChange }
+					onChange={ ( slug ) =>
+						editPost( { template: slug || '' } )
+					}
 				/>
 			) }
 			{ canEdit && (
 				<p>
-					<Button variant="link" onClick={ onEdit }>
+					<Button
+						variant="link"
+						onClick={ () => __unstableSwitchToTemplateMode() }
+					>
 						{ __( 'Edit template' ) }
 					</Button>
 				</p>
