@@ -39,6 +39,16 @@ function ScreenLinkColor( { name } ) {
 		name
 	);
 
+	const [ linkFocusColor, setLinkFocusColor ] = useStyle(
+		'elements.link.:focus.color.text',
+		name
+	);
+
+	const [ linkActiveColor, setLinkActiveColor ] = useStyle(
+		'elements.link.:active.color.text',
+		name
+	);
+
 	const [ userLinkColor ] = useStyle(
 		'elements.link.color.text',
 		name,
@@ -47,6 +57,18 @@ function ScreenLinkColor( { name } ) {
 
 	const [ userLinkHoverColor ] = useStyle(
 		'elements.link.:hover.color.text',
+		name,
+		'user'
+	);
+
+	const [ userLinkFocusColor ] = useStyle(
+		'elements.link.:focus.color.text',
+		name,
+		'user'
+	);
+
+	const [ userLinkActiveColor ] = useStyle(
+		'elements.link.:active.color.text',
 		name,
 		'user'
 	);
@@ -61,6 +83,16 @@ function ScreenLinkColor( { name } ) {
 			value: linkHoverColor,
 			handler: setLinkHoverColor,
 			userValue: userLinkHoverColor,
+		},
+		focus: {
+			value: linkFocusColor,
+			handler: setLinkFocusColor,
+			userValue: userLinkFocusColor,
+		},
+		active: {
+			value: linkActiveColor,
+			handler: setLinkActiveColor,
+			userValue: userLinkActiveColor,
 		},
 	};
 
@@ -89,6 +121,16 @@ function ScreenLinkColor( { name } ) {
 						name: 'hover',
 						title: 'Hover',
 						className: 'color-text-hover',
+					},
+					{
+						name: 'focus',
+						title: 'Focus',
+						className: 'color-text-focus',
+					},
+					{
+						name: 'active',
+						title: 'Active',
+						className: 'color-text-active',
 					},
 				] }
 			>
