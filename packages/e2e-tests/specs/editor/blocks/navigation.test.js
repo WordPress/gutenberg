@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -48,6 +43,7 @@ const REST_PAGES_ROUTES = [
 	'/wp/v2/pages',
 	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
+let uniqueId = 0;
 
 /**
  * Determines if a given URL matches any of a given collection of
@@ -312,7 +308,7 @@ async function waitForBlock( blockName ) {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	const contributorUsername = uniqueId( 'contributoruser_' );
+	const contributorUsername = `contributoruser_${ ++uniqueId }`;
 	let contributorPassword;
 
 	beforeAll( async () => {
