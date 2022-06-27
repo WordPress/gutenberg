@@ -189,7 +189,29 @@
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
-			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
+			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
+			"spacingSizes": [
+				{
+					"name": "Small",
+					"slug": "small",
+					"size": "4px"
+				},
+				{
+					"name": "Medium",
+					"slug": "medium",
+					"size": "8px"
+				},
+				{
+					"name": "Large",
+					"slug": "large",
+					"size": "16px"
+				},
+				{
+					"name": "Extra Large",
+					"slug": "x-large",
+					"size": "32px"
+				}
+			]
 		},
 		"typography": {
 			"customFontSize": true,
