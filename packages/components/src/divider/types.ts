@@ -18,13 +18,13 @@ export type DividerProps = Omit<
 	 */
 	margin?: SpaceInput;
 	/**
-	 * Adjusts the inline-start margin.
-	 */
-	marginStart?: SpaceInput;
-	/**
 	 * Adjusts the inline-end margin.
 	 */
 	marginEnd?: SpaceInput;
+	/**
+	 * Adjusts the inline-start margin.
+	 */
+	marginStart?: SpaceInput;
 	/**
 	 * Divider's orientation. When using inside a flex container, you may need
 	 * to make sure the divider is `stretch` aligned in order for it to be
