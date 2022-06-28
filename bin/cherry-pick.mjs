@@ -279,7 +279,7 @@ function reportSummaryNextSteps( successes, failures ) {
 	if ( successes.length && !AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
-		nextSteps.push( 'Remove the Backport to WP Beta/RC label' );
+		nextSteps.push( `Remove the ${ LABEL } label` );
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
 		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
