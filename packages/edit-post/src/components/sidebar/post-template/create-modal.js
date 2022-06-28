@@ -101,9 +101,12 @@ export default function PostTemplateCreateModal( { onClose } ) {
 			title={ __( 'Create custom template' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ cancel }
-			overlayClassName="edit-post-post-template__modal"
+			className="edit-post-post-template__create-modal"
 		>
-			<form onSubmit={ submit }>
+			<form
+				className="edit-post-post-template__create-form"
+				onSubmit={ submit }
+			>
 				<Flex align="flex-start" gap={ 8 }>
 					<FlexItem>
 						<TextControl
@@ -119,11 +122,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 					</FlexItem>
 				</Flex>
 
-				<Flex
-					className="edit-post-template__modal-actions"
-					justify="flex-end"
-					expanded={ false }
-				>
+				<Flex justify="flex-end" expanded={ false }>
 					<FlexItem>
 						<Button variant="tertiary" onClick={ cancel }>
 							{ __( 'Cancel' ) }
