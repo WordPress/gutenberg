@@ -33,6 +33,7 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { content, level } = attributes;
+
 			return isEmpty( content )
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
