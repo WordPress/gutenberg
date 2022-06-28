@@ -24,7 +24,9 @@ export default function PostTemplate() {
 		}
 
 		const settings = select( editorStore ).getEditorSettings();
-		const hasTemplates = !! settings.availableTemplates?.length;
+		const hasTemplates =
+			!! settings.availableTemplates &&
+			Object.keys( settings.availableTemplates ).length > 0;
 		if ( hasTemplates ) {
 			return true;
 		}
