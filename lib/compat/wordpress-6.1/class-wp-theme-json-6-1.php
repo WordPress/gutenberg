@@ -1182,7 +1182,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			if ( $block_gap_value ) {
 				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
-					// Allow skipping default layout, for example, so that classic themes can still output flex gap styles.
+					// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
 					if ( ! $has_block_gap_support && 'default' === $layout_definition_key ) {
 						continue;
 					}

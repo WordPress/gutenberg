@@ -28,6 +28,8 @@ import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -238,22 +240,36 @@ function getStylesDeclarations( blockStyles = {} ) {
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
- * @param {Object}  tree               A theme.json tree containing layout definitions.
- * @param {Object}  style              A style object containing spacing values.
- * @param {string}  selector           Selector used to group together layout styling rules.
- * @param {boolean} hasBlockGapSupport Whether or not the theme opts-in to blockGap support.
+ * @param {Object}  tree                  A theme.json tree containing layout definitions.
+ * @param {Object}  style                 A style object containing spacing values.
+ * @param {string}  selector              Selector used to group together layout styling rules.
+ * @param {boolean} hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
+ * @param {boolean} hasBlockStylesSupport Whether or not the theme opts-in to `wp-block-styles` support.
  * @return {string} Generated CSS rules for the layout styles.
  */
-function getLayoutStyles( tree, style, selector, hasBlockGapSupport ) {
+function getLayoutStyles(
+	tree,
+	style,
+	selector,
+	hasBlockGapSupport,
+	hasBlockStylesSupport
+) {
 	let ruleset = '';
 	let gapValue = style?.spacing?.blockGap;
 	if (
-		typeof gapValue !== undefined &&
+		( gapValue !== undefined || hasBlockStylesSupport ) &&
 		tree?.settings?.layout?.definitions
 	) {
-		gapValue = getGapCSSValue( gapValue, '0.5em' );
+		gapValue = hasBlockGapSupport
+			? getGapCSSValue( gapValue, '0.5em' )
+			: '0.5em';
 		Object.values( tree.settings.layout.definitions ).forEach(
-			( { className, spacingStyles } ) => {
+			( { className, name, spacingStyles } ) => {
+				// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
+				if ( ! hasBlockGapSupport && 'default' === name ) {
+					return;
+				}
+
 				if ( spacingStyles?.length ) {
 					spacingStyles.forEach( ( spacingStyle ) => {
 						const declarations = [];
@@ -464,7 +480,12 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 	return ruleset;
 };
 
-export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
+export const toStyles = (
+	tree,
+	blockSelectors,
+	hasBlockGapSupport,
+	hasBlockStylesSupport
+) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
@@ -500,7 +521,8 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 			tree,
 			styles,
 			selector,
-			hasBlockGapSupport
+			hasBlockGapSupport,
+			hasBlockStylesSupport
 		);
 
 		// Process the remaning block styles (they use either normal block class or __experimentalSelector).
@@ -555,7 +577,7 @@ export const toStyles = ( tree, blockSelectors, hasBlockGapSupport ) => {
 		'.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
 	if ( hasBlockGapSupport ) {
-		// TODO: How do we correctly support different fallback values?
+		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue = getGapCSSValue(
 			tree?.styles?.spacing?.blockGap,
 			'0.5em'
@@ -616,6 +638,10 @@ export function useGlobalStylesOutput() {
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
+	const hasBlockStylesSupport = useSelect(
+		( select ) =>
+			select( coreStore ).getThemeSupports()[ 'wp-block-styles' ]
+	);
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -630,7 +656,8 @@ export function useGlobalStylesOutput() {
 		const globalStyles = toStyles(
 			mergedConfig,
 			blockSelectors,
-			hasBlockGapSupport
+			hasBlockGapSupport,
+			hasBlockStylesSupport
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
@@ -645,7 +672,7 @@ export function useGlobalStylesOutput() {
 		] );
 		setSettings( mergedConfig.settings );
 		setSvgFilters( filters );
-	}, [ mergedConfig ] );
+	}, [ hasBlockGapSupport, hasBlockStylesSupport, mergedConfig ] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }
