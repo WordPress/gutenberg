@@ -169,9 +169,7 @@ test.describe( 'Table', () => {
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Click the first cell and add some text. Don't align.
-		const cells = await page.locator(
-			'role=textbox[name="Body cell text"i]'
-		);
+		const cells = page.locator( 'role=textbox[name="Body cell text"i]' );
 		await cells.nth( 0 ).click();
 		await page.keyboard.type( 'None' );
 
