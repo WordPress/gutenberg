@@ -131,9 +131,7 @@ describe( 'Sidebar', () => {
 		).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
-		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
-		).toBeDefined();
+		expect( await findSidebarPanelWithTitle( 'Summary' ) ).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
@@ -165,8 +163,8 @@ describe( 'Sidebar', () => {
 		expect(
 			await page.$x( getPanelToggleSelector( 'Discussion' ) )
 		).toEqual( [] );
-		expect(
-			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
-		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Summary' ) ) ).toEqual(
+			[]
+		);
 	} );
 } );
