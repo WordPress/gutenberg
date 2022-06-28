@@ -17,10 +17,16 @@ const meta: ComponentMeta< typeof Grid > = {
 		align: { control: { type: 'text' } },
 		children: { control: { type: null } },
 		columnGap: { control: { type: 'text' } },
-		columns: { control: { type: 'number' } },
+		columns: {
+			table: { type: { summary: 'number' } },
+			control: { type: 'number' },
+		},
 		justify: { control: { type: 'text' } },
 		rowGap: { control: { type: 'text' } },
-		rows: { control: { type: 'number' } },
+		rows: {
+			table: { type: { summary: 'number' } },
+			control: { type: 'number' },
+		},
 		templateColumns: { control: { type: 'text' } },
 		templateRows: { control: { type: 'text' } },
 	},
