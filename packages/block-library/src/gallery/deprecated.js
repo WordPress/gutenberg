@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { some, omit } from 'lodash';
+import { map, some, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import { isGalleryV2Enabled } from './shared';
 
 const DEPRECATED_LINK_DESTINATION_MEDIA = 'file';
 const DEPRECATED_LINK_DESTINATION_ATTACHMENT = 'post';
@@ -281,7 +282,11 @@ const v6 = {
 		);
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+
+		return attributes;
 	},
 };
 const v5 = {
@@ -367,7 +372,23 @@ const v5 = {
 		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+
+		let linkTo = attributes.linkTo;
+
+		if ( ! attributes.linkTo ) {
+			linkTo = 'none';
+		} else if ( attributes.linkTo === 'attachment' ) {
+			linkTo = 'post';
+		} else if ( attributes.linkTo === 'media' ) {
+			linkTo = 'file';
+		}
+		return {
+			...attributes,
+			linkTo,
+		};
 	},
 	save( { attributes } ) {
 		const {
@@ -514,7 +535,17 @@ const v4 = {
 		return ids && ids.some( ( id ) => typeof id === 'string' );
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+
+		return {
+			...attributes,
+			ids: map( attributes.ids, ( id ) => {
+				const parsedId = parseInt( id, 10 );
+				return Number.isInteger( parsedId ) ? parsedId : null;
+			} ),
+		};
 	},
 	save( { attributes } ) {
 		const {
@@ -710,7 +741,10 @@ const v3 = {
 		);
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+		return attributes;
 	},
 };
 const v2 = {
@@ -776,7 +810,18 @@ const v2 = {
 		);
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+		return {
+			...attributes,
+			ids: map( attributes.images, ( { id } ) => {
+				if ( ! id ) {
+					return null;
+				}
+				return parseInt( id, 10 );
+			} ),
+		};
 	},
 	supports: {
 		align: true,
@@ -929,7 +974,11 @@ const v1 = {
 		);
 	},
 	migrate( attributes ) {
-		return runV2Migration( attributes );
+		if ( isGalleryV2Enabled() ) {
+			return runV2Migration( attributes );
+		}
+
+		return attributes;
 	},
 };
 

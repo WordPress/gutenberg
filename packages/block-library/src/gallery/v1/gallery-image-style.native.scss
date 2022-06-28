@@ -1,0 +1,109 @@
+$gallery-image-container-height: 150px;
+$overlay-border-width: 2px;
+$caption-background-color: rgba(0, 0, 0, 0.4);
+
+.galleryImageContainer {
+	flex: 1;
+	height: $gallery-image-container-height;
+	overflow: hidden;
+	background-color: $gray-lighten-30;
+}
+
+.galleryImageContainerDark {
+	background-color: $gray-90;
+}
+
+.image {
+	height: 100%;
+}
+
+.button {
+	fill: $gray-0;
+	width: 30px;
+}
+
+.buttonDisabled {
+	fill: $gray-30;
+}
+
+.buttonActive {
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border-radius: 6px;
+	border-color: $gray-70;
+	background-color: $gray-70;
+}
+
+.moverButtonContainer {
+	flex-direction: row;
+	align-items: center;
+	border-radius: 3px;
+	background-color: $gray-70;
+}
+
+.separator {
+	border-right-color: $gray-30;
+	border-right-width: 1px;
+	height: 20px;
+}
+
+.toolbarContainer {
+	position: absolute;
+}
+
+.toolbar {
+	padding: 5px;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.captionContainer {
+	flex: 1;
+	flex-direction: row;
+	align-items: flex-end;
+	position: absolute;
+	bottom: $overlay-border-width;
+	left: $overlay-border-width;
+	right: $overlay-border-width;
+	top: 45;
+}
+
+@mixin caption-shared {
+	font-size: 12px;
+	background-color: #0000;
+	color: #fff;
+	font-family: $default-regular-font;
+	text-align: center;
+}
+
+.caption {
+	@include caption-shared;
+	background-color: $caption-background-color;
+	padding-top: $grid-unit;
+	padding-bottom: $grid-unit;
+}
+
+.captionPlaceholder {
+	color: #ccc;
+}
+
+// expand caption container to compensate for overlay border
+.captionExpandedContainer {
+	// constrain height to gallery image height for caption scroll
+	max-height: $gallery-image-container-height;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding-top: $grid-unit;
+	padding-bottom: $overlay-border-width + $grid-unit;
+	padding-left: $overlay-border-width;
+	padding-right: $overlay-border-width;
+	// use caption background color on container when expanded
+	background-color: $caption-background-color;
+}
+
+.captionExpanded {
+	@include caption-shared;
+}

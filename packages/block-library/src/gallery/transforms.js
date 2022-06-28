@@ -18,6 +18,11 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
+} from './v1/constants';
+import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -43,6 +48,7 @@ const parseShortcodeIds = ( ids ) => {
  */
 function updateThirdPartyTransformToGallery( block ) {
 	if (
+		isGalleryV2Enabled() &&
 		block.name === 'core/gallery' &&
 		block.attributes?.images.length > 0
 	) {
@@ -136,18 +142,34 @@ const transforms = {
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
-				const innerBlocks = validImages.map( ( image ) => {
-					return createBlock( 'core/image', image );
-				} );
+				if ( isGalleryV2Enabled() ) {
+					const innerBlocks = validImages.map( ( image ) => {
+						return createBlock( 'core/image', image );
+					} );
 
-				return createBlock(
-					'core/gallery',
-					{
-						align,
-						sizeSlug,
-					},
-					innerBlocks
-				);
+					return createBlock(
+						'core/gallery',
+						{
+							align,
+							sizeSlug,
+						},
+						innerBlocks
+					);
+				}
+
+				return createBlock( 'core/gallery', {
+					images: validImages.map(
+						( { id, url, alt, caption } ) => ( {
+							id: id.toString(),
+							url,
+							alt,
+							caption,
+						} )
+					),
+					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
+					align,
+					sizeSlug,
+				} );
 			},
 		},
 		{
@@ -155,12 +177,32 @@ const transforms = {
 			tag: 'gallery',
 
 			attributes: {
+				images: {
+					type: 'array',
+					shortcode: ( { named: { ids } } ) => {
+						if ( ! isGalleryV2Enabled() ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: id.toString(),
+							} ) );
+						}
+					},
+				},
+				ids: {
+					type: 'array',
+					shortcode: ( { named: { ids } } ) => {
+						if ( ! isGalleryV2Enabled() ) {
+							return parseShortcodeIds( ids );
+						}
+					},
+				},
 				shortCodeTransforms: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id: parseInt( id ),
-						} ) );
+						if ( isGalleryV2Enabled() ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: parseInt( id ),
+							} ) );
+						}
 					},
 				},
 				columns: {
@@ -172,6 +214,16 @@ const transforms = {
 				linkTo: {
 					type: 'string',
 					shortcode: ( { named: { link } } ) => {
+						if ( ! isGalleryV2Enabled() ) {
+							switch ( link ) {
+								case 'post':
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+								case 'file':
+									return DEPRECATED_LINK_DESTINATION_MEDIA;
+								default:
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+							}
+						}
 						switch ( link ) {
 							case 'post':
 								return LINK_DESTINATION_ATTACHMENT;
@@ -205,13 +257,23 @@ const transforms = {
 				);
 			},
 			transform( files ) {
-				const innerBlocks = files.map( ( file ) =>
-					createBlock( 'core/image', {
-						url: createBlobURL( file ),
-					} )
-				);
+				if ( isGalleryV2Enabled() ) {
+					const innerBlocks = files.map( ( file ) =>
+						createBlock( 'core/image', {
+							url: createBlobURL( file ),
+						} )
+					);
 
-				return createBlock( 'core/gallery', {}, innerBlocks );
+					return createBlock( 'core/gallery', {}, innerBlocks );
+				}
+				const block = createBlock( 'core/gallery', {
+					images: files.map( ( file ) =>
+						pickRelevantMediaFiles( {
+							url: createBlobURL( file ),
+						} )
+					),
+				} );
+				return block;
 			},
 		},
 	],
@@ -219,32 +281,47 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { align }, innerBlocks ) => {
-				if ( innerBlocks.length > 0 ) {
-					return innerBlocks.map(
-						( {
-							attributes: {
-								id,
-								url,
-								alt,
-								caption,
-								sizeSlug: imageSizeSlug,
-								linkDestination,
-								href,
-								linkTarget,
-							},
-						} ) =>
-							createBlock( 'core/image', {
-								id,
-								url,
-								alt,
-								caption,
-								sizeSlug: imageSizeSlug,
-								align,
-								linkDestination,
-								href,
-								linkTarget,
-							} )
+			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
+				if ( isGalleryV2Enabled() ) {
+					if ( innerBlocks.length > 0 ) {
+						return innerBlocks.map(
+							( {
+								attributes: {
+									id,
+									url,
+									alt,
+									caption,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
+									href,
+									linkTarget,
+								},
+							} ) =>
+								createBlock( 'core/image', {
+									id,
+									url,
+									alt,
+									caption,
+									sizeSlug: imageSizeSlug,
+									align,
+									linkDestination,
+									href,
+									linkTarget,
+								} )
+						);
+					}
+					return createBlock( 'core/image', { align } );
+				}
+				if ( images.length > 0 ) {
+					return images.map( ( { url, alt, caption }, index ) =>
+						createBlock( 'core/image', {
+							id: ids[ index ],
+							url,
+							alt,
+							caption,
+							align,
+							sizeSlug,
+						} )
 					);
 				}
 				return createBlock( 'core/image', { align } );
