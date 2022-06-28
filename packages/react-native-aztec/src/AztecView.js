@@ -214,7 +214,6 @@ class AztecView extends Component {
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, ...otherProps } = this.props;
 		// `style` has to be destructured separately, without `otherProps`, because of:
 		// https://github.com/WordPress/gutenberg/issues/23611

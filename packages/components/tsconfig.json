@@ -57,6 +57,7 @@
 		"src/external-link/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/form-toggle/**/*",
 		"src/form-token-field/**/*",
 		"src/grid/**/*",
 		"src/h-stack/**/*",

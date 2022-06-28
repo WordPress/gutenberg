@@ -20,7 +20,19 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 const noop = () => {};
 const renderQueue = createQueue();
 
-/** @typedef {import('../../types').StoreDescriptor} StoreDescriptor */
+/**
+ * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
+ * @template C
+ */
+/**
+ * @typedef {import('../../types').ReduxStoreConfig<State,Actions,Selectors>} ReduxStoreConfig
+ * @template State,Actions,Selectors
+ */
+/**
+ * @typedef {import('../../types').UseSelectReturn<T>} UseSelectReturn
+ * @template T
+ */
+/** @typedef {import('../../types').MapSelect} MapSelect */
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -28,20 +40,16 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function|StoreDescriptor|string} mapSelect Function called on every state change. The
- *                                                    returned value is exposed to the component
- *                                                    implementing this hook. The function receives
- *                                                    the `registry.select` method on the first
- *                                                    argument and the `registry` on the second
- *                                                    argument.
- *                                                    When a store key is passed, all selectors for
- *                                                    the store will be returned. This is only meant
- *                                                    for usage of these selectors in event
- *                                                    callbacks, not for data needed to create the
- *                                                    element tree.
- * @param {Array}                           deps      If provided, this memoizes the mapSelect so the
- *                                                    same `mapSelect` is invoked on every state
- *                                                    change unless the dependencies change.
+ * @template {MapSelect | StoreDescriptor<any>} T
+ * @param {T}         mapSelect Function called on every state change. The returned value is
+ *                              exposed to the component implementing this hook. The function
+ *                              receives the `registry.select` method on the first argument
+ *                              and the `registry` on the second argument.
+ *                              When a store key is passed, all selectors for the store will be
+ *                              returned. This is only meant for usage of these selectors in event
+ *                              callbacks, not for data needed to create the element tree.
+ * @param {unknown[]} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ *                              invoked on every state change unless the dependencies change.
  *
  * @example
  * ```js
@@ -86,8 +94,7 @@ const renderQueue = createQueue();
  *   return <div onPaste={ onPaste }>{ children }</div>;
  * }
  * ```
- *
- * @return {Function}  A custom react hook.
+ * @return {UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;

@@ -1,26 +1,31 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../ui/context';
-import { View } from '../view';
-import { useVStack } from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+ * Internal dependencies
  */
-function VStack( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../ui/context';
+import { View } from '../view';
+import { useVStack } from './hook';
+import type { VStackProps } from './types';
+
+function UnconnectedVStack(
+	props: WordPressComponentProps< VStackProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const vStackProps = useVStack( props );
 
 	return <View { ...vStackProps } ref={ forwardedRef } />;
 }
 
 /**
- * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
+ * `VStack` (or Vertical Stack) is a layout component that arranges child
+ * elements in a vertical line.
  *
  * `VStack` can render anything inside.
  *
- * @example
  * ```jsx
  * import {
  * 	__experimentalText as Text,
@@ -38,6 +43,6 @@ function VStack( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedVStack = contextConnect( VStack, 'VStack' );
+export const VStack = contextConnect( UnconnectedVStack, 'VStack' );
 
-export default ConnectedVStack;
+export default VStack;
