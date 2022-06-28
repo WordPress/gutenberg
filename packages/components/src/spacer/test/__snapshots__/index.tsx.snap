@@ -39,6 +39,7 @@ exports[`props should render correctly 1`] = `
 
 <div
   class="components-spacer emotion-0 emotion-1"
+  data-testid="spacer"
   data-wp-c16t="true"
   data-wp-component="Spacer"
 />
