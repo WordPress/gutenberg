@@ -33,6 +33,12 @@ function Example() {
 
 ## Props
 
+### `children`: `ReactNode`
+
+The children elements.
+
+-   Required: No
+
 ### `margin`: `number`
 
 Adjusts all margins.
