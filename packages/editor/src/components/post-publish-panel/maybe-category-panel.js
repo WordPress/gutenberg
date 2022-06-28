@@ -23,7 +23,7 @@ function MaybeCategoryPanel() {
 		const postType = select( editorStore ).getCurrentPostType();
 		const categoriesTaxonomy =
 			select( coreStore ).getTaxonomy( 'category' );
-		const defaultCategoryId = select( coreStore ).getEntityRecords(
+		const defaultCategoryId = select( coreStore ).getEntityRecord(
 			'root',
 			'site'
 		)?.default_category;
