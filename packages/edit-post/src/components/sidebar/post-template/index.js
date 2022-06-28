@@ -46,6 +46,7 @@ export default function PostTemplate() {
 			<Dropdown
 				popoverProps={ { anchorRef } }
 				position="bottom left"
+				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<PostTemplateToggle

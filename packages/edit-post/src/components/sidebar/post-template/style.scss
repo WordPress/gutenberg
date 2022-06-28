@@ -8,6 +8,17 @@
 	}
 }
 
+.edit-post-post-template__dropdown {
+	max-width: 55%;
+}
+
+.components-button.edit-post-post-template__toggle {
+	display: inline-block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .edit-post-post-template__dialog {
 	z-index: z-index(".edit-post-post-template__dialog");
 }
