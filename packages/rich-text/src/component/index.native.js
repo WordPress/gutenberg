@@ -657,6 +657,13 @@ export class RichText extends Component {
 			return;
 		}
 
+		this.comesFromAztec = true;
+		this.firedAfterTextChanged = true; // Selection change event always fires after the fact.
+
+		// Update text before updating selection
+		// Make sure there are changes made to the content before upgrading it upward.
+		this.onTextUpdate( event );
+
 		// Check for and discard events during quick typing. Updating the selection during quick typing isn't
 		// necessary and can cause UI lags. (see https://github.com/WordPress/gutenberg/pull/41682.)
 		if (
@@ -665,13 +672,6 @@ export class RichText extends Component {
 		) {
 			return;
 		}
-
-		this.comesFromAztec = true;
-		this.firedAfterTextChanged = true; // Selection change event always fires after the fact.
-
-		// Update text before updating selection
-		// Make sure there are changes made to the content before upgrading it upward.
-		this.onTextUpdate( event );
 
 		// Aztec can send us selection change events after it has lost focus.
 		// For instance the autocorrect feature will complete a partially written
