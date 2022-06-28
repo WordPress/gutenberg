@@ -65,7 +65,12 @@ describe( 'a11y', () => {
 		// the modal.
 		await page.click( '.components-modal__header-heading' );
 
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		// Because of the tabindex of all the list/ul elements, need to Shift+Tab to the start.
+		let currentShiftTabPress = 0;
+		while ( currentShiftTabPress < 6 ) {
+			await pressKeyWithModifier( 'shift', 'Tab' );
+			currentShiftTabPress++;
+		}
 
 		expect( await isCloseButtonFocused() ).toBe( true );
 	} );
