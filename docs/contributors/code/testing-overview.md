@@ -308,6 +308,9 @@ npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
 
 # Update snapshot for e2e tests
 npm run test-e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
+
+# Update snapshot for Playwright
+npm run test-e2e:playwright -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
