@@ -124,11 +124,6 @@ function Modal( props, forwardedRef ) {
 						}
 					) }
 					style={ style }
-					ref={ useMergeRefs( [
-						constrainedTabbingRef,
-						focusReturnRef,
-						focusOnMountRef,
-					] ) }
 					role={ role }
 					aria-label={ contentLabel }
 					aria-labelledby={ contentLabel ? null : headingId }
@@ -144,6 +139,12 @@ function Modal( props, forwardedRef ) {
 							'hide-header': __experimentalHideHeader,
 						} ) }
 						role="document"
+						tabIndex="0"
+						ref={ useMergeRefs( [
+							constrainedTabbingRef,
+							focusReturnRef,
+							focusOnMountRef,
+						] ) }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">
