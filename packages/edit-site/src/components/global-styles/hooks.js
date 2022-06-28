@@ -27,9 +27,10 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
-			setUserConfig,
-		] ),
+		useCallback(
+			() => setUserConfig( () => EMPTY_CONFIG ),
+			[ setUserConfig ]
+		),
 	];
 };
 
