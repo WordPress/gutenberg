@@ -84,18 +84,7 @@ function gutenberg_enqueue_global_styles() {
 		return;
 	}
 
-	/**
-	 * If we are loading CSS for each block separately, then we can load the theme.json CSS conditionally.
-	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
-	 */
-	if ( $separate_assets ) {
-		add_filter( 'gutenberg_get_style_nodes', 'filter_out_block_nodes' );
-		// add each block as an inline css.
-		wp_add_global_styles_for_blocks();
-	}
-
 	$stylesheet = gutenberg_get_global_stylesheet();
-
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -103,6 +92,14 @@ function gutenberg_enqueue_global_styles() {
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
+
+	/**
+	 * If we are loading CSS for each block separately, then we can load the theme.json CSS conditionally.
+	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
+	 */
+	add_filter( 'gutenberg_get_style_nodes', 'filter_out_block_nodes' );
+	// add each block as an inline css.
+	wp_add_global_styles_for_blocks();
 }
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
