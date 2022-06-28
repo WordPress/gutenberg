@@ -22,7 +22,7 @@ describe( 'keyboard shortcut help modal', () => {
 	} );
 
 	// Added this test to ensure scrolling does not break in some browsers.
-	it( 'should contain tabindex on ul elements for better browser support', async () => {
+	it( 'should contain tabindex on modal content div to improve compatibility with scrolling in browsers', async () => {
 		// Open modal.
 		await clickOnMoreMenuItem( 'Keyboard shortcuts' );
 		const shortcutHelpModalElements = await page.$$(
@@ -30,13 +30,11 @@ describe( 'keyboard shortcut help modal', () => {
 		);
 		await expect( shortcutHelpModalElements ).toHaveLength( 1 );
 
-		// Try to find tabindex of 0 on ul element.
+		// Try to find tabindex of 0 on the div content element.
 		const findTabIndex = await page.evaluate(
 			() =>
 				document
-					.querySelector(
-						'ul.edit-post-keyboard-shortcut-help-modal__shortcut-list'
-					)
+					.querySelector( 'div.components-modal__content' )
 					.getAttribute( 'tabindex' ) === '0'
 		);
 		await expect( findTabIndex ).toBe( true );
