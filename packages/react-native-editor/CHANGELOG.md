@@ -12,6 +12,8 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [**] RichText - Improve performance by dropping events during quick typing [#41682]
 
 ## 1.78.1
 

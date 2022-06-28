@@ -1,5 +1,7 @@
 package com.gutenberg;
 
+import static org.wordpress.mobile.WPAndroidGlue.Media.createRNMediaUsingMimeType;
+
 import android.app.Application;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -83,17 +85,17 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
                 switch (mediaType) {
                     case IMAGE:
-                        rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", "", "A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground"));
                         break;
                     case VIDEO:
-                        rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
                         break;
                     case ANY:
                     case OTHER:
-                        rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
+                        rnMediaList.add(createRNMediaUsingMimeType(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
                     case AUDIO:
-                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        rnMediaList.add(createRNMediaUsingMimeType(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
                         break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
@@ -145,7 +147,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestMediaPickFrom(String mediaSource, MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection) {
                 if (mediaSource.equals("1")) {
                     List<RNMedia> rnMediaList = new ArrayList<>();
-                    rnMediaList.add(new Media(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
+                    rnMediaList.add(createRNMediaUsingMimeType(1, "https://grad.illinois.edu/sites/default/files/pdfs/cvsamples.pdf", "other", "","cvsamples.pdf"));
                     mediaSelectedCallback.onMediaFileSelected(rnMediaList);
                 }
             }

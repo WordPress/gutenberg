@@ -7,7 +7,11 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -60,7 +64,11 @@ export default function save( { attributes } ) {
 				image
 			) }
 			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					tagName="figcaption"
+					value={ caption }
+				/>
 			) }
 		</>
 	);
