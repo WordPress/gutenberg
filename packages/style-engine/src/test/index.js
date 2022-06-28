@@ -94,7 +94,6 @@ describe( 'generate', () => {
 		);
 	} );
 
-
 	it( 'should parse border rules', () => {
 		expect(
 			generate( {
