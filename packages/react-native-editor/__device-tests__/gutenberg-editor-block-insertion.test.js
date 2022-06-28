@@ -11,9 +11,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
+		await paragraphBlockElement.click();
 
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point.
