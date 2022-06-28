@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests covering WP_REST_Block_Patterns_Controller functionality.
+ * Unit tests covering Gutenberg_REST_Block_Patterns_Controller functionality.
  *
  * @package WordPress
  * @subpackage REST_API
@@ -10,9 +10,9 @@
  * Unit tests for REST API for Block Patterns.
  *
  * @group restapi
- * @covers WP_REST_Block_Patterns_Controller
+ * @covers Gutenberg_REST_Block_Patterns_Controller
  */
-class WP_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Gutenberg_REST_Block_Patterns_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $orig_registry;
 

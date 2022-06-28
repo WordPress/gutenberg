@@ -36,15 +36,6 @@ function gutenberg_register_edit_site_export_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoint' );
 
 /**
- * Registers the block patterns REST API routes.
- */
-function gutenberg_register_rest_block_patterns() {
-	$block_patterns = new WP_REST_Block_Patterns_Controller();
-	$block_patterns->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
-
-/**
  * Registers the block pattern categories REST API routes.
  */
 function gutenberg_register_rest_block_pattern_categories() {
@@ -52,3 +43,41 @@ function gutenberg_register_rest_block_pattern_categories() {
 	$block_patterns->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
+
+/**
+ * Register a core site settings.
+ *
+ * Note: Needs to be backported into the `register_initial_settings` function.
+ */
+function gutenberg_register_site_settings() {
+	register_setting(
+		'reading',
+		'show_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'reading',
+		'page_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'reading',
+		'page_for_posts',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should display the latest posts', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_site_settings', 10 );

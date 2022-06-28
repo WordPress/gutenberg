@@ -34,3 +34,12 @@ function gutenberg_update_post_types_rest_response( $response, $post_type ) {
 	return $response;
 }
 add_filter( 'rest_prepare_post_type', 'gutenberg_update_post_types_rest_response', 10, 2 );
+
+/**
+ * Registers the block patterns REST API routes.
+ */
+function gutenberg_register_gutenberg_rest_block_patterns() {
+	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller();
+	$block_patterns->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_block_patterns', 100 );

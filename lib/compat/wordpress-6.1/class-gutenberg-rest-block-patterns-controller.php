@@ -1,23 +1,32 @@
 <?php
 /**
- * REST API: WP_REST_Block_Patterns_Controller class
+ * REST API: Gutenberg_REST_Block_Patterns_Controller class
  *
- * @package    WordPress
+ * @package    Gutenberg
  * @subpackage REST_API
- * @since      6.0.0
  */
 
 /**
  * Core class used to access block patterns via the REST API.
  *
- * @see   WP_REST_Controller
- *
  * @since 6.0.0
+ *
+ * @see WP_REST_Controller
  */
-class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 	/**
-	 * Constructor.
+	 * Defines whether remote patterns should be loaded.
+	 *
+	 * @since 6.0.0
+	 * @var bool
+	 */
+	private $remote_patterns_loaded;
+
+	/**
+	 * Constructs the controller.
+	 *
+	 * @since 6.0.0
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
@@ -26,8 +35,6 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 	/**
 	 * Registers the routes for the objects of the controller.
-	 *
-	 * @see   register_rest_route()
 	 *
 	 * @since 6.0.0
 	 */
@@ -42,7 +49,8 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true
 		);
 	}
 
@@ -52,8 +60,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @since 6.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( current_user_can( 'edit_posts' ) ) {
@@ -79,14 +86,17 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * @since 6.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		// Load block patterns from w.org.
-		_load_remote_block_patterns(); // Patterns with the `core` keyword.
-		_load_remote_featured_patterns(); // Patterns in the `featured` category.
-		gutenberg_register_remote_theme_patterns(); // Patterns requested by current theme.
+	public function get_items( $request ) {
+		if ( ! $this->remote_patterns_loaded ) {
+			// Load block patterns from w.org.
+			_load_remote_block_patterns(); // Patterns with the `core` keyword.
+			_load_remote_featured_patterns(); // Patterns in the `featured` category.
+			_register_remote_theme_patterns(); // Patterns requested by current theme.
+
+			$this->remote_patterns_loaded = true;
+		}
 
 		$response = array();
 		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
@@ -102,9 +112,9 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param object          $item    Raw pattern as registered, before any changes.
+	 * @param array           $item    Raw pattern as registered, before any changes.
 	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$fields = $this->get_fields_for_response( $request );
@@ -114,6 +124,7 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 			'description'   => 'description',
 			'viewportWidth' => 'viewport_width',
 			'blockTypes'    => 'block_types',
+			'postTypes'     => 'post_types',
 			'categories'    => 'categories',
 			'keywords'      => 'keywords',
 			'content'       => 'content',
@@ -171,6 +182,12 @@ class WP_REST_Block_Patterns_Controller extends WP_REST_Controller {
 				),
 				'block_types'    => array(
 					'description' => __( 'Block types that the pattern is intended to be used with.', 'gutenberg' ),
+					'type'        => 'array',
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'post_types'     => array(
+					'description' => __( ' An array of post types that the pattern is restricted to be used with.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
