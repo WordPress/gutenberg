@@ -31,15 +31,8 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
-		const { content, level } = attributes;
-
-		// In the list view, use the block's content as the label.
-		// If the content is empty, fall back to the default label.
-		if ( context === 'list-view' && content ) {
-			return content;
-		}
-
 		if ( context === 'accessibility' ) {
+			const { content, level } = attributes;
 			return isEmpty( content )
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */

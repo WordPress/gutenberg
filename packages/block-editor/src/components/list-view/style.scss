@@ -297,6 +297,10 @@
 		}
 	}
 
+	.block-editor-list-view-block-select-button__label-wrapper {
+		max-width: 225px;
+	}
+
 	.block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.1);
 		border-radius: $radius-block-ui;
