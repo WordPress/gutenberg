@@ -86,7 +86,6 @@ function ToggleGroupControl(
 			cx(
 				styles.ToggleGroupControl( { size } ),
 				isBlock && styles.block,
-				'medium',
 				className
 			),
 		[ className, cx, isBlock, size ]
