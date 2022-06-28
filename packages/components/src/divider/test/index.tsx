@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { Divider } from '../index';
+import { Divider } from '..';
 
 describe( 'props', () => {
 	beforeEach( () => {
