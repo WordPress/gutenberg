@@ -876,8 +876,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$x_count     = null;
 		$below_sizes = array();
+		$slug = 40;
 
-		for ( $x = $steps_mid_point - 1; $x > 0; $x-- ) {
+		for ( $x = $steps_mid_point - 1; $slug > 0; $x-- ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step - $spacing_scale['increment']
 				: $current_step / $spacing_scale['increment'];
@@ -885,7 +886,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$below_sizes[] = array(
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Small */
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_count ) ),
-				'slug' => $x * 10,
+				'slug' => $slug,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
 			if ( $x === $steps_mid_point - 2 ) {
@@ -894,6 +895,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( $x < $steps_mid_point - 2 ) {
 				$x_count++;
 			}
+			$slug = $slug - 10;
 		}
 
 		$below_sizes = array_reverse( $below_sizes );
@@ -907,7 +909,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$current_step = $spacing_scale['mediumStep'];
 		$x_count      = null;
 		$above_sizes  = array();
-		for ( $x = $steps_mid_point + 1; $x < $spacing_scale['steps']; $x++ ) {
+		$slug         = 60;
+		$steps_above  = $spacing_scale['steps'] <= 10 ? $steps_mid_point + 1 : 6;
+		for ( $x = $steps_above; $x <= $spacing_scale['steps']; $x++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment']
 				: $current_step * $spacing_scale['increment'];
@@ -915,7 +919,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$above_sizes[] = array(
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Large */
 				'name' => $x === $steps_mid_point + 1 ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_count ) ),
-				'slug' => $x * 10,
+				'slug' => $slug,
 				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
 			);
 
@@ -925,6 +929,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( $x > $steps_mid_point + 2 ) {
 				$x_count++;
 			}
+			$slug = $slug + 10;
 		}
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), array_merge( $below_sizes, $above_sizes ) );
