@@ -198,6 +198,13 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 			$changes->post_content = $request['content'];
 		} elseif ( null !== $template && 'custom' !== $template->source ) {
 			$changes->post_content = $template->content;
+		} elseif( null === $template && empty( $template->content ) ) {
+			$templates = gutenberg_get_template_slugs( $template->slug );
+			$fallback_template = resolve_block_template( $template->slug, $templates, '' );
+			if ( ! $fallback_template ) {
+				$fallback_template = resolve_block_template( 'index', array(), '' );
+			}
+			$changes->post_content = $fallback_template->content;
 		}
 		if ( isset( $request['title'] ) ) {
 			$changes->post_title = $request['title'];
