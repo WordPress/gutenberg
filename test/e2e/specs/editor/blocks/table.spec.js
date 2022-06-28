@@ -52,7 +52,7 @@ test.describe( 'Table', () => {
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Click the first cell and add some text.
-		await page.click( 'role=textbox[name="Body cell text"] >> nth=0' );
+		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
 		await page.keyboard.type( 'This' );
 
 		// Navigate to the next cell and add some text.
@@ -78,36 +78,40 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
 
-		const headerSwitchSelector = 'role=checkbox[name="Header section"i]';
-		const footerSwitchSelector = 'role=checkbox[name="Footer section"i]';
+		const headerSwitch = page.locator(
+			'role=checkbox[name="Header section"i]'
+		);
+		const footerSwitch = page.locator(
+			'role=checkbox[name="Footer section"i]'
+		);
 
 		// Expect the header and footer switches not to be present before the table has been created.
-		await expect( page.locator( headerSwitchSelector ) ).toBeHidden();
-		await expect( page.locator( footerSwitchSelector ) ).toBeHidden();
+		await expect( headerSwitch ).toBeHidden();
+		await expect( footerSwitch ).toBeHidden();
 
 		// // Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Expect the header and footer switches to be present now that the table has been created.
-		await expect( page.locator( headerSwitchSelector ) ).toBeVisible();
-		await expect( page.locator( footerSwitchSelector ) ).toBeVisible();
+		await expect( headerSwitch ).toBeVisible();
+		await expect( footerSwitch ).toBeVisible();
 
 		// // Toggle on the switches and add some content.
-		await page.locator( headerSwitchSelector ).check();
-		await page.locator( footerSwitchSelector ).check();
+		await headerSwitch.check();
+		await footerSwitch.check();
 
 		await page.click(
-			'role=rowgroup >> nth=0 >> role=textbox[name="Header cell text"] >> nth=0'
+			'role=rowgroup >> nth=0 >> role=textbox[name="Header cell text"i] >> nth=0'
 		);
 		await page.keyboard.type( 'header' );
 
 		await page.click(
-			'role=rowgroup >> nth=1 >> role=textbox[name="Body cell text"] >> nth=0'
+			'role=rowgroup >> nth=1 >> role=textbox[name="Body cell text"i] >> nth=0'
 		);
 		await page.keyboard.type( 'body' );
 
 		await page.click(
-			'role=rowgroup >> nth=2 >> role=textbox[name="Footer cell text"] >> nth=0'
+			'role=rowgroup >> nth=2 >> role=textbox[name="Footer cell text"i] >> nth=0'
 		);
 		await page.keyboard.type( 'footer' );
 
@@ -115,8 +119,8 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		// Toggle off the switches.
-		await page.locator( headerSwitchSelector ).uncheck();
-		await page.locator( footerSwitchSelector ).uncheck();
+		await headerSwitch.uncheck();
+		await footerSwitch.uncheck();
 
 		// Expect the table to have only a body with written content.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -135,20 +139,20 @@ test.describe( 'Table', () => {
 		// Toggle on the switches and add some content.
 		await page.locator( 'role=checkbox[name="Header section"i]' ).check();
 		await page.locator( 'role=checkbox[name="Footer section"i]' ).check();
-		await page.click( 'role=textbox[name="Body cell text"] >> nth=0' );
+		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
 
 		// Add a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
-		await page.click( 'role=menuitem[name="Insert column after"]' );
+		await page.click( 'role=menuitem[name="Insert column after"i]' );
 
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await page.click( 'role=textbox[name="Body cell text"] >> nth=0' );
+		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
 
 		// Delete a column.
 		await editor.clickBlockToolbarButton( 'Edit table' );
-		await page.click( 'role=menuitem[name="Delete column"]' );
+		await page.click( 'role=menuitem[name="Delete column"i]' );
 
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -166,7 +170,7 @@ test.describe( 'Table', () => {
 
 		// Click the first cell and add some text. Don't align.
 		const cells = await page.locator(
-			'role=textbox[name="Body cell text"]'
+			'role=textbox[name="Body cell text"i]'
 		);
 		await cells.nth( 0 ).click();
 		await page.keyboard.type( 'None' );
@@ -175,19 +179,19 @@ test.describe( 'Table', () => {
 		await cells.nth( 1 ).click();
 		await page.keyboard.type( 'To the left' );
 		await editor.clickBlockToolbarButton( 'Change column alignment' );
-		await page.click( 'role=menuitemradio[name="Align column left"]' );
+		await page.click( 'role=menuitemradio[name="Align column left"i]' );
 
 		// Click the next cell and add some text. Align center.
 		await cells.nth( 2 ).click();
 		await page.keyboard.type( 'Centered' );
 		await editor.clickBlockToolbarButton( 'Change column alignment' );
-		await page.click( 'role=menuitemradio[name="Align column center"]' );
+		await page.click( 'role=menuitemradio[name="Align column center"i]' );
 
 		// Tab to the next cell and add some text. Align right.
 		await cells.nth( 3 ).click();
 		await page.keyboard.type( 'Right aligned' );
 		await editor.clickBlockToolbarButton( 'Change column alignment' );
-		await page.click( 'role=menuitemradio[name="Align column right"]' );
+		await page.click( 'role=menuitemradio[name="Align column right"i]' );
 
 		// Expect the post to have the correct alignment classes inside the table.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -210,21 +214,15 @@ test.describe( 'Table', () => {
 			.check();
 
 		// Add multiple new lines to the first cell to make it taller.
-		await page.click( 'role=textbox[name="Body cell text"] >> nth=0' );
+		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
 		await page.keyboard.type( '\n\n\n\n' );
 
 		// Get the bounding client rect for the second cell.
-		const { x: secondCellX, y: secondCellY } = await page.evaluate( () => {
-			const secondCell =
-				document.querySelectorAll( '.wp-block-table td' )[ 1 ];
-			// Page.evaluate can only return a serializable value to the
-			// parent process, so destructure and restructure the result
-			// into an object.
-			const { x, y } = secondCell.getBoundingClientRect();
-			return { x, y };
-		} );
+		const { x: secondCellX, y: secondCellY } = await page
+			.locator( 'role=textbox[name="Body cell text"] >> nth=1' )
+			.boundingBox();
 
-		// // Click in the top left corner of the second cell and type some text.
+		// Click in the top left corner of the second cell and type some text.
 		await page.mouse.click( secondCellX, secondCellY );
 		await page.keyboard.type( 'Second cell.' );
 
@@ -270,7 +268,7 @@ test.describe( 'Table', () => {
 
 		// Focus should be in first td.
 		await expect(
-			page.locator( 'role=textbox[name="Body cell text"] >> nth=0' )
+			page.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
 		).toBeFocused();
 	} );
 } );
