@@ -80,7 +80,7 @@ else:
 <!-- /wp:image -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/><figcaption>Mountain</figcaption></figure>
+<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:heading {"level":4} -->
@@ -88,7 +88,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:video {"autoplay":false,"id":683,"loop":false,"muted":false,"playsInline":false,"src":"https://i.cloudup.com/YtZFJbuQCE.mov"} -->
-<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption>Videos too!</figcaption></figure>
+<figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Videos too!</figcaption></figure>
 <!-- /wp:video -->
 
 <!-- wp:heading {"level":4} -->
