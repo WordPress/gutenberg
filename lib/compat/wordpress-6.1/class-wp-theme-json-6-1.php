@@ -876,7 +876,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$x_count     = null;
 		$below_sizes = array();
-		$slug = 40;
+		$slug        = 40;
 
 		for ( $x = $steps_mid_point - 1; $slug > 0; $x-- ) {
 			$current_step = '+' === $spacing_scale['operator']
