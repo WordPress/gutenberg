@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
+-   `ColorPicker`: Widen hex input field for mobile. ([#42004](https://github.com/WordPress/gutenberg/pull/42004))
 
 ### Enhancements
 
