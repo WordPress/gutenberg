@@ -76,6 +76,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 				<Modal
 					title={ __( 'Rename' ) }
 					closeLabel={ __( 'Close' ) }
+					headerVariant="borderless"
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }

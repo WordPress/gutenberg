@@ -117,6 +117,7 @@ export default function StartPageOptions() {
 		<Modal
 			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
+			headerVariant="borderless"
 			closeLabel={ __( 'Cancel' ) }
 			onRequestClose={ () => {
 				setModalState( START_PAGE_MODAL_STATES.CLOSED );

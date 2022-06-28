@@ -71,6 +71,7 @@ export default function Guide( {
 	return (
 		<Modal
 			className={ classnames( 'components-guide', className ) }
+			headerVariant="borderless"
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
 			onKeyDown={ ( event ) => {

@@ -81,6 +81,10 @@
 		font-weight: 600;
 	}
 
+	.is-header-borderless & {
+		border-bottom: none;
+	}
+
 	h1 {
 		line-height: 1;
 		margin: 0;
@@ -127,10 +131,16 @@
 		margin-bottom: $grid-unit-30;
 	}
 
-	&.hide-header {
+	&.is-header-hidden {
 		margin-top: 0;
 		padding-top: $grid-unit-30;
 
+		&::before {
+			content: none;
+		}
+	}
+
+	&.is-header-borderless {
 		&::before {
 			content: none;
 		}

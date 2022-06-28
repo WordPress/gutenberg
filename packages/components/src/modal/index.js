@@ -60,7 +60,7 @@ function Modal( props, forwardedRef ) {
 		contentLabel,
 		onKeyDown,
 		isFullScreen = false,
-		__experimentalHideHeader = false,
+		headerVariant = 'default',
 	} = props;
 
 	const ref = useRef();
@@ -141,11 +141,13 @@ function Modal( props, forwardedRef ) {
 				>
 					<div
 						className={ classnames( 'components-modal__content', {
-							'hide-header': __experimentalHideHeader,
+							'is-header-hidden': headerVariant === 'hidden',
+							'is-header-borderless':
+								headerVariant === 'borderless',
 						} ) }
 						role="document"
 					>
-						{ ! __experimentalHideHeader && (
+						{ headerVariant !== 'hidden' && (
 							<div className="components-modal__header">
 								<div className="components-modal__header-heading-container">
 									{ icon && (

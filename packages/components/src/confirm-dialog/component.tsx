@@ -89,7 +89,7 @@ function ConfirmDialog(
 					isDismissible={ true }
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
-					__experimentalHideHeader
+					headerVariant="hidden"
 					{ ...otherProps }
 				>
 					<VStack spacing={ 8 }>

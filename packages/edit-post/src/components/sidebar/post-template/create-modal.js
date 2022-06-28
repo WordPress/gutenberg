@@ -99,6 +99,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 	return (
 		<Modal
 			title={ __( 'Create custom template' ) }
+			headerVariant="borderless"
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ cancel }
 			className="edit-post-post-template__create-modal"
