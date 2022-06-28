@@ -11,7 +11,7 @@ The purpose of this guide is to offer various ways one can lock down and curate 
 
 Users have the ability to lock and unlock blocks via the editor. The locking UI has options for preventing blocks from being moved within the content canvas or removed:
 
-![Image of locking interface](https://github.com/WordPress/gutenberg/blob/annezazu-curate-new-doc/docs/assets/Locking%20interface.png)
+![Image of locking interface](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Locking%20interface.png)
 
 Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
 
@@ -180,7 +180,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block: 
 
-![Image of restricted interface](https://github.com/WordPress/gutenberg/blob/annezazu-curate-new-doc/docs/assets/Locking%20comparison%20visual.png)
+![Image of restricted interface](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Locking%20comparison%20visual.png)
 
 Continuing the examples with duotone, this means you could allow full access to all Duotone functionality for Image blocks and only limit the Post Featured Image block like so:
 
@@ -306,7 +306,7 @@ Note that this field requires using [version 2 of theme.json](https://developer.
 
 Keep in mind that the above approaches can be combined as you see fit. In the quick video below, you’ll see an example where both the options to customize are removed and some presets remain. Specifically, the Post Title block and Post Date block don’t have options for custom font sizes, line height, font-weight, and colors. They both do still provide a few default options for font sizes and the ability to edit the blocks in other ways, like alignment. Color options are paired down to offer a few simple options in duotone, with the option to set custom colors removed.
 
-![Video of example of combined approaches](https://github.com/WordPress/gutenberg/blob/annezazu-curate-new-doc/docs/assets/Curation%20combination%20video.mp4)
+![Video of example of combined approaches](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Curation%20combination%20video.mp4)
 
 ## Additional Resources
 
