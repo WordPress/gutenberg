@@ -82,7 +82,7 @@ export default function PostTemplateForm( { onClose } ) {
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 
 	return (
-		<>
+		<div className="edit-post-post-template__form">
 			<InspectorPopoverHeader
 				title={ __( 'Template' ) }
 				help={ __(
@@ -135,6 +135,6 @@ export default function PostTemplateForm( { onClose } ) {
 					onClose={ () => setIsCreateModalOpen( false ) }
 				/>
 			) }
-		</>
+		</div>
 	);
 }
