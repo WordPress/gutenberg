@@ -23,8 +23,9 @@ import { store as editPostStore } from '../../../store';
 const DEFAULT_TITLE = __( 'Custom Template' );
 
 export default function PostTemplateCreateModal( { onClose } ) {
-	const settings = useSelect(
-		( select ) => select( editorStore ).getEditorSettings(),
+	const defaultBlockTemplate = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().defaultBlockTemplate,
 		[]
 	);
 
@@ -50,7 +51,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 		setIsBusy( true );
 
 		const newTemplateContent =
-			settings.defaultBlockTemplate ??
+			defaultBlockTemplate ??
 			serialize( [
 				createBlock(
 					'core/group',
