@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, select } from '@storybook/addon-knobs';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -12,37 +12,33 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { View } from '../../view';
-import { Scrollable } from '../';
+import { Scrollable } from '..';
 
-export default {
+const meta: ComponentMeta< typeof Scrollable > = {
 	component: Scrollable,
 	title: 'Components (Experimental)/Scrollable',
+	argTypes: {
+		as: {
+			control: { type: 'text' },
+		},
+		children: {
+			control: { type: null },
+		},
+	},
 	parameters: {
-		knobs: { disable: false },
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-export const _default = () => {
-	const targetRef = useRef( null );
+const Template: ComponentStory< typeof Scrollable > = ( { ...args } ) => {
+	const targetRef = useRef< HTMLInputElement >( null );
 
 	const onButtonClick = () => {
 		targetRef.current?.focus();
-	};
-
-	const otherProps = {
-		smoothScroll: boolean(
-			'Scrollable: smoothScroll (hint: move focus in the scrollable container)',
-			false
-		),
-		scrollDirection: select(
-			'Scrollable: scrollDirection',
-			{
-				x: 'x',
-				y: 'y',
-				auto: 'auto',
-			},
-			'y'
-		),
 	};
 
 	const containerWidth = 300;
@@ -51,19 +47,14 @@ export const _default = () => {
 	return (
 		<Scrollable
 			style={ { height: containerHeight, width: containerWidth } }
-			{ ...otherProps }
+			{ ...args }
 		>
 			<View
 				style={ {
 					backgroundColor: '#eee',
 					height:
-						otherProps.scrollDirection === 'x'
-							? containerHeight
-							: 1000,
-					width:
-						otherProps.scrollDirection === 'y'
-							? containerWidth
-							: 1000,
+						args.scrollDirection === 'x' ? containerHeight : 1000,
+					width: args.scrollDirection === 'y' ? containerWidth : 1000,
 					position: 'relative',
 				} }
 			>
@@ -74,10 +65,8 @@ export const _default = () => {
 					ref={ targetRef }
 					style={ {
 						position: 'absolute',
-						bottom:
-							otherProps.scrollDirection === 'x' ? 'initial' : 0,
-						right:
-							otherProps.scrollDirection === 'y' ? 'initial' : 0,
+						bottom: args.scrollDirection === 'x' ? 'initial' : 0,
+						right: 0,
 					} }
 					type="text"
 					value="Focus me"
@@ -85,4 +74,10 @@ export const _default = () => {
 			</View>
 		</Scrollable>
 	);
+};
+
+export const Default: ComponentStory< typeof Scrollable > = Template.bind( {} );
+Default.args = {
+	smoothScroll: false,
+	scrollDirection: 'y',
 };
