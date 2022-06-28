@@ -4,7 +4,7 @@
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { addCard } from '@wordpress/icons';
+import { addTemplate } from '@wordpress/icons';
 import { Notice, SelectControl, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
@@ -92,7 +92,7 @@ export default function PostTemplateForm( { onClose } ) {
 					canCreate
 						? [
 								{
-									icon: addCard,
+									icon: addTemplate,
 									label: __( 'Add template' ),
 									onClick: () => setIsCreateModalOpen( true ),
 								},
