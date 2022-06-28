@@ -28,7 +28,6 @@ const ShortcutList = ( { shortcuts } ) => (
 	<ul
 		className="edit-site-keyboard-shortcut-help-modal__shortcut-list"
 		role="list"
-		tabIndex="0"
 	>
 		{ shortcuts.map( ( shortcut, index ) => (
 			<li
