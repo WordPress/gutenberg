@@ -398,12 +398,11 @@ const withBlockTree =
 				const updatedBlockUids = [];
 				if ( action.fromRootClientId ) {
 					updatedBlockUids.push( action.fromRootClientId );
+				} else {
+					updatedBlockUids.push( '' );
 				}
 				if ( action.toRootClientId ) {
 					updatedBlockUids.push( action.toRootClientId );
-				}
-				if ( ! action.fromRootClientId || ! action.fromRootClientId ) {
-					updatedBlockUids.push( '' );
 				}
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
