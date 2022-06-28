@@ -311,7 +311,7 @@ class WP_Style_Engine {
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
 	protected static function get_css_definitions( $style_value, $style_definition, $should_return_css_vars ) {
-		$css_declarations_array = array();
+		$css_declarations = array();
 
 		if (
 			isset( $style_definition['value_func'] ) &&
@@ -329,15 +329,15 @@ class WP_Style_Engine {
 				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
 					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
 					if ( $slug ) {
-						$css_var = strtr(
+						$css_var                                        = strtr(
 							$css_var_pattern,
 							array( '$slug' => $slug )
 						);
-						$css_declarations_array[ $css_properties['default'] ] = "var($css_var)";
+						$css_declarations[ $css_properties['default'] ] = "var($css_var)";
 					}
 				}
 			}
-			return $css_declarations_array;
+			return $css_declarations;
 		}
 
 		// Default rule builder.
@@ -345,14 +345,14 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
-				$individual_property                            = sprintf( $css_properties['individual'], _wp_to_kebab_case( $key ) );
-				$css_declarations_array[ $individual_property ] = $value;
+				$individual_property                      = sprintf( $css_properties['individual'], _wp_to_kebab_case( $key ) );
+				$css_declarations[ $individual_property ] = $value;
 			}
 		} else {
-			$css_declarations_array[ $css_properties['default'] ] = $style_value;
+			$css_declarations[ $css_properties['default'] ] = $style_value;
 		}
 
-		return $css_declarations_array;
+		return $css_declarations;
 	}
 
 	/**
@@ -375,7 +375,7 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_declarations_array = array();
+		$css_declarations       = array();
 		$classnames             = array();
 		$should_return_css_vars = isset( $options['css_vars'] ) && true === $options['css_vars'];
 
@@ -391,21 +391,21 @@ class WP_Style_Engine {
 					continue;
 				}
 
-				$classnames             = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations_array = array_merge( $css_declarations_array, static::get_css_definitions( $style_value, $style_definition, $should_return_css_vars ) );
+				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
+				$css_declarations = array_merge( $css_declarations, static::get_css_definitions( $style_value, $style_definition, $should_return_css_vars ) );
 			}
 		}
 
 		// Build CSS rules output.
-		$css_selector     = isset( $options['selector'] ) ? $options['selector'] : null;
-		$css_declarations = array();
+		$css_selector              = isset( $options['selector'] ) ? $options['selector'] : null;
+		$filtered_css_declarations = array();
 
-		if ( ! empty( $css_declarations_array ) ) {
-			// Generate inline style rules.
-			foreach ( $css_declarations_array as $css_property => $css_value ) {
-				$filtered_css = esc_html( safecss_filter_attr( "{$css_property}: {$css_value}" ) );
+		if ( ! empty( $css_declarations ) ) {
+			// Generate inline style declarations.
+			foreach ( $css_declarations as $css_property => $css_value ) {
+				$filtered_css_declaration = esc_html( safecss_filter_attr( "{$css_property}: {$css_value}" ) );
 				if ( ! empty( $filtered_css ) ) {
-					$css_declarations[] = $filtered_css . ';';
+					$filtered_css_declarations[] = $filtered_css_declaration . ';';
 				}
 			}
 		}
@@ -414,15 +414,15 @@ class WP_Style_Engine {
 		$styles_output = array();
 
 		// Return css, if any.
-		if ( ! empty( $css_declarations ) ) {
+		if ( ! empty( $filtered_css_declarations ) ) {
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$css_rule             = "$css_selector { ";
-				$css_rule            .= implode( ' ', $css_declarations );
+				$css_rule            .= implode( ' ', $filtered_css_declarations );
 				$css_rule            .= ' }';
 				$styles_output['css'] = $css_rule;
 			} else {
-				$styles_output['css'] = implode( ' ', $css_declarations );
+				$styles_output['css'] = implode( ' ', $filtered_css_declarations );
 			}
 		}
 
