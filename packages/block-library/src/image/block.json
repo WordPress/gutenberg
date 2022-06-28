@@ -87,6 +87,7 @@
 			"color": true,
 			"radius": true,
 			"width": true,
+			"__experimentalSelector": "img, .wp-block-image__crop-area",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,

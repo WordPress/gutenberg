@@ -91,6 +91,14 @@ figure.wp-block-image:not(.wp-block) {
 	max-width: 100%;
 	width: 100%;
 	overflow: hidden;
+
+	// This removes the border from the img within the image cropper so it
+	// can be applied to the cropper itself. This then allows the image to be
+	// cropped within the visual border providing more accurate editing and
+	// smoother UX.
+	.reactEasyCrop_Container .reactEasyCrop_Image {
+		border: none;
+	}
 }
 
 .wp-block-image__crop-icon {
