@@ -25,7 +25,7 @@ Because this package is experimental and still in development it does not yet ge
 -   Support generating styles in the frontend. (Ongoing)
 -   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
 -   Refactor all block styles to use the style engine server side. (Ongoing)
--   Consolidate global and block style rendering and enqueuing 
+-   Consolidate global and block style rendering and enqueuing
 -   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
 
 See [Tracking: Add a Style Engine to manage rendering block styles #38167](https://github.com/WordPress/gutenberg/issues/38167)
