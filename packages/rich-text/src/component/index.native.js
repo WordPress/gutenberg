@@ -663,9 +663,6 @@ export class RichText extends Component {
 			contentWithoutRootTag !== this.value &&
 			this.lastAztecEventType === 'selection change'
 		) {
-			// Update text before updating selection
-			// Make sure there are changes made to the content before upgrading it upward.
-			this.onTextUpdate( event );
 			return;
 		}
 
