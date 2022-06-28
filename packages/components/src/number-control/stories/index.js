@@ -12,10 +12,10 @@ export default {
 	title: 'Components (Experimental)/NumberControl',
 	component: NumberControl,
 	argTypes: {
-		__unstableSize: {
+		size: {
 			control: {
 				type: 'select',
-				options: [ 'default', 'large' ],
+				options: [ 'default', 'small', '__unstable-large' ],
 			},
 		},
 		onChange: { action: 'onChange' },
@@ -54,6 +54,6 @@ Default.args = {
 	placeholder: '0',
 	required: false,
 	shiftStep: 10,
+	size: 'default',
 	step: '1',
-	__unstableSize: 'default',
 };
