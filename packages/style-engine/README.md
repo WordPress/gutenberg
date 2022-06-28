@@ -48,7 +48,7 @@ A guide to the terms and variable names referenced by the Style Engine package.
   <dt>CSS rule</dt>
   <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
   <dt>CSS selector</dt>
-  <dd></dd>
+   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule's CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
   <dt>CSS stylesheet</dt>
   <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
   <dt>CSS value</dt>
