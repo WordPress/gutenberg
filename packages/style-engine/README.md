@@ -20,13 +20,13 @@ Because this package is experimental and still in development it does not yet ge
 
 **TODO List:**
 
-- Add style definitions for all the currently supported styles in blocks and theme.json.
-- The CSS variable shortcuts for values (for presets...)
-- Support generating styles in the frontend. (Ongoing)
-- Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
-- Refactor all block styles to use the style engine server side. (Ongoing)
-- Consolidate global and block style rendering and enqueuing 
-- Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
+-   Add style definitions for all the currently supported styles in blocks and theme.json.
+-   The CSS variable shortcuts for values (for presets...)
+-   Support generating styles in the frontend. (Ongoing)
+-   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
+-   Refactor all block styles to use the style engine server side. (Ongoing)
+-   Consolidate global and block style rendering and enqueuing 
+-   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
 
 See [Tracking: Add a Style Engine to manage rendering block styles #38167](https://github.com/WordPress/gutenberg/issues/38167)
 
@@ -48,7 +48,7 @@ A guide to the terms and variable names referenced by the Style Engine package.
   <dt>CSS rule</dt>
   <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
   <dt>CSS selector</dt>
-   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule's CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
+   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
   <dt>CSS stylesheet</dt>
   <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
   <dt>CSS value</dt>

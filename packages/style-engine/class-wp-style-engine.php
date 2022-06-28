@@ -113,28 +113,28 @@ class WP_Style_Engine {
 				'path'          => array( 'border', 'width' ),
 			),
 			'top'    => array(
-				'value_func' => 'static::get_css_individual_property_definitions',
+				'value_func' => 'static::get_individual_property_css_declarations',
 				'path'       => array( 'border', 'top' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'right'  => array(
-				'value_func' => 'static::get_css_individual_property_definitions',
+				'value_func' => 'static::get_individual_property_css_declarations',
 				'path'       => array( 'border', 'right' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'bottom' => array(
-				'value_func' => 'static::get_css_individual_property_definitions',
+				'value_func' => 'static::get_individual_property_css_declarations',
 				'path'       => array( 'border', 'bottom' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'left'   => array(
-				'value_func' => 'static::get_css_individual_property_definitions',
+				'value_func' => 'static::get_individual_property_css_declarations',
 				'path'       => array( 'border', 'left' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
@@ -302,7 +302,7 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns CSS rules based on valid block style values.
+	 * Returns an array of CSS declarations based on valid block style values.
 	 *
 	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
 	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
@@ -310,9 +310,7 @@ class WP_Style_Engine {
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_definitions( $style_value, $style_definition, $should_return_css_vars ) {
-		$css_declarations = array();
-
+	protected static function get_css_declarations( $style_value, $style_definition, $should_return_css_vars ) {
 		if (
 			isset( $style_definition['value_func'] ) &&
 			is_callable( $style_definition['value_func'] )
@@ -320,7 +318,8 @@ class WP_Style_Engine {
 			return call_user_func( $style_definition['value_func'], $style_value, $style_definition );
 		}
 
-		$css_properties = $style_definition['property_keys'];
+		$css_declarations    = array();
+		$style_property_keys = $style_definition['property_keys'];
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
@@ -329,11 +328,11 @@ class WP_Style_Engine {
 				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
 					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
 					if ( $slug ) {
-						$css_var                                        = strtr(
+						$css_var = strtr(
 							$css_var_pattern,
 							array( '$slug' => $slug )
 						);
-						$css_declarations[ $css_properties['default'] ] = "var($css_var)";
+						$css_declarations[ $style_property_keys['default'] ] = "var($css_var)";
 					}
 				}
 			}
@@ -345,11 +344,11 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
-				$individual_property                      = sprintf( $css_properties['individual'], _wp_to_kebab_case( $key ) );
+				$individual_property                      = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
 				$css_declarations[ $individual_property ] = $value;
 			}
 		} else {
-			$css_declarations[ $css_properties['default'] ] = $style_value;
+			$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		}
 
 		return $css_declarations;
@@ -392,7 +391,7 @@ class WP_Style_Engine {
 				}
 
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_definitions( $style_value, $style_definition, $should_return_css_vars ) );
+				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_return_css_vars ) );
 			}
 		}
 
@@ -404,7 +403,7 @@ class WP_Style_Engine {
 			// Generate inline style declarations.
 			foreach ( $css_declarations as $css_property => $css_value ) {
 				$filtered_css_declaration = esc_html( safecss_filter_attr( "{$css_property}: {$css_value}" ) );
-				if ( ! empty( $filtered_css ) ) {
+				if ( ! empty( $filtered_css_declaration ) ) {
 					$filtered_css_declarations[] = $filtered_css_declaration . ';';
 				}
 			}
@@ -447,11 +446,11 @@ class WP_Style_Engine {
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_individual_property_definitions( $style_value, $individual_property_definition ) {
-		$css_declarations_array = array();
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition ) {
+		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
-			return $css_declarations_array;
+			return $css_declarations;
 		}
 
 		// The first item in $individual_property_definition['path'] array tells us the style property, e.g., "border".
@@ -479,11 +478,11 @@ class WP_Style_Engine {
 					);
 					$value   = "var($css_var)";
 				}
-				$individual_css_property                            = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
-				$css_declarations_array[ $individual_css_property ] = $value;
+				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
+				$css_declarations[ $individual_css_property ] = $value;
 			}
 		}
-		return $css_declarations_array;
+		return $css_declarations;
 	}
 }
 
