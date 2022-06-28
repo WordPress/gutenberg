@@ -25,17 +25,21 @@ export default function PostTemplateForm( { onClose } ) {
 		canCreate,
 		canEdit,
 	} = useSelect( ( select ) => {
-		const settings = select( editorStore ).getEditorSettings();
+		const editorSettings = select( editorStore ).getEditorSettings();
+		const siteSettings = select( coreStore ).getEntityRecord(
+			'root',
+			'site'
+		);
 		const _isPostsPage =
 			select( editorStore ).getCurrentPostId() ===
-			settings?.page_for_posts;
+			siteSettings?.page_for_posts;
 		const canCreateTemplates = select( coreStore ).canUser(
 			'create',
 			'templates'
 		);
 		return {
 			isPostsPage: _isPostsPage,
-			availableTemplates: settings.availableTemplates,
+			availableTemplates: editorSettings.availableTemplates,
 			fetchedTemplates: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template',
@@ -49,7 +53,7 @@ export default function PostTemplateForm( { onClose } ) {
 			canCreate: canCreateTemplates && ! _isPostsPage,
 			canEdit:
 				canCreateTemplates &&
-				settings.supportsTemplateMode &&
+				editorSettings.supportsTemplateMode &&
 				!! select( editPostStore ).getEditedPostTemplate(),
 		};
 	}, [] );
