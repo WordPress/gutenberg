@@ -9,32 +9,32 @@ import { render, screen } from '@testing-library/react';
 import { Divider } from '../index';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
+	beforeEach( () => {
 		render( <Divider /> );
+	} );
+
+	test( 'should render correctly', () => {
 		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
 	} );
 
 	test( 'should render marginStart', () => {
-		render( <Divider marginStart={ 5 } data-testid="with-margin-start" /> );
-		render( <Divider data-testid="default" /> );
-		expect(
-			screen.getByTestId( 'with-margin-start' )
-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'default' ) );
+		render( <Divider marginStart={ 5 } /> );
+
+		const dividers = screen.getAllByRole( 'separator' );
+		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
 	} );
 
 	test( 'should render marginEnd', () => {
-		render( <Divider marginEnd={ 5 } data-testid="width-margin-end" /> );
-		render( <Divider data-testid="default" /> );
-		expect(
-			screen.getByTestId( 'width-margin-end' )
-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'default' ) );
+		render( <Divider marginEnd={ 5 } /> );
+
+		const dividers = screen.getAllByRole( 'separator' );
+		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
 	} );
 
 	test( 'should render margin', () => {
-		render( <Divider margin={ 7 } data-testid="with-margin" /> );
-		render( <Divider data-testid="default" /> );
-		expect( screen.getByTestId( 'with-margin' ) ).toMatchStyleDiffSnapshot(
-			screen.getByTestId( 'default' )
-		);
+		render( <Divider margin={ 7 } /> );
+
+		const dividers = screen.getAllByRole( 'separator' );
+		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
 	} );
 } );

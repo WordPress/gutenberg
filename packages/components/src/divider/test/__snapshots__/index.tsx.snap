@@ -23,14 +23,14 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,10 +2,8 @@
+@@ -2,8 +2,10 @@
     Object {
       "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
--     "margin-bottom": "calc(4px * 7)",
--     "margin-top": "calc(4px * 7)",
++     "margin-bottom": "calc(4px * 7)",
++     "margin-top": "calc(4px * 7)",
       "width": "auto",
     },
   ]
@@ -41,13 +41,13 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,9 +2,8 @@
+@@ -2,8 +2,9 @@
     Object {
       "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
--     "margin-bottom": "calc(4px * 5)",
++     "margin-bottom": "calc(4px * 5)",
       "width": "auto",
     },
   ]
@@ -58,13 +58,13 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -2,9 +2,8 @@
+@@ -2,8 +2,9 @@
     Object {
       "border": "0",
       "border-bottom": "1px solid currentColor",
       "height": "0",
       "margin": "0",
--     "margin-top": "calc(4px * 5)",
++     "margin-top": "calc(4px * 5)",
       "width": "auto",
     },
   ]
