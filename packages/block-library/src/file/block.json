@@ -56,16 +56,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true,
-		"__experimentalStyle": {
-			"elements": {
-				"button": {
-					"typography": {
-						"fontSize": "0.8em"
-					}
-				}
-			}
-		}
+		"align": true
 	},
 	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-file-editor",
