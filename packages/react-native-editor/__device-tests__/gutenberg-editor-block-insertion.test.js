@@ -18,6 +18,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point.
 
+		const html = await editorPage.getHtmlContent();
+
+		expect( html.toLowerCase() ).toBe(
+			testData.blockInsertionHtml.toLowerCase()
+		);
+
 		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
@@ -32,12 +38,6 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		);
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlock( 3, testData.mediumText );
-
-		const html = await editorPage.getHtmlContent();
-
-		expect( html.toLowerCase() ).toBe(
-			testData.blockInsertionHtml.toLowerCase()
-		);
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
