@@ -19,6 +19,7 @@ import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
+import PostTemplate from '../post-template';
 
 /**
  * Module Constants
@@ -29,7 +30,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 	return (
 		<PanelBody
 			className="edit-post-post-status"
-			title={ __( 'Status & visibility' ) }
+			title={ __( 'Summary' ) }
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
@@ -38,6 +39,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 					<>
 						<PostVisibility />
 						<PostSchedule />
+						<PostTemplate />
 						<PostFormat />
 						<PostSticky />
 						<PostPendingStatus />
