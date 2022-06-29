@@ -19,6 +19,15 @@
 		letter-spacing: inherit;
 	}
 
+	// Styles copied from button block styles.
+	input[type="submit"] {
+		box-shadow: none;
+		cursor: pointer;
+		display: inline-block;
+		text-align: center;
+		overflow-wrap: break-word;
+	}
+
 	textarea,
 	input:not([type="submit"]) {
 		border: 1px solid $gray-600;
