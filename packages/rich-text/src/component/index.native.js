@@ -659,9 +659,14 @@ export class RichText extends Component {
 
 		// Check for and discard events during quick typing. Updating the selection during quick typing isn't
 		// necessary and can cause UI lags. (see https://github.com/WordPress/gutenberg/pull/41682.)
+		const detectSpaceAtStartOrEnd =
+			contentWithoutRootTag.charAt( 0 ) === '' ||
+			contentWithoutRootTag.substr( contentWithoutRootTag.length - 1 ) ===
+				' ';
 		if (
 			contentWithoutRootTag !== this.value &&
-			this.lastAztecEventType === 'selection change'
+			this.lastAztecEventType === 'selection change' &&
+			! detectSpaceAtStartOrEnd
 		) {
 			return;
 		}
