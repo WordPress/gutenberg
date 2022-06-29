@@ -871,18 +871,23 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return null;
 		}
 
+		$steps           = $spacing_scale['steps'] > 1 ? $spacing_scale['steps'] : 2;
 		$current_step    = $spacing_scale['mediumStep'];
-		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
+		$steps_mid_point = round( ( ( $steps ) / 2 ), 0 );
+		$x_count         = null;
+		$below_sizes     = array();
+		$slug            = 40;
+		$remainder       = 0;
 
-		$x_count     = null;
-		$below_sizes = array();
-		$slug        = 40;
-
-		for ( $x = $steps_mid_point - 1; $slug > 0; $x-- ) {
+		for ( $x = $steps_mid_point - 1; $slug > 0 && $x > 0; $x-- ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step - $spacing_scale['increment']
-				: $current_step / $spacing_scale['increment'];
+				: ( $spacing_scale['increment'] > 1 ? $current_step / $spacing_scale['increment'] : $current_step * $spacing_scale['increment'] );
 
+			if ( $current_step < 0 ) {
+				$remainder = $x;
+				break;
+			}
 			$below_sizes[] = array(
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Small */
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_count ) ),
@@ -910,11 +915,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$x_count      = null;
 		$above_sizes  = array();
 		$slug         = 60;
-		$steps_above  = $spacing_scale['steps'] <= 10 ? $steps_mid_point + 1 : 6;
-		for ( $x = $steps_above; $x <= $spacing_scale['steps']; $x++ ) {
+		$steps_above  = $steps_mid_point + 1 - $remainder;
+
+		for ( $x = $steps_above; $x <= $steps; $x++ ) {
 			$current_step = '+' === $spacing_scale['operator']
 				? $current_step + $spacing_scale['increment']
-				: $current_step * $spacing_scale['increment'];
+				: ( $spacing_scale['increment'] >= 1 ? $current_step * $spacing_scale['increment'] : $current_step / $spacing_scale['increment'] );
 
 			$above_sizes[] = array(
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Large */
