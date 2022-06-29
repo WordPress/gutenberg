@@ -32,48 +32,53 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * path to the value in theme.json & block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'                 => array( 'color', 'gradient' ),
-		'background-color'           => array( 'color', 'background' ),
-		'border-radius'              => array( 'border', 'radius' ),
-		'border-top-left-radius'     => array( 'border', 'radius', 'topLeft' ),
-		'border-top-right-radius'    => array( 'border', 'radius', 'topRight' ),
-		'border-bottom-left-radius'  => array( 'border', 'radius', 'bottomLeft' ),
-		'border-bottom-right-radius' => array( 'border', 'radius', 'bottomRight' ),
-		'border-color'               => array( 'border', 'color' ),
-		'border-width'               => array( 'border', 'width' ),
-		'border-style'               => array( 'border', 'style' ),
-		'border-top-color'           => array( 'border', 'top', 'color' ),
-		'border-top-width'           => array( 'border', 'top', 'width' ),
-		'border-top-style'           => array( 'border', 'top', 'style' ),
-		'border-right-color'         => array( 'border', 'right', 'color' ),
-		'border-right-width'         => array( 'border', 'right', 'width' ),
-		'border-right-style'         => array( 'border', 'right', 'style' ),
-		'border-bottom-color'        => array( 'border', 'bottom', 'color' ),
-		'border-bottom-width'        => array( 'border', 'bottom', 'width' ),
-		'border-bottom-style'        => array( 'border', 'bottom', 'style' ),
-		'border-left-color'          => array( 'border', 'left', 'color' ),
-		'border-left-width'          => array( 'border', 'left', 'width' ),
-		'border-left-style'          => array( 'border', 'left', 'style' ),
-		'color'                      => array( 'color', 'text' ),
-		'font-family'                => array( 'typography', 'fontFamily' ),
-		'font-size'                  => array( 'typography', 'fontSize' ),
-		'font-style'                 => array( 'typography', 'fontStyle' ),
-		'font-weight'                => array( 'typography', 'fontWeight' ),
-		'letter-spacing'             => array( 'typography', 'letterSpacing' ),
-		'line-height'                => array( 'typography', 'lineHeight' ),
-		'margin'                     => array( 'spacing', 'margin' ),
-		'margin-top'                 => array( 'spacing', 'margin', 'top' ),
-		'margin-right'               => array( 'spacing', 'margin', 'right' ),
-		'margin-bottom'              => array( 'spacing', 'margin', 'bottom' ),
-		'margin-left'                => array( 'spacing', 'margin', 'left' ),
-		'padding'                    => array( 'spacing', 'padding' ),
-		'padding-top'                => array( 'spacing', 'padding', 'top' ),
-		'padding-right'              => array( 'spacing', 'padding', 'right' ),
-		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
-		'padding-left'               => array( 'spacing', 'padding', 'left' ),
-		'text-decoration'            => array( 'typography', 'textDecoration' ),
-		'text-transform'             => array( 'typography', 'textTransform' ),
-		'filter'                     => array( 'filter', 'duotone' ),
+		'background'                        => array( 'color', 'gradient' ),
+		'background-color'                  => array( 'color', 'background' ),
+		'border-radius'                     => array( 'border', 'radius' ),
+		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'         => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius'        => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'                      => array( 'border', 'color' ),
+		'border-width'                      => array( 'border', 'width' ),
+		'border-style'                      => array( 'border', 'style' ),
+		'border-top-color'                  => array( 'border', 'top', 'color' ),
+		'border-top-width'                  => array( 'border', 'top', 'width' ),
+		'border-top-style'                  => array( 'border', 'top', 'style' ),
+		'border-right-color'                => array( 'border', 'right', 'color' ),
+		'border-right-width'                => array( 'border', 'right', 'width' ),
+		'border-right-style'                => array( 'border', 'right', 'style' ),
+		'border-bottom-color'               => array( 'border', 'bottom', 'color' ),
+		'border-bottom-width'               => array( 'border', 'bottom', 'width' ),
+		'border-bottom-style'               => array( 'border', 'bottom', 'style' ),
+		'border-left-color'                 => array( 'border', 'left', 'color' ),
+		'border-left-width'                 => array( 'border', 'left', 'width' ),
+		'border-left-style'                 => array( 'border', 'left', 'style' ),
+		'color'                             => array( 'color', 'text' ),
+		'font-family'                       => array( 'typography', 'fontFamily' ),
+		'font-size'                         => array( 'typography', 'fontSize' ),
+		'font-style'                        => array( 'typography', 'fontStyle' ),
+		'font-weight'                       => array( 'typography', 'fontWeight' ),
+		'letter-spacing'                    => array( 'typography', 'letterSpacing' ),
+		'line-height'                       => array( 'typography', 'lineHeight' ),
+		'margin'                            => array( 'spacing', 'margin' ),
+		'margin-top'                        => array( 'spacing', 'margin', 'top' ),
+		'margin-right'                      => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'                     => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
+		'padding'                           => array( 'spacing', 'padding' ),
+		'padding-top'                       => array( 'spacing', 'padding', 'top' ),
+		'padding-right'                     => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
+		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
+		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
+		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
+		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
+		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
+		'text-decoration'                   => array( 'typography', 'textDecoration' ),
+		'text-transform'                    => array( 'typography', 'textTransform' ),
+		'filter'                            => array( 'filter', 'duotone' ),
 	);
 
 	/**
@@ -617,10 +622,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-
-		$selector = $block_metadata['selector'];
-		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$node          = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), array() );
+		$selector      = $block_metadata['selector'];
+		$settings      = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
@@ -649,9 +654,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
-			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json );
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_vars );
 		} else {
-			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_vars );
 		}
 
 		$block_rules = '';
@@ -697,6 +702,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			$block_gap_value = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
+
+			if ( $use_root_vars ) {
+				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				$block_rules .= '.wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
+				$block_rules .= '.alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6, ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			}
 
 			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
@@ -754,13 +766,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * )
 	 * ```
 	 *
-	 * @param array $styles Styles to process.
-	 * @param array $settings Theme settings.
-	 * @param array $properties Properties metadata.
-	 * @param array $theme_json Theme JSON array.
-	 * @return array Returns the modified $declarations.
+	 * @param array   $styles Styles to process.
+	 * @param array   $settings Theme settings.
+	 * @param array   $properties Properties metadata.
+	 * @param array   $theme_json Theme JSON array.
+	 * @param string  $selector The style block selector.
+	 * @param boolean $use_root_vars Whether to add custom properties at root level.
+	 * @return array  Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_vars = null ) {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
@@ -770,8 +784,22 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return $declarations;
 		}
 
+		$root_variable_duplicates = array();
+
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
+
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
+				continue;
+			}
+			// We don't support string values.
+			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
+				continue;
+			}
+
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_vars ) {
+				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
+			}
 
 			// Look up protected properties, keyed by value path.
 			// Skip protected properties that are explicitly set to `null`.
@@ -795,6 +823,14 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+		}
+
+		// If a variable value is added to the root, the corresponding property should be removed.
+		foreach ( $root_variable_duplicates as $duplicate ) {
+			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
+			if ( $discard ) {
+				array_splice( $declarations, $discard, 1 );
+			}
 		}
 
 		return $declarations;
@@ -985,6 +1021,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	const VALID_SETTINGS = array(
 		'appearanceTools' => null,
+		'useRootVariables' => null,
 		'border'          => array(
 			'color'  => null,
 			'radius' => null,
