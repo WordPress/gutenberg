@@ -15,6 +15,11 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
+function ucFirst( str ) {
+	if ( ! str ) return str;
+	return str[ 0 ].toUpperCase() + str.slice( 1 );
+}
+
 function ScreenLinkColor( { name } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
@@ -68,6 +73,14 @@ function ScreenLinkColor( { name } ) {
 		return null;
 	}
 
+	const tabs = Object.keys( PSEUDOSTATES ).map( ( pseudoSelector ) => {
+		return {
+			name: pseudoSelector,
+			title: ucFirst( pseudoSelector ),
+			className: `color-text-${ pseudoSelector }`,
+		};
+	} );
+
 	return (
 		<>
 			<ScreenHeader
@@ -77,21 +90,7 @@ function ScreenLinkColor( { name } ) {
 				) }
 			/>
 
-			<TabPanel
-				className="my-tab-panel"
-				tabs={ [
-					{
-						name: 'default',
-						title: 'Default',
-						className: 'color-text-default',
-					},
-					{
-						name: 'hover',
-						title: 'Hover',
-						className: 'color-text-hover',
-					},
-				] }
-			>
+			<TabPanel className="my-tab-panel" tabs={ tabs }>
 				{ ( tab ) => {
 					const psuedoSelector = tab.name;
 
