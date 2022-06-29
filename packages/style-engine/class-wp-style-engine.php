@@ -396,32 +396,19 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$css_selector              = isset( $options['selector'] ) ? $options['selector'] : null;
-		$filtered_css_declarations = array();
-
-		if ( ! empty( $css_declarations ) ) {
-			// Generate inline style declarations.
-			foreach ( $css_declarations as $css_property => $css_value ) {
-				$filtered_css_declaration = esc_html( safecss_filter_attr( "{$css_property}: {$css_value}" ) );
-				if ( ! empty( $filtered_css_declaration ) ) {
-					$filtered_css_declarations[] = $filtered_css_declaration . ';';
-				}
-			}
-		}
+		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
+		$style_rules  = new WP_Style_Engine_CSS_Rules();
+		$style_rules->add_declarations( $css_declarations );
 
 		// The return object.
-		$styles_output = array();
+		$styles_output        = array();
+		$styles_output['css'] = $style_rules->get_styles_string();
 
 		// Return css, if any.
-		if ( ! empty( $filtered_css_declarations ) ) {
+		if ( ! empty( $styles_output['css'] ) ) {
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$css_rule             = "$css_selector { ";
-				$css_rule            .= implode( ' ', $filtered_css_declarations );
-				$css_rule            .= ' }';
-				$styles_output['css'] = $css_rule;
-			} else {
-				$styles_output['css'] = implode( ' ', $filtered_css_declarations );
+				$styles_output['css'] = $css_selector . '{' . $styles_output['css'] . '}';
 			}
 		}
 
