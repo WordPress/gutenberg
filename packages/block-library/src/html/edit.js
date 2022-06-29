@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
@@ -18,29 +18,29 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+// Default styles used to unset some of the styles
+// that might be inherited from the editor style.
+const DEFAULT_STYLES = `
+	html,body,:root {
+		margin: 0 !important;
+		padding: 0 !important;
+		overflow: visible !important;
+		min-height: auto !important;
+	}
+`;
+
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
 
-	const styles = useSelect( ( select ) => {
-		// Default styles used to unset some of the styles
-		// that might be inherited from the editor style.
-		const defaultStyles = `
-			html,body,:root {
-				margin: 0 !important;
-				padding: 0 !important;
-				overflow: visible !important;
-				min-height: auto !important;
-			}
-		`;
-
-		return [
-			defaultStyles,
-			...transformStyles(
-				select( blockEditorStore ).getSettings().styles
-			),
-		];
+	const settingStyles = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().styles;
 	}, [] );
+
+	const styles = useMemo(
+		() => [ DEFAULT_STYLES, ...transformStyles( settingStyles ) ],
+		[ settingStyles ]
+	);
 
 	function switchToPreview() {
 		setIsPreview( true );
