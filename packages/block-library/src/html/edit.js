@@ -2,45 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useMemo, useState } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
-	transformStyles,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	Disabled,
-	SandBox,
-	ToolbarGroup,
-} from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
 
-// Default styles used to unset some of the styles
-// that might be inherited from the editor style.
-const DEFAULT_STYLES = `
-	html,body,:root {
-		margin: 0 !important;
-		padding: 0 !important;
-		overflow: visible !important;
-		min-height: auto !important;
-	}
-`;
+/**
+ * Internal dependencies
+ */
+import Preview from './preview';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
-
-	const settingStyles = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()?.styles;
-	}, [] );
-
-	const styles = useMemo(
-		() => [ DEFAULT_STYLES, ...transformStyles( settingStyles ) ],
-		[ settingStyles ]
-	);
 
 	function switchToPreview() {
 		setIsPreview( true );
@@ -71,17 +48,10 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</ToolbarGroup>
 			</BlockControls>
 			{ isPreview || isDisabled ? (
-				<>
-					<SandBox html={ attributes.content } styles={ styles } />
-					{ /*
-							An overlay is added when the block is not selected in order to register click events.
-							Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it
-							difficult to reselect the block.
-						*/ }
-					{ ! isSelected && (
-						<div className="block-library-html__preview-overlay"></div>
-					) }
-				</>
+				<Preview
+					content={ attributes.content }
+					isSelected={ isSelected }
+				/>
 			) : (
 				<PlainText
 					value={ attributes.content }
