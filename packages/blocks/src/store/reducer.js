@@ -6,7 +6,6 @@ import {
 	find,
 	get,
 	isEmpty,
-	keyBy,
 	map,
 	mapValues,
 	omit,
@@ -40,6 +39,16 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
+
+function keyBlockTypesByName( types ) {
+	return types.reduce(
+		( newBlockTypes, block ) => ( {
+			...newBlockTypes,
+			[ block.name ]: block,
+		} ),
+		{}
+	);
+}
 
 /**
  * Reducer managing the unprocessed block types in a form passed when registering the by block.
@@ -79,7 +88,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy( action.blockTypes, 'name' ),
+				...keyBlockTypesByName( action.blockTypes ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -102,7 +111,7 @@ export function blockStyles( state = {}, action ) {
 			return {
 				...state,
 				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
+					keyBlockTypesByName( action.blockTypes ),
 					( blockType ) => {
 						return uniqBy(
 							[
@@ -159,7 +168,7 @@ export function blockVariations( state = {}, action ) {
 			return {
 				...state,
 				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
+					keyBlockTypesByName( action.blockTypes ),
 					( blockType ) => {
 						return uniqBy(
 							[

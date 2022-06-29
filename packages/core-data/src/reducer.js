@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
+import { map, groupBy, flowRight, isEqual, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,13 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 			return {
 				byId: {
 					...state.byId,
-					...keyBy( action.users, 'id' ),
+					...action.users.reduce(
+						( newUsers, user ) => ( {
+							...newUsers,
+							[ user.id ]: user,
+						} ),
+						{}
+					),
 				},
 				queries: {
 					...state.queries,
