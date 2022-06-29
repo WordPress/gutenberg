@@ -162,6 +162,9 @@ $z-layers: (
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
+	// Keep template popover underneath 'Create custom template' modal overlay.
+	".edit-post-post-template__dialog": 99999,
+
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__handle": 2,
 	".components-resizable-box__side-handle": 2,

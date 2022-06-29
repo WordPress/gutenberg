@@ -10,6 +10,8 @@
 
 -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
 -   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
+-   `DatePicker`: highlight today's date. ([#41647](https://github.com/WordPress/gutenberg/pull/41647/)).
+-   Allow automatic repositioning of `BorderBoxControl` and `ColorPalette` popovers within smaller viewports ([#41930](https://github.com/WordPress/gutenberg/pull/41930)).
 
 ### Internal
 
@@ -34,6 +36,7 @@
 -   `CustomGradientPicker`: Refactor away from Lodash ([#41901](https://github.com/WordPress/gutenberg/pull/41901/)).
 -   `SegmentedControl`: Refactor away from `_.values()` ([#41905](https://github.com/WordPress/gutenberg/pull/41905/)).
 -   `DimensionControl`: Refactor docs away from `_.partialRight()` ([#41909](https://github.com/WordPress/gutenberg/pull/41909/)).
+-   `NavigationItem` updated to ignore `react/exhuastive-deps` eslint rule ([#41639](https://github.com/WordPress/gutenberg/pull/41639)).
 
 ## 19.13.0 (2022-06-15)
 
