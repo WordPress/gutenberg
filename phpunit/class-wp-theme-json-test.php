@@ -2936,4 +2936,131 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = 'body { margin: 0; }body{background-color: #ffffff;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 	}
+
+	/**
+	 * Tests generating the spacing presets array based on the spacing scale provided.
+	 *
+	 * @dataProvider data_generate_spacing_scale_fixtures
+	 */
+	function test_get_spacing_sizes( $spacing_scale, $expected_output ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => $spacing_scale,
+					),
+				),
+			)
+		);
+
+		$theme_json->get_spacing_sizes();
+		$this->assertSame( $expected_output, _wp_array_get( $theme_json->get_raw_data(), array( 'settings', 'spacing', 'spacingSizes', 'default' ) ) );
+	}
+
+	/**
+	 * Data provider for spacing scale tests.
+	 *
+	 * @return array
+	 */
+	function data_generate_spacing_scale_fixtures() {
+		return array(
+			'empty_spacing_scale'    => array(
+				'spacing_scale'   => array(),
+				'expected_output' => null,
+			),
+
+			'invalid_spacing_scale_values_missing_operator' => array(
+				'spacingScale'    => array(
+					'operator'   => '',
+					'increment'  => 1.5,
+					'steps'      => 1,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => null,
+			),
+
+			'invalid_spacing_scale_values_non_numeric_increment' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 'add two to previous value',
+					'steps'      => 1,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => null,
+			),
+
+			'invalid_spacing_scale_values_non_numeric_steps' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 'spiral staircase preferred',
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => null,
+			),
+
+			'invalid_spacing_scale_values_non_numeric_medium_step' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 5,
+					'mediumStep' => 'That which is just right',
+					'units'      => 'rem',
+				),
+				'expected_output' => null,
+			),
+
+			'invalid_spacing_scale_values_missing_units' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 5,
+					'mediumStep' => 4,
+				),
+				'expected_output' => null,
+			),
+
+			'one_step_spacing_scale' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 1,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '4rem',
+					),
+				),
+			),
+			'two_step_spacing_scale' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 2,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '4rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '5.5rem',
+					),
+				),
+			),
+		);
+	}
 }
