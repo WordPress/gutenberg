@@ -511,7 +511,9 @@ class EditorPage {
 				position + i
 			);
 
-			await block.click();
+			if ( isAndroid() ) {
+				await block.click();
+			}
 
 			await this.typeTextToTextBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
