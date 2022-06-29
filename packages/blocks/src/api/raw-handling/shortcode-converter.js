@@ -92,8 +92,13 @@ function segmentHTMLToShortcodeBlock(
 			( schema ) => schema.shortcode( match.shortcode.attrs, match )
 		);
 
+		const blockType = getBlockType( transformation.blockName );
+		if ( ! blockType ) {
+			return [ HTML ];
+		}
+
 		const transformationBlockType = {
-			...getBlockType( transformation.blockName ),
+			...blockType,
 			attributes: transformation.attributes,
 		};
 
