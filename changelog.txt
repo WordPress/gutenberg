@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 13.5.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+### Block Themes
+
+- Global Styles: Add block CSS rules after the Global Styles rules. ([41934](https://github.com/WordPress/gutenberg/pull/41934))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@scruffian
+
+
 = 13.5.0 =
 
 ## Changelog

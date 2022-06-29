@@ -9,6 +9,9 @@
 ### Enhancements
 
 -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
+-   `DatePicker`: highlight today's date. ([#41647](https://github.com/WordPress/gutenberg/pull/41647/)).
+-   Allow automatic repositioning of `BorderBoxControl` and `ColorPalette` popovers within smaller viewports ([#41930](https://github.com/WordPress/gutenberg/pull/41930)).
 
 ### Internal
 
@@ -16,9 +19,24 @@
 -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
 -   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
 -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+-   `Truncate`: Convert to TypeScript ([#41697](https://github.com/WordPress/gutenberg/pull/41697)).
+-   `FocalPointPicker`: Refactor away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   `RangeControl`: Refactor away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   Refactor components `utils` away from `_.clamp()` ([#41735](https://github.com/WordPress/gutenberg/pull/41735/)).
+-   `BoxControl`: Refactor utils away from `_.isNumber()` ([#41776](https://github.com/WordPress/gutenberg/pull/41776/)).
+-   `Elevation`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
+-   `HStack`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
+-   `Truncate`: Refactor away from `_.isNil()` ([#41785](https://github.com/WordPress/gutenberg/pull/41785/)).
 -   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
 -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
 -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+-   `Spacer`: Convert knobs to controls in Storybook ([#41851](https://github.com/WordPress/gutenberg/pull/41851)).
+-   `Heading`: Complete TypeScript migration ([#41921](https://github.com/WordPress/gutenberg/pull/41921)).
+-   `Navigation`: Refactor away from Lodash functions ([#41865](https://github.com/WordPress/gutenberg/pull/41865/)).
+-   `CustomGradientPicker`: Refactor away from Lodash ([#41901](https://github.com/WordPress/gutenberg/pull/41901/)).
+-   `SegmentedControl`: Refactor away from `_.values()` ([#41905](https://github.com/WordPress/gutenberg/pull/41905/)).
+-   `DimensionControl`: Refactor docs away from `_.partialRight()` ([#41909](https://github.com/WordPress/gutenberg/pull/41909/)).
+-   `NavigationItem` updated to ignore `react/exhuastive-deps` eslint rule ([#41639](https://github.com/WordPress/gutenberg/pull/41639)).
 
 ## 19.13.0 (2022-06-15)
 

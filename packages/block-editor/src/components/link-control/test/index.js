@@ -4,7 +4,6 @@
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 import { queryByText, queryByRole } from '@testing-library/react';
-import { default as lodash } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -25,10 +24,13 @@ import {
 } from './fixtures';
 
 // Mock debounce() so that it runs instantly.
-lodash.debounce = jest.fn( ( callback ) => {
-	callback.cancel = jest.fn();
-	return callback;
-} );
+jest.mock( 'lodash', () => ( {
+	...jest.requireActual( 'lodash' ),
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
 
 const mockFetchSearchSuggestions = jest.fn();
 

@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../ui/context';
-import { View } from '../view';
-import useTruncate from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').ForwardedRef<any>}                                                forwardedRef
+ * Internal dependencies
  */
-function Truncate( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../ui/context';
+import { View } from '../view';
+import useTruncate from './hook';
+import type { TruncateProps } from './types';
+
+function UnconnectedTruncate(
+	props: WordPressComponentProps< TruncateProps, 'span' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const truncateProps = useTruncate( props );
 
 	return <View as="span" { ...truncateProps } ref={ forwardedRef } />;
@@ -21,7 +26,6 @@ function Truncate( props, forwardedRef ) {
  * `Subheading` is used to render text content. However,`Truncate` is
  * available for custom implementations.
  *
- * @example
  * ```jsx
  * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
  *
@@ -36,6 +40,6 @@ function Truncate( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedTruncate = contextConnect( Truncate, 'Truncate' );
+export const Truncate = contextConnect( UnconnectedTruncate, 'Truncate' );
 
-export default ConnectedTruncate;
+export default Truncate;

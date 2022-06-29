@@ -65,15 +65,6 @@
 				"background": true,
 				"link": true
 			}
-		},
-		"__experimentalStyle": {
-			"elements": {
-				"button": {
-					"typography": {
-						"fontSize": "0.8em"
-					}
-				}
-			}
 		}
 	},
 	"viewScript": "file:./view.min.js",

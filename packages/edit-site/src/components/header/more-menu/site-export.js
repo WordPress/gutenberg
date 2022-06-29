@@ -21,6 +21,9 @@ export default function SiteExport() {
 			const response = await apiFetch( {
 				path: '/wp-block-editor/v1/export',
 				parse: false,
+				headers: {
+					Accept: 'application/zip',
+				},
 			} );
 			const blob = await response.blob();
 			const contentDisposition = response.headers.get(

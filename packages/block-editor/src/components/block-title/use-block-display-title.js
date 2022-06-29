@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { truncate } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -78,8 +73,15 @@ export default function useBlockDisplayTitle( clientId, maximumLength ) {
 	const blockTitle =
 		label && label !== blockType.title ? label : blockInformation.title;
 
-	if ( maximumLength && maximumLength > 0 ) {
-		return truncate( blockTitle, { length: maximumLength } );
+	if (
+		maximumLength &&
+		maximumLength > 0 &&
+		blockTitle.length > maximumLength
+	) {
+		const omission = '...';
+		return (
+			blockTitle.slice( 0, maximumLength - omission.length ) + omission
+		);
 	}
 
 	return blockTitle;
