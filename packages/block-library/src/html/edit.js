@@ -34,7 +34,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const isDisabled = useContext( Disabled.Context );
 
 	const settingStyles = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().styles;
+		return select( blockEditorStore ).getSettings()?.styles;
 	}, [] );
 
 	const styles = useMemo(
