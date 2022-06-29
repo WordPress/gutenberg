@@ -103,9 +103,9 @@ export function useElevation( props ) {
 		return cx(
 			styles.Elevation,
 			sx.Base,
-			sx.hover && sx.hover,
-			sx.focus && sx.focus,
-			sx.active && sx.active,
+			sx.hover,
+			sx.focus,
+			sx.active,
 			className
 		);
 	}, [
