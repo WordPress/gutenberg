@@ -1,0 +1,26 @@
+.edit-post-post-url {
+	width: 100%;
+	justify-content: flex-start;
+
+	span {
+		display: block;
+		width: 45%;
+	}
+}
+
+.edit-post-post-url__dropdown {
+	max-width: 55%;
+}
+
+.components-button.edit-post-post-url__toggle {
+	display: inline-block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.edit-post-post-url__dialog .editor-post-url {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+}
