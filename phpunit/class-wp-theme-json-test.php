@@ -3040,7 +3040,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'two_step_spacing_scale' => array(
+
+			'two_step_spacing_scale_should_add_step_above_medium' => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
@@ -3058,6 +3059,176 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'name' => 'Large',
 						'slug' => 60,
 						'size' => '5.5rem',
+					),
+				),
+			),
+
+			'three_step_spacing_scale_should_add_step_above_and_below_medium' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 3,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'Small',
+						'slug' => 40,
+						'size' => '2.5rem',
+					),
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '4rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '5.5rem',
+					),
+				),
+			),
+
+			'even_step_spacing_scale_steps_should_add_extra_step_above_medium' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 1.5,
+					'steps'      => 4,
+					'mediumStep' => 4,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'Small',
+						'slug' => 40,
+						'size' => '2.5rem',
+					),
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '4rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '5.5rem',
+					),
+					array(
+						'name' => 'X-Large',
+						'slug' => 70,
+						'size' => '7rem',
+					),
+				),
+			),
+
+			'if_bottom_end_will_go_below_zero_should_add_extra_steps_above_medium_instead' => array(
+				'spacingScale'    => array(
+					'operator'   => '+',
+					'increment'  => 2.5,
+					'steps'      => 5,
+					'mediumStep' => 5,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'Small',
+						'slug' => 40,
+						'size' => '2.5rem',
+					),
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '5rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '7.5rem',
+					),
+					array(
+						'name' => 'X-Large',
+						'slug' => 70,
+						'size' => '10rem',
+					),
+					array(
+						'name' => '2X-Large',
+						'slug' => 80,
+						'size' => '12.5rem',
+					),
+				),
+			),
+
+			'multiplier_should_correctly_calculate_above_and_below_medium' => array(
+				'spacingScale'    => array(
+					'operator'   => '*',
+					'increment'  => 1.5,
+					'steps'      => 5,
+					'mediumStep' => 1.5,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'X-Small',
+						'slug' => 30,
+						'size' => '0.67rem',
+					),
+					array(
+						'name' => 'Small',
+						'slug' => 40,
+						'size' => '1rem',
+					),
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '1.5rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '2.25rem',
+					),
+					array(
+						'name' => 'X-Large',
+						'slug' => 70,
+						'size' => '3.38rem',
+					),
+				),
+			),
+
+			'increment_<_1_combined+with_*_operator_should_act_as_divisor_to_calculate_above_and_below_medium' => array(
+				'spacingScale'    => array(
+					'operator'   => '*',
+					'increment'  => 0.25,
+					'steps'      => 5,
+					'mediumStep' => 1.5,
+					'units'      => 'rem',
+				),
+				'expected_output' => array(
+					array(
+						'name' => 'X-Small',
+						'slug' => 30,
+						'size' => '0.09rem',
+					),
+					array(
+						'name' => 'Small',
+						'slug' => 40,
+						'size' => '0.38rem',
+					),
+					array(
+						'name' => 'Medium',
+						'slug' => 50,
+						'size' => '1.5rem',
+					),
+					array(
+						'name' => 'Large',
+						'slug' => 60,
+						'size' => '6rem',
+					),
+					array(
+						'name' => 'X-Large',
+						'slug' => 70,
+						'size' => '24rem',
 					),
 				),
 			),
