@@ -231,6 +231,26 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Get an instance of the WP_Style_Engine_CSS_Rules object.
+	 *
+	 * If a $selector is provided, then the same instance will be used each time the same $selector is used,
+	 * otherwise, a new instance will be created each time.
+	 *
+	 * @param string $selector The selector to use for the CSS rules.
+	 * @return WP_Style_Engine_CSS_Rules The CSS rules object.
+	 */
+	public function get_css_rules_object( $selector = null ) {
+		if ( null === $selector ) {
+			return new WP_Style_Engine_CSS_Rules();
+		}
+		static $instances = array();
+		if ( ! isset( $instances[ $selector ] ) ) {
+			$instances[ $selector ] = new WP_Style_Engine_CSS_Rules();
+		}
+		return $instances[ $selector ];
+	}
+
+	/**
 	 * Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 	 *
 	 * @param string? $style_value  A single css preset value.
@@ -397,7 +417,7 @@ class WP_Style_Engine {
 
 		// Build CSS rules output.
 		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = new WP_Style_Engine_CSS_Rules();
+		$style_rules  = $this->get_css_rules_object( $options['selector'] );
 		$style_rules->add_declarations( $css_declarations );
 
 		// The return object.
@@ -419,7 +439,6 @@ class WP_Style_Engine {
 
 		return $styles_output;
 	}
-
 
 	/**
 	 * Style value parser that returns a CSS definition array comprising style properties
