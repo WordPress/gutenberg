@@ -247,7 +247,7 @@ function getStylesDeclarations( blockStyles = {} ) {
  * @param {boolean} hasBlockStylesSupport Whether or not the theme opts-in to `wp-block-styles` support.
  * @return {string} Generated CSS rules for the layout styles.
  */
-function getLayoutStyles(
+export function getLayoutStyles(
 	tree,
 	style,
 	selector,
@@ -261,7 +261,7 @@ function getLayoutStyles(
 		tree?.settings?.layout?.definitions
 	) {
 		gapValue = hasBlockGapSupport
-			? getGapCSSValue( gapValue, '0.5em' )
+			? getGapCSSValue( gapValue, '0.5em' ) || '0.5em'
 			: '0.5em';
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
@@ -297,7 +297,7 @@ function getLayoutStyles(
 									  }`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
-							) } }`;
+							) }; }`;
 						}
 					} );
 				}
