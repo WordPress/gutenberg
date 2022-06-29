@@ -51,7 +51,7 @@ test.describe( 'Site editor writing flow', () => {
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/41811.
-	test.only( 'allows tabbing to the inspector from the last block', async ( {
+	test( 'allows tabbing to the inspector from the last block', async ( {
 		admin,
 		editor,
 		page,
