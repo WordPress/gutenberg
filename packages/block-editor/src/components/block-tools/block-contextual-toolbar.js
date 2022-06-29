@@ -20,11 +20,8 @@ import { store as blockEditorStore } from '../../store';
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const { blockType, hasParents, showParentSelector } = useSelect(
 		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientIds,
-			} = select( blockEditorStore );
+			const { getBlockName, getBlockParents, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -39,11 +36,13 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 					getBlockType( getBlockName( selectedBlockClientId ) ),
 				hasParents: parents.length,
 				showParentSelector:
+					parentBlockType &&
 					hasBlockSupport(
 						parentBlockType,
 						'__experimentalParentSelector',
 						true
-					) && selectedBlockClientIds.length <= 1,
+					) &&
+					selectedBlockClientIds.length <= 1,
 			};
 		},
 		[]

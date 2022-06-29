@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, isNumber } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -82,16 +82,16 @@ export function getAllValue(
 		: '';
 
 	/**
-	 * The isNumber check is important. On reset actions, the incoming value
+	 * The typeof === 'number' check is important. On reset actions, the incoming value
 	 * may be null or an empty string.
 	 *
 	 * Also, the value may also be zero (0), which is considered a valid unit value.
 	 *
-	 * isNumber() is more specific for these cases, rather than relying on a
+	 * typeof === 'number' is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
 	let commonUnit;
-	if ( isNumber( commonQuantity ) ) {
+	if ( typeof commonQuantity === 'number' ) {
 		commonUnit = mode( allParsedUnits );
 	} else {
 		// Set meaningful unit selection if no commonQuantity and user has previously

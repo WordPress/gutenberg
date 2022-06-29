@@ -31,9 +31,8 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		[ rootClientId ]
 	);
 
-	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
-		blockTypes
-	);
+	const { items, trackBlockTypeSelected } =
+		useBlockTypeImpressions( blockTypes );
 
 	const handleSelect = ( ...args ) => {
 		trackBlockTypeSelected( ...args );

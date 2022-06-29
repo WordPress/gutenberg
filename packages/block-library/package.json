@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "7.7.0",
+	"version": "7.9.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -66,7 +66,8 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
-		"moment": "^2.22.1"
+		"moment": "^2.22.1",
+		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {
 		"react": "^17.0.0",

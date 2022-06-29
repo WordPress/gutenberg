@@ -6,6 +6,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
+	NavigableToolbar,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
@@ -57,9 +58,8 @@ export default function Header( {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
@@ -108,47 +108,72 @@ export default function Header( {
 
 	return (
 		<div className="edit-site-header">
-			<div className="edit-site-header_start">
+			<NavigableToolbar
+				className="edit-site-header_start"
+				aria-label={ __( 'Document tools' ) }
+			>
 				<div className="edit-site-header__toolbar">
-					<Button
+					<ToolbarItem
 						ref={ inserterButton }
+						as={ Button }
+						className="edit-site-header-toolbar__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpen }
-						className="edit-site-header-toolbar__inserter-toggle"
-						disabled={ ! isVisualMode }
 						onMouseDown={ preventDefault }
 						onClick={ openInserter }
+						disabled={ ! isVisualMode }
 						icon={ plus }
+						/* translators: button label text should, if possible, be under 16
+				characters. */
 						label={ _x(
 							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
+						showTooltip={ ! showIconLabels }
 					>
 						{ showIconLabels &&
 							( ! isInserterOpen ? __( 'Add' ) : __( 'Close' ) ) }
-					</Button>
+					</ToolbarItem>
 					{ isLargeViewport && (
 						<>
 							<ToolbarItem
 								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								disabled={ ! isVisualMode }
 							/>
-							<UndoButton />
-							<RedoButton />
-							<Button
+							<ToolbarItem
+								as={ UndoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ RedoButton }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+							/>
+							<ToolbarItem
+								as={ Button }
 								className="edit-site-header-toolbar__list-view-toggle"
-								disabled={ ! isVisualMode }
 								icon={ listView }
+								disabled={ ! isVisualMode }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
+								showTooltip={ ! showIconLabels }
 							/>
 						</>
 					) }
 				</div>
-			</div>
+			</NavigableToolbar>
 
 			<div className="edit-site-header_center">
 				<DocumentActions

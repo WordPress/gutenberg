@@ -16,10 +16,8 @@ export default function SaveButton( {
 	isEntitiesSavedStatesOpen,
 } ) {
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			isSavingEntityRecord,
-		} = select( coreStore );
+		const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
+			select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
 			isDirty: dirtyEntityRecords.length > 0,

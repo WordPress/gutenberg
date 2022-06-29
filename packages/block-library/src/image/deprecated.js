@@ -176,16 +176,8 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-				id,
-			} = attributes;
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
 			const classes = classnames( {
 				[ `align${ align }` ]: align,
@@ -218,16 +210,8 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-				id,
-			} = attributes;
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
 			const image = (
 				<img
@@ -255,15 +239,8 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-			} = attributes;
+			const { url, alt, caption, align, href, width, height } =
+				attributes;
 			const extraImageProps = width || height ? { width, height } : {};
 			const image = (
 				<img src={ url } alt={ alt } { ...extraImageProps } />

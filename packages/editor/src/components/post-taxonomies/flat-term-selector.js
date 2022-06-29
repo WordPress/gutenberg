@@ -55,11 +55,11 @@ const termNamesToIds = ( names, terms ) => {
 };
 
 // Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( termName, restBase ) {
+function findOrCreateTerm( termName, restBase, namespace ) {
 	const escapedTermName = escapeString( termName );
 
 	return apiFetch( {
-		path: `/wp/v2/${ restBase }`,
+		path: `/${ namespace }/${ restBase }`,
 		method: 'POST',
 		data: { name: escapedTermName },
 	} )
@@ -68,7 +68,7 @@ function findOrCreateTerm( termName, restBase ) {
 			if ( errorCode === 'term_exists' ) {
 				// If the terms exist, fetch it instead of creating a new one.
 				const addRequest = apiFetch( {
-					path: addQueryArgs( `/wp/v2/${ restBase }`, {
+					path: addQueryArgs( `/${ namespace }/${ restBase }`, {
 						...DEFAULT_QUERY,
 						search: escapedTermName,
 					} ),
@@ -100,14 +100,10 @@ function FlatTermSelector( { slug } ) {
 		hasResolvedTerms,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const {
-				getEntityRecords,
-				getTaxonomy,
-				hasFinishedResolution,
-			} = select( coreStore );
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
@@ -228,9 +224,10 @@ function FlatTermSelector( { slug } ) {
 			return;
 		}
 
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		Promise.all(
 			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( termName, taxonomy.rest_base )
+				findOrCreateTerm( termName, taxonomy.rest_base, namespace )
 			)
 		).then( ( newTerms ) => {
 			const newAvailableTerms = availableTerms.concat( newTerms );

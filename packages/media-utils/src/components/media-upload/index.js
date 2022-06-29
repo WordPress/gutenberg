@@ -377,6 +377,11 @@ class MediaUpload extends Component {
 	onOpen() {
 		this.updateCollection();
 
+		//Handle active tab in media model on model open.
+		if ( this.props.mode ) {
+			this.frame.content.mode( this.props.mode );
+		}
+
 		// Handle both this.props.value being either (number[]) multiple ids
 		// (for galleries) or a (number) singular id (e.g. image block).
 		const hasMedia = Array.isArray( this.props.value )

@@ -57,18 +57,18 @@ export default function EntityRecordItem( {
 
 	const isSelected = useSelect(
 		( select ) => {
-			const selectedBlockId = select(
-				blockEditorStore
-			).getSelectedBlockClientId();
+			const selectedBlockId =
+				select( blockEditorStore ).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
 		[ parentBlockId ]
 	);
 	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
+	const selectParentBlock = useCallback(
+		() => selectBlock( parentBlockId ),
+		[ parentBlockId ]
+	);
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
 		closePanel();

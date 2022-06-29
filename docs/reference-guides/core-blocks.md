@@ -123,7 +123,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 -	**Name:** core/comment-author-name
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, isLink, linkTarget, textAlign
+-	**Attributes:** isLink, linkTarget, textAlign
 
 ## Comment Content
 
@@ -141,7 +141,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 -	**Name:** core/comment-date
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, format, isLink
+-	**Attributes:** format, isLink
 
 ## Comment Edit Link
 
@@ -150,7 +150,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, linkTarget, textAlign
+-	**Attributes:** linkTarget, textAlign
 
 ## Comment Reply Link
 
@@ -159,7 +159,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** fontSize, textAlign
+-	**Attributes:** textAlign
 
 ## Comment Template
 
@@ -230,7 +230,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (padding), ~~html~~
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, minHeight, minHeightUnit, overlayColor, templateLock, url, useFeaturedImage
 
 ## Embed
@@ -275,7 +275,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, color (background, gradients, link, text), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -563,7 +563,7 @@ Displays the next or previous post link that is adjacent to the current post. ([
 
 -	**Name:** core/post-navigation-link
 -	**Category:** theme
--	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label, linkLabel, showTitle, textAlign, type
 
 ## Post Template

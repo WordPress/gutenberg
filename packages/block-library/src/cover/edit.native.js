@@ -117,9 +117,8 @@ const Cover = ( {
 		overlayColor,
 		isDark,
 	} = attributes;
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
-		false
-	);
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
 
 	useEffect( () => {
 		let isCurrent = true;
@@ -176,10 +175,8 @@ const Cover = ( {
 
 	const hasOnlyColorBackground = ! url && ( hasBackground || hasInnerBlocks );
 
-	const [
-		isCustomColorPickerShowing,
-		setCustomColorPickerShowing,
-	] = useState( false );
+	const [ isCustomColorPickerShowing, setCustomColorPickerShowing ] =
+		useState( false );
 
 	const openMediaOptionsRef = useRef();
 
@@ -248,9 +245,8 @@ const Cover = ( {
 		openGeneralSidebar();
 	}
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const isCoverDark = useCoverIsDark(
 		isDark,
 		url,
@@ -622,9 +618,8 @@ const Cover = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId, getBlock } = select(
-			blockEditorStore
-		);
+		const { getSelectedBlockClientId, getBlock } =
+			select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 

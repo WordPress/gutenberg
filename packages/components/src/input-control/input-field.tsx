@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
@@ -25,6 +24,8 @@ import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
+
+const noop = () => {};
 
 function InputField(
 	{
