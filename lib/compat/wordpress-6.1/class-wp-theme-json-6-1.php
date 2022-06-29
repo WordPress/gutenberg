@@ -852,13 +852,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	/**
 	 * Transform the spacing scale values into an array of spacing scale presets.
 	 */
-	public function get_spacing_sizes() {
+	public function set_spacing_sizes() {
 		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
 
 		if ( ! is_numeric( $spacing_scale['steps'] )
 			|| ! $spacing_scale['steps'] > 0
 			|| ! isset( $spacing_scale['mediumStep'] )
-			|| ! isset( $spacing_scale['units'] )
+			|| ! isset( $spacing_scale['unit'] )
 			|| ! isset( $spacing_scale['operator'] )
 			|| ! isset( $spacing_scale['increment'] )
 			|| ! isset( $spacing_scale['steps'] )
@@ -871,6 +871,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			return null;
 		}
 
+		$unit            = sanitize_title( $spacing_scale['unit'] );
 		$current_step    = $spacing_scale['mediumStep'];
 		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
 		$x_small_count   = null;
@@ -892,7 +893,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Small */
 				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
 				'slug' => $slug,
-				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
+				'size' => round( $current_step, 2 ) . $unit,
 			);
 
 			if ( $x === $steps_mid_point - 2 ) {
@@ -911,7 +912,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$below_sizes[] = array(
 			'name' => __( 'Medium', 'gutenberg' ),
 			'slug' => 50,
-			'size' => $spacing_scale['mediumStep'] . $spacing_scale['units'],
+			'size' => $spacing_scale['mediumStep'] . $unit,
 		);
 
 		$current_step  = $spacing_scale['mediumStep'];
@@ -927,9 +928,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$above_sizes[] = array(
 				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Large */
-				'name' => $x === 0 ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
+				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
 				'slug' => $slug,
-				'size' => round( $current_step, 2 ) . $spacing_scale['units'],
+				'size' => round( $current_step, 2 ) . $unit,
 			);
 
 			if ( 1 === $x ) {

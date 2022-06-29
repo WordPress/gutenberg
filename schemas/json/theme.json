@@ -275,8 +275,8 @@
 									"description": "The value to medium setting in the scale.",
 									"type": "number"
 								},
-								"units": {
-									"description": "Units that the scale uses, eg. rem, em, px.",
+								"unit": {
+									"description": "Unit that the scale uses, eg. rem, em, px.",
 									"type": "string",
 									"enum": [
 										"px",
