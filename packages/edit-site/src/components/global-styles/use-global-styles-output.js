@@ -175,14 +175,22 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles Block styles.
+ * @param {Object}  blockStyles Block styles.
+ *
+ * @param {string}  selector    The selector these declarations should attach to.
+ *
+ * @param {boolean} useRootVars Whether to use CSS custom properties in root selector.
  *
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations( blockStyles = {} ) {
+function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
+	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
 		STYLE_PROPERTY,
-		( declarations, { value, properties, useEngine }, key ) => {
+		( declarations, { value, properties, useEngine, rootOnly }, key ) => {
+			if ( rootOnly && ! isRoot ) {
+				return declarations;
+			}
 			const pathToValue = value;
 			if ( first( pathToValue ) === 'elements' || useEngine ) {
 				return declarations;
@@ -200,7 +208,9 @@ function getStylesDeclarations( blockStyles = {} ) {
 						return;
 					}
 
-					const cssProperty = kebabCase( name );
+					const cssProperty = name.startsWith( '--' )
+						? name
+						: kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
 							get( styleValue, [ prop ] )
@@ -222,6 +232,10 @@ function getStylesDeclarations( blockStyles = {} ) {
 		},
 		[]
 	);
+
+	if ( isRoot && useRootVars ) {
+		return output;
+	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
@@ -497,6 +511,7 @@ export const toStyles = (
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	const useRootVars = tree?.settings?.useRootVariables;
 
 	/*
 	 * Reset default browser margin on the root body element.
@@ -507,6 +522,12 @@ export const toStyles = (
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
 	let ruleset = 'body {margin: 0;}';
+
+	if ( useRootVars ) {
+		ruleset =
+			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6, ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+	}
+
 	nodesWithStyles.forEach(
 		( { selector, duotoneSelector, styles, hasLayoutSupport } ) => {
 			const duotoneStyles = {};
@@ -540,8 +561,12 @@ export const toStyles = (
 				} );
 			}
 
-			// Process the remaning block styles (they use either normal block class or __experimentalSelector).
-			const declarations = getStylesDeclarations( styles );
+			// Process the remaining block styles (they use either normal block class or __experimentalSelector).
+			const declarations = getStylesDeclarations(
+				styles,
+				selector,
+				useRootVars
+			);
 			if ( declarations?.length ) {
 				ruleset =
 					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;

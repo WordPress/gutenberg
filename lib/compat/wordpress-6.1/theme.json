@@ -2,6 +2,7 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
+		"useRootVariables": false,
 		"border": {
 			"color": false,
 			"radius": false,
@@ -346,6 +347,14 @@
 				}
 			}
 		},
-		"spacing": { "blockGap": "24px" }
+		"spacing": {
+			"blockGap": "24px",
+			"padding": {
+				"top": "0px",
+				"right": "0px",
+				"bottom": "0px",
+				"left": "0px"
+			}
+		}
 	}
 }
