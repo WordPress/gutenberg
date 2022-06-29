@@ -3,6 +3,11 @@
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 
+/**
+ * External dependencies
+ */
+import fetch from 'node-fetch';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -81,27 +86,38 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 
 export function attributesFromUrl( setAttributes, dimRatio ) {
 	return ( newURL ) => {
-		const mediaRegexp = /\.(jpg|jpeg|gif|ico|webp|png|svg)$/;
-		let mediaType;
+		getContentTypeFromUrl( newURL ).then( function ( contentType ) {
+			let mediaType;
 
-		if ( newURL.match( mediaRegexp ) !== null ) {
-			mediaType = IMAGE_BACKGROUND_TYPE;
-		} else {
-			mediaType = VIDEO_BACKGROUND_TYPE;
-		}
+			if ( contentType && contentType.startsWith( 'image' ) ) {
+				mediaType = IMAGE_BACKGROUND_TYPE;
+			} else if ( contentType && contentType.startsWith( 'video' ) ) {
+				mediaType = VIDEO_BACKGROUND_TYPE;
+			}
 
-		setAttributes( {
-			url: newURL,
-			id: undefined,
-			width: undefined,
-			height: undefined,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
-			backgroundType: mediaType,
-			...( mediaType === VIDEO_BACKGROUND_TYPE
-				? { focalPoint: undefined, hasParallax: undefined }
-				: {} ),
+			if ( ! mediaType ) return;
+
+			setAttributes( {
+				url: newURL,
+				id: undefined,
+				width: undefined,
+				height: undefined,
+				dimRatio: dimRatio === 100 ? 50 : dimRatio,
+				backgroundType: mediaType,
+				...( mediaType === VIDEO_BACKGROUND_TYPE
+					? { focalPoint: undefined, hasParallax: undefined }
+					: {} ),
+			} );
 		} );
 	};
+}
+
+async function getContentTypeFromUrl( url ) {
+	const response = await fetch( url );
+	if ( response.ok ) {
+		return response.headers.get( 'Content-Type' );
+	}
+	return false;
 }
 
 /**
