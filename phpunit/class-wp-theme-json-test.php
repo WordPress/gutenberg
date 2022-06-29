@@ -3196,7 +3196,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'increment_<_1_combined+with_*_operator_should_act_as_divisor_to_calculate_above_and_below_medium' => array(
+			'increment_<_1_combined_with_*_operator_should_act_as_divisor_to_calculate_above_and_below_medium' => array(
 				'spacingScale'    => array(
 					'operator'   => '*',
 					'increment'  => 0.25,
