@@ -7,7 +7,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SandBox } from '@wordpress/components';
-
 import { useSelect } from '@wordpress/data';
 
 // Default styles used to unset some of the styles
