@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { get, omit } from 'lodash';
-/**
  * WordPress dependencies
  */
 import { PanelBody, RadioControl, RangeControl } from '@wordpress/components';
@@ -37,7 +33,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	}
 
 	function getGradientColor( type ) {
-		const orientation = get( gradientAST, [ 'orientation' ] );
+		const { orientation, ...restGradientAST } = gradientAST;
 
 		if ( orientation ) {
 			setGradientOrientation( orientation );
@@ -55,7 +51,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 						type,
 				  }
 				: {
-						...omit( gradientAST, [ 'orientation' ] ),
+						...restGradientAST,
 						type,
 				  }
 		);
@@ -83,11 +79,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	}
 
 	function getGradientAngle() {
-		return get(
-			gradientAST,
-			[ 'orientation', 'value' ],
-			DEFAULT_LINEAR_GRADIENT_ANGLE
-		);
+		return gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
 	}
 	return (
 		<>

@@ -1,6 +1,14 @@
 /**
  * WordPress dependencies
  */
+/**
+ * External dependencies
+ */
+import { flatMap } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
@@ -33,6 +41,15 @@ function getListContentSchema( { phrasingContentSchema } ) {
 	} );
 
 	return listContentSchema;
+}
+
+function getListContentFlat( blocks ) {
+	return flatMap( blocks, ( { name, attributes, innerBlocks = [] } ) => {
+		if ( name === 'core/list-item' ) {
+			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+		}
+		return getListContentFlat( innerBlocks );
+	} );
 }
 
 const transforms = {
@@ -123,13 +140,11 @@ const transforms = {
 			type: 'block',
 			blocks: [ block ],
 			transform: ( _attributes, childBlocks ) => {
-				return childBlocks
-					.filter( ( { name } ) => name === 'core/list-item' )
-					.map( ( { attributes } ) =>
-						createBlock( block, {
-							content: attributes.content,
-						} )
-					);
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( block, {
+						content,
+					} )
+				);
 			},
 		} ) ),
 		...[ 'core/quote', 'core/pullquote' ].map( ( block ) => ( {

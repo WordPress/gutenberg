@@ -128,8 +128,12 @@
 	input:not([type="submit"]):not([type="checkbox"]) {
 		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
+}
 
-	input[type="submit"] {
-		border: none;
-	}
+
+// Using :where to give this a low specificity so that element styles take precedence.
+// Needed for backwards compatibility.
+// Styles copied from button block styles.
+:where(.wp-block-post-comments input[type="submit"]) {
+	border: none;
 }

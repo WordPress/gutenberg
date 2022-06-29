@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -48,6 +43,7 @@ const REST_PAGES_ROUTES = [
 	'/wp/v2/pages',
 	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
+let uniqueId = 0;
 
 /**
  * Determines if a given URL matches any of a given collection of
@@ -312,7 +308,7 @@ async function waitForBlock( blockName ) {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	const contributorUsername = uniqueId( 'contributoruser_' );
+	const contributorUsername = `contributoruser_${ ++uniqueId }`;
 	let contributorPassword;
 
 	beforeAll( async () => {
@@ -388,7 +384,10 @@ describe( 'Navigation', () => {
 			expect( loadingSpinner ).toBeNull();
 		} );
 
-		it( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
+		// Skip reason: This test is quite flaky recently.
+		// See https://github.com/WordPress/gutenberg/issues/39231.
+		// eslint-disable-next-line jest/no-disabled-tests
+		it.skip( 'shows a loading indicator whilst ref resolves to Navigation post items', async () => {
 			const testNavId = 1;
 
 			let resolveNavigationRequest;
@@ -400,11 +399,8 @@ describe( 'Navigation', () => {
 			await setUpResponseMocking( [
 				{
 					match: ( request ) => {
-						return (
-							[ 'GET', 'OPTIONS' ].includes( request.method() ) &&
-							decodeURIComponent( request.url() ).includes(
-								`navigation/${ testNavId }`
-							)
+						return decodeURIComponent( request.url() ).includes(
+							`navigation/`
 						);
 					},
 					onRequestMatch: ( request ) => {
