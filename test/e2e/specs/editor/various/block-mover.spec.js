@@ -22,7 +22,7 @@ test.describe( 'block mover', () => {
 		await page.focus( 'text=First Paragraph' );
 		await editor.showBlockToolbar();
 
-		const blockMover = await page.$$( '.block-editor-block-mover' );
+		const blockMover = await page.locator( '.block-editor-block-mover' );
 		// There should be a block mover.
 		expect( blockMover ).toHaveLength( 1 );
 	} );
@@ -41,7 +41,7 @@ test.describe( 'block mover', () => {
 		await editor.showBlockToolbar();
 
 		// Ensure no block mover exists when only one block exists on the page.
-		const blockMover = await page.$$( '.block-editor-block-mover' );
+		const blockMover = await page.locator( '.block-editor-block-mover' );
 		expect( blockMover ).toHaveLength( 0 );
 	} );
 } );
