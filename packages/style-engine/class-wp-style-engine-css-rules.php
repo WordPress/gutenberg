@@ -107,8 +107,7 @@ class WP_Style_Engine_CSS_Rules {
 	 * @return string The sanitized property name.
 	 */
 	protected function sanitize_property( $property ) {
-		$property = trim( $property );
-		return preg_replace( '/[^a-zA-Z0-9_-]/', '', $property );
+		return sanitize_key( $property );
 	}
 
 	/**
