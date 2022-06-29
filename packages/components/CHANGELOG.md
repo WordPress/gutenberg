@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.14.0 (2022-06-29)
+
 ### Bug Fix
 
 -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
