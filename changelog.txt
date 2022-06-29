@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 13.5.2 =
+
+## Changelog
+
+### Bug Fixes
+
+### Components
+Revert: Refactor Autocomplete component to pass exhaustive-deps. (https://github.com/WordPress/gutenberg/pull/41820)
+
+
 = 13.5.1 =
 
 
