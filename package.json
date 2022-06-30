@@ -273,7 +273,7 @@
 		"lint-css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint:md-docs": "wp-scripts lint-md-docs",
-		"native": "npm run --prefix packages/react-native-editor",
+		"native": "cd ./packages/react-native-editor && npm run",
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",

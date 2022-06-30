@@ -71,6 +71,10 @@ const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 const DEFAULT_FONT_SIZE = 16;
 const MIN_LINE_HEIGHT = 1;
 
+function last( string ) {
+	return '[' + string.substr( -1 ) + ']';
+}
+
 export class RichText extends Component {
 	constructor( {
 		value,
@@ -303,6 +307,7 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChangeFromAztec( event ) {
+		console.log( '>>> onChangeFromAztec 1' );
 		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
 			return;
 		}
@@ -312,11 +317,17 @@ export class RichText extends Component {
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
 		if ( contentWithoutRootTag === this.value ) {
+			console.log( '>>> onChangeFromAztec 4', {
+				contentWithoutRootTag: last( contentWithoutRootTag ),
+				value: last( this.value ),
+				full: this.value,
+			} );
 			return;
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // The onChange event always fires after the fact.
+		console.log( '>>> onChangeFromAztec 2' );
 		this.onTextUpdate( event );
 		this.lastAztecEventType = 'input';
 	}
@@ -335,6 +346,7 @@ export class RichText extends Component {
 
 		this.debounceCreateUndoLevel();
 		const refresh = this.value !== formattedContent;
+		console.log( '>>> SET onTextUpdate', last( formattedContent ) );
 		this.value = formattedContent;
 
 		// We don't want to refresh if our goal is just to create a record.
@@ -544,6 +556,7 @@ export class RichText extends Component {
 						href: decodeEntities( trimmedText ),
 					},
 				} );
+				console.log( '>>> SET onPaste', last( linkedRecord ) );
 				this.value = this.valueToFormat( linkedRecord );
 				onChange( this.value );
 
@@ -584,6 +597,7 @@ export class RichText extends Component {
 	}
 
 	onBlur( event ) {
+		console.log( '>>> onBlur 1' );
 		this.isTouched = false;
 
 		// Check if value is up to date with latest state of native AztecView.
@@ -591,6 +605,7 @@ export class RichText extends Component {
 			event.nativeEvent.text &&
 			event.nativeEvent.text !== this.props.value
 		) {
+			console.log( '>>> onBlur 2' );
 			this.onTextUpdate( event );
 		}
 
@@ -667,9 +682,13 @@ export class RichText extends Component {
 				' ';
 		if (
 			contentWithoutRootTag !== this.value &&
-			this.lastAztecEventType === 'selection change' &&
-			! leadingOrTrailingSpace
+			this.lastAztecEventType === 'selection change'
 		) {
+			console.log( '>>> RETURN onSelectionChangeFromAztec', {
+				contentWithoutRootTag: last( contentWithoutRootTag ),
+				value: last( this.value ),
+				full: this.value,
+			} );
 			return;
 		}
 
@@ -748,6 +767,7 @@ export class RichText extends Component {
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
+			console.log( '>>> 2' );
 			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
@@ -775,9 +795,11 @@ export class RichText extends Component {
 				typeof nextProps.selectionStart !== 'undefined' &&
 				typeof nextProps.selectionEnd !== 'undefined'
 			) {
+				console.log( '>>> 1a' );
 				this.needsSelectionUpdate = true;
 			}
 
+			console.log( '>>> 1b' );
 			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
@@ -842,6 +864,11 @@ export class RichText extends Component {
 		const { currentFontSize } = this.state;
 
 		if ( this.props.value !== this.value ) {
+			console.log( '>>> SET cDU', {
+				old: last( this.value ),
+				new: last( this.props.value ),
+				full: this.value,
+			} );
 			this.value = this.props.value;
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
