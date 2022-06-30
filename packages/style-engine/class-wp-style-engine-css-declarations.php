@@ -69,9 +69,6 @@ class WP_Style_Engine_CSS_Declarations {
 
 		// Loop declarations and add them.
 		foreach ( $declarations as $property => $value ) {
-			if ( empty( $property ) || empty( $value ) ) {
-				continue;
-			}
 			$this->add_declaration( $property, $value );
 		}
 	}
