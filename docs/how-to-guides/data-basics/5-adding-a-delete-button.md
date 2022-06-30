@@ -158,7 +158,7 @@ const DeletePageButton = ({ pageId }) => {
 }
 ```
 
-The `error` object comes from the `@wordpress/api-fetch` and contains information about the failure reason. It has the following properties:
+The `error` object comes from the `@wordpress/api-fetch` and contains information about the error. It has the following properties:
 
 * `message` – a human-readable error message such as `Invalid post ID`.
 * `code` – a string-based error code such as `rest_post_invalid_id`. To learn about all possible error codes you'd need to refer to the [`/v2/pages` endpoint's source code](https://github.com/WordPress/wordpress-develop/blob/2648a5f984b8abf06872151898e3a61d3458a628/src/wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php#L226-L230).
