@@ -7,6 +7,7 @@
  */
 
 require __DIR__ . '/../class-wp-style-engine.php';
+require __DIR__ . '/../class-wp-style-engine-rule.php';
 
 /**
  * Tests for registering, storing and generating styles.
@@ -139,7 +140,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'style_block_with_selector'                    => array(
+			'style_block_with_selector_unprettified'       => array(
 				'block_styles'    => array(
 					'spacing' => array(
 						'padding' => array(
