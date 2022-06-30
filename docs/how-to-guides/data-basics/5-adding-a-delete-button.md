@@ -124,9 +124,9 @@ Here's what it looks like in action:
 
 We optimistically assumed that a *delete* operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
 
-* The website can be down
-* The update may be invalid
-* The page could have been deleted by someone else in the meantime
+* The website can be down.
+* The update may be invalid.
+* The page could have been deleted by someone else in the meantime.
 
 To tell the user when any of these happens, we need to extract the error information using the `getLastEntityDeleteError` selector:
 
