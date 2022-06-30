@@ -88,7 +88,12 @@ function ScreenLinkColor( { name } ) {
 
 			<TabPanel className="my-tab-panel" tabs={ tabs }>
 				{ ( tab ) => {
-					const psuedoSelector = tab.name;
+					const pseudoSelectorConfig =
+						pseudoStates[ tab.name ] ?? null;
+
+					if ( ! pseudoSelectorConfig ) {
+						return null;
+					}
 
 					return (
 						<>
@@ -100,15 +105,11 @@ function ScreenLinkColor( { name } ) {
 								showTitle={ false }
 								enableAlpha
 								__experimentalIsRenderedInSidebar
-								colorValue={
-									pseudoStates[ psuedoSelector ].value
-								}
-								onColorChange={
-									pseudoStates[ psuedoSelector ].handler
-								}
+								colorValue={ pseudoSelectorConfig.value }
+								onColorChange={ pseudoSelectorConfig.handler }
 								clearable={
-									pseudoStates[ psuedoSelector ].value ===
-									pseudoStates[ psuedoSelector ].userValue
+									pseudoSelectorConfig.value ===
+									pseudoSelectorConfig.userValue
 								}
 							/>
 						</>
