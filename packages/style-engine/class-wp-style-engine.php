@@ -239,7 +239,7 @@ class WP_Style_Engine {
 	 * @param string $selector The selector to use for the CSS rules.
 	 * @return WP_Style_Engine_CSS_Declarations The CSS rules object.
 	 */
-	public function get_css_rules_object( $selector = null ) {
+	public function get_css_declarations_object( $selector = null ) {
 		/**
 		 * The implementation below will in the future be replaced with a "Store" object.
 		 * The store will be responsible for caching the CSS rules objects and selectors,
@@ -422,7 +422,7 @@ class WP_Style_Engine {
 
 		// Build CSS rules output.
 		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = $this->get_css_rules_object( $options['selector'] );
+		$style_rules  = $this->get_css_declarations_object( $options['selector'] );
 		$style_rules->add_declarations( $css_declarations );
 
 		// The return object.
