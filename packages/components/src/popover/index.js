@@ -272,10 +272,10 @@ const Popover = (
 					return anchorRect;
 				},
 			};
-		} else if ( getAnchorRect ) {
+		} else if ( getAnchorRect && anchorRefFallback.current ) {
 			usedRef = {
 				getBoundingClientRect() {
-					const rect = getAnchorRect();
+					const rect = getAnchorRect( anchorRefFallback.current );
 					return new window.DOMRect(
 						rect.x ?? rect.left,
 						rect.y ?? rect.top,
