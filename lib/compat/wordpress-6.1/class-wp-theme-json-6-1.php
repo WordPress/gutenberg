@@ -1144,7 +1144,16 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Layout styles for the block.
 	 */
 	protected function get_layout_styles( $block_metadata ) {
-		$block_rules              = '';
+		$block_rules = '';
+		$block_type  = null;
+
+		if ( isset( $block_metadata['name'] ) ) {
+			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
+			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
+				return $block_rules;
+			}
+		}
+
 		$selector                 = isset( $block_metadata['selector'] ) ? $block_metadata['selector'] : '';
 		$has_block_gap_support    = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 		$has_block_styles_support = current_theme_supports( 'wp-block-styles' );
@@ -1160,8 +1169,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			// Use a fallback gap value if block gap support is not available.
 			if ( ! $has_block_gap_support ) {
 				$block_gap_value = '0.5em';
-				if ( isset( $block_metadata['name'] ) ) {
-					$block_type      = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
+				if ( ! empty( $block_type ) ) {
 					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
 				}
 			} else {
