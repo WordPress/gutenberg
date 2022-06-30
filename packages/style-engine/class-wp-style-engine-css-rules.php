@@ -109,38 +109,4 @@ class WP_Style_Engine_CSS_Rules {
 	protected function sanitize_property( $property ) {
 		return sanitize_key( $property );
 	}
-
-	/**
-	 * Add declarations from a CSS string.
-	 *
-	 * @param string $css A string of declarations.
-	 * @return void
-	 */
-	public function add_declarations_from_string( $css ) {
-		$this->add_declarations( $this->parse_declarations_string( $css ) );
-	}
-
-	/**
-	 * Parse CSS string declarations to an array.
-	 *
-	 * @param string $css The CSS string.
-	 *
-	 * @return array An array of declarations.
-	 */
-	protected function parse_declarations_string( $css ) {
-		$declarations = array();
-		$parts        = explode( ';', $css );
-		foreach ( $parts as $part ) {
-			if ( empty( $part ) ) {
-				continue;
-			}
-			$part        = trim( $part );
-			$declaration = explode( ':', $part );
-			if ( count( $declaration ) === 2 ) {
-				$declarations[ $declaration[0] ] = $declaration[1];
-			}
-		}
-
-		return $declarations;
-	}
 }
