@@ -11,6 +11,25 @@ Namespace: `core/notices`.
 Returns all notices as an array, optionally for a given context. Defaults to
 the global context.
 
+_Usage_
+
+```js
+// This example retrieves all notices and displays their messages in a unordered list.
+
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( 'core/notices' ).getNotices()
+	);
+	return (
+		<ul>
+			{ notices.map( ( notice ) => (
+				<li key={ notice.ID }>{ notice.content }</li>
+			) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Notices state.

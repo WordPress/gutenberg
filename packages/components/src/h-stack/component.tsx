@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useHStack } from './hook';
+import type { Props } from './types';
 
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
- */
-function HStack( props, forwardedRef ) {
+function UnconnectedHStack(
+	props: WordPressComponentProps< Props, 'div' >,
+	forwardedRef: React.ForwardedRef< any >
+) {
 	const hStackProps = useHStack( props );
 
 	return <View { ...hStackProps } ref={ forwardedRef } />;
@@ -38,6 +38,6 @@ function HStack( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedHStack = contextConnect( HStack, 'HStack' );
+export const HStack = contextConnect( UnconnectedHStack, 'HStack' );
 
-export default ConnectedHStack;
+export default HStack;

@@ -109,6 +109,7 @@ module.exports = {
 							'overEvery',
 							'partialRight',
 							'random',
+							'reject',
 							'reverse',
 							'size',
 							'stubFalse',
