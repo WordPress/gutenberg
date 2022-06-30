@@ -83,7 +83,12 @@ function segmentHTMLToShortcodeBlock(
 			] );
 		}
 
-		const blockType = getBlockType( transformation.blockName );
+		let blockType = getBlockType( transformation.blockName );
+		if ( ! blockType ) {
+			return [ HTML ];
+		}
+		blockType = { ...blockType, attributes: transformation.attributes };
+
 		let block;
 		if ( typeof transformation.__experimentalTransform === 'function' ) {
 			// Passing all of `match` as second argument is intentionally broad
@@ -106,8 +111,6 @@ function segmentHTMLToShortcodeBlock(
 				// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
 				( schema ) => schema.shortcode( match.shortcode.attrs, match )
 			);
-
-			blockType.attributes = transformation.attributes;
 
 			block = createBlock(
 				transformation.blockName,

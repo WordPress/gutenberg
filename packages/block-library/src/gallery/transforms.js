@@ -225,14 +225,24 @@ const transforms = {
 					},
 				},
 			},
-			__experimentalTransform( { named: { ids } } ) {
+			__experimentalTransform( { named: { ids, columns = 3, link } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
 
+				let linkTo = LINK_DESTINATION_NONE;
+				if ( link === 'post' ) {
+					linkTo = LINK_DESTINATION_ATTACHMENT;
+				} else if ( link === 'file' ) {
+					linkTo = LINK_DESTINATION_MEDIA;
+				}
+
 				const galleryBlock = createBlock(
 					'core/gallery',
-					{},
+					{
+						columns: parseInt( columns, 10 ),
+						linkTo,
+					},
 					imageIds.map( ( imageId ) =>
 						createBlock( 'core/image', { id: imageId } )
 					)
