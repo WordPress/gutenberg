@@ -40,7 +40,7 @@ window.addEventListener(
 
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
-	background: #FFF;
+	background: #fff;
 	height: 1000px;
 }
 button .components-spinner {
