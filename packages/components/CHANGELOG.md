@@ -5,6 +5,7 @@
 ### Internal
 
 -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
+-   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
 
 ## 19.14.0 (2022-06-29)
 
