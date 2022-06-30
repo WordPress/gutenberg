@@ -103,7 +103,7 @@ describe( 'Gallery', () => {
 		// This xpath selects the anchor node for the block which has a child span which contains the text
 		// label of the block and then selects the expander span for that node.
 		const galleryExpander = await page.waitForXPath(
-			`//a[contains(., 'Gallery')]/span[contains(@class, 'block-editor-list-view__expander')]`
+			`//a[.//span[text()='Gallery']]/span[contains(@class, 'block-editor-list-view__expander')]`
 		);
 
 		await galleryExpander.click();

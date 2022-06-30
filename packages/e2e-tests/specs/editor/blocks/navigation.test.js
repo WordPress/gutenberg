@@ -1047,7 +1047,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			await openListView();
 
 			const navExpander = await page.waitForXPath(
-				`//a[contains(., 'Navigation')]/span[contains(@class, 'block-editor-list-view__expander')]`
+				`//a[.//span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`
 			);
 
 			await navExpander.click();
