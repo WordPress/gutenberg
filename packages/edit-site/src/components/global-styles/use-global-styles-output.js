@@ -240,29 +240,37 @@ function getStylesDeclarations( blockStyles = {} ) {
  * Get generated CSS for layout styles by looking up layout definitions provided
  * in theme.json, and outputting common layout styles, and specific blockGap values.
  *
- * @param {Object}  tree                  A theme.json tree containing layout definitions.
- * @param {Object}  style                 A style object containing spacing values.
- * @param {string}  selector              Selector used to group together layout styling rules.
- * @param {boolean} hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
- * @param {boolean} hasBlockStylesSupport Whether or not the theme opts-in to `wp-block-styles` support.
+ * @param {Object}  props
+ * @param {Object}  props.tree                  A theme.json tree containing layout definitions.
+ * @param {Object}  props.style                 A style object containing spacing values.
+ * @param {string}  props.selector              Selector used to group together layout styling rules.
+ * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
+ * @param {boolean} props.hasBlockStylesSupport Whether or not the theme opts-in to `wp-block-styles` support.
  * @return {string} Generated CSS rules for the layout styles.
  */
-export function getLayoutStyles(
+export function getLayoutStyles( {
 	tree,
 	style,
 	selector,
 	hasBlockGapSupport,
-	hasBlockStylesSupport
-) {
+	hasBlockStylesSupport,
+} ) {
 	let ruleset = '';
-	let gapValue = style?.spacing?.blockGap;
+	let gapValue = hasBlockGapSupport
+		? getGapCSSValue( style?.spacing?.blockGap )
+		: '';
+
+	// Ensure a fallback gap value for the root layout definitions if no gap value exists,
+	// or if there is block styles support and blockGap has been disabled.
 	if (
-		( gapValue !== undefined || hasBlockStylesSupport ) &&
-		tree?.settings?.layout?.definitions
+		( ! gapValue || ! hasBlockGapSupport ) &&
+		selector === ROOT_BLOCK_SELECTOR &&
+		hasBlockStylesSupport
 	) {
-		gapValue = hasBlockGapSupport
-			? getGapCSSValue( gapValue, '0.5em' ) || '0.5em'
-			: '0.5em';
+		gapValue = '0.5em';
+	}
+
+	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
 				// Allow skipping default layout for themes that opt-in to block styles, but opt-out of blockGap.
@@ -336,7 +344,7 @@ export function getLayoutStyles(
 							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
-							) } }`;
+							) }; }`;
 						}
 					} );
 				}
@@ -383,9 +391,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		const blockStyles = pickStyleKeys( node );
 		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
 			nodes.push( {
-				styles: blockStyles,
-				selector: blockSelectors[ blockName ].selector,
 				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
+				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
+				selector: blockSelectors[ blockName ].selector,
+				styles: blockStyles,
 			} );
 		}
 
@@ -498,72 +507,81 @@ export const toStyles = (
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
 	let ruleset = 'body {margin: 0;}';
-	nodesWithStyles.forEach( ( { selector, duotoneSelector, styles } ) => {
-		const duotoneStyles = {};
-		if ( styles?.filter ) {
-			duotoneStyles.filter = styles.filter;
-			delete styles.filter;
-		}
-
-		// Process duotone styles (they use color.__experimentalDuotone selector).
-		if ( duotoneSelector ) {
-			const duotoneDeclarations = getStylesDeclarations( duotoneStyles );
-			if ( duotoneDeclarations.length === 0 ) {
-				return;
+	nodesWithStyles.forEach(
+		( { selector, duotoneSelector, styles, hasLayoutSupport } ) => {
+			const duotoneStyles = {};
+			if ( styles?.filter ) {
+				duotoneStyles.filter = styles.filter;
+				delete styles.filter;
 			}
-			ruleset =
-				ruleset +
-				`${ duotoneSelector }{${ duotoneDeclarations.join( ';' ) };}`;
-		}
 
-		// Process blockGap and layout styles.
-		ruleset += getLayoutStyles(
-			tree,
-			styles,
-			selector,
-			hasBlockGapSupport,
-			hasBlockStylesSupport
-		);
-
-		// Process the remaning block styles (they use either normal block class or __experimentalSelector).
-		const declarations = getStylesDeclarations( styles );
-		if ( declarations?.length ) {
-			ruleset = ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
-		}
-
-		// Check for pseudo selector in `styles` and handle separately.
-		const psuedoSelectorStyles = Object.entries( styles ).filter(
-			( [ key ] ) => key.startsWith( ':' )
-		);
-
-		if ( psuedoSelectorStyles?.length ) {
-			psuedoSelectorStyles.forEach( ( [ pseudoKey, pseudoRule ] ) => {
-				const pseudoDeclarations = getStylesDeclarations( pseudoRule );
-
-				if ( ! pseudoDeclarations?.length ) {
+			// Process duotone styles (they use color.__experimentalDuotone selector).
+			if ( duotoneSelector ) {
+				const duotoneDeclarations =
+					getStylesDeclarations( duotoneStyles );
+				if ( duotoneDeclarations.length === 0 ) {
 					return;
 				}
+				ruleset =
+					ruleset +
+					`${ duotoneSelector }{${ duotoneDeclarations.join(
+						';'
+					) };}`;
+			}
 
-				// `selector` maybe provided in a form
-				// where block level selectors have sub element
-				// selectors appended to them as a comma seperated
-				// string.
-				// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-				// Split and append pseudo selector to create
-				// the proper rules to target the elements.
-				const _selector = selector
-					.split( ',' )
-					.map( ( sel ) => sel + pseudoKey )
-					.join( ',' );
+			// Process blockGap and layout styles.
+			if ( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport ) {
+				ruleset += getLayoutStyles( {
+					tree,
+					style: styles,
+					selector,
+					hasBlockGapSupport,
+					hasBlockStylesSupport,
+				} );
+			}
 
-				const psuedoRule = `${ _selector }{${ pseudoDeclarations.join(
-					';'
-				) };}`;
+			// Process the remaning block styles (they use either normal block class or __experimentalSelector).
+			const declarations = getStylesDeclarations( styles );
+			if ( declarations?.length ) {
+				ruleset =
+					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
+			}
 
-				ruleset = ruleset + psuedoRule;
-			} );
+			// Check for pseudo selector in `styles` and handle separately.
+			const psuedoSelectorStyles = Object.entries( styles ).filter(
+				( [ key ] ) => key.startsWith( ':' )
+			);
+
+			if ( psuedoSelectorStyles?.length ) {
+				psuedoSelectorStyles.forEach( ( [ pseudoKey, pseudoRule ] ) => {
+					const pseudoDeclarations =
+						getStylesDeclarations( pseudoRule );
+
+					if ( ! pseudoDeclarations?.length ) {
+						return;
+					}
+
+					// `selector` maybe provided in a form
+					// where block level selectors have sub element
+					// selectors appended to them as a comma seperated
+					// string.
+					// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
+					// Split and append pseudo selector to create
+					// the proper rules to target the elements.
+					const _selector = selector
+						.split( ',' )
+						.map( ( sel ) => sel + pseudoKey )
+						.join( ',' );
+
+					const psuedoRule = `${ _selector }{${ pseudoDeclarations.join(
+						';'
+					) };}`;
+
+					ruleset = ruleset + psuedoRule;
+				} );
+			}
 		}
-	} );
+	);
 
 	/* Add alignment / layout styles */
 	ruleset =
@@ -578,10 +596,8 @@ export const toStyles = (
 
 	if ( hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
-		const gapValue = getGapCSSValue(
-			tree?.styles?.spacing?.blockGap,
-			'0.5em'
-		);
+		const gapValue =
+			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
 			'.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
@@ -621,10 +637,12 @@ const getBlockSelectors = ( blockTypes ) => {
 			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
 		const duotoneSelector =
 			blockType?.supports?.color?.__experimentalDuotone ?? null;
+		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		result[ name ] = {
+			duotoneSelector,
+			hasLayoutSupport,
 			name,
 			selector,
-			duotoneSelector,
 		};
 	} );
 
