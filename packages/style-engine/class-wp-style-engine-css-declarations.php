@@ -91,7 +91,10 @@ class WP_Style_Engine_CSS_Declarations {
 		$styles_array = $this->get_styles();
 		$styles       = '';
 		foreach ( $styles_array as $property => $value ) {
-			$styles .= esc_html( safecss_filter_attr( "{$property}: {$value}" ) ) . '; ';
+			$css = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			if ( $css ) {
+				$styles .= $css . '; ';
+			}
 		}
 		return rtrim( $styles );
 	}
