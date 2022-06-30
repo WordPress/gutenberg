@@ -325,11 +325,7 @@ function MyFirstApp() {
 				query.search = searchTerm;
 			}
 			const selectorArgs = ['postType', 'page', query];
-			const pages = (
-				select( coreDataStore )
-					.getEntityRecords( ...selectorArgs )
-					?.filter( page => ! select( coreDataStore ).isDeletingEntityRecord('postType', 'page', page.id ) )
-			);
+			const pages = select( coreDataStore ).getEntityRecords( ...selectorArgs );
 			return {
 				pages,
 				hasResolved: select( coreDataStore ).hasFinishedResolution(
