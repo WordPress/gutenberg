@@ -34,38 +34,34 @@ function ScreenLinkColor( { name } ) {
 		isLinkEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 
-	const [ linkColor, setLinkColor ] = useStyle(
-		'elements.link.color.text',
-		name
-	);
-
-	const [ linkHoverColor, setLinkHoverColor ] = useStyle(
-		'elements.link.:hover.color.text',
-		name
-	);
-
-	const [ userLinkColor ] = useStyle(
-		'elements.link.color.text',
-		name,
-		'user'
-	);
-
-	const [ userLinkHoverColor ] = useStyle(
-		'elements.link.:hover.color.text',
-		name,
-		'user'
-	);
-
-	const PSEUDOSTATES = {
+	const pseudoStates = {
 		default: {
-			value: linkColor,
-			handler: setLinkColor,
-			userValue: userLinkColor,
+			...useStyle( 'elements.link.color.text', name ).reduce(
+				( acc, psuedoSelector, index ) => {
+					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
+					return acc;
+				},
+				{}
+			),
+			userValue: useStyle(
+				'elements.link.color.text',
+				name,
+				'user'
+			)[ 0 ],
 		},
 		hover: {
-			value: linkHoverColor,
-			handler: setLinkHoverColor,
-			userValue: userLinkHoverColor,
+			...useStyle( 'elements.link.:hover.color.text', name ).reduce(
+				( acc, psuedoSelector, index ) => {
+					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
+					return acc;
+				},
+				{}
+			),
+			userValue: useStyle(
+				'elements.link.:hover.color.text',
+				name,
+				'user'
+			)[ 0 ],
 		},
 	};
 
@@ -73,7 +69,7 @@ function ScreenLinkColor( { name } ) {
 		return null;
 	}
 
-	const tabs = Object.keys( PSEUDOSTATES ).map( ( pseudoSelector ) => {
+	const tabs = Object.keys( pseudoStates ).map( ( pseudoSelector ) => {
 		return {
 			name: pseudoSelector,
 			title: ucFirst( pseudoSelector ),
@@ -105,14 +101,14 @@ function ScreenLinkColor( { name } ) {
 								enableAlpha
 								__experimentalIsRenderedInSidebar
 								colorValue={
-									PSEUDOSTATES[ psuedoSelector ].value
+									pseudoStates[ psuedoSelector ].value
 								}
 								onColorChange={
-									PSEUDOSTATES[ psuedoSelector ].handler
+									pseudoStates[ psuedoSelector ].handler
 								}
 								clearable={
-									PSEUDOSTATES[ psuedoSelector ].value ===
-									PSEUDOSTATES[ psuedoSelector ].userValue
+									pseudoStates[ psuedoSelector ].value ===
+									pseudoStates[ psuedoSelector ].userValue
 								}
 							/>
 						</>
