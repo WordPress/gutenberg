@@ -60,7 +60,7 @@ This is what the PagesList should look like now:
 
 In Gutenberg data, we delete entity records from the WordPress REST API using the `deleteEntityRecord` action. It sends the request, processes the result, and updates the cached data in the Redux state.
 
-Here's how you can try it in your browser's dev tools:
+Here's how you can try deleting entity records in your browser's dev tools:
 
 ```js
 // We need a valid page ID to call deleteEntityRecord, so let's get the first available one using getEntityRecords.
