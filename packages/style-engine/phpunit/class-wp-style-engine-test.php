@@ -6,7 +6,7 @@
  * @subpackage style-engine
  */
 
-require __DIR__ . '/../class-wp-style-engine-css-rules.php';
+require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
 require __DIR__ . '/../class-wp-style-engine.php';
 
 /**
