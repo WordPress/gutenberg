@@ -128,7 +128,7 @@ We optimistically assumed that a *delete* operation would always succeed. Unfort
 * The update may be invalid.
 * The page could have been deleted by someone else in the meantime.
 
-To tell the user when any of these happens, we need to extract the error information using the `getLastEntityDeleteError` selector:
+To tell the user when any of these errors happen, we need to extract the error information using the `getLastEntityDeleteError` selector:
 
 ```js
 // Replace 9 with an actual page ID
