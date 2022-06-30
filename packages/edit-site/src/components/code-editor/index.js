@@ -38,6 +38,9 @@ export default function CodeEditor() {
 	if ( contentStructure instanceof Function ) {
 		content = contentStructure( { blocks } );
 	} else if ( blocks ) {
+		// If we have parsed blocks already, they should be our source of truth.
+		// Parsing applies block deprecations and legacy block conversions that
+		// unparsed content will not have.
 		content = __unstableSerializeAndClean( blocks );
 	} else {
 		content = contentStructure;
