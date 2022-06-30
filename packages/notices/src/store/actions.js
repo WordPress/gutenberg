@@ -37,11 +37,13 @@ let uniqueId = 0;
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
- * @param {string}                [options.icon]               An icon displayed with the notice. Only used when type is set to `snackbar`.
+ * @param {string}                [options.icon]               An icon displayed with the notice.
+ *                                                             Only used when type is set to `snackbar`.
  * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
  *                                                             an explicit dismiss button and
  *                                                             can't be dismissed by clicking
- *                                                             the body of the notice.
+ *                                                             the body of the notice. Only applies
+ *                                                             when type is set to `snackbar`.
  * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
  *
  * @example
@@ -174,6 +176,27 @@ export function createInfoNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ * const { createErrorNotice } = useDispatch( 'core/notices' );
+ * return (
+ * <Button
+ * onClick={ () =>
+ * createErrorNotice( __( 'An error occurred!' ), {
+ * type: 'snackbar',
+ * explicitDismiss: true,
+ * } )
+ * }
+ * >
+ * { __(
+ * 'Generate an snackbar error notice with explicit dismiss button.'
+ * ) }
+ * </Button>
+ * );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createErrorNotice( content, options ) {
@@ -188,6 +211,29 @@ export function createErrorNotice( content, options ) {
  *
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ * const { createWarningNotice, createInfoNotice } =
+ * useDispatch( 'core/notices' );
+ *  return (
+ *  <Button
+ *  onClick={ () =>
+ *  createWarningNotice( __( 'Warning!' ), {
+ * onDismiss: () => {
+ * createInfoNotice(
+ *  __( 'The warning has been dismissed!' )
+ * );
+ *  },
+ * } )
+ *  }
+ *  >
+ *  { __( 'Generates a warning notice with onDismiss callback' ) }
+ *  </Button>
+ *  );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */

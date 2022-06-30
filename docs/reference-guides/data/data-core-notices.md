@@ -54,6 +54,28 @@ _Related_
 
 -   createNotice
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { createErrorNotice } = useDispatch( 'core/notices' );
+	return (
+		<Button
+			onClick={ () =>
+				createErrorNotice( __( 'An error occurred!' ), {
+					type: 'snackbar',
+					explicitDismiss: true,
+				} )
+			}
+		>
+			{ __(
+				'Generate an snackbar error notice with explicit dismiss button.'
+			) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _content_ `string`: Notice message.
@@ -131,7 +153,7 @@ _Parameters_
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
 -   _options.icon_ `[string]`: An icon displayed with the notice. Only used when type is set to `snackbar`.
--   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice.
+-   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is set to `snackbar`.
 -   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
 
 _Returns_
@@ -184,6 +206,30 @@ created. Refer to `createNotice` for options documentation.
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { createWarningNotice, createInfoNotice } =
+		useDispatch( 'core/notices' );
+	return (
+		<Button
+			onClick={ () =>
+				createWarningNotice( __( 'Warning!' ), {
+					onDismiss: () => {
+						createInfoNotice(
+							__( 'The warning has been dismissed!' )
+						);
+					},
+				} )
+			}
+		>
+			{ __( 'Generates a warning notice with onDismiss callback' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
