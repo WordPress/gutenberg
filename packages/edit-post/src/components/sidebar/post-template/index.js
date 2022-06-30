@@ -95,7 +95,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			}
 			onClick={ onClick }
 		>
-			{ templateTitle ?? __( '(none)' ) }
+			{ templateTitle ?? __( 'Default template' ) }
 		</Button>
 	);
 }
