@@ -9,20 +9,14 @@ import type { Editor } from './index';
  * @param {Editor} this
  */
 export async function saveSiteEditorEntities( this: Editor ) {
-	await this.page
-		.locator( 'role=region[name="Header"i] >> role=button[name="Save"i]' )
-		.click();
-
-	// The sidebar entities panel opens with another save button. Click this too.
-	await this.page
-		.locator( 'role=region[name="Publish"i] >> role=button[name="Save"i]' )
-		.click();
-
-	// The panel will close revealing the main editor save button again.
-	// It will have the classname `.is-busy` while saving. Wait for it to
-	// not have that classname.
-	// TODO - find a way to improve this selector to use role/name.
+	await this.page.click(
+		'role=region[name="Editor top bar"i] >> role=button[name="Save"i]'
+	);
+	// Second Save button in the entities panel.
+	await this.page.click(
+		'role=region[name="Publish"i] >> role=button[name="Save"i]'
+	);
 	await this.page.waitForSelector(
-		'css=.edit-site-save-button__button:not(.is-busy)'
+		'role=region[name="Editor top bar"i] >> role=button[name="Save"i][disabled]'
 	);
 }
