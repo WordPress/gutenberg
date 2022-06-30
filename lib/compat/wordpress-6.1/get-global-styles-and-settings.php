@@ -14,6 +14,11 @@ function wp_add_global_styles_for_blocks() {
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );
 
+		if ( ! wp_should_load_separate_core_block_assets() ) {
+			wp_add_inline_style( 'global-styles', $block_css );
+			continue;
+		}
+
 		if ( isset( $metadata['name'] ) ) {
 			$block_name = str_replace( 'core/', '', $metadata['name'] );
 			// These block styles are added on block_render.
