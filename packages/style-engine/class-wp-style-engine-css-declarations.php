@@ -2,7 +2,7 @@
 /**
  * WP_Style_Engine_CSS_Declarations
  *
- * Holds, sanitizes and prints CSS rules.
+ * Holds, sanitizes and prints CSS rules declarations
  *
  * @package Gutenberg
  */
@@ -12,7 +12,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS styles rules for the style engine.
+ * Holds, sanitizes, processes and prints CSS styles rules declarations for the style engine.
  *
  * @access private
  */
