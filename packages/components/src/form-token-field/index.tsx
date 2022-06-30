@@ -71,9 +71,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
+		__experimentalCustomIdPrefix = '',
 	} = props;
 
-	const instanceId = useInstanceId( FormTokenField );
+	const instanceId = useInstanceId(
+		FormTokenField,
+		__experimentalCustomIdPrefix
+	);
 
 	// We reset to these initial values again in the onBlur
 	const [ incompleteTokenValue, setIncompleteTokenValue ] = useState( '' );

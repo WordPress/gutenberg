@@ -292,6 +292,7 @@ function FlatTermSelector( { slug } ) {
 				onInputChange={ debouncedSearch }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				label={ newTermLabel }
+				__experimentalCustomIdPrefix={ slug }
 				messages={ {
 					added: termAddedLabel,
 					removed: termRemovedLabel,

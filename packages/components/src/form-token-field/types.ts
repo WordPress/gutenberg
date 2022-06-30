@@ -147,6 +147,12 @@ export interface FormTokenFieldProps
 	 * @default true
 	 */
 	__experimentalShowHowTo?: boolean;
+	/**
+	 * Custom prefix for input id and label htmlFor values. This ensures a more unique id.
+	 *
+	 * @default empty string
+	 */
+	__experimentalCustomIdPrefix?: string;
 }
 
 export interface SuggestionsListProps< T = string | { value: string } > {
