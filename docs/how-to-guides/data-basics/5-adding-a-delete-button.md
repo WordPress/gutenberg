@@ -72,7 +72,7 @@ const promise = wp.data.dispatch( 'core' ).deleteEntityRecord( 'postType', 'page
 // promise gets resolved or rejected when the API request succeeds or fails.
 ```
 
-Once the REST API request is finished, you will notice one of the pages has disappeared from the list. This is because that list is populated by using `useSelect()` and the `select( coreDataStore ).getEntityRecords( 'postType', 'page' )` selector. Anytime the underlying data changes, the list gets re-rendered with fresh data. That's pretty convenient!
+Once the REST API request is finished, you will notice one of the pages has disappeared from the list. This is because that list is populated by the `useSelect()` hook and the `select( coreDataStore ).getEntityRecords( 'postType', 'page' )` selector. Anytime the underlying data changes, the list gets re-rendered with fresh data. That's pretty convenient!
 
 Let's dispatch that action when `DeletePageButton` is clicked:
 
