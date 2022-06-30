@@ -21,10 +21,11 @@ test.describe( 'block mover', () => {
 		// Select a block so the block mover is rendered.
 		await page.focus( 'text=First Paragraph' );
 		await editor.showBlockToolbar();
-
-		const blockMover = await page.locator( '.block-editor-block-mover' );
-		// There should be a block mover.
-		expect( blockMover ).toHaveLength( 1 );
+		const count = await page.$$eval(
+			'.block-editor-block-mover',
+			( el ) => el.length
+		);
+		expect( count ).toBe( 1 );
 	} );
 
 	test( 'should hide block mover when only one block exists', async ( {
@@ -37,11 +38,13 @@ test.describe( 'block mover', () => {
 
 		// Select a block so the block mover has the possibility of being rendered.
 		await page.focus( 'text=First Paragraph' );
-
 		await editor.showBlockToolbar();
 
 		// Ensure no block mover exists when only one block exists on the page.
-		const blockMover = await page.locator( '.block-editor-block-mover' );
-		expect( blockMover ).toHaveLength( 0 );
+		const count = await page.$$eval(
+			'.block-editor-block-mover',
+			( el ) => el.length
+		);
+		expect( count ).toBe( 0 );
 	} );
 } );
