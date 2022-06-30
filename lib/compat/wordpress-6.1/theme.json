@@ -196,7 +196,7 @@
 				"increment": 1.5,
 				"steps": 10,
 				"mediumStep": 1.5,
-				"units": "rem"
+				"unit": "rem"
 			}
 		},
 		"typography": {
