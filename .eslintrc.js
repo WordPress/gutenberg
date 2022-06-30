@@ -110,6 +110,7 @@ module.exports = {
 							'partialRight',
 							'random',
 							'reject',
+							'repeat',
 							'reverse',
 							'size',
 							'stubFalse',
