@@ -48,7 +48,7 @@ function fixPlaceholderSelection( defaultView ) {
 	if (
 		! targetNode ||
 		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.getAttribute( PLACEHOLDER_ATTR_NAME )
+		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
 	) {
 		return;
 	}
