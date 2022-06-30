@@ -166,7 +166,7 @@ The `error` object comes from the `@wordpress/api-fetch` and contains informatio
 
 In this tutorial, we will display the `error.message` to the user.
 
-In WordPress, there is an established patterns of displaying status information using the `Snackbar` component:
+In WordPress, there is an established pattern of displaying status information using the `Snackbar` component:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
 ![](./media/delete-button/snackbar-example.png)
