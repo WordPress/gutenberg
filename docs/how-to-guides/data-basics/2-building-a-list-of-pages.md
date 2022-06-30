@@ -274,11 +274,10 @@ A few messages like  _Loading…_ or _No results_ would clear it up. Let’s imp
 import { SearchControl, Spinner } from '@wordpress/components';
 function PagesList( { hasResolved, pages } ) {
 	if ( !pages?.length ) {
-		if ( !hasResolved ) {
-			return <Spinner/>
-		}
-
 		return <div>No results</div>
+	}
+	if ( !hasResolved ) {
+		return <Spinner/>
 	}
 	// ...
 }
