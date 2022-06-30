@@ -52,11 +52,11 @@ let uniqueId = 0;
  *     const { createNotice } = useDispatch( 'core/notices' );
  *     return (
  *         <Button
- * onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
- * >
- * { __( 'Generate a success notice!' ) }
- * </Button>
- * );
+ *             onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+ *         >
+ *             { __( 'Generate a success notice!' ) }
+ *         </Button>
+ *     );
  * };
  * ```
  *
@@ -115,14 +115,14 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  *     const { createSuccessNotice } = useDispatch( 'core/notices' );
  *     return (
  *         <Button
- *              onClick={ () =>
- *                   createSuccessNotice( __( 'Success!' ), {
- *                       type: 'snackbar',
- *                       icon: '🔥',
- *                   } )
- *            }
- *        >
- *        { __( 'Generate a snackbar success notice!' ) }
+ *             onClick={ () =>
+ *                 createSuccessNotice( __( 'Success!' ), {
+ *                     type: 'snackbar',
+ *                     icon: '🔥',
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generate a snackbar success notice!' ) }
  *        </Button>
  *     );
  * };
@@ -179,21 +179,21 @@ export function createInfoNotice( content, options ) {
  * @example
  * ```js
  * const ExampleComponent = () => {
- * const { createErrorNotice } = useDispatch( 'core/notices' );
- * return (
- * <Button
- * onClick={ () =>
- * createErrorNotice( __( 'An error occurred!' ), {
- * type: 'snackbar',
- * explicitDismiss: true,
- * } )
- * }
- * >
- * { __(
- * 'Generate an snackbar error notice with explicit dismiss button.'
- * ) }
- * </Button>
- * );
+ *     const { createErrorNotice } = useDispatch( 'core/notices' );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createErrorNotice( __( 'An error occurred!' ), {
+ *                     type: 'snackbar',
+ *                     explicitDismiss: true,
+ *                 } )
+ *             }
+ *         >
+ *             { __(
+ *                 'Generate an snackbar error notice with explicit dismiss button.'
+ *             ) }
+ *         </Button>
+ *     );
  * };
  * ```
  *
@@ -215,23 +215,23 @@ export function createErrorNotice( content, options ) {
  * @example
  * ```js
  * const ExampleComponent = () => {
- * const { createWarningNotice, createInfoNotice } =
- * useDispatch( 'core/notices' );
- *  return (
- *  <Button
- *  onClick={ () =>
- *  createWarningNotice( __( 'Warning!' ), {
- * onDismiss: () => {
- * createInfoNotice(
- *  __( 'The warning has been dismissed!' )
- * );
- *  },
- * } )
- *  }
- *  >
- *  { __( 'Generates a warning notice with onDismiss callback' ) }
- *  </Button>
- *  );
+ *     const { createWarningNotice, createInfoNotice } =
+ *         useDispatch( 'core/notices' );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createWarningNotice( __( 'Warning!' ), {
+ *                     onDismiss: () => {
+ *                         createInfoNotice(
+ *                             __( 'The warning has been dismissed!' )
+ *                         );
+ *                     },
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generates a warning notice with onDismiss callback' ) }
+ *         </Button>
+ *     );
  * };
  * ```
  *
@@ -251,28 +251,28 @@ export function createWarningNotice( content, options ) {
  * @example
  * ```js
  * const ExampleComponent = () => {
- *const notices = useSelect( ( select ) =>
- * select( 'core/notices' ).getNotices()
- *);
- *const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
- *return (
- *<>
- *<Button
- * onClick={ () =>
- *createWarningNotice( __( 'Warning!' ), {
- *isDismissible: false,
- * } )
- * }
- * >
- * { __( 'Generate a notice' ) }
- * </Button>
- *{ notices.length > 0 && (
- *<Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
- *{ __( 'Remove the notice' ) }
- *</Button>
- *) }
- *</>
- *);
+ *     const notices = useSelect( ( select ) =>
+ *         select( 'core/notices' ).getNotices()
+ *     );
+ *    const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+ *    return (
+ *         <>
+ *             <Button
+ *                 onClick={ () =>
+ *                     createWarningNotice( __( 'Warning!' ), {
+ *                         isDismissible: false,
+ *                     } )
+ *                 }
+ *             >
+ *                 { __( 'Generate a notice' ) }
+ *             </Button>
+ *             { notices.length > 0 && (
+ *                 <Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+ *                     { __( 'Remove the notice' ) }
+ *                 </Button>
+ *             ) }
+ *         </>
+ *     );
  *};
  * ```
  *
