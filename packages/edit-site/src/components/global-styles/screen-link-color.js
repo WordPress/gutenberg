@@ -15,11 +15,6 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ucFirst( str ) {
-	if ( ! str ) return str;
-	return str[ 0 ].toUpperCase() + str.slice( 1 );
-}
-
 function ScreenLinkColor( { name } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
@@ -36,6 +31,7 @@ function ScreenLinkColor( { name } ) {
 
 	const pseudoStates = {
 		default: {
+			label: __( 'Default' ),
 			...useStyle( 'elements.link.color.text', name ).reduce(
 				( acc, psuedoSelector, index ) => {
 					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
@@ -50,6 +46,7 @@ function ScreenLinkColor( { name } ) {
 			)[ 0 ],
 		},
 		hover: {
+			label: __( 'Hover' ),
 			...useStyle( 'elements.link.:hover.color.text', name ).reduce(
 				( acc, psuedoSelector, index ) => {
 					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
@@ -69,13 +66,15 @@ function ScreenLinkColor( { name } ) {
 		return null;
 	}
 
-	const tabs = Object.keys( pseudoStates ).map( ( pseudoSelector ) => {
-		return {
-			name: pseudoSelector,
-			title: ucFirst( pseudoSelector ),
-			className: `color-text-${ pseudoSelector }`,
-		};
-	} );
+	const tabs = Object.entries( pseudoStates ).map(
+		( [ selector, config ] ) => {
+			return {
+				name: selector,
+				title: config.label,
+				className: `color-text-${ selector }`,
+			};
+		}
+	);
 
 	return (
 		<>
