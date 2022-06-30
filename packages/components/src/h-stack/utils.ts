@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import type { CSSProperties } from 'react';
+/**
  * Internal dependencies
  */
+import type { FlexDirection } from '../flex/types';
+import type { HStackAlignment, AlignmentProps, Alignments } from './types';
 import { isValueDefined } from '../utils/values';
 
-/** @type {import('./types').Alignments} */
-const ALIGNMENTS = {
+const H_ALIGNMENTS: Alignments = {
 	bottom: { align: 'flex-end', justify: 'center' },
 	bottomLeft: { align: 'flex-start', justify: 'flex-end' },
 	bottomRight: { align: 'flex-end', justify: 'flex-end' },
@@ -18,8 +23,7 @@ const ALIGNMENTS = {
 	topRight: { align: 'flex-start', justify: 'flex-end' },
 };
 
-/** @type {import('./types').Alignments} */
-const V_ALIGNMENTS = {
+const V_ALIGNMENTS: Alignments = {
 	bottom: { justify: 'flex-end', align: 'center' },
 	bottomLeft: { justify: 'flex-start', align: 'flex-end' },
 	bottomRight: { justify: 'flex-end', align: 'flex-end' },
@@ -33,23 +37,19 @@ const V_ALIGNMENTS = {
 	topRight: { justify: 'flex-start', align: 'flex-end' },
 };
 
-/* eslint-disable jsdoc/valid-types */
-/**
- * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment         Where to align.
- * @param {import('../flex/types').FlexDirection}                                             [direction='row'] Direction to align.
- * @return {import('./types').AlignmentProps} Alignment props.
- */
-/* eslint-enable jsdoc/valid-types */
-export function getAlignmentProps( alignment, direction = 'row' ) {
+export function getAlignmentProps(
+	alignment: HStackAlignment | CSSProperties[ 'alignItems' ],
+	direction: FlexDirection = 'row'
+): AlignmentProps {
 	if ( ! isValueDefined( alignment ) ) {
 		return {};
 	}
 	const isVertical = direction === 'column';
-	const props = isVertical ? V_ALIGNMENTS : ALIGNMENTS;
+	const props = isVertical ? V_ALIGNMENTS : H_ALIGNMENTS;
 
 	const alignmentProps =
 		alignment in props
-			? props[ /** @type {keyof typeof ALIGNMENTS} */ ( alignment ) ]
+			? props[ alignment as keyof typeof props ]
 			: { align: alignment };
 
 	return alignmentProps;
