@@ -233,6 +233,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON {
 			'margin'   => null,
 			'padding'  => null,
 			'units'    => null,
+			'width'    => null,
 		),
 		'typography'      => array(
 			'customFontSize' => null,
