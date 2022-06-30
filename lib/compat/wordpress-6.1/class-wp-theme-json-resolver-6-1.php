@@ -23,7 +23,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 	 * @since 5.8.0
 	 * @var WP_Theme_JSON
 	 */
-	public static $core = null;
+	protected static $core = null;
 
 	/**
 	 * Given a theme.json structure modifies it in place
