@@ -231,21 +231,21 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Get an instance of the WP_Style_Engine_CSS_Rules object.
+	 * Get an instance of the WP_Style_Engine_CSS_Declarations object.
 	 *
 	 * If a $selector is provided, then the same instance will be used each time the same $selector is used,
 	 * otherwise, a new instance will be created each time.
 	 *
 	 * @param string $selector The selector to use for the CSS rules.
-	 * @return WP_Style_Engine_CSS_Rules The CSS rules object.
+	 * @return WP_Style_Engine_CSS_Declarations The CSS rules object.
 	 */
 	public function get_css_rules_object( $selector = null ) {
 		if ( null === $selector ) {
-			return new WP_Style_Engine_CSS_Rules();
+			return new WP_Style_Engine_CSS_Declarations();
 		}
 		static $instances = array();
 		if ( ! isset( $instances[ $selector ] ) ) {
-			$instances[ $selector ] = new WP_Style_Engine_CSS_Rules();
+			$instances[ $selector ] = new WP_Style_Engine_CSS_Declarations();
 		}
 		return $instances[ $selector ];
 	}

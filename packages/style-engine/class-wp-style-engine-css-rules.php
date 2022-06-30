@@ -1,13 +1,13 @@
 <?php
 /**
- * WP_Style_Engine_CSS_Rules
+ * WP_Style_Engine_CSS_Declarations
  *
  * Holds, sanitizes and prints CSS rules.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine_CSS_Rules' ) ) {
+if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 	return;
 }
 
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rules' ) ) {
  *
  * @access private
  */
-class WP_Style_Engine_CSS_Rules {
+class WP_Style_Engine_CSS_Declarations {
 
 	/**
 	 * An array of styles (property => value pairs).
