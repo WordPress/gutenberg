@@ -40,6 +40,7 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
+// Key block types by their name.
 function keyBlockTypesByName( types ) {
 	return types.reduce(
 		( newBlockTypes, block ) => ( {

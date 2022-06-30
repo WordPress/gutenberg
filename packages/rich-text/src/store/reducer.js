@@ -21,6 +21,7 @@ export function formatTypes( state = {}, action ) {
 		case 'ADD_FORMAT_TYPES':
 			return {
 				...state,
+				// Key format types by their name.
 				...action.formatTypes.reduce(
 					( newFormatTypes, type ) => ( {
 						...newFormatTypes,

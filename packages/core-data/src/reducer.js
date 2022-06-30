@@ -55,6 +55,7 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 			return {
 				byId: {
 					...state.byId,
+					// Key users by their ID.
 					...action.users.reduce(
 						( newUsers, user ) => ( {
 							...newUsers,

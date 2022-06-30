@@ -342,7 +342,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			{ per_page: -1 }
 		);
 		const templatePartsById = templateParts
-			? templateParts.reduce(
+			? // Key template parts by their ID.
+			  templateParts.reduce(
 					( newTemplateParts, part ) => ( {
 						...newTemplateParts,
 						[ part.id ]: part,

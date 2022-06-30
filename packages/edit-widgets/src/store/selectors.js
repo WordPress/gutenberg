@@ -32,6 +32,7 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 	);
 
 	return (
+		// Key widgets by their ID.
 		widgets?.reduce(
 			( allWidgets, widget ) => ( {
 				...allWidgets,
