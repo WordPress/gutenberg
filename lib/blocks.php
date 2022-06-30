@@ -191,11 +191,9 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
-	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
-	$stylesheet_url    = gutenberg_url( $style_path );
-	$stylesheet_path   = gutenberg_dir_path() . $style_path;
-	$stylesheet_path   = is_rtl() ? str_replace( 'style.css', 'style-rtl.css', $stylesheet_path ) : $stylesheet_path;
+	$style_path      = "build/block-library/blocks/$block_name/";
+	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
 	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
@@ -257,6 +255,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
