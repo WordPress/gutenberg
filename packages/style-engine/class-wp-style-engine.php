@@ -421,14 +421,15 @@ class WP_Style_Engine {
 		$style_rules->add_declarations( $css_declarations );
 
 		// The return object.
-		$styles_output        = array();
-		$styles_output['css'] = $style_rules->get_styles_string();
+		$styles_output = array();
+		$css           = $style_rules->get_styles_string();
 
 		// Return css, if any.
-		if ( ! empty( $styles_output['css'] ) ) {
+		if ( ! empty( $css ) ) {
+			$styles_output['css'] = $css;
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$styles_output['css'] = $css_selector . '{' . $styles_output['css'] . '}';
+				$styles_output['css'] = $css_selector . '{ ' . $css . ' }';
 			}
 		}
 
