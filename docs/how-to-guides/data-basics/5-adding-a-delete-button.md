@@ -249,7 +249,7 @@ function DeletePageButton( { pageId } ) {
 }
 ```
 
-Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do it is to set the `id` to `-1`:
+Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to set the `id` to `-1`:
 
 ```js
 export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
