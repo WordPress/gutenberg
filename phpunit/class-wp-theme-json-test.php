@@ -2965,7 +2965,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	function data_generate_spacing_scale_fixtures() {
 		return array(
-			'empty_spacing_scale'                        => array(
+			'empty_spacing_scale'                       => array(
 				'spacing_scale'   => array(),
 				'expected_output' => null,
 			),
@@ -2976,7 +2976,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 1,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => null,
 			),
@@ -2987,7 +2987,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 'add two to previous value',
 					'steps'      => 1,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => null,
 			),
@@ -2998,7 +2998,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 'spiral staircase preferred',
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => null,
 			),
@@ -3009,7 +3009,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 5,
 					'mediumStep' => 'That which is just right',
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => null,
 			),
@@ -3024,13 +3024,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'expected_output' => null,
 			),
 
-			'one_step_spacing_scale'                     => array(
+			'one_step_spacing_scale'                    => array(
 				'spacingScale'    => array(
 					'operator'   => '+',
 					'increment'  => 1.5,
 					'steps'      => 1,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3047,7 +3047,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 2,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3069,7 +3069,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 3,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3096,7 +3096,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 4,
 					'mediumStep' => 4,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3128,7 +3128,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 2.5,
 					'steps'      => 5,
 					'mediumStep' => 5,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3165,7 +3165,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 1.5,
 					'steps'      => 5,
 					'mediumStep' => 1.5,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
@@ -3202,7 +3202,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'increment'  => 0.25,
 					'steps'      => 5,
 					'mediumStep' => 1.5,
-					'unit'      => 'rem',
+					'unit'       => 'rem',
 				),
 				'expected_output' => array(
 					array(
