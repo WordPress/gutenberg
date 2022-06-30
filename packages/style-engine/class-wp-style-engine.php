@@ -240,6 +240,11 @@ class WP_Style_Engine {
 	 * @return WP_Style_Engine_CSS_Declarations The CSS rules object.
 	 */
 	public function get_css_rules_object( $selector = null ) {
+		/**
+		 * The implementation below will in the future be replaced with a "Store" object.
+		 * The store will be responsible for caching the CSS rules objects and selectors,
+		 * as well as allow for further CSS optimizations.
+		 */
 		if ( null === $selector ) {
 			return new WP_Style_Engine_CSS_Declarations();
 		}
