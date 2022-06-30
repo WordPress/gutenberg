@@ -244,6 +244,35 @@ _Returns_
 
 Returns an action object used in signalling that a notice is to be removed.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const notices = useSelect( ( select ) =>
+		select( 'core/notices' ).getNotices()
+	);
+	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+	return (
+		<>
+			<Button
+				onClick={ () =>
+					createWarningNotice( __( 'Warning!' ), {
+						isDismissible: false,
+					} )
+				}
+			>
+				{ __( 'Generate a notice' ) }
+			</Button>
+			{ notices.length > 0 && (
+				<Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+					{ __( 'Remove the notice' ) }
+				</Button>
+			) }
+		</>
+	);
+};
+```
+
 _Parameters_
 
 -   _id_ `string`: Notice unique identifier.
