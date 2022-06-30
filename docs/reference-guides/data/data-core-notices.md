@@ -85,6 +85,21 @@ _Returns_
 
 Returns an action object used in signalling that a notice is to be created.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { createNotice } = useDispatch( 'core/notices' );
+	return (
+		<Button
+			onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+		>
+			{ __( 'Generate a success notice!' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _status_ `[string]`: Notice status.
@@ -96,8 +111,8 @@ _Parameters_
 -   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
 -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
 -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
--   _options.icon_ `[Object]`: An icon displayed with the notice.
--   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explict dismiss button and can't be dismissed by clicking the body of the notice.
+-   _options.icon_ `[string]`: An icon displayed with the notice. Only used when type is set to `snackbar`.
+-   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice.
 -   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
 
 _Returns_
@@ -112,6 +127,26 @@ created. Refer to `createNotice` for options documentation.
 _Related_
 
 -   createNotice
+
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	return (
+		<Button
+			onClick={ () =>
+				createSuccessNotice( __( 'Success!' ), {
+					type: 'snackbar',
+					icon: '🔥',
+				} )
+			}
+		>
+			{ __( 'Generate a snackbar success notice!' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

@@ -37,12 +37,26 @@ let uniqueId = 0;
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
- * @param {Object}                [options.icon]               An icon displayed with the notice.
+ * @param {string}                [options.icon]               An icon displayed with the notice. Only used when type is set to `snackbar`.
  * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
- *                                                             an explict dismiss button and
+ *                                                             an explicit dismiss button and
  *                                                             can't be dismissed by clicking
  *                                                             the body of the notice.
  * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *     const { createNotice } = useDispatch( 'core/notices' );
+ *     return (
+ *         <Button
+ * onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+ * >
+ * { __( 'Generate a success notice!' ) }
+ * </Button>
+ * );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
@@ -92,6 +106,25 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  *
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *     const { createSuccessNotice } = useDispatch( 'core/notices' );
+ *     return (
+ *         <Button
+ *              onClick={ () =>
+ *                   createSuccessNotice( __( 'Success!' ), {
+ *                       type: 'snackbar',
+ *                       icon: '🔥',
+ *                   } )
+ *            }
+ *        >
+ *        { __( 'Generate a snackbar success notice!' ) }
+ *        </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
