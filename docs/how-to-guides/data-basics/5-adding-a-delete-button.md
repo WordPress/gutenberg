@@ -52,7 +52,7 @@ function PagesList( { hasResolved, pages } ) {
 }
 ```
 
-This is how the PagesList should look like now:
+This is what the PagesList should look like now:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
