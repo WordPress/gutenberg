@@ -284,11 +284,11 @@ function DeletePageButton( { pageId } ) {
 }
 ```
 
-Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to set the `pageId` to `-1 * pageId`:
+Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to multiply the `pageId` by a large number:
 
 ```js
 export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
-	pageId = -1 * pageId;
+	pageId = pageId * 1000;
 	// ...
 }
 ```
@@ -298,7 +298,7 @@ Once you refresh the page and click any `Delete` button, you should see the foll
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-error.png)
 ![](./media/delete-button/snackbar-error.png)
 
-Fantastic! We can now **remove the `pageId = -1 * pageId;` line.**
+Fantastic! We can now **remove the `pageId = pageId * 1000;` line.**
 
 Let's now try actually deleting a page. Here's what you should see after refreshing your browser and clicking the Delete button:
 
