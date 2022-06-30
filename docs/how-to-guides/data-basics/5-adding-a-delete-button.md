@@ -164,7 +164,7 @@ The `error` object comes from the `@wordpress/api-fetch` and contains informatio
 * `code` – a string-based error code such as `rest_post_invalid_id`. To learn about all possible error codes you'd need to refer to the [`/v2/pages` endpoint's source code](https://github.com/WordPress/wordpress-develop/blob/2648a5f984b8abf06872151898e3a61d3458a628/src/wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php#L226-L230).
 * `data` (optional) – error details, contains the `code` property containing the HTTP response code for the failed request.
 
-There are many ways to turn that data into an error message, but in this tutorial, we will display the `error.message`.
+There are many ways to turn that object into an error message, but in this tutorial, we will display the `error.message`.
 
 WordPress has an established pattern of displaying status information using the `Snackbar` component. Here's what it looks like **in the Widgets editor**:
 
