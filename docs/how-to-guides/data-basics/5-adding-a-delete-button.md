@@ -254,7 +254,7 @@ Great! `DeletePageButton` is now fully aware of errors. Let's see that error mes
 ```js
 export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 	// ...
-	pageId = pageId * -1;
+	pageId = -1;
 	const handleDelete = () => deleteEntityRecord( 'postType', 'page', pageId );
 	// ...
 }
@@ -265,7 +265,7 @@ Once you refresh the page and click any `Delete` button, you should see the foll
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-error.png)
 ![](./media/delete-button/snackbar-error.png)
 
-Fantastic! We can now **remove the `pageId = pageId * -1;` line.**
+Fantastic! We can now **remove the `pageId = -1;` line.**
 
 Before we move on to the next step, let's also confirm a successful deletion with another snackbar message:
 
