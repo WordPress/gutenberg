@@ -1,6 +1,6 @@
 # Adding a delete button
 
-This part is about adding a *Delete* feature to our app. Here's a glimpse of what we're going to build:
+In this section we're going to be adding a *Delete* feature to our app. Here's a glimpse of what we're going to build:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
