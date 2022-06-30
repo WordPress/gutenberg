@@ -141,6 +141,24 @@ export function createSuccessNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *     const { createInfoNotice } = useDispatch( 'core/notices' );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                createInfoNotice( __( 'Something happened!' ), {
+ *                   isDismissible: false,
+ *                } )
+ *             }
+ *         >
+ *         { __( 'Generate a notice that cannot be dismissed.' ) }
+ *       </Button>
+ *       );
+ * };
+ *```
+ *
  * @return {Object} Action object.
  */
 export function createInfoNotice( content, options ) {

@@ -72,6 +72,25 @@ _Related_
 
 -   createNotice
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	const { createInfoNotice } = useDispatch( 'core/notices' );
+	return (
+		<Button
+			onClick={ () =>
+				createInfoNotice( __( 'Something happened!' ), {
+					isDismissible: false,
+				} )
+			}
+		>
+			{ __( 'Generate a notice that cannot be dismissed.' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _content_ `string`: Notice message.
