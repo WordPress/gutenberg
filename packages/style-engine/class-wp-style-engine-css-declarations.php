@@ -34,10 +34,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return void
 	 */
 	public function add_declaration( $property, $value ) {
-		// Sanity check.
-		if ( empty( $property ) || ! is_string( $property ) || ( empty( $value ) && 0 !== $value && '0' !== $value ) ) {
-			return;
-		}
 
 		// Sanitize the property.
 		$property = $this->sanitize_property( $property );
@@ -48,12 +44,12 @@ class WP_Style_Engine_CSS_Declarations {
 
 		// Trim the value. If empty, bail early.
 		$value = trim( $value );
-		if ( empty( $value ) && 0 !== $value && '0' !== $value ) {
+		if ( '' === $value ) {
 			return;
 		}
 
 		// Add the style.
-		$this->styles[ $property ] = (string) $value;
+		$this->styles[ $property ] = $value;
 	}
 
 	/**
@@ -64,10 +60,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return void
 	 */
 	public function add_declarations( $declarations ) {
-		// Remove empty declarations.
-		$declarations = array_filter( $declarations );
-
-		// Loop declarations and add them.
 		foreach ( $declarations as $property => $value ) {
 			$this->add_declaration( $property, $value );
 		}
