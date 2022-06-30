@@ -217,6 +217,12 @@ function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
 						) }`
 					);
 				} );
+			} else if (
+				key === '--wp--style--root--padding' &&
+				isString( styleValue )
+			) {
+				// We don't support string values for root padding
+				return declarations;
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key
