@@ -207,11 +207,16 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
-	// Attempt to retrieve and prioritize any existing navigation menu unless
-	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
-	// for the block to "just work" from a user perspective using existing data.
+	// Attempt to retrieve and prioritize any existing navigation menu unless:
+	// - the are uncontrolled inner blocks already present in the block.
+	// - the user is creating a new menu.
+	// - there is more than 1 Navigation Post (wp_navigation).
+	// This attempts to pick the first menu if there is a single Navigation Post. If more
+	// than 1 exists then no attempt to automatically pick a menu is made.
+	// The aim is for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
 		if (
+			hasUncontrolledInnerBlocks ||
 			isCreatingNavigationMenu ||
 			ref ||
 			! navigationMenus?.length ||
