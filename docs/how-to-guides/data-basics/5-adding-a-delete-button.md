@@ -1,6 +1,6 @@
 # Adding a delete button
 
-In this section we're going to be adding a *Delete* feature to our app. Here's a glimpse of what we're going to build:
+In this section, we will add a *Delete* feature to our app. Here's a glimpse of what we're going to build:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
@@ -90,7 +90,7 @@ const DeletePageButton = ({ pageId }) => {
 
 ### Step 3: Add visual feedback
 
-It may take a few moments for the REST API request to finish after clicking the _Delete_ button. Let's communicate that with a `<Spinner />` component in a similar fashion as we did in the previous parts of this tutorial.
+It may take a few moments for the REST API request to finish after clicking the _Delete_ button. Let's communicate that with a `<Spinner />` component similarly to what we did in the previous parts of this tutorial.
 
 We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in [part 3](/docs/how-to-guides/data-basics/3-building-an-edit-form.md): it returns `true` or `false` and never issues any HTTP requests:
 
@@ -164,13 +164,51 @@ The `error` object comes from the `@wordpress/api-fetch` and contains informatio
 * `code` – a string-based error code such as `rest_post_invalid_id`. To learn about all possible error codes you'd need to refer to the [`/v2/pages` endpoint's source code](https://github.com/WordPress/wordpress-develop/blob/2648a5f984b8abf06872151898e3a61d3458a628/src/wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php#L226-L230).
 * `data` (optional) – error details, contains the `code` property containing the HTTP response code for the failed request.
 
-In this tutorial, we will display the `error.message` to the user.
+There are many ways to turn that data into an error message, but in this tutorial, we will display the `error.message`.
 
-In WordPress, there is an established pattern of displaying status information using the `Snackbar` component:
+WordPress has an established pattern of displaying status information using the `Snackbar` component. Here's what it looks like **in the Widgets editor**:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
 ![](./media/delete-button/snackbar-example.png)
 
+Let's use the same type of notifications in our plugin! There are two parts to this:
+
+1. Displaying notifications
+2. Dispatching notifications
+
+#### Displaying notifications
+
+Our application only knows how to display pages but does not know how to display notifications. Let's tell it!
+
+The [`Snackbar` WordPress component](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--default) represents a single notification:
+
+![](./media/delete-button/snackbar.png)
+
+However, the user may delete a few pages one after another and expect to see a few notifications simultaneously. Then, it would be nice to have them automatically go away after a few seconds.
+
+Luckily, the `SnackbarList` WordPress component can help us with all of that. It presents a list of notifications in an accessible, user-friendly manner. That's precisely the component used in the Widgets editor and in the rest of WordPress!
+
+Here's how we can use it:
+
+```js
+import { SnackbarList } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
+
+function SnackbarNotices() {
+	const notices = []; // We'll come back here in a second!
+
+	return (
+		<SnackbarList
+			notices={ snackbarNotices }
+			className="components-editor-notices__snackbar"
+		/>
+	);
+}
+```
+
+That's all great, but the notices list is empty. How do we populate it? We'll lean on the same package as WordPress: [`@wordpress/notices`](https://github.com/WordPress/gutenberg/blob/895ca1f6a7d7e492974ea55f693aecbeb1d5bbe3/docs/reference-guides/data/data-core-notices.md).
+
+Here's how:
 
 ```js
 import { SnackbarList } from '@wordpress/components';
@@ -204,58 +242,53 @@ function MyFirstApp() {
 }
 ```
 
+This tutorial is focused on managing the pages and won't discuss the above snippet in detail. If you're interested in the details of `@wordpress/notices`, the [handbook page](https://developer.wordpress.org/block-editor/reference-guides/data/data-core-notices/) is a good place to start.
+
 Now we're ready to tell the user about any errors that may have occurred.
 
+#### Dispatching notifications
+
+With the SnackbarNotices component in place, we're ready to dispatch some notifications! Here's how:
+
 ```js
+import { store as noticesStore } from '@wordpress/notices';
 import { useEffect } from '@wordpress/element';
-const DeletePageButton = ({ pageId }) => {
-	const { deleteEntityRecord } = useDispatch( coreDataStore );
-	// ...
-	const { error, /* ... */ } = useSelect(
-		select => ( {
-			error: select( coreDataStore ).getLastEntityDeleteError( 'postType', 'page', pageId ),
-			// ...
-		} ),
-		[pageId]
-	);
-	useEffect( () => {
-		if ( error ) {
-			// Display the error
-		}
-	}, [error] )
-
-	// ...
-}
 function DeletePageButton( { pageId } ) {
-	const { createErrorNotice } = useDispatch( noticesStore );
-	// ...
-	const { error, isDeleting } = useSelect(
-		select => ( {
-			error: select( coreDataStore ).getLastEntityDeleteError( 'postType', 'page', pageId ),
-			isDeleting: select( coreDataStore ).isDeletingEntityRecord( 'postType', 'page', pageId ),
-		} ),
-		[ pageId ]
-	);
-
-	useEffect( () => {
-		if ( error ) {
-			const message = ( error?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
-			createErrorNotice( , {
+	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	// useSelect returns a list of selectors if you pass the store handle
+	// instead of a callback:
+	const { getLastEntityDeleteError } = useSelect( coreDataStore )
+	const handleDelete = async () => {
+		const success = await deleteEntityRecord( 'postType', 'page', pageId);
+		if ( success ) {
+			// Tell the user the operation succeeded:
+			createSuccessNotice( "The page was deleted!", {
+				type: 'snackbar',
+			} );
+		} else {
+			// We use the selector directly to get the error at this point in time.
+			// Imagine we fetched the error like this:
+			//     const { lastError } = useSelect( function() { /* ... */ } );
+			// Then, lastError would be null inside of handleDelete.
+			// Why? Because we'd refer to the version of it that was computed
+			// before the handleDelete was even called.
+			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
+			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
+			// Tell the user how exactly the operation have failed:
+			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
 		}
-	}, [ error ] )
-    // ...
+	}
+	// ...
 }
 ```
 
-Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to set the `id` to `-1`:
+Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to set the `pageId` to `-1 * pageId`:
 
 ```js
 export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
-	// ...
-	pageId = -1;
-	const handleDelete = () => deleteEntityRecord( 'postType', 'page', pageId );
+	pageId = -1 * pageId;
 	// ...
 }
 ```
@@ -265,28 +298,9 @@ Once you refresh the page and click any `Delete` button, you should see the foll
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-error.png)
 ![](./media/delete-button/snackbar-error.png)
 
-Fantastic! We can now **remove the `pageId = -1;` line.**
+Fantastic! We can now **remove the `pageId = -1 * pageId;` line.**
 
-Before we move on to the next step, let's also confirm a successful deletion with another snackbar message:
-
-```js
-
-function DeletePageButton( { pageId } ) {
-	const { deleteEntityRecord } = useDispatch( coreDataStore );
-	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
-	const handleDelete = async () => {
-		const success = await deleteEntityRecord( 'postType', 'page', pageId );
-		if ( success ) {
-			createSuccessNotice( "The page was deleted!", {
-				type: 'snackbar',
-			} );
-		}
-	}
-	// ...
-}
-```
-
-Here's what you should see after applying these changes and deleting a page:
+Let's now try actually deleting a page. Here's what you should see after refreshing your browser and clicking the Delete button:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-success.png)
 ![](./media/delete-button/snackbar-success.png)
@@ -390,33 +404,40 @@ function PagesList( { hasResolved, pages } ) {
 }
 
 function DeletePageButton( { pageId } ) {
-	const { deleteEntityRecord } = useDispatch( coreDataStore );
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	// useSelect returns a list of selectors if you pass the store handle
+	// instead of a callback:
+	const { getLastEntityDeleteError } = useSelect( coreDataStore )
 	const handleDelete = async () => {
 		const success = await deleteEntityRecord( 'postType', 'page', pageId);
 		if ( success ) {
+			// Tell the user the operation succeeded:
 			createSuccessNotice( "The page was deleted!", {
+				type: 'snackbar',
+			} );
+		} else {
+			// We use the selector directly to get the error at this point in time.
+			// Imagine we fetched the error like this:
+			//     const { lastError } = useSelect( function() { /* ... */ } );
+			// Then, lastError would be null inside of handleDelete.
+			// Why? Because we'd refer to the version of it that was computed
+			// before the handleDelete was even called.
+			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
+			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
+			// Tell the user how exactly the operation have failed:
+			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
 		}
 	}
 
-	const { error, isDeleting } = useSelect(
+	const { deleteEntityRecord } = useDispatch( coreDataStore );
+	const { isDeleting } = useSelect(
 		select => ( {
-			error: select( coreDataStore ).getLastEntityDeleteError( 'postType', 'page', pageId ),
 			isDeleting: select( coreDataStore ).isDeletingEntityRecord( 'postType', 'page', pageId ),
 		} ),
 		[ pageId ]
 	);
-
-	useEffect( () => {
-		if ( error ) {
-			const message = ( error?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
-			createErrorNotice( message, {
-				type: 'snackbar',
-			} );
-		}
-	}, [ error ] )
 
 	return (
 		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting }>
