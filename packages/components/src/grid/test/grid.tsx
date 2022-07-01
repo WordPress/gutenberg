@@ -28,7 +28,7 @@ describe( 'props', () => {
 
 	test( 'should render gap', () => {
 		const { container } = render(
-			<Grid columns="3" gap={ 4 }>
+			<Grid columns={ 3 } gap={ 4 }>
 				<View />
 				<View />
 				<View />
@@ -44,7 +44,7 @@ describe( 'props', () => {
 
 	test( 'should render custom columns', () => {
 		const { container } = render(
-			<Grid columns="7">
+			<Grid columns={ 7 }>
 				<View />
 				<View />
 				<View />
@@ -59,7 +59,7 @@ describe( 'props', () => {
 
 	test( 'should render custom rows', () => {
 		const { container } = render(
-			<Grid rows="7">
+			<Grid rows={ 7 }>
 				<View />
 				<View />
 				<View />
@@ -120,7 +120,7 @@ describe( 'props', () => {
 
 	test( 'should render isInline', () => {
 		const { container } = render(
-			<Grid columns="3" isInline>
+			<Grid columns={ 3 } isInline>
 				<View />
 				<View />
 				<View />

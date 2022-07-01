@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../ui/context';
-import { View } from '../view';
-import useGrid from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+ * Internal dependencies
  */
-function Grid( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../ui/context';
+import { View } from '../view';
+import useGrid from './hook';
+import type { GridProps } from './types';
+
+function UnconnectedGrid(
+	props: WordPressComponentProps< GridProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const gridProps = useGrid( props );
 
 	return <View { ...gridProps } ref={ forwardedRef } />;
@@ -18,7 +23,6 @@ function Grid( props, forwardedRef ) {
 /**
  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
  *
- * @example
  * ```jsx
  * import {
  * 	__experimentalGrid as Grid,
@@ -36,6 +40,6 @@ function Grid( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedGrid = contextConnect( Grid, 'Grid' );
+export const Grid = contextConnect( UnconnectedGrid, 'Grid' );
 
-export default ConnectedGrid;
+export default Grid;
