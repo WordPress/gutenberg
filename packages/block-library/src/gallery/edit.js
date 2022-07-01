@@ -547,7 +547,9 @@ function GalleryEdit( props ) {
 					onSelect={ updateImages }
 					name={ __( 'Add' ) }
 					multiple={ true }
-					mediaIds={ images.map( ( image ) => image.id ) }
+					mediaIds={ images
+						.filter( ( image ) => image.id )
+						.map( ( image ) => image.id ) }
 					addToGallery={ hasImageIds }
 				/>
 			</BlockControls>
