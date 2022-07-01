@@ -486,6 +486,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$block_rules = '';
 
+		$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), array() );
+		$node          = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$selector      = $block_metadata['selector'];
+		$settings      = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$declarations  = static::compute_style_properties( $node, $settings, null, null, $selector, $use_root_vars );
+
 		// 1. Separate the ones who use the general selector
 		// and the ones who use the duotone selector.
 		$declarations_duotone = array();
@@ -518,6 +524,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			if ( $use_root_vars ) {
+				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
+				$block_rules .= '.wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+
+				// This will be overridden by children who inherit default layout.
+				$block_rules .= '.wp-site-blocks .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: auto;}';
+
+				// Alignfull blocks in the block editor that are direct children of post content should also get negative margins.
+				if ( is_callable( 'get_current_screen' ) && get_current_screen()->is_block_editor() ) {
+					$block_rules .= '.is-root-container .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); width: auto; }';
+				}
+			}
+
 			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
@@ -571,24 +590,96 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * )
 	 * ```
 	 *
-	 * @param array $styles Styles to process.
-	 * @param array $settings Theme settings.
-	 * @param array $properties Properties metadata.
-	 * @param array $theme_json Theme JSON array.
-	 * @return array Returns the modified $declarations.
+	 * @param array   $styles Styles to process.
+	 * @param array   $settings Theme settings.
+	 * @param array   $properties Properties metadata.
+	 * @param array   $theme_json Theme JSON array.
+	 * @param string  $selector Selector for styles.
+	 * @param boolean $use_root_vars Whether to use root.
+	 * @return array  Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_vars = null ) {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
 
-		$declarations = array();
+		$declarations             = array();
+		$root_variable_duplicates = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
+
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
+				continue;
+			}
+
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_vars ) {
+				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
+			}
+
+			// Root padding requires special logic to split shorthand values.
+			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
+
+				$shorthand_top    = '0';
+				$shorthand_right  = '0';
+				$shorthand_bottom = '0';
+				$shorthand_left   = '0';
+
+				$separate_values = explode( ' ', $value );
+
+				switch ( count( $separate_values ) ) {
+					case 1:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[0];
+						$shorthand_bottom = $separate_values[0];
+						$shorthand_left   = $separate_values[0];
+						break;
+					case 2:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[0];
+						$shorthand_left   = $separate_values[1];
+						break;
+					case 3:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[2];
+						$shorthand_left   = $separate_values[1];
+						break;
+					case 4:
+						$shorthand_top    = $separate_values[0];
+						$shorthand_right  = $separate_values[1];
+						$shorthand_bottom = $separate_values[2];
+						$shorthand_left   = $separate_values[3];
+						break;
+				}
+
+				$all_properties = array(
+					array(
+						'name'  => '--wp--style--root--padding-top',
+						'value' => $shorthand_top,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-right',
+						'value' => $shorthand_right,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-bottom',
+						'value' => $shorthand_bottom,
+					),
+					array(
+						'name'  => '--wp--style--root--padding-left',
+						'value' => $shorthand_left,
+					),
+				);
+
+				$declarations = array_merge( $declarations, $all_properties );
+
+				continue;
+			}
 
 			// Look up protected properties, keyed by value path.
 			// Skip protected properties that are explicitly set to `null`.
@@ -612,6 +703,14 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				'name'  => $css_property,
 				'value' => $value,
 			);
+		}
+
+		// If a variable value is added to the root, the corresponding property should be removed.
+		foreach ( $root_variable_duplicates as $duplicate ) {
+			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
+			if ( $discard ) {
+				array_splice( $declarations, $discard, 1 );
+			}
 		}
 
 		return $declarations;
