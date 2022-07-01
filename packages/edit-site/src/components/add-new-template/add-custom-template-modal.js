@@ -30,7 +30,7 @@ function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
 	const {
 		labels,
 		slug,
-		config: { aliasTemplateSlug, templatePrefix },
+		config: { templateSlug, templatePrefix },
 	} = entityForSuggestions;
 	// TODO: check if we can reuse the message and the translators message...(?)
 	// This refers to `where %1$s is the singular name of a post type and %2$s...`part.
@@ -40,7 +40,7 @@ function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
 		labels.singular_name,
 		suggestion.name
 	);
-	let newTemplateSlug = `${ aliasTemplateSlug || slug }-${ suggestion.slug }`;
+	let newTemplateSlug = `${ templateSlug || slug }-${ suggestion.slug }`;
 	if ( templatePrefix ) {
 		newTemplateSlug = templatePrefix + newTemplateSlug;
 	}

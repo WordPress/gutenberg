@@ -44,22 +44,22 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 
 /**
  * @typedef {Object} EntityConfig
- * @property {string}   entityName        The entity's name.
- * @property {Function} getOrderBy        Getter for an entity's `orderBy` query parameter, given the object
- *                                        {search} as argument.
- * @property {Function} getIcon           Getter function for returning an entity's icon for the menu item.
- * @property {Function} getTitle          Getter function for returning an entity's title for the menu item.
- * @property {Function} getDescription    Getter function for returning an entity's description for the menu item.
- * @property {string}   recordNamePath    The path to an entity's properties to use as a `name`. If not provided
- *                                        is assumed that `name` property exists.
- * @property {string}   templatePrefix    The template prefix to create new templates and check against existing
- *                                        templates. For example custom post types need a `single-` prefix to all
- *                                        templates(`single-post-hello`), whereas `pages` don't (`page-hello`).
- * @property {string}   aliasTemplateSlug If this property is provided, is going to be used for the creation of
- *                                        new templates and the check against existing templates in the place
- *                                        of the actual entity's `slug`. An example is `Tag` templates where the
- *                                        the Tag's taxonomy slug is `post_tag`, but template hierarchy is based
- *                                        on `tag` alias.
+ * @property {string}   entityName     The entity's name.
+ * @property {Function} getOrderBy     Getter for an entity's `orderBy` query parameter, given the object
+ *                                     {search} as argument.
+ * @property {Function} getIcon        Getter function for returning an entity's icon for the menu item.
+ * @property {Function} getTitle       Getter function for returning an entity's title for the menu item.
+ * @property {Function} getDescription Getter function for returning an entity's description for the menu item.
+ * @property {string}   recordNamePath The path to an entity's properties to use as a `name`. If not provided
+ *                                     is assumed that `name` property exists.
+ * @property {string}   templatePrefix The template prefix to create new templates and check against existing
+ *                                     templates. For example custom post types need a `single-` prefix to all
+ *                                     templates(`single-post-hello`), whereas `pages` don't (`page-hello`).
+ * @property {string}   templateSlug   If this property is provided, it is going to be used for the creation of
+ *                                     new templates and the check against existing templates in the place
+ *                                     of the actual entity's `slug`. An example is `Tag` templates where the
+ *                                     the Tag's taxonomy slug is `post_tag`, but template hierarchy is based
+ *                                     on `tag` alias.
  */
 
 const taxonomyBaseConfig = {
@@ -108,7 +108,7 @@ export const entitiesConfig = {
 		templatePrefix: 'taxonomy-',
 	},
 	category: { ...taxonomyBaseConfig },
-	tag: { ...taxonomyBaseConfig, aliasTemplateSlug: 'tag' },
+	tag: { ...taxonomyBaseConfig, templateSlug: 'tag' },
 };
 
 export const useExistingTemplates = () => {
@@ -205,16 +205,16 @@ export const useTaxonomyTag = () => {
 const useEntitiesInfo = (
 	existingTemplates,
 	entities,
-	{ entityName, templatePrefix, aliasTemplateSlug }
+	{ entityName, templatePrefix, templateSlug }
 ) => {
 	const slugsToExcludePerEntity = useMemo( () => {
 		return entities?.reduce( ( accumulator, entity ) => {
+			let _prefix = `${ templateSlug || entity.slug }-`;
+			if ( templatePrefix ) {
+				_prefix = templatePrefix + _prefix;
+			}
 			const slugsWithTemplates = ( existingTemplates || [] ).reduce(
 				( _accumulator, existingTemplate ) => {
-					let _prefix = `${ aliasTemplateSlug || entity.slug }-`;
-					if ( templatePrefix ) {
-						_prefix = templatePrefix + _prefix;
-					}
 					if ( existingTemplate.slug.startsWith( _prefix ) ) {
 						_accumulator.push(
 							existingTemplate.slug.substring( _prefix.length )
@@ -298,16 +298,15 @@ export const useExtraTemplates = (
 		( { slug } ) => slug
 	);
 	const extraTemplates = ( entities || [] ).reduce(
-		( accumulator, _postType ) => {
-			const { slug, labels, icon } = _postType;
+		( accumulator, entity ) => {
+			const { slug, labels, icon } = entity;
 			// TODO: add/move/remove comments :)
 			// `post_tag` seems to be the only exception in template
 			// hierarchy that doesn't use the `slug` for its general
 			// template. Instead it uses `tag`.
 			// I'm not sure how to fit this in a generic util like this,
 			// if it's indeed the only case..
-			const slugForGeneralTemplate =
-				entityConfig.aliasTemplateSlug || slug;
+			const slugForGeneralTemplate = entityConfig.templateSlug || slug;
 			// We need to check if the general template is part of the
 			// defaultTemplateTypes. If it is, just use that info and
 			// augment it with the specific template functionality.
