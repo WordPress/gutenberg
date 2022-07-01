@@ -180,33 +180,31 @@ Let's use the same type of notifications in our plugin! There are two parts to t
 
 Our application only knows how to display pages but does not know how to display notifications. Let's tell it!
 
-The [`Snackbar` WordPress component](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--default) represents a single notification:
+WordPress conveniently provides us with all the React components we need to render notifications. A [component called `Snackbar`](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--default) represents a single notification:
 
 ![](./media/delete-button/snackbar.png)
 
-However, the user may delete a few pages one after another and expect to see a few notifications simultaneously. Then, it would be nice to have them automatically go away after a few seconds.
+We won't use `Snackbar` directly, though. We'll use the `SnackbarList` component, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component used in the Widgets editor and other wp-admin pages!
 
-Luckily, the `SnackbarList` WordPress component can help us with all of that. It presents a list of notifications in an accessible, user-friendly manner. That's precisely the component used in the Widgets editor and in the rest of WordPress!
-
-Here's how we can use it:
+Let's create our own `Notifications` components:
 
 ```js
 import { SnackbarList } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
-function SnackbarNotices() {
+function Notifications() {
 	const notices = []; // We'll come back here in a second!
 
 	return (
 		<SnackbarList
-			notices={ snackbarNotices }
+			notices={ notices }
 			className="components-editor-notices__snackbar"
 		/>
 	);
 }
 ```
 
-That's all great, but the notices list is empty. How do we populate it? We'll lean on the same package as WordPress: [`@wordpress/notices`](https://github.com/WordPress/gutenberg/blob/895ca1f6a7d7e492974ea55f693aecbeb1d5bbe3/docs/reference-guides/data/data-core-notices.md).
+The basic structure is in place, but the list of notifications it renders is empty. How do we populate it? We'll lean on the same package as WordPress: [`@wordpress/notices`](https://github.com/WordPress/gutenberg/blob/895ca1f6a7d7e492974ea55f693aecbeb1d5bbe3/docs/reference-guides/data/data-core-notices.md).
 
 Here's how:
 
@@ -214,7 +212,7 @@ Here's how:
 import { SnackbarList } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
-function SnackbarNotices() {
+function Notifications() {
 	const notices = useSelect(
 		( select ) => select( noticesStore ).getNotices(),
 		[]
@@ -236,7 +234,7 @@ function MyFirstApp() {
 	return (
 		<div>
 			{/* ... */}
-			<SnackbarNotices />
+			<Notifications />
 		</div>
 	);
 }
@@ -340,7 +338,7 @@ function MyFirstApp() {
 				<PageCreateButton/>
 			</div>
 			<PagesList hasResolved={ hasResolved } pages={ pages }/>
-			<SnackbarNotices />
+			<Notifications />
 		</div>
 	);
 }
