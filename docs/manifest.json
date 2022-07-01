@@ -203,7 +203,7 @@
 		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
 		"parent": "data-basics"
 	},
-	{"title": "Adding a delete button",
+	{	"title": "Adding a delete button",
 		"slug": "5-adding-a-delete-button",
 		"markdown_source": "../docs/how-to-guides/data-basics/5-adding-a-delete-button.md",
 		"parent": "data-basics"
