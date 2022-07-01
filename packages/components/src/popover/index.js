@@ -114,7 +114,7 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableAvoidOverlap,
+		__unstableAvoidOverflow,
 		__unstableObserveElement,
 		__unstableForcePosition,
 		__unstableShift = false,
@@ -183,13 +183,13 @@ const Popover = (
 		};
 	}, [ ownerDocument ] );
 
-	const avoidOverlap = useMemo( () => {
-		if ( ! __unstableAvoidOverlap ) {
+	const avoidOverflow = useMemo( () => {
+		if ( ! __unstableAvoidOverflow ) {
 			return;
 		}
 
 		return {
-			name: 'avoidOverlap',
+			name: 'avoidOverflow',
 			async fn( middlewareArgs ) {
 				const overflow = await detectOverflow( middlewareArgs );
 				const { placement: currentPlacement } = middlewareArgs;
@@ -213,13 +213,12 @@ const Popover = (
 				return middlewareArgs;
 			},
 		};
-	}, [ __unstableAvoidOverlap ] );
+	}, [ __unstableAvoidOverflow ] );
 
 	const middlewares = [
 		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
-
-		avoidOverlap,
+		avoidOverflow,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -234,13 +233,14 @@ const Popover = (
 						} );
 					},
 			  } ),
-		__unstableShift && ! avoidOverlap
+		__unstableShift && ! avoidOverflow
 			? shift( {
 					crossAxis: true,
 					limiter: limitShift(),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
+
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
