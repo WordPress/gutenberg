@@ -30,8 +30,10 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import Token from './token';
 import TokenInput from './token-input';
+import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
+import { FlexItem } from '../flex';
 
 /**
  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
@@ -71,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
+		__next36pxDefaultSize = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -566,28 +569,35 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const termsCount = tokens.length;
 
 		return (
-			<Token
-				key={ 'token-' + _value }
-				value={ _value }
-				status={ status }
-				title={ typeof token !== 'string' ? token.title : undefined }
-				displayTransform={ displayTransform }
-				onClickRemove={ onTokenClickRemove }
-				isBorderless={
-					( typeof token !== 'string' && token.isBorderless ) ||
-					isBorderless
-				}
-				onMouseEnter={
-					typeof token !== 'string' ? token.onMouseEnter : undefined
-				}
-				onMouseLeave={
-					typeof token !== 'string' ? token.onMouseLeave : undefined
-				}
-				disabled={ 'error' !== status && disabled }
-				messages={ messages }
-				termsCount={ termsCount }
-				termPosition={ termPosition }
-			/>
+			<FlexItem key={ 'token-' + _value }>
+				<Token
+					value={ _value }
+					status={ status }
+					title={
+						typeof token !== 'string' ? token.title : undefined
+					}
+					displayTransform={ displayTransform }
+					onClickRemove={ onTokenClickRemove }
+					isBorderless={
+						( typeof token !== 'string' && token.isBorderless ) ||
+						isBorderless
+					}
+					onMouseEnter={
+						typeof token !== 'string'
+							? token.onMouseEnter
+							: undefined
+					}
+					onMouseLeave={
+						typeof token !== 'string'
+							? token.onMouseLeave
+							: undefined
+					}
+					disabled={ 'error' !== status && disabled }
+					messages={ messages }
+					termsCount={ termsCount }
+					termPosition={ termPosition }
+				/>
+			</FlexItem>
 		);
 	}
 
@@ -660,7 +670,16 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				{ renderTokensAndInput() }
+				<TokensAndInputWrapperFlex
+					justify="flex-start"
+					align="center"
+					gap={ 1 }
+					wrap={ true }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					hasTokens={ !! value.length }
+				>
+					{ renderTokensAndInput() }
+				</TokensAndInputWrapperFlex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }
