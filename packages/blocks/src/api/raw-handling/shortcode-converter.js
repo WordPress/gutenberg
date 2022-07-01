@@ -83,22 +83,24 @@ function segmentHTMLToShortcodeBlock(
 			] );
 		}
 
-		let blockType = getBlockType( transformation.blockName );
-		if ( ! blockType ) {
-			return [ HTML ];
-		}
-		blockType = { ...blockType, attributes: transformation.attributes };
-
-		let block;
-		if ( typeof transformation.__experimentalTransform === 'function' ) {
+		let blocks = [];
+		if ( typeof transformation.transform === 'function' ) {
 			// Passing all of `match` as second argument is intentionally broad
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			block = transformation.__experimentalTransform(
-				match.shortcode.attrs,
-				match
+			blocks = [].concat(
+				transformation.transform( match.shortcode.attrs, match )
 			);
+
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			blocks = blocks.map( ( block ) => {
+				block.originalContent = match.shortcode.content;
+				return applyBuiltInValidationFixes(
+					block,
+					getBlockType( block.name )
+				);
+			} );
 		} else {
 			const attributes = mapValues(
 				pickBy(
@@ -112,22 +114,38 @@ function segmentHTMLToShortcodeBlock(
 				( schema ) => schema.shortcode( match.shortcode.attrs, match )
 			);
 
-			block = createBlock(
+			const blockType = getBlockType( transformation.blockName );
+			if ( ! blockType ) {
+				return [ HTML ];
+			}
+
+			const transformationBlockType = {
+				...blockType,
+				attributes: transformation.attributes,
+			};
+
+			let block = createBlock(
 				transformation.blockName,
 				getBlockAttributes(
-					blockType,
+					transformationBlockType,
 					match.shortcode.content,
 					attributes
 				)
 			);
+
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			block.originalContent = match.shortcode.content;
+			block = applyBuiltInValidationFixes(
+				block,
+				transformationBlockType
+			);
+
+			blocks = [ block ];
 		}
-		block.originalContent = match.shortcode.content;
-		// Applying the built-in fixes can enhance the attributes with missing content like "className".
-		block = applyBuiltInValidationFixes( block, blockType );
 
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML ),
-			block,
+			...blocks,
 			...segmentHTMLToShortcodeBlock( afterHTML ),
 		];
 	}

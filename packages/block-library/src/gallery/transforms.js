@@ -225,7 +225,7 @@ const transforms = {
 					},
 				},
 			},
-			__experimentalTransform( { named: { ids, columns = 3, link } } ) {
+			transform( { named: { ids, columns = 3, link } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
