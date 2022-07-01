@@ -299,6 +299,7 @@
 
 	.block-editor-list-view-block-select-button__label-wrapper {
 		max-width: 225px;
+		margin-right: $grid-unit-10;
 	}
 
 	.block-editor-list-view-block-select-button__anchor {
@@ -306,7 +307,7 @@
 		border-radius: $radius-block-ui;
 		display: inline-block;
 		padding: 2px 6px;
-		margin: 0 $grid-unit-10;
+		margin: 0 0 0 $grid-unit-10;
 		max-width: 120px;
 		overflow: hidden;
 		text-overflow: ellipsis;

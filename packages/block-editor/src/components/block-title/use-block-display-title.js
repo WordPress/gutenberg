@@ -21,19 +21,20 @@ import { store as blockEditorStore } from '../../store';
  * @example
  *
  * ```js
- * useBlockDisplayTitle( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', 17 );
+ * useBlockDisplayTitle( { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', maximumLength: 17 } );
  * ```
  *
- * @param {string}           clientId      Client ID of block.
- * @param {number|undefined} maximumLength The maximum length that the block title string may be before truncated.
- * @param {string|undefined} context       The context to pass to `getBlockLabel`.
+ * @param {Object}           props
+ * @param {string}           props.clientId      Client ID of block.
+ * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
+ * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
  * @return {?string} Block title.
  */
-export default function useBlockDisplayTitle(
+export default function useBlockDisplayTitle( {
 	clientId,
 	maximumLength,
-	context
-) {
+	context,
+} ) {
 	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {

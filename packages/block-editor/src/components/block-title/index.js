@@ -22,5 +22,5 @@ import useBlockDisplayTitle from './use-block-display-title';
  * @return {JSX.Element} Block title.
  */
 export default function BlockTitle( { clientId, maximumLength, context } ) {
-	return useBlockDisplayTitle( clientId, maximumLength, context );
+	return useBlockDisplayTitle( { clientId, maximumLength, context } );
 }
