@@ -77,20 +77,15 @@ const TEMPLATE_ICONS = {
 };
 
 export default function NewTemplate( { postType } ) {
-	const history = useHistory();
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
+
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
+
+	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
-	const postTypes = usePostTypes();
-	const taxonomies = useTaxonomies();
-	const categoryTaxonomy = useTaxonomyCategory();
-	const tagTaxonomy = useTaxonomyTag();
-
-	const existingTemplates = useExistingTemplates();
-	const defaultTemplateTypes = useDefaultTemplateTypes();
 	async function createTemplate( template ) {
 		try {
 			const { title, description, slug } = template;
@@ -130,6 +125,85 @@ export default function NewTemplate( { postType } ) {
 			} );
 		}
 	}
+
+	const missingTemplates = useMissingTemplates(
+		setEntityForSuggestions,
+		setShowCustomTemplateModal
+	);
+	if ( ! missingTemplates.length ) {
+		return null;
+	}
+	return (
+		<>
+			<DropdownMenu
+				className="edit-site-new-template-dropdown"
+				icon={ null }
+				text={ postType.labels.add_new }
+				label={ postType.labels.add_new_item }
+				popoverProps={ {
+					noArrow: false,
+				} }
+				toggleProps={ {
+					variant: 'primary',
+				} }
+			>
+				{ () => (
+					<NavigableMenu className="edit-site-new-template-dropdown__popover">
+						<MenuGroup label={ postType.labels.add_new_item }>
+							{ missingTemplates.map( ( template ) => {
+								const {
+									title,
+									description,
+									slug,
+									onClick,
+									icon,
+								} = template;
+								return (
+									<MenuItem
+										icon={
+											icon ||
+											TEMPLATE_ICONS[ slug ] ||
+											post
+										}
+										iconPosition="left"
+										info={ description }
+										key={ slug }
+										onClick={ () =>
+											onClick
+												? onClick( template )
+												: createTemplate( template )
+										}
+									>
+										{ title }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					</NavigableMenu>
+				) }
+			</DropdownMenu>
+			{ showCustomTemplateModal && (
+				<AddCustomTemplateModal
+					onClose={ () => setShowCustomTemplateModal( false ) }
+					onSelect={ createTemplate }
+					entityForSuggestions={ entityForSuggestions }
+				/>
+			) }
+		</>
+	);
+}
+
+function useMissingTemplates(
+	setEntityForSuggestions,
+	setShowCustomTemplateModal
+) {
+	const postTypes = usePostTypes();
+	const taxonomies = useTaxonomies();
+	const categoryTaxonomy = useTaxonomyCategory();
+	const tagTaxonomy = useTaxonomyTag();
+
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
 
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
@@ -204,65 +278,5 @@ export default function NewTemplate( { postType } ) {
 		...extraPostTypeTemplates,
 		...extraTaxonomyTemplates,
 	];
-	if ( ! missingTemplates.length ) {
-		return null;
-	}
-	return (
-		<>
-			<DropdownMenu
-				className="edit-site-new-template-dropdown"
-				icon={ null }
-				text={ postType.labels.add_new }
-				label={ postType.labels.add_new_item }
-				popoverProps={ {
-					noArrow: false,
-				} }
-				toggleProps={ {
-					variant: 'primary',
-				} }
-			>
-				{ () => (
-					<NavigableMenu className="edit-site-new-template-dropdown__popover">
-						<MenuGroup label={ postType.labels.add_new_item }>
-							{ missingTemplates.map( ( template ) => {
-								const {
-									title,
-									description,
-									slug,
-									onClick,
-									icon,
-								} = template;
-								return (
-									<MenuItem
-										icon={
-											icon ||
-											TEMPLATE_ICONS[ slug ] ||
-											post
-										}
-										iconPosition="left"
-										info={ description }
-										key={ slug }
-										onClick={ () =>
-											onClick
-												? onClick( template )
-												: createTemplate( template )
-										}
-									>
-										{ title }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					</NavigableMenu>
-				) }
-			</DropdownMenu>
-			{ showCustomTemplateModal && (
-				<AddCustomTemplateModal
-					onClose={ () => setShowCustomTemplateModal( false ) }
-					onSelect={ createTemplate }
-					entityForSuggestions={ entityForSuggestions }
-				/>
-			) }
-		</>
-	);
+	return missingTemplates;
 }
