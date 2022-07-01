@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import PostTemplateForm from './form';
+import { store as editPostStore } from '../../../store';
 
 export default function PostTemplate() {
 	const anchorRef = useRef();
@@ -65,19 +66,7 @@ export default function PostTemplate() {
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
-		const templateSlug =
-			select( editorStore ).getEditedPostAttribute( 'template' );
-
-		const settings = select( editorStore ).getEditorSettings();
-		if ( settings.availableTemplates[ templateSlug ] ) {
-			return settings.availableTemplates[ templateSlug ];
-		}
-
-		const template = select( coreStore )
-			.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
-			?.find( ( { slug } ) => slug === templateSlug );
-
-		return template?.title.rendered;
+		return select( editPostStore ).getEditedPostTemplate()?.title;
 	}, [] );
 
 	return (
