@@ -5,7 +5,6 @@ import {
 	get,
 	unescape as unescapeString,
 	debounce,
-	repeat,
 	find,
 	deburr,
 } from 'lodash';
@@ -98,7 +97,7 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						repeat( '— ', level ) + unescapeString( treeNode.name ),
+						'— '.repeat( level ) + unescapeString( treeNode.name ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),

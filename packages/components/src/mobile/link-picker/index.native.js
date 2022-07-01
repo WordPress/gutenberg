@@ -3,7 +3,6 @@
  */
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +25,7 @@ import styles from './styles.scss';
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
-	const protocol = lowerCase( getProtocol( value ) ) || '';
+	const protocol = getProtocol( value )?.toLowerCase() || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
 		type = 'mailto';
@@ -36,7 +35,7 @@ export const createDirectEntry = ( value ) => {
 		type = 'tel';
 	}
 
-	if ( startsWith( value, '#' ) ) {
+	if ( value?.startsWith( '#' ) ) {
 		type = 'internal';
 	}
 

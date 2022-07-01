@@ -21,6 +21,7 @@
 		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"gradients": true,
