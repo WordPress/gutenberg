@@ -25,11 +25,6 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
-const BASE_QUERY = {
-	order: 'asc',
-	_fields: 'id,name,title,slug,link',
-	context: 'view',
-};
 
 function SuggestionListItem( {
 	suggestion,
@@ -89,50 +84,71 @@ function SuggestionListItem( {
 	);
 }
 
-function SuggestionList( { entityForSuggestions, onSelect } ) {
-	const composite = useCompositeState( { orientation: 'vertical' } );
-	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
-	// We need to track two values, the search input's value(searchInputValue)
-	// and the one we want to debounce(search) and make REST API requests.
-	const [ searchInputValue, setSearchInputValue ] = useState( '' );
-	const [ search, setSearch ] = useState( '' );
-	const debouncedSearch = useDebounce( setSearch, 250 );
-	const { config, postsToExclude, labels } = entityForSuggestions;
-	const query = {
-		...BASE_QUERY,
-		search,
-		orderby: search ? config.orderBySearch : config.orderBy,
-		exclude: postsToExclude,
-		per_page: search ? 20 : 10,
-	};
+function useDebouncedInput() {
+	const [ input, setInput ] = useState( '' );
+	const [ debounced, setter ] = useState( '' );
+	const setDebounced = useDebounce( setter, 250 );
+	useEffect( () => {
+		if ( debounced !== input ) {
+			setDebounced( input );
+		}
+	}, [ debounced, input ] );
+	return [ input, setInput, debounced ];
+}
+
+function useSearchSuggestions( entityForSuggestions, search ) {
+	const { config, postsToExclude } = entityForSuggestions;
+	const query = useMemo(
+		() => ( {
+			order: 'asc',
+			_fields: 'id,name,title,slug,link',
+			context: 'view',
+			search,
+			orderby: search ? config.orderBySearch : config.orderBy,
+			exclude: postsToExclude,
+			per_page: search ? 20 : 10,
+		} ),
+		[ search, config, postsToExclude ]
+	);
 	const { records: searchResults, hasResolved: searchHasResolved } =
 		useEntityRecords(
 			entityForSuggestions.type,
 			entityForSuggestions.slug,
 			query
 		);
-	useEffect( () => {
-		if ( search !== searchInputValue ) {
-			debouncedSearch( searchInputValue );
-		}
-	}, [ search, searchInputValue ] );
-	const entitiesInfo = useMemo( () => {
-		if ( ! searchResults?.length ) return EMPTY_ARRAY;
-		if ( config.recordNamePath ) {
-			return mapToIHasNameAndId( searchResults, config.recordNamePath );
-		}
-		return searchResults;
-	}, [ searchResults ] );
-	// Update suggestions only when the query has resolved.
+	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
 		if ( ! searchHasResolved ) return;
-		setSuggestions( entitiesInfo );
-	}, [ entitiesInfo, searchHasResolved ] );
+		let newSuggestions = EMPTY_ARRAY;
+		if ( searchResults?.length ) {
+			newSuggestions = searchResults;
+			if ( config.recordNamePath ) {
+				newSuggestions = mapToIHasNameAndId(
+					newSuggestions,
+					config.recordNamePath
+				);
+			}
+		}
+		// Update suggestions only when the query has resolved, so as to keep
+		// the previous results in the UI.
+		setSuggestions( newSuggestions );
+	}, [ searchResults, searchHasResolved ] );
+	return suggestions;
+}
+
+function SuggestionList( { entityForSuggestions, onSelect } ) {
+	const composite = useCompositeState( { orientation: 'vertical' } );
+	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
+	const suggestions = useSearchSuggestions(
+		entityForSuggestions,
+		debouncedSearch
+	);
+	const { labels } = entityForSuggestions;
 	return (
 		<>
 			<SearchControl
-				onChange={ setSearchInputValue }
-				value={ searchInputValue }
+				onChange={ setSearch }
+				value={ search }
 				label={ labels.search_items }
 				placeholder={ labels.search_items }
 			/>
@@ -146,7 +162,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 						<SuggestionListItem
 							key={ suggestion.slug }
 							suggestion={ suggestion }
-							search={ search }
+							search={ debouncedSearch }
 							onSelect={ onSelect }
 							entityForSuggestions={ entityForSuggestions }
 							composite={ composite }
@@ -154,7 +170,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 					) ) }
 				</Composite>
 			) }
-			{ search && ! suggestions?.length && (
+			{ debouncedSearch && ! suggestions?.length && (
 				<p className="edit-site-custom-template-modal__no-results">
 					{ labels.not_found }
 				</p>
