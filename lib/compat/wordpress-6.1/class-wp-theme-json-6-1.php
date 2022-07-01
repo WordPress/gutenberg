@@ -1020,15 +1020,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
-		'appearanceTools' => null,
+		'appearanceTools'  => null,
 		'useRootVariables' => null,
-		'border'          => array(
+		'border'           => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'           => array(
+		'color'            => array(
 			'background'       => null,
 			'custom'           => null,
 			'customDuotone'    => null,
@@ -1042,13 +1042,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'palette'          => null,
 			'text'             => null,
 		),
-		'custom'          => null,
-		'layout'          => array(
+		'custom'           => null,
+		'layout'           => array(
 			'contentSize' => null,
 			'definitions' => null,
 			'wideSize'    => null,
 		),
-		'spacing'         => array(
+		'spacing'          => array(
 			'customSpacingSize' => null,
 			'spacingSizes'      => null,
 			'spacingScale'      => null,
@@ -1057,7 +1057,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'padding'           => null,
 			'units'             => null,
 		),
-		'typography'      => array(
+		'typography'       => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,
