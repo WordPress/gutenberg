@@ -37,6 +37,7 @@ exports[`props should render correctly 1`] = `
 
 <div
   class="components-scrollable emotion-0 emotion-1"
+  data-testid="scrollable"
   data-wp-c16t="true"
   data-wp-component="Scrollable"
 >

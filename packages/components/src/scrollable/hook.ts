@@ -6,16 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
+import type { ScrollableProps } from './types';
 
-/* eslint-disable jsdoc/valid-types */
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- */
-/* eslint-enable jsdoc/valid-types */
-export function useScrollable( props ) {
+export function useScrollable(
+	props: WordPressComponentProps< ScrollableProps, 'div' >
+) {
 	const {
 		className,
 		scrollDirection = 'y',
