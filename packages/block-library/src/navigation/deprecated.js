@@ -35,8 +35,6 @@ const migrateTextColorToLinkColor = ( {
 } ) => {
 	return {
 		...attributes,
-		textColor: null,
-		customTextColor: null,
 		style: {
 			...attributes?.style,
 			elements: {
@@ -193,7 +191,11 @@ const v7 = {
 		}
 		return <InnerBlocks.Content />;
 	},
-	isEligible: ( { textColor, customTextColor } ) => {
+	isEligible: ( { textColor, customTextColor, ...attributes } ) => {
+		if ( attributes?.style?.elements?.link?.color?.text ) {
+			return false;
+		}
+
 		return !! customTextColor || !! textColor;
 	},
 	migrate: migrateTextColorToLinkColor,
