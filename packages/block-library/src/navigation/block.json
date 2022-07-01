@@ -91,6 +91,13 @@
 		"anchor": true,
 		"html": false,
 		"inserter": true,
+		"color": {
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
