@@ -4,6 +4,7 @@
  */
 import classnames from 'classnames';
 import {
+	detectOverflow,
 	useFloating,
 	flip,
 	shift,
@@ -17,7 +18,6 @@ import {
 /**
  * WordPress dependencies
  */
-import { getScrollContainer } from '@wordpress/dom';
 import {
 	useRef,
 	useLayoutEffect,
@@ -190,70 +190,36 @@ const Popover = (
 
 		return {
 			name: 'avoidOverlap',
-			fn( { x, y, rects, initialPlacement } ) {
-				if ( initialPlacement.includes( 'bottom' ) ) {
-					return;
+			async fn( middlewareArgs ) {
+				const overflow = await detectOverflow( middlewareArgs );
+				const { placement: currentPlacement } = middlewareArgs;
+
+				const hasOverflowTop =
+					currentPlacement.includes( 'top' ) && overflow.top > 0;
+				const hasOverflowBottom =
+					currentPlacement.includes( 'bottom' ) &&
+					overflow.bottom > 0;
+
+				if ( hasOverflowTop || hasOverflowBottom ) {
+					return {
+						reset: {
+							placement: hasOverflowTop
+								? currentPlacement.replace( 'top', 'bottom' )
+								: currentPlacement.replace( 'bottom', 'top' ),
+						},
+					};
 				}
 
-				const floatingRect = rects.floating;
-				const referenceRect = rects.reference;
-
-				let anchorElement;
-				if ( anchorRef?.top ) {
-					anchorElement = anchorRef?.top;
-				} else if ( anchorRef?.startContainer ) {
-					anchorElement = anchorRef.startContainer;
-				} else if ( anchorRef?.current ) {
-					anchorElement = anchorRef.current;
-				} else if ( anchorRef ) {
-					// This one should be deprecated.
-					anchorElement = anchorRef;
-				}
-
-				if ( ! anchorElement ) {
-					return { x, y };
-				}
-				const scrollContainerElement =
-					getScrollContainer( anchorElement );
-
-				if ( ! scrollContainerElement ) {
-					return { x, y };
-				}
-
-				const scrollContainerRect =
-					scrollContainerElement.getBoundingClientRect();
-
-				if ( referenceRect.top > scrollContainerRect.top ) {
-					return { x, y };
-				}
-
-				const isRoomAboveInCanvas =
-					floatingRect.height <
-					scrollContainerElement.scrollTop + referenceRect.top;
-
-				if ( isRoomAboveInCanvas ) {
-					return { x, y };
-				}
-
-				return {
-					reset: {
-						placement: initialPlacement.replace( 'top', 'bottom' ),
-						x,
-						y,
-						// y: Math.min(
-						// 	referenceRect.bottom,
-						// 	scrollContainerRect.bottom
-						// ),
-					},
-				};
+				return middlewareArgs;
 			},
 		};
-	}, [ __unstableAvoidOverlap, anchorRef ] );
+	}, [ __unstableAvoidOverlap ] );
 
 	const middlewares = [
 		frameOffset,
-		avoidOverlap,
 		offset ? offsetMiddleware( offset ) : undefined,
+
+		avoidOverlap,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -268,7 +234,7 @@ const Popover = (
 						} );
 					},
 			  } ),
-		__unstableShift
+		__unstableShift && ! avoidOverlap
 			? shift( {
 					crossAxis: true,
 					limiter: limitShift(),
