@@ -539,7 +539,7 @@ export const toStyles = (
 
 	if ( useRootVars ) {
 		ruleset =
-			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .wp-site-blocks > * { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .wp-site-blocks > * > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6, ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-content-size { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-content-size > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6, ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 	}
 
 	nodesWithStyles.forEach(

@@ -174,6 +174,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 
+	// Add a classname to blocks with flow layout set.
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
+		$class_names[] = 'has-content-size';
+	}
+
 	// The following section was added to reintroduce a small set of layout classnames that were
 	// removed in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719). It is
 	// not intended to provide an extended set of classes to match all block layout attributes
