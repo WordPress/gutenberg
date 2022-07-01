@@ -5,7 +5,6 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { Warning } from '@wordpress/block-editor';
-import { doAction } from '@wordpress/hooks';
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -20,8 +19,6 @@ class ErrorBoundary extends Component {
 
 	componentDidCatch( error ) {
 		this.setState( { error } );
-
-		doAction( 'gb.reportErrorBoundaryException', error );
 	}
 
 	reboot() {
