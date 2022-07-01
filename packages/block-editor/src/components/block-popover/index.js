@@ -63,6 +63,7 @@ export default function BlockPopover( {
 			__unstableObserveElement={ selectedElement }
 			__unstableForcePosition
 			__unstableShift
+			__unstableAvoidOverlap
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',

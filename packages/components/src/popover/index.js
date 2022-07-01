@@ -17,6 +17,7 @@ import {
 /**
  * WordPress dependencies
  */
+import { getScrollContainer } from '@wordpress/dom';
 import {
 	useRef,
 	useLayoutEffect,
@@ -113,6 +114,7 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
+		__unstableAvoidOverlap,
 		__unstableObserveElement,
 		__unstableForcePosition,
 		__unstableShift = false,
@@ -181,8 +183,76 @@ const Popover = (
 		};
 	}, [ ownerDocument ] );
 
+	const avoidOverlap = useMemo( () => {
+		if ( ! __unstableAvoidOverlap ) {
+			return;
+		}
+
+		return {
+			name: 'avoidOverlap',
+			fn( { x, y, rects, initialPlacement } ) {
+				if ( initialPlacement.includes( 'bottom' ) ) {
+					return;
+				}
+
+				const floatingRect = rects.floating;
+				const referenceRect = rects.reference;
+
+				let anchorElement;
+				if ( anchorRef?.top ) {
+					anchorElement = anchorRef?.top;
+				} else if ( anchorRef?.startContainer ) {
+					anchorElement = anchorRef.startContainer;
+				} else if ( anchorRef?.current ) {
+					anchorElement = anchorRef.current;
+				} else if ( anchorRef ) {
+					// This one should be deprecated.
+					anchorElement = anchorRef;
+				}
+
+				if ( ! anchorElement ) {
+					return { x, y };
+				}
+				const scrollContainerElement =
+					getScrollContainer( anchorElement );
+
+				if ( ! scrollContainerElement ) {
+					return { x, y };
+				}
+
+				const scrollContainerRect =
+					scrollContainerElement.getBoundingClientRect();
+
+				if ( referenceRect.top > scrollContainerRect.top ) {
+					return { x, y };
+				}
+
+				const isRoomAboveInCanvas =
+					floatingRect.height <
+					scrollContainerElement.scrollTop + referenceRect.top;
+
+				if ( isRoomAboveInCanvas ) {
+					return { x, y };
+				}
+
+				return {
+					reset: {
+						placement: initialPlacement.replace( 'top', 'bottom' ),
+						x,
+						y,
+						// y: Math.min(
+						// 	referenceRect.bottom,
+						// 	scrollContainerRect.bottom
+						// ),
+					},
+				};
+			},
+		};
+	}, [ __unstableAvoidOverlap, anchorRef ] );
+
 	const middlewares = [
 		frameOffset,
+		avoidOverlap,
 		offset ? offsetMiddleware( offset ) : undefined,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
