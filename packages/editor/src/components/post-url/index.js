@@ -89,9 +89,11 @@ export default function PostURL( { onClose } ) {
 					} }
 				/>
 			) }
-			<h3 className="editor-post-url__link-label">
-				{ viewPostLabel ?? __( 'View post' ) }
-			</h3>
+			{ isEditable && (
+				<h3 className="editor-post-url__link-label">
+					{ viewPostLabel ?? __( 'View post' ) }
+				</h3>
+			) }
 			<p>
 				<ExternalLink
 					className="editor-post-url__link"
