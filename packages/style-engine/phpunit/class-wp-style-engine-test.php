@@ -246,6 +246,59 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'valid_spacing_single_preset_values'           => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						'margin'  => 'var:preset|spacing|10',
+						'padding' => 'var:preset|spacing|20',
+					),
+				),
+				'options'         => array( 'css_vars' => true ),
+				'expected_output' => array(
+					'css' => 'padding: var(--wp--preset--spacing--20); margin: var(--wp--preset--spacing--10);',
+				),
+			),
+
+			'valid_spacing_multi_preset_values'            => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						'margin'  => array(
+							'left'   => 'var:preset|spacing|10',
+							'right'  => 'var:preset|spacing|20',
+							'top'    => '1rem',
+							'bottom' => '1rem',
+						),
+						'padding' => array(
+							'left'   => 'var:preset|spacing|30',
+							'right'  => 'var:preset|spacing|40',
+							'top'    => '14px',
+							'bottom' => '14px',
+						),
+					),
+				),
+				'options'         => array( 'css_vars' => true ),
+				'expected_output' => array(
+					'css' => 'padding-left: var(--wp--preset--spacing--30); padding-right: var(--wp--preset--spacing--40); padding-top: 14px; padding-bottom: 14px; margin-left: var(--wp--preset--spacing--10); margin-right: var(--wp--preset--spacing--20); margin-top: 1rem; margin-bottom: 1rem;',
+				),
+			),
+
+			'invalid_spacing_multi_preset_values'          => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						'margin' => array(
+							'left'   => 'var:preset|spaceman|10',
+							'right'  => 'var:preset|spaceman|20',
+							'top'    => '1rem',
+							'bottom' => '1rem',
+						),
+					),
+				),
+				'options'         => array( 'css_vars' => true ),
+				'expected_output' => array(
+					'css' => 'margin-top: 1rem; margin-bottom: 1rem;',
+				),
+			),
+
 			'invalid_classnames_options'                   => array(
 				'block_styles'    => array(
 					'typography' => array(
@@ -285,7 +338,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
+				'options'         => array( 'css_vars' => true ),
 				'expected_output' => array(
 					'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
 				),
@@ -315,7 +368,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array(),
+				'options'         => array( 'css_vars' => true ),
 				'expected_output' => array(
 					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
 				),

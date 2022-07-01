@@ -189,7 +189,15 @@
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
-			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
+			"customSpacingSizes": true,
+			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
+			"spacingScale": {
+				"operator": "*",
+				"increment": 1.5,
+				"steps": 10,
+				"mediumStep": 1.5,
+				"unit": "rem"
+			}
 		},
 		"typography": {
 			"customFontSize": true,
