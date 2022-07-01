@@ -254,6 +254,9 @@
 					"text": "#fff",
 					"background": "#32373c"
 				},
+				"spacing": {
+					"padding": "calc(0.667em + 2px) calc(1.333em + 2px)"
+				},
 				"typography": {
 					"fontSize": "inherit",
 					"fontFamily": "inherit",
