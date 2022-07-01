@@ -17,7 +17,7 @@
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	/**
-	 * Whitelist which defines which pseudo selectors are enabled for
+	 * Define which defines which pseudo selectors are enabled for
 	 * which elements.
 	 * Note: this will effect both top level and block level elements.
 	 */
@@ -31,7 +31,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
-		'link'    => 'a',
+		'link'    => 'a:not(.wp-element-button)',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
 		'h3'      => 'h3',
@@ -431,7 +431,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						'selector' => $selectors[ $name ]['elements'][ $element ],
 					);
 
-					// Handle any psuedo selectors for the element.
+					// Handle any pseudo selectors for the element.
 					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
@@ -462,11 +462,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$selector = $block_metadata['selector'];
 		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
-		// Attempt to parse a pseudo selector (e.g. ":hover") from the $selector ("a:hover").
-		$pseudo_matches = array();
-		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
-		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
-
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
 		// Make sure that $block_metadata['path'] describes an element node, like ['styles', 'element', 'link'].
@@ -474,6 +469,21 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
 
 		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
+
+		$element_pseudo_allowed = isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ? static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] : array();
+
+		// Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
+		// This also resets the array keys.
+		$pseudo_matches = array_values(
+			array_filter(
+				$element_pseudo_allowed,
+				function( $pseudo_selector ) use ( $selector ) {
+					return str_contains( $selector, $pseudo_selector );
+				}
+			)
+		);
+
+		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
 
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
