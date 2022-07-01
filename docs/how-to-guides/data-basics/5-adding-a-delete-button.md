@@ -1,6 +1,9 @@
 # Adding a delete button
 
-In this section, we will add a *Delete* feature to our app. Here's a glimpse of what we're going to build:
+In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we added an ability to create new pages,
+and in this part we will add a *Delete* feature to our app.
+
+Here's a glimpse of what we're going to build:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/delete-button.png)
 
@@ -170,8 +173,7 @@ There are many ways to turn that object into an error message, but in this tutor
 
 WordPress has an established pattern of displaying status information using the `Snackbar` component. Here's what it looks like **in the Widgets editor**:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/deleting-in-progress.png)
-![](./media/delete-button/snackbar-example.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-example.png)
 
 Let's use the same type of notifications in our plugin! There are two parts to this:
 
@@ -184,7 +186,7 @@ Our application only knows how to display pages but does not know how to display
 
 WordPress conveniently provides us with all the React components we need to render notifications. A [component called `Snackbar`](https://wordpress.github.io/gutenberg/?path=/story/components-snackbar--default) represents a single notification:
 
-![](./media/delete-button/snackbar.png)
+![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar.png)
 
 We won't use `Snackbar` directly, though. We'll use the `SnackbarList` component, which can display multiple notices using smooth animations and automatically hide them after a few seconds. In fact, WordPress uses the same component used in the Widgets editor and other wp-admin pages!
 
@@ -292,14 +294,12 @@ export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 Once you refresh the page and click any `Delete` button, you should see the following error message:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-error.png)
-![](./media/delete-button/snackbar-error.png)
 
 Fantastic! We can now **remove the `pageId = pageId * 1000;` line.**
 
 Let's now try actually deleting a page. Here's what you should see after refreshing your browser and clicking the Delete button:
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/delete-button/snackbar-success.png)
-![](./media/delete-button/snackbar-success.png)
 
 And that's it!
 
