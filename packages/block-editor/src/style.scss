@@ -64,4 +64,6 @@
 @import "./components/inserter/style.scss";
 @import "./components/preview-options/style.scss";
 
+@import "./elements/style.scss";
+
 @include wordpress-admin-schemes();
