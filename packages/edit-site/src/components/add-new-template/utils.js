@@ -145,7 +145,7 @@ export const usePostTypes = () => {
 	}, [ postTypes ] );
 };
 
-export const usePublicTaxonomies = () => {
+const usePublicTaxonomies = () => {
 	const taxonomies = useSelect(
 		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
 		[]
@@ -204,7 +204,7 @@ export const useTaxonomyTag = () => {
  * @param {EntityConfig} entityConfig      The entity config.
  * @return {Record<string,EntitiesInfo>} An object with the `entities.slug` as `keys` and EntitiesInfo as values.
  */
-export const useEntitiesInfo = (
+const useEntitiesInfo = (
 	existingTemplates,
 	entities,
 	{ entityName, templatePrefix, aliasTemplateSlug }
