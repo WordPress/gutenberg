@@ -106,13 +106,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Given the name of a registered store, returns an object containing the store's
-	 * selectors pre-bound to state so that you only need to supply additional arguments,
-	 * and modified so that they return promises that resolve to their eventual values,
-	 * after any resolvers have ran.
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they return
+	 * promises that resolve to their eventual values, after any resolvers have ran.
 	 *
-	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
-	 *                                                       or the store descriptor.
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
@@ -130,12 +130,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Given the name of a registered store, returns an object containing the store's
-	 * selectors pre-bound to state so that you only need to supply additional arguments,
-	 * and modified so that they throw promises in case the selector is not resolved yet.
+	 * Given a store descriptor, returns an object containing the store's selectors pre-bound to
+	 * state so that you only need to supply additional arguments, and modified so that they throw
+	 * promises in case the selector is not resolved yet.
 	 *
-	 * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
-	 *                                                       or the store descriptor.
+	 * @param {StoreDescriptor|string} storeNameOrDescriptor The store descriptor. The legacy calling
+	 *                                                       convention of passing the store name is
+	 *                                                       also supported.
 	 *
 	 * @return {Object} Object containing the store's suspense-wrapped selectors.
 	 */

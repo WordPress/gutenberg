@@ -248,11 +248,10 @@ export async function siteEditorNavigateSequence( labels ) {
  */
 export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 	query = addQueryArgs( '', {
-		page: 'gutenberg-edit-site',
 		...query,
 	} ).slice( 1 );
 
-	await visitAdminPage( 'themes.php', query );
+	await visitAdminPage( 'site-editor.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
 
 	if ( skipWelcomeGuide ) {

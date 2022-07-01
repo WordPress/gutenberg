@@ -19,7 +19,6 @@ import { useSelectObject } from './use-select-object';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
-import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -247,7 +246,6 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

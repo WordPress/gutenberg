@@ -104,6 +104,12 @@ function ScreenTypography( { name } ) {
 								element="link"
 								label={ __( 'Links' ) }
 							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="button"
+								label={ __( 'Buttons' ) }
+							/>
 						</ItemGroup>
 					</VStack>
 				</div>

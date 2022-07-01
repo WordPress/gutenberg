@@ -47,10 +47,14 @@ export default function useNavigationMenu( ref ) {
 				hasResolvedCanUserCreateNavigationMenu: hasResolvedPermissions,
 
 				canUserUpdateNavigationMenu: canUpdate,
-				hasResolvedCanUserUpdateNavigationMenu: hasResolvedPermissions,
+				hasResolvedCanUserUpdateNavigationMenu: ref
+					? hasResolvedPermissions
+					: undefined,
 
 				canUserDeleteNavigationMenu: canDelete,
-				hasResolvedCanUserDeleteNavigationMenu: hasResolvedPermissions,
+				hasResolvedCanUserDeleteNavigationMenu: ref
+					? hasResolvedPermissions
+					: undefined,
 			};
 		},
 		[ ref, permissions ]
