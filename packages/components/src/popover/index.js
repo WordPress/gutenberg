@@ -148,8 +148,11 @@ const Popover = (
 			return anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			return anchorRect.ownerDocument;
-		} else if ( getAnchorRect ) {
-			return getAnchorRect()?.ownerDocument ?? document;
+		} else if ( getAnchorRect && anchorRefFallback.current ) {
+			return (
+				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
+				document
+			);
 		}
 
 		return document;
