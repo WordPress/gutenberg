@@ -210,7 +210,6 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	h5: 'h5',
 	h6: 'h6',
 	button: '.wp-element-button, .wp-block-button__link',
-	img: '.wp-block-image__crop-area, img',
 };
 
 export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
