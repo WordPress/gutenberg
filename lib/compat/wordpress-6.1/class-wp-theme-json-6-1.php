@@ -491,23 +491,25 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
-		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
-			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json );
-		} else {
-			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
-		}
+
+//		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
+//			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json );
+//		} else {
+//			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
+//		}
 
 		$block_rules = '';
 
+		// @TODO migrate duotone to style engine
 		// 1. Separate the ones who use the general selector
 		// and the ones who use the duotone selector.
-		$declarations_duotone = array();
-		foreach ( $declarations as $index => $declaration ) {
-			if ( 'filter' === $declaration['name'] ) {
-				unset( $declarations[ $index ] );
-				$declarations_duotone[] = $declaration;
-			}
-		}
+//		$declarations_duotone = array();
+//		foreach ( $declarations as $index => $declaration ) {
+//			if ( 'filter' === $declaration['name'] ) {
+//				unset( $declarations[ $index ] );
+//				$declarations_duotone[] = $declaration;
+//			}
+//		}
 
 		/*
 		 * Reset default browser margin on the root body element.
@@ -523,27 +525,30 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// 2. Generate and append the rules that use the general selector.
 		//$block_rules .= static::to_ruleset( $selector, $declarations );
-		// @TODO check duotone
+
+
+		$block_styles = $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ? $node[ $pseudo_selector ] : $node;
 
 		$styles = gutenberg_style_engine_generate(
-			$node,
+			$block_styles,
 			array(
 				'selector' => $selector,
-				'css_vars' => true,
+				'layer'    => 0, // Or 'global'.
+				'css_vars' => true, // @TODO this doesn't make sense in this context. Refactor.
 				'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 			)
 		);
 
 		if ( isset( $styles['css'] ) ) {
-
 			$block_rules .= $styles['css'];
 		}
 
 		// 3. Generate and append the rules that use the duotone selector.
-		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
-			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
-			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
-		}
+		// @TODO migrate duotone to style engine
+//		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+//			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+//			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
+//		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			$block_rules .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';

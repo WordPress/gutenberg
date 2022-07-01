@@ -371,9 +371,9 @@ class WP_Style_Engine {
 	/**
 	 * Returns an array of CSS declarations based on valid block style values.
 	 *
-	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
-	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param array<string> $options Options passed to generate().
+	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
+	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array<string> $options          Options passed to generate().
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
@@ -394,7 +394,7 @@ class WP_Style_Engine {
 		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
 			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
-				if ( $css_var ) {
+				if ( $css_var && isset( $style_property_keys['default'] ) ) {
 					$css_declarations[ $style_property_keys['default'] ] = $css_var;
 				}
 			}
