@@ -8,20 +8,6 @@
 /**
  * Returns true if the style is coming from global styles.
  *
- * @param array $style Array containing a '__unstableType' key.
- * @return boolean
- */
-function gutenberg_is_global_styles_in_5_8( $style ) {
-	if ( isset( $style['__unstableType'] ) && ( 'globalStyles' === $style['__unstableType'] ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Returns true if the style is coming from global styles.
- *
  * @param array $style Array containing a '__unstableType' key and a 'css' key with the actual CSS.
  * @return boolean
  */
