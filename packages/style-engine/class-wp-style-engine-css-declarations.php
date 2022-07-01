@@ -26,6 +26,21 @@ class WP_Style_Engine_CSS_Declarations {
 	protected $styles = array();
 
 	/**
+	 * Contructor for this object.
+	 *
+	 * If a `$styles` array is passed, it will be used to populate
+	 * the initial $styles prop of the object by calling add_declarations().
+	 *
+	 * @param array $styles An array of styles (property => value pairs).
+	 */
+	public function __construct( $styles = array() ) {
+		if ( empty( $styles ) ) {
+			return;
+		}
+		$this->add_declarations( $styles );
+	}
+
+	/**
 	 * Add a single declaration.
 	 *
 	 * @param string $property The CSS property.

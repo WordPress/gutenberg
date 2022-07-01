@@ -397,8 +397,7 @@ class WP_Style_Engine {
 
 		// Build CSS rules output.
 		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = new WP_Style_Engine_CSS_Declarations();
-		$style_rules->add_declarations( $css_declarations );
+		$style_rules  = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 
 		// The return object.
 		$styles_output = array();
