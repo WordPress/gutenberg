@@ -248,9 +248,9 @@ const Popover = (
 	}[ placementData.split( '-' )[ 0 ] ];
 	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
 
-	// Updates references
+	// Updates references.
 	useLayoutEffect( () => {
-		// No ref or position have been passed
+		// No ref or position have been passed.
 		let usedRef;
 		if ( anchorRef?.top ) {
 			usedRef = {
@@ -304,7 +304,7 @@ const Popover = (
 		return autoUpdate( usedRef, refs.floating.current, update );
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
-	// This is only needed for a smoth transition when moving blocks.
+	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
 		if ( ! __unstableObserveElement ) {
 			return;
