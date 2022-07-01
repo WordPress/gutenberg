@@ -107,7 +107,7 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 			_fields: 'id,name,title,slug,link',
 			context: 'view',
 			search,
-			orderby: search ? config.orderBySearch : config.orderBy,
+			orderBy: config.getOrderBy( { search } ),
 			exclude: postsToExclude,
 			per_page: search ? 20 : 10,
 		} ),

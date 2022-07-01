@@ -45,8 +45,8 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 /**
  * @typedef {Object} EntityConfig
  * @property {string}   entityName        The entity's name.
- * @property {string}   orderBy           Prefered default `orderBy` for initial results. Entities support different fields.
- * @property {string}   orderBySearch     Prefered `orderBy` for search results. Entities support different fields.
+ * @property {Function} getOrderBy        Getter for an entity's `orderBy` query parameter, given the object
+ *                                        {search} as argument.
  * @property {Function} getIcon           Getter function for returning an entity's icon for the menu item.
  * @property {Function} getTitle          Getter function for returning an entity's title for the menu item.
  * @property {Function} getDescription    Getter function for returning an entity's description for the menu item.
@@ -64,8 +64,7 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 
 const taxonomyBaseConfig = {
 	entityName: 'taxonomy',
-	orderBy: 'count',
-	orderBySearch: 'name',
+	getOrderBy: ( { search } ) => ( search ? 'name' : 'count' ),
 	getIcon: () => blockMeta,
 	getTitle: ( labels ) =>
 		sprintf(
@@ -84,8 +83,7 @@ export const entitiesConfig = {
 	postType: {
 		entityName: 'postType',
 		templatePrefix: 'single-',
-		orderBy: 'modified',
-		orderBySearch: 'relevance',
+		getOrderBy: ( { search } ) => ( search ? 'relevance' : 'modified' ),
 		recordNamePath: 'title.rendered',
 		// `icon` is the `menu_icon` property of a post type. We
 		// only handle `dashicons` for now, even if the `menu_icon`
