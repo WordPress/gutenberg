@@ -440,6 +440,74 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	function test_get_stylesheet_with_block_support_feature_level_selectors() {
+		// Register a test block that will have feature level selectors.
+		WP_Block_Type_Registry::get_instance()->register(
+			'test/test',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'textColor' => array(
+						'type' => 'string',
+					),
+					'style'     => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'border'                 => array(
+						'radius'                 => true,
+						'__experimentalSelector' => '.bordered',
+					),
+					'color'                  => array(
+						'text' => true,
+					),
+				),
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'border' => array(
+						'radius' => true,
+					),
+					'color'  => array(
+						'custom'  => false,
+						'palette' => array(
+							array(
+								'slug'  => 'green',
+								'color' => 'green',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'test/test' => array(
+							'border' => array(
+								'radius' => '9999px',
+							),
+							'color'  => array(
+								'text' => 'green',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$base_styles   = 'body{--wp--preset--color--green: green;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$block_styles  = '.wp-block-test, .wp-block-test__wrapper{color: green;}.wp-block-test .bordered, .wp-block-test__wrapper .bordered{border-radius: 9999px;}';
+		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
+		$expected      = $base_styles . $block_styles . $preset_styles;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+
+		unregister_block_type( 'test/test' );
+	}
+
 	function test_remove_invalid_element_pseudo_selectors() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
