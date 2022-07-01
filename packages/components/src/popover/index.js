@@ -128,6 +128,7 @@ const Popover = (
 	}
 
 	const arrowRef = useRef( null );
+	const anchorRefFallback = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const hasArrow = ! isExpanded && ! noArrow;
@@ -203,7 +204,6 @@ const Popover = (
 			: undefined,
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
-	const anchorRefFallback = useRef( null );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
