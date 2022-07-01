@@ -28,6 +28,33 @@ const migrateIdToRef = ( { navigationMenuId, ...attributes } ) => {
 	};
 };
 
+const migrateTextColorToLinkColor = ( {
+	textColor,
+	customTextColor,
+	...attributes
+} ) => {
+	return {
+		...attributes,
+		textColor: null,
+		customTextColor: null,
+		style: {
+			...attributes?.style,
+			elements: {
+				...attributes?.style?.elements,
+				link: {
+					...attributes?.style?.elements?.link,
+					color: {
+						...attributes?.style?.elements?.link?.color,
+						text:
+							customTextColor ||
+							`var:preset|color|${ textColor }`,
+					},
+				},
+			},
+		},
+	};
+};
+
 const migrateWithLayout = ( attributes ) => {
 	if ( !! attributes.layout ) {
 		return attributes;
@@ -49,6 +76,127 @@ const migrateWithLayout = ( attributes ) => {
 	}
 
 	return updatedAttributes;
+};
+
+const v7 = {
+	attributes: {
+		ref: {
+			type: 'number',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		openSubmenusOnClick: {
+			type: 'boolean',
+			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'mobile',
+		},
+		hasIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+		maxNestingLevel: {
+			type: 'number',
+			default: 5,
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		color: {
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: false,
+			},
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalTextDecoration: true,
+			__experimentalSkipSerialization: [ 'textDecoration' ],
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		__experimentalLayout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			allowVerticalAlignment: false,
+			default: {
+				type: 'flex',
+			},
+		},
+		__experimentalStyle: {
+			elements: {
+				link: {
+					color: {
+						text: 'inherit',
+					},
+				},
+			},
+		},
+	},
+	save( { attributes } ) {
+		if ( attributes.ref ) {
+			return;
+		}
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( { textColor, customTextColor } ) => {
+		return !! customTextColor || !! textColor;
+	},
+	migrate: migrateTextColorToLinkColor,
 };
 
 const v6 = {
@@ -353,6 +501,7 @@ const migrateTypographyPresets = function ( attributes ) {
 };
 
 const deprecated = [
+	v7,
 	v6,
 	v5,
 	v4,
