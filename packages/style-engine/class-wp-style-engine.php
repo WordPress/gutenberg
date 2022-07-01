@@ -31,6 +31,14 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
+	 * A white list of CSS custom properties.
+	 * Used to bypass safecss_filter_attr().
+	 */
+	const VALID_CUSTOM_PROPERTIES = array(
+		'--wp--style--block-gap' => array( 'spacing', 'blockGap' ),
+	);
+
+	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -145,7 +153,7 @@ class WP_Style_Engine {
 			),
 		),
 		'spacing'    => array(
-			'padding' => array(
+			'padding'  => array(
 				'property_keys' => array(
 					'default'    => 'padding',
 					'individual' => 'padding-%s',
@@ -155,7 +163,7 @@ class WP_Style_Engine {
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
-			'margin'  => array(
+			'margin'   => array(
 				'property_keys' => array(
 					'default'    => 'margin',
 					'individual' => 'margin-%s',
@@ -164,6 +172,15 @@ class WP_Style_Engine {
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
+			),
+			'blockGap' => array(
+				'property_keys' => array(
+					// @TODO 'grid-gap' has been deprecated in favor of 'gap'.
+					// See: https://developer.mozilla.org/en-US/docs/Web/CSS/gap.
+					// Update the white list in safecss_filter_attr (kses.php).
+					'default' => 'grid-gap',
+				),
+				'path'          => array( 'spacing', 'blockGap' ),
 			),
 		),
 		'typography' => array(
@@ -297,6 +314,25 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Merges single style definitions with incoming custom style definitions.
+	 *
+	 * @param array $style_definition The internal style definition metadata.
+	 * @param array $custom_definition The custom style definition metadata to be merged.
+	 *
+	 * @return array The merged definition metadata.
+	 */
+	public static function merge_custom_style_definitions_metadata( $style_definition, $custom_definition = array() ) {
+		$valid_keys = array( 'property_keys', 'classnames' );
+		foreach ( $valid_keys as $key ) {
+			if ( isset( $custom_definition[ $key ] ) && is_array( $custom_definition[ $key ] ) ) {
+				$style_definition[ $key ] = array_merge( $style_definition[ $key ], $custom_definition[ $key ] );
+			}
+		}
+
+		return $style_definition;
+	}
+
+	/**
 	 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., 'var:preset|color|heavenly-blue'.
 	 *
 	 * @param array         $style_value      A single raw style value or css preset property from the generate() $block_styles array.
@@ -337,20 +373,21 @@ class WP_Style_Engine {
 	 *
 	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
 	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean       $should_skip_css_vars Whether to skip compiling CSS var values.
+	 * @param array<string> $options Options passed to generate().
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
+	protected static function get_css_declarations( $style_value, $style_definition, $options ) {
 		if (
 			isset( $style_definition['value_func'] ) &&
 			is_callable( $style_definition['value_func'] )
 		) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
 		}
 
-		$css_declarations    = array();
-		$style_property_keys = $style_definition['property_keys'];
+		$css_declarations     = array();
+		$style_property_keys  = $style_definition['property_keys'];
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
@@ -369,6 +406,9 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
+				if ( ! isset( $style_property_keys['individual'] ) ) {
+					return $css_declarations;
+				}
 				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
@@ -377,7 +417,7 @@ class WP_Style_Engine {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
-		} else {
+		} elseif ( isset( $style_property_keys['default'] ) ) {
 			$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		}
 
@@ -404,16 +444,20 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_declarations     = array();
-		$classnames           = array();
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$css_declarations = array();
+		$classnames       = array();
+		$custom_metadata  = isset( $options['custom_metadata'] ) && is_array( $options['custom_metadata'] ) ? $options['custom_metadata'] : null;
 
 		// Collect CSS and classnames.
 		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
 				continue;
 			}
-			foreach ( $definition_group_style as $style_definition ) {
+			foreach ( $definition_group_style as $style_key => $style_definition ) {
+				// Merge incoming custom metadata.
+				if ( isset( $custom_metadata[ "$definition_group_key.$style_key" ] ) ) {
+					$style_definition = static::merge_custom_style_definitions_metadata( $style_definition, $custom_metadata[ "$definition_group_key.$style_key" ] );
+				}
 				$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
 				if ( ! static::is_valid_style_value( $style_value ) ) {
@@ -421,7 +465,7 @@ class WP_Style_Engine {
 				}
 
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
+				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $options ) );
 			}
 		}
 
@@ -458,19 +502,20 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean $should_skip_css_vars           Whether to skip compiling CSS var values.
+	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array<string> $options                  Options passed to generate().
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_skip_css_vars ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options ) {
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
 			return $css_declarations;
 		}
 
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 		// The first item in $individual_property_definition['path'] array tells us the style property, e.g., "border".
 		// We use this to get a corresponding CSS style definition such as "color" or "width" from the same group.
 		// The second item in $individual_property_definition['path'] array refers to the individual property marker, e.g., "top".

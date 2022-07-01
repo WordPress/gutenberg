@@ -231,13 +231,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'valid_classnames_and_css_vars'                => array(
 				'block_styles'    => array(
 					'color' => array(
-						'text' => 'var:preset|color|teal-independents',
+						'text'       => 'var:preset|color|teal-independents',
+						'background' => 'var:preset|color|blue-ribbon',
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'        => 'color: var(--wp--preset--color--teal-independents);',
-					'classnames' => 'has-text-color has-teal-independents-color',
+					'css'        => 'color: var(--wp--preset--color--teal-independents); background-color: var(--wp--preset--color--blue-ribbon);',
+					'classnames' => 'has-text-color has-teal-independents-color has-background has-blue-ribbon-background-color',
 				),
 			),
 
@@ -397,6 +398,19 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+				),
+			),
+
+			'valid_css_custom_property'                    => array(
+				'block_styles'    => array(
+					'spacing' => array(
+						//'--wp--style--block-gap' => '.0001rem',
+						'blockGap'               => '10000rem',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css' => '--wp--style--block-gap: 10000rem;',
 				),
 			),
 		);
