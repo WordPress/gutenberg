@@ -32,13 +32,8 @@ function ScreenLinkColor( { name } ) {
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
-			...useStyle( 'elements.link.color.text', name ).reduce(
-				( acc, pseudoSelector, index ) => {
-					acc[ index === 0 ? 'value' : 'handler' ] = pseudoSelector;
-					return acc;
-				},
-				{}
-			),
+			value: useStyle( 'elements.link.color.text', name )[ 0 ],
+			handler: useStyle( 'elements.link.color.text', name )[ 1 ],
 			userValue: useStyle(
 				'elements.link.color.text',
 				name,
@@ -47,13 +42,8 @@ function ScreenLinkColor( { name } ) {
 		},
 		hover: {
 			label: __( 'Hover' ),
-			...useStyle( 'elements.link.:hover.color.text', name ).reduce(
-				( acc, pseudoSelector, index ) => {
-					acc[ index === 0 ? 'value' : 'handler' ] = pseudoSelector;
-					return acc;
-				},
-				{}
-			),
+			value: useStyle( 'elements.link.:hover.color.text', name )[ 0 ],
+			handler: useStyle( 'elements.link.:hover.color.text', name )[ 1 ],
 			userValue: useStyle(
 				'elements.link.:hover.color.text',
 				name,
