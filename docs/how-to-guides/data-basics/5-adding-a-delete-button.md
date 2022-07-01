@@ -274,7 +274,7 @@ function DeletePageButton( { pageId } ) {
 			// before the handleDelete was even called.
 			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
 			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
-			// Tell the user how exactly the operation have failed:
+			// Tell the user how exactly the operation has failed:
 			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
