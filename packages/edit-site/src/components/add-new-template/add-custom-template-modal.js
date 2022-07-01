@@ -26,6 +26,36 @@ import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];
 
+function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
+	const {
+		labels,
+		slug,
+		config: { aliasTemplateSlug, templatePrefix },
+	} = entityForSuggestions;
+	// TODO: check if we can reuse the message and the translators message...(?)
+	// This refers to `where %1$s is the singular name of a post type and %2$s...`part.
+	const title = sprintf(
+		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
+		__( '%1$s: %2$s' ),
+		labels.singular_name,
+		suggestion.name
+	);
+	let newTemplateSlug = `${ aliasTemplateSlug || slug }-${ suggestion.slug }`;
+	if ( templatePrefix ) {
+		newTemplateSlug = templatePrefix + newTemplateSlug;
+	}
+	const newTemplate = {
+		title,
+		description: sprintf(
+			// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
+			__( 'Template for %1$s' ),
+			title
+		),
+		slug: newTemplateSlug,
+	};
+	onSelect( newTemplate );
+}
+
 function SuggestionListItem( {
 	suggestion,
 	search,
@@ -41,36 +71,9 @@ function SuggestionListItem( {
 			as={ Button }
 			{ ...composite }
 			className={ baseCssClass }
-			onClick={ () => {
-				const {
-					labels,
-					slug,
-					config: { aliasTemplateSlug, templatePrefix },
-				} = entityForSuggestions;
-				// TODO: check if we can reuse the message and the translators message...(?)
-				// This refers to `where %1$s is the singular name of a post type and %2$s...`part.
-				const title = sprintf(
-					// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
-					__( '%1$s: %2$s' ),
-					labels.singular_name,
-					suggestion.name
-				);
-				let _slug = `${ aliasTemplateSlug || slug }-${
-					suggestion.slug
-				}`;
-				if ( templatePrefix ) {
-					_slug = templatePrefix + _slug;
-				}
-				onSelect( {
-					title,
-					description: sprintf(
-						// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
-						__( 'Template for %1$s' ),
-						title
-					),
-					slug: _slug,
-				} );
-			} }
+			onClick={ () =>
+				selectSuggestion( suggestion, onSelect, entityForSuggestions )
+			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
 				<TextHighlight text={ suggestion.name } highlight={ search } />
