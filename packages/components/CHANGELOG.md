@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   `Popover`: pass missing anchor ref to the `getAnchorRef` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
+-   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
 
 ## 19.14.0 (2022-06-29)
 
