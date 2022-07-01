@@ -19,6 +19,7 @@ function chunk( array, size ) {
 
 function BlockTypesList( {
 	items = [],
+	rootClientId,
 	onSelect,
 	onHover = () => {},
 	children,
@@ -35,6 +36,7 @@ function BlockTypesList( {
 					{ row.map( ( item, j ) => (
 						<InserterListItem
 							key={ item.id }
+							rootClientId={ rootClientId }
 							item={ item }
 							className={ getBlockMenuDefaultClassName(
 								item.id

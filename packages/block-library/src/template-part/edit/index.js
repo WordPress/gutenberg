@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	BlockTitle,
@@ -17,24 +17,26 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { Modal, Spinner, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, createInterpolateElement } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import TemplatePartPlaceholder from './placeholder';
-import TemplatePartSelectionModal from './selection-modal';
+import TemplatePartSelection from '../components/template-part-selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
-import { createTemplatePartId } from './utils/create-template-part-id';
+import createTemplatePartId from '../utils/create-template-part-id';
+import createTemplatePartPostData from '../utils/create-template-part-post-data';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
-} from './utils/hooks';
+} from '../utils/hooks';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -51,42 +53,49 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
+	const { rootClientId, isResolved, innerBlocks, isMissing, area } =
+		useSelect(
+			( select ) => {
+				const { getEditedEntityRecord, hasFinishedResolution } =
+					select( coreStore );
+				const { getBlocks, getBlockRootClientId } =
+					select( blockEditorStore );
 
-			const getEntityArgs = [
-				'postType',
-				'wp_template_part',
-				templatePartId,
-			];
-			const entityRecord = templatePartId
-				? getEditedEntityRecord( ...getEntityArgs )
-				: null;
-			const _area = entityRecord?.area || attributes.area;
-			const hasResolvedEntity = templatePartId
-				? hasFinishedResolution(
-						'getEditedEntityRecord',
-						getEntityArgs
-				  )
-				: false;
+				const getEntityArgs = [
+					'postType',
+					'wp_template_part',
+					templatePartId,
+				];
+				const entityRecord = templatePartId
+					? getEditedEntityRecord( ...getEntityArgs )
+					: null;
+				const _area = entityRecord?.area || attributes.area;
+				const hasResolvedEntity = templatePartId
+					? hasFinishedResolution(
+							'getEditedEntityRecord',
+							getEntityArgs
+					  )
+					: false;
 
-			return {
-				innerBlocks: getBlocks( clientId ),
-				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
-				area: _area,
-			};
-		},
-		[ templatePartId, clientId ]
-	);
+				return {
+					rootClientId: getBlockRootClientId( clientId ),
+					innerBlocks: getBlocks( clientId ),
+					isResolved: hasResolvedEntity,
+					isMissing: hasResolvedEntity && isEmpty( entityRecord ),
+					area: _area,
+				};
+			},
+			[ templatePartId, clientId ]
+		);
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
 	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const blockPatterns = useAlternativeBlockPatterns( area, rootClientId );
 	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
 	const hasBlockOverlay = useBlockOverlayActive( clientId );
@@ -155,7 +164,7 @@ export default function TemplatePartEdit( {
 					<TemplatePartPlaceholder
 						area={ attributes.area }
 						templatePartId={ templatePartId }
-						clientId={ clientId }
+						rootClientId={ rootClientId }
 						setAttributes={ setAttributes }
 						onOpenSelectionModal={ () =>
 							setIsTemplatePartSelectionOpen( true )
@@ -206,21 +215,60 @@ export default function TemplatePartEdit( {
 					title={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						__( 'Choose a %s' ),
-						areaObject.label.toLowerCase()
+						areaObject?.label.toLowerCase() ?? __( 'template part' )
 					) }
 					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
 				>
-					<TemplatePartSelectionModal
-						templatePartId={ templatePartId }
-						clientId={ clientId }
+					<TemplatePartSelection
 						area={ area }
-						setAttributes={ setAttributes }
-						onClose={ () =>
-							setIsTemplatePartSelectionOpen( false )
-						}
+						templatePartId={ templatePartId }
+						rootClientId={ rootClientId }
+						onTemplatePartSelect={ ( pattern ) => {
+							const { templatePart } = pattern;
+							setAttributes( {
+								slug: templatePart.slug,
+								theme: templatePart.theme,
+								area: undefined,
+							} );
+							createSuccessNotice(
+								sprintf(
+									/* translators: %s: template part title. */
+									__( 'Template Part "%s" inserted.' ),
+									templatePart.title?.rendered ||
+										templatePart.slug
+								),
+								{
+									type: 'snackbar',
+								}
+							);
+							setIsTemplatePartSelectionOpen( false );
+						} }
+						onPatternSelect={ async ( pattern, blocks ) => {
+							const hasSelectedTemplatePart = !! templatePartId;
+							if ( hasSelectedTemplatePart ) {
+								replaceInnerBlocks( clientId, blocks );
+							} else {
+								const postData = createTemplatePartPostData(
+									area,
+									blocks,
+									pattern.title
+								);
+								const templatePart = await saveEntityRecord(
+									'postType',
+									'wp_template_part',
+									postData
+								);
+								setAttributes( {
+									slug: templatePart.slug,
+									theme: templatePart.theme,
+									area: undefined,
+								} );
+							}
+							setIsTemplatePartSelectionOpen( false );
+						} }
 					/>
 				</Modal>
 			) }

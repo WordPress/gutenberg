@@ -16,13 +16,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { createTemplatePartId } from './create-template-part-id';
+import createTemplatePartId from './create-template-part-id';
 
 /**
  * Retrieves the available template parts for the given area.
  *
- * @param {string} area       Template part area.
- * @param {string} excludedId Template part ID to exclude.
+ * @param {string}  area       Template part area.
+ * @param {string?} excludedId Template part ID to exclude.
  *
  * @return {{ templateParts: Array, isResolving: boolean }} array of template parts.
  */
@@ -72,28 +72,25 @@ export function useAlternativeTemplateParts( area, excludedId ) {
 /**
  * Retrieves the available block patterns for the given area.
  *
- * @param {string} area     Template part area.
- * @param {string} clientId Block Client ID. (The container of the block can impact allowed blocks).
+ * @param {string} area         Template part area.
+ * @param {string} rootClientId Root client id
  *
  * @return {Array} array of block patterns.
  */
-export function useAlternativeBlockPatterns( area, clientId ) {
+export function useAlternativeBlockPatterns( area, rootClientId ) {
 	return useSelect(
 		( select ) => {
 			const blockNameWithArea = area
 				? `core/template-part/${ area }`
 				: 'core/template-part';
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
+			const { __experimentalGetPatternsByBlockTypes } =
+				select( blockEditorStore );
 			return __experimentalGetPatternsByBlockTypes(
 				blockNameWithArea,
 				rootClientId
 			);
 		},
-		[ area, clientId ]
+		[ area, rootClientId ]
 	);
 }
 

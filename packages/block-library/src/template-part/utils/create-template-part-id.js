@@ -5,6 +5,6 @@
  * @param {string} slug  the template part's slug
  * @return {string|null} the template part's Id.
  */
-export function createTemplatePartId( theme, slug ) {
+export default function createTemplatePartId( theme, slug ) {
 	return theme && slug ? theme + '//' + slug : null;
 }

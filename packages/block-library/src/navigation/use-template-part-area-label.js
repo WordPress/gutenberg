@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
  */
 
 // TODO: this util should perhaps be refactored somewhere like core-data.
-import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
+import createTemplatePartId from '../template-part/utils/create-template-part-id';
 
 export default function useTemplatePartAreaLabel( clientId ) {
 	return useSelect(

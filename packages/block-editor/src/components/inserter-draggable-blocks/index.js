@@ -18,7 +18,12 @@ const InserterDraggableBlocks = ( { isEnabled, blocks, icon, children } ) => {
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			__experimentalDragComponent={
-				<BlockDraggableChip count={ blocks.length } icon={ icon } />
+				!! isEnabled && (
+					<BlockDraggableChip
+						count={ blocks?.length }
+						icon={ icon }
+					/>
+				)
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
