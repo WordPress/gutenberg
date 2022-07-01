@@ -33,8 +33,8 @@ function ScreenLinkColor( { name } ) {
 		default: {
 			label: __( 'Default' ),
 			...useStyle( 'elements.link.color.text', name ).reduce(
-				( acc, psuedoSelector, index ) => {
-					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
+				( acc, pseudoSelector, index ) => {
+					acc[ index === 0 ? 'value' : 'handler' ] = pseudoSelector;
 					return acc;
 				},
 				{}
@@ -48,8 +48,8 @@ function ScreenLinkColor( { name } ) {
 		hover: {
 			label: __( 'Hover' ),
 			...useStyle( 'elements.link.:hover.color.text', name ).reduce(
-				( acc, psuedoSelector, index ) => {
-					acc[ index === 0 ? 'value' : 'handler' ] = psuedoSelector;
+				( acc, pseudoSelector, index ) => {
+					acc[ index === 0 ? 'value' : 'handler' ] = pseudoSelector;
 					return acc;
 				},
 				{}
