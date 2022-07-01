@@ -12,6 +12,11 @@
 		border-radius: initial;
 		display: flex;
 		align-items: center;
+		cursor: revert;
+
+		&[role="textbox"] {
+			cursor: text;
+		}
 	}
 
 	&__components-button-group {
