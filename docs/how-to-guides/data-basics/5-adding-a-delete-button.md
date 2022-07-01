@@ -266,12 +266,8 @@ function DeletePageButton( { pageId } ) {
 				type: 'snackbar',
 			} );
 		} else {
-			// We use the selector directly to get the error at this point in time.
-			// Imagine we fetched the error like this:
-			//     const { lastError } = useSelect( function() { /* ... */ } );
-			// Then, lastError would be null inside of handleDelete.
-			// Why? Because we'd refer to the version of it that was computed
-			// before the handleDelete was even called.
+			// We use the selector directly to get the fresh error *after* the deleteEntityRecord
+			// have failed.
 			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
 			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
 			// Tell the user how exactly the operation has failed:
