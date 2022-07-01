@@ -7,6 +7,7 @@ import { useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { TextControl, ExternalLink } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -14,19 +15,28 @@ import { TextControl, ExternalLink } from '@wordpress/components';
 import { store as editorStore } from '../../store';
 
 export default function PostURL( { onClose } ) {
-	const { isEditable, postSlug, postLink, permalinkPrefix, permalinkSuffix } =
-		useSelect( ( select ) => {
-			const permalinkParts = select( editorStore ).getPermalinkParts();
-			return {
-				isEditable: select( editorStore ).isPermalinkEditable(),
-				postSlug: safeDecodeURIComponent(
-					select( editorStore ).getEditedPostSlug()
-				),
-				postLink: select( editorStore ).getCurrentPost().link,
-				permalinkPrefix: permalinkParts?.prefix,
-				permalinkSuffix: permalinkParts?.suffix,
-			};
-		}, [] );
+	const {
+		isEditable,
+		postSlug,
+		viewPostLabel,
+		postLink,
+		permalinkPrefix,
+		permalinkSuffix,
+	} = useSelect( ( select ) => {
+		const postTypeSlug = select( editorStore ).getCurrentPostType();
+		const postType = select( coreStore ).getPostType( postTypeSlug );
+		const permalinkParts = select( editorStore ).getPermalinkParts();
+		return {
+			isEditable: select( editorStore ).isPermalinkEditable(),
+			postSlug: safeDecodeURIComponent(
+				select( editorStore ).getEditedPostSlug()
+			),
+			viewPostLabel: postType?.labels.view_item,
+			postLink: select( editorStore ).getCurrentPost().link,
+			permalinkPrefix: permalinkParts?.prefix,
+			permalinkSuffix: permalinkParts?.suffix,
+		};
+	}, [] );
 
 	const { editPost } = useDispatch( editorStore );
 
@@ -79,7 +89,9 @@ export default function PostURL( { onClose } ) {
 					} }
 				/>
 			) }
-			<h3 className="editor-post-url__link-label">{ __( 'URL' ) }</h3>
+			<h3 className="editor-post-url__link-label">
+				{ viewPostLabel ?? __( 'View post' ) }
+			</h3>
 			<p>
 				<ExternalLink
 					className="editor-post-url__link"
