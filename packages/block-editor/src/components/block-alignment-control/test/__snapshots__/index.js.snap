@@ -73,7 +73,7 @@ exports[`BlockAlignmentUI should match snapshot 1`] = `
     </SVG>
   }
   isCollapsed={true}
-  label="Align"
+  label="Change alignment or width"
   popoverProps={
     Object {
       "isAlternate": true,
@@ -81,7 +81,7 @@ exports[`BlockAlignmentUI should match snapshot 1`] = `
   }
   toggleProps={
     Object {
-      "describedBy": "Change alignment",
+      "describedBy": "Change alignment or width",
     }
   }
 />

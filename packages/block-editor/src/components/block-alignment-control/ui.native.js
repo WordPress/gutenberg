@@ -47,7 +47,7 @@ function BlockAlignmentUI( {
 		: toolbarUIComponent;
 
 	const commonProps = {
-		label: __( 'Align' ),
+		label: __( 'Change alignment or width' ),
 	};
 	const extraProps = isBottomSheetControl
 		? {
