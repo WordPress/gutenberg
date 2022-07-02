@@ -40,14 +40,18 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 			>
 				<ul role="list" className="table-of-contents__counts">
 					<li className="table-of-contents__count">
+						{ __( 'Words' ) }
+						<WordCount />
+					</li>
+					<li className="table-of-contents__count">
 						{ __( 'Characters' ) }
 						<span className="table-of-contents__number">
 							<CharacterCount />
 						</span>
 					</li>
 					<li className="table-of-contents__count">
-						{ __( 'Words' ) }
-						<WordCount />
+						{ __( 'Time to read' ) }
+						<TimeToRead />
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Headings' ) }
@@ -66,10 +70,6 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 						<span className="table-of-contents__number">
 							{ numberOfBlocks }
 						</span>
-					</li>
-					<li className="table-of-contents__count">
-						{ __( 'Time to read' ) }
-						<TimeToRead />
 					</li>
 				</ul>
 			</div>
