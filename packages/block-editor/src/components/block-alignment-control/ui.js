@@ -52,8 +52,8 @@ function BlockAlignmentUI( {
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
-		label: __( 'Align' ),
-		toggleProps: { describedBy: __( 'Change alignment' ) },
+		label: __( 'Change alignment or width' ),
+		toggleProps: { describedBy: __( 'Change alignment or width' ) },
 	};
 	const extraProps = isToolbar
 		? {
