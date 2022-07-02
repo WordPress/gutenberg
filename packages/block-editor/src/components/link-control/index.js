@@ -235,8 +235,8 @@ function LinkControl( {
 			internalTextValue !== value?.title
 		) {
 			onChange( {
+				...value,
 				url: currentInputValue,
-				opensInNewTab: value?.opensInNewTab || undefined,
 				title: internalTextValue,
 			} );
 		}
