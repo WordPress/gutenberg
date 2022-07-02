@@ -668,7 +668,9 @@ describe( 'Embed block', () => {
 
 				// Open alignment options.
 				fireEvent.press(
-					await waitFor( () => getByA11yLabel( 'Align' ) )
+					await waitFor( () =>
+						getByA11yLabel( 'Change alignment or width' )
+					)
 				);
 
 				// Select alignment option.
