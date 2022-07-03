@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Output asset files for shared chunks, too ([#41002](https://github.com/WordPress/gutenberg/pull/41002)).
+
 ## 3.5.0 (2022-05-18)
 
 ### Bug Fix

@@ -19,7 +19,6 @@ import {
 	Container as InputControlContainer,
 	Input,
 } from '../input-control/styles/input-control-styles';
-import InputControl from '../input-control';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
@@ -139,8 +138,4 @@ export const CopyButton = styled( Button )`
 			margin-right: 0;
 		}
 	}
-`;
-
-export const ColorHexInputControl = styled( InputControl )`
-	width: 8em;
 `;

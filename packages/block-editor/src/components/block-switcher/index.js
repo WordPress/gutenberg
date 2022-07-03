@@ -98,8 +98,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) =>
 		replaceBlocks( clientIds, transformedBlocks );
+
+	/**
+	 * The `isTemplate` check is a stopgap solution here.
+	 * Ideally, the Transforms API should handle this
+	 * by allowing to exclude blocks from wildcard transformations.
+	 */
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations.length && canRemove;
+		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (

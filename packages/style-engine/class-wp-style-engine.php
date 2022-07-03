@@ -51,7 +51,7 @@ class WP_Style_Engine {
 				),
 				'path'          => array( 'color', 'text' ),
 				'css_vars'      => array(
-					'--wp--preset--color--$slug' => 'color',
+					'color' => '--wp--preset--color--$slug',
 				),
 				'classnames'    => array(
 					'has-text-color'  => true,
@@ -148,6 +148,9 @@ class WP_Style_Engine {
 					'individual' => 'padding-%s',
 				),
 				'path'          => array( 'spacing', 'padding' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
 			),
 			'margin'  => array(
 				'property_keys' => array(
@@ -155,6 +158,9 @@ class WP_Style_Engine {
 					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
 			),
 		),
 		'typography' => array(
@@ -247,6 +253,28 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Generates a css var string, eg var(--wp--preset--color--background) from a preset string, eg. `var:preset|space|50`.
+	 *
+	 * @param string $style_value  A single css preset value.
+	 * @param array  $css_vars The css var patterns used to generate the var string.
+	 *
+	 * @return string|null The css var, or null if no match for slug found.
+	 */
+	protected static function get_css_var_value( $style_value, $css_vars ) {
+		foreach ( $css_vars as  $property_key => $css_var_pattern ) {
+			$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+			if ( $slug ) {
+				$var = strtr(
+					$css_var_pattern,
+					array( '$slug' => $slug )
+				);
+				return "var($var)";
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Checks whether an incoming block style value is valid.
 	 *
 	 * @param string? $style_value  A single css preset value.
@@ -315,7 +343,7 @@ class WP_Style_Engine {
 			isset( $style_definition['value_func'] ) &&
 			is_callable( $style_definition['value_func'] )
 		) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_return_css_vars );
 		}
 
 		$css_declarations    = array();
@@ -325,15 +353,9 @@ class WP_Style_Engine {
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
 		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
 			if ( $should_return_css_vars && ! empty( $style_definition['css_vars'] ) ) {
-				foreach ( $style_definition['css_vars'] as $css_var_pattern => $property_key ) {
-					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
-					if ( $slug ) {
-						$css_var = strtr(
-							$css_var_pattern,
-							array( '$slug' => $slug )
-						);
-						$css_declarations[ $style_property_keys['default'] ] = "var($css_var)";
-					}
+				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
+				if ( $css_var ) {
+					$css_declarations[ $style_property_keys['default'] ] = $css_var;
 				}
 			}
 			return $css_declarations;
@@ -344,8 +366,13 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
-				$individual_property                      = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
-				$css_declarations[ $individual_property ] = $value;
+				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && $should_return_css_vars && ! empty( $style_definition['css_vars'] ) ) {
+					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
+				}
+				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
+				if ( $value ) {
+					$css_declarations[ $individual_property ] = $value;
+				}
 			}
 		} else {
 			$css_declarations[ $style_property_keys['default'] ] = $style_value;
@@ -441,12 +468,13 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param boolean $should_return_css_vars Whether to try to build and return CSS var values.
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_return_css_vars ) {
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -470,13 +498,8 @@ class WP_Style_Engine {
 
 			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
-				$slug = isset( $individual_property_definition['css_vars'][ $css_property ] ) ? static::get_slug_from_preset_value( $value, $css_property ) : null;
-				if ( $slug ) {
-					$css_var = strtr(
-						$individual_property_definition['css_vars'][ $css_property ],
-						array( '$slug' => $slug )
-					);
-					$value   = "var($css_var)";
+				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && $should_return_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
+					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 				}
 				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
 				$css_declarations[ $individual_css_property ] = $value;
