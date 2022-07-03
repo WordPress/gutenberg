@@ -19,13 +19,11 @@ import LastRevision from '../last-revision';
 import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
 import PostExcerpt from '../post-excerpt';
-import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
-import Template from '../template';
 import TemplateSummary from '../template-summary';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -86,10 +84,8 @@ const SettingsSidebar = () => {
 			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
-					<Template />
 					<PluginDocumentSettingPanel.Slot />
 					<LastRevision />
-					<PostLink />
 					<PostTaxonomies />
 					<FeaturedImage />
 					<PostExcerpt />

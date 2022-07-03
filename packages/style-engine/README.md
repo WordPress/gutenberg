@@ -16,16 +16,48 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 This Package is considered experimental at the moment. The idea is to have a package used to generate styles based on a style object that is consistent between: backend, frontend, block style object and theme.json.
 
-Currently it's not a package that generates a wp.styleEngine global because it's not ready yet, it's still a bundled package but ultimately, we want it to be so, once the roadmap is finished:
+Because this package is experimental and still in development it does not yet generate a `wp.styleEngine` global. To get there, the following tasks need to be completed:
 
 **TODO List:**
 
 -   Add style definitions for all the currently supported styles in blocks and theme.json.
--   the CSS variable shortcuts for values (for presets...)
+-   The CSS variable shortcuts for values (for presets...)
 -   Support generating styles in the frontend. (Ongoing)
 -   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
 -   Refactor all block styles to use the style engine server side. (Ongoing)
+-   Consolidate global and block style rendering and enqueuing
 -   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
+
+See [Tracking: Add a Style Engine to manage rendering block styles #38167](https://github.com/WordPress/gutenberg/issues/38167)
+
+## Glossary
+
+A guide to the terms and variable names referenced by the Style Engine package.
+
+<dl>
+  <dt>Block style (Gutenberg internal)</dt>
+  <dd>An object comprising a block's style attribute that contains a block's style values. E.g., <code>{ spacing: { margin: '10px' }, color: { ... }, ...  }</code></dd>
+  <dt>Global styles (Gutenberg internal)</dt>
+  <dd>A merged block styles object containing values from a theme's theme.json and user styles settings.</dd>
+  <dt>CSS declaration or (CSS property declaration)</dt>
+  <dd>A CSS property paired with a CSS value. E.g., <code>color: pink</code> </dd>
+  <dt>CSS declarations block</dt>
+  <dd>A set of CSS declarations usually paired with a CSS selector to create a CSS rule.</dd>
+  <dt>CSS property</dt>
+  <dd>Identifiers that describe stylistic, modifiable features of an HTML element. E.g., <code>border</code>, <code>font-size</code>, <code>width</code>...</dd>
+  <dt>CSS rule</dt>
+  <dd>A CSS selector followed by a CSS declarations block inside a set of curly braces. Usually found in a CSS stylesheet.</dd>
+  <dt>CSS selector</dt>
+   <dd>The first component of a CSS rule, a CSS selector is a pattern of elements, classnames or other terms that define the element to which the rule&rsquo;s CSS definitions apply. E.g., <code>p.my-cool-classname > span</code>. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors" target="_blank">MDN CSS selectors article</a>.</dd>
+  <dt>CSS stylesheet</dt>
+  <dd>A collection of CSS rules contained within a file or within an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style" target="_blank">HTML style tag</a>.</dd>
+  <dt>CSS value</dt>
+  <dd>The value of a CSS property. The value determines how the property is modified. E.g., the <code>10vw</code> in <code>height: 10vw</code>.</dd>
+  <dt>CSS variables (vars) or CSS custom properties</dt>
+  <dd>Properties, whose values can be reused in other CSS declarations. Set using custom property notation (e.g., <code>--wp--preset--olive: #808000;</code>) and  accessed using the <code>var()</code> function (e.g., <code>color: var( --wp--preset--olive );</code>). See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties" target="_blank">MDN article on CSS custom properties</a>.</dd>
+  <dt>Inline styles</dt>
+  <dd>Inline styles are CSS declarations that affect a single HTML element, contained within a style attribute</dd>
+</dl>
 
 ## Usage
 

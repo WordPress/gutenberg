@@ -22,11 +22,12 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { Flex, FlexBlock, FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
 const noop = () => {};
@@ -44,6 +45,7 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
+	__next36pxDefaultSize,
 	value,
 	label,
 	options,
@@ -225,7 +227,9 @@ function ComboboxControl( {
 					tabIndex="-1"
 					onKeyDown={ onKeyDown }
 				>
-					<Flex>
+					<InputWrapperFlex
+						__next36pxDefaultSize={ __next36pxDefaultSize }
+					>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -257,7 +261,7 @@ function ComboboxControl( {
 								/>
 							</FlexItem>
 						) }
-					</Flex>
+					</InputWrapperFlex>
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }

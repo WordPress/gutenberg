@@ -89,13 +89,14 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return no information when no data is resolved', () => {
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus: null,
+			navigationMenu: undefined,
 			canSwitchNavigationMenu: false,
 			canUserCreateNavigationMenu: false,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: false,
+			canUserDeleteNavigationMenu: undefined,
+			canUserUpdateNavigationMenu: undefined,
 			hasResolvedCanUserCreateNavigationMenu: false,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: undefined,
+			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: false,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
@@ -109,13 +110,14 @@ describe( 'useNavigationMenus', () => {
 		resolveCreatePermission( registry, true );
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
+			navigationMenu: undefined,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenu: true,
-			canUserDeleteNavigationMenu: false,
-			canUserUpdateNavigationMenu: false,
+			canUserDeleteNavigationMenu: undefined,
+			canUserUpdateNavigationMenu: undefined,
 			hasResolvedCanUserCreateNavigationMenu: true,
-			hasResolvedCanUserDeleteNavigationMenu: false,
-			hasResolvedCanUserUpdateNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: undefined,
+			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
@@ -170,6 +172,7 @@ describe( 'useNavigationMenus', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
 		resolveUpdatePermission( registry, 1, true );
+		resolveDeletePermission( registry, 1, false );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
@@ -178,7 +181,7 @@ describe( 'useNavigationMenus', () => {
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: true,
 			hasResolvedCanUserCreateNavigationMenu: true,
-			hasResolvedCanUserDeleteNavigationMenu: false,
+			hasResolvedCanUserDeleteNavigationMenu: true,
 			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
@@ -190,6 +193,8 @@ describe( 'useNavigationMenus', () => {
 
 	it( 'Should return correct permissions (delete only)', () => {
 		resolveRecords( registry, navigationMenus );
+		resolveCreatePermission( registry, false );
+		resolveUpdatePermission( registry, 1, false );
 		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
@@ -198,9 +203,9 @@ describe( 'useNavigationMenus', () => {
 			canUserCreateNavigationMenu: false,
 			canUserDeleteNavigationMenu: true,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenu: true,
 			hasResolvedCanUserDeleteNavigationMenu: true,
-			hasResolvedCanUserUpdateNavigationMenu: false,
+			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,

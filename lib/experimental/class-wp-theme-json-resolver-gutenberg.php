@@ -15,7 +15,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
+class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 	/**
 	 * Returns the theme's data.
 	 *
@@ -115,7 +115,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 
 		// Core here means it's the lower level part of the styles chain.
 		// It can be a core or a third-party block.
-		return new WP_Theme_JSON( $config, 'core' );
+		return new WP_Theme_JSON_Gutenberg( $config, 'core' );
 	}
 
 	/**
@@ -173,9 +173,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_0 {
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
+		// Generate the default spacing sizes presets.
+		$result->set_spacing_sizes();
 
 		return $result;
 	}
-
-
 }

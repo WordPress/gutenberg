@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
+import { unescape as unescapeString, flatMap, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
 		{
 			value: treeNode.id,
 			label:
-				repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
+				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
 		},
 		...getSelectOptions( treeNode.children || [], level + 1 ),
 	] );
