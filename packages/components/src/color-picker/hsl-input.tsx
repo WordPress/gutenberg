@@ -25,8 +25,8 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				label="Hue"
 				abbreviation="H"
 				value={ h }
-				onChange={ ( nextH?: number ) => {
-					onChange( colord( { h: nextH as number, s, l, a } ) );
+				onChange={ ( nextH: number ) => {
+					onChange( colord( { h: nextH, s, l, a } ) );
 				} }
 			/>
 			<InputWithSlider
@@ -35,11 +35,11 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				label="Saturation"
 				abbreviation="S"
 				value={ s }
-				onChange={ ( nextS?: number ) => {
+				onChange={ ( nextS: number ) => {
 					onChange(
 						colord( {
 							h,
-							s: nextS as number,
+							s: nextS,
 							l,
 							a,
 						} )
@@ -52,12 +52,12 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				label="Lightness"
 				abbreviation="L"
 				value={ l }
-				onChange={ ( nextL?: number ) => {
+				onChange={ ( nextL: number ) => {
 					onChange(
 						colord( {
 							h,
 							s,
-							l: nextL as number,
+							l: nextL,
 							a,
 						} )
 					);
@@ -70,13 +70,13 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 					label="Alpha"
 					abbreviation="A"
 					value={ Math.trunc( 100 * a ) }
-					onChange={ ( nextA?: number ) => {
+					onChange={ ( nextA: number ) => {
 						onChange(
 							colord( {
 								h,
 								s,
 								l,
-								a: ( nextA as number ) / 100,
+								a: nextA / 100,
 							} )
 						);
 					} }

@@ -14,7 +14,7 @@ interface InputWithSliderProps {
 	value: number;
 	label: string;
 	abbreviation: string;
-	onChange: ( value?: number ) => void;
+	onChange: ( value: number ) => void;
 }
 
 export const InputWithSlider = ( {
@@ -52,6 +52,8 @@ export const InputWithSlider = ( {
 				min={ min }
 				max={ max }
 				value={ value }
+				// @ts-expect-error
+				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }
 			/>
