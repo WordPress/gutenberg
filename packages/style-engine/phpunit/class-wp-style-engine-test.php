@@ -18,7 +18,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_styles_fixtures
 	 */
-	function test_generate_styles( $block_styles, $options, $expected_output ) {
+	public function test_generate_styles( $block_styles, $options, $expected_output ) {
 		$generated_styles = wp_style_engine_generate( $block_styles, $options );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
@@ -76,7 +76,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'spacing' => array(
 						'margin'   => '111px',
 						'padding'  => '0',
-						//'blockGap' => '100px',
+						'blockGap' => '100px',
 					),
 					'border'  => array(
 						'color' => 'var:preset|color|cool-caramel',
@@ -86,7 +86,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
-					'css'        => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;/* gap: 100px;*/',
+					'css'        => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px; grid-gap: 100px;',
 					'classnames' => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
 				),
 			),
@@ -327,7 +327,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'invalid_classnames_options'                   => array(
+			'invalid_property_array_values'                => array(
 				'block_styles'    => array(
 					'typography' => array(
 						'fontSize'   => array(
@@ -409,7 +409,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => array(
-					'layer' => 0,
+					'custom_metadata' => array(
+						'spacing.blockGap' => array(
+							'property_keys' => array(
+								'default' => '--wp--style--block-gap',
+							),
+						),
+					),
 				),
 				'expected_output' => array(
 					'css' => '--wp--style--block-gap: 10000rem;',

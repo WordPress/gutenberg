@@ -257,6 +257,25 @@ class WP_Style_Engine {
 	}
 
 	/**
+	 * Merges single style definitions with incoming custom style definitions.
+	 *
+	 * @param array $style_definition The internal style definition metadata.
+	 * @param array $custom_definition The custom style definition metadata to be merged.
+	 *
+	 * @return array The merged definition metadata.
+	 */
+	public static function merge_custom_style_definitions_metadata( $style_definition, $custom_definition = array() ) {
+		$valid_keys = array( 'property_keys', 'classnames' );
+		foreach ( $valid_keys as $key ) {
+			if ( isset( $custom_definition[ $key ] ) && is_array( $custom_definition[ $key ] ) ) {
+				$style_definition[ $key ] = array_merge( $style_definition[ $key ], $custom_definition[ $key ] );
+			}
+		}
+
+		return $style_definition;
+	}
+
+	/**
 	 * Extracts the slug in kebab case from a preset string, e.g., "heavenly-blue" from 'var:preset|color|heavenlyBlue'.
 	 *
 	 * @param string? $style_value  A single css preset value.
@@ -311,25 +330,6 @@ class WP_Style_Engine {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Merges single style definitions with incoming custom style definitions.
-	 *
-	 * @param array $style_definition The internal style definition metadata.
-	 * @param array $custom_definition The custom style definition metadata to be merged.
-	 *
-	 * @return array The merged definition metadata.
-	 */
-	public static function merge_custom_style_definitions_metadata( $style_definition, $custom_definition = array() ) {
-		$valid_keys = array( 'property_keys', 'classnames' );
-		foreach ( $valid_keys as $key ) {
-			if ( isset( $custom_definition[ $key ] ) && is_array( $custom_definition[ $key ] ) ) {
-				$style_definition[ $key ] = array_merge( $style_definition[ $key ], $custom_definition[ $key ] );
-			}
-		}
-
-		return $style_definition;
 	}
 
 	/**
@@ -502,8 +502,8 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 	 * @param array<string> $options                  Options passed to generate().
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).

@@ -532,10 +532,16 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$styles = gutenberg_style_engine_generate(
 			$block_styles,
 			array(
-				'selector' => $selector,
-				'layer'    => 0, // Or 'global'.
-				'css_vars' => true, // @TODO this doesn't make sense in this context. Refactor.
-				'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+				'selector'        => $selector,
+				'custom_metadata' => array(
+					'spacing.blockGap' => array(
+						'property_keys' => array(
+							'default' => '--wp--style--block-gap',
+						),
+					),
+				),
+				'css_vars'        => true, // @TODO this doesn't make sense in this context. Refactor.
+				'prettify'        => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 			)
 		);
 
