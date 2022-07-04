@@ -151,7 +151,7 @@ describe( 'Align Hook Works As Expected', () => {
 		it( 'Shows no alignment buttons on the alignment toolbar', async () => {
 			await insertBlock( BLOCK_NAME );
 			const CHANGE_ALIGNMENT_BUTTON_SELECTOR =
-				'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Align"]';
+				'.block-editor-block-toolbar .components-dropdown-menu__toggle[aria-label="Change alignment or width"]';
 			const changeAlignmentButton = await page.$(
 				CHANGE_ALIGNMENT_BUTTON_SELECTOR
 			);
