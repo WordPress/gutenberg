@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Add 'Insert from URL' option to Video block [#41493]
 -   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [*] Introduce "block recovery" option for invalid blocks [#41988]
 
 ## 1.78.1
 
