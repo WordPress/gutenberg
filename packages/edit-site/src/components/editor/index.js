@@ -53,6 +53,8 @@ const interfaceLabels = {
 	body: __( 'Editor content' ),
 	/* translators: accessibility text for the editor settings landmark region. */
 	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 	/* translators: accessibility text for the navigation sidebar landmark region. */
