@@ -99,6 +99,7 @@ module.exports = {
 							'isNumber',
 							'isObjectLike',
 							'isUndefined',
+							'keyBy',
 							'keys',
 							'lowerCase',
 							'memoize',
