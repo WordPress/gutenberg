@@ -231,7 +231,7 @@ function useMissingTemplates(
 	);
 	// We need to replace existing default template types with
 	// the create specific template functionality. The original
-	// info(`title, description, etc..) are preserved in
+	// info (title, description, etc.) is preserved in the
 	// `useExtraTemplates` hook.
 	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
 	[ categoryMenuItem, tagMenuItem ].forEach( ( menuItem ) => {
