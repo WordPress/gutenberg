@@ -79,30 +79,34 @@ const taxonomyBaseConfig = {
 			labels.singular_name
 		),
 };
+const postTypeBaseConfig = {
+	entityName: 'postType',
+	getOrderBy: ( { search } ) => ( search ? 'relevance' : 'modified' ),
+	recordNamePath: 'title.rendered',
+	// `icon` is the `menu_icon` property of a post type. We
+	// only handle `dashicons` for now, even if the `menu_icon`
+	// also supports urls and svg as values.
+	getIcon: ( _icon ) =>
+		_icon?.startsWith( 'dashicons-' ) ? _icon.slice( 10 ) : post,
+	getTitle: ( labels ) =>
+		sprintf(
+			// translators: %s: Name of the post type e.g: "Post".
+			__( 'Single item: %s' ),
+			labels.singular_name
+		),
+	getDescription: ( labels ) =>
+		sprintf(
+			// translators: %s: Name of the post type e.g: "Post".
+			__( 'Displays a single item: %s.' ),
+			labels.singular_name
+		),
+};
 export const entitiesConfig = {
 	postType: {
-		entityName: 'postType',
+		...postTypeBaseConfig,
 		templatePrefix: 'single-',
-		getOrderBy: ( { search } ) => ( search ? 'relevance' : 'modified' ),
-		recordNamePath: 'title.rendered',
-		// `icon` is the `menu_icon` property of a post type. We
-		// only handle `dashicons` for now, even if the `menu_icon`
-		// also supports urls and svg as values.
-		getIcon: ( _icon ) =>
-			_icon?.startsWith( 'dashicons-' ) ? _icon.slice( 10 ) : post,
-		getTitle: ( labels ) =>
-			sprintf(
-				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Single item: %s' ),
-				labels.singular_name
-			),
-		getDescription: ( labels ) =>
-			sprintf(
-				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Displays a single item: %s.' ),
-				labels.singular_name
-			),
 	},
+	page: { ...postTypeBaseConfig },
 	taxonomy: {
 		...taxonomyBaseConfig,
 		templatePrefix: 'taxonomy-',
@@ -129,17 +133,33 @@ export const useDefaultTemplateTypes = () => {
 	);
 };
 
-export const usePostTypes = () => {
+const usePublicPostTypes = () => {
 	const postTypes = useSelect(
 		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
 		[]
 	);
 	return useMemo( () => {
-		const excludedPostTypes = [ 'attachment', 'page' ];
+		const excludedPostTypes = [ 'attachment' ];
 		return postTypes?.filter(
 			( { viewable, slug } ) =>
 				viewable && ! excludedPostTypes.includes( slug )
 		);
+	}, [ postTypes ] );
+};
+
+// `page` post type is a special case in the template hierarchy,
+// so we exclude it from the list of post types and we handle it
+// separately.
+export const usePostTypes = () => {
+	const postTypes = usePublicPostTypes();
+	return useMemo( () => {
+		return postTypes?.filter( ( { slug } ) => slug !== 'page' );
+	}, [ postTypes ] );
+};
+export const usePostTypePage = () => {
+	const postTypes = usePublicPostTypes();
+	return useMemo( () => {
+		return postTypes?.filter( ( { slug } ) => slug === 'page' );
 	}, [ postTypes ] );
 };
 
