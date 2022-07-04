@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -56,6 +56,17 @@ const MediaReplaceFlow = ( {
 	handleUpload = true,
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
+
+	// In the event of an external change to prop `mediaURL`, synchronize
+	// internal state `mediaURLValue`. Synchronization is especially important
+	// when dealing with images that are being uploaded and whose URL changes
+	// from a blob to a proper URL.
+	useEffect( () => {
+		if ( mediaURL && mediaURL !== mediaURLValue ) {
+			setMediaURLValue( mediaURL );
+		}
+	}, [ mediaURL ] );
+
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
