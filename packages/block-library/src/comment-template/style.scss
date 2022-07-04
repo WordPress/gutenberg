@@ -14,4 +14,18 @@
 		list-style: none;
 		padding-left: 2rem;
 	}
+
+	&.alignleft {
+		float: left;
+	}
+
+	&.aligncenter {
+		margin-left: auto;
+		margin-right: auto;
+		width: fit-content;
+	}
+
+	&.alignright {
+		float: right;
+	}
 }

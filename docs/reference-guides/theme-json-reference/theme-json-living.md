@@ -83,6 +83,9 @@ Settings related to spacing.
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
+| customSpacingSize | boolean | true |  |
+| spacingSizes | array |  | name, size, slug |
+| spacingScale | object |  |  |
 
 ---
 
@@ -169,6 +172,16 @@ Typography styles.
 | lineHeight | string |  |
 | textDecoration | string |  |
 | textTransform | string |  |
+
+---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string |  |
 
 ---
 

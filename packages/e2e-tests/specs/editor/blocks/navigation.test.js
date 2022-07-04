@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -48,6 +43,7 @@ const REST_PAGES_ROUTES = [
 	'/wp/v2/pages',
 	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
+let uniqueId = 0;
 
 /**
  * Determines if a given URL matches any of a given collection of
@@ -312,7 +308,7 @@ async function waitForBlock( blockName ) {
 // Disable reason - these tests are to be re-written.
 // eslint-disable-next-line jest/no-disabled-tests
 describe( 'Navigation', () => {
-	const contributorUsername = uniqueId( 'contributoruser_' );
+	const contributorUsername = `contributoruser_${ ++uniqueId }`;
 	let contributorPassword;
 
 	beforeAll( async () => {
@@ -1319,42 +1315,6 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 	describe( 'Permission based restrictions', () => {
 		afterEach( async () => {
 			await switchUserToAdmin();
-		} );
-
-		it( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {
-			await createNewPost();
-			await insertBlock( 'Navigation' );
-
-			const startEmptyButton = await page.waitForXPath(
-				START_EMPTY_XPATH
-			);
-
-			// This creates an empty Navigation post type entity.
-			await startEmptyButton.click();
-
-			// Publishing the Post ensures the Navigation entity is saved.
-			// The Post itself is irrelevant.
-			await publishPost();
-
-			// Switch to a Contributor role user - they should not have
-			// permission to update Navigation menus.
-			await loginUser( contributorUsername, contributorPassword );
-
-			await createNewPost();
-
-			// At this point the block will automatically pick the first Navigation Menu
-			// which will be the one created by the Admin User.
-			await insertBlock( 'Navigation' );
-
-			// Make sure the snackbar error shows up.
-			await page.waitForXPath(
-				`//*[contains(@class, 'components-snackbar__content')][ text()="You do not have permission to edit this Menu. Any changes made will not be saved." ]`
-			);
-
-			// Expect a console 403 for requests to:
-			// * /wp/v2/settings?_locale=user
-			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
