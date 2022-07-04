@@ -210,6 +210,12 @@
 		"parent": "data-basics"
 	},
 	{
+		"title": "Curating the Editor Experience",
+		"slug": "curating-the-editor-experience",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
