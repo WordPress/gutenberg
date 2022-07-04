@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "13.5.1",
+	"version": "13.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -202,6 +202,7 @@
 		"metro-react-native-babel-transformer": "0.66.2",
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
+		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
 		"npm-run-all": "4.1.5",
 		"patch-package": "6.2.2",
@@ -250,6 +251,7 @@
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"build": "npm run build:packages && wp-scripts build",
 		"changelog": "node ./bin/plugin/cli.js changelog",
+		"cherry-pick": "node ./bin/cherry-pick.mjs",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "node ./bin/check-local-changes.js",

@@ -5,6 +5,7 @@ import './compat';
 import './align';
 import './lock';
 import './anchor';
+import './aria-label';
 import './custom-class-name';
 import './generated-class-name';
 import './style';
