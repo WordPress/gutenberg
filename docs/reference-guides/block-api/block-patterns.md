@@ -16,6 +16,16 @@ In this Document:
 
 ## Block Patterns
 
+Before using the helper functions listed on this page it is advisable to check for the existence of the `WP_Block_Patterns_Registry` class.
+
+```
+if ( ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
+     return;
+   }
+```
+
+This class only exists in versions of the block editor that support these helper functions.
+
 ### register_block_pattern
 
 The editor comes with several core block patterns. Theme and plugin authors can register additional custom block patterns using the `register_block_pattern` helper function.
