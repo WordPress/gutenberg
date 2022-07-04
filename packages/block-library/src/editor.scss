@@ -52,6 +52,8 @@
 @import "./post-comments/editor.scss";
 @import "./post-comments-form/editor.scss";
 
+@import "./editor-elements.scss";
+
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
