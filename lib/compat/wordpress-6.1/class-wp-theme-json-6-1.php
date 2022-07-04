@@ -343,8 +343,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		);
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
-
-			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
+			foreach ( self::ELEMENTS as $element => $selector ) {
+				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) ) {
+					continue;
+				}
 
 				// Handle element defaults.
 				$nodes[] = array(
