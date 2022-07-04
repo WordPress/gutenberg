@@ -56,7 +56,7 @@ const DEFAULT_NOTICES = [];
  * import { store as noticesStore } from '@wordpress/notices';
  *
  * const ExampleComponent = () => {
- *     const notices = useSelect( ( select ) => select( store ).getNotices() );
+ *     const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
  *     return (
  *         <ul>
  *         { notices.map( ( notice ) => (

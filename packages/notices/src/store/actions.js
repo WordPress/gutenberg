@@ -54,7 +54,7 @@ let uniqueId = 0;
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *     const { createNotice } = useDispatch( store );
+ *     const { createNotice } = useDispatch( noticesStore );
  *     return (
  *         <Button
  *             onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
@@ -122,7 +122,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *     const { createSuccessNotice } = useDispatch( store );
+ *     const { createSuccessNotice } = useDispatch( noticesStore );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -161,7 +161,7 @@ export function createSuccessNotice( content, options ) {
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *     const { createInfoNotice } = useDispatch( store );
+ *     const { createInfoNotice } = useDispatch( noticesStore );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -199,7 +199,7 @@ export function createInfoNotice( content, options ) {
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *     const { createErrorNotice } = useDispatch( store );
+ *     const { createErrorNotice } = useDispatch( noticesStore );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -240,7 +240,7 @@ export function createErrorNotice( content, options ) {
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *     const { createWarningNotice, createInfoNotice } = useDispatch( store );
+ *     const { createWarningNotice, createInfoNotice } = useDispatch( noticesStore );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -280,8 +280,8 @@ export function createWarningNotice( content, options ) {
  * import { Button } from '@wordpress/components';
  *
  * const ExampleComponent = () => {
- *    const notices = useSelect( ( select ) => select( store ).getNotices() );
- *    const { createWarningNotice, removeNotice } = useDispatch( store );
+ *    const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+ *    const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
  *
  *    return (
  *         <>

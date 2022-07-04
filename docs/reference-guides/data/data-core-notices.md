@@ -18,7 +18,9 @@ import { useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) => select( store ).getNotices() );
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
 	return (
 		<ul>
 			{ notices.map( ( notice ) => (
@@ -62,7 +64,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createErrorNotice } = useDispatch( store );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	return (
 		<Button
 			onClick={ () =>
@@ -107,7 +109,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createInfoNotice } = useDispatch( store );
+	const { createInfoNotice } = useDispatch( noticesStore );
 	return (
 		<Button
 			onClick={ () =>
@@ -144,7 +146,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createNotice } = useDispatch( store );
+	const { createNotice } = useDispatch( noticesStore );
 	return (
 		<Button
 			onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
@@ -192,7 +194,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createSuccessNotice } = useDispatch( store );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	return (
 		<Button
 			onClick={ () =>
@@ -235,7 +237,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createWarningNotice, createInfoNotice } = useDispatch( store );
+	const { createWarningNotice, createInfoNotice } =
+		useDispatch( noticesStore );
 	return (
 		<Button
 			onClick={ () =>
@@ -276,8 +279,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) => select( store ).getNotices() );
-	const { createWarningNotice, removeNotice } = useDispatch( store );
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 
 	return (
 		<>
