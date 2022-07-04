@@ -61,7 +61,10 @@ function ComboboxControl( {
 } ) {
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
-	const instanceId = useInstanceId( ComboboxControl );
+	// Use a custom prefix when generating the `instanceId` to avoid having
+	// duplicate input IDs when rendering this component and `FormTokenField`
+	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
+	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
 		currentOption || null
 	);
