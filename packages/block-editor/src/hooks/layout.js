@@ -58,6 +58,12 @@ function getLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
+	if ( layout?.inherit || layout.contentSize ) {
+		layoutClassnames.push( 'has-content-size' );
+	} else if ( layout?.useGlobalPadding ) {
+		layoutClassnames.push( 'has-global-padding' );
+	}
+
 	if ( layout?.orientation ) {
 		layoutClassnames.push( `is-${ kebabCase( layout.orientation ) }` );
 	}

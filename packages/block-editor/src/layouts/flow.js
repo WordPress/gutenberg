@@ -5,6 +5,7 @@ import {
 	Button,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
@@ -24,7 +25,7 @@ export default {
 		layout,
 		onChange,
 	} ) {
-		const { wideSize, contentSize } = layout;
+		const { wideSize, contentSize, useGlobalPadding = false } = layout;
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [
 				'%',
@@ -101,6 +102,17 @@ export default {
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
+
+				<ToggleControl
+					label={ __( 'Use global padding' ) }
+					checked={ useGlobalPadding }
+					onChange={ () =>
+						onChange( {
+							...layout,
+							useGlobalPadding: ! useGlobalPadding,
+						} )
+					}
+				/>
 			</>
 		);
 	},

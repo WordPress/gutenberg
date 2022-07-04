@@ -705,7 +705,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			if ( $use_root_vars ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
-				$block_rules .= '.has-content-size { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+				$block_rules .= '.has-content-size, .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 				$block_rules .= '.has-content-size > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
 				$block_rules .= '.alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			}

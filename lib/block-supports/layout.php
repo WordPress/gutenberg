@@ -177,6 +177,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// Add a classname to blocks with flow layout set.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
 		$class_names[] = 'has-content-size';
+		// If no layout is set, check if the block uses root padding and set a classname accordingly.
+	} elseif ( isset( $used_layout['useGlobalPadding'] ) && $used_layout['useGlobalPadding'] ) {
+		$class_names[] = 'has-global-padding';
 	}
 
 	// The following section was added to reintroduce a small set of layout classnames that were
