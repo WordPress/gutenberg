@@ -440,32 +440,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	/**
+	 * This test relies on a block having already been registered prior to
+	 * theme.json generating block metadata. Until a core block, such as Image,
+	 * opts into feature level selectors, we need to register a test block.
+	 * This is achieved via `tests_add_filter()` in Gutenberg's phpunit
+	 * bootstrap. After a core block adopts feature level selectors we could
+	 * remove that filter and instead use the core block for the following test.
+	 */
 	function test_get_stylesheet_with_block_support_feature_level_selectors() {
-		// Register a test block that will have feature level selectors.
-		WP_Block_Type_Registry::get_instance()->register(
-			'test/test',
-			array(
-				'api_version' => 2,
-				'attributes'  => array(
-					'textColor' => array(
-						'type' => 'string',
-					),
-					'style'     => array(
-						'type' => 'object',
-					),
-				),
-				'supports'    => array(
-					'border'                 => array(
-						'radius'                 => true,
-						'__experimentalSelector' => '.bordered',
-					),
-					'color'                  => array(
-						'text' => true,
-					),
-				),
-			)
-		);
-
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,

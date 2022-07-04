@@ -80,6 +80,43 @@ $GLOBALS['wp_tests_options'] = array(
 // Enable the widget block editor.
 tests_add_filter( 'gutenberg_use_widgets_block_editor', '__return_true' );
 
+/**
+ * Register test block prior to theme.json generating metadata.
+ *
+ * This new block is used to test experimental selectors. It is registered
+ * via `tests_add_filter()` here during bootstrapping so that it occurs prior
+ * to theme.json generating block metadata. Once a core block, such as Image,
+ * uses feature level selectors we could remove this in favour of testing via
+ * the core block.
+ */
+function gutenberg_register_test_block_for_feature_selectors() {
+	WP_Block_Type_Registry::get_instance()->register(
+		'test/test',
+		array(
+			'api_version' => 2,
+			'attributes'  => array(
+				'textColor' => array(
+					'type' => 'string',
+				),
+				'style'     => array(
+					'type' => 'object',
+				),
+			),
+			'supports'    => array(
+				'__experimentalBorder'   => array(
+					'radius'                 => true,
+					'__experimentalSelector' => '.bordered',
+				),
+				'color'                  => array(
+					'text' => true,
+				),
+				'__experimentalSelector' => '.wp-block-test, .wp-block-test__wrapper',
+			),
+		)
+	);
+}
+tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
+
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
 
