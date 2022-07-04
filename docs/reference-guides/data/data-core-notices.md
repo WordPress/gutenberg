@@ -14,12 +14,11 @@ the global context.
 _Usage_
 
 ```js
-// This example retrieves all notices and displays their messages in a unordered list.
+import { useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) =>
-		select( 'core/notices' ).getNotices()
-	);
+	const notices = useSelect( ( select ) => select( store ).getNotices() );
 	return (
 		<ul>
 			{ notices.map( ( notice ) => (
@@ -57,8 +56,13 @@ _Related_
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const { createErrorNotice } = useDispatch( 'core/notices' );
+	const { createErrorNotice } = useDispatch( store );
 	return (
 		<Button
 			onClick={ () =>
@@ -97,8 +101,13 @@ _Related_
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const { createInfoNotice } = useDispatch( 'core/notices' );
+	const { createInfoNotice } = useDispatch( store );
 	return (
 		<Button
 			onClick={ () =>
@@ -129,8 +138,13 @@ Returns an action object used in signalling that a notice is to be created.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const { createNotice } = useDispatch( 'core/notices' );
+	const { createNotice } = useDispatch( store );
 	return (
 		<Button
 			onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
@@ -172,8 +186,13 @@ _Related_
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const { createSuccessNotice } = useDispatch( store );
 	return (
 		<Button
 			onClick={ () =>
@@ -210,9 +229,13 @@ _Related_
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const { createWarningNotice, createInfoNotice } =
-		useDispatch( 'core/notices' );
+	const { createWarningNotice, createInfoNotice } = useDispatch( store );
 	return (
 		<Button
 			onClick={ () =>
@@ -247,11 +270,15 @@ Returns an action object used in signalling that a notice is to be removed.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) =>
-		select( 'core/notices' ).getNotices()
-	);
-	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+	const notices = useSelect( ( select ) => select( store ).getNotices() );
+	const { createWarningNotice, removeNotice } = useDispatch( store );
+
 	return (
 		<>
 			<Button

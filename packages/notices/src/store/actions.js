@@ -48,8 +48,13 @@ let uniqueId = 0;
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const { createNotice } = useDispatch( 'core/notices' );
+ *     const { createNotice } = useDispatch( store );
  *     return (
  *         <Button
  *             onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
@@ -111,8 +116,13 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const { createSuccessNotice } = useDispatch( 'core/notices' );
+ *     const { createSuccessNotice } = useDispatch( store );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -145,8 +155,13 @@ export function createSuccessNotice( content, options ) {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const { createInfoNotice } = useDispatch( 'core/notices' );
+ *     const { createInfoNotice } = useDispatch( store );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -178,8 +193,13 @@ export function createInfoNotice( content, options ) {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const { createErrorNotice } = useDispatch( 'core/notices' );
+ *     const { createErrorNotice } = useDispatch( store );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -214,9 +234,13 @@ export function createErrorNotice( content, options ) {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const { createWarningNotice, createInfoNotice } =
- *         useDispatch( 'core/notices' );
+ *     const { createWarningNotice, createInfoNotice } = useDispatch( store );
  *     return (
  *         <Button
  *             onClick={ () =>
@@ -250,11 +274,15 @@ export function createWarningNotice( content, options ) {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
- *     const notices = useSelect( ( select ) =>
- *         select( 'core/notices' ).getNotices()
- *     );
- *    const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+ *    const notices = useSelect( ( select ) => select( store ).getNotices() );
+ *    const { createWarningNotice, removeNotice } = useDispatch( store );
+ *
  *    return (
  *         <>
  *             <Button
