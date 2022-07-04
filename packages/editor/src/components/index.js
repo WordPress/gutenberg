@@ -61,9 +61,12 @@ export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
-export { default as PostURLLabel } from './post-url/label';
+export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
 export { default as PostVisibility } from './post-visibility';
-export { default as PostVisibilityLabel } from './post-visibility/label';
+export {
+	default as PostVisibilityLabel,
+	usePostVisibilityLabel,
+} from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
 export { default as ThemeSupportCheck } from './theme-support-check';
