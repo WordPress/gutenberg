@@ -98,17 +98,17 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_transform  = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = gutenberg_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
 
-	$typography_block_styles = array();
+	$typography_block_styles  = array();
+	$typography_block_presets = array();
+
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
-		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
-		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
-		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : $custom_font_size;
+		$typography_block_styles['fontSize']  = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
+		$typography_block_presets['fontSize'] = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
 	}
 
 	if ( $has_font_family_support && ! $should_skip_font_family ) {
-		$preset_font_family                    = array_key_exists( 'fontFamily', $block_attributes ) ? "var:preset|font-family|{$block_attributes['fontFamily']}" : null;
-		$custom_font_family                    = isset( $block_attributes['style']['typography']['fontFamily'] ) ? gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['fontFamily'], 'font-family' ) : null;
-		$typography_block_styles['fontFamily'] = $preset_font_family ? $preset_font_family : $custom_font_family;
+		$typography_block_styles['fontFamily']  = isset( $block_attributes['style']['typography']['fontFamily'] ) ? $block_attributes['style']['typography']['fontFamily'] : null;
+		$typography_block_presets['fontFamily'] = array_key_exists( 'fontFamily', $block_attributes ) ? "var:preset|font-family|{$block_attributes['fontFamily']}" : null;
 	}
 
 	if ( $has_font_style_support && ! $should_skip_font_style && isset( $block_attributes['style']['typography']['fontStyle'] ) ) {
@@ -141,17 +141,15 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_generate(
-		array( 'typography' => $typography_block_styles ),
-		array( 'convert_vars_to_classnames' => true )
-	);
+	$style      = gutenberg_style_engine_generate_css( array( 'border' => $typography_block_styles ) );
+	$class      = gutenberg_style_engine_generate_classnames( array( 'border' => $typography_block_presets ) );
 
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
+	if ( ! empty( $style ) ) {
+		$attributes['style'] = $style;
 	}
 
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
+	if ( ! empty( $class ) ) {
+		$attributes['class'] = $class;
 	}
 
 	return $attributes;

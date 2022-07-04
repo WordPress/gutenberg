@@ -48,9 +48,9 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$sides               = array( 'top', 'right', 'bottom', 'left' );
-	$border_block_styles = array();
-
+	$sides                    = array( 'top', 'right', 'bottom', 'left' );
+	$border_block_styles      = array();
+	$border_block_presets     = array();
 	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 	$has_border_width_support = gutenberg_has_border_feature_support( $block_type, 'width' );
 
@@ -99,9 +99,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		$has_border_color_support &&
 		! gutenberg_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
-		$preset_border_color          = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
-		$custom_border_color          = _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null );
-		$border_block_styles['color'] = $preset_border_color ? $preset_border_color : $custom_border_color;
+		$border_block_styles['color']  = _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null );
+		$border_block_presets['color'] = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
 	}
 
 	// Generate styles for individual border sides.
@@ -119,14 +118,15 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Collect classes and styles.
 	$attributes = array();
-	$styles     = gutenberg_style_engine_generate( array( 'border' => $border_block_styles ) );
+	$style      = gutenberg_style_engine_generate_css( array( 'border' => $border_block_styles ) );
+	$class      = gutenberg_style_engine_generate_classnames( array( 'border' => $border_block_presets ) );
 
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
+	if ( ! empty( $class ) ) {
+		$attributes['class'] = $class;
 	}
 
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
+	if ( ! empty( $style ) ) {
+		$attributes['style'] = $style;
 	}
 
 	return $attributes;

@@ -77,39 +77,38 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'background' ), true ) );
 	$has_gradients_support         = _wp_array_get( $color_support, array( 'gradients' ), false );
 	$color_block_styles            = array();
+	$color_block_presets           = array();
 
 	// Text colors.
 	// Check support for text colors.
 	if ( $has_text_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'text' ) ) {
-		$preset_text_color          = array_key_exists( 'textColor', $block_attributes ) ? "var:preset|color|{$block_attributes['textColor']}" : null;
-		$custom_text_color          = _wp_array_get( $block_attributes, array( 'style', 'color', 'text' ), null );
-		$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
+		$color_block_styles['text']  = _wp_array_get( $block_attributes, array( 'style', 'color', 'text' ), null );
+		$color_block_presets['text'] = array_key_exists( 'textColor', $block_attributes ) ? "var:preset|color|{$block_attributes['textColor']}" : null;
 	}
 
 	// Background colors.
 	if ( $has_background_colors_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'background' ) ) {
-		$preset_background_color          = array_key_exists( 'backgroundColor', $block_attributes ) ? "var:preset|color|{$block_attributes['backgroundColor']}" : null;
-		$custom_background_color          = _wp_array_get( $block_attributes, array( 'style', 'color', 'background' ), null );
-		$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
+		$color_block_styles['background']  = _wp_array_get( $block_attributes, array( 'style', 'color', 'background' ), null );
+		$color_block_presets['background'] = array_key_exists( 'backgroundColor', $block_attributes ) ? "var:preset|color|{$block_attributes['backgroundColor']}" : null;
 	}
 
 	// Gradients.
 
 	if ( $has_gradients_support && ! gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
-		$preset_gradient_color          = array_key_exists( 'gradient', $block_attributes ) ? "var:preset|gradient|{$block_attributes['gradient']}" : null;
-		$custom_gradient_color          = _wp_array_get( $block_attributes, array( 'style', 'color', 'gradient' ), null );
-		$color_block_styles['gradient'] = $preset_gradient_color ? $preset_gradient_color : $custom_gradient_color;
+		$color_block_styles['gradient']  = _wp_array_get( $block_attributes, array( 'style', 'color', 'gradient' ), null );
+		$color_block_presets['gradient'] = array_key_exists( 'gradient', $block_attributes ) ? "var:preset|gradient|{$block_attributes['gradient']}" : null;
 	}
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_generate( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$style      = gutenberg_style_engine_generate_css( array( 'border' => $color_block_styles ) );
+	$class      = gutenberg_style_engine_generate_classnames( array( 'border' => $color_block_presets ) );
 
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
+	if ( ! empty( $style ) ) {
+		$attributes['style'] = $style;
 	}
 
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
+	if ( ! empty( $class ) ) {
+		$attributes['class'] = $class;
 	}
 
 	return $attributes;

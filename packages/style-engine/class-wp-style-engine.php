@@ -63,6 +63,9 @@ class WP_Style_Engine {
 					'default' => 'background-color',
 				),
 				'path'          => array( 'color', 'background' ),
+				'css_vars'      => array(
+					'color' => '--wp--preset--color--$slug',
+				),
 				'classnames'    => array(
 					'has-background'             => true,
 					'has-$slug-background-color' => 'color',
@@ -86,6 +89,9 @@ class WP_Style_Engine {
 					'individual' => 'border-%s-color',
 				),
 				'path'          => array( 'border', 'color' ),
+				'css_vars'      => array(
+					'color' => '--wp--preset--color--$slug',
+				),
 				'classnames'    => array(
 					'has-border-color'       => true,
 					'has-$slug-border-color' => 'color',
@@ -382,31 +388,18 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns classname and CSS from a block styles object.
-	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * Loops over the metadata definitions and returns an array of css declarations (the default) or classnames based
+	 * on the definition parameters.
 	 *
-	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options array(
-	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
-	 * );.
+	 * @param array  $block_styles An array of styles from a block's attributes.
+	 * @param string $output_type Optional. Pass `classnames` to generate classnames.
 	 *
-	 * @return array|null array(
-	 *     'css'        => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
-	 *     'classnames' => (string) Classnames separated by a space.
-	 * );
+	 * @return array Default is an array of CSS definitions, e.g., array( "$property" => "$value" ). If $output_type is `classnames`, then an array of classnames.
 	 */
-	public function generate( $block_styles, $options ) {
-		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
-			return null;
-		}
-
-		$css_declarations     = array();
-		$classnames           = array();
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
-
+	protected static function generate_output_from_metadata( $block_styles, $output_type = 'css' ) {
+		$result = array();
 		// Collect CSS and classnames.
-		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
+		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
 				continue;
 			}
@@ -417,10 +410,60 @@ class WP_Style_Engine {
 					continue;
 				}
 
-				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
+				if ( 'classnames' === $output_type ) {
+					$result = array_merge( $result, static::get_classnames( $style_value, $style_definition ) );
+				} else {
+					$result = array_merge( $result, static::get_css_declarations( $style_value, $style_definition ) );
+				}
 			}
 		}
+		return $result;
+	}
+
+	/**
+	 * Returns classname and CSS from a block styles object.
+	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @param array $block_styles An array of styles from a block's attributes.
+	 * @param array $options array(
+	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
+	 * );.
+	 *
+	 * @return string (string) Classnames separated by a space.
+	 */
+	public function generate_classnames( $block_styles, $options ) {
+		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
+			return '';
+		}
+
+		$classnames = static::generate_output_from_metadata( $block_styles, 'classnames' );
+
+		if ( ! empty( $classnames ) ) {
+			return implode( ' ', array_unique( $classnames ) );
+		}
+
+		return '';
+	}
+
+	/**
+	 * Returns classname and CSS from a block styles object.
+	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @param array $block_styles An array of styles from a block's attributes.
+	 * @param array $options array(
+	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
+	 * );.
+	 *
+	 * @return string (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.  Default is a string of inline styles.
+	 */
+	public function generate_css( $block_styles, $options ) {
+		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
+			return '';
+		}
+
+		$css_declarations = static::generate_output_from_metadata( $block_styles );
 
 		// Build CSS rules output.
 		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
@@ -439,12 +482,7 @@ class WP_Style_Engine {
 			}
 		}
 
-		// Return classnames, if any.
-		if ( ! empty( $classnames ) ) {
-			$styles_output['classnames'] = implode( ' ', array_unique( $classnames ) );
-		}
-
-		return $styles_output;
+		return '';
 	}
 
 	/**
@@ -496,14 +534,14 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->generate.
+ * Global public interface method to WP_Style_Engine->generate_css.
  *
- * Returns an CSS ruleset.
+ * Returns an CSS ruleset or CSS declarations.
  * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
  *
  * Example usage:
  *
- * $styles = wp_style_engine_generate( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * $styles = generate_css( array( 'color' => array( 'text' => '#cccccc' ) ) );
  * // Returns `'color: #cccccc'`.
  *
  * @access public
@@ -511,15 +549,38 @@ class WP_Style_Engine {
  * @param array $block_styles An array of styles from a block's attributes.
  * @param array $options An array of options to determine the output.
  *
- * @return array|null array(
- *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
- *     'classnames' => (string) Classnames separated by a space.
- * );
+ * @return string A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
  */
-function wp_style_engine_generate( $block_styles, $options = array() ) {
+function wp_style_engine_generate_css( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->generate( $block_styles, $options );
+		return $style_engine->generate_css( $block_styles, $options );
 	}
-	return null;
+	return '';
+}
+
+/**
+ * Global public interface method to WP_Style_Engine->generate_classnames.
+ *
+ * Returns a string of classnames, based on style values formatted according to 'var:preset|style-property|style-slug'.
+ * Classnames are generated on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ *
+ * Example usage:
+ *
+ * $styles = wp_style_engine_generate_classnames( array( 'color' => array( 'text' => 'var:preset|color|my-little-pony' ) ) );
+ * // Returns `'has-text-color has-my-little-pony-color'`.
+ *
+ * @access public
+ *
+ * @param array $block_styles An array of styles from a block's attributes.
+ * @param array $options An array of options to determine the output.
+ *
+ * @return string Classnames separated by a space;
+ */
+function wp_style_engine_generate_classnames( $block_styles, $options = array() ) {
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		$style_engine = WP_Style_Engine::get_instance();
+		return $style_engine->generate_classnames( $block_styles, $options );
+	}
+	return '';
 }
