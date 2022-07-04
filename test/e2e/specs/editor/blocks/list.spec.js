@@ -487,9 +487,9 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'should change the base list type', async ( { editor, page } ) => {
+	test( 'should change the base list type', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
-		await page.click( 'role=button[name="Ordered"i]' );
+		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
 <ol><li></li></ol>
