@@ -98,7 +98,7 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					// This adds a post meta field in template, that is part of `is_custom` value calculation.
 					is_wp_suggestion: true,
 				},
 				{ throwOnError: true }
@@ -218,7 +218,7 @@ function useMissingTemplates(
 		setShowCustomTemplateModal( true );
 		setEntityForSuggestions( _entityForSuggestions );
 	};
-	// TODO: find better names for many new vars :)
+	// TODO: find better names for these variables. `useExtraTemplates` returns an array of items.
 	const categoryMenuItem = useExtraTemplates(
 		categoryTaxonomy,
 		entitiesConfig.category,

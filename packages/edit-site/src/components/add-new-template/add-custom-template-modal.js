@@ -32,10 +32,8 @@ function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
 		slug,
 		config: { templateSlug, templatePrefix },
 	} = entityForSuggestions;
-	// TODO: check if we can reuse the message and the translators message...(?)
-	// This refers to `where %1$s is the singular name of a post type and %2$s...`part.
 	const title = sprintf(
-		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Post: Hello, WordPress"
+		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type or taxonomy and %2$s is the name of the post or term, e.g. "Post: Hello, WordPress", "Category: shoes"
 		__( '%1$s: %2$s' ),
 		labels.singular_name,
 		suggestion.name
@@ -223,7 +221,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							</Heading>
 							<Text as="span">
 								{
-									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For all items' )
 								}
 							</Text>
@@ -239,7 +237,7 @@ function AddCustomTemplateModal( { onClose, onSelect, entityForSuggestions } ) {
 							</Heading>
 							<Text as="span">
 								{
-									// translators: The user is given the choice to set up a template for all items of a post type, or just a specific one.
+									// translators: The user is given the choice to set up a template for all items of a post type or taxonomy, or just a specific one.
 									__( 'For a specific item' )
 								}
 							</Text>

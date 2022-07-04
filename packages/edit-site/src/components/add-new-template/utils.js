@@ -68,7 +68,7 @@ const taxonomyBaseConfig = {
 	getIcon: () => blockMeta,
 	getTitle: ( labels ) =>
 		sprintf(
-			// translators: %s: Name of the post type e.g: "Post".
+			// translators: %s: Name of the taxonomy e.g: "Cagegory".
 			__( 'Single taxonomy: %s' ),
 			labels.singular_name
 		),
@@ -300,12 +300,6 @@ export const useExtraTemplates = (
 	const extraTemplates = ( entities || [] ).reduce(
 		( accumulator, entity ) => {
 			const { slug, labels, icon } = entity;
-			// TODO: add/move/remove comments :)
-			// `post_tag` seems to be the only exception in template
-			// hierarchy that doesn't use the `slug` for its general
-			// template. Instead it uses `tag`.
-			// I'm not sure how to fit this in a generic util like this,
-			// if it's indeed the only case..
 			const slugForGeneralTemplate = entityConfig.templateSlug || slug;
 			// We need to check if the general template is part of the
 			// defaultTemplateTypes. If it is, just use that info and
