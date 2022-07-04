@@ -59,7 +59,6 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 	$spacing_block_styles['margin']  = $has_margin_support && ! $skip_margin ? _wp_array_get( $block_styles, array( 'spacing', 'margin' ), null ) : null;
 	$styles                          = gutenberg_style_engine_generate(
 		array( 'spacing' => $spacing_block_styles ),
-		array( 'css_vars' => true )
 	);
 
 	if ( ! empty( $styles['css'] ) ) {

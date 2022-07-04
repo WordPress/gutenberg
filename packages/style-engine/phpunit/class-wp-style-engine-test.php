@@ -82,7 +82,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'style' => 'dotted',
 					),
 				),
-				'options'         => array(),
+				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
 					'css'        => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;',
 					'classnames' => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
@@ -164,7 +164,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(
 					'selector' => '.wp-selector',
-					'css_vars' => true,
 				),
 				'expected_output' => array(
 					'css'        => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
@@ -196,7 +195,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'fontFamily' => 'var:preset|font-family|totally-awesome',
 					),
 				),
-				'options'         => array(),
+				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-copper-socks-color has-background has-splendid-carrot-background-color has-like-wow-dude-gradient-background has-fantastic-font-size has-totally-awesome-font-family',
 				),
@@ -208,7 +207,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text' => 'var:preset|color|teal-independents',
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css'        => 'color: var(--wp--preset--color--teal-independents);',
 					'classnames' => 'has-text-color has-teal-independents-color',
@@ -240,7 +239,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'padding' => 'var:preset|spacing|padding',
 					),
 				),
-				'options'         => array(),
+				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
 					'classnames' => 'has-text-color has-background',
 				),
@@ -253,7 +252,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'padding' => 'var:preset|spacing|20',
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'padding: var(--wp--preset--spacing--20); margin: var(--wp--preset--spacing--10);',
 				),
@@ -276,7 +275,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'padding-left: var(--wp--preset--spacing--30); padding-right: var(--wp--preset--spacing--40); padding-top: 14px; padding-bottom: 14px; margin-left: var(--wp--preset--spacing--10); margin-right: var(--wp--preset--spacing--20); margin-top: 1rem; margin-bottom: 1rem;',
 				),
@@ -293,7 +292,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'margin-top: 1rem; margin-bottom: 1rem;',
 				),
@@ -338,7 +337,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
 				),
@@ -368,7 +367,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'options'         => array( 'css_vars' => true ),
+				'options'         => array(),
 				'expected_output' => array(
 					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
 				),
