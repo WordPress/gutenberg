@@ -526,8 +526,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// 2. Generate and append the rules that use the general selector.
 		//$block_rules .= static::to_ruleset( $selector, $declarations );
 
-
 		$block_styles = $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ? $node[ $pseudo_selector ] : $node;
+
+		if ( isset( $block_styles['filter']['duotone'] ) && ! empty( $block_styles['filter']['duotone'] ) ) {
+			$selector = static::scope_selector( $selector, $block_metadata['duotone'] );
+		}
 
 		$styles = gutenberg_style_engine_generate(
 			$block_styles,

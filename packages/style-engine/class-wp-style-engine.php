@@ -152,6 +152,14 @@ class WP_Style_Engine {
 				),
 			),
 		),
+		'filter'     => array(
+			'duotone' => array(
+				'property_keys' => array(
+					'default' => 'filter',
+				),
+				'path'          => array( 'filter', 'duotone' ),
+			),
+		),
 		'spacing'    => array(
 			'padding'  => array(
 				'property_keys' => array(

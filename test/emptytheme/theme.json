@@ -246,8 +246,8 @@
 				}
 			},
 			"core/image": {
-				"color": {
-					"duotone": "#ffffff"
+				"filter": {
+					"duotone": "var(--wp--preset--duotone--primary-and-tertiary)"
 				}
 			},
 			"core/group": {
