@@ -228,7 +228,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
-	function test_get_stylesheet_handles_only_psuedo_selector_rules_for_given_property() {
+	function test_get_stylesheet_handles_only_pseudo_selector_rules_for_given_property() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
