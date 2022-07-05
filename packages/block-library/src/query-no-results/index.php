@@ -31,7 +31,7 @@ function render_block_core_query_no_results( $attributes, $content, $block ) {
 		$query      = new WP_Query( $query_args );
 	}
 
-	if ( ! $query->have_posts() ) {
+	if ( $query->have_posts() ) {
 		return '';
 	}
 
