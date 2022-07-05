@@ -487,8 +487,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected      = $base_styles . $block_styles . $preset_styles;
 
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-
-		unregister_block_type( 'test/test' );
 	}
 
 	function test_remove_invalid_element_pseudo_selectors() {
