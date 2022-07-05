@@ -57,7 +57,7 @@ function PostVisibilityToggle( { isOpen, onClick } ) {
 			className="edit-post-post-visibility__toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
-			// translators: %s: Current post visibilty.
+			// translators: %s: Current post visibility.
 			aria-label={ sprintf( __( 'Select visibility: %s' ), label ) }
 			onClick={ onClick }
 		>
