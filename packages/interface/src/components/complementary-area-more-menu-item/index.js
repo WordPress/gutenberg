@@ -11,15 +11,13 @@ import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
 
 const PluginsMenuItem = ( {
-	__unstableExplicitMenuItem,
-	__unstableTarget,
-	...restProps
-} ) => (
 	// Menu item is marked with unstable prop for backward compatibility.
 	// They are removed so they don't leak to DOM elements.
 	// @see https://github.com/WordPress/gutenberg/issues/14457
-	<MenuItem { ...restProps } />
-);
+	__unstableExplicitMenuItem,
+	__unstableTarget,
+	...restProps
+} ) => <MenuItem { ...restProps } />;
 
 export default function ComplementaryAreaMoreMenuItem( {
 	scope,
