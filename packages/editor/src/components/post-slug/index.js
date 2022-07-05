@@ -6,6 +6,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
+import { TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,25 +42,19 @@ export class PostSlug extends Component {
 	}
 
 	render() {
-		const { instanceId } = this.props;
 		const { editedSlug } = this.state;
-
-		const inputId = 'editor-post-slug-' + instanceId;
-
 		return (
 			<PostSlugCheck>
-				<label htmlFor={ inputId }>{ __( 'Slug' ) }</label>
-				<input
+				<TextControl
+					label={ __( 'Slug' ) }
 					autoComplete="off"
 					spellCheck="false"
-					type="text"
-					id={ inputId }
 					value={ editedSlug }
 					onChange={ ( event ) =>
 						this.setState( { editedSlug: event.target.value } )
 					}
 					onBlur={ this.setSlug }
-					className="editor-post-slug__input"
+					className="editor-post-slug"
 				/>
 			</PostSlugCheck>
 		);
