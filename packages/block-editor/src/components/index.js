@@ -28,7 +28,7 @@ export { default as BlockNavigationDropdown } from './block-navigation/dropdown'
 export { default as BlockStyles } from './block-styles';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
-export { default as BlockPatternsList } from './block-patterns-list';
+export { default as BlockPatternList } from './block-patterns-list';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
 export {
 	BlockVerticalAlignmentToolbar,
