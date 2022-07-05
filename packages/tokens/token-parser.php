@@ -52,7 +52,7 @@ class WP_Token_Parser
 				list( '0' => $full_match, 'QUOTED' => $quoted, 'TOKEN_CONTENTS' => $contents ) = $matches;
 
 				if ( ! empty( $quoted ) ) {
-					return $full_match;
+					return substr( $full_match, 1 );
 				}
 
 				$token = self::parse_token_contents( $contents );

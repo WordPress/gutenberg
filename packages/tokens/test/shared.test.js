@@ -56,7 +56,7 @@ export const jsTester = ( parse ) => () => {
 	it( 'avoids escaping quoted tokens', () => {
 		expect( parse( '##{not-a-token}#' ) ).toEqual( {
 			tokens: [],
-			output: '##{not-a-token}#',
+			output: '#{not-a-token}#',
 		} );
 	} );
 

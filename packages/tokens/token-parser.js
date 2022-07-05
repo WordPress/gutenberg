@@ -25,7 +25,7 @@ export const swapTokens = ( tokenReplacer, input ) => {
 		new RegExp( '(#)?#{([^#]*)}#' ),
 		( fullMatch, quoted, tokenContents ) => {
 			if ( quoted ) {
-				return fullMatch;
+				return fullMatch.slice(1);
 			}
 
 			const token = parseTokenContents( tokenContents );
