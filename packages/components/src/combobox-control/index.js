@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { deburr } from 'lodash';
+import removeAccents from 'remove-accents';
+
 /**
  * WordPress dependencies
  */
@@ -76,9 +77,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = deburr( inputValue.toLocaleLowerCase() );
+		const match = removeAccents( inputValue.toLocaleLowerCase() );
 		options.forEach( ( option ) => {
-			const index = deburr( option.label )
+			const index = removeAccents( option.label )
 				.toLocaleLowerCase()
 				.indexOf( match );
 			if ( index === 0 ) {
