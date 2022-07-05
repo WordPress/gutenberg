@@ -128,6 +128,7 @@ const Popover = (
 	}
 
 	const arrowRef = useRef( null );
+	const anchorRefFallback = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const hasArrow = ! isExpanded && ! noArrow;
@@ -147,8 +148,11 @@ const Popover = (
 			return anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			return anchorRect.ownerDocument;
-		} else if ( getAnchorRect ) {
-			return getAnchorRect()?.ownerDocument ?? document;
+		} else if ( getAnchorRect && anchorRefFallback.current ) {
+			return (
+				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
+				document
+			);
 		}
 
 		return document;
@@ -203,7 +207,6 @@ const Popover = (
 			: undefined,
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
-	const anchorRefFallback = useRef( null );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
@@ -272,10 +275,10 @@ const Popover = (
 					return anchorRect;
 				},
 			};
-		} else if ( getAnchorRect ) {
+		} else if ( getAnchorRect && anchorRefFallback.current ) {
 			usedRef = {
 				getBoundingClientRect() {
-					const rect = getAnchorRect();
+					const rect = getAnchorRect( anchorRefFallback.current );
 					return new window.DOMRect(
 						rect.x ?? rect.left,
 						rect.y ?? rect.top,
