@@ -73,7 +73,6 @@ export type RangeMarkProps = {
 };
 
 export type ControlledRangeValue = number | '' | null;
-export type SetControlledRangeValue = ( value?: number | null ) => void;
 
 export type RangeControlProps< IconProps = unknown > = Pick<
 	BaseControlProps,
