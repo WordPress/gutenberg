@@ -110,6 +110,8 @@ type InputProps = {
 	inputSize?: Size;
 	isDragging?: boolean;
 	dragCursor?: CSSProperties[ 'cursor' ];
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
@@ -184,6 +186,13 @@ const sizeStyles = ( {
 	return css( style );
 };
 
+const customPaddings = ( {
+	paddingInlineStart,
+	paddingInlineEnd,
+}: InputProps ) => {
+	return css( { paddingInlineStart, paddingInlineEnd } );
+};
+
 const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
 	let defaultArrowStyles: SerializedStyles | undefined;
 	let activeDragCursorStyles: SerializedStyles | undefined;
@@ -235,6 +244,7 @@ export const Input = styled.input< InputProps >`
 		${ disabledStyles }
 		${ fontSizeStyles }
 		${ sizeStyles }
+		${ customPaddings }
 
 		&::-webkit-input-placeholder {
 			line-height: normal;
