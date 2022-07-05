@@ -93,7 +93,7 @@ function Modal( props, forwardedRef ) {
 				ariaHelper.showApp();
 			}
 		};
-	}, [] );
+	}, [ bodyOpenClassName ] );
 
 	function handleEscapeKeyDown( event ) {
 		if (

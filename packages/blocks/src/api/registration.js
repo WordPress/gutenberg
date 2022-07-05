@@ -5,9 +5,7 @@
  */
 import {
 	camelCase,
-	isArray,
 	isEmpty,
-	isNil,
 	isObject,
 	isString,
 	mapKeys,
@@ -178,7 +176,10 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 			continue;
 		}
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
-			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			pickBy(
+				definitions[ blockName ],
+				( value ) => value !== null && value !== undefined
+			),
 			( value, key ) => camelCase( key )
 		);
 	}
@@ -306,9 +307,9 @@ function translateBlockSettingUsingI18nSchema(
 		return _x( settingValue, i18nSchema, textdomain );
 	}
 	if (
-		isArray( i18nSchema ) &&
+		Array.isArray( i18nSchema ) &&
 		! isEmpty( i18nSchema ) &&
-		isArray( settingValue )
+		Array.isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
 			translateBlockSettingUsingI18nSchema(

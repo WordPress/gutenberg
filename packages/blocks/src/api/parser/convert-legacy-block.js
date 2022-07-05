@@ -49,12 +49,6 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		name = 'core/embed';
 	}
 
-	// Convert 'core/query-loop' blocks in existing content to 'core/post-template'.
-	// TODO: Remove this check when WordPress 5.9 is released.
-	if ( name === 'core/query-loop' ) {
-		name = 'core/post-template';
-	}
-
 	// Convert Post Comment blocks in existing content to Comment blocks.
 	// TODO: Remove these checks when WordPress 6.0 is released.
 	if ( name === 'core/post-comment-author' ) {

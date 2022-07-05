@@ -277,16 +277,8 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const {
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-		kind,
-	} = attributes;
+	const { label, type, opensInNewTab, url, description, rel, title, kind } =
+		attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -294,10 +286,8 @@ export default function NavigationSubmenuEdit( {
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
@@ -481,10 +471,8 @@ export default function NavigationSubmenuEdit( {
 			'has-text-color': !! textColor || !! customTextColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName(
-				'background-color',
-				backgroundColor
-			) ]: !! backgroundColor,
+			[ getColorClassName( 'background-color', backgroundColor ) ]:
+				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
 		} ),
 		style: {
@@ -509,12 +497,14 @@ export default function NavigationSubmenuEdit( {
 					innerBlocksColors.textColor ||
 					innerBlocksColors.customTextColor
 				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+				[ `has-${ innerBlocksColors.textColor }-color` ]:
+					!! innerBlocksColors.textColor,
 				'has-background': !! (
 					innerBlocksColors.backgroundColor ||
 					innerBlocksColors.customBackgroundColor
 				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
+					!! innerBlocksColors.backgroundColor,
 			} ),
 			style: {
 				color: innerBlocksColors.customTextColor,

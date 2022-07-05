@@ -33,7 +33,7 @@ export default function Edit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
-	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
+	let [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
 	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
 		'root',
 		'site',
@@ -60,21 +60,17 @@ export default function Edit( {
 	);
 
 	if ( ! commentId || ! date ) {
-		return (
-			<>
-				{ inspectorControls }
-				<div { ...blockProps }>
-					<time>{ _x( 'Comment Date', 'block title' ) }</time>
-				</div>
-			</>
-		);
+		date = _x( 'Comment Date', 'block title' );
 	}
 
-	let commentDate = (
-		<time dateTime={ dateI18n( 'c', date ) }>
-			{ dateI18n( format || siteFormat, date ) }
-		</time>
-	);
+	let commentDate =
+		date instanceof Date ? (
+			<time dateTime={ dateI18n( 'c', date ) }>
+				{ dateI18n( format || siteFormat, date ) }
+			</time>
+		) : (
+			<time>{ date }</time>
+		);
 
 	if ( isLink ) {
 		commentDate = (

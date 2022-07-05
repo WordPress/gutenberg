@@ -49,6 +49,23 @@ const DEFAULT_NOTICES = [];
  * @param {Object}  state   Notices state.
  * @param {?string} context Optional grouping context.
  *
+ * @example
+ *
+ *```js
+ * // This example retrieves all notices and displays their messages in a unordered list.
+ *
+ * const ExampleComponent = () => {
+ *     const notices = useSelect( ( select ) => select( 'core/notices' ).getNotices() );
+ *     return (
+ *         <ul>
+ *         { notices.map( ( notice ) => (
+ *             <li key={ notice.ID }>{ notice.content }</li>
+ *         ) ) }
+ *        </ul>
+ *    )
+ * };
+ *```
+ *
  * @return {WPNotice[]} Array of notices.
  */
 export function getNotices( state, context = DEFAULT_CONTEXT ) {

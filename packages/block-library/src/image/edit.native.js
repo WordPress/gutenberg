@@ -196,16 +196,13 @@ export class ImageEdit extends Component {
 
 		this.replacedFeaturedImage = false;
 
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -215,9 +212,8 @@ export class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
-			this
-		);
+		this.accessibilityLabelCreator =
+			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
 		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
 	}
@@ -270,12 +266,8 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const {
-			image,
-			attributes,
-			setAttributes,
-			featuredImageId,
-		} = this.props;
+		const { image, attributes, setAttributes, featuredImageId } =
+			this.props;
 		if ( ! previousProps.image && image ) {
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
@@ -436,6 +428,7 @@ export class ImageEdit extends Component {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
+			alt: media.alt,
 		};
 
 		let additionalAttributes;
@@ -469,11 +462,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectURL( newURL ) {
-		const {
-			createErrorNotice,
-			imageDefaultSize,
-			setAttributes,
-		} = this.props;
+		const { createErrorNotice, imageDefaultSize, setAttributes } =
+			this.props;
 
 		if ( isURL( newURL ) ) {
 			this.setState( {
@@ -906,9 +896,8 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings, wasBlockJustInserted } = select(
-			blockEditorStore
-		);
+		const { getSettings, wasBlockJustInserted } =
+			select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },

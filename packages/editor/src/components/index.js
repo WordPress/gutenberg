@@ -41,7 +41,10 @@ export { default as PostPublishPanel } from './post-publish-panel';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';
-export { default as PostScheduleLabel } from './post-schedule/label';
+export {
+	default as PostScheduleLabel,
+	usePostScheduleLabel,
+} from './post-schedule/label';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
@@ -56,6 +59,9 @@ export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
+export { default as PostURL } from './post-url';
+export { default as PostURLCheck } from './post-url/check';
+export { default as PostURLLabel } from './post-url/label';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';

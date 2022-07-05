@@ -358,7 +358,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const [ logoUrl, setLogoUrl ] = useState();
 	const ref = useRef();
 
 	const {
@@ -369,9 +368,8 @@ export default function LogoEdit( {
 		mediaItemData,
 		isRequestingMediaItem,
 	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
-			coreStore
-		);
+		const { canUser, getEntityRecord, getEditedEntityRecord } =
+			select( coreStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		const _siteLogo = siteSettings?.site_logo;
@@ -421,13 +419,7 @@ export default function LogoEdit( {
 			site_icon: newValue ?? null,
 		} );
 
-	let alt = null;
-	if ( mediaItemData ) {
-		alt = mediaItemData.alt_text;
-		if ( logoUrl !== mediaItemData.source_url ) {
-			setLogoUrl( mediaItemData.source_url );
-		}
-	}
+	const { alt_text: alt, source_url: logoUrl } = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
@@ -453,7 +445,6 @@ export default function LogoEdit( {
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
 			setLogo( undefined );
-			setLogoUrl( media.url );
 			return;
 		}
 
@@ -462,7 +453,6 @@ export default function LogoEdit( {
 
 	const onRemoveLogo = () => {
 		setLogo( null );
-		setLogoUrl( undefined );
 		setAttributes( { width: undefined } );
 	};
 
@@ -543,7 +533,7 @@ export default function LogoEdit( {
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">
-					{ isLoading && (
+					{ !! isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>

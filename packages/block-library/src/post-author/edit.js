@@ -28,9 +28,8 @@ function PostAuthorEdit( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getUsers } = select(
-				coreStore
-			);
+			const { getEditedEntityRecord, getUser, getUsers } =
+				select( coreStore );
 			const _authorId = getEditedEntityRecord(
 				'postType',
 				postType,

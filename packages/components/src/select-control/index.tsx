@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isEmpty } from 'lodash';
 import classNames from 'classnames';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
@@ -20,6 +20,8 @@ import InputBase from '../input-control/input-base';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
 import type { SelectControlProps } from './types';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );

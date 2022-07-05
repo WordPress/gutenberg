@@ -112,9 +112,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		// Verify the editor has not crashed.
-		const mergedBlockText = await editorPage.getTextForParagraphBlockAtPosition(
-			1
-		);
+		const mergedBlockText =
+			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( mergedBlockText );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );

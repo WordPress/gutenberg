@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop, uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useRef } from '@wordpress/element';
@@ -37,6 +32,9 @@ import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
+const noop = () => {};
+let uniqueId = 0;
+
 const MediaReplaceFlow = ( {
 	mediaURL,
 	mediaId,
@@ -62,9 +60,7 @@ const MediaReplaceFlow = ( {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = useRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
+	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );

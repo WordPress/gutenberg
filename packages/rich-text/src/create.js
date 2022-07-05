@@ -64,9 +64,8 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( richTextStore ).getFormatTypeForBareElement(
-			type
-		);
+		formatType =
+			select( richTextStore ).getFormatTypeForBareElement( type );
 	}
 
 	if ( ! formatType ) {
@@ -94,12 +93,11 @@ function toFormat( { type, attributes } ) {
 		registeredAttributes[ key ] = _attributes[ name ];
 
 		if ( formatType.__unstableFilterAttributeValue ) {
-			registeredAttributes[
-				key
-			] = formatType.__unstableFilterAttributeValue(
-				key,
-				registeredAttributes[ key ]
-			);
+			registeredAttributes[ key ] =
+				formatType.__unstableFilterAttributeValue(
+					key,
+					registeredAttributes[ key ]
+				);
 		}
 
 		// delete the attribute and what's left is considered

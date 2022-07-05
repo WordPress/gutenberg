@@ -8,10 +8,13 @@ import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleLabel,
 	PostScheduleCheck,
+	usePostScheduleLabel,
 } from '@wordpress/editor';
 
-export function PostSchedule() {
+export default function PostSchedule() {
 	const anchorRef = useRef();
+
+	const fullLabel = usePostScheduleLabel( { full: true } );
 
 	return (
 		<PostScheduleCheck>
@@ -28,6 +31,7 @@ export function PostSchedule() {
 								onClick={ onToggle }
 								aria-expanded={ isOpen }
 								variant="tertiary"
+								label={ fullLabel }
 							>
 								<PostScheduleLabel />
 							</Button>
@@ -41,5 +45,3 @@ export function PostSchedule() {
 		</PostScheduleCheck>
 	);
 }
-
-export default PostSchedule;

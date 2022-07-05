@@ -34,9 +34,9 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await page.click( 'role=button[name="Show template details"i]' );
 
@@ -50,17 +50,19 @@ test.describe( 'Template Revert', () => {
 		editor,
 		templateRevertUtils,
 	} ) => {
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
-		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
@@ -69,18 +71,20 @@ test.describe( 'Template Revert', () => {
 		editor,
 		templateRevertUtils,
 	} ) => {
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
-		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
@@ -93,20 +97,23 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		await editor.saveSiteEditorEntities();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		// Revert template and check state.
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
-		const contentAfterSave = await templateRevertUtils.getCurrentSiteEditorContent();
+		await editor.saveSiteEditorEntities();
+		const contentAfterSave =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterSave ).not.toEqual( contentBefore );
 
 		// Undo revert by clicking header button and check state again.
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
-		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfterUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterUndo ).toEqual( contentBefore );
 	} );
 
@@ -119,18 +126,20 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		await editor.saveSiteEditorEntities();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		// Click the snackbar "Undo" button.
 		await page.click(
 			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
-		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
@@ -139,27 +148,30 @@ test.describe( 'Template Revert', () => {
 		page,
 		templateRevertUtils,
 	} ) => {
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
-		const contentAfterUndo = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfterUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterUndo ).not.toEqual( contentBefore );
 
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Redo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
 		);
 
-		const contentAfterRedo = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfterRedo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterRedo ).toEqual( contentBefore );
 	} );
 
@@ -168,15 +180,16 @@ test.describe( 'Template Revert', () => {
 		page,
 		templateRevertUtils,
 	} ) => {
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		// Click undo in the snackbar. This reverts revert template action.
 		await page.click(
@@ -184,16 +197,18 @@ test.describe( 'Template Revert', () => {
 		);
 
 		//Check we have dummy content.
-		const contentAfterFirstUndo = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfterFirstUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterFirstUndo ).not.toEqual( contentBefore );
 
 		// Click undo again, this time in the header. Reverts initial dummy content.
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
 		// Check dummy content is gone.
-		const contentAfterSecondUndo = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfterSecondUndo =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfterSecondUndo ).toEqual( contentBefore );
 	} );
 
@@ -207,21 +222,23 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		await editor.saveSiteEditorEntities();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await page.click(
-			'role=region[name="Header"i] >> role=button[name="Undo"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
 		);
 
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await admin.visitSiteEditor();
 
-		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
 	} );
 
@@ -235,20 +252,22 @@ test.describe( 'Template Revert', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await templateRevertUtils.save();
-		const contentBefore = await templateRevertUtils.getCurrentSiteEditorContent();
+		await editor.saveSiteEditorEntities();
+		const contentBefore =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 
 		await templateRevertUtils.revertTemplate();
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 
 		await page.click(
 			'role=button[name="Dismiss this notice"i] >> role=button[name="Undo"i]'
 		);
 
-		await templateRevertUtils.save();
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
-		const contentAfter = await templateRevertUtils.getCurrentSiteEditorContent();
+		const contentAfter =
+			await templateRevertUtils.getCurrentSiteEditorContent();
 		expect( contentAfter ).toEqual( contentBefore );
 	} );
 } );
@@ -256,19 +275,6 @@ test.describe( 'Template Revert', () => {
 class TemplateRevertUtils {
 	constructor( { page } ) {
 		this.page = page;
-	}
-
-	async save() {
-		await this.page.click(
-			'role=region[name="Header"i] >> role=button[name="Save"i]'
-		);
-		// Second Save button in the entities panel.
-		await this.page.click(
-			'role=region[name="Publish"i] >> role=button[name="Save"i]'
-		);
-		await this.page.waitForSelector(
-			'role=region[name="Header"i] >> role=button[name="Save"i][disabled]'
-		);
 	}
 
 	async revertTemplate() {

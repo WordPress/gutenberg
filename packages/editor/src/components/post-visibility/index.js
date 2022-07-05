@@ -29,9 +29,8 @@ export default function PostVisibility( { onClose } ) {
 	const { editPost, savePost } = useDispatch( editorStore );
 
 	const [ hasPassword, setHasPassword ] = useState( !! password );
-	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] = useState(
-		false
-	);
+	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] =
+		useState( false );
 
 	const setPublic = () => {
 		editPost( {
@@ -69,7 +68,7 @@ export default function PostVisibility( { onClose } ) {
 	};
 
 	return (
-		<>
+		<div className="editor-post-visibility">
 			<InspectorPopoverHeader
 				title={ __( 'Visibility' ) }
 				help={ __( 'Control how this post is viewed.' ) }
@@ -129,7 +128,7 @@ export default function PostVisibility( { onClose } ) {
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>
-		</>
+		</div>
 	);
 }
 
