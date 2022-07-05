@@ -396,7 +396,7 @@ class WP_Style_Engine {
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function generate( $block_styles, $options ) {
+	public function generate_block_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
@@ -519,7 +519,7 @@ class WP_Style_Engine {
 function wp_style_engine_generate_block_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->generate( $block_styles, $options );
+		return $style_engine->generate_block_styles( $block_styles, $options );
 	}
 	return null;
 }
