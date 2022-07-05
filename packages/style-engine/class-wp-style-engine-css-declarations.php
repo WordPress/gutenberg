@@ -26,7 +26,13 @@ class WP_Style_Engine_CSS_Declarations {
 	protected $styles = array();
 
 	/**
-	 * Contructor for this object.
+	 * A white list of CSS custom properties.
+	 * Used to bypass safecss_filter_attr().
+	 */
+	const VALID_CUSTOM_PROPERTIES = array( '--wp--style--block-gap' => 'blockGap' );
+
+	/**
+	 * Constructor for this object.
 	 *
 	 * If a `$styles` array is passed, it will be used to populate
 	 * the initial $styles prop of the object by calling add_declarations().
@@ -92,15 +98,22 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Get the CSS styles.
 	 *
+	 * @param boolean $should_prettify Whether to format the output with indents.
+	 *
 	 * @return string The CSS styles.
 	 */
-	public function get_styles_string() {
+	public function get_styles_string( $should_prettify = false ) {
 		$styles_array = $this->get_styles();
 		$styles       = '';
+		$indent       = $should_prettify ? "\t" : '';
+		$newline      = $should_prettify ? "\n" : ' ';
 		foreach ( $styles_array as $property => $value ) {
 			$css = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			// @TODO The safecss_filter_attr_allow_css filter in safecss_filter_attr (kses.php) does not let through CSS custom variables.
+			// So we have to be strict about them here.
+			$css = isset( static::VALID_CUSTOM_PROPERTIES[ $property ] ) ? esc_html( "{$property}: {$value}" ) : esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
 			if ( $css ) {
-				$styles .= $css . '; ';
+				$styles .= "$indent$css;$newline";
 			}
 		}
 		return rtrim( $styles );

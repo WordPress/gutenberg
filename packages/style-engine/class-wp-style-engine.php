@@ -31,14 +31,6 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
-	 * A white list of CSS custom properties.
-	 * Used to bypass safecss_filter_attr().
-	 */
-	const VALID_CUSTOM_PROPERTIES = array(
-		'--wp--style--block-gap' => array( 'spacing', 'blockGap' ),
-	);
-
-	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -484,14 +476,17 @@ class WP_Style_Engine {
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_styles_string();
+		$css           = $style_rules->get_styles_string( $should_prettify );
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
 			$styles_output['css'] = $css;
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				$new_line = $should_prettify ? "\n" : '';
+				$spacer   = $should_prettify ? '' : ' ';
+				// @TODO this is just weird. Simplify?
+				$styles_output['css'] = "$css_selector {{$spacer}{$new_line}{$css}{$new_line}{$spacer}}$new_line";
 			}
 		}
 
