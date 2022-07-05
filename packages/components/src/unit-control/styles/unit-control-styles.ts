@@ -18,7 +18,6 @@ type SelectProps = {
 
 type InputProps = {
 	disableUnits?: boolean;
-	size: SelectSize;
 };
 
 export const Root = styled.div`
