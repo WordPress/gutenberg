@@ -8,7 +8,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import type { Admin } from './';
 
-interface SiteEditorQueryParams {
+export interface SiteEditorQueryParams {
 	postId: string | number;
 	postType: string;
 }
