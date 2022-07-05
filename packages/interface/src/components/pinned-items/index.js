@@ -16,8 +16,7 @@ function PinnedItemsSlot( { scope, className, ...props } ) {
 	return (
 		<Slot name={ `PinnedItems/${ scope }` } { ...props }>
 			{ ( fills ) =>
-				fills &&
-				fills.length && (
+				fills?.length > 0 && (
 					<div
 						className={ classnames(
 							className,
