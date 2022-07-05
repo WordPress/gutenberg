@@ -84,7 +84,7 @@ describe( 'Comments', () => {
 			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 		] );
 
-		// We check that there is only have a next link
+		// We check that there is only a next comments page link.
 		await expect( page ).not.toMatchElement(
 			'.wp-block-comments-pagination-previous'
 		);
