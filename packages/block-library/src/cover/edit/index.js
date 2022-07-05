@@ -264,7 +264,6 @@ function CoverEdit( {
 							minHeight: minHeightWithUnit || undefined,
 						} }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
-						hasFeaturedImage={ !! mediaUrl }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -401,7 +400,6 @@ function CoverEdit( {
 					onSelectMedia={ onSelectMedia }
 					onError={ onUploadError }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-					hasFeaturedImage={ !! mediaUrl }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>
