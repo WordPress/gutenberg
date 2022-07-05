@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, PanelBody } from '@wordpress/components';
+import { BottomSheet, BottomSheetV2, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
 
@@ -107,10 +107,14 @@ function DropdownMenu( {
 			} }
 			renderContent={ ( { isOpen, onClose, ...props } ) => {
 				return (
-					<BottomSheet
-						hideHeader={ true }
-						isVisible={ isOpen }
+					<BottomSheetV2
+						index={ isOpen ? 0 : -1 }
 						onClose={ onClose }
+						snapPoints={ [ BottomSheetV2.CONTENT_HEIGHT ] }
+						style={ {
+							paddingLeft: 16,
+							paddingRight: 16,
+						} }
 					>
 						{ isFunction( children ) ? children( props ) : null }
 						<PanelBody
@@ -147,7 +151,7 @@ function DropdownMenu( {
 									)
 							) }
 						</PanelBody>
-					</BottomSheet>
+					</BottomSheetV2>
 				);
 			} }
 		/>
