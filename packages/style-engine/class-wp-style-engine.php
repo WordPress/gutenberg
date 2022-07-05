@@ -428,7 +428,7 @@ class WP_Style_Engine {
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_styles_string();
+		$css           = $style_rules->get_declarations_string();
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
@@ -496,27 +496,27 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->generate.
+ * Global public interface method to WP_Style_Engine->generate to generate block styles from a single block style object.
  *
- * Returns an CSS ruleset.
- * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ * Returns an array of CSS and classnames.
+ * CSS and classnames are compiled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
  *
  * Example usage:
  *
- * $styles = wp_style_engine_generate( array( 'color' => array( 'text' => '#cccccc' ) ) );
- * // Returns `'color: #cccccc'`.
+ * $styles = wp_style_engine_generate_block_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * // Returns `array( 'css' => 'color: #cccccc', 'classnames' => 'has-color' )`.
  *
  * @access public
  *
- * @param array $block_styles An array of styles from a block's attributes.
- * @param array $options An array of options to determine the output.
+ * @param array         $block_styles An array of styles from a block's attributes.
+ * @param array<string> $options      An array of options to determine the output.
  *
- * @return array|null array(
+ * @return array<string>|null array(
  *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
  *     'classnames' => (string) Classnames separated by a space.
  * );
  */
-function wp_style_engine_generate( $block_styles, $options = array() ) {
+function wp_style_engine_generate_block_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
 		return $style_engine->generate( $block_styles, $options );

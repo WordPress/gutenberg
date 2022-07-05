@@ -12,32 +12,32 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS styles rules declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the style engine.
  *
  * @access private
  */
 class WP_Style_Engine_CSS_Declarations {
 
 	/**
-	 * An array of styles (property => value pairs).
+	 * An array of CSS declarations (property => value pairs).
 	 *
 	 * @var array
 	 */
-	protected $styles = array();
+	protected $declarations = array();
 
 	/**
-	 * Contructor for this object.
+	 * Constructor for this object.
 	 *
-	 * If a `$styles` array is passed, it will be used to populate
-	 * the initial $styles prop of the object by calling add_declarations().
+	 * If a `$declarations` array is passed, it will be used to populate
+	 * the initial $declarations prop of the object by calling add_declarations().
 	 *
-	 * @param array $styles An array of styles (property => value pairs).
+	 * @param array $declarations An array of declarations (property => value pairs).
 	 */
-	public function __construct( $styles = array() ) {
-		if ( empty( $styles ) ) {
+	public function __construct( $declarations = array() ) {
+		if ( empty( $declarations ) ) {
 			return;
 		}
-		$this->add_declarations( $styles );
+		$this->add_declarations( $declarations );
 	}
 
 	/**
@@ -63,8 +63,8 @@ class WP_Style_Engine_CSS_Declarations {
 			return;
 		}
 
-		// Add the style.
-		$this->styles[ $property ] = $value;
+		// Add the declaration property/value pair.
+		$this->declarations[ $property ] = $value;
 	}
 
 	/**
@@ -81,29 +81,29 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Get the styles array.
+	 * Get the declarations array.
 	 *
 	 * @return array
 	 */
-	public function get_styles() {
-		return $this->styles;
+	public function get_declarations() {
+		return $this->declarations;
 	}
 
 	/**
-	 * Get the CSS styles.
+	 * Filters and compiles the CSS declarations.
 	 *
-	 * @return string The CSS styles.
+	 * @return string The CSS declarations.
 	 */
-	public function get_styles_string() {
-		$styles_array = $this->get_styles();
-		$styles       = '';
-		foreach ( $styles_array as $property => $value ) {
-			$css = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
-			if ( $css ) {
-				$styles .= $css . '; ';
+	public function get_declarations_string() {
+		$declarations_array  = $this->get_declarations();
+		$declarations_output = '';
+		foreach ( $declarations_array as $property => $value ) {
+			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			if ( $filtered_declaration ) {
+				$declarations_output .= $filtered_declaration . '; ';
 			}
 		}
-		return rtrim( $styles );
+		return rtrim( $declarations_output );
 	}
 
 	/**
