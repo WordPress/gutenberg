@@ -9,6 +9,7 @@ import {
 	publishPost,
 	setOption,
 	trashAllComments,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Comments', () => {
@@ -29,6 +30,8 @@ describe( 'Comments', () => {
 		await createNewPost();
 		await insertBlock( 'Comments' );
 		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
+		// Prevent the "unsaved changes" warning dialog from opening.
+		await saveDraft();
 	} );
 	it( 'Pagination links are working as expected', async () => {
 		await createNewPost();
