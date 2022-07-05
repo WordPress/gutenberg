@@ -262,6 +262,9 @@
 					"fontFamily": "inherit",
 					"lineHeight": "inherit",
 					"textDecoration": "none"
+				},
+				"border": {
+					"width": "0"
 				}
 			},
 			"link": {
