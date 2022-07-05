@@ -187,7 +187,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 * The value to revert to if the Reset button is clicked (enabled by
 		 * `allowReset`)
 		 */
-		resetFallbackValue?: number | string | null;
+		resetFallbackValue?: number;
 		/**
 		 * Define if separator line under/above control row should be disabled
 		 * or full width. By default it is placed below excluding underline the

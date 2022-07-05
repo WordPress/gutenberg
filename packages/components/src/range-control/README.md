@@ -309,7 +309,7 @@ const MyRangeControl() {
 -   Required: No
 -   Platform: Web
 
-### `resetFallbackValue`: `number` | `string` | `null`
+### `resetFallbackValue`: `number`
 
 The value to revert to if the Reset button is clicked (enabled by `allowReset`)
 
