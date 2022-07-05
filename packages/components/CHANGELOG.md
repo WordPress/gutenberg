@@ -20,6 +20,10 @@
 
 -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
 
+### Bug Fix
+
+-   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
+
 ## 19.14.0 (2022-06-29)
 
 ### Bug Fix
