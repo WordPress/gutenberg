@@ -243,7 +243,6 @@ export type InputRangeProps = {
 };
 
 export type WrapperProps = {
-	className?: string;
 	color?: CSSProperties[ 'color' ];
 	marks?: RangeMarks;
 };
