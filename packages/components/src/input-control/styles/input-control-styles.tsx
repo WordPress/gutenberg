@@ -147,6 +147,7 @@ const sizeStyles = ( {
 	inputSize: size,
 	__next36pxDefaultSize,
 }: InputProps ) => {
+	// Paddings may be overriden by the custom paddings props.
 	const sizes = {
 		default: {
 			height: 36,
