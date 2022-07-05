@@ -164,9 +164,9 @@
 				"innerContent": []
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-comments wp-block-comments-query-loop comments-post-extra\">\n\n    \n    \n    \n    \n    </div>\n    ",
+		"innerHTML": "\n<div class=\"wp-block-comments comments-post-extra\">\n\n    \n    \n    \n    \n    </div>\n    ",
 		"innerContent": [
-			"\n<div class=\"wp-block-comments wp-block-comments-query-loop comments-post-extra\">",
+			"\n<div class=\"wp-block-comments comments-post-extra\">",
 			null,
 			"\n\n    ",
 			null,
