@@ -9,7 +9,7 @@ import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 		'input',
 		false
 	>,
-	ref: ForwardedRef< HTMLInputElement >
+	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
 		afterIcon,
@@ -103,15 +103,6 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	const inputRef = useRef< HTMLInputElement >();
-
-	const setRef = ( nodeRef: HTMLInputElement ) => {
-		inputRef.current = nodeRef;
-
-		if ( typeof ref === 'function' ) {
-			ref( nodeRef );
-		}
-	};
-
 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 	const isThumbFocused = ! disabled && isFocused;
 
@@ -255,7 +246,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
 						onFocus={ handleOnFocus }
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
-						ref={ setRef }
+						ref={ useMergeRefs( [ inputRef, forwardedRef ] ) }
 						step={ step }
 						value={ inputSliderValue ?? undefined }
 					/>
