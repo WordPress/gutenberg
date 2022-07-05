@@ -7,7 +7,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ComboboxControl from '../';
-import FormTokenField from '../../form-token-field';
 
 const countries = [
 	{ name: 'Afghanistan', code: 'AF' },
@@ -288,39 +287,3 @@ _default.args = {
 	__next36pxDefaultSize: false,
 	allowReset: false,
 };
-
-export function TestDuplicateInstanceIds( args ) {
-	const [ comboboxValue, setComboboxValue ] = useState( null );
-
-	const [ selectedContinents, setSelectedContinents ] = useState( [] );
-
-	return (
-		<>
-			<ComboboxControl
-				{ ...args }
-				value={ comboboxValue }
-				onChange={ setComboboxValue }
-				label="Select a country"
-				options={ countryOptions }
-			/>
-
-			<FormTokenField
-				{ ...args }
-				label="Type a continent"
-				value={ selectedContinents }
-				onChange={ ( tokens ) => setSelectedContinents( tokens ) }
-				suggestions={ [
-					'Africa',
-					'America',
-					'Antarctica',
-					'Asia',
-					'Europe',
-					'Oceania',
-				] }
-			/>
-
-			<p>Value CBB: { comboboxValue }</p>
-			<p>Value FTF: { selectedContinents }</p>
-		</>
-	);
-}
