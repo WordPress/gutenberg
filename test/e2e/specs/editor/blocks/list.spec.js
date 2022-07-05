@@ -761,15 +761,13 @@ test.describe( 'List', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 
 		// Tests the shortcut with a non breaking space.
-		await page.keyboard.type( '* ' );
+		await page.keyboard.type( '*\u00a0' );
 
-		/* eslint-disable no-irregular-whitespace */
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
-<p>* </p>
+<p>*\u00a0</p>
 <!-- /wp:paragraph -->`
 		);
-		/* eslint-enable no-irregular-whitespace */
 	} );
 
 	test( 'should preserve indentation after merging backward and forward', async ( {
