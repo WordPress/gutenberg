@@ -29,6 +29,19 @@ const colorsAndGradientKeys = [
 	'disableCustomGradients',
 ];
 
+const TAB_COLOR = {
+	name: 'color',
+	title: 'Solid color',
+	value: 'color',
+};
+const TAB_GRADIENT = {
+	name: 'gradient',
+	title: 'Gradient',
+	value: 'gradient',
+};
+
+const TABS_SETTINGS = [ TAB_COLOR, TAB_GRADIENT ];
+
 function ColorGradientControlInner( {
 	colors,
 	gradients,
@@ -52,7 +65,9 @@ function ColorGradientControlInner( {
 		onGradientChange &&
 		( ! isEmpty( gradients ) || ! disableCustomGradients );
 	const [ currentTab, setCurrentTab ] = useState(
-		gradientValue ? 'gradient' : !! canChooseAColor && 'color'
+		gradientValue
+			? TAB_GRADIENT.value
+			: !! canChooseAColor && TAB_COLOR.value
 	);
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
@@ -80,23 +95,13 @@ function ColorGradientControlInner( {
 						<TabPanel
 							className="block-editor-color-gradient-control__tabs"
 							onSelect={ setCurrentTab }
-							tabs={ [
-								{
-									name: 'color',
-									title: 'Solid color',
-									value: 'color',
-								},
-								{
-									name: 'gradient',
-									title: 'Gradient',
-									value: 'gradient',
-								},
-							] }
+							tabs={ TABS_SETTINGS }
 						>
 						{ ( tab ) => <p className="screen-reader-text">Selected tab: { tab.title }</p> }
 						</TabPanel>
 					) }
-					{ ( currentTab === 'color' || ! canChooseAGradient ) && (
+					{ ( currentTab === TAB_COLOR.value ||
+						! canChooseAGradient ) && (
 						<ColorPalette
 							value={ colorValue }
 							onChange={
@@ -118,7 +123,8 @@ function ColorGradientControlInner( {
 							enableAlpha={ enableAlpha }
 						/>
 					) }
-					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
+					{ ( currentTab === TAB_GRADIENT.value ||
+						! canChooseAColor ) && (
 						<GradientPicker
 							value={ gradientValue }
 							onChange={
