@@ -162,17 +162,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return array Sanitized structure.
 	 */
 	public static function remove_insecure_properties( $theme_json ) {
-		$sanitized = array();
-
-		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
-
+		$sanitized           = array();
+		$theme_json          = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-
-		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
-
-		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $theme_json );
+		$theme_json          = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+		$style_nodes         = static::get_style_nodes( $theme_json );
 
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
