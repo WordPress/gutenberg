@@ -84,3 +84,26 @@ function gutenberg_register_has_archive_on_post_types_endpoint() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_has_archive_on_post_types_endpoint' );
+
+/**
+ * Update `custom_css` post type to show in rest
+ *
+ * @param array  $args Array of arguments for registering a post type.
+ * @param string $post_type Post type key.
+ */
+function gutenberg_update_custom_css_rest( $args, $post_type ) {
+	if ( in_array( $post_type, array( 'custom_css' ), true ) ) {
+		$args['show_in_rest'] = true;
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_update_custom_css_rest', 10, 2 );
+
+/**
+ * Registers the custom CSS REST API routes.
+ */
+function gutenberg_register_gutenberg_rest_custom_css() {
+	$custom_css = new WP_REST_Custom_CSS_Controller();
+	$custom_css->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_custom_css', 100 );
