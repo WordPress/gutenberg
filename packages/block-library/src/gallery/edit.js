@@ -51,7 +51,6 @@ import {
 	LINK_DESTINATION_NONE,
 } from './constants';
 import useImageSizes from './use-image-sizes';
-import useShortCodeTransform from './use-short-code-transform';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
@@ -87,14 +86,7 @@ function GalleryEdit( props ) {
 		insertBlocksAfter,
 	} = props;
 
-	const {
-		columns,
-		imageCrop,
-		linkTarget,
-		linkTo,
-		shortCodeTransforms,
-		sizeSlug,
-	} = attributes;
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -151,6 +143,8 @@ function GalleryEdit( props ) {
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
+			// Update the images data without creating new undo levels.
+			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( newImage.clientId, {
 				...buildImageAttributes( newImage.attributes ),
 				id: newImage.id,
@@ -161,16 +155,6 @@ function GalleryEdit( props ) {
 			clearSelectedBlock();
 		}
 	}, [ newImages ] );
-
-	const shortCodeImages = useShortCodeTransform( shortCodeTransforms );
-
-	useEffect( () => {
-		if ( ! shortCodeTransforms || ! shortCodeImages ) {
-			return;
-		}
-		updateImages( shortCodeImages );
-		setAttributes( { shortCodeTransforms: undefined } );
-	}, [ shortCodeTransforms, shortCodeImages ] );
 
 	const imageSizeOptions = useImageSizes(
 		imageData,
@@ -208,8 +192,9 @@ function GalleryEdit( props ) {
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
 			className: newClassName,
-			caption: imageAttributes.caption,
 			sizeSlug,
+			caption: imageAttributes.caption || image.caption?.raw,
+			alt: imageAttributes.alt || image.alt_text,
 		};
 	}
 

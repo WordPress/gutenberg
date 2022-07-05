@@ -287,20 +287,45 @@ A transformation of type `shortcode` is an object that takes the following param
 
 -   **type** _(string)_: the value `shortcode`.
 -   **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
--   **attributes** _(object)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
+-   **transform** _(function, optional): a callback that receives the shortcode attributes as the first argument and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as the second. It should return a block object or an array of block objects. When this parameter is defined, it will take precedence over the `attributes` parameter.
+-   **attributes** _(object, optional)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
 -   **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
 -   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from shortcode to block**
+**Example: from shortcode to block using `transform`**
 
-An existing shortcode can be transformed into its block counterpart.
+An existing shortcode can be transformed into its block counterpart using the `transform` method.
 
 ```js
 transforms: {
     from: [
         {
             type: 'shortcode',
-            tag: 'caption',
+            tag: 'video',
+            transform( { named: { src } } ) {
+                return createBlock( 'core/video', { src } );
+            },
+            // Prevent the shortcode to be converted
+            // into this block when it doesn't
+            // have the proper ID.
+            isMatch( { named: { id } } ) {
+                return id === 'my-id';
+            },
+        },
+    ],
+},
+```
+
+**Example: from shortcode to block using `attributes`**
+
+An existing shortcode can be transformed into its block counterpart using the `attributes` parameters.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'youtube',
             attributes: {
                 url: {
                     type: 'string',
