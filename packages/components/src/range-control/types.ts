@@ -268,17 +268,12 @@ export type TrackProps = {
 	trackColor: CSSProperties[ 'color' ];
 };
 
-export type useControlledRangeValueProps = {
+export type useControlledRangeValueArgs = {
 	initial?: number;
 	max: number;
 	min: number;
 	value: number | null;
 };
-
-export type useControlledRangeValueReturn = [
-	number | '' | null,
-	( nextValue: number | null ) => void
-];
 
 export type useMarksArgs = NumericProps & {
 	marks: RangeMarks;

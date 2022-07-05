@@ -14,10 +14,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
 
-import type {
-	useControlledRangeValueProps,
-	useControlledRangeValueReturn,
-} from './types';
+import type { useControlledRangeValueArgs } from './types';
 
 const noop = () => {};
 
@@ -54,14 +51,14 @@ export function useControlledRangeValue( {
 	max,
 	value: valueProp,
 	initial,
-}: useControlledRangeValueProps ): useControlledRangeValueReturn {
+}: useControlledRangeValueArgs ) {
 	const [ state, setInternalState ] = useControlledState(
 		floatClamp( valueProp, min, max ),
 		{ initial, fallback: null }
 	);
 
 	const setState = useCallback(
-		( nextValue ) => {
+		( nextValue: number | null ) => {
 			if ( nextValue === null ) {
 				setInternalState( null );
 			} else {
@@ -71,7 +68,7 @@ export function useControlledRangeValue( {
 		[ min, max ]
 	);
 
-	return [ state, setState ];
+	return [ state, setState ] as const;
 }
 
 /**
