@@ -59,12 +59,12 @@ describe( 'Comments', () => {
 		}
 
 		// We check that there is a previous comments page link.
-		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
-		).not.toBeNull();
-		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
-		).toBeNull();
+		await expect( page ).toMatchElement(
+			'.wp-block-comments-pagination-previous'
+		);
+		await expect( page ).not.toMatchElement(
+			'.wp-block-comments-pagination-next'
+		);
 
 		await Promise.all( [
 			page.click( '.wp-block-comments-pagination-previous' ),
@@ -72,12 +72,12 @@ describe( 'Comments', () => {
 		] );
 
 		// We check that there are a previous and a next link.
-		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
-		).not.toBeNull();
-		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
-		).not.toBeNull();
+		await expect( page ).toMatchElement(
+			'.wp-block-comments-pagination-previous'
+		);
+		await expect( page ).toMatchElement(
+			'.wp-block-comments-pagination-next'
+		);
 
 		await Promise.all( [
 			page.click( '.wp-block-comments-pagination-previous' ),
@@ -85,12 +85,12 @@ describe( 'Comments', () => {
 		] );
 
 		// We check that there is only have a next link
-		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
-		).toBeNull();
-		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
-		).not.toBeNull();
+		await expect( page ).not.toMatchElement(
+			'.wp-block-comments-pagination-previous'
+		);
+		await expect( page ).toMatchElement(
+			'.wp-block-comments-pagination-next'
+		);
 	} );
 	it( 'Pagination links are not appearing if break comments is not enabled', async () => {
 		await setOption( 'page_comments', '0' );
@@ -117,12 +117,12 @@ describe( 'Comments', () => {
 			] );
 		}
 		// We check that there are no comments page link.
-		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
-		).toBeNull();
-		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
-		).toBeNull();
+		await expect( page ).not.toMatchElement(
+			'.wp-block-comments-pagination-previous'
+		);
+		await expect( page ).not.toMatchElement(
+			'.wp-block-comments-pagination-next'
+		);
 	} );
 	afterAll( async () => {
 		await trashAllComments();
