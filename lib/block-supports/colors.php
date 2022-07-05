@@ -100,7 +100,12 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$style      = gutenberg_style_engine_generate_css( array( 'border' => $color_block_styles ) );
+	$style      = gutenberg_style_engine_generate_css(
+		array( 'border' => $color_block_styles ),
+		array(
+			'skip_css_vars' => true,
+		)
+	);
 	$class      = gutenberg_style_engine_generate_classnames( array( 'border' => $color_block_presets ) );
 
 	if ( ! empty( $style ) ) {
