@@ -50,8 +50,8 @@ export class PostSlug extends Component {
 					autoComplete="off"
 					spellCheck="false"
 					value={ editedSlug }
-					onChange={ ( event ) =>
-						this.setState( { editedSlug: event.target.value } )
+					onChange={ ( slug ) =>
+						this.setState( { editedSlug: slug } )
 					}
 					onBlur={ this.setSlug }
 					className="editor-post-slug"
