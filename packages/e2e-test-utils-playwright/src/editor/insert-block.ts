@@ -3,7 +3,7 @@
  */
 import type { Editor } from './index';
 
-export interface BlockRepresentation {
+interface BlockRepresentation {
 	name: string;
 	attributes: Object;
 	innerBlocks: BlockRepresentation[];
