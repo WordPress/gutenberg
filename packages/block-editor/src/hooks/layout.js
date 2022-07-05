@@ -58,9 +58,7 @@ function getLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
-	if ( layout?.inherit || layout.contentSize ) {
-		layoutClassnames.push( 'has-content-size' );
-	} else if ( layout?.useGlobalPadding ) {
+	if ( layout?.inherit || layout?.contentSize || layout?.useGlobalPadding ) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -115,7 +113,11 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const { inherit = false, type = 'default' } = usedLayout;
+	const {
+		inherit = false,
+		type = 'default',
+		useGlobalPadding = false,
+	} = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow`
 	 * layout and it should not be taken into account when other
@@ -142,7 +144,11 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								checked={ ! inherit }
 								onChange={ () =>
 									setAttributes( {
-										layout: { inherit: ! inherit },
+										layout: {
+											inherit: ! inherit,
+											useGlobalPadding:
+												! inherit || useGlobalPadding,
+										},
 									} )
 								}
 							/>

@@ -53,6 +53,7 @@ export default {
 								onChange( {
 									...layout,
 									contentSize: nextWidth,
+									useGlobalPadding: true,
 								} );
 							} }
 							units={ units }
@@ -73,6 +74,7 @@ export default {
 								onChange( {
 									...layout,
 									wideSize: nextWidth,
+									useGlobalPadding: true,
 								} );
 							} }
 							units={ units }
@@ -90,6 +92,7 @@ export default {
 								contentSize: undefined,
 								wideSize: undefined,
 								inherit: false,
+								useGlobalPadding: false,
 							} )
 						}
 					>
@@ -159,6 +162,22 @@ export default {
 				`
 				: '';
 
+		// If there is custom padding, add negative margins for alignfull blocks.
+		// They're added separately because padding might only be set on one side.
+		if ( style?.spacing?.padding?.right ) {
+			output += `
+			${ appendSelectors( selector, '> .alignfull' ) } {
+				margin-right: -${ style.spacing.padding.right };
+			}
+			`;
+		}
+		if ( style?.spacing?.padding?.left ) {
+			output += `
+			${ appendSelectors( selector, '> .alignfull' ) } {
+				margin-left: -${ style.spacing.padding.left };
+			}
+			`;
+		}
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
 		if ( hasBlockGapSupport && blockGapValue ) {
 			output += getBlockGapCSS(
