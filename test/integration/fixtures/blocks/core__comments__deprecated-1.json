@@ -4,7 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"className": "comments-post-extra has-luminous-vivid-orange-color has-text-color",
+			"className": "wp-block-comments-query-loop comments-post-extra",
 			"textColor": "luminous-vivid-orange"
 		},
 		"innerBlocks": [

@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 // v1: Deprecate the initial version of the block which was called "Comments
 // Query Loop" instead of "Comments".
@@ -31,14 +26,21 @@ const v1 = {
 			},
 		},
 	},
-	save( { attributes: { className, tagName: Tag } } ) {
+	save( { attributes: { tagName: Tag } } ) {
+		const blockProps = useBlockProps.save();
+		const { className } = blockProps;
+		const classes = className?.split( ' ' ) || [];
+
+		const newClasses = classes?.filter(
+			( cls ) => cls !== 'wp-block-comments'
+		);
+		const newBlockProps = {
+			...blockProps,
+			className: newClasses.join( ' ' ),
+		};
+
 		return (
-			<Tag
-				className={ classnames(
-					'wp-block-comments-query-loop',
-					className
-				) }
-			>
+			<Tag { ...newBlockProps }>
 				<InnerBlocks.Content />
 			</Tag>
 		);
