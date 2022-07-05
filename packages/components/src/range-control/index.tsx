@@ -43,10 +43,10 @@ const noop = () => {};
 function UnforwardedRangeControl< IconProps = unknown >(
 	props: WordPressComponentProps<
 		RangeControlProps< IconProps >,
-		'div',
+		'input',
 		false
 	>,
-	ref: ForwardedRef< HTMLDivElement >
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
 		afterIcon,
