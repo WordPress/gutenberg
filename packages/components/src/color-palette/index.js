@@ -118,7 +118,11 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 			contentClassName="components-color-palette__custom-color-dropdown-content"
 			popoverProps={
 				isRenderedInSidebar
-					? { placement: 'left-start', offset: 20 }
+					? {
+							placement: 'left-start',
+							offset: 20,
+							__unstableShift: true,
+					  }
 					: undefined
 			}
 			{ ...props }

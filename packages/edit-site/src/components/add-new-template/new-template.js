@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -13,9 +8,8 @@ import {
 	NavigableMenu,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import {
 	archive,
 	blockMeta,
@@ -31,14 +25,23 @@ import {
 	search,
 	tag,
 } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import AddCustomTemplateModal from './add-custom-template-modal';
-import { usePostTypes, usePostTypesEntitiesInfo } from './utils';
+import {
+	useExistingTemplates,
+	useDefaultTemplateTypes,
+	entitiesConfig,
+	usePostTypes,
+	useTaxonomies,
+	useTaxonomyCategory,
+	useTaxonomyTag,
+	useExtraTemplates,
+} from './utils';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -74,28 +77,15 @@ const TEMPLATE_ICONS = {
 };
 
 export default function NewTemplate( { postType } ) {
-	const history = useHistory();
-	const postTypes = usePostTypes();
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
+
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
-	const { existingTemplates, defaultTemplateTypes } = useSelect(
-		( select ) => ( {
-			existingTemplates: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{ per_page: -1 }
-			),
-			defaultTemplateTypes:
-				select( editorStore ).__experimentalGetDefaultTemplateTypes(),
-		} ),
-		[]
-	);
-	const postTypesEntitiesInfo = usePostTypesEntitiesInfo( existingTemplates );
+
+	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setTemplate } = useDispatch( editSiteStore );
-
 	async function createTemplate( template ) {
 		try {
 			const { title, description, slug } = template;
@@ -108,7 +98,7 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					// This adds a post meta field in template that is part of `is_custom` value calculation.
+					// This adds a post meta field in template, that is part of `is_custom` value calculation.
 					is_wp_suggestion: true,
 				},
 				{ throwOnError: true }
@@ -135,78 +125,14 @@ export default function NewTemplate( { postType } ) {
 			} );
 		}
 	}
-	const existingTemplateSlugs = ( existingTemplates || [] ).map(
-		( { slug } ) => slug
-	);
-	const missingTemplates = filter(
-		defaultTemplateTypes,
-		( template ) =>
-			includes( DEFAULT_TEMPLATE_SLUGS, template.slug ) &&
-			! includes( existingTemplateSlugs, template.slug )
-	);
 
-	const extraTemplates = ( postTypes || [] ).reduce(
-		( accumulator, _postType ) => {
-			const { slug, labels, icon } = _postType;
-			const hasGeneralTemplate = existingTemplateSlugs?.includes(
-				`single-${ slug }`
-			);
-			const hasEntities = postTypesEntitiesInfo?.[ slug ]?.hasEntities;
-			const menuItem = {
-				slug: `single-${ slug }`,
-				title: sprintf(
-					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Single item: %s' ),
-					labels.singular_name
-				),
-				description: sprintf(
-					// translators: %s: Name of the post type e.g: "Post".
-					__( 'Displays a single item: %s.' ),
-					labels.singular_name
-				),
-				// `icon` is the `menu_icon` property of a post type. We
-				// only handle `dashicons` for now, even if the `menu_icon`
-				// also supports urls and svg as values.
-				icon: icon?.startsWith( 'dashicons-' )
-					? icon.slice( 10 )
-					: null,
-			};
-			// We have a different template creation flow only if they have entities.
-			if ( hasEntities ) {
-				menuItem.onClick = ( template ) => {
-					setShowCustomTemplateModal( true );
-					setEntityForSuggestions( {
-						type: 'postType',
-						slug,
-						labels,
-						hasGeneralTemplate,
-						template,
-						postsToExclude:
-							postTypesEntitiesInfo[ slug ].existingPosts,
-					} );
-				};
-			}
-			// We don't need to add the menu item if there are no
-			// entities and the general template exists.
-			if ( ! hasGeneralTemplate || hasEntities ) {
-				accumulator.push( menuItem );
-			}
-			return accumulator;
-		},
-		[]
+	const missingTemplates = useMissingTemplates(
+		setEntityForSuggestions,
+		setShowCustomTemplateModal
 	);
-	if ( ! missingTemplates.length && ! extraTemplates.length ) {
+	if ( ! missingTemplates.length ) {
 		return null;
 	}
-	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
-	missingTemplates?.sort( ( template1, template2 ) => {
-		return (
-			DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) -
-			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
-		);
-	} );
-	// Append all extra templates at the end of the list for now.
-	missingTemplates.push( ...extraTemplates );
 	return (
 		<>
 			<DropdownMenu
@@ -265,4 +191,92 @@ export default function NewTemplate( { postType } ) {
 			) }
 		</>
 	);
+}
+
+function useMissingTemplates(
+	setEntityForSuggestions,
+	setShowCustomTemplateModal
+) {
+	const postTypes = usePostTypes();
+	const taxonomies = useTaxonomies();
+	const categoryTaxonomy = useTaxonomyCategory();
+	const tagTaxonomy = useTaxonomyTag();
+
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+
+	const existingTemplateSlugs = ( existingTemplates || [] ).map(
+		( { slug } ) => slug
+	);
+
+	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
+		( template ) =>
+			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
+			! existingTemplateSlugs.includes( template.slug )
+	);
+	const onClickMenuItem = ( _entityForSuggestions ) => {
+		setShowCustomTemplateModal( true );
+		setEntityForSuggestions( _entityForSuggestions );
+	};
+	// TODO: find better names for these variables. `useExtraTemplates` returns an array of items.
+	const categoryMenuItem = useExtraTemplates(
+		categoryTaxonomy,
+		entitiesConfig.category,
+		onClickMenuItem
+	);
+	const tagMenuItem = useExtraTemplates(
+		tagTaxonomy,
+		entitiesConfig.tag,
+		onClickMenuItem
+	);
+	// We need to replace existing default template types with
+	// the create specific template functionality. The original
+	// info (title, description, etc.) is preserved in the
+	// `useExtraTemplates` hook.
+	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
+	[ categoryMenuItem, tagMenuItem ].forEach( ( menuItem ) => {
+		if ( ! menuItem?.length ) {
+			return;
+		}
+		const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
+			( template ) => template.slug === menuItem[ 0 ].slug
+		);
+		// Some default template types might have been filtered above from
+		// `missingDefaultTemplates` because they only check for the general
+		// template. So here we either replace or append the item, augmented
+		// with the check if it has available specific item to create a
+		// template for.
+		if ( matchIndex > -1 ) {
+			enhancedMissingDefaultTemplateTypes.splice(
+				matchIndex,
+				1,
+				menuItem[ 0 ]
+			);
+		} else {
+			enhancedMissingDefaultTemplateTypes.push( menuItem[ 0 ] );
+		}
+	} );
+	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
+	enhancedMissingDefaultTemplateTypes?.sort( ( template1, template2 ) => {
+		return (
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template1.slug ) -
+			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
+		);
+	} );
+	const extraPostTypeTemplates = useExtraTemplates(
+		postTypes,
+		entitiesConfig.postType,
+		onClickMenuItem
+	);
+	const extraTaxonomyTemplates = useExtraTemplates(
+		taxonomies,
+		entitiesConfig.taxonomy,
+		onClickMenuItem
+	);
+	const missingTemplates = [
+		...enhancedMissingDefaultTemplateTypes,
+		...extraPostTypeTemplates,
+		...extraTaxonomyTemplates,
+	];
+	return missingTemplates;
 }
