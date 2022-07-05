@@ -142,22 +142,32 @@ class WP_Style_Engine {
 			),
 		),
 		'spacing'    => array(
-			'padding' => array(
+			'blockGap' => array(
 				'property_keys' => array(
-					'default'    => 'padding',
-					'individual' => 'padding-%s',
+					// @TODO 'grid-gap' has been deprecated in favor of 'gap'.
+					// See: https://developer.mozilla.org/en-US/docs/Web/CSS/gap.
+					// Update the white list in safecss_filter_attr (kses.php).
+					// See: https://core.trac.wordpress.org/ticket/56122
+					'default' => 'grid-gap',
 				),
-				'path'          => array( 'spacing', 'padding' ),
-				'css_vars'      => array(
-					'spacing' => '--wp--preset--spacing--$slug',
-				),
+				'path'          => array( 'spacing', 'blockGap' ),
 			),
-			'margin'  => array(
+			'margin'   => array(
 				'property_keys' => array(
 					'default'    => 'margin',
 					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
+			),
+			'padding'  => array(
+				'property_keys' => array(
+					'default'    => 'padding',
+					'individual' => 'padding-%s',
+				),
+				'path'          => array( 'spacing', 'padding' ),
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
@@ -219,6 +229,16 @@ class WP_Style_Engine {
 				'path'          => array( 'typography', 'letterSpacing' ),
 			),
 		),
+	);
+
+	/**
+	 * The valid elements that can be found under styles.
+	 *
+	 * @var string[]
+	 */
+	const ELEMENTS = array(
+		'link' => 'a',
+		'h1'   => 'h1',
 	);
 
 	/**
@@ -448,6 +468,53 @@ class WP_Style_Engine {
 		return $styles_output;
 	}
 
+	public function generate_global_styles( $global_styles, $options ) {
+		if ( empty( $global_styles ) || ! is_array( $global_styles ) ) {
+			return null;
+		}
+
+		// The return stylesheet.
+		$global_stylesheet = '';
+
+		// Layer 0: Root.
+		$root_level_styles = $this->generate( $global_styles, array( 'selector' => 'body' ) );
+
+		if ( ! empty( $root_level_styles['css'] ) ) {
+			$global_stylesheet .= $root_level_styles['css'] . ' ';
+		}
+
+		// Layer 1: Elements.
+		if ( isset( $global_styles['elements'] ) && is_array( $global_styles['elements'] ) ) {
+			foreach ( $global_styles['elements'] as $element_name => $element_styles ) {
+				$selector = isset( static::ELEMENTS[ $element_name ] ) ? static::ELEMENTS[ $element_name ] : null;
+				if ( ! $selector ) {
+					continue;
+				}
+				$element_level_styles = $this->generate( $element_styles, array( 'selector' => $selector ) );
+				if ( ! empty( $element_level_styles['css'] ) ) {
+					$global_stylesheet .= $element_level_styles['css'] . ' ';
+				}
+			}
+		}
+
+		// Layer 2: Blocks.
+		if ( isset( $global_styles['blocks'] ) && is_array( $global_styles['blocks'] ) ) {
+			foreach ( $global_styles['blocks'] as $block_name => $block_styles ) {
+				$selector           = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+				$block_level_styles = $this->generate( $block_styles, array( 'selector' => $selector ) );
+				if ( ! empty( $block_level_styles['css'] ) ) {
+					$global_stylesheet .= $block_level_styles['css'] . ' ';
+				}
+			}
+		}
+
+		if ( ! empty( $global_stylesheet ) ) {
+			return rtrim( $global_stylesheet );
+		}
+
+		return null;
+	}
+
 	/**
 	 * Style value parser that returns a CSS definition array comprising style properties
 	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
@@ -519,6 +586,15 @@ function wp_style_engine_get_block_supports_styles( $block_styles, $options = ar
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
 		return $style_engine->get_block_supports_styles( $block_styles, $options );
+	}
+	return null;
+}
+
+
+function wp_style_engine_generate_global_styles( $global_styles, $options = array() ) {
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		$style_engine = WP_Style_Engine::get_instance();
+		return $style_engine->generate_global_styles( $global_styles, $options );
 	}
 	return null;
 }

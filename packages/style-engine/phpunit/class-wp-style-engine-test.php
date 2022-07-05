@@ -458,4 +458,114 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Tests generating styles and classnames based on various manifestations of the $global_styles argument.
+	 *
+	 * @dataProvider data_generate_global_styles_fixtures
+	 */
+	public function test_generate_global_styles( $global_styles, $options, $expected_output ) {
+		$generated_styles = wp_style_engine_generate_global_styles( $global_styles, $options );
+		$this->assertSame( $expected_output, $generated_styles );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_generate_global_styles_fixtures() {
+		return array(
+			'default_return_value'                         => array(
+				'global_styles'   => array(),
+				'options'         => null,
+				'expected_output' => null,
+			),
+			'default_return_valid_top_level_css_rules'     => array(
+				'global_styles'   => array(
+					'color'      => array(
+						'text'       => 'var(--wp--preset--color--foreground)',
+						'background' => 'var(--wp--preset--color--background)',
+					),
+					'spacing'    => array(
+						'blockGap' => '2rem',
+						'padding'  => array(
+							'top'    => '10%',
+							'right'  => '20%',
+							'bottom' => '10%',
+							'left'   => '20%',
+						),
+					),
+					'typography' => array(
+						'fontFamily' => 'var(--wp--preset--font-family--system-font)',
+						'lineHeight' => 2,
+						'fontSize'   => '1rem',
+					),
+				),
+				'options'         => null,
+				'expected_output' => 'body { color: var(--wp--preset--color--foreground); background-color: var(--wp--preset--color--background); padding-top: 10%; padding-right: 20%; padding-bottom: 10%; padding-left: 20%; font-size: 1rem; font-family: var(--wp--preset--font-family--system-font); line-height: 2; }',
+			),
+			'default_return_valid_element_level_css_rules' => array(
+				'global_styles'   => array(
+					'spacing'  => array(
+						'margin' => '20%',
+					),
+					'elements' => array(
+						'h1'   => array(
+							'border' => array(
+								'radius' => '0',
+							),
+							'color'  => array(
+								'text'       => '#ffffff',
+								'background' => '#000000',
+							),
+						),
+						'link' => array(
+							'typography' => array(
+								'fontStyle' => 'underline',
+							),
+							'margin'     => array(
+								'bottom' => '20px',
+							),
+							'color'      => array(
+								'text' => 'var(--wp--preset--color--foreground)',
+							),
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => 'body { margin: 20%; } h1 { color: #ffffff; background-color: #000000; border-radius: 0; } a { color: var(--wp--preset--color--foreground); font-style: underline; }',
+			),
+			'default_return_valid_block_level_css_rules'   => array(
+				'global_styles'   => array(
+					'spacing' => array(
+						'margin' => '20%',
+					),
+					'blocks'  => array(
+						'core/button'     => array(
+							'border' => array(
+								'radius' => '0',
+							),
+							'color'  => array(
+								'text'       => 'piano-red',
+								'background' => 'muddy-waters',
+							),
+						),
+						'core/site-title' => array(
+							'typography' => array(
+								'fontSize'   => 'clamp(2em, 2vw, 4em)',
+								'fontFamily' => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+								'fontStyle'  => 'italic',
+							),
+							'margin'     => array(
+								'bottom' => '20px',
+							),
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => 'body { margin: 20%; } .wp-block-button { color: piano-red; background-color: muddy-waters; border-radius: 0; } .wp-block-site-title { font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; }',
+			),
+		);
+	}
 }
