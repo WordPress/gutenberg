@@ -234,10 +234,10 @@ export type RailProps = MarksProps & {
 export type InputRangeProps = {
 	describedBy?: string;
 	label?: string;
-	onHideTooltip?: () => undefined;
+	onHideTooltip?: () => void;
 	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
 	onMouseMove?: MouseEventHandler< HTMLInputElement >;
-	onShowTooltip?: () => undefined;
+	onShowTooltip?: () => void;
 	value?: number | '';
 };
 
