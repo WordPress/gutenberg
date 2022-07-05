@@ -382,11 +382,11 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns classname and CSS from a block styles object.
+	 * Returns classnames and CSS based on the values in a block attributes.styles object.
 	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
-	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options array(
+	 * @param array $block_styles Styles from a block's attributes object.
+	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
 	 * );.
@@ -396,7 +396,7 @@ class WP_Style_Engine {
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function generate_block_styles( $block_styles, $options ) {
+	public function get_block_supports_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
@@ -496,19 +496,17 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->generate to generate block styles from a single block style object.
- *
- * Returns an array of CSS and classnames.
- * CSS and classnames are compiled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ * Global public interface method to WP_Style_Engine->get_block_supports_styles to generate block styles from a single block style object.
+ * See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
  *
  * Example usage:
  *
- * $styles = wp_style_engine_generate_block_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * $styles = wp_style_engine_get_block_supports_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
  * // Returns `array( 'css' => 'color: #cccccc', 'classnames' => 'has-color' )`.
  *
  * @access public
  *
- * @param array         $block_styles An array of styles from a block's attributes.
+ * @param array         $block_styles The value of a block's attributes.style.
  * @param array<string> $options      An array of options to determine the output.
  *
  * @return array<string>|null array(
@@ -516,10 +514,10 @@ class WP_Style_Engine {
  *     'classnames' => (string) Classnames separated by a space.
  * );
  */
-function wp_style_engine_generate_block_styles( $block_styles, $options = array() ) {
+function wp_style_engine_get_block_supports_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->generate_block_styles( $block_styles, $options );
+		return $style_engine->get_block_supports_styles( $block_styles, $options );
 	}
 	return null;
 }
