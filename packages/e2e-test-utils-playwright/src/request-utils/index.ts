@@ -13,14 +13,7 @@ import { WP_ADMIN_USER, WP_BASE_URL } from '../config';
 import type { User } from './login';
 import { login } from './login';
 import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
-import {
-	setupRest,
-	rest,
-	getMaxBatchSize,
-	batchRest,
-	RestOptions,
-	BatchRequest,
-} from './rest';
+import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
@@ -117,13 +110,11 @@ class RequestUtils {
 
 	login = login.bind( this );
 	setupRest = setupRest.bind( this );
-	rest = rest.bind( this ) as < RestResponse = any >(
-		options: RestOptions
-	) => Promise< RestResponse >;
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	rest = rest.bind( this ) as typeof rest;
 	getMaxBatchSize = getMaxBatchSize.bind( this );
-	batchRest = batchRest.bind( this ) as < BatchResponse >(
-		requests: BatchRequest[]
-	) => Promise< BatchResponse[] >;
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	batchRest = batchRest.bind( this ) as typeof batchRest;
 	getPluginsMap = getPluginsMap.bind( this );
 	activatePlugin = activatePlugin.bind( this );
 	deactivatePlugin = deactivatePlugin.bind( this );
