@@ -21,6 +21,7 @@ function render_block_core_query_no_results( $attributes, $content, $block ) {
 
 	$page_key   = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page       = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+
 	// Override the custom query with the global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
