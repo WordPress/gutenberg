@@ -50,7 +50,10 @@ export default function PostTemplateForm( { onClose } ) {
 			),
 			selectedTemplateSlug:
 				select( editorStore ).getEditedPostAttribute( 'template' ),
-			canCreate: canCreateTemplates && ! _isPostsPage,
+			canCreate:
+				canCreateTemplates &&
+				! _isPostsPage &&
+				editorSettings.supportsTemplateMode,
 			canEdit:
 				canCreateTemplates &&
 				editorSettings.supportsTemplateMode &&
