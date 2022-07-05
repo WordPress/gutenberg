@@ -32,6 +32,7 @@ const meta: ComponentMeta< typeof RangeControl > = {
 		},
 		color: { control: { type: 'color' } },
 		help: { control: { type: 'text' } },
+		icon: { control: { type: null } },
 		marks: { control: { type: 'object' } },
 		onBlur: { control: { type: null } },
 		onChange: { action: 'onChange' },
