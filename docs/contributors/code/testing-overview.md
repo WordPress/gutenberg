@@ -305,6 +305,12 @@ However, if the change was intentional, follow these steps to update the snapsho
 ```sh
 # --testPathPattern is optional but will be much faster by only running matching tests
 npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+
+# Update snapshot for e2e tests
+npm run test-e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
+
+# Update snapshot for Playwright
+npm run test-e2e:playwright -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -606,7 +612,7 @@ To ensure that the editor stays performant as we add features, we monitor the im
 
 Performance tests are end-to-end tests running the editor and capturing these measures. Make sure you have an e2e testing environment ready.
 
-To set up the e2e testing environment, checkout the Gutenberg repository and switch to the branch that you would like to test. Run the following command to prepare the environment. 
+To set up the e2e testing environment, checkout the Gutenberg repository and switch to the branch that you would like to test. Run the following command to prepare the environment.
 
 ```
 nvm use && npm install

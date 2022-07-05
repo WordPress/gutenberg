@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_6_0 extends WP_Theme_JSON_5_9 {
+class WP_Theme_JSON_6_0 extends WP_Theme_JSON {
 	/**
 	 * Metadata for style properties.
 	 *

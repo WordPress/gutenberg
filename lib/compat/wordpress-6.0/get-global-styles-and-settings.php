@@ -92,9 +92,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	}
 	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-	if ( empty( $types ) && ! $supports_theme_json ) {
-		$types = array( 'variables', 'presets' );
-	} elseif ( empty( $types ) ) {
+	if ( empty( $types ) ) {
 		$types = array( 'variables', 'styles', 'presets' );
 	}
 

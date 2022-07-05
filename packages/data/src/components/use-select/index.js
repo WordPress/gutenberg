@@ -54,10 +54,11 @@ const renderQueue = createQueue();
  * @example
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function HammerPriceDisplay( { currency } ) {
  *   const price = useSelect( ( select ) => {
- *     return select( 'my-shop' ).getPrice( 'hammer', currency )
+ *     return select( myCustomStore ).getPrice( 'hammer', currency );
  *   }, [ currency ] );
  *   return new Intl.NumberFormat( 'en-US', {
  *     style: 'currency',
@@ -84,9 +85,10 @@ const renderQueue = createQueue();
  *
  * ```js
  * import { useSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function Paste( { children } ) {
- *   const { getSettings } = useSelect( 'my-shop' );
+ *   const { getSettings } = useSelect( myCustomStore );
  *   function onPaste() {
  *     // Do something with the settings.
  *     const settings = getSettings();

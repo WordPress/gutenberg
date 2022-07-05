@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -38,7 +42,11 @@ export default function save( { attributes } ) {
 				</video>
 			) }
 			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					tagName="figcaption"
+					value={ caption }
+				/>
 			) }
 		</figure>
 	);

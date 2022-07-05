@@ -17,27 +17,35 @@
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	/**
-	 * Whitelist which defines which pseudo selectors are enabled for
+	 * Define which defines which pseudo selectors are enabled for
 	 * which elements.
 	 * Note: this will effect both top level and block level elements.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link' => array( ':hover', ':focus', ':active' ),
+		'link' => array( ':hover', ':focus', ':active', ':visited' ),
 	);
 
+	/*
+	 * The valid elements that can be found under styles.
+	 *
+	 * @var string[]
+	 */
 	const ELEMENTS = array(
-		'link'   => 'a',
-		'h1'     => 'h1',
-		'h2'     => 'h2',
-		'h3'     => 'h3',
-		'h4'     => 'h4',
-		'h5'     => 'h5',
-		'h6'     => 'h6',
-		'button' => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
+		'link'    => 'a:not(.wp-element-button)',
+		'heading' => 'h1, h2, h3, h4, h5, h6',
+		'h1'      => 'h1',
+		'h2'      => 'h2',
+		'h3'      => 'h3',
+		'h4'      => 'h4',
+		'h5'      => 'h5',
+		'h6'      => 'h6',
+		'button'  => '.wp-element-button, .wp-block-button__link', // We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
+		'caption' => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption', // The block classes are necessary to target older content that won't use the new class names.
 	);
 
 	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
-		'button' => 'wp-element-button',
+		'button'  => 'wp-element-button',
+		'caption' => 'wp-element-caption',
 	);
 
 	/**
@@ -222,7 +230,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		return $theme_json;
 	}
 
-
 	/**
 	 * Returns the metadata for each block.
 	 *
@@ -336,8 +343,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		);
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
-
-			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
+			foreach ( self::ELEMENTS as $element => $selector ) {
+				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) ) {
+					continue;
+				}
 
 				// Handle element defaults.
 				$nodes[] = array(
@@ -425,7 +434,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						'selector' => $selectors[ $name ]['elements'][ $element ],
 					);
 
-					// Handle any psuedo selectors for the element.
+					// Handle any pseudo selectors for the element.
 					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
@@ -451,16 +460,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-
 		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 
 		$selector = $block_metadata['selector'];
 		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
-
-		// Attempt to parse a pseudo selector (e.g. ":hover") from the $selector ("a:hover").
-		$pseudo_matches = array();
-		preg_match( '/:[a-z]+/', $selector, $pseudo_matches );
-		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
@@ -470,13 +473,28 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
 
+		$element_pseudo_allowed = isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ? static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] : array();
+
+		// Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
+		// This also resets the array keys.
+		$pseudo_matches = array_values(
+			array_filter(
+				$element_pseudo_allowed,
+				function( $pseudo_selector ) use ( $selector ) {
+					return str_contains( $selector, $pseudo_selector );
+				}
+			)
+		);
+
+		$pseudo_selector = isset( $pseudo_matches[0] ) ? $pseudo_matches[0] : null;
+
 		// If the current selector is a pseudo selector that's defined in the allow list for the current
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
-			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings );
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json );
 		} else {
-			$declarations = static::compute_style_properties( $node, $settings );
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
 		}
 
 		$block_rules = '';
@@ -553,5 +571,392 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		return $block_rules;
+	}
+
+	/**
+	 * Given a styles array, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
+	 *
+	 * @param array $styles Styles to process.
+	 * @param array $settings Theme settings.
+	 * @param array $properties Properties metadata.
+	 * @param array $theme_json Theme JSON array.
+	 * @return array Returns the modified $declarations.
+	 */
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null ) {
+		if ( null === $properties ) {
+			$properties = static::PROPERTIES_METADATA;
+		}
+
+		$declarations = array();
+		if ( empty( $styles ) ) {
+			return $declarations;
+		}
+
+		foreach ( $properties as $css_property => $value_path ) {
+			$value = static::get_property_value( $styles, $value_path, $theme_json );
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			if ( is_array( $value_path ) ) {
+				$path_string = implode( '.', $value_path );
+				if (
+					array_key_exists( $path_string, static::PROTECTED_PROPERTIES ) &&
+					_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+				) {
+					continue;
+				}
+			}
+
+			// Skip if empty and not "0" or value represents array of longhand values.
+			$has_missing_value = empty( $value ) && ! is_numeric( $value );
+			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			$declarations[] = array(
+				'name'  => $css_property,
+				'value' => $value,
+			);
+		}
+
+		return $declarations;
+	}
+
+	/**
+	 * Returns the style property for the given path.
+	 *
+	 * It also converts CSS Custom Property stored as
+	 * "var:preset|color|secondary" to the form
+	 * "--wp--preset--color--secondary".
+	 *
+	 * It also converts references to a path to the value
+	 * stored at that location, e.g.
+	 * { "ref": "style.color.background" } => "#fff".
+	 *
+	 * @param array $styles Styles subtree.
+	 * @param array $path   Which property to process.
+	 * @param array $theme_json Theme JSON array.
+	 * @return string Style property value.
+	 */
+	protected static function get_property_value( $styles, $path, $theme_json = null ) {
+		$value = _wp_array_get( $styles, $path, '' );
+
+		// This converts references to a path to the value at that path
+		// where the values is an array with a "ref" key, pointing to a path.
+		// For example: { "ref": "style.color.background" } => "#fff".
+		if ( is_array( $value ) && array_key_exists( 'ref', $value ) ) {
+			$value_path = explode( '.', $value['ref'] );
+			$ref_value  = _wp_array_get( $theme_json, $value_path );
+			// Only use the ref value if we find anything.
+			if ( ! empty( $ref_value ) && is_string( $ref_value ) ) {
+				$value = $ref_value;
+			}
+
+			if ( is_array( $ref_value ) && array_key_exists( 'ref', $ref_value ) ) {
+				$path_string      = json_encode( $path );
+				$ref_value_string = json_encode( $ref_value );
+				_doing_it_wrong( 'get_property_value', "Your theme.json file uses a dynamic value (${ref_value_string}) for the path at ${path_string}. However, the value at ${path_string} is also a dynamic value (pointing to ${ref_value['ref']}) and pointing to another dynamic value is not supported. Please update ${path_string} to point directly to ${ref_value['ref']}.", '6.1.0' );
+			}
+		}
+
+		if ( '' === $value || is_array( $value ) ) {
+			return $value;
+		}
+
+		// Convert custom CSS properties.
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value          = "var(--wp--$unwrapped_name)";
+		}
+
+		return $value;
+	}
+
+	/*
+	 * Presets are a set of values that serve
+	 * to bootstrap some styles: colors, font sizes, etc.
+	 *
+	 * They are a unkeyed array of values such as:
+	 *
+	 * ```php
+	 * array(
+	 *   array(
+	 *     'slug'      => 'unique-name-within-the-set',
+	 *     'name'      => 'Name for the UI',
+	 *     <value_key> => 'value'
+	 *   ),
+	 * )
+	 * ```
+	 *
+	 * This contains the necessary metadata to process them:
+	 *
+	 * - path             => Where to find the preset within the settings section.
+	 * - prevent_override => Disables override of default presets by theme presets.
+	 *                       The relationship between whether to override the defaults
+	 *                       and whether the defaults are enabled is inverse:
+	 *                         - If defaults are enabled  => theme presets should not be overriden
+	 *                         - If defaults are disabled => theme presets should be overriden
+	 *                       For example, a theme sets defaultPalette to false,
+	 *                       making the default palette hidden from the user.
+	 *                       In that case, we want all the theme presets to be present,
+	 *                       so they should override the defaults by setting this false.
+	 * - use_default_names => whether to use the default names
+	 * - value_key        => the key that represents the value
+	 * - value_func       => optionally, instead of value_key, a function to generate
+	 *                       the value that takes a preset as an argument
+	 *                       (either value_key or value_func should be present)
+	 * - css_vars         => template string to use in generating the CSS Custom Property.
+	 *                       Example output: "--wp--preset--duotone--blue: <value>" will generate as many CSS Custom Properties as presets defined
+	 *                       substituting the $slug for the slug's value for each preset value.
+	 * - classes          => array containing a structure with the classes to
+	 *                       generate for the presets, where for each array item
+	 *                       the key is the class name and the value the property name.
+	 *                       The "$slug" substring will be replaced by the slug of each preset.
+	 *                       For example:
+	 *                       'classes' => array(
+	 *                         '.has-$slug-color'            => 'color',
+	 *                         '.has-$slug-background-color' => 'background-color',
+	 *                         '.has-$slug-border-color'     => 'border-color',
+	 *                       )
+	 * - properties       => array of CSS properties to be used by kses to
+	 *                       validate the content of each preset
+	 *                       by means of the remove_insecure_properties method.
+	 */
+	const PRESETS_METADATA = array(
+		array(
+			'path'              => array( 'color', 'palette' ),
+			'prevent_override'  => array( 'color', 'defaultPalette' ),
+			'use_default_names' => false,
+			'value_key'         => 'color',
+			'css_vars'          => '--wp--preset--color--$slug',
+			'classes'           => array(
+				'.has-$slug-color'            => 'color',
+				'.has-$slug-background-color' => 'background-color',
+				'.has-$slug-border-color'     => 'border-color',
+			),
+			'properties'        => array( 'color', 'background-color', 'border-color' ),
+		),
+		array(
+			'path'              => array( 'color', 'gradients' ),
+			'prevent_override'  => array( 'color', 'defaultGradients' ),
+			'use_default_names' => false,
+			'value_key'         => 'gradient',
+			'css_vars'          => '--wp--preset--gradient--$slug',
+			'classes'           => array( '.has-$slug-gradient-background' => 'background' ),
+			'properties'        => array( 'background' ),
+		),
+		array(
+			'path'              => array( 'color', 'duotone' ),
+			'prevent_override'  => array( 'color', 'defaultDuotone' ),
+			'use_default_names' => false,
+			'value_func'        => 'gutenberg_get_duotone_filter_property',
+			'css_vars'          => '--wp--preset--duotone--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'filter' ),
+		),
+		array(
+			'path'              => array( 'typography', 'fontSizes' ),
+			'prevent_override'  => false,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--font-size--$slug',
+			'classes'           => array( '.has-$slug-font-size' => 'font-size' ),
+			'properties'        => array( 'font-size' ),
+		),
+		array(
+			'path'              => array( 'typography', 'fontFamilies' ),
+			'prevent_override'  => false,
+			'use_default_names' => false,
+			'value_key'         => 'fontFamily',
+			'css_vars'          => '--wp--preset--font-family--$slug',
+			'classes'           => array( '.has-$slug-font-family' => 'font-family' ),
+			'properties'        => array( 'font-family' ),
+		),
+		array(
+			'path'              => array( 'spacing', 'spacingSizes' ),
+			'prevent_override'  => false,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--spacing--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'padding', 'margin' ),
+		),
+		array(
+			'path'              => array( 'spacing', 'spacingScale' ),
+			'prevent_override'  => false,
+			'use_default_names' => true,
+			'value_key'         => 'size',
+			'css_vars'          => '--wp--preset--spacing--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'padding', 'margin' ),
+		),
+	);
+
+	/**
+	 * The valid properties under the settings key.
+	 *
+	 * @var array
+	 */
+	const VALID_SETTINGS = array(
+		'appearanceTools' => null,
+		'border'          => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'           => array(
+			'background'       => null,
+			'custom'           => null,
+			'customDuotone'    => null,
+			'customGradient'   => null,
+			'defaultGradients' => null,
+			'defaultPalette'   => null,
+			'duotone'          => null,
+			'gradients'        => null,
+			'link'             => null,
+			'palette'          => null,
+			'text'             => null,
+		),
+		'custom'          => null,
+		'layout'          => array(
+			'contentSize' => null,
+			'wideSize'    => null,
+		),
+		'spacing'         => array(
+			'customSpacingSize' => null,
+			'spacingSizes'      => null,
+			'spacingScale'      => null,
+			'blockGap'          => null,
+			'margin'            => null,
+			'padding'           => null,
+			'units'             => null,
+		),
+		'typography'      => array(
+			'customFontSize' => null,
+			'dropCap'        => null,
+			'fontFamilies'   => null,
+			'fontSizes'      => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'letterSpacing'  => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	/**
+	 * Transform the spacing scale values into an array of spacing scale presets.
+	 */
+	public function set_spacing_sizes() {
+		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
+
+		if ( ! is_numeric( $spacing_scale['steps'] )
+			|| ! $spacing_scale['steps'] > 0
+			|| ! isset( $spacing_scale['mediumStep'] )
+			|| ! isset( $spacing_scale['unit'] )
+			|| ! isset( $spacing_scale['operator'] )
+			|| ! isset( $spacing_scale['increment'] )
+			|| ! isset( $spacing_scale['steps'] )
+			|| ! is_numeric( $spacing_scale['increment'] )
+			|| ! is_numeric( $spacing_scale['mediumStep'] )
+			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
+			if ( ! empty( $spacing_scale ) ) {
+				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), E_USER_NOTICE );
+			}
+			return null;
+		}
+
+		$unit            = sanitize_title( $spacing_scale['unit'] );
+		$current_step    = $spacing_scale['mediumStep'];
+		$steps_mid_point = round( ( ( $spacing_scale['steps'] ) / 2 ), 0 );
+		$x_small_count   = null;
+		$below_sizes     = array();
+		$slug            = 40;
+		$remainder       = 0;
+
+		for ( $x = $steps_mid_point - 1; $spacing_scale['steps'] > 1 && $slug > 0 && $x > 0; $x-- ) {
+			$current_step = '+' === $spacing_scale['operator']
+				? $current_step - $spacing_scale['increment']
+				: ( $spacing_scale['increment'] > 1 ? $current_step / $spacing_scale['increment'] : $current_step * $spacing_scale['increment'] );
+
+			if ( $current_step <= 0 ) {
+				$remainder = $x;
+				break;
+			}
+
+			$below_sizes[] = array(
+				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Small */
+				'name' => $x === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), strval( $x_small_count ) ),
+				'slug' => $slug,
+				'size' => round( $current_step, 2 ) . $unit,
+			);
+
+			if ( $x === $steps_mid_point - 2 ) {
+				$x_small_count = 2;
+			}
+
+			if ( $x < $steps_mid_point - 2 ) {
+				$x_small_count++;
+			}
+
+			$slug = $slug - 10;
+		}
+
+		$below_sizes = array_reverse( $below_sizes );
+
+		$below_sizes[] = array(
+			'name' => __( 'Medium', 'gutenberg' ),
+			'slug' => 50,
+			'size' => $spacing_scale['mediumStep'] . $unit,
+		);
+
+		$current_step  = $spacing_scale['mediumStep'];
+		$x_large_count = null;
+		$above_sizes   = array();
+		$slug          = 60;
+		$steps_above   = ( $spacing_scale['steps'] - $steps_mid_point ) + $remainder;
+
+		for ( $x = 0; $x < $steps_above; $x++ ) {
+			$current_step = '+' === $spacing_scale['operator']
+				? $current_step + $spacing_scale['increment']
+				: ( $spacing_scale['increment'] >= 1 ? $current_step * $spacing_scale['increment'] : $current_step / $spacing_scale['increment'] );
+
+			$above_sizes[] = array(
+				/* translators: %s: Muliple of t-shirt sizing, eg. 2X-Large */
+				'name' => 0 === $x ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), strval( $x_large_count ) ),
+				'slug' => $slug,
+				'size' => round( $current_step, 2 ) . $unit,
+			);
+
+			if ( 1 === $x ) {
+				$x_large_count = 2;
+			}
+
+			if ( $x > 1 ) {
+				$x_large_count++;
+			}
+
+			$slug = $slug + 10;
+		}
+
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), array_merge( $below_sizes, $above_sizes ) );
 	}
 }
