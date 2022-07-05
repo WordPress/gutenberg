@@ -268,6 +268,9 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
+	 */
 	function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
 		add_filter( 'query', array( $this, 'filter_db_query' ) );
 		$query_count = count( $this->queries );
@@ -276,7 +279,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 		}
 		$query_count = count( $this->queries ) - $query_count;
-		$this->assertEquals( 1, $query_count, 'Only one SQL query should be peformed for multiple invocations of WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles()' );
+		$this->assertEquals( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type' );
 
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme() );
 		$this->assertEmpty( $user_cpt );
@@ -286,11 +289,55 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$query_count = count( $this->queries );
 		for ( $i = 0; $i < 3; $i++ ) {
-			WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme() );
+			$new_user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme() );
 			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$this->assertSameSets( $user_cpt, $new_user_cpt );
 		}
 		$query_count = count( $this->queries ) - $query_count;
 		$this->assertEquals( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type' );
 		remove_filter( 'query', array( $this, 'filter_db_query' ) );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
+	 * @ticket 55392
+	 */
+	function test_get_user_data_from_wp_global_styles_does_exist() {
+		$post1 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$this->assertIsArray( $post1 );
+		$this->assertArrayHasKey( 'ID', $post1 );
+		wp_delete_post( $post1['ID'], true );
+		$post2 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$this->assertIsArray( $post2 );
+		$this->assertArrayHasKey( 'ID', $post2 );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
+	 * @ticket 55392
+	 */
+	function test_get_user_data_from_wp_global_styles_create_post() {
+		$post1 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme( 'testing' ) );
+		$this->assertIsArray( $post1 );
+		$this->assertSameSets( array(), $post1 );
+		$post2 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme( 'testing' ) );
+		$this->assertIsArray( $post2 );
+		$this->assertSameSets( array(), $post2 );
+		$post3 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme( 'testing' ), true );
+		$this->assertIsArray( $post3 );
+		$this->assertArrayHasKey( 'ID', $post3 );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
+	 * @ticket 55392
+	 */
+	function test_get_user_data_from_wp_global_styles_filter_state() {
+		$post1 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme( 'foo' ), true, array( 'publish' ) );
+		$this->assertIsArray( $post1 );
+		$this->assertArrayHasKey( 'ID', $post1 );
+		$post2 = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme( 'foo' ), false, array( 'draft' ) );
+		$this->assertIsArray( $post2 );
+		$this->assertSameSets( array(), $post2 );
 	}
 }
