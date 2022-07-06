@@ -669,7 +669,17 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					// to leverage existing `compute_style_properties` function.
 					$feature = array( $feature_name => $node[ $feature_name ] );
 					// Generate the feature's declarations only.
-					$feature_declarations[ $feature_selector ] = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
+					$new_feature_declarations = static::compute_style_properties( $feature, $settings, null, $this->theme_json );
+
+					// Merge new declarations with any that already exist for
+					// the feature selector. This may occur when multiple block
+					// support features use the same custom selector.
+					if ( isset( $feature_declarations[ $feature_selector ] ) ) {
+						$feature_declarations[ $feature_selector ] = array_merge( $feature_declarations[ $feature_selector ], $new_feature_declarations );
+					} else {
+						$feature_declarations[ $feature_selector ] = $new_feature_declarations;
+					}
+
 					// Remove the feature from the block's node now the
 					// styles will be included under the feature level selector.
 					unset( $node[ $feature_name ] );

@@ -453,10 +453,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'border' => array(
+					'border'  => array(
 						'radius' => true,
 					),
-					'color'  => array(
+					'color'   => array(
 						'custom'  => false,
 						'palette' => array(
 							array(
@@ -465,15 +465,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					'spacing' => array(
+						'padding' => true,
+					),
+					'typography' => array(
+						'fontSize' => true,
+					),
 				),
 				'styles'   => array(
 					'blocks' => array(
 						'test/test' => array(
-							'border' => array(
+							'border'  => array(
 								'radius' => '9999px',
 							),
-							'color'  => array(
+							'color'   => array(
 								'text' => 'green',
+							),
+							'spacing' => array(
+								'padding' => '20px',
+							),
+							'typography' => array(
+								'fontSize' => '3em',
 							),
 						),
 					),
@@ -482,7 +494,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$base_styles   = 'body{--wp--preset--color--green: green;}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-		$block_styles  = '.wp-block-test, .wp-block-test__wrapper{color: green;}.wp-block-test .bordered, .wp-block-test__wrapper .bordered{border-radius: 9999px;}';
+		$block_styles  = '.wp-block-test, .wp-block-test__wrapper{color: green;}.wp-block-test .inner, .wp-block-test__wrapper .inner{border-radius: 9999px;padding: 20px;}.wp-block-test .sub-heading, .wp-block-test__wrapper .sub-heading{font-size: 3em;}';
 		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
 		$expected      = $base_styles . $block_styles . $preset_styles;
 
