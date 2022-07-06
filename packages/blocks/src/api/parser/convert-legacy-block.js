@@ -69,8 +69,8 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 				className,
 			].join( ' ' );
 		}
-		// Note that we also had to add a deprecation to the block in order to remove the old,
-		// generated `wp-block-comments-query-loop` class name.
+		// Note that we also had to add a deprecation to the block in order
+		// for the ID change to work.
 	}
 
 	return [ name, newAttributes ];
