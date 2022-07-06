@@ -101,7 +101,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	// List of block support features that can have their related styles
 	// generated under their own feature level selector rather than the block's.
-	const SUPPORT_FEATURES = array(
+	const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = array(
 		'__experimentalBorder' => 'border',
 		'color'                => 'color',
 		'spacing'              => 'spacing',
@@ -384,7 +384,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			// Generate block support feature level selectors if opted into
 			// for the current block.
 			$features = array();
-			foreach ( static::SUPPORT_FEATURES as $key => $feature ) {
+			foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) {
 				if (
 					isset( $block_type->supports[ $key ]['__experimentalSelector'] ) &&
 					$block_type->supports[ $key ]['__experimentalSelector']

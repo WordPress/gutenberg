@@ -35,7 +35,9 @@ import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
-const SUPPORT_FEATURES = {
+// List of block support features that can have their related styles
+// generated under their own feature level selector rather than the block's.
+const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	__experimentalBorder: 'border',
 	color: 'color',
 	spacing: 'spacing',
@@ -694,7 +696,7 @@ export const getBlockSelectors = ( blockTypes ) => {
 
 		// For each block support feature add any custom selectors.
 		const featureSelectors = {};
-		Object.entries( SUPPORT_FEATURES ).forEach(
+		Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
 			( [ featureKey, featureName ] ) => {
 				const featureSelector =
 					blockType?.supports?.[ featureKey ]?.__experimentalSelector;
