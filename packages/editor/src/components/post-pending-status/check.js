@@ -1,43 +1,22 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-export function PostPendingStatusCheck( {
-	hasPublishAction,
-	isPublished,
-	children,
-} ) {
-	if ( isPublished || ! hasPublishAction ) {
-		return null;
-	}
-
-	return children;
+export default function PostPendingStatusCheck( { children } ) {
+	return usePostPendingStatusCheck() ? children : null;
 }
 
-export default compose(
-	withSelect( ( select ) => {
-		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } =
-			select( editorStore );
-		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			isPublished: isCurrentPostPublished(),
-			postType: getCurrentPostType(),
-		};
-	} )
-)( PostPendingStatusCheck );
+export function usePostPendingStatusCheck() {
+	return useSelect( ( select ) => {
+		const isPublished = select( editorStore ).isCurrentPostPublished();
+		const post = select( editorStore ).getCurrentPost();
+		const hasPublishAction = !! post?._links?.[ 'wp:action-publish' ];
+		return ! isPublished && hasPublishAction;
+	}, [] );
+}

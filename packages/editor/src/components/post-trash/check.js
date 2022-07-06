@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -9,26 +9,25 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-function PostTrashCheck( { isNew, postId, canUserDelete, children } ) {
-	if ( isNew || ! postId || ! canUserDelete ) {
-		return null;
-	}
-
-	return children;
+export default function PostTrashCheck( { children } ) {
+	return usePostTrashCheck() ? children : null;
 }
 
-export default withSelect( ( select ) => {
-	const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
-		select( editorStore );
-	const { getPostType, canUser } = select( coreStore );
-	const postId = getCurrentPostId();
-	const postType = getPostType( getCurrentPostType() );
-	const resource = postType?.rest_base || ''; // eslint-disable-line camelcase
+export function usePostTrashCheck() {
+	return useSelect( ( select ) => {
+		const isNew = select( editorStore ).isEditedPostNew();
+		const postId = select( editorStore ).getCurrentPostId();
+		if ( isNew || ! postId ) {
+			return false;
+		}
 
-	return {
-		isNew: isEditedPostNew(),
-		postId,
-		canUserDelete:
-			postId && resource ? canUser( 'delete', resource, postId ) : false,
-	};
-} )( PostTrashCheck );
+		const postTypeSlug = select( editorStore ).getCurrentPostType();
+		const postType = select( coreStore ).getPostType( postTypeSlug );
+		const resource = postType?.rest_base || '';
+		if ( ! resource ) {
+			return false;
+		}
+
+		return select( coreStore ).canUser( 'delete', resource, postId );
+	}, [] );
+}

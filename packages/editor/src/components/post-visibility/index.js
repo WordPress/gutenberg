@@ -10,6 +10,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { sticky as stickyIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,11 +21,15 @@ import { store as editorStore } from '../../store';
 export default function PostVisibility( { onClose } ) {
 	const instanceId = useInstanceId( PostVisibility );
 
-	const { status, visibility, password } = useSelect( ( select ) => ( {
-		status: select( editorStore ).getEditedPostAttribute( 'status' ),
-		visibility: select( editorStore ).getEditedPostVisibility(),
-		password: select( editorStore ).getEditedPostAttribute( 'password' ),
-	} ) );
+	const { status, visibility, password, sticky } = useSelect(
+		( select ) => ( {
+			status: select( editorStore ).getEditedPostAttribute( 'status' ),
+			visibility: select( editorStore ).getEditedPostVisibility(),
+			password:
+				select( editorStore ).getEditedPostAttribute( 'password' ),
+			sticky: select( editorStore ).getEditedPostAttribute( 'sticky' ),
+		} )
+	);
 
 	const { editPost, savePost } = useDispatch( editorStore );
 
@@ -72,6 +77,16 @@ export default function PostVisibility( { onClose } ) {
 			<InspectorPopoverHeader
 				title={ __( 'Visibility' ) }
 				help={ __( 'Control how this post is viewed.' ) }
+				actions={ [
+					{
+						label: __( 'Stick to the top of the blog' ),
+						icon: stickyIcon,
+						isPressed: sticky,
+						onClick() {
+							editPost( { sticky: ! sticky } );
+						},
+					},
+				] }
 				onClose={ onClose }
 			/>
 			<fieldset className="editor-post-visibility__fieldset">

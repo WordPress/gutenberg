@@ -99,10 +99,12 @@ describe( 'Change detection', () => {
 		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
 
-		const postPendingReviewButton = (
-			await page.$x( "//label[contains(text(), 'Pending review')]" )
-		 )[ 0 ];
-		await postPendingReviewButton.click( 'button' );
+		await page.click( '*[aria-label="Post options"]' );
+		await page.waitForXPath( "//*[text()='Mark as pending']" );
+		const [ postMarkAsPendingButton ] = await page.$x(
+			"//*[text()='Mark as pending']"
+		);
+		await postMarkAsPendingButton.click();
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -347,7 +349,12 @@ describe( 'Change detection', () => {
 
 		// Trash post.
 		await openDocumentSettingsSidebar();
-		await page.click( '.editor-post-trash.components-button' );
+		await page.click( '*[aria-label="Post options"]' );
+		await page.waitForXPath( "//*[text()='Move to trash']" );
+		const [ postMoveToTrashButton ] = await page.$x(
+			"//*[text()='Move to trash']"
+		);
+		await postMoveToTrashButton.click();
 
 		await Promise.all( [
 			// Wait for "Saved" to confirm save complete.

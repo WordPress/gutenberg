@@ -29,10 +29,16 @@ export { default as PostFeaturedImageCheck } from './post-featured-image/check';
 export { default as PostFormat } from './post-format';
 export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
-export { default as PostLastRevisionCheck } from './post-last-revision/check';
+export {
+	default as PostLastRevisionCheck,
+	usePostLastRevisionCheck,
+} from './post-last-revision/check';
 export { default as PostLockedModal } from './post-locked-modal';
 export { default as PostPendingStatus } from './post-pending-status';
-export { default as PostPendingStatusCheck } from './post-pending-status/check';
+export {
+	default as PostPendingStatusCheck,
+	usePostPendingStatusCheck,
+} from './post-pending-status/check';
 export { default as PostPingbacks } from './post-pingbacks';
 export { default as PostPreviewButton } from './post-preview-button';
 export { default as PostPublishButton } from './post-publish-button';
@@ -57,7 +63,10 @@ export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
-export { default as PostTrashCheck } from './post-trash/check';
+export {
+	default as PostTrashCheck,
+	usePostTrashCheck,
+} from './post-trash/check';
 export {
 	default as PostTypeSupportCheck,
 	usePostTypeSupportCheck,

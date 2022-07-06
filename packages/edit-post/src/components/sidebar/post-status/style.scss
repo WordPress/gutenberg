@@ -1,7 +1,39 @@
-.edit-post-post-status {
-	// Counteract the 5px of bottom margin on .components-panel__body-title.
-	.edit-post-post-featured-image:first-of-type,
-	.edit-post-post-summary:first-of-type {
-		margin-top: -5px;
+.edit-post-post-status__header {
+	box-sizing: content-box;
+	margin: (-$grid-unit-20) (-$grid-unit-20) 0 (-$grid-unit-20);
+	padding: $grid-unit-20;
+
+	.components-dropdown-menu {
+		line-height: 0;
+		margin: -$grid-unit-05 0;
 	}
+
+	[class][class].components-dropdown-menu__toggle {
+		min-width: $grid-unit-30;
+		padding: 0;
+	}
+}
+
+[class].edit-post-post-status__header {
+	box-sizing: content-box;
+}
+
+[class].edit-post-post-status__heading {
+	font-weight: 500;
+	margin: 0;
+}
+
+[class][class].edit-post-post-status__revisions-count-badge {
+	align-items: center;
+	background: $gray-800;
+	border-radius: 2px;
+	color: $white;
+	display: inline-flex;
+	justify-content: center;
+	min-height: $icon-size;
+	min-width: $icon-size;
+}
+
+[class].edit-post-post-status__post-trash {
+	box-shadow: none;
 }

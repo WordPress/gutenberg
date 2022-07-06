@@ -1,35 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
+import { usePostTypeSupportCheck } from '../post-type-support-check';
 
-export function PostLastRevisionCheck( {
-	lastRevisionId,
-	revisionsCount,
-	children,
-} ) {
-	if ( ! lastRevisionId || revisionsCount < 2 ) {
-		return null;
-	}
-
-	return (
-		<PostTypeSupportCheck supportKeys="revisions">
-			{ children }
-		</PostTypeSupportCheck>
-	);
+export default function PostLastRevisionCheck( { children } ) {
+	return usePostLastRevisionCheck() ? children : null;
 }
 
-export default withSelect( ( select ) => {
-	const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
-		select( editorStore );
-	return {
-		lastRevisionId: getCurrentPostLastRevisionId(),
-		revisionsCount: getCurrentPostRevisionsCount(),
-	};
-} )( PostLastRevisionCheck );
+export function usePostLastRevisionCheck() {
+	const hasRevisions = useSelect( ( select ) => {
+		const lastRevisionId =
+			select( editorStore ).getCurrentPostLastRevisionId();
+		const revisionsCount =
+			select( editorStore ).getCurrentPostRevisionsCount();
+		return !! lastRevisionId && revisionsCount >= 2;
+	}, [] );
+	const hasPostTypeSupport = usePostTypeSupportCheck( 'revisions' );
+	return hasRevisions && hasPostTypeSupport;
+}

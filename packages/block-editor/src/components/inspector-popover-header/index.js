@@ -41,13 +41,14 @@ export default function InspectorPopoverHeader( {
 					{ title }
 				</Heading>
 				<Spacer />
-				{ actions.map( ( { label, icon, onClick } ) => (
+				{ actions.map( ( { label, icon, isPressed, onClick } ) => (
 					<Button
 						key={ label }
 						className="block-editor-inspector-popover-header__action"
 						label={ label }
 						icon={ icon }
 						variant={ ! icon && 'tertiary' }
+						isPressed={ isPressed }
 						onClick={ onClick }
 					>
 						{ ! icon && label }

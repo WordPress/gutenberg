@@ -202,6 +202,7 @@ export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';
 export { default as starHalf } from './library/star-half';
+export { default as sticky } from './library/sticky';
 export { default as store } from './library/store';
 export { default as stretchFullWidth } from './library/stretch-full-width';
 export { default as styles } from './library/styles';
