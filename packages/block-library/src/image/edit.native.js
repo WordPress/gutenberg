@@ -269,11 +269,14 @@ export class ImageEdit extends Component {
 		const { image, attributes, setAttributes, featuredImageId } =
 			this.props;
 		const { url } = attributes;
-		if ( ! hasQueryArg( url, 'w' ) && ! previousProps.image && image ) {
-			const updatedUrl =
-				getUrlForSlug( image, attributes?.sizeSlug ) ||
-				image.source_url;
-			setAttributes( { url: updatedUrl } );
+		if ( ! previousProps.image && image ) {
+			if ( ! hasQueryArg( url, 'w' ) && attributes?.sizeSlug ) {
+				const updatedUrl =
+					getUrlForSlug( image, attributes.sizeSlug ) ||
+					image.source_url;
+
+				setAttributes( { url: updatedUrl } );
+			}
 		}
 
 		const { id } = attributes;
