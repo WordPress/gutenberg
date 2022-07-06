@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-import { setOption } from '@wordpress/e2e-test-utils';
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -13,11 +12,14 @@ test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
 		previousDefaultCommentsPage;
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { admin, requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-		previousPageComments = await setOption( 'page_comments', '1' );
-		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
-		previousDefaultCommentsPage = await setOption(
+		previousPageComments = await admin.setOption( 'page_comments', '1' );
+		previousCommentsPerPage = await admin.setOption(
+			'comments_per_page',
+			'1'
+		);
+		previousDefaultCommentsPage = await admin.setOption(
 			'default_comments_page',
 			'newest'
 		);
@@ -105,7 +107,7 @@ test.describe( 'Comments', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await setOption( 'page_comments', '0' );
+		await admin.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await editor.publishPost();
@@ -136,11 +138,14 @@ test.describe( 'Comments', () => {
 			await page.$( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 	} );
-	test.afterAll( async ( { requestUtils } ) => {
+	test.afterAll( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllComments();
 		await requestUtils.activateTheme( 'twentytwentyone' );
-		await setOption( 'page_comments', previousPageComments );
-		await setOption( 'comments_per_page', previousCommentsPerPage );
-		await setOption( 'default_comments_page', previousDefaultCommentsPage );
+		await admin.setOption( 'page_comments', previousPageComments );
+		await admin.setOption( 'comments_per_page', previousCommentsPerPage );
+		await admin.setOption(
+			'default_comments_page',
+			previousDefaultCommentsPage
+		);
 	} );
 } );
