@@ -63,6 +63,17 @@ android {
         disable 'GradleCompatible'
         abortOnError false
     }
+
+    externalNativeBuild {
+        cmake {
+            path "./CMakeLists.txt"
+            version "3.8.0+"
+        }
+    }
+
+    configurations {
+     extractJNI
+    }
 }
 
 repositories {
@@ -96,6 +107,31 @@ dependencies {
     def rnVersion = readReactNativeVersion('../../../package.json', 'devDependencies')
     println "react-native version for react-native-aztec: $rnVersion"
     implementation "com.facebook.react:react-native:$rnVersion"
+
+    def rnAAR = fileTree('../../../node_modules/react-native/android').matching({ it.include "**/**/*.aar" }).singleFile
+    extractJNI(files(rnAAR))
+}
+
+def extracted = false;
+task extractJNIFiles {
+  if (extracted) return
+  doLast {
+    configurations.extractJNI.files.each {
+      def file = it.absoluteFile
+
+      copy {
+        from zipTree(file)
+        into "$buildDir/$file.name"
+        include "jni/**/*"
+      }
+      extracted = true;
+    }
+  }
+}
+
+// Extract JNI files as soon as first task is added
+tasks.whenTaskAdded { task ->
+  task.dependsOn(extractJNIFiles);
 }
 
 project.afterEvaluate {

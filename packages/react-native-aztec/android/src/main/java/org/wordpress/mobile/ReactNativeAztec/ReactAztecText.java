@@ -30,6 +30,7 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
+import com.reactnativesimplejsi.SimpleJsiModule;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.aztec.AlignmentRendering;
@@ -373,10 +374,14 @@ public class ReactAztecText extends AztecText {
         }
         String content = toHtml(getText(), false);
         ReactContext reactContext = (ReactContext) getContext();
-        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        eventDispatcher.dispatchEvent(
-                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd, incrementAndGetEventCounter())
-        );
+
+        // Send content and selection to JS side via JSI
+        SimpleJsiModule jsiModule = reactContext.getNativeModule(SimpleJsiModule.class);
+        new Handler(reactContext.getMainLooper()).post(() -> jsiModule.sendEvent(getId(), "selectionChangeEvent", content, selStart, selEnd, System.currentTimeMillis()));
+
+        /*EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+            eventDispatcher.dispatchEvent(new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd, incrementAndGetEventCounter(), System.currentTimeMillis())
+        );*/
     }
 
     @Override
