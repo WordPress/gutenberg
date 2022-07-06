@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-import {
-	pressKeyTimes,
-	setOption,
-} from '@wordpress/e2e-test-utils';
+import { setOption } from '@wordpress/e2e-test-utils';
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -42,6 +39,7 @@ test.describe( 'Comments', () => {
 		admin,
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
@@ -60,7 +58,7 @@ test.describe( 'Comments', () => {
 				`textarea#comment`,
 				`This is an automated comment - ${ i }`
 			);
-			await pressKeyTimes( 'Tab', 1 );
+			await pageUtils.pressKeyTimes( 'Tab', 1 );
 			await Promise.all( [
 				page.keyboard.press( 'Enter' ),
 				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
@@ -105,6 +103,7 @@ test.describe( 'Comments', () => {
 		admin,
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await setOption( 'page_comments', '0' );
 		await admin.createNewPost();
@@ -123,7 +122,7 @@ test.describe( 'Comments', () => {
 				`textarea#comment`,
 				`This is an automated comment - ${ i }`
 			);
-			await pressKeyTimes( 'Tab', 1 );
+			await pageUtils.pressKeyTimes( 'Tab', 1 );
 			await Promise.all( [
 				page.keyboard.press( 'Enter' ),
 				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
