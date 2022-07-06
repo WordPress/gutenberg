@@ -19,6 +19,7 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,6 +30,14 @@ function BottomSheetWithRef(
 	{ children, index, onClose, snapPoints = [ '50%' ] } = {},
 	ref
 ) {
+	const backgroundStyle = [
+		styles[ 'bottom-sheet-v2__background' ],
+		usePreferredColorSchemeStyle(
+			null,
+			styles[ 'bottom-sheet-v2__background--dark' ]
+		),
+	];
+
 	const renderBackdrop = useCallback(
 		( props ) => (
 			<BottomSheetBackdrop
@@ -50,7 +59,7 @@ function BottomSheetWithRef(
 	return (
 		<BottomSheetExternal
 			backdropComponent={ renderBackdrop }
-			backgroundStyle={ styles[ 'bottom-sheet-v2__background' ] }
+			backgroundStyle={ backgroundStyle }
 			enablePanDownToClose={ true }
 			contentHeight={ animatedContentHeight }
 			handleHeight={ animatedHandleHeight }

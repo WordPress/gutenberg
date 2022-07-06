@@ -6,6 +6,10 @@
 	border-radius: 8px;
 }
 
+.bottom-sheet-v2__background--dark {
+	background-color: $modal-background-dark;
+}
+
 .bottom-sheet-v2__handle-indicator {
 	background-color: $light-gray-400;
 	border-radius: 2px;
