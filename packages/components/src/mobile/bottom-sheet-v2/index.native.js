@@ -7,6 +7,7 @@ import BottomSheet, {
 	useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import { Modal } from 'react-native';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -18,6 +19,7 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,11 +27,10 @@ import {
 import styles from './style';
 
 function BottomSheetV2WithRef(
-	{ children, index = 0, onClose, snapPoints = [ '50%' ] } = {},
+	{ children, index = 0, onClose, setVisible, snapPoints = [ '50%' ] } = {},
 	ref
 ) {
 	const bottomSheetRef = useRef( null );
-	const [ visible, setVisible ] = useState( index >= 0 );
 	/**
 	 * `internalIndex` is used to allow displaying the modal on initial render,
 	 * which is required in some areas of the code base that do not easily support
@@ -76,36 +77,51 @@ function BottomSheetV2WithRef(
 	} = useBottomSheetDynamicSnapPoints( snapPoints );
 
 	return (
-		<Modal transparent={ true } visible={ visible }>
-			<BottomSheet
-				backdropComponent={ renderBackdrop }
-				backgroundStyle={ styles[ 'bottom-sheet-v2__background' ] }
-				enablePanDownToClose={ true }
-				contentHeight={ animatedContentHeight }
-				handleHeight={ animatedHandleHeight }
-				handleIndicatorStyle={
-					styles[ 'bottom-sheet-v2__handle-indicator' ]
+		<BottomSheet
+			backdropComponent={ renderBackdrop }
+			backgroundStyle={ styles[ 'bottom-sheet-v2__background' ] }
+			enablePanDownToClose={ true }
+			contentHeight={ animatedContentHeight }
+			handleHeight={ animatedHandleHeight }
+			handleIndicatorStyle={
+				styles[ 'bottom-sheet-v2__handle-indicator' ]
+			}
+			index={ internalIndex }
+			onClose={ () => {
+				setVisible( false );
+				if ( onClose ) {
+					onClose();
 				}
-				index={ internalIndex }
-				onClose={ () => {
-					setVisible( false );
-					if ( onClose ) {
-						onClose();
-					}
-				} }
-				ref={ bottomSheetRef }
-				snapPoints={ animatedSnapPoints }
-			>
-				<BottomSheetScrollView onLayout={ handleContentLayout }>
-					{ children }
-				</BottomSheetScrollView>
-			</BottomSheet>
-		</Modal>
+			} }
+			ref={ bottomSheetRef }
+			snapPoints={ animatedSnapPoints }
+		>
+			<BottomSheetScrollView onLayout={ handleContentLayout }>
+				{ children }
+			</BottomSheetScrollView>
+		</BottomSheet>
 	);
 }
 
-const BottomSheetV2 = forwardRef( BottomSheetV2WithRef );
+const BottomSheetV2 = compose( [ gestureHandlerRootHOC, forwardRef ] )(
+	BottomSheetV2WithRef
+);
 
-BottomSheetV2.CONTENT_HEIGHT = 'CONTENT_HEIGHT';
+const BottomSheetModal = forwardRef( ( { index = 0, ...rest }, ref ) => {
+	const [ visible, setVisible ] = useState( index >= 0 );
 
-export default BottomSheetV2;
+	return (
+		<Modal transparent={ true } visible={ visible }>
+			<BottomSheetV2
+				{ ...rest }
+				index={ index }
+				ref={ ref }
+				setVisible={ setVisible }
+			/>
+		</Modal>
+	);
+} );
+
+BottomSheetModal.CONTENT_HEIGHT = 'CONTENT_HEIGHT';
+
+export default BottomSheetModal;

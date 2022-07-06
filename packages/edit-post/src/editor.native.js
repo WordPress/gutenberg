@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
-import { I18nManager } from 'react-native';
+import { I18nManager, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
@@ -173,7 +173,7 @@ class Editor extends Component {
 		};
 
 		return (
-			<GestureHandlerRootView style={ { flex: 1 } }>
+			<GestureHandlerRootView style={ styles.container }>
 				<SlotFillProvider>
 					<EditorProvider
 						settings={ editorSettings }
@@ -189,6 +189,12 @@ class Editor extends Component {
 		);
 	}
 }
+
+const styles = StyleSheet.create( {
+	container: {
+		flex: 1,
+	},
+} );
 
 export default compose( [
 	withSelect( ( select ) => {
