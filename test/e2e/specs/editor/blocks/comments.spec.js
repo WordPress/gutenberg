@@ -3,8 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 import {
-	createNewPost,
-	insertBlock,
 	pressKeyTimes,
 	publishPost,
 	setOption,
@@ -30,18 +28,24 @@ test.describe( 'Comments', () => {
 	} );
 
 	test( 'We show no results message if there are no comments', async ( {
+		admin,
+		editor,
 		page,
 		requestUtils,
 	} ) => {
 		await requestUtils.deleteAllComments();
-		await createNewPost();
-		await insertBlock( 'Comments' );
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
 	} );
 
-	test( 'Pagination links are working as expected', async ( { page } ) => {
-		await createNewPost();
-		await insertBlock( 'Comments' );
+	test( 'Pagination links are working as expected', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await publishPost();
 		// Visit the post that was just published.
 		await page.click(
@@ -99,11 +103,13 @@ test.describe( 'Comments', () => {
 		).not.toBeNull();
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
+		admin,
+		editor,
 		page,
 	} ) => {
 		await setOption( 'page_comments', '0' );
-		await createNewPost();
-		await insertBlock( 'Comments' );
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await publishPost();
 		// Visit the post that was just published.
 		await page.click(
