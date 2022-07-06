@@ -100,7 +100,6 @@ export function getInlineStyles( styles = {} ) {
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	// Elements is already handled by compileElementsStyles()
 	const extraRules = getCSSRules( styles );
 	extraRules.forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
