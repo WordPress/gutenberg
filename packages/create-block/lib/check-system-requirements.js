@@ -3,6 +3,7 @@
  */
 const inquirer = require( 'inquirer' );
 const checkSync = require( 'check-node-version' );
+const tools = require( 'check-node-version/tools' );
 const { forEach } = require( 'lodash' );
 const { promisify } = require( 'util' );
 
@@ -46,9 +47,7 @@ async function checkSystemRequirements( engines ) {
 			forEach( result.versions, ( { isSatisfied, wanted }, name ) => {
 				if ( ! isSatisfied ) {
 					log.info(
-						check.PROGRAMS[ name ].getInstallInstructions(
-							wanted.raw
-						)
+						tools[ name ].getInstallInstructions( wanted.raw )
 					);
 				}
 			} );
