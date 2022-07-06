@@ -111,11 +111,11 @@ function gutenberg_register_test_block_for_feature_selectors() {
 					'text' => true,
 				),
 				'spacing'                => array(
-					'padding' => true,
+					'padding'                => true,
 					'__experimentalSelector' => '.inner',
 				),
-				'typography'                => array(
-					'fontSize' => true,
+				'typography'             => array(
+					'fontSize'               => true,
 					'__experimentalSelector' => '.sub-heading',
 				),
 				'__experimentalSelector' => '.wp-block-test, .wp-block-test__wrapper',
