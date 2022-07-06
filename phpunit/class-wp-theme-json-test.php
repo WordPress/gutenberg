@@ -563,7 +563,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Testing that dynamic properties in theme.json return the value they refrence, e.g.
+	 * Testing that dynamic properties in theme.json return the value they reference, e.g.
 	 * array( 'ref' => 'styles.color.background' ) => "#ffffff".
 	 */
 	function test_get_property_value_valid() {
