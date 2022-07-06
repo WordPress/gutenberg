@@ -130,7 +130,7 @@ export default function QueryInspectorControls( {
 						onChange={ setQuery }
 					/>
 				) }
-				{ showSticky && (
+				{ ! inherit && showSticky && (
 					<StickyControl
 						value={ sticky }
 						onChange={ ( value ) => setQuery( { sticky: value } ) }
