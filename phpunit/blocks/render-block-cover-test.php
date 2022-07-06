@@ -58,51 +58,76 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 	 *
 	 * @covers ::render_block_core_cover
 	 */
-	public function test_render_block_core_latest_posts() {
+	public function test_render_block_core_cover() {
 
 		global $wp_query;
 
 		// Fake being in the loop.
 		$wp_query->in_the_loop = true;
+		$wp_query->post  = self::$post;
+
+		$wp_query->posts = array( self::$post );
+		$GLOBALS['post'] = self::$post;
 
 		$attributes = array(
 			'useFeaturedImage' => true,
 			'backgroundType'   => 'image',
 			'hasParallax'      => true,
 			'isRepeated'       => true,
+			'minHeight'        => '100px',
 		);
 
-		$content = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$rendered = render_block_core_cover( $attributes, $content );
 
-		$wp_query->post  = self::$post;
-		$wp_query->posts = array( self::$post );
-
-		$attributes['minHeight'] = '100px';
-		$rendered                = render_block_core_cover( $attributes, $content );
 		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
 		$this->assertStringContainsString( 'background-image', $rendered );
 		$this->assertStringContainsString( 'min-height', $rendered );
 
-		$attributes['hasParallax'] = false;
-		$attributes['isRepeated']  = false;
-		$attributes['focalPoint']  = array(
-			'x' => 10,
-			'y' => 10,
-		);
-
-		$rendered = render_block_core_cover( $attributes, $content );
-
-		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
-		$this->assertStringNotContainsString( 'background-image', $rendered );
-		$this->assertStringNotContainsString( 'min-height', $rendered );
-
+		// If cover background type is not image.
 		$attributes['backgroundType'] = 'color';
 		$rendered                     = render_block_core_cover( $attributes, '' );
 		$this->assertEmpty( $rendered );
 
+		// If cover background is not post featured image.
 		$attributes['backgroundType']   = 'image';
 		$attributes['useFeaturedImage'] = false;
 		$rendered                       = render_block_core_cover( $attributes, '' );
 		$this->assertEmpty( $rendered );
+	}
+
+	/**
+	 * Test render_block_core_cover() method.
+	 *
+	 * @covers ::render_block_core_cover
+	 */
+	public function test_render_block_core_cover_fixed_or_repeated_background() {
+
+		global $wp_query;
+
+		// Fake being in the loop.
+		$wp_query->post  = self::$post;
+		$GLOBALS['post'] = self::$post;
+
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'backgroundType'   => 'image',
+			'hasParallax'      => false,
+			'isRepeated'       => false,
+			'minHeight'        => '100px',
+			'focalPoint'       =>array(
+				'x' => 10,
+				'y' => 10,
+			),
+		);
+
+		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
+		$rendered = render_block_core_cover( $attributes, $content );
+
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+		$this->assertStringContainsString( 'object-position', $rendered );
+		$this->assertStringNotContainsString( 'background-image', $rendered );
+		$this->assertStringNotContainsString( 'min-height', $rendered );
+
 	}
 }
