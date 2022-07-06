@@ -136,3 +136,10 @@ export function isResolving( state, selectorName, args ) {
 export function getCachedResolvers( state ) {
 	return state;
 }
+
+export function haveAllResolutionsFinished( state ) {
+	return Object.keys( state ).every( ( selectorName ) => {
+		const args = state?.[ selectorName ]?._map.keys().next().value;
+		return hasFinishedResolution( state, selectorName, args );
+	} );
+}

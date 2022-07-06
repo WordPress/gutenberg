@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
 
@@ -19,6 +20,14 @@ import getIsListPage from '../../utils/get-is-list-page';
 
 export default function EditSiteApp( { reboot } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const loaded = useSelect(
+		( select ) => select( coreStore ).haveAllResolutionsFinished(),
+		[]
+	);
+
+	// eslint-disable-next-line no-console
+	console.log( 'are all resolutions loaded? ', loaded );
 
 	function onPluginAreaError( name ) {
 		createErrorNotice(
