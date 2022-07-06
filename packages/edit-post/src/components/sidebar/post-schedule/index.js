@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Dropdown, Button } from '@wordpress/components';
+import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleCheck,
@@ -10,22 +11,26 @@ import {
 } from '@wordpress/editor';
 
 export default function PostSchedule() {
+	const anchorRef = useRef();
 	return (
 		<PostScheduleCheck>
-			<span>{ __( 'Publish' ) }</span>
-			<Dropdown
-				position="bottom left"
-				contentClassName="edit-post-post-schedule__dialog"
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<PostScheduleToggle
-						isOpen={ isOpen }
-						onClick={ onToggle }
-					/>
-				) }
-				renderContent={ ( { onClose } ) => (
-					<PostScheduleForm onClose={ onClose } />
-				) }
-			/>
+			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
+				<span>{ __( 'Publish' ) }</span>
+				<Dropdown
+					popoverProps={ { anchorRef } }
+					position="bottom left"
+					contentClassName="edit-post-post-schedule__dialog"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<PostScheduleToggle
+							isOpen={ isOpen }
+							onClick={ onToggle }
+						/>
+					) }
+					renderContent={ ( { onClose } ) => (
+						<PostScheduleForm onClose={ onClose } />
+					) }
+				/>
+			</PanelRow>
 		</PostScheduleCheck>
 	);
 }
