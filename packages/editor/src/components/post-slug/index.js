@@ -4,7 +4,7 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
 import { TextControl } from '@wordpress/components';
 
@@ -81,5 +81,4 @@ export default compose( [
 			},
 		};
 	} ),
-	withInstanceId,
 ] )( PostSlug );
