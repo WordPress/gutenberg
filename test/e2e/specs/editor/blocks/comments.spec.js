@@ -69,10 +69,10 @@ test.describe( 'Comments', () => {
 
 		// We check that there is a previous comments page link.
 		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
+			await page.locator( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
 		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
+			await page.locator( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 
 		await Promise.all( [
@@ -82,10 +82,10 @@ test.describe( 'Comments', () => {
 
 		// We check that there are a previous and a next link.
 		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
+			await page.locator( '.wp-block-comments-pagination-previous' )
 		).not.toBeNull();
 		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
+			await page.locator( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
 
 		await Promise.all( [
@@ -95,10 +95,10 @@ test.describe( 'Comments', () => {
 
 		// We check that there is only have a next link
 		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
+			await page.locator( '.wp-block-comments-pagination-previous' )
 		).toBeNull();
 		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
+			await page.locator( '.wp-block-comments-pagination-next' )
 		).not.toBeNull();
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
@@ -132,10 +132,10 @@ test.describe( 'Comments', () => {
 		}
 		// We check that there are no comments page link.
 		expect(
-			await page.$( '.wp-block-comments-pagination-previous' )
+			await page.locator( '.wp-block-comments-pagination-previous' )
 		).toBeNull();
 		expect(
-			await page.$( '.wp-block-comments-pagination-next' )
+			await page.locator( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 	} );
 	test.afterAll( async ( { admin, requestUtils } ) => {
