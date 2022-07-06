@@ -28,7 +28,6 @@ const SetupContent = ( {
 	activeSlide,
 	patterns,
 	onBlockPatternSelect,
-	height,
 } ) => {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
@@ -41,7 +40,6 @@ const SetupContent = ( {
 		return (
 			<div
 				className="block-editor-block-pattern-setup__carousel"
-				style={ { height } }
 			>
 				<div className={ containerClass }>
 					<ul className="carousel-container">
@@ -50,7 +48,6 @@ const SetupContent = ( {
 								className={ slideClass.get( index ) || '' }
 								key={ pattern.name }
 								pattern={ pattern }
-								minHeight={ height }
 							/>
 						) ) }
 					</ul>
@@ -60,7 +57,6 @@ const SetupContent = ( {
 	}
 	return (
 		<div
-			style={ { height } }
 			className="block-editor-block-pattern-setup__grid"
 		>
 			<Composite
