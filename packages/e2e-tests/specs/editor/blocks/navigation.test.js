@@ -1393,6 +1393,51 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			expect( linkText ).toBe( 'WordPress' );
 		} );
 
+		it( 'does not automatically use the first Navigation Menu if uncontrolled inner blocks are present', async () => {
+			const pageTitle = 'A Test Page';
+
+			await createNavigationMenu( {
+				title: 'Example Navigation',
+				content:
+					'<!-- wp:navigation-link {"label":"First Nav Menu Item","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
+			} );
+
+			await rest( {
+				method: 'POST',
+				path: `/wp/v2/pages/`,
+				data: {
+					status: 'publish',
+					title: pageTitle,
+					content: 'Hello world',
+				},
+			} );
+
+			await createNewPost();
+
+			await clickOnMoreMenuItem( 'Code editor' );
+
+			const codeEditorInput = await page.waitForSelector(
+				'.editor-post-text-editor'
+			);
+			await codeEditorInput.click();
+
+			const markup =
+				'<!-- wp:navigation --><!-- wp:page-list /--><!-- /wp:navigation -->';
+			await page.keyboard.type( markup );
+			await clickButton( 'Exit code editor' );
+
+			await waitForBlock( 'Navigation' );
+
+			const hasUncontrolledInnerBlocks = await page.evaluate( () => {
+				const blocks = wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				return !! blocks[ 0 ]?.innerBlocks?.length;
+			} );
+
+			expect( hasUncontrolledInnerBlocks ).toBe( true );
+		} );
+
 		it( 'does not automatically use first Navigation Menu if more than one exists', async () => {
 			await createNavigationMenu( {
 				title: 'Example Navigation',
