@@ -121,8 +121,11 @@ function ScreenHeadingColor( { name } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
+				<h4>{ __( 'Heading Level' ) }</h4>
+
 				<ToggleGroupControl
 					label={ __( 'Heading Level' ) }
+					hideLabelFromVision={ true }
 					value={ selectedLevel }
 					onChange={ setCurrentTab }
 					isBlock
