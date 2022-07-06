@@ -40,21 +40,25 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		let target = node;
+		const focusTimeout = setTimeout( () => {
+			let target = node;
 
-		if ( focusOnMountRef.current === 'firstElement' ) {
-			const firstTabbable = focus.tabbable.find( node )[ 0 ];
+			if ( focusOnMountRef.current === 'firstElement' ) {
+				const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
-			if ( firstTabbable ) {
-				target = /** @type {HTMLElement} */ ( firstTabbable );
+				if ( firstTabbable ) {
+					target = /** @type {HTMLElement} */ ( firstTabbable );
+				}
 			}
-		}
 
-		target.focus( {
-			// When focusing newly mounted dialogs,
-			// the position of the popover is often not right on the first render
-			// This prevents the layout shifts when focusing the dialogs.
-			preventScroll: true,
-		} );
+			target.focus( {
+				// When focusing newly mounted dialogs,
+				// the position of the popover is often not right on the first render
+				// This prevents the layout shifts when focusing the dialogs.
+				preventScroll: true,
+			} );
+		}, 0 );
+
+		return () => clearTimeout( focusTimeout );
 	}, [] );
 }
