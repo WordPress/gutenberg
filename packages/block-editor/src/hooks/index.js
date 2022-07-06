@@ -15,6 +15,7 @@ import './duotone';
 import './font-size';
 import './border';
 import './layout';
+import './spacing-size';
 
 export { useCustomSides } from './dimensions';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
