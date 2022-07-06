@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import BottomSheet, {
+import BottomSheetExternal, {
 	BottomSheetBackdrop,
 	BottomSheetScrollView,
 	useBottomSheetDynamicSnapPoints,
@@ -26,38 +26,10 @@ import { compose } from '@wordpress/compose';
  */
 import styles from './style';
 
-function BottomSheetV2WithRef(
-	{ children, index = 0, onClose, setVisible, snapPoints = [ '50%' ] } = {},
+function BottomSheetWithRef(
+	{ children, index, onClose, snapPoints = [ '50%' ] } = {},
 	ref
 ) {
-	const bottomSheetRef = useRef( null );
-	/**
-	 * `internalIndex` is used to allow displaying the modal on initial render,
-	 * which is required in some areas of the code base that do not easily support
-	 * an call to an imperative `present` method.
-	 */
-	const [ internalIndex, setInternalIndex ] = useState( index );
-
-	const handlePresent = useCallback( () => {
-		setVisible( true );
-		setInternalIndex( index >= 0 ? index : 0 );
-	}, [] );
-
-	const handleDismiss = useCallback( () => {
-		bottomSheetRef.current?.close();
-	}, [] );
-
-	/**
-	 * Utilize imperative handle to mimic the `@gorhom/bottom-sheet` API, which
-	 * would simplify migrating to `BottomSheetModal` in the future once the
-	 * editor header navigation is rendered by React Native, not the native host
-	 * app.
-	 */
-	useImperativeHandle( ref, () => ( {
-		present: handlePresent,
-		dismiss: handleDismiss,
-	} ) );
-
 	const renderBackdrop = useCallback(
 		( props ) => (
 			<BottomSheetBackdrop
@@ -77,7 +49,7 @@ function BottomSheetV2WithRef(
 	} = useBottomSheetDynamicSnapPoints( snapPoints );
 
 	return (
-		<BottomSheet
+		<BottomSheetExternal
 			backdropComponent={ renderBackdrop }
 			backgroundStyle={ styles[ 'bottom-sheet-v2__background' ] }
 			enablePanDownToClose={ true }
@@ -86,41 +58,75 @@ function BottomSheetV2WithRef(
 			handleIndicatorStyle={
 				styles[ 'bottom-sheet-v2__handle-indicator' ]
 			}
-			index={ internalIndex }
-			onClose={ () => {
-				setVisible( false );
-				if ( onClose ) {
-					onClose();
-				}
-			} }
-			ref={ bottomSheetRef }
+			index={ index }
+			onClose={ onClose }
+			ref={ ref }
 			snapPoints={ animatedSnapPoints }
 		>
 			<BottomSheetScrollView onLayout={ handleContentLayout }>
 				{ children }
 			</BottomSheetScrollView>
-		</BottomSheet>
+		</BottomSheetExternal>
 	);
 }
 
-const BottomSheetV2 = compose( [ gestureHandlerRootHOC, forwardRef ] )(
-	BottomSheetV2WithRef
+const BottomSheet = compose( [ gestureHandlerRootHOC, forwardRef ] )(
+	BottomSheetWithRef
 );
 
-const BottomSheetModal = forwardRef( ( { index = 0, ...rest }, ref ) => {
+const BottomSheetModalWithRef = (
+	{ index = 0, onClose, ...bottomSheetProps },
+	ref
+) => {
+	const bottomSheetRef = useRef( null );
+
+	/**
+	 * `internalIndex` is used to allow displaying the modal on initial render,
+	 * which is required in some areas of the code base that do not easily support
+	 * an call to an imperative `present` method.
+	 */
+	const [ internalIndex, setInternalIndex ] = useState( index );
 	const [ visible, setVisible ] = useState( index >= 0 );
+
+	const handlePresent = useCallback( () => {
+		setVisible( true );
+		setInternalIndex( index >= 0 ? index : 0 );
+	}, [] );
+
+	const handleDismiss = useCallback( () => {
+		bottomSheetRef.current?.close();
+	}, [] );
+
+	/**
+	 * Utilize imperative handle to mimic the `@gorhom/bottom-sheet` API, which
+	 * would simplify migrating to `BottomSheetModal` in the future if the editor
+	 * header navigation is rendered by React Native, not the native host app.
+	 */
+	useImperativeHandle( ref, () => ( {
+		present: handlePresent,
+		dismiss: handleDismiss,
+	} ) );
+
+	const handleClose = useCallback( () => {
+		setVisible( false );
+		if ( onClose ) {
+			onClose();
+		}
+	}, [ onClose ] );
 
 	return (
 		<Modal transparent={ true } visible={ visible }>
-			<BottomSheetV2
-				{ ...rest }
-				index={ index }
+			<BottomSheet
+				{ ...bottomSheetProps }
+				index={ internalIndex }
 				ref={ ref }
-				setVisible={ setVisible }
+				onClose={ handleClose }
 			/>
 		</Modal>
 	);
-} );
+};
+
+const BottomSheetModal = forwardRef( BottomSheetModalWithRef );
 
 BottomSheetModal.CONTENT_HEIGHT = 'CONTENT_HEIGHT';
 
