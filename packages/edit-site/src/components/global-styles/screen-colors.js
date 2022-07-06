@@ -108,6 +108,36 @@ function LinkColorItem( { name, parentMenu } ) {
 	);
 }
 
+function HeadingColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'color' );
+	const [ color ] = useStyle( 'elements.heading.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.heading.color.background', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/heading' }
+			aria-label={ __( 'Colors heading styles' ) }
+		>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem>{ __( 'Headings' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
 function ButtonColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'buttonColor' );
@@ -163,6 +193,10 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<HeadingColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>

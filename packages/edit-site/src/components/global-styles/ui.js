@@ -20,6 +20,7 @@ import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
+import ScreenHeadingColor from './screen-color-heading';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
@@ -87,6 +88,12 @@ function ContextScreens( { name } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
 				<ScreenLinkColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/heading' }
+			>
+				<ScreenHeadingColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
