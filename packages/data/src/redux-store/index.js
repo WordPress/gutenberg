@@ -16,6 +16,7 @@ import createReduxRoutineMiddleware from '@wordpress/redux-routine';
  */
 import { builtinControls } from '../controls';
 import promise from '../promise-middleware';
+import loadingMiddleware from '../loading-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
@@ -242,6 +243,7 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 	const middlewares = [
 		createResolversCacheMiddleware( registry, key ),
 		promise,
+		loadingMiddleware,
 		createReduxRoutineMiddleware( normalizedControls ),
 		createThunkMiddleware( thunkArgs ),
 	];
