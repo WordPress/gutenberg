@@ -18,7 +18,7 @@ export function getSpacingPresetCssVar( presetVar ) {
 }
 
 /**
- * Inspector control panel containing the spacing size related configuration
+ * Inspector control panel containing the spacing size related configuration.
  *
  * @param {Object} props
  *
