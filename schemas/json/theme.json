@@ -1083,6 +1083,9 @@
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
+				"button": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"link": {
 					"type": "object",
 					"allOf": [
