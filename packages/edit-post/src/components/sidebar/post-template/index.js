@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
@@ -14,8 +13,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import PostTemplateForm from './form';
 
 export default function PostTemplate() {
-	const anchorRef = useRef();
-
 	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
@@ -41,10 +38,9 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ anchorRef }>
+		<>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
-				popoverProps={ { anchorRef } }
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
@@ -58,7 +54,7 @@ export default function PostTemplate() {
 					<PostTemplateForm onClose={ onClose } />
 				) }
 			/>
-		</PanelRow>
+		</>
 	);
 }
 

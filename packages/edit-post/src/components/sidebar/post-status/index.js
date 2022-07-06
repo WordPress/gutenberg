@@ -2,9 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	__experimentalGrid as Grid,
+} from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
+import { moreVertical, check, trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,21 +36,24 @@ import PostURL from '../post-url';
  */
 const PANEL_NAME = 'post-status';
 
-function PostStatus( { isOpened, onTogglePanel } ) {
+// todo: should we rename this to PostSummary? (incl. css classes) - it might break BC.
+function PostStatus() {
 	return (
-		<PanelBody
-			className="edit-post-post-status"
-			title={ __( 'Summary' ) }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
-		>
+		<VStack className="edit-post-post-status" spacing={ 4 }>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostVisibility />
-						<PostSchedule />
-						<PostURL />
-						<PostTemplate />
+						<PostStatusHeader />
+						<Grid
+							columns={ 2 }
+							templateColumns="fit-content(40%) 1fr"
+							align="center"
+						>
+							<PostVisibility />
+							<PostSchedule />
+							<PostURL />
+							<PostTemplate />
+						</Grid>
 						<PostSticky />
 						<PostPendingStatus />
 						<PostFormat />
@@ -52,7 +64,50 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>
-		</PanelBody>
+		</VStack>
+	);
+}
+
+// todo: move to new file
+function PostStatusHeader() {
+	return (
+		<HStack className="edit-post-post-status__header">
+			<Heading className="edit-post-post-status__heading" level={ 2 }>
+				{ __( 'Summary' ) }
+			</Heading>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				toggleProps={ { isSmall: true } }
+			>
+				{ () => (
+					<>
+						<MenuGroup>
+							<MenuItem
+								icon={ check }
+								isSelected
+								role="menuitemcheckbox"
+							>
+								{ __( 'Stick to the top' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ check }
+								isSelected
+								role="menuitemcheckbox"
+							>
+								{ __( 'Mark as pending' ) }
+							</MenuItem>
+							<MenuItem>{ __( 'Revision history' ) }</MenuItem>
+						</MenuGroup>
+						<MenuGroup>
+							<MenuItem icon={ trash } isDestructive>
+								{ __( 'Move to trash' ) }
+							</MenuItem>
+						</MenuGroup>
+					</>
+				) }
+			</DropdownMenu>
+		</HStack>
 	);
 }
 
@@ -60,19 +115,10 @@ export default compose( [
 	withSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } =
-			select( editPostStore );
+		const { isEditorPanelRemoved } = select( editPostStore );
 		return {
 			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),
 	ifCondition( ( { isRemoved } ) => ! isRemoved ),
-	withDispatch( ( dispatch ) => ( {
-		onTogglePanel() {
-			return dispatch( editPostStore ).toggleEditorPanelOpened(
-				PANEL_NAME
-			);
-		},
-	} ) ),
 ] )( PostStatus );

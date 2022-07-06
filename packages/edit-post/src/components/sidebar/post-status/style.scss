@@ -1,5 +1,20 @@
-.edit-post-post-status .edit-post-post-publish-dropdown__switch-to-draft {
-	margin-top: 15px;
-	width: 100%;
-	text-align: center;
+.edit-post-post-status {
+	padding: $grid-unit-20;
+}
+
+.edit-post-post-status__header {
+	.components-dropdown-menu {
+		margin: -$grid-unit-05 0;
+		line-height: 0;
+	}
+
+	[class][class].components-dropdown-menu__toggle {
+		padding: 0;
+		min-width: $grid-unit-30;
+	}
+}
+
+[class].edit-post-post-status__heading {
+	margin: 0;
+	font-weight: 500;
 }
