@@ -86,7 +86,7 @@ function findOrCreateTerm( termName, restBase, namespace ) {
 		.then( unescapeTerm );
 }
 
-function FlatTermSelector( { slug } ) {
+export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );

@@ -2,8 +2,7 @@
 
 The purpose of this guide is to offer various ways one can lock down and curate the experience of using WordPress, especially with the introduction of more design tools and full site editing functionality. 
 
-	
-<div class="callout callout-info"> For information around adding functionality to a theme, rather than curating and locking, please review this guide on [Converting a classic theme to a block theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/).</div>
+For information around adding functionality to a theme, rather than curating and locking, please review this guide on [Converting a classic theme to a block theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/).
 
 ## Locking APIs
 
@@ -11,7 +10,7 @@ The purpose of this guide is to offer various ways one can lock down and curate 
 
 Users have the ability to lock and unlock blocks via the editor. The locking UI has options for preventing blocks from being moved within the content canvas or removed:
 
-![Image of locking interface](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Locking%20interface.png)
+![Image of locking interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20interface.png?raw=true)
 
 Keep in mind that each block you want to lock will need to be individually locked as desired. There is not a way to mass lock blocks currently. 
 
@@ -142,7 +141,8 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 *Duotone with only defined default options and core options available for the Post Featured Image block (no customization):*
 
-```{
+```
+{
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
@@ -180,11 +180,12 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block: 
 
-![Image of restricted interface](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Locking%20comparison%20visual.png)
+![Image of restricted interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20comparison%20visual.png?raw=true)
 
 Continuing the examples with duotone, this means you could allow full access to all Duotone functionality for Image blocks and only limit the Post Featured Image block like so:
 
-```{
+```
+{
 	"schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
@@ -266,7 +267,11 @@ To enable something from the above, just set whatever value you want to change t
 
 **Remove access to the template editor**
 
-Whether you’re using [theme.json in a Classic Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/#adding-theme-json-in-classic-themes) or Block Theme, you can add remove_theme_support( `block-templates`); to your functions.php file to remove access to the Template Editor that is available when editing posts or pages. This prevents both the ability to both create new block templates or edit them from within the Post Editor. 
+Whether you’re using [theme.json in a Classic Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/#adding-theme-json-in-classic-themes) or Block Theme, you can add the following to your functions.php file to remove access to the Template Editor that is available when editing posts or pages:
+
+`remove_theme_support( 'block-templates');`
+
+This prevents both the ability to both create new block templates or edit them from within the Post Editor. 
 
 **Create an allow or disallow list to limit block options**
 
@@ -302,13 +307,11 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 
 Note that this field requires using [version 2 of theme.json](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
 
-## Example of combining approaches
+## Combining approaches
 
-Keep in mind that the above approaches can be combined as you see fit. In the quick video below, you’ll see an example where both the options to customize are removed and some presets remain. Specifically, the Post Title block and Post Date block don’t have options for custom font sizes, line height, font-weight, and colors. They both do still provide a few default options for font sizes and the ability to edit the blocks in other ways, like alignment. Color options are paired down to offer a few simple options in duotone, with the option to set custom colors removed.
-
-![Video of example of combined approaches](https://github.com/WordPress/gutenberg/blob/trunk/docs/assets/Curation%20combination%20video.mp4)
+Keep in mind that the above approaches can be combined as you see fit. For example, you can provide custom patterns to use when creating a new page while also limiting the amount of customization that can be done to aspects of them, like only allowing certain preset colors to be used for the background of a Cover block or locking down what blocks can be deleted. When considering the approaches to take, think about the specific ways you might want to both open up the experience and curate it. 
 
 ## Additional Resources
 
-[Builder Basics – Working with Templates in Full Site Editing (Part 3)](https://wordpress.tv/2022/05/24/nick-diego-builder-basics-working-with-templates-in-full-site-editing-part-3/)
-[Core Editor Improvement: Curated experiences with locking APIs & theme.json](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/)
+- [Builder Basics – Working with Templates in Full Site Editing (Part 3)](https://wordpress.tv/2022/05/24/nick-diego-builder-basics-working-with-templates-in-full-site-editing-part-3/)
+- [Core Editor Improvement: Curated experiences with locking APIs & theme.json](https://make.wordpress.org/core/2022/02/09/core-editor-improvement-curated-experiences-with-locking-apis-theme-json/)
