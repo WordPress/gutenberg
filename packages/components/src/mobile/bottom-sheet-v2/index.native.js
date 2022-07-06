@@ -20,7 +20,7 @@ import {
 } from '@wordpress/element';
 
 function BottomSheetV2WithRef(
-	{ onClose, children, index = 0, snapPoints = [ '50%' ], style } = {},
+	{ children, index = 0, onClose, snapPoints = [ '50%' ] } = {},
 	ref
 ) {
 	const bottomSheetRef = useRef( null );
@@ -85,7 +85,6 @@ function BottomSheetV2WithRef(
 				} }
 				ref={ bottomSheetRef }
 				snapPoints={ animatedSnapPoints }
-				style={ style }
 			>
 				<BottomSheetScrollView onLayout={ handleContentLayout }>
 					{ children }
