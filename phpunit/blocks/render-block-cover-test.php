@@ -13,7 +13,7 @@
  */
 class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 	/**
-	 * Post object .
+	 * Post object.
 	 *
 	 * @var array
 	 */
@@ -64,7 +64,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 
 		// Fake being in the loop.
 		$wp_query->in_the_loop = true;
-		$wp_query->post  = self::$post;
+		$wp_query->post        = self::$post;
 
 		$wp_query->posts = array( self::$post );
 		$GLOBALS['post'] = self::$post;
@@ -115,7 +115,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 			'hasParallax'      => false,
 			'isRepeated'       => false,
 			'minHeight'        => '100px',
-			'focalPoint'       =>array(
+			'focalPoint'       => array(
 				'x' => 10,
 				'y' => 10,
 			),
