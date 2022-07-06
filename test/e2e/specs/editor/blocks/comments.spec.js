@@ -4,7 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 import {
 	pressKeyTimes,
-	publishPost,
 	setOption,
 } from '@wordpress/e2e-test-utils';
 
@@ -46,7 +45,7 @@ test.describe( 'Comments', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
-		await publishPost();
+		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
 			'.post-publish-panel__postpublish-buttons .is-primary'
@@ -110,7 +109,7 @@ test.describe( 'Comments', () => {
 		await setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
-		await publishPost();
+		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
 			'.post-publish-panel__postpublish-buttons .is-primary'
