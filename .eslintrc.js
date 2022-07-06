@@ -93,6 +93,7 @@ module.exports = {
 							'findLast',
 							'flatten',
 							'flattenDeep',
+							'invoke',
 							'isArray',
 							'isFinite',
 							'isFunction',
