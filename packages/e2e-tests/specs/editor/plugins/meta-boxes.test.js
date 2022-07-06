@@ -59,7 +59,7 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Check the the dynamic block appears.
+		// Check the dynamic block appears.
 		const latestPostsBlock = await page.waitForSelector(
 			'.wp-block-latest-posts'
 		);

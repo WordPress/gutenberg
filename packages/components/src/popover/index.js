@@ -159,7 +159,7 @@ const Popover = (
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
-	 * Offsets the the position of the popover when the anchor is inside an iframe.
+	 * Offsets the position of the popover when the anchor is inside an iframe.
 	 */
 	const frameOffset = useMemo( () => {
 		const { defaultView } = ownerDocument;

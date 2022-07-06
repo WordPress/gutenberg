@@ -108,25 +108,27 @@ class RequestUtils {
 		this.baseURL = baseURL;
 	}
 
-	login = login;
-	setupRest = setupRest;
-	rest = rest;
-	getMaxBatchSize = getMaxBatchSize;
-	batchRest = batchRest;
-	getPluginsMap = getPluginsMap;
-	activatePlugin = activatePlugin;
-	deactivatePlugin = deactivatePlugin;
-	activateTheme = activateTheme;
+	login = login.bind( this );
+	setupRest = setupRest.bind( this );
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	rest = rest.bind( this ) as typeof rest;
+	getMaxBatchSize = getMaxBatchSize.bind( this );
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	batchRest = batchRest.bind( this ) as typeof batchRest;
+	getPluginsMap = getPluginsMap.bind( this );
+	activatePlugin = activatePlugin.bind( this );
+	deactivatePlugin = deactivatePlugin.bind( this );
+	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
-	deleteAllPosts = deleteAllPosts;
-	deleteAllWidgets = deleteAllWidgets;
-	addWidgetBlock = addWidgetBlock;
-	deleteAllTemplates = deleteAllTemplates;
-	resetPreferences = resetPreferences;
-	listMedia = listMedia;
-	uploadMedia = uploadMedia;
-	deleteMedia = deleteMedia;
-	deleteAllMedia = deleteAllMedia;
+	deleteAllPosts = deleteAllPosts.bind( this );
+	deleteAllWidgets = deleteAllWidgets.bind( this );
+	addWidgetBlock = addWidgetBlock.bind( this );
+	deleteAllTemplates = deleteAllTemplates.bind( this );
+	resetPreferences = resetPreferences.bind( this );
+	listMedia = listMedia.bind( this );
+	uploadMedia = uploadMedia.bind( this );
+	deleteMedia = deleteMedia.bind( this );
+	deleteAllMedia = deleteAllMedia.bind( this );
 }
 
 export type { StorageState };

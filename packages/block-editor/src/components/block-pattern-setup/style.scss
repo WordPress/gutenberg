@@ -17,6 +17,7 @@
 			display: block;
 			width: 100%;
 			padding: $grid-unit-40;
+			padding-top: 0;
 			column-count: 2;
 
 			@include break-huge() {
@@ -54,7 +55,6 @@
 		margin: 0;
 		color: $gray-900;
 		// Block UI appearance.
-		border-radius: $radius-block-ui $radius-block-ui 0 0;
 		background-color: $white;
 		display: flex;
 		flex-direction: row;
