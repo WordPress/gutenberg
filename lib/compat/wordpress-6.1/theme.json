@@ -237,11 +237,11 @@
 					"name": "flex",
 					"slug": "flex",
 					"className": "is-layout-flex",
+					"displayMode": "flex",
 					"baseStyles": [
 						{
 							"selector": "",
 							"rules": {
-								"display": "flex",
 								"flex-wrap": "wrap",
 								"align-items": "center"
 							}

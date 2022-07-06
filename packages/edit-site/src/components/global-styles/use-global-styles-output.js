@@ -322,8 +322,16 @@ export function getLayoutStyles( {
 		selector === ROOT_BLOCK_SELECTOR &&
 		tree?.settings?.layout?.definitions
 	) {
+		const validDisplayModes = [ 'block', 'flex', 'grid' ];
 		Object.values( tree.settings.layout.definitions ).forEach(
-			( { className, baseStyles } ) => {
+			( { className, displayMode, baseStyles } ) => {
+				if (
+					displayMode &&
+					validDisplayModes.includes( displayMode )
+				) {
+					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
+				}
+
 				if ( baseStyles?.length ) {
 					baseStyles.forEach( ( baseStyle ) => {
 						const declarations = [];

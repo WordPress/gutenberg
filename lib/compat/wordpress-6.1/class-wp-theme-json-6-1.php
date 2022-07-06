@@ -1239,6 +1239,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if (
 			static::ROOT_BLOCK_SELECTOR === $selector
 		) {
+			$valid_display_modes = array( 'block', 'flex', 'grid' );
 			foreach ( $layout_definitions as $layout_definition ) {
 				$class_name       = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
 				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
@@ -1247,6 +1248,28 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					! empty( $class_name ) &&
 					! empty( $base_style_rules )
 				) {
+					// Output display mode. This requires special handling as `display` is not exposed in `safe_style_css_filter`.
+					if (
+						! empty( $layout_definition['displayMode'] ) &&
+						is_string( $layout_definition['displayMode'] ) &&
+						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
+					) {
+						$layout_selector = sprintf(
+							'%s .%s',
+							$selector,
+							$class_name
+						);
+						$block_rules    .= static::to_ruleset(
+							$layout_selector,
+							array(
+								array(
+									'name'  => 'display',
+									'value' => $layout_definition['displayMode'],
+								),
+							)
+						);
+					}
+
 					foreach ( $base_style_rules as $base_style_rule ) {
 						$declarations = array();
 
@@ -1264,9 +1287,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 								}
 							}
 
-							$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
 							$layout_selector = sprintf(
-								$format,
+								'%s .%s%s',
 								$selector,
 								$class_name,
 								$base_style_rule['selector']

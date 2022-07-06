@@ -507,11 +507,11 @@ describe( 'global styles renderer', () => {
 							name: 'flex',
 							slug: 'flex',
 							className: 'is-layout-flex',
+							displayMode: 'flex',
 							baseStyles: [
 								{
 									selector: '',
 									rules: {
-										display: 'flex',
 										'flex-wrap': 'wrap',
 										'align-items': 'center',
 									},
@@ -549,7 +549,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'body .is-layout-flex { gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display: flex; flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				'body .is-layout-flex { gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -565,7 +565,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 0.5em; margin-block-end: 0; }body .is-layout-flex { gap: 0.5em; }body { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display: flex; flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 0.5em; margin-block-end: 0; }body .is-layout-flex { gap: 0.5em; }body { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -581,7 +581,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }body .is-layout-flex { gap: 12px; }body { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display: flex; flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				'body .is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }body .is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }body .is-layout-flex { gap: 12px; }body { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
