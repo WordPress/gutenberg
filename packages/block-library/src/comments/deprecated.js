@@ -31,6 +31,9 @@ const v1 = {
 		const { className } = blockProps;
 		const classes = className?.split( ' ' ) || [];
 
+		// The ID of the previous version of the block
+		// didn't have the `wp-block-comments` class,
+		// so we need to remove it here in order to mimic it.
 		const newClasses = classes?.filter(
 			( cls ) => cls !== 'wp-block-comments'
 		);
