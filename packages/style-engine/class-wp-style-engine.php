@@ -332,18 +332,18 @@ class WP_Style_Engine {
 	/**
 	 * Returns an array of CSS declarations based on valid block style values.
 	 *
-	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
-	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean       $should_return_css_vars Whether to try to build and return CSS var values.
+	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
+	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param boolean       $should_skip_css_vars Whether to skip compiling CSS var values.
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $should_return_css_vars ) {
+	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
 		if (
 			isset( $style_definition['value_func'] ) &&
 			is_callable( $style_definition['value_func'] )
 		) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_return_css_vars );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
 		}
 
 		$css_declarations    = array();
@@ -352,7 +352,7 @@ class WP_Style_Engine {
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
 		if ( is_string( $style_value ) && strpos( $style_value, 'var:' ) !== false ) {
-			if ( $should_return_css_vars && ! empty( $style_definition['css_vars'] ) ) {
+			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
 				if ( $css_var ) {
 					$css_declarations[ $style_property_keys['default'] ] = $css_var;
@@ -366,7 +366,7 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
-				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && $should_return_css_vars && ! empty( $style_definition['css_vars'] ) ) {
+				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
 				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
@@ -382,13 +382,13 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns classname and CSS from a block styles object.
+	 * Returns classnames and CSS based on the values in a block attributes.styles object.
 	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
-	 * @param array $block_styles An array of styles from a block's attributes.
-	 * @param array $options array(
-	 *     'selector' => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'css_vars' => (boolean) Whether to covert CSS values to var() values. If `true` the style engine will try to parse var:? values and output var( --wp--preset--* ) rules. Default is `false`.
+	 * @param array $block_styles Styles from a block's attributes object.
+	 * @param array $options      array(
+	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -396,17 +396,17 @@ class WP_Style_Engine {
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function generate( $block_styles, $options ) {
+	public function get_block_supports_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
 
-		$css_declarations       = array();
-		$classnames             = array();
-		$should_return_css_vars = isset( $options['css_vars'] ) && true === $options['css_vars'];
+		$css_declarations     = array();
+		$classnames           = array();
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
 		// Collect CSS and classnames.
-		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
+		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
 				continue;
 			}
@@ -418,37 +418,24 @@ class WP_Style_Engine {
 				}
 
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_return_css_vars ) );
+				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
 			}
 		}
 
 		// Build CSS rules output.
-		$css_selector              = isset( $options['selector'] ) ? $options['selector'] : null;
-		$filtered_css_declarations = array();
-
-		if ( ! empty( $css_declarations ) ) {
-			// Generate inline style declarations.
-			foreach ( $css_declarations as $css_property => $css_value ) {
-				$filtered_css_declaration = esc_html( safecss_filter_attr( "{$css_property}: {$css_value}" ) );
-				if ( ! empty( $filtered_css_declaration ) ) {
-					$filtered_css_declarations[] = $filtered_css_declaration . ';';
-				}
-			}
-		}
+		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
+		$style_rules  = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 
 		// The return object.
 		$styles_output = array();
+		$css           = $style_rules->get_declarations_string();
 
 		// Return css, if any.
-		if ( ! empty( $filtered_css_declarations ) ) {
+		if ( ! empty( $css ) ) {
+			$styles_output['css'] = $css;
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$css_rule             = "$css_selector { ";
-				$css_rule            .= implode( ' ', $filtered_css_declarations );
-				$css_rule            .= ' }';
-				$styles_output['css'] = $css_rule;
-			} else {
-				$styles_output['css'] = implode( ' ', $filtered_css_declarations );
+				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
 			}
 		}
 
@@ -460,7 +447,6 @@ class WP_Style_Engine {
 		return $styles_output;
 	}
 
-
 	/**
 	 * Style value parser that returns a CSS definition array comprising style properties
 	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
@@ -470,11 +456,11 @@ class WP_Style_Engine {
 	 *
 	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
 	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean $should_return_css_vars Whether to try to build and return CSS var values.
+	 * @param boolean $should_skip_css_vars           Whether to skip compiling CSS var values.
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_return_css_vars ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_skip_css_vars ) {
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -494,11 +480,11 @@ class WP_Style_Engine {
 
 			// Build a path to the individual rules in definitions.
 			$style_definition_path = array( $definition_group_key, $css_property );
-			$style_definition      = _wp_array_get( self::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+			$style_definition      = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
 
 			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
-				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && $should_return_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
+				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 				}
 				$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
@@ -510,30 +496,28 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->generate.
- *
- * Returns an CSS ruleset.
- * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ * Global public interface method to WP_Style_Engine->get_block_supports_styles to generate block styles from a single block style object.
+ * See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
  *
  * Example usage:
  *
- * $styles = wp_style_engine_generate( array( 'color' => array( 'text' => '#cccccc' ) ) );
- * // Returns `'color: #cccccc'`.
+ * $styles = wp_style_engine_get_block_supports_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * // Returns `array( 'css' => 'color: #cccccc', 'classnames' => 'has-color' )`.
  *
  * @access public
  *
- * @param array $block_styles An array of styles from a block's attributes.
- * @param array $options An array of options to determine the output.
+ * @param array         $block_styles The value of a block's attributes.style.
+ * @param array<string> $options      An array of options to determine the output.
  *
- * @return array|null array(
+ * @return array<string>|null array(
  *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
  *     'classnames' => (string) Classnames separated by a space.
  * );
  */
-function wp_style_engine_generate( $block_styles, $options = array() ) {
+function wp_style_engine_get_block_supports_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->generate( $block_styles, $options );
+		return $style_engine->get_block_supports_styles( $block_styles, $options );
 	}
 	return null;
 }

@@ -14,7 +14,7 @@ export default function PostScheduleLabel( props ) {
 	return usePostScheduleLabel( props );
 }
 
-export function usePostScheduleLabel( { full } ) {
+export function usePostScheduleLabel( { full = false } = {} ) {
 	const { date, isFloating } = useSelect(
 		( select ) => ( {
 			date: select( editorStore ).getEditedPostAttribute( 'date' ),

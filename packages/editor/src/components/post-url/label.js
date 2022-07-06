@@ -10,6 +10,10 @@ import { filterURLForDisplay } from '@wordpress/url';
 import { store as editorStore } from '../../store';
 
 export default function PostURLLabel() {
+	return usePostURLLabel();
+}
+
+export function usePostURLLabel() {
 	const postLink = useSelect(
 		( select ) => select( editorStore ).getCurrentPost().link,
 		[]

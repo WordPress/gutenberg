@@ -62,13 +62,10 @@ export default function PostCommentsFormEdit( {
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments Form block: Comments on this %s are not allowed.'
-				),
-				postType
+			warning = __(
+				'Post Comments Form block: Comments are not enabled for this item.'
 			);
+
 			actions = [
 				<Button
 					key="enableComments"
@@ -86,7 +83,7 @@ export default function PostCommentsFormEdit( {
 			warning = sprintf(
 				/* translators: 1: Post type (i.e. "post", "page") */
 				__(
-					'Post Comments Form block: Comments for this post type (%s) are not enabled.'
+					'Post Comments Form block: Comments are not enabled for this post type (%s).'
 				),
 				postType
 			);
