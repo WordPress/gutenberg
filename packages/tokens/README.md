@@ -64,4 +64,21 @@ It's always possible to use the full syntax.
 |---|-------------------------------------------|
 | `#{"token":"sportier/stat", "value":{"sport": "basketball", "game": "latest"}, "fallback": "TBD"}}#` | Show the score for the latest basketball game, but the plugin isn't available render `TBD` instead. |
 
+#### Indicating context for token
+
+While not currently supported, it may arise that we need to indicate in which context the token is found.
+This is due to the fact that there are different escaping and security concerns for content bound for HTML attributes than there are for those bound for HTML markup, similarly for other potential contexts.
+
+Tokens support indicating this with a _sigil_ at the front of the token syntax according to the following table.
+Not all potential sigils are meaningful, and in the absence of a recognized sigil the context for a token remains blank  (`null`).
+
+| Sigil | Associated context                                     |
+|---|--------------------------------------------------------|
+| `a` | token is inside an HTML attribute                      |
+| `h` | token is inside normal HTML markup                     |
+| `j` | token is inside a `<script>` tag or in JavaScript code |
+
+The context is a hint to the backend on how to render and escape the token content.
+It's not yet decided if these will be enforced by the token system or left up to the token authors to enforce.
+
 ## Background

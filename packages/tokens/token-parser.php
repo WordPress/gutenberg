@@ -13,6 +13,11 @@ class WP_Token
 	public $name;
 
 	/**
+	 * @var string|null
+	 */
+	public $context;
+
+	/**
 	 * @var mixed
 	 */
 	public $value;
@@ -27,6 +32,7 @@ class WP_Token
 		$this->name       = $name;
 		$this->value      = $value;
 		$this->fallback   = $fallback;
+		$this->context    = null;
 	}
 }
 
@@ -47,9 +53,10 @@ class WP_Token_Parser
 		}
 
 		return preg_replace_callback(
-			"~(?P<QUOTED>#)?#{(?P<TOKEN_CONTENTS>[^#]*)}#~",
+			"~(?P<QUOTED>#)?#(?P<SIGIL>[^#{])?{(?P<TOKEN_CONTENTS>[^#]*)}#~",
 			function ( $matches ) use ( $token_replacer ) {
 				list( '0' => $full_match, 'QUOTED' => $quoted, 'TOKEN_CONTENTS' => $contents ) = $matches;
+				$sigil = isset( $matches['SIGIL'] ) ? $matches['SIGIL'] : null;
 
 				if ( ! empty( $quoted ) ) {
 					return substr( $full_match, 1 );
@@ -64,7 +71,7 @@ class WP_Token_Parser
 					return '';
 				}
 
-				$output = call_user_func( $token_replacer, $token );
+				$output = call_user_func( $token_replacer, self::with_context( $token, $sigil ) );
 				return null !== $output ? $output : $token->fallback;
 			},
 			$input
@@ -139,6 +146,35 @@ class WP_Token_Parser
 			isset( $token_data['value'] ) ? $token_data['value'] : null,
 			isset( $token_data['fallback'] ) ? $token_data['fallback'] : ''
 		);
+	}
+
+
+	/**
+	 * Add appropriate context to token if given a recognized sigil.
+	 *
+	 * @param {WPToken} token input token to augment.
+	 * @param {string}  sigil identifies context.
+	 * @returns {WPToken} the token with context, if available.
+	 */
+	public static function with_context( $token, $sigil ) {
+		switch ( $sigil ) {
+			case 'a':
+				$token->context = 'attribute';
+				break;
+
+			case 'h':
+				$token->context = 'html';
+				break;
+
+			case 'j':
+				$token->context = 'javascript';
+				break;
+
+			default:
+				$token->context = null;
+		}
+
+		return $token;
 	}
 
 

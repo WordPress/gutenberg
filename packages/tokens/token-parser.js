@@ -1,9 +1,10 @@
 /**
  * @typedef {Object} WPToken
- * @property {string}              namespace  e.g. "core", "query", or "my-plugin"
- * @property {string}              name       e.g. "home_url", "featured-iamge", "my-token"
- * @property {Record<string, any>} value      defined by each token separately.
- * @property {string}              fallback   what to render if no matching token plugin available.
+ * @property {string}              namespace e.g. "core", "query", or "my-plugin"
+ * @property {string}              name      e.g. "home_url", "featured-image", "my-token"
+ * @property {Record<string, any>} value     defined by each token separately.
+ * @property {string}              fallback  what to render if no matching token plugin available.
+ * @property {string|null}         context   how token values should be escaped when rendered, e.g. "attribute" or "html".
  */
 
 /**
@@ -22,10 +23,10 @@
  */
 export const swapTokens = ( tokenReplacer, input ) => {
 	return input.replace(
-		new RegExp( '(#)?#{([^#]*)}#' ),
-		( fullMatch, quoted, tokenContents ) => {
+		new RegExp( '(#)?#([^#{])?{([^#]*)}#' ),
+		( fullMatch, quoted, sigil, tokenContents ) => {
 			if ( quoted ) {
-				return fullMatch.slice(1);
+				return fullMatch.slice( 1 );
 			}
 
 			const token = parseTokenContents( tokenContents );
@@ -33,7 +34,9 @@ export const swapTokens = ( tokenReplacer, input ) => {
 				return '';
 			}
 
-			return tokenReplacer( token ) ?? token.fallback;
+			return (
+				tokenReplacer( withContext( token, sigil ) ) ?? token.fallback
+			);
 		}
 	);
 };
@@ -54,7 +57,7 @@ const parseTokenContents = ( contents ) => {
 		const namespace = rawNamespace || 'core';
 		const value = rawValue ? jsonDecode( rawValue ) : null;
 
-		return { namespace, name, value, fallback: '' }
+		return { namespace, name, value, fallback: '', context: null };
 	}
 
 	const tokenData = jsonDecode( `{${ contents }}` );
@@ -74,7 +77,42 @@ const parseTokenContents = ( contents ) => {
 	const value = tokenData?.value ?? null;
 	const fallback = tokenData?.fallback ?? '';
 
-	return { namespace, name, value, fallback };
+	return { namespace, name, value, fallback, context: null };
 };
 
-const jsonDecode = ( s ) => JSON.parse( s );
+/**
+ * Add appropriate context to token if given a recognized sigil.
+ *
+ * @param {WPToken} token input token to augment.
+ * @param {string}  sigil identifies context.
+ * @return {WPToken} the token with context, if available.
+ */
+const withContext = ( token, sigil ) => {
+	switch ( sigil ) {
+		case 'a':
+			return { ...token, context: 'attribute' };
+
+		case 'h':
+			return { ...token, context: 'html' };
+
+		case 'j':
+			return { ...token, context: 'javascript' };
+
+		default:
+			return { ...token, context: null };
+	}
+};
+
+/**
+ * Attempt to parse augmented JSON.
+ *
+ * @param {string} s
+ * @return {any} the parsed document or `null` if unable to parse.
+ */
+const jsonDecode = ( s ) => {
+	try {
+		return JSON.parse( s );
+	} catch ( e ) {
+		return null;
+	}
+};

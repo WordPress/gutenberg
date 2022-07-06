@@ -1,5 +1,16 @@
+// eslint-disable-next-line jest/no-export
 export const jsTester = ( parse ) => () => {
 	const tokenForms = [
+		[
+			'#{echo}#',
+			{
+				namespace: 'core',
+				name: 'echo',
+				value: null,
+				fallback: '',
+				context: null,
+			},
+		],
 		[
 			'#{core/identity}#',
 			{
@@ -7,6 +18,7 @@ export const jsTester = ( parse ) => () => {
 				name: 'identity',
 				value: null,
 				fallback: '',
+				context: null,
 			},
 		],
 		[
@@ -16,6 +28,7 @@ export const jsTester = ( parse ) => () => {
 				name: 'identity',
 				value: null,
 				fallback: '',
+				context: null,
 			},
 		],
 		[
@@ -25,6 +38,7 @@ export const jsTester = ( parse ) => () => {
 				name: 'echo',
 				value: '<',
 				fallback: '',
+				context: null,
 			},
 		],
 		[
@@ -34,6 +48,7 @@ export const jsTester = ( parse ) => () => {
 				name: 'widget',
 				value: { name: 'sprocket' },
 				fallback: 'just a sprocket',
+				context: null,
 			},
 		],
 		[
@@ -43,6 +58,7 @@ export const jsTester = ( parse ) => () => {
 				name: 'widget',
 				value: { name: 'sprocket' },
 				fallback: '',
+				context: null,
 			},
 		],
 	];
@@ -73,10 +89,25 @@ export const jsTester = ( parse ) => () => {
 					name: 'echo',
 					value: 'look out for #1',
 					fallback: '',
+					context: null,
 				},
 			],
 			output: '{{TOKEN_1}}',
 		} );
+	} );
+
+	it.each( [
+		[ '#a{echo}#', 'attribute' ],
+		[ '#h{echo}#', 'html' ],
+		[ '#j{echo}#', 'javascript' ],
+		[ '#z{echo}#', null ],
+		[ '#3{echo}#', null ],
+		[ '#{echo}#', null ],
+	] )( 'recognizes context-specifying sigils: %s', ( input, context ) => {
+		expect( parse( input ).tokens[ 0 ] ).toHaveProperty(
+			'context',
+			context
+		);
 	} );
 };
 
@@ -104,6 +135,7 @@ const makeTest = hasPHP
 	: // eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe-callback, jest/valid-title
 	  ( ...args ) => describe.skip( ...args );
 
+// eslint-disable-next-line jest/no-export
 export const phpTester = ( name, filename ) =>
 	makeTest(
 		name,
@@ -137,6 +169,7 @@ export const phpTester = ( name, filename ) =>
 							)
 						);
 					} catch ( e ) {
+						// eslint-disable-next-line no-console
 						console.error( process.stdout );
 						throw new Error(
 							'failed to parse JSON:\n' + process.stdout
