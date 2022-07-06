@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import {
 	PostVisibility as PostVisibilityForm,
 	PostVisibilityLabel,
 	PostVisibilityCheck,
+	usePostVisibilityLabel,
 } from '@wordpress/editor';
 import { useRef } from '@wordpress/element';
 
@@ -33,14 +34,10 @@ export function PostVisibility() {
 								anchorRef: rowRef.current,
 							} }
 							renderToggle={ ( { isOpen, onToggle } ) => (
-								<Button
-									aria-expanded={ isOpen }
-									className="edit-post-post-visibility__toggle"
+								<PostVisibilityToggle
+									isOpen={ isOpen }
 									onClick={ onToggle }
-									variant="tertiary"
-								>
-									<PostVisibilityLabel />
-								</Button>
+								/>
 							) }
 							renderContent={ ( { onClose } ) => (
 								<PostVisibilityForm onClose={ onClose } />
@@ -50,6 +47,22 @@ export function PostVisibility() {
 				</PanelRow>
 			) }
 		/>
+	);
+}
+
+function PostVisibilityToggle( { isOpen, onClick } ) {
+	const label = usePostVisibilityLabel();
+	return (
+		<Button
+			className="edit-post-post-visibility__toggle"
+			variant="tertiary"
+			aria-expanded={ isOpen }
+			// translators: %s: Current post visibility.
+			aria-label={ sprintf( __( 'Select visibility: %s' ), label ) }
+			onClick={ onClick }
+		>
+			{ label }
+		</Button>
 	);
 }
 

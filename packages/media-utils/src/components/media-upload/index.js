@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, defaults, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -169,14 +164,10 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query(
-						defaults(
-							{
-								type: 'image',
-							},
-							this.options.library
-						)
-					),
+					library: wp.media.query( {
+						type: 'image',
+						...this.options.library,
+					} ),
 				} ),
 				new wp.media.controller.EditImage( {
 					model: this.options.editImage,
@@ -210,7 +201,12 @@ const slimImageObject = ( img ) => {
 		'link',
 		'caption',
 	];
-	return pick( img, attrSet );
+	return attrSet.reduce( ( result, key ) => {
+		if ( img?.hasOwnProperty( key ) ) {
+			result[ key ] = img[ key ];
+		}
+		return result;
+	}, {} );
 };
 
 const getAttachmentsCollection = ( ids ) => {
@@ -375,6 +371,7 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
+		const { value } = this.props;
 		this.updateCollection();
 
 		//Handle active tab in media model on model open.
@@ -384,9 +381,7 @@ class MediaUpload extends Component {
 
 		// Handle both this.props.value being either (number[]) multiple ids
 		// (for galleries) or a (number) singular id (e.g. image block).
-		const hasMedia = Array.isArray( this.props.value )
-			? !! this.props.value?.length
-			: !! this.props.value;
+		const hasMedia = Array.isArray( value ) ? !! value?.length : !! value;
 
 		if ( ! hasMedia ) {
 			return;
@@ -394,17 +389,16 @@ class MediaUpload extends Component {
 
 		const isGallery = this.props.gallery;
 		const selection = this.frame.state().get( 'selection' );
+		const valueArray = Array.isArray( value ) ? value : [ value ];
 
 		if ( ! isGallery ) {
-			castArray( this.props.value ).forEach( ( id ) => {
+			valueArray.forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
 
 		// Load the images so they are available in the media modal.
-		const attachments = getAttachmentsCollection(
-			castArray( this.props.value )
-		);
+		const attachments = getAttachmentsCollection( valueArray );
 
 		// Once attachments are loaded, set the current selection.
 		attachments.more().done( function () {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
@@ -25,7 +20,7 @@ function ActionItemSlot( {
 			fillProps={ fillProps }
 		>
 			{ ( fills ) => {
-				if ( isEmpty( Children.toArray( fills ) ) ) {
+				if ( ! Children.toArray( fills ).length ) {
 					return null;
 				}
 

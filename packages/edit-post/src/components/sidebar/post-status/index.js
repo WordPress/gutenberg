@@ -42,9 +42,9 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostSchedule />
 						<PostURL />
 						<PostTemplate />
-						<PostFormat />
 						<PostSticky />
 						<PostPendingStatus />
+						<PostFormat />
 						<PostSlug />
 						<PostAuthor />
 						{ fills }
