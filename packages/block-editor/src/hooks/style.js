@@ -349,7 +349,7 @@ const withElementsStyles = createHigherOrderComponent(
 					createPortal(
 						<style
 							dangerouslySetInnerHTML={ {
-								__html: styles.join( '\n' ),
+								__html: styles,
 							} }
 						/>,
 						element
