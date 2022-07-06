@@ -14,7 +14,6 @@
  * @return string[] CSS attributes.
  */
 function gutenberg_safe_style_attrs_6_1( $attrs ) {
-	$attrs[] = 'display';
 	$attrs[] = 'flex-wrap';
 	$attrs[] = 'gap';
 	$attrs[] = 'margin-block-start';
