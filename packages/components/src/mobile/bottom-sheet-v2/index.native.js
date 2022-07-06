@@ -7,7 +7,7 @@ import BottomSheetExternal, {
 	useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import { Modal } from 'react-native';
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,6 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -70,9 +69,7 @@ function BottomSheetWithRef(
 	);
 }
 
-const BottomSheet = compose( [ gestureHandlerRootHOC, forwardRef ] )(
-	BottomSheetWithRef
-);
+const BottomSheet = forwardRef( BottomSheetWithRef );
 
 const BottomSheetModalWithRef = (
 	{ index = 0, onClose, ...bottomSheetProps },
@@ -115,13 +112,21 @@ const BottomSheetModalWithRef = (
 	}, [ onClose ] );
 
 	return (
-		<Modal transparent={ true } visible={ visible }>
-			<BottomSheet
-				{ ...bottomSheetProps }
-				index={ internalIndex }
-				ref={ ref }
-				onClose={ handleClose }
-			/>
+		<Modal
+			onRequestClose={ handleDismiss }
+			transparent={ true }
+			visible={ visible }
+		>
+			<GestureHandlerRootView
+				style={ styles[ 'bottom-sheet-v2__gesture-handler' ] }
+			>
+				<BottomSheet
+					{ ...bottomSheetProps }
+					index={ internalIndex }
+					ref={ bottomSheetRef }
+					onClose={ handleClose }
+				/>
+			</GestureHandlerRootView>
 		</Modal>
 	);
 };
