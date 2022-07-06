@@ -82,8 +82,9 @@ function ListViewBlockSelectButton(
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<HStack
 					alignment="center"
-					justify="flex-start"
 					className="block-editor-list-view-block-select-button__label-wrapper"
+					justify="flex-start"
+					spacing={ 1 }
 				>
 					<Truncate
 						className="block-editor-list-view-block-select-button__title"
@@ -96,12 +97,12 @@ function ListViewBlockSelectButton(
 							{ blockInformation.anchor }
 						</span>
 					) }
+					{ isLocked && (
+						<span className="block-editor-list-view-block-select-button__lock">
+							<Icon icon={ lock } />
+						</span>
+					) }
 				</HStack>
-				{ isLocked && (
-					<span className="block-editor-list-view-block-select-button__lock">
-						<Icon icon={ lock } />
-					</span>
-				) }
 			</Button>
 		</>
 	);
