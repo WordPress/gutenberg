@@ -19,6 +19,11 @@ import {
 	useRef,
 } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import styles from './style';
+
 function BottomSheetV2WithRef(
 	{ children, index = 0, onClose, snapPoints = [ '50%' ] } = {},
 	ref
@@ -69,13 +74,18 @@ function BottomSheetV2WithRef(
 		animatedContentHeight,
 		handleContentLayout,
 	} = useBottomSheetDynamicSnapPoints( snapPoints );
+
 	return (
 		<Modal transparent={ true } visible={ visible }>
 			<BottomSheet
 				backdropComponent={ renderBackdrop }
+				backgroundStyle={ styles[ 'bottom-sheet-v2__background' ] }
 				enablePanDownToClose={ true }
 				contentHeight={ animatedContentHeight }
 				handleHeight={ animatedHandleHeight }
+				handleIndicatorStyle={
+					styles[ 'bottom-sheet-v2__handle-indicator' ]
+				}
 				index={ internalIndex }
 				onClose={ () => {
 					setVisible( false );
