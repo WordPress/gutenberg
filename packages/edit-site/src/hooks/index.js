@@ -2,4 +2,4 @@
  * Internal dependencies
  */
 import './components';
-import './template-part';
+import './template-part-edit';
