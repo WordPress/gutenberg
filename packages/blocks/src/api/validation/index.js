@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, isEqual, includes } from 'lodash';
+import { xor, fromPairs, isEqual, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,8 @@ import { normalizeBlockType } from '../utils';
 /** @typedef {import('../parser').WPBlock} WPBlock */
 /** @typedef {import('../registration').WPBlockType} WPBlockType */
 /** @typedef {import('./logger').LoggerItem} LoggerItem */
+
+const identity = ( x ) => x;
 
 /**
  * Globally matches any consecutive whitespace
