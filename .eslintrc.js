@@ -96,6 +96,7 @@ module.exports = {
 							'identity',
 							'invoke',
 							'isArray',
+							'isBoolean',
 							'isFinite',
 							'isFunction',
 							'isNil',
