@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -163,7 +158,7 @@ export default compose(
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			blocks: getBlocks(),
-			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
+			isTitleSupported: postType?.supports?.title ?? false,
 		};
 	} )
 )( DocumentOutline );
