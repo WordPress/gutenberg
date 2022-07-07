@@ -548,7 +548,7 @@ export const toStyles = (
 				} );
 			}
 
-			// Process the remaning block styles (they use either normal block class or __experimentalSelector).
+			// Process the remaining block styles (they use either normal block class or __experimentalSelector).
 			const declarations = getStylesDeclarations( styles );
 			if ( declarations?.length ) {
 				ruleset =
@@ -556,37 +556,39 @@ export const toStyles = (
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
-			const psuedoSelectorStyles = Object.entries( styles ).filter(
+			const pseudoSelectorStyles = Object.entries( styles ).filter(
 				( [ key ] ) => key.startsWith( ':' )
 			);
 
-			if ( psuedoSelectorStyles?.length ) {
-				psuedoSelectorStyles.forEach( ( [ pseudoKey, pseudoRule ] ) => {
-					const pseudoDeclarations =
-						getStylesDeclarations( pseudoRule );
+			if ( pseudoSelectorStyles?.length ) {
+				pseudoSelectorStyles.forEach(
+					( [ pseudoKey, pseudoStyle ] ) => {
+						const pseudoDeclarations =
+							getStylesDeclarations( pseudoStyle );
 
-					if ( ! pseudoDeclarations?.length ) {
-						return;
+						if ( ! pseudoDeclarations?.length ) {
+							return;
+						}
+
+						// `selector` maybe provided in a form
+						// where block level selectors have sub element
+						// selectors appended to them as a comma seperated
+						// string.
+						// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
+						// Split and append pseudo selector to create
+						// the proper rules to target the elements.
+						const _selector = selector
+							.split( ',' )
+							.map( ( sel ) => sel + pseudoKey )
+							.join( ',' );
+
+						const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+							';'
+						) };}`;
+
+						ruleset = ruleset + pseudoRule;
 					}
-
-					// `selector` maybe provided in a form
-					// where block level selectors have sub element
-					// selectors appended to them as a comma seperated
-					// string.
-					// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-					// Split and append pseudo selector to create
-					// the proper rules to target the elements.
-					const _selector = selector
-						.split( ',' )
-						.map( ( sel ) => sel + pseudoKey )
-						.join( ',' );
-
-					const psuedoRule = `${ _selector }{${ pseudoDeclarations.join(
-						';'
-					) };}`;
-
-					ruleset = ruleset + psuedoRule;
-				} );
+				);
 			}
 		}
 	);
