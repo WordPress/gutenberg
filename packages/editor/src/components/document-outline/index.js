@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { countBy, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -85,7 +85,13 @@ export const DocumentOutline = ( {
 	// Not great but it's the simplest way to locate the title right now.
 	const titleNode = document.querySelector( '.editor-post-title__input' );
 	const hasTitle = isTitleSupported && title && titleNode;
-	const countByLevel = countBy( headings, 'level' );
+	const countByLevel = headings.reduce(
+		( acc, heading ) => ( {
+			...acc,
+			[ heading.level ]: ( acc[ heading.level ] || 0 ) + 1,
+		} ),
+		{}
+	);
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (

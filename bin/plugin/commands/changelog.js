@@ -2,7 +2,6 @@
  * External dependencies
  */
 const {
-	countBy,
 	groupBy,
 	escapeRegExp,
 	uniq,
@@ -309,7 +308,17 @@ function getIssueFeature( issue ) {
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = featureCandidates.reduce(
+			/**
+			 * @param {Record<string,number>} acc     Accumulator
+			 * @param {string}                feature Feature label
+			 */
+			( acc, feature ) => ( {
+				...acc,
+				[ feature ]: ( acc[ feature ] || 0 ) + 1,
+			} ),
+			{}
+		);
 
 		// Check which matching label occurs most often.
 		const rankedFeatures = Object.keys( featureCounts ).sort(
