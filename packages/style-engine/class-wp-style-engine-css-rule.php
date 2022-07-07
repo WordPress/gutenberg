@@ -60,6 +60,9 @@ class WP_Style_Engine_CSS_Rule {
 	 * @param string $selector The CSS selector.
 	 */
 	public function set_selector( $selector ) {
+		if ( empty( $selector ) ) {
+			return;
+		}
 		$this->selector = $selector;
 	}
 
@@ -69,6 +72,9 @@ class WP_Style_Engine_CSS_Rule {
 	 * @param WP_Style_Engine_CSS_Rule $parent The parent rule.
 	 */
 	public function set_parent( $parent ) {
+		if ( ! $parent instanceof WP_Style_Engine_CSS_Rule ) {
+			return;
+		}
 		$this->parent = $parent;
 	}
 
@@ -81,7 +87,7 @@ class WP_Style_Engine_CSS_Rule {
 		if ( $declarations instanceof WP_Style_Engine_CSS_Declarations ) {
 			$declarations = array( $declarations );
 		}
-		$this->declarations = array_merge( $this->$declarations, $declarations );
+		$this->declarations = array_merge( $this->declarations, $declarations );
 	}
 
 	/**
@@ -103,5 +109,19 @@ class WP_Style_Engine_CSS_Rule {
 			return $this->get_parent_selector() . substr( $this->selector, 1 );
 		}
 		return $this->get_parent_selector() . ' ' . $this->selector;
+	}
+
+	/**
+	 * Get the CSS.
+	 *
+	 * @return string
+	 */
+	public function get_css() {
+		$css = $this->get_selector() . ' {';
+		foreach ( $this->declarations as $declaration ) {
+			$css .= $declaration->get_declarations_string();
+		}
+		$css .= '}';
+		return $css;
 	}
 }
