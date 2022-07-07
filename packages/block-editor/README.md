@@ -691,6 +691,26 @@ _Returns_
 
 -   `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
+### useBlockDisplayTitle
+
+Returns the block's configured title as a string, or empty if the title
+cannot be determined.
+
+_Usage_
+
+```js
+useBlockDisplayTitle( 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1', 17 );
+```
+
+_Parameters_
+
+-   _clientId_ `string`: Client ID of block.
+-   _maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+
+_Returns_
+
+-   `?string`: Block title.
+
 ### useBlockEditContext
 
 The `useBlockEditContext` hook provides information about the block this hook is being used in.
