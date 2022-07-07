@@ -341,5 +341,11 @@ module.exports = {
 				'jsdoc/require-param': 'off',
 			},
 		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
 	],
 };
