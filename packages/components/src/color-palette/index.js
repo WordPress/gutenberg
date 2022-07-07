@@ -228,14 +228,18 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ customColorAccessibleLabel }
-							style={ {
-								background: value,
-								color:
-									colordColor.contrast() >
-									colordColor.contrast( '#000' )
-										? '#fff'
-										: '#000',
-							} }
+							style={
+								'transparent' === value
+									? { color: '#000' }
+									: {
+											background: value,
+											color:
+												colordColor.contrast() >
+												colordColor.contrast( '#000' )
+													? '#fff'
+													: '#000',
+									  }
+							}
 						>
 							<FlexItem
 								isBlock
