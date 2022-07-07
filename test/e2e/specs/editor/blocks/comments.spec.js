@@ -76,12 +76,12 @@ test.describe( 'Comments', () => {
 		}
 
 		// We check that there is a previous comments page link.
-		expect(
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-previous' )
-		).not.toBeNull();
-		expect(
+		).toHaveCount( 1 );
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-next' )
-		).toBeNull();
+		).toHaveCount( 0 );
 
 		await Promise.all( [
 			page.click( '.wp-block-comments-pagination-previous' ),
@@ -89,12 +89,12 @@ test.describe( 'Comments', () => {
 		] );
 
 		// We check that there are a previous and a next link.
-		expect(
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-previous' )
-		).not.toBeNull();
-		expect(
+		).toHaveCount( 1 );
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-next' )
-		).not.toBeNull();
+		).toHaveCount( 1 );
 
 		await Promise.all( [
 			page.click( '.wp-block-comments-pagination-previous' ),
@@ -102,12 +102,12 @@ test.describe( 'Comments', () => {
 		] );
 
 		// We check that there is only have a next link
-		expect(
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-previous' )
-		).toBeNull();
-		expect(
+		).toHaveCount( 0 );
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-next' )
-		).not.toBeNull();
+		).toHaveCount( 1 );
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
 		admin,
@@ -139,12 +139,12 @@ test.describe( 'Comments', () => {
 			] );
 		}
 		// We check that there are no comments page link.
-		expect(
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-previous' )
-		).toBeNull();
-		expect(
+		).toHaveCount( 0 );
+		await expect(
 			await page.locator( '.wp-block-comments-pagination-next' )
-		).toBeNull();
+		).toHaveCount( 0 );
 	} );
 
 	test.afterEach( async ( { admin } ) => {
