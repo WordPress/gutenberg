@@ -28,8 +28,6 @@ import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -245,7 +243,7 @@ function getStylesDeclarations( blockStyles = {} ) {
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
- * @param {boolean} props.hasBlockStylesSupport Whether or not the theme opts-in to `wp-block-styles` support.
+ * @param {boolean} props.hasFallbackGapSupport Whether or not the theme allows fallback gap styles.
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
@@ -253,7 +251,7 @@ export function getLayoutStyles( {
 	style,
 	selector,
 	hasBlockGapSupport,
-	hasBlockStylesSupport,
+	hasFallbackGapSupport,
 } ) {
 	let ruleset = '';
 	let gapValue = hasBlockGapSupport
@@ -265,7 +263,7 @@ export function getLayoutStyles( {
 	if (
 		( ! gapValue || ! hasBlockGapSupport ) &&
 		selector === ROOT_BLOCK_SELECTOR &&
-		hasBlockStylesSupport
+		hasFallbackGapSupport
 	) {
 		gapValue = '0.5em';
 	}
@@ -501,7 +499,7 @@ export const toStyles = (
 	tree,
 	blockSelectors,
 	hasBlockGapSupport,
-	hasBlockStylesSupport
+	hasFallbackGapSupport
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -544,7 +542,7 @@ export const toStyles = (
 					style: styles,
 					selector,
 					hasBlockGapSupport,
-					hasBlockStylesSupport,
+					hasFallbackGapSupport,
 				} );
 			}
 
@@ -666,10 +664,7 @@ export function useGlobalStylesOutput() {
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
-	const hasBlockStylesSupport = useSelect(
-		( select ) =>
-			select( coreStore ).getThemeSupports()[ 'wp-block-styles' ]
-	);
+	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -685,7 +680,7 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
-			hasBlockStylesSupport
+			hasFallbackGapSupport
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
@@ -700,7 +695,7 @@ export function useGlobalStylesOutput() {
 		] );
 		setSettings( mergedConfig.settings );
 		setSvgFilters( filters );
-	}, [ hasBlockGapSupport, hasBlockStylesSupport, mergedConfig ] );
+	}, [ hasBlockGapSupport, hasFallbackGapSupport, mergedConfig ] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

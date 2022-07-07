@@ -545,7 +545,7 @@ describe( 'global styles renderer', () => {
 				style,
 				selector: 'body',
 				hasBlockGapSupport: false,
-				hasBlockStylesSupport: true,
+				hasFallbackGapSupport: true,
 			} );
 
 			expect( layoutStyles ).toEqual(
@@ -561,7 +561,7 @@ describe( 'global styles renderer', () => {
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
-				hasBlockStylesSupport: true,
+				hasFallbackGapSupport: true,
 			} );
 
 			expect( layoutStyles ).toEqual(
@@ -577,7 +577,7 @@ describe( 'global styles renderer', () => {
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
-				hasBlockStylesSupport: true,
+				hasFallbackGapSupport: true,
 			} );
 
 			expect( layoutStyles ).toEqual(
@@ -593,7 +593,7 @@ describe( 'global styles renderer', () => {
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: true,
-				hasBlockStylesSupport: true,
+				hasFallbackGapSupport: true,
 			} );
 
 			expect( layoutStyles ).toEqual(

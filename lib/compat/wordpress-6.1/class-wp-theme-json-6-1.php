@@ -1156,15 +1156,14 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		$selector                 = isset( $block_metadata['selector'] ) ? $block_metadata['selector'] : '';
 		$has_block_gap_support    = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
-		$has_block_styles_support = current_theme_supports( 'wp-block-styles' );
+		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$layout_definitions       = _wp_array_get( $this->theme_json, array( 'settings', 'layout', 'definitions' ), array() );
 		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, and child combinator selectors.
 
-		// Gap styles will only be output if the theme has block gap support, or supports `wp-block-styles`.
-		// In this way, we tie the concept of gap styles to the styles that ship with core blocks.
+		// Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
 		// Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.
-		if ( $has_block_gap_support || $has_block_styles_support ) {
+		if ( $has_block_gap_support || $has_fallback_gap_support ) {
 			$block_gap_value = null;
 			// Use a fallback gap value if block gap support is not available.
 			if ( ! $has_block_gap_support ) {

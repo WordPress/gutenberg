@@ -81,8 +81,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 				$block_classes['css'] = $actual_css;
 				$new_global_styles[]  = $block_classes;
 			}
-		} elseif ( current_theme_supports( 'wp-block-styles' ) ) {
-			// If there is no `theme.json` file, but the theme opts in to block styles, ensure base layout styles are available.
+		} else {
+			// If there is no `theme.json` file, ensure base layout styles are still available.
 			$block_classes = array(
 				'css'            => 'base-layout-styles',
 				'__unstableType' => 'theme',
