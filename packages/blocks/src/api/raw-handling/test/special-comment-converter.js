@@ -59,7 +59,7 @@ describe( 'specialCommentConverter', () => {
 				`<p>First part</p><wp-block data-block=\"core/more\"></wp-block><p>second part</p>`
 			);
 		} );
-		it( 'should handle complex cases', () => {
+		it( 'should preserve inline formatting', () => {
 			const output = deepFilterHTML(
 				`<p><em>First <span>part</span></em><!--more-->second part, some more <u>text</u>.</p>`,
 				[ specialCommentConverter ]
