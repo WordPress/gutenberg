@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { countBy, flatMap, get } from 'lodash';
+import { countBy, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,16 +50,18 @@ const multipleH1Headings = [
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
-	return flatMap( blocks, ( block = {} ) => {
-		if ( block.name === 'core/heading' ) {
-			return {
-				...block,
-				level: block.attributes.level,
-				isEmpty: isEmptyHeading( block ),
-			};
-		}
-		return computeOutlineHeadings( block.innerBlocks );
-	} );
+	return blocks
+		.map( ( block = {} ) => {
+			if ( block.name === 'core/heading' ) {
+				return {
+					...block,
+					level: block.attributes.level,
+					isEmpty: isEmptyHeading( block ),
+				};
+			}
+			return computeOutlineHeadings( block.innerBlocks );
+		} )
+		.flat();
 };
 
 const isEmptyHeading = ( heading ) =>
