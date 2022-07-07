@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
+-   `FocalPointPicker`, `FormTokenField`, `ResizableBox`: Fixed SSR breakage ([#42248](https://github.com/WordPress/gutenberg/pull/42248)).
 
 ### Internal
 
