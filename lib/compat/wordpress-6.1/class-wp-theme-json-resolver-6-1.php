@@ -16,6 +16,34 @@
  * @access private
  */
 class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
+
+	/**
+	 * Container for data coming from core.
+	 *
+	 * @since 5.8.0
+	 * @var WP_Theme_JSON
+	 */
+	protected static $core = null;
+
+	/**
+	 * Given a theme.json structure modifies it in place
+	 * to update certain values by its translated strings
+	 * according to the language set by the user.
+	 *
+	 * @param array  $theme_json The theme.json to translate.
+	 * @param string $domain     Optional. Text domain. Unique identifier for retrieving translated strings.
+	 *                           Default 'default'.
+	 * @return array Returns the modified $theme_json_structure.
+	 */
+	protected static function translate( $theme_json, $domain = 'default' ) {
+		if ( null === static::$i18n_schema ) {
+			$i18n_schema         = wp_json_file_decode( __DIR__ . '/theme-i18n.json' );
+			static::$i18n_schema = null === $i18n_schema ? array() : $i18n_schema;
+		}
+
+		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
+	}
+
 	/**
 	 * Return core's origin config.
 	 *

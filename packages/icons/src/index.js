@@ -2,6 +2,7 @@ export { default as Icon } from './icon';
 
 export { default as addCard } from './library/add-card';
 export { default as addSubmenu } from './library/add-submenu';
+export { default as addTemplate } from './library/add-template';
 export { default as alignCenter } from './library/align-center';
 export { default as alignJustify } from './library/align-justify';
 export { default as alignLeft } from './library/align-left';

@@ -148,7 +148,7 @@ If this property is added, a DashIcon component will be rendered after the slide
 
 #### allowReset
 
-If this property is true, a button to reset the the slider is rendered.
+If this property is true, a button to reset the slider is rendered.
 
 -   Type: `Boolean`
 -   Required: No
