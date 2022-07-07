@@ -35,7 +35,7 @@ import type {
 // It makes the selectors slightly more safe, but is intended to evolve
 // into a more detailed representation over time.
 // See https://github.com/WordPress/gutenberg/pull/40025#discussion_r865410589 for more context.
-interface State {
+export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
@@ -259,7 +259,7 @@ export function getEntityConfig( state: State, kind: Kind, name: Name ): any {
  * 	    ? EntityRecordOf< K, N, C >
  * 		  : Partial< EntityRecordOf< K, N, C > >
  */
-interface GetEntityRecord {
+export interface GetEntityRecord {
 	<
 		R extends EntityRecordOf< K, N >,
 		C extends Context = DefaultContextOf< R >,
@@ -494,7 +494,7 @@ export function hasEntityRecords<
  * 	    ? EntityRecordOf< K, N, C >[]
  * 		  : Partial< EntityRecordOf< K, N, C > >[]
  */
-interface GetEntityRecords {
+export interface GetEntityRecords {
 	<
 		R extends EntityRecordOf< K, N >,
 		C extends Context = DefaultContextOf< R >,

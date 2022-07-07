@@ -1,0 +1,18 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+		"noImplicitAny": false,
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../data" },
+		{ "path": "../api-fetch" }
+	],
+	"include": [
+		"src/**/*.js",
+		"src/**/*.ts",
+	]
+}

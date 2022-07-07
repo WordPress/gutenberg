@@ -5,6 +5,7 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
+		{ "path": "../core-data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
