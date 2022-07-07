@@ -67,7 +67,7 @@ window.addEventListener( 'load', () => {
 				const toggle = block.querySelector( '[aria-expanded="true"]' );
 				closeSubmenus( block );
 				// Focus the submenu trigger so focus does not get trapped in the closed submenu.
-				toggle.focus();
+				toggle?.focus();
 			}
 		} );
 	} );
