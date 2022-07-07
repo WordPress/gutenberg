@@ -82,6 +82,7 @@ module.exports = {
 							'chunk',
 							'clamp',
 							'concat',
+							'countBy',
 							'defaults',
 							'defaultTo',
 							'differenceWith',
