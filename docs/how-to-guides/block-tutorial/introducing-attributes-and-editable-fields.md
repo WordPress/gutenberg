@@ -12,7 +12,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 	attributes: {
 		content: {
 			type: 'string',
-			source: 'text',
+			source: 'html',
 			selector: 'p',
 		},
 	},
