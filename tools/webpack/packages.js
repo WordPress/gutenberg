@@ -37,6 +37,7 @@ const bundledPackagesPhpConfig = [
 		to: 'build/style-engine/',
 		replaceClasses: [
 			'WP_Style_Engine_CSS_Declarations',
+			'WP_Style_Engine_CSS_Rule',
 			'WP_Style_Engine',
 		],
 	},
