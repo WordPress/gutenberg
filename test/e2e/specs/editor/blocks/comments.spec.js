@@ -42,7 +42,9 @@ test.describe( 'Comments', () => {
 		await requestUtils.deleteAllComments();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
-		await page.waitForXPath( '//p[contains(text(), "No results found.")]' );
+		await page.waitForSelector(
+			'xpath=//p[contains(text(), "No results found.")]'
+		);
 	} );
 
 	test( 'Pagination links are working as expected', async ( {
