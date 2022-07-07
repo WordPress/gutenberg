@@ -828,7 +828,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// If a variable value is added to the root, the corresponding property should be removed.
 		foreach ( $root_variable_duplicates as $duplicate ) {
 			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
-			if ( $discard ) {
+			if ( is_numeric( $discard ) ) {
 				array_splice( $declarations, $discard, 1 );
 			}
 		}
