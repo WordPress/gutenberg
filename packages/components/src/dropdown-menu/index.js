@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,13 +58,13 @@ function DropdownMenu( dropdownMenuProps ) {
 		noIcons,
 	} = dropdownMenuProps;
 
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ( ! controls || ! controls.length ) && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls && controls.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -146,50 +145,54 @@ function DropdownMenu( dropdownMenuProps ) {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
-							controlSet.map( ( control, indexOfControl ) => (
-								<Button
-									key={ [
-										indexOfSet,
-										indexOfControl,
-									].join() }
-									onClick={ ( event ) => {
-										event.stopPropagation();
-										props.onClose();
-										if ( control.onClick ) {
-											control.onClick();
+						{ controlSets
+							?.map( ( controlSet, indexOfSet ) =>
+								controlSet.map( ( control, indexOfControl ) => (
+									<Button
+										key={ [
+											indexOfSet,
+											indexOfControl,
+										].join() }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											props.onClose();
+											if ( control.onClick ) {
+												control.onClick();
+											}
+										} }
+										className={ classnames(
+											'components-dropdown-menu__menu-item',
+											{
+												'has-separator':
+													indexOfSet > 0 &&
+													indexOfControl === 0,
+												'is-active': control.isActive,
+												'is-icon-only': ! control.title,
+											}
+										) }
+										icon={ control.icon }
+										label={ control.label }
+										aria-checked={
+											control.role ===
+												'menuitemcheckbox' ||
+											control.role === 'menuitemradio'
+												? control.isActive
+												: undefined
 										}
-									} }
-									className={ classnames(
-										'components-dropdown-menu__menu-item',
-										{
-											'has-separator':
-												indexOfSet > 0 &&
-												indexOfControl === 0,
-											'is-active': control.isActive,
-											'is-icon-only': ! control.title,
+										role={
+											control.role ===
+												'menuitemcheckbox' ||
+											control.role === 'menuitemradio'
+												? control.role
+												: 'menuitem'
 										}
-									) }
-									icon={ control.icon }
-									label={ control.label }
-									aria-checked={
-										control.role === 'menuitemcheckbox' ||
-										control.role === 'menuitemradio'
-											? control.isActive
-											: undefined
-									}
-									role={
-										control.role === 'menuitemcheckbox' ||
-										control.role === 'menuitemradio'
-											? control.role
-											: 'menuitem'
-									}
-									disabled={ control.isDisabled }
-								>
-									{ control.title }
-								</Button>
-							) )
-						) }
+										disabled={ control.isDisabled }
+									>
+										{ control.title }
+									</Button>
+								) )
+							)
+							.flat() }
 					</NavigableMenu>
 				);
 			} }

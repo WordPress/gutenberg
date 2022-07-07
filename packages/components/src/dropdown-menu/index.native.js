@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty } from 'lodash';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
@@ -53,13 +52,13 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
+	if ( ( ! controls || ! controls.length ) && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( ! isEmpty( controls ) ) {
+	if ( controls && controls.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
@@ -131,9 +130,8 @@ function DropdownMenu( {
 							title={ label }
 							style={ { paddingLeft: 0, paddingRight: 0 } }
 						>
-							{ flatMap(
-								controlSets,
-								( controlSet, indexOfSet ) =>
+							{ controlSets
+								?.map( ( controlSet, indexOfSet ) =>
 									controlSet.map(
 										( control, indexOfControl ) => (
 											<BottomSheet.Cell
@@ -160,7 +158,8 @@ function DropdownMenu( {
 											/>
 										)
 									)
-							) }
+								)
+								.flat() }
 						</PanelBody>
 					</BottomSheet>
 				);
