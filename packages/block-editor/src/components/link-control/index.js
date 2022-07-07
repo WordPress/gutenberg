@@ -11,7 +11,6 @@ import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -243,9 +242,9 @@ function LinkControl( {
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
-		const { keyCode } = event;
+		const { code } = event;
 		if (
-			keyCode === ENTER &&
+			code === "Enter" &&
 			! currentInputIsEmpty // Disallow submitting empty values.
 		) {
 			event.preventDefault();
