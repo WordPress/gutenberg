@@ -6,7 +6,7 @@
  */
 
 /**
- * Optimizes the preload paths registered in Core (`edit-form-blocks.php`).
+ * Adds the preload paths registered in Core (`edit-form-blocks.php`).
  *
  * @param array $preload_paths Preload paths to be filtered.
  * @return array
