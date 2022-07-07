@@ -28,6 +28,14 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	/**
+	 * Prepend emails with `mailto:` if not set.
+	 * The `is_email` returns false for emails with schema.
+	 */
+	if ( is_email( $url ) ) {
+		$url = 'mailto:' . $url;
+	}
+
+	/**
 	 * Prepend URL with https:// if it doesn't appear to contain a scheme
 	 * and it's not a relative link starting with //.
 	 */
