@@ -8,7 +8,8 @@
 /**
  * Adds the preload paths registered in Core (`edit-form-blocks.php`).
  *
- * @param array $preload_paths Preload paths to be filtered.
+ * @param array                   $preload_paths    Preload paths to be filtered.
+ * @param WP_Block_Editor_Context $context The current block editor context.
  * @return array
  */
 function gutenberg_preload_template_permissions( $preload_paths, $context ) {
