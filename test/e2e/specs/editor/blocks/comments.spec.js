@@ -12,7 +12,7 @@ test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
 		previousDefaultCommentsPage;
-	test.beforeAll( async ( { admin, requestUtils } ) => {
+	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		previousPageComments = await admin.setOption( 'page_comments', '1' );
 		previousCommentsPerPage = await admin.setOption(
@@ -138,7 +138,7 @@ test.describe( 'Comments', () => {
 			await page.locator( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 	} );
-	test.afterAll( async ( { admin, requestUtils } ) => {
+	test.afterEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllComments();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await admin.setOption( 'page_comments', previousPageComments );
