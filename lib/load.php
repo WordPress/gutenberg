@@ -118,8 +118,11 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-de
 }
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
-
 }
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
+}
+
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/elements.php';
