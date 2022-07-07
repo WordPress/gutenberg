@@ -14,30 +14,13 @@ import { __ } from '@wordpress/i18n';
  */
 import { addEntities } from './actions';
 import type * as Records from './entity-types';
-import type {
-	EntityType,
-	Context,
-	Post,
-	Taxonomy,
-	Type,
-	Updatable,
-} from './entity-types';
+import type { Post, Taxonomy, Type, Updatable } from './entity-types';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-type AttachmentEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'media';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Attachment< C >,
-	C
->;
-
-const attachmentConfig: AttachmentEntity[ 'config' ] = {
+const attachmentConfig = {
 	name: 'media',
 	kind: 'root',
 	baseURL: '/wp/v2/media',
@@ -47,16 +30,7 @@ const attachmentConfig: AttachmentEntity[ 'config' ] = {
 	rawAttributes: [ 'caption', 'title', 'description' ],
 };
 
-type SiteEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'site';
-		kind: 'root';
-	},
-	Records.Settings< C >,
-	C
->;
-
-const siteConfig: SiteEntity[ 'config' ] = {
+const siteConfig = {
 	label: __( 'Site' ),
 	name: 'site',
 	kind: 'root',
@@ -66,18 +40,7 @@ const siteConfig: SiteEntity[ 'config' ] = {
 	},
 };
 
-type PostTypeEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'postType';
-		kind: 'root';
-		key: 'slug';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Type< C >,
-	C
->;
-
-const postTypeConfig: PostTypeEntity[ 'config' ] = {
+const postTypeConfig = {
 	label: __( 'Post Type' ),
 	name: 'postType',
 	kind: 'root',
@@ -86,18 +49,7 @@ const postTypeConfig: PostTypeEntity[ 'config' ] = {
 	baseURLParams: { context: 'edit' },
 };
 
-type TaxonomyEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'taxonomy';
-		kind: 'root';
-		key: 'slug';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Taxonomy< C >,
-	C
->;
-
-const taxonomyConfig: TaxonomyEntity[ 'config' ] = {
+const taxonomyConfig = {
 	name: 'taxonomy',
 	kind: 'root',
 	key: 'slug',
@@ -107,17 +59,7 @@ const taxonomyConfig: TaxonomyEntity[ 'config' ] = {
 	label: __( 'Taxonomy' ),
 };
 
-type SidebarEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'sidebar';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Sidebar< C >,
-	C
->;
-
-const sidebarConfig: SidebarEntity[ 'config' ] = {
+const sidebarConfig = {
 	name: 'sidebar',
 	kind: 'root',
 	baseURL: '/wp/v2/sidebars',
@@ -127,16 +69,7 @@ const sidebarConfig: SidebarEntity[ 'config' ] = {
 	label: __( 'Widget areas' ),
 };
 
-type WidgetEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'widget';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Widget< C >,
-	C
->;
-const widgetConfig: WidgetEntity[ 'config' ] = {
+const widgetConfig = {
 	name: 'widget',
 	kind: 'root',
 	baseURL: '/wp/v2/widgets',
@@ -146,16 +79,7 @@ const widgetConfig: WidgetEntity[ 'config' ] = {
 	label: __( 'Widgets' ),
 };
 
-type WidgetTypeEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'widgetType';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.WidgetType< C >,
-	C
->;
-const widgetTypeConfig: WidgetTypeEntity[ 'config' ] = {
+const widgetTypeConfig = {
 	name: 'widgetType',
 	kind: 'root',
 	baseURL: '/wp/v2/widget-types',
@@ -164,16 +88,7 @@ const widgetTypeConfig: WidgetTypeEntity[ 'config' ] = {
 	label: __( 'Widget types' ),
 };
 
-type UserEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'user';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.User< C >,
-	C
->;
-const userConfig: UserEntity[ 'config' ] = {
+const userConfig = {
 	label: __( 'User' ),
 	name: 'user',
 	kind: 'root',
@@ -182,16 +97,7 @@ const userConfig: UserEntity[ 'config' ] = {
 	plural: 'users',
 };
 
-type CommentEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'comment';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.Comment< C >,
-	C
->;
-const commentConfig: CommentEntity[ 'config' ] = {
+const commentConfig = {
 	name: 'comment',
 	kind: 'root',
 	baseURL: '/wp/v2/comments',
@@ -200,17 +106,7 @@ const commentConfig: CommentEntity[ 'config' ] = {
 	label: __( 'Comment' ),
 };
 
-type NavMenuEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'menu';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.NavMenu< C >,
-	C
->;
-
-const menuConfig: NavMenuEntity[ 'config' ] = {
+const menuConfig = {
 	name: 'menu',
 	kind: 'root',
 	baseURL: '/wp/v2/menus',
@@ -219,17 +115,7 @@ const menuConfig: NavMenuEntity[ 'config' ] = {
 	label: __( 'Menu' ),
 };
 
-type NavMenuItemEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'menuItem';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.NavMenuItem< C >,
-	C
->;
-
-const menuItemConfig: NavMenuItemEntity[ 'config' ] = {
+const menuItemConfig = {
 	name: 'menuItem',
 	kind: 'root',
 	baseURL: '/wp/v2/menu-items',
@@ -239,18 +125,7 @@ const menuItemConfig: NavMenuItemEntity[ 'config' ] = {
 	rawAttributes: [ 'title' ],
 };
 
-type MenuLocationEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'menuLocation';
-		kind: 'root';
-		key: 'name';
-		baseURLParams: { context: 'edit' };
-	},
-	Records.MenuLocation< C >,
-	C
->;
-
-const menuLocationConfig: MenuLocationEntity[ 'config' ] = {
+const menuLocationConfig = {
 	name: 'menuLocation',
 	kind: 'root',
 	baseURL: '/wp/v2/menu-locations',
@@ -270,18 +145,7 @@ const globalStyleConfig = {
 	getTitle: ( record ) => record?.title?.rendered || record?.title,
 };
 
-type ThemeEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'theme';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-		key: 'stylesheet';
-	},
-	Records.Theme< C >,
-	C
->;
-
-const themeConfig: ThemeEntity[ 'config' ] = {
+const themeConfig = {
 	label: __( 'Themes' ),
 	name: 'theme',
 	kind: 'root',
@@ -290,17 +154,7 @@ const themeConfig: ThemeEntity[ 'config' ] = {
 	key: 'stylesheet',
 };
 
-type PluginEntity< C extends Context = Context > = EntityType<
-	{
-		name: 'plugin';
-		kind: 'root';
-		baseURLParams: { context: 'edit' };
-		key: 'plugin';
-	},
-	Records.Plugin< C >,
-	C
->;
-const pluginConfig: PluginEntity[ 'config' ] = {
+const pluginConfig = {
 	label: __( 'Plugins' ),
 	name: 'plugin',
 	kind: 'root',
@@ -345,53 +199,6 @@ export const rootEntitiesConfig = [
 	themeConfig,
 	pluginConfig,
 ];
-
-type PostTypeConfig = {
-	kind: 'postType';
-	key: 'id';
-	defaultContext: 'edit';
-};
-
-type PostEntity< C extends Context = Context > = EntityType<
-	PostTypeConfig & { name: 'post' },
-	Records.Post< C >,
-	C
->;
-type PageEntity< C extends Context > = EntityType<
-	PostTypeConfig & { name: 'page' },
-	Records.Page< C >,
-	C
->;
-type WpTemplateEntity< C extends Context > = EntityType<
-	PostTypeConfig & { name: 'wp_template' },
-	Records.WpTemplate< C >,
-	C
->;
-type WpTemplatePartEntity< C extends Context > = EntityType<
-	PostTypeConfig & { name: 'wp_template_part' },
-	Records.WpTemplatePart< C >,
-	C
->;
-
-export type CoreEntities< C extends Context > =
-	| SiteEntity< C >
-	| PostTypeEntity< C >
-	| AttachmentEntity< C >
-	| TaxonomyEntity< C >
-	| SidebarEntity< C >
-	| WidgetEntity< C >
-	| WidgetTypeEntity< C >
-	| UserEntity< C >
-	| CommentEntity< C >
-	| NavMenuEntity< C >
-	| NavMenuItemEntity< C >
-	| MenuLocationEntity< C >
-	| ThemeEntity< C >
-	| PluginEntity< C >
-	| PostEntity< C >
-	| PageEntity< C >
-	| WpTemplateEntity< C >
-	| WpTemplatePartEntity< C >;
 
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
