@@ -28,8 +28,8 @@
 		}
 	}
 
-	// Hide table of contents and block navigation on mobile.
-	.block-editor-block-navigation {
+	// Hide table of contents and list view on mobile.
+	.block-editor-list-view {
 		display: none;
 
 		@include break-small() {

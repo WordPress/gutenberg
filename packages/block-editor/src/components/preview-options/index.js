@@ -29,17 +29,21 @@ export default function PreviewOptions( {
 		position: 'bottom left',
 	};
 	const toggleProps = {
-		isTertiary: true,
+		variant: 'tertiary',
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
 		/* translators: button label text should, if possible, be under 16 characters. */
 		children: __( 'Preview' ),
+	};
+	const menuProps = {
+		'aria-label': __( 'Preview options' ),
 	};
 	return (
 		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
+			menuProps={ menuProps }
 			icon={ null }
 		>
 			{ () => (

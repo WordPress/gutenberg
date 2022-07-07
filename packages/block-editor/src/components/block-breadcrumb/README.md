@@ -13,6 +13,15 @@ The block breadcrumb trail displays the hierarchy of the current block selection
 
 ## Development guidelines
 
+#### Props
+
+##### rootLabelText
+
+Label text for the root element (the first `<li />`) of the breadcrumb trail.
+
+-   Type: `String`
+-   Required: No
+
 ### Usage
 
 Renders a block breadcrumb with default style.

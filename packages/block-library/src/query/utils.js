@@ -1,57 +1,73 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
- * WordPress term object from REST API.
- * Categories ref: https://developer.wordpress.org/rest-api/reference/categories/
- * Tags ref: https://developer.wordpress.org/rest-api/reference/tags/
- *
- * @typedef {Object} WPTerm
- * @property {number} id Unique identifier for the term.
- * @property {number} count Number of published posts for the term.
- * @property {string} description HTML description of the term.
- * @property {string} link URL of the term.
- * @property {string} name HTML title for the term.
- * @property {string} slug An alphanumeric identifier for the term unique to its type.
- * @property {string} taxonomy Type attribution for the term.
- * @property {Object} meta Meta fields
- * @property {number} [parent] The parent term ID.
+ * @typedef IHasNameAndId
+ * @property {string|number} id   The entity's id.
+ * @property {string}        name The entity's name.
  */
 
 /**
  * The object used in Query block that contains info and helper mappings
- * from an array of WPTerm.
+ * from an array of IHasNameAndId objects.
  *
- * @typedef {Object} QueryTermsInfo
- * @property {WPTerm[]} terms The array of terms.
- * @property {Object<string, WPTerm>} mapById Object mapping with the term id as key and the term as value.
- * @property {Object<string, WPTerm>} mapByName Object mapping with the term name as key and the term as value.
- * @property {string[]} names Array with the terms' names.
+ * @typedef {Object} QueryEntitiesInfo
+ * @property {IHasNameAndId[]}               entities  The array of entities.
+ * @property {Object<string, IHasNameAndId>} mapById   Object mapping with the id as key and the entity as value.
+ * @property {Object<string, IHasNameAndId>} mapByName Object mapping with the name as key and the entity as value.
+ * @property {string[]}                      names     Array with the entities' names.
  */
 
 /**
- * Returns a helper object with mapping from WPTerms.
+ * Returns a helper object with mapping from Objects that implement
+ * the `IHasNameAndId` interface. The returned object is used for
+ * integration with `FormTokenField` component.
  *
- * @param {WPTerm[]} terms The terms to extract of helper object.
- * @return {QueryTermsInfo} The object with the terms information.
+ * @param {IHasNameAndId[]} entities The entities to extract of helper object.
+ * @return {QueryEntitiesInfo} The object with the entities information.
  */
-export const getTermsInfo = ( terms ) => ( {
-	terms,
-	...terms?.reduce(
-		( accumulator, term ) => {
+export const getEntitiesInfo = ( entities ) => {
+	const mapping = entities?.reduce(
+		( accumulator, entity ) => {
 			const { mapById, mapByName, names } = accumulator;
-			mapById[ term.id ] = term;
-			mapByName[ term.name ] = term;
-			names.push( term.name );
+			mapById[ entity.id ] = entity;
+			mapByName[ entity.name ] = entity;
+			names.push( entity.name );
 			return accumulator;
 		},
 		{ mapById: {}, mapByName: {}, names: [] }
-	),
-} );
+	);
+	return {
+		entities,
+		...mapping,
+	};
+};
+
+/**
+ * Helper util to map records to add a `name` prop from a
+ * provided path, in order to handle all entities in the same
+ * fashion(implementing`IHasNameAndId` interface).
+ *
+ * @param {Object[]} entities The array of entities.
+ * @param {string}   path     The path to map a `name` property from the entity.
+ * @return {IHasNameAndId[]} An array of enitities that now implement the `IHasNameAndId` interface.
+ */
+export const mapToIHasNameAndId = ( entities, path ) => {
+	return ( entities || [] ).map( ( entity ) => ( {
+		...entity,
+		name: decodeEntities( get( entity, path ) ),
+	} ) );
+};
 
 /**
  * Returns a helper object that contains:
@@ -61,16 +77,14 @@ export const getTermsInfo = ( terms ) => ( {
  * @return {Object} The helper object related to post types.
  */
 export const usePostTypes = () => {
-	const { postTypes } = useSelect( ( select ) => {
+	const postTypes = useSelect( ( select ) => {
 		const { getPostTypes } = select( coreStore );
 		const excludedPostTypes = [ 'attachment' ];
 		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
 			( { viewable, slug } ) =>
 				viewable && ! excludedPostTypes.includes( slug )
 		);
-		return {
-			postTypes: filteredPostTypes,
-		};
+		return filteredPostTypes;
 	}, [] );
 	const postTypesTaxonomiesMap = useMemo( () => {
 		if ( ! postTypes?.length ) return;
@@ -88,4 +102,46 @@ export const usePostTypes = () => {
 		[ postTypes ]
 	);
 	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+};
+
+/**
+ * Hook that returns the taxonomies associated with a specific post type.
+ *
+ * @param {string} postType The post type from which to retrieve the associated taxonomies.
+ * @return {Object[]} An array of the associated taxonomies.
+ */
+export const useTaxonomies = ( postType ) => {
+	const taxonomies = useSelect(
+		( select ) => {
+			const { getTaxonomies } = select( coreStore );
+			const filteredTaxonomies = getTaxonomies( {
+				type: postType,
+				per_page: -1,
+				context: 'view',
+			} );
+			return filteredTaxonomies;
+		},
+		[ postType ]
+	);
+	return taxonomies;
+};
+
+/**
+ * Recurses over a list of blocks and returns the first found
+ * Query Loop block's clientId.
+ *
+ * @param {WPBlock[]} blocks The list of blocks to look through.
+ * @return {string=} The first found Query Loop's clientId.
+ */
+export const getFirstQueryClientIdFromBlocks = ( blocks ) => {
+	const blocksQueue = [ ...blocks ];
+	while ( blocksQueue.length > 0 ) {
+		const block = blocksQueue.shift();
+		if ( block.name === 'core/query' ) {
+			return block.clientId;
+		}
+		block.innerBlocks?.forEach( ( innerBlock ) => {
+			blocksQueue.push( innerBlock );
+		} );
+	}
 };

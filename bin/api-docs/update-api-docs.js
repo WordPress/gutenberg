@@ -24,23 +24,23 @@ const { readFile } = require( 'fs' ).promises;
  *
  * @type {string}
  */
-const ROOT_DIR = resolve( __dirname, '../..' );
+const ROOT_DIR = resolve( __dirname, '../..' ).replace( /\\/g, '/' );
 
 /**
  * Path to packages directory.
  *
  * @type {string}
  */
-const PACKAGES_DIR = resolve( ROOT_DIR, 'packages' );
+const PACKAGES_DIR = resolve( ROOT_DIR, 'packages' ).replace( /\\/g, '/' );
 
 /**
  * Path to data documentation directory.
  *
  * @type {string}
  */
-const DATA_DOCS_DIR = resolve(
-	ROOT_DIR,
-	'docs/designers-developers/developers/data'
+const DATA_DOCS_DIR = resolve( ROOT_DIR, 'docs/reference-guides/data' ).replace(
+	/\\/g,
+	'/'
 );
 
 /**
@@ -235,6 +235,9 @@ glob.stream( [
 					{ shell: true }
 				);
 			}
+			await execa( 'npm', [ 'run', 'format', output ], {
+				shell: true,
+			} );
 		} catch ( error ) {
 			console.error( error );
 			process.exit( 1 );

@@ -11,7 +11,7 @@ When the user selects a block, a number of control buttons may be shown in a too
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -61,17 +61,17 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				{
 					<BlockControls>
 						<AlignmentToolbar
-							value={ alignment }
+							value={ attributes.alignment }
 							onChange={ onChangeAlignment }
 						/>
 					</BlockControls>
 				}
 				<RichText
-					className={ className }
-					style={ { textAlign: alignment } }
+					className={ attributes.className }
+					style={ { textAlign: attributes.alignment } }
 					tagName="p"
 					onChange={ onChangeContent }
-					value={ content }
+					value={ attributes.content }
 				/>
 			</div>
 		);
@@ -82,9 +82,9 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		return (
 			<div { ...blockProps }>
 				<RichText.Content
-					className={ `gutenberg-examples-align-${ attributes.alignment }` }
+					className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
 					tagName="p"
-					value={ attributes.content }
+					value={ props.attributes.content }
 				/>
 			</div>
 		);
@@ -92,7 +92,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, blockEditor, element ) {
@@ -279,3 +279,5 @@ registerBlockType( 'create-block/gutenpride', {
 
 Block controls rendered in both the toolbar and sidebar will also be used when
 multiple blocks of the same type are selected.
+
+**Note :** In the example above, we added text and background color customization support to our block to demonstrate the use of `InspectorControls` to add custom controls to the sidebar. That said, for common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md) that you can rely on block supports to provide the same functionality in a more efficient way.

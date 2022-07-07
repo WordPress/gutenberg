@@ -20,7 +20,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
  */
 
-// Disable reason: Rule doesn't support predicate return types
+// Disable reason: Rule doesn't support predicate return types.
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns true if the given element is a button element subject to focus
@@ -81,8 +81,8 @@ function isFocusNormalizedButton( eventTarget ) {
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
- * @param {EventCallback} onFocusOutside        A callback triggered when focus moves outside
- *                                              the element the event handlers are bound to.
+ * @param {EventCallback} onFocusOutside A callback triggered when focus moves outside
+ *                                       the element the event handlers are bound to.
  *
  * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers
  *                                   to a wrapping element element to capture when focus moves

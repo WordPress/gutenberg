@@ -2,32 +2,37 @@
  * External dependencies
  */
 import {
-	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
 class AztecView extends Component {
 	constructor() {
 		super( ...arguments );
+		this.aztecViewRef = createRef();
+
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
 		this._onEnter = this._onEnter.bind( this );
 		this._onBackspace = this._onBackspace.bind( this );
 		this._onKeyDown = this._onKeyDown.bind( this );
 		this._onChange = this._onChange.bind( this );
-		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
-			this
-		);
+		this._onHTMLContentWithCursor =
+			this._onHTMLContentWithCursor.bind( this );
 		this._onFocus = this._onFocus.bind( this );
 		this._onBlur = this._onBlur.bind( this );
 		this._onSelectionChange = this._onSelectionChange.bind( this );
@@ -40,7 +45,7 @@ class AztecView extends Component {
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
-			findNodeHandle( this ),
+			this.aztecViewRef.current,
 			command,
 			params
 		);
@@ -126,7 +131,8 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( findNodeHandle( this ) );
+
+		AztecInputState.blur( this.aztecViewRef.current );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -137,7 +143,7 @@ class AztecView extends Component {
 	}
 
 	_onChange( event ) {
-		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
+		// iOS uses the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
 		// Android includes the information needed for onKeyDown in the event passed to onChange.
 		if ( Platform.OS === 'android' ) {
 			const triggersIncludeEventKeyCode =
@@ -169,7 +175,7 @@ class AztecView extends Component {
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
 			this.props.onCaretVerticalPositionChange(
-				event.target,
+				event.nativeEvent.target,
 				caretY,
 				this.selectionEndCaretY
 			);
@@ -178,22 +184,22 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( findNodeHandle( this ) );
+		AztecInputState.blur( this.aztecViewRef.current );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( findNodeHandle( this ) );
+		AztecInputState.focus( this.aztecViewRef.current );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedField();
-		return focusedField && focusedField === findNodeHandle( this );
+		const focusedElement = AztecInputState.getCurrentFocusedElement();
+		return focusedElement && focusedElement === this.aztecViewRef.current;
 	}
 
 	_onPress( event ) {
 		if ( ! this.isFocused() ) {
 			this.focus(); // Call to move the focus in RN way (TextInputState)
-			this._onFocus( event ); // Check if there are listeners set on the focus event
+			this._onFocus( event ); // Check if there are listeners set on the focus event.
 		}
 	}
 
@@ -208,7 +214,6 @@ class AztecView extends Component {
 	}
 
 	render() {
-		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, ...otherProps } = this.props;
 		// `style` has to be destructured separately, without `otherProps`, because of:
 		// https://github.com/WordPress/gutenberg/issues/23611
@@ -219,10 +224,8 @@ class AztecView extends Component {
 			window.console.warn(
 				"Removing lineHeight style as it's not supported by native AztecView"
 			);
-			// IMPORTANT: Current Gutenberg implementation is supporting line-height without unit e.g. 'line-height':1.5
-			// and library which we are using to convert css to react-native requires unit to be included with dimension
-			// https://github.com/kristerkari/css-to-react-native-transform/blob/945866e84a505fdfb1a43b03ebe4bd32784a7f22/src/index.spec.js#L1234
-			// which means that we would need to patch the library if we want to support line-height from native AztecView in the future.
+			// Prevents passing line-heigth within styles to avoid a crash due to values without units
+			// We now support this but passing line-height as a prop instead.
 		}
 
 		return (
@@ -243,6 +246,7 @@ class AztecView extends Component {
 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
+					ref={ this.aztecViewRef }
 				/>
 			</TouchableWithoutFeedback>
 		);
@@ -250,5 +254,7 @@ class AztecView extends Component {
 }
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
+
+AztecView.InputState = AztecInputState;
 
 export default AztecView;

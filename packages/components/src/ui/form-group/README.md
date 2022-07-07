@@ -1,5 +1,9 @@
 # FormGroup
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `FormGroup` is a form component that groups a label with a form element (e.g. `Switch` or `TextInput`).
 
 ## Usage

@@ -21,7 +21,7 @@ import { store } from './store';
  *
  * @see isViewportMatch
  *
- * @param {Object} queries  Object of prop name to viewport query.
+ * @param {Object} queries Object of prop name to viewport query.
  *
  * @example
  *

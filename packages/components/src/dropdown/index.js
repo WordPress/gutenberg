@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -26,29 +27,30 @@ function useObservableState( initialState, onStateChange ) {
 	];
 }
 
-export default function Dropdown( {
-	renderContent,
-	renderToggle,
-	position = 'bottom right',
-	className,
-	contentClassName,
-	expandOnMobile,
-	headerTitle,
-	focusOnMount,
-	popoverProps,
-	onClose,
-	onToggle,
-} ) {
+export default function Dropdown( props ) {
+	const {
+		renderContent,
+		renderToggle,
+		className,
+		contentClassName,
+		expandOnMobile,
+		headerTitle,
+		focusOnMount,
+		position,
+		popoverProps,
+		onClose,
+		onToggle,
+	} = props;
 	const containerRef = useRef();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
 	useEffect(
 		() => () => {
-			if ( onToggle ) {
+			if ( onToggle && isOpen ) {
 				onToggle( false );
 			}
 		},
-		[]
+		[ onToggle, isOpen ]
 	);
 
 	function toggle() {
@@ -56,17 +58,17 @@ export default function Dropdown( {
 	}
 
 	/**
-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
-	 * intentionally distinct from `onClose` since focus loss from the popover
-	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed. The same applies
-	 * in case when focus is moved to the modal dialog.
+	 * Closes the popover when focus leaves it unless the toggle was pressed or
+	 * focus has moved to a separate dialog. The former is to let the toggle
+	 * handle closing the popover and the latter is to preserve presence in
+	 * case a dialog has opened, allowing focus to return when it's dismissed.
 	 */
 	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
+		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
 		if (
 			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+			( ! dialog || dialog.contains( containerRef.current ) )
 		) {
 			close();
 		}
@@ -80,11 +82,19 @@ export default function Dropdown( {
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
+	const hasAnchorRef =
+		!! popoverProps?.anchorRef ||
+		!! popoverProps?.getAnchorRect ||
+		!! popoverProps?.anchorRect;
 
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
+			// Some UAs focus the closest focusable parent when the toggle is
+			// clicked. Making this div focusable ensures such UAs will focus
+			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+			tabIndex="-1"
 		>
 			{ renderToggle( args ) }
 			{ isOpen && (
@@ -95,10 +105,15 @@ export default function Dropdown( {
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
-					{ ...popoverProps }
+					// This value is used to ensure that the dropdowns
+					// align with the editor header by default.
+					offset={ 13 }
 					anchorRef={
-						popoverProps?.anchorRef ?? containerRef.current
+						! hasAnchorRef
+							? containerRef?.current?.firstChild // Anchor to the rendered toggle.
+							: undefined
 					}
+					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,

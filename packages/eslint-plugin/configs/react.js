@@ -5,6 +5,11 @@ module.exports = {
 			jsx: true,
 		},
 	},
+	settings: {
+		react: {
+			version: 'detect',
+		},
+	},
 	plugins: [ '@wordpress', 'react', 'react-hooks' ],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': [

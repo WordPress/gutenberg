@@ -39,10 +39,23 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
- * @param {Object} spinner A CLI spinner which indicates progress.
+ * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const url = ( () => {
+		const port = config.env[ environment ].port;
+		const domain =
+			environment === 'tests'
+				? config.env.tests.config.WP_TESTS_DOMAIN
+				: config.env.development.config.WP_SITEURL;
+		if ( port === 80 ) {
+			return domain;
+		}
+
+		return `${ domain }:${ port }`;
+	} )();
+
+	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
@@ -51,6 +64,11 @@ async function configureWordPress( environment, config, spinner ) {
 	for ( let [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
+		// Allow the configuration to skip a default constant by specifying it as null.
+		if ( null === value ) {
+			continue;
+		}
+
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
@@ -206,7 +224,7 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * (.git, node_modules) and configuration files (wp-config.php).
  *
  * @param {string} fromPath Path to the WordPress directory to copy.
- * @param {string} toPath Destination path.
+ * @param {string} toPath   Destination path.
  */
 async function copyCoreFiles( fromPath, toPath ) {
 	await copyDir( fromPath, toPath, {

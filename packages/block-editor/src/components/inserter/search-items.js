@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import { deburr, differenceWith, find, words } from 'lodash';
+import { deburr, find, words } from 'lodash';
 
-// Default search helpers
+// Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;
 const defaultGetDescription = ( item ) => item.description || '';
@@ -47,11 +47,11 @@ export const getNormalizedSearchTerms = ( input = '' ) => {
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
-	return differenceWith(
-		unmatchedTerms,
-		getNormalizedSearchTerms( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
+	return unmatchedTerms.filter(
+		( term ) =>
+			! getNormalizedSearchTerms( unprocessedTerms ).some(
+				( unprocessedTerm ) => unprocessedTerm.includes( term )
+			)
 	);
 };
 
@@ -82,7 +82,8 @@ export const searchBlockItems = (
  * @param {Array}  items       Item list
  * @param {string} searchInput Search input.
  * @param {Object} config      Search Config.
- * @return {Array}             Filtered item list.
+ *
+ * @return {Array} Filtered item list.
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
@@ -108,7 +109,8 @@ export const searchItems = ( items = [], searchInput = '', config = {} ) => {
  * @param {Object} item       Item to filter.
  * @param {string} searchTerm Search term.
  * @param {Object} config     Search Config.
- * @return {number}           Search Rank.
+ *
+ * @return {number} Search Rank.
  */
 export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const {
@@ -161,7 +163,9 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	// Give a better rank to "core" namespaced items.
 	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
-		rank++;
+		const isCoreBlockVariation = name !== item.id;
+		// Give a bit better rank to "core" blocks over "core" block variations.
+		rank += isCoreBlockVariation ? 1 : 2;
 	}
 
 	return rank;

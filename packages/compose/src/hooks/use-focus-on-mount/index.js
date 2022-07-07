@@ -7,8 +7,8 @@ import { focus } from '@wordpress/dom';
 /**
  * Hook used to focus the first tabbable element on mount.
  *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @return {Function} Ref callback.
+ * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
+ * @return {import('react').RefCallback<HTMLElement>} Ref callback.
  *
  * @example
  * ```js
@@ -36,7 +36,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		if ( node.contains( node.ownerDocument.activeElement ) ) {
+		if ( node.contains( node.ownerDocument?.activeElement ?? null ) ) {
 			return;
 		}
 
@@ -46,10 +46,15 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 			if ( firstTabbable ) {
-				target = firstTabbable;
+				target = /** @type {HTMLElement} */ ( firstTabbable );
 			}
 		}
 
-		target.focus();
+		target.focus( {
+			// When focusing newly mounted dialogs,
+			// the position of the popover is often not right on the first render
+			// This prevents the layout shifts when focusing the dialogs.
+			preventScroll: true,
+		} );
 	}, [] );
 }

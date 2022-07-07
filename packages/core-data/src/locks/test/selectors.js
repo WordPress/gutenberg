@@ -6,58 +6,45 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import {
-	__unstableGetPendingLockRequests,
-	__unstableIsLockAvailable,
-} from '../selectors';
+import { getPendingLockRequests, isLockAvailable } from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';
 
-describe( '__unstableGetPendingLockRequests', () => {
+describe( 'getPendingLockRequests', () => {
 	it( 'returns pending lock requests', () => {
 		const state = deepFreeze( {
-			locks: {
-				requests: [ 1, 2, 3 ],
-			},
+			requests: [ 1, 2, 3 ],
 		} );
 
-		expect( __unstableGetPendingLockRequests( state ) ).toEqual( [
-			1,
-			2,
-			3,
-		] );
+		expect( getPendingLockRequests( state ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 } );
 
-describe( '__unstableIsLockAvailable', () => {
+describe( 'isLockAvailable', () => {
 	describe( 'smoke tests', () => {
 		it( 'returns true if lock is available', () => {
 			const state = deepFreeze( {
-				locks: {
-					tree: {
-						children: {},
-						locks: [],
-					},
+				tree: {
+					children: {},
+					locks: [],
 				},
 			} );
 
 			expect(
-				__unstableIsLockAvailable( state, 'core', [], {
+				isLockAvailable( state, 'core', [], {
 					exclusive: true,
 				} )
 			).toBe( true );
 		} );
 		it( 'returns false if lock is not available', () => {
 			const state = deepFreeze( {
-				locks: {
-					tree: {
-						children: {},
-						locks: [ { exclusive: false } ],
-					},
+				tree: {
+					children: {},
+					locks: [ { exclusive: false } ],
 				},
 			} );
 
 			expect(
-				__unstableIsLockAvailable( state, 'core', [], {
+				isLockAvailable( state, 'core', [], {
 					exclusive: true,
 				} )
 			).toBe( false );
@@ -75,7 +62,7 @@ describe( '__unstableIsLockAvailable', () => {
 		} );
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -89,7 +76,7 @@ describe( '__unstableIsLockAvailable', () => {
 				exclusive: true,
 			} );
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -103,7 +90,7 @@ describe( '__unstableIsLockAvailable', () => {
 				exclusive: true,
 			} );
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -114,41 +101,39 @@ describe( '__unstableIsLockAvailable', () => {
 
 		it( `returns true if another branch holds a locks (3)`, () => {
 			const subState = {
-				locks: {
-					tree: {
-						locks: [],
-						children: {
-							postType: {
-								locks: [],
-								children: {
-									post: {
-										locks: [],
-										children: {
-											16: {
-												locks: [
-													{
-														store: 'core',
-														path: [
-															'entities',
-															'data',
-															'postType',
-															'post',
-															16,
-														],
-														exclusive: true,
-													},
-												],
-												children: {},
-											},
+				tree: {
+					locks: [],
+					children: {
+						postType: {
+							locks: [],
+							children: {
+								post: {
+									locks: [],
+									children: {
+										16: {
+											locks: [
+												{
+													store: 'core',
+													path: [
+														'entities',
+														'records',
+														'postType',
+														'post',
+														16,
+													],
+													exclusive: true,
+												},
+											],
+											children: {},
 										},
 									},
-									wp_template_part: {
-										locks: [],
-										children: {
-											17: {
-												locks: [],
-												children: {},
-											},
+								},
+								wp_template_part: {
+									locks: [],
+									children: {
+										17: {
+											locks: [],
+											children: {},
 										},
 									},
 								},
@@ -158,7 +143,7 @@ describe( '__unstableIsLockAvailable', () => {
 				},
 			};
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( subState ),
 					'core',
 					[ 'postType', 'wp_template_part', 17 ],
@@ -169,41 +154,40 @@ describe( '__unstableIsLockAvailable', () => {
 
 		it( `returns true if another branch holds a locks (4)`, () => {
 			const subState = {
-				locks: {
-					tree: {
-						locks: [],
-						children: {
-							core: {
-								locks: [],
-								children: {
-									entities: {
-										locks: [],
-										children: {
-											data: {
-												locks: [],
-												children: {
-													postType: {
-														locks: [],
-														children: {
-															book: {
-																locks: [],
-																children: {
-																	67: {
-																		locks: [
-																			{
-																				path: [
-																					'core',
-																					'entities',
-																					'data',
-																					'postType',
-																					'book',
-																					67,
-																				],
-																				exclusive: true,
-																			},
-																		],
-																		children: {},
-																	},
+				tree: {
+					locks: [],
+					children: {
+						core: {
+							locks: [],
+							children: {
+								entities: {
+									locks: [],
+									children: {
+										records: {
+											locks: [],
+											children: {
+												postType: {
+													locks: [],
+													children: {
+														book: {
+															locks: [],
+															children: {
+																67: {
+																	locks: [
+																		{
+																			path: [
+																				'core',
+																				'entities',
+																				'records',
+																				'postType',
+																				'book',
+																				67,
+																			],
+																			exclusive: true,
+																		},
+																	],
+																	children:
+																		{},
 																},
 															},
 														},
@@ -219,10 +203,10 @@ describe( '__unstableIsLockAvailable', () => {
 				},
 			};
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( subState ),
 					'core',
-					[ 'entities', 'data', 'postType', 'book', 67 ],
+					[ 'entities', 'records', 'postType', 'book', 67 ],
 					{ exclusive: false }
 				)
 			).toBe( false );
@@ -231,7 +215,7 @@ describe( '__unstableIsLockAvailable', () => {
 		[ true, false ].forEach( ( exclusive ) => {
 			it( `returns true if the path is not accessible and no parent holds a lock`, () => {
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -245,7 +229,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -259,7 +243,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -273,7 +257,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -287,7 +271,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -306,7 +290,7 @@ describe( '__unstableIsLockAvailable', () => {
 					}
 				);
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -325,7 +309,7 @@ describe( '__unstableIsLockAvailable', () => {
 					}
 				);
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -345,7 +329,7 @@ describe( '__unstableIsLockAvailable', () => {
 		} );
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
-				__unstableIsLockAvailable(
+				isLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -361,7 +345,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -375,7 +359,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -389,7 +373,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -403,7 +387,7 @@ describe( '__unstableIsLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -422,7 +406,7 @@ describe( '__unstableIsLockAvailable', () => {
 					}
 				);
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -441,7 +425,7 @@ describe( '__unstableIsLockAvailable', () => {
 					}
 				);
 				expect(
-					__unstableIsLockAvailable(
+					isLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -454,20 +438,18 @@ describe( '__unstableIsLockAvailable', () => {
 } );
 
 function appendLock( state, store, path, lock ) {
-	getNode( state.locks.tree, [ store, ...path ] ).locks.push( lock );
+	getNode( state.tree, [ store, ...path ] ).locks.push( lock );
 }
 
 function buildState( paths ) {
 	return {
-		locks: {
-			requests: [],
-			tree: paths.reduce(
-				( tree, path ) => deepCopyLocksTreePath( tree, path ),
-				{
-					locks: [],
-					children: {},
-				}
-			),
-		},
+		requests: [],
+		tree: paths.reduce(
+			( tree, path ) => deepCopyLocksTreePath( tree, path ),
+			{
+				locks: [],
+				children: {},
+			}
+		),
 	};
 }

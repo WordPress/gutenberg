@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
-import { color } from '../../utils/style-mixins';
+import { COLORS } from '../../utils';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
@@ -43,7 +43,7 @@ export const MediaContainer = styled.div`
 `;
 
 export const MediaPlaceholder = styled.div`
-	background: ${ color( 'lightGray.300' ) };
+	background: ${ COLORS.lightGray[ 300 ] };
 	box-sizing: border-box;
 	height: 170px;
 	max-width: 280px;

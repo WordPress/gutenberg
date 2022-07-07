@@ -1,0 +1,9 @@
+[
+	{
+		"blockName": "core/shortcode",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n[gallery ids=\"238,338\"]\n",
+		"innerContent": [ "\n[gallery ids=\"238,338\"]\n" ]
+	}
+]

@@ -1,38 +1,3 @@
-// These styles are only applied to the appender when it appears inside of a block.
-// Otherwise the default appender may be improperly positioned in some themes.
-.block-editor-block-list__block .block-list-appender {
-	align-self: center;
-	padding: 0;
-	list-style: none;
-
-	// Themes sometimes apply a max-width to all elements classed blocks.
-	&.wp-block {
-		max-width: none;
-	}
-
-	// Add a little left margin when used horizontally.
-	// The right margin should be set to auto, so as to not shift layout in flex containers.
-	margin: 0 auto 0 $grid-unit-10;
-
-	// ... unless it's the only child.
-	&:first-child {
-		margin-left: 0;
-	}
-
-	.block-editor-default-block-appender {
-		margin: $grid-unit-10 0;
-	}
-
-	// Animate appearance.
-	.block-list-appender__toggle {
-		padding: 0;
-		opacity: 1;
-		transform: scale(1);
-		transition: all 0.1s ease;
-		@include reduce-motion("transition");
-	}
-}
-
 // For vertical flex containers, a 100% width ensures correct alignment.
 .is-vertical .block-list-appender {
 	width: $icon-size;

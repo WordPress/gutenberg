@@ -41,7 +41,6 @@ classes to be applied to the container.
 
 -   Type: `String`
 -   Required: No
--   Default: `Select or Upload Media`
 
 ### clearable
 
@@ -55,11 +54,10 @@ Whether the palette should have a clearing button or not.
 
 ```jsx
 import { ColorPalette } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyColorPalette = withState( {
-	color: '#f00',
-} )( ( { color, setState } ) => {
+const MyColorPalette = () => {
+	const [ color, setColor ] = useState ( '#f00' )
 	const colors = [
 		{ name: 'red', color: '#f00' },
 		{ name: 'white', color: '#fff' },
@@ -70,8 +68,14 @@ const MyColorPalette = withState( {
 		<ColorPalette
 			colors={ colors }
 			value={ color }
-			onChange={ ( color ) => setState( { color } ) }
+			onChange={ ( color ) => setColor( color ) }
 		/>
 	);
 } );
 ```
+
+If you're using this component outside the editor, you can
+[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
+for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
+`Popover.Slot` further up the element tree and within a
+`SlotFillProvider` overall.

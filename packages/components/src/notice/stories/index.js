@@ -11,6 +11,9 @@ import Notice from '../';
 export default {
 	title: 'Components/Notice',
 	component: Notice,
+	parameters: {
+		knobs: { disable: false },
+	},
 };
 
 export const _default = () => {

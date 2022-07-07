@@ -6,58 +6,61 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { usePrevious } from '@wordpress/compose';
+import {
+	__experimentalNavigation as Navigation,
+	__experimentalNavigationBackButton as NavigationBackButton,
+	__experimentalNavigationGroup as NavigationGroup,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationMenu as NavigationMenu,
+} from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
+import { decodeEntities } from '@wordpress/html-entities';
+import {
+	home as siteIcon,
+	layout as templateIcon,
+	symbolFilled as templatePartIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import ContentNavigation from './content-navigation';
-import TemplatesNavigation from './templates-navigation';
-import { MENU_ROOT } from './constants';
+import { useLink } from '../../routes/link';
+import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
 
-const NavigationPanel = ( { isOpen } ) => {
-	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
-	const { templatesActiveMenu, siteTitle } = useSelect( ( select ) => {
-		const { getNavigationPanelActiveMenu } = select( editSiteStore );
-		const { getEntityRecord } = select( coreDataStore );
+const SITE_EDITOR_KEY = 'site-editor';
 
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+function NavLink( { params, replace, ...props } ) {
+	const linkProps = useLink( params, replace );
 
-		return {
-			templatesActiveMenu: getNavigationPanelActiveMenu(),
-			siteTitle: siteData.name,
-		};
-	}, [] );
+	return <NavigationItem { ...linkProps } { ...props } />;
+}
 
-	// Ensures focus is moved to the panel area when it is activated
-	// from a separate component (such as document actions in the header).
-	const panelRef = useRef();
-	useEffect( () => {
-		if ( isOpen ) {
-			panelRef.current.focus();
-		}
-	}, [ templatesActiveMenu ] );
+const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
+	const { homeTemplate, isNavigationOpen, siteTitle } = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreDataStore );
+			const { getSettings, isNavigationOpened } = select( editSiteStore );
 
-	// Resets the content menu to its root whenever the navigation opens to avoid
-	// having it stuck on a sub-menu, interfering with the normal navigation behavior.
-	const prevIsOpen = usePrevious( isOpen );
-	useEffect( () => {
-		if ( contentActiveMenu !== MENU_ROOT && isOpen && ! prevIsOpen ) {
-			setContentActiveMenu( MENU_ROOT );
-		}
-	}, [ contentActiveMenu, isOpen ] );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
+			return {
+				siteTitle: siteData.name,
+				homeTemplate: getSettings().__unstableHomeTemplate,
+				isNavigationOpen: isNavigationOpened(),
+			};
+		},
+		[]
+	);
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const closeOnEscape = ( event ) => {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
 			setIsNavigationPanelOpened( false );
 		}
 	};
@@ -66,28 +69,58 @@ const NavigationPanel = ( { isOpen } ) => {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
-				'is-open': isOpen,
+				'is-open': isNavigationOpen,
 			} ) }
-			ref={ panelRef }
-			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">
-						{ siteTitle }
+						{ decodeEntities( siteTitle ) }
 					</div>
 				</div>
-
 				<div className="edit-site-navigation-panel__scroll-container">
-					{ contentActiveMenu === MENU_ROOT && (
-						<TemplatesNavigation />
-					) }
-					{ templatesActiveMenu === MENU_ROOT && (
-						<ContentNavigation
-							onActivateMenu={ setContentActiveMenu }
-						/>
-					) }
+					<Navigation activeItem={ activeItem }>
+						<MainDashboardButton.Slot>
+							<NavigationBackButton
+								backButtonLabel={ __( 'Dashboard' ) }
+								className="edit-site-navigation-panel__back-to-dashboard"
+								href="index.php"
+							/>
+						</MainDashboardButton.Slot>
+
+						<NavigationMenu>
+							<NavigationGroup title={ __( 'Editor' ) }>
+								<NavLink
+									icon={ siteIcon }
+									title={ __( 'Site' ) }
+									item={ SITE_EDITOR_KEY }
+									params={ {
+										postId: homeTemplate?.postId,
+										postType: homeTemplate?.postType,
+									} }
+								/>
+								<NavLink
+									icon={ templateIcon }
+									title={ __( 'Templates' ) }
+									item="wp_template"
+									params={ {
+										postId: undefined,
+										postType: 'wp_template',
+									} }
+								/>
+								<NavLink
+									icon={ templatePartIcon }
+									title={ __( 'Template Parts' ) }
+									item="wp_template_part"
+									params={ {
+										postId: undefined,
+										postType: 'wp_template_part',
+									} }
+								/>
+							</NavigationGroup>
+						</NavigationMenu>
+					</Navigation>
 				</div>
 			</div>
 		</div>

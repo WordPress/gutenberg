@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
+import {
+	EntitiesSavedStates,
+	PostPublishPanel,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -22,9 +26,8 @@ export default function ActionsPanel( {
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
 } ) {
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		editPostStore
-	);
+	const { closePublishSidebar, togglePublishSidebar } =
+		useDispatch( editPostStore );
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
@@ -32,14 +35,12 @@ export default function ActionsPanel( {
 		hasNonPostEntityChanges,
 	} = useSelect( ( select ) => {
 		return {
-			publishSidebarOpened: select(
-				editPostStore
-			).isPublishSidebarOpened(),
+			publishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
-			hasNonPostEntityChanges: select(
-				'core/editor'
-			).hasNonPostEntityChanges(),
+			hasNonPostEntityChanges:
+				select( editorStore ).hasNonPostEntityChanges(),
 		};
 	}, [] );
 
@@ -65,7 +66,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-entities-saved-states-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
@@ -78,7 +79,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-publish-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }

@@ -16,7 +16,7 @@ import { act } from '@testing-library/react';
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
-			// Mount: Enzyme shallow does not support wrapping multiple nodes
+			// Mount: Enzyme shallow does not support wrapping multiple nodes.
 			const wrapper = mount(
 				<Tooltip>
 					<div />
@@ -145,11 +145,51 @@ describe( 'Tooltip', () => {
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
-			// Force delayedSetIsOver to be called
+			// Force delayedSetIsOver to be called.
 			setTimeout( () => {
 				const popoverAfterTimeout = wrapper.find( 'Popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
 			}, TOOLTIP_DELAY );
+		} );
+
+		it( 'should respect custom delay prop when showing popover', () => {
+			const originalMouseEnter = jest.fn();
+			jest.useFakeTimers();
+			const wrapper = mount(
+				<Tooltip text="Help text" delay={ 2000 }>
+					<button
+						onMouseEnter={ originalMouseEnter }
+						onFocus={ originalMouseEnter }
+					>
+						<span>Hover Me!</span>
+					</button>
+				</Tooltip>
+			);
+
+			const button = wrapper.find( 'button' );
+			button.simulate( 'mouseenter', { type: 'mouseenter' } );
+
+			const popoverBeforeTimeout = wrapper.find( 'Popover' );
+			expect( popoverBeforeTimeout ).toHaveLength( 0 );
+			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
+
+			// Popover does not yet exist after default delay, because custom delay is passed.
+			setTimeout( () => {
+				const popoverBetweenTimeout = wrapper.find( 'Popover' );
+				expect( popoverBetweenTimeout ).toHaveLength( 0 );
+			}, TOOLTIP_DELAY );
+
+			// Popover appears after custom delay.
+			setTimeout( () => {
+				const popoverAfterTimeout = wrapper.find( 'Popover' );
+				expect( popoverAfterTimeout ).toHaveLength( 1 );
+
+				jest.runOnlyPendingTimers();
+				jest.useRealTimers();
+			}, 2000 );
 		} );
 
 		it( 'should show tooltip when an element is disabled', () => {
@@ -175,6 +215,26 @@ describe( 'Tooltip', () => {
 				const popover = wrapper.find( 'Popover' );
 				expect( popover ).toHaveLength( 1 );
 			}, TOOLTIP_DELAY );
+		} );
+
+		it( 'should not emit events back to children when they are disabled', () => {
+			const handleClick = jest.fn();
+
+			const wrapper = mount(
+				<Tooltip text="Show helpful text here">
+					<button disabled onClick={ handleClick }>
+						Click me
+					</button>
+				</Tooltip>
+			);
+
+			const eventCatcher = wrapper.find( '.event-catcher' );
+			eventCatcher.simulate( 'click', {
+				type: 'click',
+				currentTarget: {},
+			} );
+
+			expect( handleClick ).toHaveBeenCalledTimes( 0 );
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', () => {

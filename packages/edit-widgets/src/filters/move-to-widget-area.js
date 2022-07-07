@@ -6,7 +6,7 @@ import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { getWidgetIdFromBlock, MoveToWidgetArea } from '@wordpress/widgets';
+import { MoveToWidgetArea } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -15,32 +15,29 @@ import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const widgetId = getWidgetIdFromBlock( props );
-		const blockName = props.name;
-		const {
-			widgetAreas,
-			currentWidgetAreaId,
-			canInsertBlockInWidgetArea,
-		} = useSelect(
-			( select ) => {
-				// Component won't display for a widget area, so don't run selectors.
-				if ( blockName === 'core/widget-area' ) {
-					return {};
-				}
+		const { clientId, name: blockName } = props;
+		const { widgetAreas, currentWidgetAreaId, canInsertBlockInWidgetArea } =
+			useSelect(
+				( select ) => {
+					// Component won't display for a widget area, so don't run selectors.
+					if ( blockName === 'core/widget-area' ) {
+						return {};
+					}
 
-				const selectors = select( editWidgetsStore );
-				return {
-					widgetAreas: selectors.getWidgetAreas(),
-					currentWidgetAreaId: widgetId
-						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
-						: undefined,
-					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
-						blockName
-					),
-				};
-			},
-			[ widgetId, blockName ]
-		);
+					const selectors = select( editWidgetsStore );
+
+					const widgetAreaBlock =
+						selectors.getParentWidgetAreaBlock( clientId );
+
+					return {
+						widgetAreas: selectors.getWidgetAreas(),
+						currentWidgetAreaId: widgetAreaBlock?.attributes?.id,
+						canInsertBlockInWidgetArea:
+							selectors.canInsertBlockInWidgetArea( blockName ),
+					};
+				},
+				[ clientId, blockName ]
+			);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
 		const hasMultipleWidgetAreas = widgetAreas?.length > 1;

@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 const DEFAULT_FONT_SIZES = [];
 
@@ -49,7 +49,7 @@ export default ( ...fontSizeNames ) => {
 			createHigherOrderComponent(
 				( WrappedComponent ) => ( props ) => {
 					const fontSizes =
-						useEditorFeature( 'typography.fontSizes' ) ||
+						useSetting( 'typography.fontSizes' ) ||
 						DEFAULT_FONT_SIZES;
 					return (
 						<WrappedComponent
@@ -78,9 +78,8 @@ export default ( ...fontSizeNames ) => {
 								customFontSizeAttributeName,
 								fontSizeAttributeName
 							) => {
-								const upperFirstFontSizeAttributeName = upperFirst(
-									fontSizeAttributeName
-								);
+								const upperFirstFontSizeAttributeName =
+									upperFirst( fontSizeAttributeName );
 								settersAccumulator[
 									`set${ upperFirstFontSizeAttributeName }`
 								] = this.createSetFontSize(
@@ -123,7 +122,7 @@ export default ( ...fontSizeNames ) => {
 							fontSizeAttributeName
 						) => {
 							if ( previousState[ fontSizeAttributeName ] ) {
-								// if new font size is name compare with the previous slug
+								// If new font size is name compare with the previous slug.
 								if ( attributes[ fontSizeAttributeName ] ) {
 									return (
 										attributes[ fontSizeAttributeName ] !==
@@ -131,14 +130,14 @@ export default ( ...fontSizeNames ) => {
 											.slug
 									);
 								}
-								// if font size is not named, update when the font size value changes.
+								// If font size is not named, update when the font size value changes.
 								return (
 									previousState[ fontSizeAttributeName ]
 										.size !==
 									attributes[ customFontSizeAttributeName ]
 								);
 							}
-							// in this case we need to build the font size object
+							// In this case we need to build the font size object.
 							return true;
 						};
 

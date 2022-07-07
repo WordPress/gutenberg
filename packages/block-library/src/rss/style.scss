@@ -1,4 +1,7 @@
-.wp-block-rss {
+ul.wp-block-rss { // The ul is needed for specificity to override the reset styles in the editor.
+	list-style: none;
+	padding: 0;
+
 	// This needs extra specificity due to the reset mixin on the parent: https://github.com/WordPress/gutenberg/blob/a250e9e5fe00dd5195624f96a3d924e7078951c3/packages/edit-post/src/style.scss#L54
 	&.wp-block-rss {
 		box-sizing: border-box;
@@ -36,6 +39,5 @@
 .wp-block-rss__item-publish-date,
 .wp-block-rss__item-author {
 	display: block;
-	color: #555;
 	font-size: 0.8125em;
 }

@@ -4,25 +4,34 @@ public struct MediaInfo: Encodable {
     public let type: String?
     public let title: String?
     public let caption: String?
+    public let alt: String?
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
         self.title = title
+        self.alt = alt
     }
 }
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
     case contactInfoBlock
+    case layoutGridBlock
+    case tiledGalleryBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case audioBlock
+    case isAudioBlockMediaUploadEnabled
+    case reusableBlock
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
 }
 
 /// Wrapper for single block data
@@ -160,6 +169,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
@@ -230,6 +243,23 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
+
+    func gutenbergDidRequestPreview()
+
+    /// Tells the delegate that the editor requested the block type impression counts
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
+
+    /// Tells the delegate that the editor requested setting the impression counts
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
+
+    /// Tells the delegate that the editor requested to show the "Contact Support" support view.
+    func gutenbergDidRequestContactCustomerSupport()
+
+    /// Tells the delegate that the editor requested to show the "My Tickets" support view.
+    func gutenbergDidRequestGotoCustomerSupportOptions()
+
+    /// Tells the delegate the editor requested sending an event
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

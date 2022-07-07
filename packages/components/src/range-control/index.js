@@ -1,8 +1,8 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { clamp, isFinite, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,8 +17,9 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { color } from '../utils/colors';
+import { COLORS } from '../utils';
 import { floatClamp, useControlledRangeValue } from './utils';
+import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
@@ -34,6 +35,8 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 
+const noop = () => {};
+
 function RangeControl(
 	{
 		afterIcon,
@@ -41,12 +44,13 @@ function RangeControl(
 		beforeIcon,
 		className,
 		currentInput,
-		color: colorProp = color( 'ui.theme' ),
+		color: colorProp = COLORS.ui.theme,
 		disabled = false,
 		help,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
+		hideLabelFromVision = false,
 		marks = false,
 		max = 100,
 		min = 0,
@@ -75,6 +79,14 @@ function RangeControl(
 		initial: initialPosition,
 	} );
 	const isResetPendent = useRef( false );
+
+	if ( step === 'any' ) {
+		// The tooltip and number input field are hidden when the step is "any"
+		// because the decimals get too lengthy to fit well.
+		showTooltipProp = false;
+		withInputField = false;
+	}
+
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -111,7 +123,7 @@ function RangeControl(
 
 	const id = useInstanceId( RangeControl, 'inspector-range-control' );
 	const describedBy = !! help ? `${ id }__help` : undefined;
-	const enableTooltip = showTooltipProp !== false && isFinite( value );
+	const enableTooltip = showTooltipProp !== false && Number.isFinite( value );
 
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
@@ -194,6 +206,7 @@ function RangeControl(
 		<BaseControl
 			className={ classes }
 			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
 		>
@@ -214,7 +227,6 @@ function RangeControl(
 						describedBy={ describedBy }
 						disabled={ disabled }
 						id={ id }
-						isShiftStepEnabled={ isShiftStepEnabled }
 						label={ label }
 						max={ max }
 						min={ min }
@@ -224,7 +236,6 @@ function RangeControl(
 						onMouseMove={ onMouseMove }
 						onMouseLeave={ onMouseLeave }
 						ref={ setRef }
-						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }
 					/>
@@ -245,16 +256,18 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
+							tooltipPosition="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }
@@ -288,7 +301,7 @@ function RangeControl(
 						<Button
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
-							isSecondary
+							variant="secondary"
 							isSmall
 							onClick={ handleOnReset }
 						>

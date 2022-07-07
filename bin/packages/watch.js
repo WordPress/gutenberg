@@ -59,12 +59,14 @@ function isDirectory( pathname ) {
 function isSourceFile( filename ) {
 	// Only run this regex on the relative path, otherwise we might run
 	// into some false positives when eg. the project directory contains `src`
-	const relativePath = path.relative( process.cwd(), filename );
+	const relativePath = path
+		.relative( process.cwd(), filename )
+		.replace( /\\/g, '/' );
 
 	return (
-		/\/src\/.+\.(js|json|scss)$/.test( relativePath ) &&
+		/\/src\/.+\.(js|json|scss|ts|tsx)$/.test( relativePath ) &&
 		! [
-			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
+			/\/(benchmark|__mocks__|__tests__|test|storybook|stories|e2e-test-utils-playwright)\/.+/,
 			/.\.(spec|test)\.js$/,
 		].some( ( regex ) => regex.test( relativePath ) )
 	);
@@ -98,6 +100,7 @@ function isWatchableFile( filename, skip ) {
 	// Recursive file watching is not available on a Linux-based OS. If this is the case,
 	// the watcher library falls back to watching changes in the subdirectories
 	// and passes the directories to this filter callback instead.
+
 	if ( isDirectory( filename ) ) {
 		return true;
 	}
@@ -117,16 +120,17 @@ function isWatchableFile( filename, skip ) {
 function getBuildFile( srcFile ) {
 	// Could just use string.replace, but the user might have the project
 	// checked out and nested under another src folder.
-	const packageDir = srcFile.substr( 0, srcFile.lastIndexOf( '/src/' ) );
-	const filePath = srcFile.substr( srcFile.lastIndexOf( '/src/' ) + 5 );
+	const srcDir = `${ path.sep }src${ path.sep }`;
+	const packageDir = srcFile.substr( 0, srcFile.lastIndexOf( srcDir ) );
+	const filePath = srcFile.substr( srcFile.lastIndexOf( srcDir ) + 5 );
 	return path.resolve( packageDir, 'build', filePath );
 }
 
 /**
  * Adds a build file to the set of files that should be rebuilt.
  *
- * @param {'update'} event The event name
- * @param {string} filename
+ * @param {'update'} event    The event name
+ * @param {string}   filename
  */
 function updateBuildFile( event, filename ) {
 	if ( exists( filename ) ) {
@@ -147,8 +151,8 @@ function updateBuildFile( event, filename ) {
  * Removes a build file from the build folder
  * (usually triggered the associated source file was deleted)
  *
- * @param {'remove'} event The event name
- * @param {string} filename
+ * @param {'remove'} event    The event name
+ * @param {string}   filename
  */
 function removeBuildFile( event, filename ) {
 	const buildFile = getBuildFile( filename );

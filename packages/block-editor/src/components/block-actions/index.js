@@ -28,12 +28,11 @@ export default function BlockActions( {
 		canInsertBlockType,
 		getBlockRootClientId,
 		getBlocksByClientId,
-		getTemplateLock,
-	} = useSelect( ( select ) => select( blockEditorStore ), [] );
-	const { getDefaultBlockName, getGroupingBlockName } = useSelect(
-		( select ) => select( blocksStore ),
-		[]
-	);
+		canMoveBlocks,
+		canRemoveBlocks,
+	} = useSelect( blockEditorStore );
+	const { getDefaultBlockName, getGroupingBlockName } =
+		useSelect( blocksStore );
 
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
@@ -49,6 +48,9 @@ export default function BlockActions( {
 		getDefaultBlockName(),
 		rootClientId
 	);
+
+	const canMove = canMoveBlocks( clientIds, rootClientId );
+	const canRemove = canRemoveBlocks( clientIds, rootClientId );
 
 	const {
 		removeBlocks,
@@ -67,7 +69,8 @@ export default function BlockActions( {
 	return children( {
 		canDuplicate,
 		canInsertDefaultBlock,
-		isLocked: !! getTemplateLock( rootClientId ),
+		canMove,
+		canRemove,
 		rootClientId,
 		blocks,
 		onDuplicate() {
@@ -94,7 +97,7 @@ export default function BlockActions( {
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion
+			// Activate the `transform` on `core/group` which does the conversion.
 			const newBlocks = switchToBlockType( blocks, groupingBlockName );
 
 			if ( ! newBlocks ) {

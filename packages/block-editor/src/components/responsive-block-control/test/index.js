@@ -3,7 +3,6 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,19 +18,19 @@ import ResponsiveBlockControl from '../index';
 
 let container = null;
 beforeEach( () => {
-	// setup a DOM element as a render target
+	// Setup a DOM element as a render target.
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 } );
 
 afterEach( () => {
-	// cleanup on exiting
+	// Cleanup on exiting.
 	unmountComponentAtNode( container );
 	container.remove();
 	container = null;
 } );
 
-const inputId = uniqueId();
+const inputId = 'input-12345678';
 
 const sizeOptions = [
 	{
@@ -97,8 +96,9 @@ describe( 'Basic rendering', () => {
 			)
 		);
 
-		const toggleState = container.querySelector( 'input[type="checkbox"]' )
-			.checked;
+		const toggleState = container.querySelector(
+			'input[type="checkbox"]'
+		).checked;
 
 		const defaultControlGroup = container.querySelector(
 			'.block-editor-responsive-block-control__group:not(.is-responsive)'
@@ -315,7 +315,7 @@ describe( 'Default and Responsive modes', () => {
 			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
-		// Select elements based on what the user can see
+		// Select elements based on what the user can see.
 		const toggleLabel = Array.from(
 			container.querySelectorAll( 'label' )
 		).find( ( label ) =>
@@ -331,7 +331,7 @@ describe( 'Default and Responsive modes', () => {
 		expect( defaultControlGroup ).not.toBeNull();
 		expect( responsiveControlGroup ).toBeNull();
 
-		// Toggle to "responsive" mode
+		// Toggle to "responsive" mode.
 		act( () => {
 			Simulate.change( toggleInput, { target: { checked: false } } );
 		} );
@@ -346,7 +346,7 @@ describe( 'Default and Responsive modes', () => {
 		expect( defaultControlGroup ).toBeNull();
 		expect( responsiveControlGroup ).not.toBeNull();
 
-		// Toggle back to "default" mode
+		// Toggle back to "default" mode.
 		act( () => {
 			Simulate.change( toggleInput, { target: { checked: true } } );
 		} );
@@ -395,7 +395,7 @@ describe( 'Default and Responsive modes', () => {
 			);
 		} );
 
-		// The user should see "range" controls so we can legitimately query for them here
+		// The user should see "range" controls so we can legitimately query for them here.
 		const customControls = Array.from(
 			container.querySelectorAll( 'input[type="range"]' )
 		);

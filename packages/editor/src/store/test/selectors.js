@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -22,7 +17,6 @@ import { layout, footer, header } from '@wordpress/icons';
  * Internal dependencies
  */
 import * as _selectors from '../selectors';
-import { PREFERENCES_DEFAULTS } from '../defaults';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );
@@ -37,6 +31,13 @@ selectorNames.forEach( ( name ) => {
 				return (
 					state.__experimentalGetDirtyEntityRecords &&
 					state.__experimentalGetDirtyEntityRecords()
+				);
+			},
+
+			__experimentalGetEntitiesBeingSaved() {
+				return (
+					state.__experimentalGetEntitiesBeingSaved &&
+					state.__experimentalGetEntitiesBeingSaved()
 				);
 			},
 
@@ -112,6 +113,19 @@ selectorNames.forEach( ( name ) => {
 			getAutosave() {
 				return state.getAutosave && state.getAutosave();
 			},
+
+			getPostType() {
+				const postTypeLabel = {
+					post: 'Post',
+					page: 'Page',
+				}[ state.postType ];
+
+				return {
+					labels: {
+						singular_name: postTypeLabel,
+					},
+				};
+			},
 		} );
 
 		selectorNames.forEach( ( otherName ) => {
@@ -157,11 +171,11 @@ const {
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	isSavingPost,
+	isSavingNonPostEntityChanges,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	isPublishSidebarEnabled,
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
@@ -169,6 +183,7 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	getPostTypeLabel,
 	__experimentalGetDefaultTemplateType,
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
@@ -207,7 +222,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
@@ -1578,10 +1595,11 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true if title or excerpt have changed', () => {
-			for ( const variantField of [ 'title', 'excerpt' ] ) {
-				for ( const constantField of without(
-					[ 'title', 'excerpt' ],
-					variantField
+			const fields = [ 'title', 'excerpt' ];
+
+			for ( const variantField of fields ) {
+				for ( const constantField of fields.filter(
+					( f ) => ! f === variantField
 				) ) {
 					const state = {
 						editor: {
@@ -1891,7 +1909,7 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
-			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future
+			const time = Date.now() + 1000 * 3600 * 24 * 7; // 7 days in the future.
 			const date = new Date( time );
 			const state = {
 				editor: {
@@ -2071,6 +2089,53 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isSavingNonPostEntityChanges', () => {
+		it( 'should return true if changes to an arbitrary entity are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return false if the only changes being saved are for the current post', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [ { kind: 'postType', name: 'post', key: 1 } ];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if changes to multiple posts are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'post', key: 2 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return true if changes to multiple posts of different post types are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'wp_template', key: 1 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'didPostSaveRequestSucceed', () => {
 		it( 'should return true if the post save request is successful', () => {
 			const state = {
@@ -2082,7 +2147,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestSucceed( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request has failed', () => {
+		it( 'should return false if the post save request has failed', () => {
 			const state = {
 				saving: {
 					successful: false,
@@ -2104,7 +2169,7 @@ describe( 'selectors', () => {
 			expect( didPostSaveRequestFail( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if the post save request is successful', () => {
+		it( 'should return false if the post save request is successful', () => {
 			const state = {
 				saving: {
 					error: false,
@@ -2501,39 +2566,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isPublishSidebarEnabled', () => {
-		it( 'should return the value on state if it is thruthy', () => {
-			const state = {
-				preferences: {
-					isPublishSidebarEnabled: true,
-				},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				state.preferences.isPublishSidebarEnabled
-			);
-		} );
-
-		it( 'should return the value on state if it is falsy', () => {
-			const state = {
-				preferences: {
-					isPublishSidebarEnabled: false,
-				},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				state.preferences.isPublishSidebarEnabled
-			);
-		} );
-
-		it( 'should return the default value if there is no isPublishSidebarEnabled key on state', () => {
-			const state = {
-				preferences: {},
-			};
-			expect( isPublishSidebarEnabled( state ) ).toBe(
-				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
-			);
-		} );
-	} );
-
 	describe( 'isPermalinkEditable', () => {
 		it( 'should be false if there is no permalink', () => {
 			const state = {
@@ -2837,9 +2869,8 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'assigns an icon to each area', () => {
-			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
-				state
-			);
+			const templatePartAreas =
+				__experimentalGetDefaultTemplatePartAreas( state );
 			templatePartAreas.forEach( ( area ) =>
 				expect( area.icon ).not.toBeNull()
 			);
@@ -2934,7 +2965,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} ).description
 			).toEqual( 'test description' );
 		} );
@@ -2962,7 +2993,7 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'Default (Index)',
@@ -2974,7 +3005,7 @@ describe( 'selectors', () => {
 				__experimentalGetTemplateInfo( state, {
 					slug: 'index',
 					title: { rendered: 'test title' },
-					excerpt: { raw: 'test description' },
+					description: { raw: 'test description' },
 				} )
 			).toEqual( {
 				title: 'test title',
@@ -3023,6 +3054,37 @@ describe( 'selectors', () => {
 				title: 'template part, area = footer',
 				icon: footer,
 			} );
+		} );
+	} );
+
+	describe( 'getPostTypeLabel', () => {
+		it( 'should return the correct label for the current post type', () => {
+			const postTypes = [
+				{
+					state: {
+						postType: 'page',
+					},
+					expected: 'Page',
+				},
+				{
+					state: {
+						postType: 'post',
+					},
+					expected: 'Post',
+				},
+			];
+
+			postTypes.forEach( ( { state, expected } ) =>
+				expect( getPostTypeLabel( state ) ).toBe( expected )
+			);
+		} );
+
+		it( 'should return `undefined` when the post type label does not exist', () => {
+			const postTypes = [ {}, { postType: 'humpty' } ];
+
+			postTypes.forEach( ( state ) =>
+				expect( getPostTypeLabel( state ) ).toBeUndefined()
+			);
 		} );
 	} );
 } );

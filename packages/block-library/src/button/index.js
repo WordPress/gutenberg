@@ -21,7 +21,6 @@ export const settings = {
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			backgroundColor: 'vivid-green-cyan',
 			text: __( 'Call to Action' ),
 		},
 	},

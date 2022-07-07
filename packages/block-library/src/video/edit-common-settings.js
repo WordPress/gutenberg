@@ -1,33 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { ToggleControl, SelectControl } from '@wordpress/components';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, Platform } from '@wordpress/element';
 
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },
 	{ value: 'metadata', label: __( 'Metadata' ) },
-	{ value: 'none', label: __( 'None' ) },
+	{ value: 'none', label: _x( 'None', 'Preload value' ) },
 ];
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
-	const {
-		autoplay,
-		controls,
-		loop,
-		muted,
-		playsInline,
-		preload,
-	} = attributes;
+	const { autoplay, controls, loop, muted, playsInline, preload } =
+		attributes;
 
-	const getAutoplayHelp = useCallback( ( checked ) => {
-		return checked
-			? __(
-					'Note: Autoplaying videos may cause usability issues for some visitors.'
-			  )
-			: null;
-	}, [] );
+	const autoPlayHelpText = __(
+		'Autoplay may cause usability issues for some users.'
+	);
+	const getAutoplayHelp = Platform.select( {
+		web: useCallback( ( checked ) => {
+			return checked ? autoPlayHelpText : null;
+		}, [] ),
+		native: autoPlayHelpText,
+	} );
 
 	const toggleFactory = useMemo( () => {
 		const toggleAttribute = ( attribute ) => {

@@ -11,7 +11,7 @@ import { Path, SVG } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { color } from '../../utils/style-mixins';
+import { COLORS } from '../../utils';
 
 export const FocalPointWrapper = styled.div`
 	background-color: transparent;
@@ -43,6 +43,6 @@ export const PointerIconPathOutline = styled( Path )`
 `;
 
 export const PointerIconPathFill = styled( Path )`
-	fill: ${ color( 'blue.wordpress.700' ) };
-	fill: ${ color( 'ui.theme' ) };
+	fill: ${ COLORS.blue.wordpress[ 700 ] };
+	fill: ${ COLORS.ui.theme };
 `;

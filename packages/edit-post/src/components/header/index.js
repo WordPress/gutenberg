@@ -21,6 +21,7 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
+import TemplateTitle from './template-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -32,16 +33,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isPublishSidebarOpened: select(
-				editPostStore
-			).isPublishSidebarOpened(),
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
-			),
-			hasReducedUI: select( editPostStore ).isFeatureActive(
-				'reducedUI'
-			),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			hasReducedUI:
+				select( editPostStore ).isFeatureActive( 'reducedUI' ),
 		} ),
 		[]
 	);
@@ -55,10 +53,11 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	return (
 		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<FullscreenModeClose showTooltip />
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />
+				<TemplateTitle />
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (

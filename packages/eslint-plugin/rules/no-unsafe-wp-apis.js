@@ -34,8 +34,8 @@ module.exports = {
 };
 
 /**
- * @param {Object} _
- * @param {AllowedImportsMap} _.allowedImports
+ * @param {Object}                            _
+ * @param {AllowedImportsMap}                 _.allowedImports
  * @param {import('eslint').Rule.RuleContext} _.context
  *
  * @return {(node: Node) => void} Listener function
@@ -51,7 +51,7 @@ function makeListener( { allowedImports, context } ) {
 
 		const sourceModule = node.source.value.trim();
 
-		// Ignore non-WordPress packages
+		// Ignore non-WordPress packages.
 		if ( ! sourceModule.startsWith( '@wordpress/' ) ) {
 			return;
 		}

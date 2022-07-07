@@ -6,27 +6,27 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
 	RichText,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
-	ToolbarItem,
+	ToolbarDropdownMenu,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -41,7 +41,7 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -106,6 +106,9 @@ function TableEdit( {
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 
+	const tableRef = useRef();
+	const [ hasTableCreated, setHasTableCreated ] = useState( false );
+
 	/**
 	 * Updates the initial column count used for table creation.
 	 *
@@ -138,6 +141,7 @@ function TableEdit( {
 				columnCount: parseInt( initialColumnCount, 10 ) || 2,
 			} )
 		);
+		setHasTableCreated( true );
 	}
 
 	/**
@@ -243,7 +247,7 @@ function TableEdit( {
 				rowIndex: newRowIndex,
 			} )
 		);
-		// Select the first cell of the new row
+		// Select the first cell of the new row.
 		setSelectedCell( {
 			sectionName,
 			rowIndex: newRowIndex,
@@ -298,7 +302,7 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column
+		// Select the first cell of the new column.
 		setSelectedCell( {
 			rowIndex: 0,
 			columnIndex: newColumnIndex,
@@ -341,6 +345,15 @@ function TableEdit( {
 			setSelectedCell();
 		}
 	}, [ isSelected ] );
+
+	useEffect( () => {
+		if ( hasTableCreated ) {
+			tableRef?.current
+				?.querySelector( 'td[contentEditable="true"]' )
+				?.focus();
+			setHasTableCreated( false );
+		}
+	}, [ hasTableCreated ] );
 
 	const sections = [ 'head', 'body', 'foot' ].filter(
 		( name ) => ! isEmptyTableSection( attributes[ name ] )
@@ -427,36 +440,33 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...useBlockProps( { ref: tableRef } ) }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
+				</>
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
 					<PanelBody
-						title={ __( 'Table settings' ) }
+						title={ __( 'Settings' ) }
 						className="blocks-table-settings"
 					>
 						<ToggleControl
@@ -482,7 +492,15 @@ function TableEdit( {
 					className={ classnames(
 						colorProps.className,
 						borderProps.className,
-						{ 'has-fixed-layout': hasFixedLayout }
+						{
+							'has-fixed-layout': hasFixedLayout,
+							// This is required in the editor only to overcome
+							// the fact the editor rewrites individual border
+							// widths into a shorthand format.
+							'has-individual-borders': hasSplitBorders(
+								attributes?.style?.border
+							),
+						}
 					) }
 					style={ { ...colorProps.style, ...borderProps.style } }
 				>
@@ -492,6 +510,7 @@ function TableEdit( {
 			{ ! isEmpty && (
 				<RichText
 					tagName="figcaption"
+					className={ __experimentalGetElementClassName( 'caption' ) }
 					aria-label={ __( 'Table caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
@@ -501,7 +520,9 @@ function TableEdit( {
 					// Deselect the selected table cell when the caption is focused.
 					unstableOnFocus={ () => setSelectedCell() }
 					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
 					}
 				/>
 			) }
@@ -533,7 +554,7 @@ function TableEdit( {
 						/>
 						<Button
 							className="blocks-table__placeholder-button"
-							isPrimary
+							variant="primary"
 							type="submit"
 						>
 							{ __( 'Create Table' ) }

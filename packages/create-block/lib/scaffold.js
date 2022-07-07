@@ -1,24 +1,22 @@
 /**
  * External dependencies
  */
-const { writeFile } = require( 'fs' ).promises;
-const { snakeCase } = require( 'lodash' );
-const makeDir = require( 'make-dir' );
-const { render } = require( 'mustache' );
-const { dirname, join } = require( 'path' );
+const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
-const initBlockJSON = require( './init-block-json' );
+const initBlock = require( './init-block' );
 const initPackageJSON = require( './init-package-json' );
 const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
+const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 
 module.exports = async (
-	blockTemplate,
+	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
 	{
+		$schema,
 		apiVersion,
 		namespace,
 		slug,
@@ -29,12 +27,18 @@ module.exports = async (
 		attributes,
 		supports,
 		author,
+		pluginURI,
 		license,
 		licenseURI,
+		domainPath,
+		updateURI,
 		version,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
+		npmDevDependencies,
+		customScripts,
+		folderName,
 		editorScript,
 		editorStyle,
 		style,
@@ -44,15 +48,16 @@ module.exports = async (
 	namespace = namespace.toLowerCase();
 
 	info( '' );
-	info( `Creating a new WordPress block in "${ slug }" folder.` );
+	info( `Creating a new WordPress plugin in the "${ slug }" directory.` );
 
-	const { outputTemplates, outputAssets } = blockTemplate;
 	const view = {
+		$schema,
 		apiVersion,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
 		slugSnakeCase: snakeCase( slug ),
+		slugPascalCase: upperFirst( camelCase( slug ) ),
 		title,
 		description,
 		dashicon,
@@ -61,39 +66,47 @@ module.exports = async (
 		supports,
 		version,
 		author,
+		pluginURI,
 		license,
 		licenseURI,
 		textdomain: slug,
+		domainPath,
+		updateURI,
 		wpScripts,
+		wpEnv,
 		npmDependencies,
+		npmDevDependencies,
+		customScripts,
+		folderName,
 		editorScript,
 		editorStyle,
 		style,
 	};
+
 	await Promise.all(
-		Object.keys( outputTemplates ).map( async ( outputFile ) => {
-			// Output files can have names that depend on the slug provided.
-			const outputFilePath = join(
-				slug,
-				outputFile.replace( /\$slug/g, slug )
-			);
-			await makeDir( dirname( outputFilePath ) );
-			writeFile(
-				outputFilePath,
-				render( outputTemplates[ outputFile ], view )
-			);
-		} )
+		Object.keys( pluginOutputTemplates ).map(
+			async ( outputFile ) =>
+				await writeOutputTemplate(
+					pluginOutputTemplates[ outputFile ],
+					outputFile,
+					view
+				)
+		)
 	);
 
 	await Promise.all(
-		Object.keys( outputAssets ).map( async ( outputFile ) => {
-			const outputFilePath = join( slug, 'assets', outputFile );
-			await makeDir( dirname( outputFilePath ) );
-			writeFile( outputFilePath, outputAssets[ outputFile ] );
-		} )
+		Object.keys( outputAssets ).map(
+			async ( outputFile ) =>
+				await writeOutputAsset(
+					outputAssets[ outputFile ],
+					outputFile,
+					view
+				)
+		)
 	);
 
-	await initBlockJSON( view );
+	await initBlock( blockOutputTemplates, view );
+
 	await initPackageJSON( view );
 
 	if ( wpScripts ) {
@@ -106,11 +119,11 @@ module.exports = async (
 
 	info( '' );
 	success(
-		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
+		`Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
 	);
 	if ( wpScripts ) {
 		info( '' );
-		info( 'Inside that directory, you can run several commands:' );
+		info( 'You can run several commands inside:' );
 		info( '' );
 		code( '  $ npm start' );
 		info( '    Starts the build for development.' );
@@ -127,11 +140,14 @@ module.exports = async (
 		code( '  $ npm run lint:js' );
 		info( '    Lints JavaScript files.' );
 		info( '' );
+		code( '  $ npm run plugin-zip' );
+		info( '    Creates a zip file for a WordPress plugin.' );
+		info( '' );
 		code( '  $ npm run packages-update' );
 		info( '    Updates WordPress packages to the latest version.' );
 	}
 	info( '' );
-	info( 'To enter the folder type:' );
+	info( 'To enter the directory type:' );
 	info( '' );
 	code( `  $ cd ${ slug }` );
 	if ( wpScripts ) {

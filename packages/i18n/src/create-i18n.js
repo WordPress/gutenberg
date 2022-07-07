@@ -39,7 +39,17 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
 /**
  * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
  *
- * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will overwrite the domain configuration. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} AddLocaleData
+ *
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will also merge the domain configuration. Accepts data in a
  * Jed-formatted JSON object shape.
  *
  * @see http://messageformat.github.io/Jed/
@@ -114,29 +124,34 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
  * An i18n instance
  *
  * @typedef I18n
- * @property {GetLocaleData} getLocaleData     Returns locale data by domain in a Jed-formatted JSON object shape.
- * @property {SetLocaleData} setLocaleData     Merges locale data into the Tannin instance by domain. Accepts data in a
+ * @property {GetLocaleData}   getLocaleData   Returns locale data by domain in a Jed-formatted JSON object shape.
+ * @property {SetLocaleData}   setLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will overwrite the domain configuration. Accepts data in a
+ *                                             Jed-formatted JSON object shape.
+ * @property {AddLocaleData}   addLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will also merge the domain configuration. Accepts data in a
  *                                             Jed-formatted JSON object shape.
  * @property {ResetLocaleData} resetLocaleData Resets all current Tannin instance locale data and sets the specified
  *                                             locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
- * @property {Subscribe} subscribe             Subscribes to changes of Tannin locale data.
- * @property {__} __                           Retrieve the translation of text.
- * @property {_x} _x                           Retrieve translated string with gettext context.
- * @property {_n} _n                           Translates and retrieves the singular or plural form based on the supplied
+ * @property {Subscribe}       subscribe       Subscribes to changes of Tannin locale data.
+ * @property {__}              __              Retrieve the translation of text.
+ * @property {_x}              _x              Retrieve translated string with gettext context.
+ * @property {_n}              _n              Translates and retrieves the singular or plural form based on the supplied
  *                                             number.
- * @property {_nx} _nx                         Translates and retrieves the singular or plural form based on the supplied
+ * @property {_nx}             _nx             Translates and retrieves the singular or plural form based on the supplied
  *                                             number, with gettext context.
- * @property {IsRtl} isRTL                     Check if current locale is RTL.
- * @property {HasTranslation} hasTranslation   Check if there is a translation for a given string.
+ * @property {IsRtl}           isRTL           Check if current locale is RTL.
+ * @property {HasTranslation}  hasTranslation  Check if there is a translation for a given string.
  */
 
 /**
  * Create an i18n instance
  *
- * @param {LocaleData} [initialData]    Locale data configuration.
- * @param {string}     [initialDomain]  Domain for which configuration applies.
- * @param {Hooks} [hooks]     Hooks implementation.
- * @return {I18n}                       I18n instance
+ * @param {LocaleData} [initialData]   Locale data configuration.
+ * @param {string}     [initialDomain] Domain for which configuration applies.
+ * @param {Hooks}      [hooks]         Hooks implementation.
+ *
+ * @return {I18n} I18n instance.
  */
 export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**
@@ -168,11 +183,10 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 	/**
 	 * @param {LocaleData} [data]
-	 * @param {string} [domain]
+	 * @param {string}     [domain]
 	 */
 	const doSetLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
-			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
 			...data,
 		};
@@ -181,13 +195,36 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		// a plural forms expression).
 		tannin.data[ domain ][ '' ] = {
 			...DEFAULT_LOCALE_DATA[ '' ],
-			...tannin.data[ domain ][ '' ],
+			...tannin.data[ domain ]?.[ '' ],
 		};
+
+		// Clean up cached plural forms functions cache as it might be updated.
+		delete tannin.pluralForms[ domain ];
 	};
 
 	/** @type {SetLocaleData} */
 	const setLocaleData = ( data, domain ) => {
 		doSetLocaleData( data, domain );
+		notifyListeners();
+	};
+
+	/** @type {AddLocaleData} */
+	const addLocaleData = ( data, domain = 'default' ) => {
+		tannin.data[ domain ] = {
+			...tannin.data[ domain ],
+			...data,
+			// Populate default domain configuration (supported locale date which omits
+			// a plural forms expression).
+			'': {
+				...DEFAULT_LOCALE_DATA[ '' ],
+				...tannin.data[ domain ]?.[ '' ],
+				...data?.[ '' ],
+			},
+		};
+
+		// Clean up cached plural forms functions cache as it might be updated.
+		delete tannin.pluralForms[ domain ];
+
 		notifyListeners();
 	};
 
@@ -225,7 +262,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		number
 	) => {
 		if ( ! tannin.data[ domain ] ) {
-			// use `doSetLocaleData` to set silently, without notifying listeners
+			// Use `doSetLocaleData` to set silently, without notifying listeners.
 			doSetLocaleData( undefined, domain );
 		}
 
@@ -408,9 +445,9 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 			 * Filters the presence of a translation in the locale data.
 			 *
 			 * @param {boolean} hasTranslation Whether the translation is present or not..
-			 * @param {string} single The singular form of the translated text (used as key in locale data)
-			 * @param {string} context Context information for the translators.
-			 * @param {string} domain Text domain. Unique identifier for retrieving translated strings.
+			 * @param {string}  single         The singular form of the translated text (used as key in locale data)
+			 * @param {string}  context        Context information for the translators.
+			 * @param {string}  domain         Text domain. Unique identifier for retrieving translated strings.
 			 */
 			result = /** @type { boolean } */ (
 				/** @type {*} */ hooks.applyFilters(
@@ -456,6 +493,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	return {
 		getLocaleData,
 		setLocaleData,
+		addLocaleData,
 		resetLocaleData,
 		subscribe,
 		__,

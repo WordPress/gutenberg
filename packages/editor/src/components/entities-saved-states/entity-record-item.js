@@ -6,6 +6,13 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 export default function EntityRecordItem( {
 	record,
@@ -16,7 +23,7 @@ export default function EntityRecordItem( {
 	const { name, kind, title, key } = record;
 	const parentBlockId = useSelect( ( select ) => {
 		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
+		const { blocks = [] } = select( coreStore ).getEditedEntityRecord(
 			kind,
 			name,
 			key
@@ -29,19 +36,19 @@ export default function EntityRecordItem( {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
-	// Handle templates that might use default descriptive titles
+	// Handle templates that might use default descriptive titles.
 	const entityRecordTitle = useSelect(
 		( select ) => {
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return title;
 			}
 
-			const template = select( 'core' ).getEditedEntityRecord(
+			const template = select( coreStore ).getEditedEntityRecord(
 				kind,
 				name,
 				key
 			);
-			return select( 'core/editor' ).__experimentalGetTemplateInfo(
+			return select( editorStore ).__experimentalGetTemplateInfo(
 				template
 			).title;
 		},
@@ -50,18 +57,18 @@ export default function EntityRecordItem( {
 
 	const isSelected = useSelect(
 		( select ) => {
-			const selectedBlockId = select(
-				blockEditorStore
-			).getSelectedBlockClientId();
+			const selectedBlockId =
+				select( blockEditorStore ).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
 		[ parentBlockId ]
 	);
 	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
+	const selectParentBlock = useCallback(
+		() => selectBlock( parentBlockId ),
+		[ parentBlockId ]
+	);
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
 		closePanel();
@@ -71,7 +78,10 @@ export default function EntityRecordItem( {
 		<PanelRow>
 			<CheckboxControl
 				label={
-					<strong>{ entityRecordTitle || __( 'Untitled' ) }</strong>
+					<strong>
+						{ decodeEntities( entityRecordTitle ) ||
+							__( 'Untitled' ) }
+					</strong>
 				}
 				checked={ checked }
 				onChange={ onChange }

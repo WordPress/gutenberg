@@ -14,19 +14,28 @@ import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
+	const hasReducedUI = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+		[]
+	);
 	const {
 		getBlockListSettings,
 		getBlockRootClientId,
 		getBlockIndex,
 		isBlockInsertionPointVisible,
 		isMultiSelecting,
+		getSelectedBlockClientIds,
+		getTemplateLock,
 	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
+			if ( hasReducedUI ) {
+				return;
+			}
+
 			function onMouseMove( event ) {
 				if ( openRef.current ) {
 					return;
@@ -57,6 +66,11 @@ export function useInBetweenInserter() {
 						? event.target
 						: event.target.closest( '[data-block]' );
 					rootClientId = blockElement.getAttribute( 'data-block' );
+				}
+
+				// Don't set the insertion point if the template is locked.
+				if ( getTemplateLock( rootClientId ) ) {
+					return;
 				}
 
 				const orientation =
@@ -92,9 +106,24 @@ export function useInBetweenInserter() {
 					}
 				}
 
+				// Don't show the insertion point if a parent block has an "overlay"
+				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
+				const parentOverlay = element.parentElement?.closest(
+					'.block-editor-block-content-overlay'
+				);
+				if ( parentOverlay ) {
+					return;
+				}
+
 				const clientId = element.id.slice( 'block-'.length );
 
 				if ( ! clientId ) {
+					return;
+				}
+
+				// Don't show the inserter when hovering above (conflicts with
+				// block toolbar) or inside selected block(s).
+				if ( getSelectedBlockClientIds().includes( clientId ) ) {
 					return;
 				}
 
@@ -114,7 +143,7 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const index = getBlockIndex( clientId, rootClientId );
+				const index = getBlockIndex( clientId );
 
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).
@@ -145,6 +174,7 @@ export function useInBetweenInserter() {
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,
+			getSelectedBlockClientIds,
 		]
 	);
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,14 +15,17 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.wordpress.android.util.AppLog;;
+import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.FileUtils;
 
 import java.util.ArrayList;
@@ -38,11 +42,17 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String INJECT_LOCAL_STORAGE_SCRIPT_TEMPLATE = "localStorage.setItem('WP_DATA_USER_%d','%s')";
     private static final String INJECT_CSS_SCRIPT_TEMPLATE = "window.injectCss('%s')";
     private static final String INJECT_GET_HTML_POST_CONTENT_SCRIPT = "window.getHTMLPostContent();";
+    private static final String INJECT_ON_SHOW_CONTEXT_MENU_SCRIPT = "window.onShowContextMenu();";
+    private static final String INJECT_ON_HIDE_CONTEXT_MENU_SCRIPT = "window.onHideContextMenu();";
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
-    protected View mForegroundView;
+    protected LinearLayout mForegroundView;
+    protected ImageView mForegroundViewImage;
+    protected TextView mForegroundViewTitle;
+    protected TextView mForegroundViewSubtitle;
     protected boolean mIsRedirected;
+    protected ActionMode mActionMode = null;
 
     private ProgressBar mProgressBar;
     private boolean mIsGutenbergReady;
@@ -61,10 +71,41 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                         // Insert block content
                         insertBlockScript();
                     }, 200);
+                } else {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        if (!mIsGutenbergReady) {
+                            showTroubleshootingInstructions();
+                        }
+                    }, 10000);
                 }
             }
         }
     };
+
+    private void showTroubleshootingInstructions() {
+        mForegroundViewTitle.setText(R.string.block_editor_failed_title);
+        mForegroundViewSubtitle.setText(R.string.block_editor_failed_subtitle);
+        mForegroundViewImage.setVisibility(ImageView.VISIBLE);
+    }
+
+    @Override
+    public void onActionModeStarted(ActionMode mode) {
+        if (mActionMode == null) {
+            mActionMode = mode;
+        }
+        mWebView.evaluateJavascript(INJECT_ON_SHOW_CONTEXT_MENU_SCRIPT,
+                value -> AppLog.e(AppLog.T.EDITOR, value));
+        super.onActionModeStarted(mode);
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        mActionMode = null;
+        mWebView.evaluateJavascript(INJECT_ON_HIDE_CONTEXT_MENU_SCRIPT,
+                value -> AppLog.e(AppLog.T.EDITOR, value));
+        super.onActionModeFinished(mode);
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +116,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.gutenberg_web_view);
         mForegroundView = findViewById(R.id.foreground_view);
+        mForegroundViewImage = findViewById(R.id.foreground_view_image);
+        mForegroundViewTitle = findViewById(R.id.foreground_view_title);
+        mForegroundViewSubtitle = findViewById(R.id.foreground_view_subtitle);
         mProgressBar = findViewById(R.id.progress_bar);
 
         // Set settings
@@ -245,6 +289,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
+
+                String behaviorOverrides = getFileContentFromAssets("gutenberg-web-single-block/editor-behavior-overrides.js");
+                evaluateJavaScript(behaviorOverrides);
             }
         });
     }
@@ -271,7 +318,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             }
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
-            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
+            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(LinearLayout.INVISIBLE), 1500);
         }, 2000);
     }
 
@@ -286,8 +333,16 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
                 injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
                 evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
+
+                String injectExternalCssScript = getOnGutenbergReadyExternalStyles();
+                injectExternalCssScript = removeWhiteSpace(removeNewLines(injectExternalCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectExternalCssScript));
             }
         });
+    }
+
+    protected String getOnGutenbergReadyExternalStyles() {
+        return new String();
     }
 
     private void injectOnGutenbergReadyExternalSources() {
@@ -377,6 +432,15 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         @JavascriptInterface
         public void gutenbergReady() {
             GutenbergWebViewActivity.this.runOnUiThread(() -> onGutenbergReady());
+        }
+
+        @JavascriptInterface
+        public void hideTextSelectionContextMenu() {
+            if (mActionMode != null) {
+                GutenbergWebViewActivity.this.runOnUiThread(() -> {
+                    GutenbergWebViewActivity.this.mActionMode.finish();
+                });
+            }
         }
     }
 }

@@ -1,5 +1,9 @@
 # DimensionControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
 
 ## Usage
@@ -9,7 +13,12 @@ In a block's `edit` implementation, render a `<DimensionControl />` component.
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { DimensionControl } from '@wordpress/block-editor';
+import { DimensionControl } from '@wordpress/components';
+
+const partialRight =
+	( fn, ...partialArgs ) =>
+	( ...args ) =>
+		fn( ...args, ...partialArgs );
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...

@@ -7,23 +7,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useCallback,
-	useRef,
-	useMemo,
-	createContext,
-	useContext,
-} from '@wordpress/element';
-import { Popover } from '@wordpress/components';
-import { isRTL } from '@wordpress/i18n';
+import { useRef, createContext, useContext } from '@wordpress/element';
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { usePopoverScroll } from './use-popover-scroll';
+import BlockPopoverInbetween from '../block-popover/inbetween';
 
 export const InsertionPointOpenRef = createContext();
 
@@ -31,12 +24,11 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
 		orientation,
-		isHidden,
 		previousClientId,
 		nextClientId,
 		rootClientId,
@@ -45,136 +37,42 @@ function InsertionPointPopover( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
-			hasMultiSelection,
-			getSettings,
 			getBlockInsertionPoint,
+			isBlockBeingDragged,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
-		const targetClientId = order[ insertionPoint.index - 1 ];
-		const targetRootClientId = insertionPoint.rootClientId;
-		const blockOrder = getBlockOrder( targetRootClientId );
-		if ( ! blockOrder.length ) {
+
+		if ( ! order.length ) {
 			return {};
 		}
-		const previous = targetClientId
-			? targetClientId
-			: blockOrder[ blockOrder.length - 1 ];
-		const isLast = previous === blockOrder[ blockOrder.length - 1 ];
-		const next = isLast
-			? null
-			: blockOrder[ blockOrder.indexOf( previous ) + 1 ];
-		const { hasReducedUI } = getSettings();
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const blockOrientation =
-			getBlockListSettings( targetRootClientId )?.orientation ||
-			'vertical';
+
+		let _previousClientId = order[ insertionPoint.index - 1 ];
+		let _nextClientId = order[ insertionPoint.index ];
+
+		while ( isBlockBeingDragged( _previousClientId ) ) {
+			_previousClientId = getPreviousBlockClientId( _previousClientId );
+		}
+
+		while ( isBlockBeingDragged( _nextClientId ) ) {
+			_nextClientId = getNextBlockClientId( _nextClientId );
+		}
 
 		return {
-			previousClientId: previous,
-			nextClientId: next,
-			isHidden:
-				hasReducedUI ||
-				( hasMultiSelection()
-					? next && multiSelectedBlockClientIds.includes( next )
-					: next &&
-					  blockOrientation === 'vertical' &&
-					  next === selectedBlockClientId ),
-			orientation: blockOrientation,
-			clientId: targetClientId,
-			rootClientId: targetRootClientId,
+			previousClientId: _previousClientId,
+			nextClientId: _nextClientId,
+			orientation:
+				getBlockListSettings( insertionPoint.rootClientId )
+					?.orientation || 'vertical',
+			rootClientId: insertionPoint.rootClientId,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
-	const previousElement = useBlockElement( previousClientId );
-	const nextElement = useBlockElement( nextClientId );
-	const style = useMemo( () => {
-		if ( ! previousElement ) {
-			return {};
-		}
-		const previousRect = previousElement.getBoundingClientRect();
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
+	const isVertical = orientation === 'vertical';
 
-		if ( orientation === 'vertical' ) {
-			return {
-				width: previousElement.offsetWidth,
-				height: nextRect ? nextRect.top - previousRect.bottom : 0,
-			};
-		}
-
-		let width = 0;
-		if ( nextElement ) {
-			width = isRTL()
-				? previousRect.left - nextRect.right
-				: nextRect.left - previousRect.right;
-		}
-
-		return {
-			width,
-			height: previousElement.offsetHeight,
-		};
-	}, [ previousElement, nextElement ] );
-
-	const getAnchorRect = useCallback( () => {
-		const { ownerDocument } = previousElement;
-		const previousRect = previousElement.getBoundingClientRect();
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
-		if ( orientation === 'vertical' ) {
-			if ( isRTL() ) {
-				return {
-					top: previousRect.bottom,
-					left: previousRect.right,
-					right: previousRect.left,
-					bottom: nextRect ? nextRect.top : previousRect.bottom,
-					ownerDocument,
-				};
-			}
-
-			return {
-				top: previousRect.bottom,
-				left: previousRect.left,
-				right: previousRect.right,
-				bottom: nextRect ? nextRect.top : previousRect.bottom,
-				ownerDocument,
-			};
-		}
-
-		if ( isRTL() ) {
-			return {
-				top: previousRect.top,
-				left: nextRect ? nextRect.right : previousRect.left,
-				right: previousRect.left,
-				bottom: previousRect.bottom,
-				ownerDocument,
-			};
-		}
-
-		return {
-			top: previousRect.top,
-			left: previousRect.right,
-			right: nextRect ? nextRect.left : previousRect.right,
-			bottom: previousRect.bottom,
-			ownerDocument,
-		};
-	}, [ previousElement, nextElement ] );
-
-	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
-
-	if ( ! previousElement ) {
-		return null;
-	}
-
-	const className = classnames(
-		'block-editor-block-list__insertion-point',
-		'is-' + orientation
-	);
+	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
 		if ( event.target === ref.current && nextClientId ) {
@@ -190,52 +88,122 @@ function InsertionPointPopover( {
 		}
 	}
 
-	// Only show the inserter when there's a `nextElement` (a block after the
-	// insertion point). At the end of the block list the trailing appender
-	// should serve the purpose of inserting blocks.
-	const showInsertionPointInserter =
-		! isHidden && nextElement && isInserterShown;
+	function maybeHideInserterPoint( event ) {
+		// Only hide the inserter if it's triggered on the wrapper,
+		// and the inserter is not open.
+		if ( event.target === ref.current && ! openRef.current ) {
+			hideInsertionPoint();
+		}
+	}
 
-	// Show the indicator if the insertion point inserter is visible, or if
-	// the `showInsertionPoint` state is `true`. The latter is generally true
-	// when hovering blocks for insertion in the block library.
-	const showInsertionPointIndicator =
-		showInsertionPointInserter || ! isHidden;
+	// Define animation variants for the line element.
+	const horizontalLine = {
+		start: {
+			width: 0,
+			top: '50%',
+			bottom: '50%',
+			x: 0,
+		},
+		rest: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+		hover: {
+			width: 4,
+			top: 0,
+			bottom: 0,
+			x: -2,
+		},
+	};
+	const verticalLine = {
+		start: {
+			height: 0,
+			left: '50%',
+			right: '50%',
+			y: 0,
+		},
+		rest: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+		hover: {
+			height: 4,
+			left: 0,
+			right: 0,
+			y: -2,
+		},
+	};
+	const lineVariants = {
+		// Initial position starts from the center and invisible.
+		start: {
+			...( ! isVertical ? horizontalLine.start : verticalLine.start ),
+			opacity: 0,
+		},
+		// The line expands to fill the container. If the inserter is visible it
+		// is delayed so it appears orchestrated.
+		rest: {
+			...( ! isVertical ? horizontalLine.rest : verticalLine.rest ),
+			opacity: 1,
+			borderRadius: '2px',
+			transition: { delay: isInserterShown ? 0.4 : 0 },
+		},
+		hover: {
+			...( ! isVertical ? horizontalLine.hover : verticalLine.hover ),
+			opacity: 1,
+			borderRadius: '2px',
+			transition: { delay: 0.4 },
+		},
+	};
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-	// While ideally it would be enough to capture the
-	// bubbling focus event from the Inserter, due to the
-	// characteristics of click focusing of `button`s in
-	// Firefox and Safari, it is not reliable.
-	//
-	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+	const inserterVariants = {
+		start: {
+			scale: disableMotion ? 1 : 0,
+		},
+		rest: {
+			scale: 1,
+			transition: { delay: 0.2 },
+		},
+	};
+
+	const className = classnames(
+		'block-editor-block-list__insertion-point',
+		'is-' + orientation
+	);
+
 	return (
-		<Popover
-			ref={ popoverScrollRef }
-			noArrow
-			animate={ false }
-			getAnchorRect={ getAnchorRect }
-			focusOnMount={ false }
-			className="block-editor-block-list__insertion-point-popover"
-			// Render in the old slot if needed for backward compatibility,
-			// otherwise render in place (not in the the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+		<BlockPopoverInbetween
+			previousClientId={ previousClientId }
+			nextClientId={ nextClientId }
+			__unstablePopoverSlot={ __unstablePopoverSlot }
+			__unstableContentRef={ __unstableContentRef }
 		>
-			<div
+			<motion.div
+				layout={ ! disableMotion }
+				initial={ disableMotion ? 'rest' : 'start' }
+				animate="rest"
+				whileHover="hover"
+				whileTap="pressed"
+				exit="start"
 				ref={ ref }
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
 				className={ classnames( className, {
-					'is-with-inserter': showInsertionPointInserter,
+					'is-with-inserter': isInserterShown,
 				} ) }
-				style={ style }
+				onHoverEnd={ maybeHideInserterPoint }
 			>
-				{ showInsertionPointIndicator && (
-					<div className="block-editor-block-list__insertion-point-indicator" />
-				) }
-				{ showInsertionPointInserter && (
-					<div
+				<motion.div
+					variants={ lineVariants }
+					className="block-editor-block-list__insertion-point-indicator"
+				/>
+				{ isInserterShown && (
+					<motion.div
+						variants={ inserterVariants }
 						className={ classnames(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
@@ -252,35 +220,21 @@ function InsertionPointPopover( {
 								openRef.current = false;
 							} }
 						/>
-					</div>
+					</motion.div>
 				) }
-			</div>
-		</Popover>
+			</motion.div>
+		</BlockPopoverInbetween>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
-export default function InsertionPoint( {
-	children,
-	__unstablePopoverSlot,
-	__unstableContentRef,
-} ) {
+export default function InsertionPoint( { children, ...props } ) {
 	const isVisible = useSelect( ( select ) => {
-		const { isMultiSelecting, isBlockInsertionPointVisible } = select(
-			blockEditorStore
-		);
-
-		return isBlockInsertionPointVisible() && ! isMultiSelecting();
+		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
 	return (
 		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && (
-				<InsertionPointPopover
-					__unstablePopoverSlot={ __unstablePopoverSlot }
-					__unstableContentRef={ __unstableContentRef }
-				/>
-			) }
+			{ isVisible && <InsertionPointPopover { ...props } /> }
 			{ children }
 		</InsertionPointOpenRef.Provider>
 	);

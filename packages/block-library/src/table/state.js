@@ -47,7 +47,7 @@ export function getFirstRow( state ) {
 /**
  * Gets an attribute for a cell.
  *
- * @param {Object} state 		 Current table state.
+ * @param {Object} state         Current table state.
  * @param {Object} cellLocation  The location of the cell
  * @param {string} attributeName The name of the attribute to get the value of.
  *
@@ -79,10 +79,8 @@ export function updateSelectedCell( state, selection, updateCell ) {
 	}
 
 	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
-	const {
-		sectionName: selectionSectionName,
-		rowIndex: selectionRowIndex,
-	} = selection;
+	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } =
+		selection;
 
 	return mapValues( tableSections, ( section, sectionName ) => {
 		if ( selectionSectionName && selectionSectionName !== sectionName ) {

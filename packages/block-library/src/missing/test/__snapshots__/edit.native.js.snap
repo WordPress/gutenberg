@@ -5,6 +5,11 @@ exports[`Missing block renders without crashing 1`] = `
   accessibilityHint="Tap here to show help"
   accessibilityLabel="Help button"
   accessibilityRole="button"
+  accessibilityState={
+    Object {
+      "disabled": true,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}
@@ -21,7 +26,6 @@ exports[`Missing block renders without crashing 1`] = `
     accessibilityRole="button"
     accessible={true}
     focusable={true}
-    isTVSelectable={true}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -29,7 +33,6 @@ exports[`Missing block renders without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
-    style={null}
   >
     Svg
   </View>

@@ -26,6 +26,15 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
 
+const INITIAL_INSERTER_RESULTS = 9;
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation and rerendering the component.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
@@ -39,6 +48,7 @@ function InserterSearchResults( {
 	showBlockDirectory = false,
 	isDraggable = true,
 	shouldFocusBlock = true,
+	prioritizePatterns,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -61,7 +71,25 @@ function InserterSearchResults( {
 		destinationRootClientId
 	);
 
+	const filteredBlockPatterns = useMemo( () => {
+		if ( maxBlockPatterns === 0 ) {
+			return [];
+		}
+		const results = searchItems( patterns, filterValue );
+		return maxBlockPatterns !== undefined
+			? results.slice( 0, maxBlockPatterns )
+			: results;
+	}, [ filterValue, patterns, maxBlockPatterns ] );
+
+	let maxBlockTypesToShow = maxBlockTypes;
+	if ( prioritizePatterns && filteredBlockPatterns.length > 2 ) {
+		maxBlockTypesToShow = 0;
+	}
+
 	const filteredBlockTypes = useMemo( () => {
+		if ( maxBlockTypesToShow === 0 ) {
+			return [];
+		}
 		const results = searchBlockItems(
 			orderBy( blockTypes, [ 'frecency' ], [ 'desc' ] ),
 			blockTypeCategories,
@@ -69,8 +97,8 @@ function InserterSearchResults( {
 			filterValue
 		);
 
-		return maxBlockTypes !== undefined
-			? results.slice( 0, maxBlockTypes )
+		return maxBlockTypesToShow !== undefined
+			? results.slice( 0, maxBlockTypesToShow )
 			: results;
 	}, [
 		filterValue,
@@ -80,14 +108,7 @@ function InserterSearchResults( {
 		maxBlockTypes,
 	] );
 
-	const filteredBlockPatterns = useMemo( () => {
-		const results = searchItems( patterns, filterValue );
-		return maxBlockPatterns !== undefined
-			? results.slice( 0, maxBlockPatterns )
-			: results;
-	}, [ filterValue, patterns, maxBlockPatterns ] );
-
-	// Announce search results on change
+	// Announce search results on change.
 	useEffect( () => {
 		if ( ! filterValue ) {
 			return;
@@ -101,54 +122,61 @@ function InserterSearchResults( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns );
+	const currentShownBlockTypes = useAsyncList( filteredBlockTypes, {
+		step: INITIAL_INSERTER_RESULTS,
+	} );
+	const currentShownPatterns = useAsyncList(
+		currentShownBlockTypes.length === filteredBlockTypes.length
+			? filteredBlockPatterns
+			: EMPTY_ARRAY
+	);
 
 	const hasItems =
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
+
+	const blocksUI = !! filteredBlockTypes.length && (
+		<InserterPanel
+			title={ <VisuallyHidden>{ __( 'Blocks' ) }</VisuallyHidden> }
+		>
+			<BlockTypesList
+				items={ currentShownBlockTypes }
+				onSelect={ onSelectBlockType }
+				onHover={ onHover }
+				label={ __( 'Blocks' ) }
+				isDraggable={ isDraggable }
+			/>
+		</InserterPanel>
+	);
+
+	const patternsUI = !! filteredBlockPatterns.length && (
+		<InserterPanel
+			title={
+				<VisuallyHidden>{ __( 'Block Patterns' ) }</VisuallyHidden>
+			}
+		>
+			<div className="block-editor-inserter__quick-inserter-patterns">
+				<BlockPatternsList
+					shownPatterns={ currentShownPatterns }
+					blockPatterns={ filteredBlockPatterns }
+					onClickPattern={ onSelectBlockPattern }
+					isDraggable={ isDraggable }
+				/>
+			</div>
+		</InserterPanel>
+	);
 
 	return (
 		<InserterListbox>
 			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
-			{ !! filteredBlockTypes.length && (
-				<InserterPanel
-					title={
-						<VisuallyHidden>{ __( 'Blocks' ) }</VisuallyHidden>
-					}
-				>
-					<BlockTypesList
-						items={ filteredBlockTypes }
-						onSelect={ onSelectBlockType }
-						onHover={ onHover }
-						label={ __( 'Blocks' ) }
-						isDraggable={ isDraggable }
-					/>
-				</InserterPanel>
-			) }
+			{ prioritizePatterns ? patternsUI : blocksUI }
 
 			{ !! filteredBlockTypes.length &&
 				!! filteredBlockPatterns.length && (
 					<div className="block-editor-inserter__quick-inserter-separator" />
 				) }
 
-			{ !! filteredBlockPatterns.length && (
-				<InserterPanel
-					title={
-						<VisuallyHidden>
-							{ __( 'Block Patterns' ) }
-						</VisuallyHidden>
-					}
-				>
-					<div className="block-editor-inserter__quick-inserter-patterns">
-						<BlockPatternsList
-							shownPatterns={ currentShownPatterns }
-							blockPatterns={ filteredBlockPatterns }
-							onClickPattern={ onSelectBlockPattern }
-							isDraggable={ isDraggable }
-						/>
-					</div>
-				</InserterPanel>
-			) }
+			{ prioritizePatterns ? blocksUI : patternsUI }
 
 			{ showBlockDirectory && (
 				<__unstableInserterMenuExtension.Slot

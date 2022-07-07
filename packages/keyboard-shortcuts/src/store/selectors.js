@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -116,6 +115,16 @@ export function getShortcutAliases( state, name ) {
 		: EMPTY_ARRAY;
 }
 
+export const getAllShortcutKeyCombinations = createSelector(
+	( state, name ) => {
+		return [
+			getShortcutKeyCombination( state, name ),
+			...getShortcutAliases( state, name ),
+		].filter( Boolean );
+	},
+	( state, name ) => [ state[ name ] ]
+);
+
 /**
  * Returns the raw representation of all the keyboard combinations of a given shortcut name.
  *
@@ -126,15 +135,10 @@ export function getShortcutAliases( state, name ) {
  */
 export const getAllShortcutRawKeyCombinations = createSelector(
 	( state, name ) => {
-		return compact( [
-			getKeyCombinationRepresentation(
-				getShortcutKeyCombination( state, name ),
-				'raw'
-			),
-			...getShortcutAliases( state, name ).map( ( combination ) =>
+		return getAllShortcutKeyCombinations( state, name ).map(
+			( combination ) =>
 				getKeyCombinationRepresentation( combination, 'raw' )
-			),
-		] );
+		);
 	},
 	( state, name ) => [ state[ name ] ]
 );

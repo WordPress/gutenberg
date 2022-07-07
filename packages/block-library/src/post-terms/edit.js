@@ -2,18 +2,21 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
 	AlignmentToolbar,
+	InspectorControls,
 	BlockControls,
-	Warning,
 	useBlockProps,
+	useBlockDisplayInformation,
+	RichText,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,61 +24,53 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import useTermLinks from './use-term-links';
+import usePostTerms from './use-post-terms';
+
+// Allowed formats for the prefix and suffix fields.
+const ALLOWED_FORMATS = [
+	'core/bold',
+	'core/image',
+	'core/italic',
+	'core/link',
+	'core/strikethrough',
+	'core/text-color',
+];
 
 export default function PostTermsEdit( {
 	attributes,
+	clientId,
 	context,
 	setAttributes,
+	insertBlocksAfter,
 } ) {
-	const { term, textAlign } = attributes;
+	const { term, textAlign, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				per_page: -1,
-			} );
-			return (
-				find(
-					taxonomies,
-					( taxonomy ) =>
-						taxonomy.slug === term && taxonomy.visibility.show_ui
-				) || {}
-			);
+			const { getTaxonomy } = select( coreStore );
+			const taxonomy = getTaxonomy( term );
+			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
 		},
 		[ term ]
 	);
-
-	const { termLinks, isLoadingTermLinks } = useTermLinks( {
+	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
 		postType,
 		term: selectedTerm,
 	} );
-
 	const hasPost = postId && postType;
-	const hasTermLinks = termLinks && termLinks.length > 0;
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `taxonomy-${ term }` ]: term,
 		} ),
 	} );
 
-	if ( ! hasPost ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>{ __( 'Post Terms block: post not found.' ) }</Warning>
-			</div>
-		);
-	}
-
-	if ( ! term ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Terms block: no term specified.' ) }
-			</div>
-		);
+	if ( ! hasPost || ! term ) {
+		return <div { ...blockProps }>{ blockInformation.title }</div>;
 	}
 
 	return (
@@ -88,22 +83,77 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					autoComplete="off"
+					label={ __( 'Separator' ) }
+					value={ separator || '' }
+					onChange={ ( nextValue ) => {
+						setAttributes( { separator: nextValue } );
+					} }
+					help={ __( 'Enter character(s) used to separate terms.' ) }
+				/>
+			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoadingTermLinks && <Spinner /> }
-
-				{ hasTermLinks &&
-					! isLoadingTermLinks &&
-					termLinks.reduce( ( prev, curr ) => [
-						prev,
-						' | ',
-						curr,
-					] ) }
-
-				{ ! isLoadingTermLinks &&
-					! hasTermLinks &&
-					// eslint-disable-next-line camelcase
+				{ isLoading && <Spinner /> }
+				{ ! isLoading && hasPostTerms && (
+					<RichText
+						allowedFormats={ ALLOWED_FORMATS }
+						className="wp-block-post-terms__prefix"
+						multiline={ false }
+						aria-label={ __( 'Prefix' ) }
+						placeholder={ __( 'Prefix' ) + ' ' }
+						value={ prefix }
+						onChange={ ( value ) =>
+							setAttributes( { prefix: value } )
+						}
+						tagName="span"
+					/>
+				) }
+				{ ! isLoading &&
+					hasPostTerms &&
+					postTerms
+						.map( ( postTerm ) => (
+							<a
+								key={ postTerm.id }
+								href={ postTerm.link }
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ unescape( postTerm.name ) }
+							</a>
+						) )
+						.reduce( ( prev, curr ) => (
+							<>
+								{ prev }
+								<span className="wp-block-post-terms__separator">
+									{ separator || ' ' }
+								</span>
+								{ curr }
+							</>
+						) ) }
+				{ ! isLoading &&
+					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
+				{ ! isLoading && hasPostTerms && (
+					<RichText
+						allowedFormats={ ALLOWED_FORMATS }
+						className="wp-block-post-terms__suffix"
+						multiline={ false }
+						aria-label={ __( 'Suffix' ) }
+						placeholder={ ' ' + __( 'Suffix' ) }
+						value={ suffix }
+						onChange={ ( value ) =>
+							setAttributes( { suffix: value } )
+						}
+						tagName="span"
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 			</div>
 		</>
 	);

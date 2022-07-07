@@ -70,11 +70,11 @@ function switchButtonPropIfRTL(
 	isStackedHorizontally
 ) {
 	if ( I18nManager.isRTL && isStackedHorizontally ) {
-		// for RTL and horizontal direction switch prop between forward and backward button
+		// For RTL and horizontal direction switch prop between forward and backward button.
 		if ( isBackwardButton ) {
-			return forwardButtonProp; // set forwardButtonProp for backward button
+			return forwardButtonProp; // Set forwardButtonProp for backward button.
 		}
-		return backwardButtonProp; // set backwardButtonProp for forward button
+		return backwardButtonProp; // Set backwardButtonProp for forward button.
 	}
 
 	return isBackwardButton ? backwardButtonProp : forwardButtonProp;
@@ -128,10 +128,10 @@ function getMoverActionTitle( isStackedHorizontally ) {
 
 function getMoverButtonTitle( isStackedHorizontally, { firstIndex } ) {
 	const getIndexes = ( isBackwardButton ) => {
-		const fromIndex = firstIndex + 1; // current position based on index
+		const fromIndex = firstIndex + 1; // Current position based on index
 		// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
 		const direction = isBackwardButton ? -1 : 1;
-		const toIndex = fromIndex + direction; // position after move
+		const toIndex = fromIndex + direction; // Position after move.
 		return [ fromIndex, toIndex ];
 	};
 

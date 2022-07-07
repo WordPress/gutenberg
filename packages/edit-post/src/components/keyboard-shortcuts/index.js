@@ -8,6 +8,8 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,12 +17,12 @@ import { __ } from '@wordpress/i18n';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( 'core/block-editor' );
-	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
+		useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } = select(
-			'core/editor'
-		).getEditorSettings();
+		const { richEditingEnabled, codeEditingEnabled } =
+			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
 
@@ -29,6 +31,7 @@ function KeyboardShortcuts() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
+		setIsListViewOpened,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
@@ -54,7 +57,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/toggle-block-navigation',
+			name: 'core/edit-post/toggle-list-view',
 			category: 'global',
 			description: __( 'Open the block list view.' ),
 			keyCombination: {
@@ -124,38 +127,31 @@ function KeyboardShortcuts() {
 			);
 		},
 		{
-			bindGlobal: true,
 			isDisabled: isModeToggleDisabled,
 		}
 	);
 
-	useShortcut(
-		'core/edit-post/toggle-fullscreen',
-		() => {
-			toggleFeature( 'fullscreenMode' );
-		},
-		{
-			bindGlobal: true,
+	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
+		toggleFeature( 'fullscreenMode' );
+	} );
+
+	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+
+		if ( isEditorSidebarOpened() ) {
+			closeGeneralSidebar();
+		} else {
+			const sidebarToOpen = getBlockSelectionStart()
+				? 'edit-post/block'
+				: 'edit-post/document';
+			openGeneralSidebar( sidebarToOpen );
 		}
-	);
+	} );
 
-	useShortcut(
-		'core/edit-post/toggle-sidebar',
-		( event ) => {
-			// This shortcut has no known clashes, but use preventDefault to prevent any
-			// obscure shortcuts from triggering.
-			event.preventDefault();
-
-			if ( isEditorSidebarOpened() ) {
-				closeGeneralSidebar();
-			} else {
-				const sidebarToOpen = getBlockSelectionStart()
-					? 'edit-post/block'
-					: 'edit-post/document';
-				openGeneralSidebar( sidebarToOpen );
-			}
-		},
-		{ bindGlobal: true }
+	useShortcut( 'core/edit-post/toggle-list-view', () =>
+		setIsListViewOpened( ! isListViewOpened() )
 	);
 
 	return null;

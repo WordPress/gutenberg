@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { fireEvent, render } from '@testing-library/react';
-import { each } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,7 @@ import { NavigableMenu } from '../menu';
 
 function simulateVisible( container, selector ) {
 	const elements = container.querySelectorAll( selector );
-	each( elements, ( elem ) => {
+	elements.forEach( ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
 		];
@@ -75,7 +74,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -129,7 +128,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -185,7 +184,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -239,7 +238,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown(
 				getByRole( 'menu' ),
@@ -284,7 +283,7 @@ describe( 'NavigableMenu', () => {
 
 		container.querySelector( '#btn1' ).focus();
 
-		// Navigate options
+		// Navigate options.
 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
 			const interaction = fireKeyDown( getByRole( 'menu' ), keyCode );
 			expect( currentIndex ).toBe( expectedActiveIndex );

@@ -1,14 +1,15 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
-import { useHover } from 'react-use-gesture';
+import { useHover } from '@use-gesture/react';
 
 /**
  * Internal dependencies
  */
 import BaseTooltip from '../tooltip';
 import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
+
+const noop = () => {};
 
 export default function BoxUnitControl( {
 	isFirst,

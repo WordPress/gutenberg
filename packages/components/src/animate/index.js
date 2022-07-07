@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * @typedef {'left' | 'right'} SlideInOrigin
  * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
  * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
- * @typedef {{ type: 'loading'; }} LoadingOptions
+ * @typedef {{ type: 'loading' }} LoadingOptions
  * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
  */
 

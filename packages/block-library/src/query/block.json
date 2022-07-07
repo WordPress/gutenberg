@@ -1,9 +1,10 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/query",
-	"title": "Query",
-	"category": "design",
-	"description": "Displays a list of posts as a result of a query.",
+	"title": "Query Loop",
+	"category": "theme",
+	"description": "An advanced block that allows displaying post types based on different query parameters and visual configurations.",
 	"textdomain": "default",
 	"attributes": {
 		"queryId": {
@@ -16,22 +17,22 @@
 				"pages": 0,
 				"offset": 0,
 				"postType": "post",
-				"categoryIds": [],
-				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
 				"author": "",
 				"search": "",
 				"exclude": [],
 				"sticky": "",
-				"inherit": true
+				"inherit": true,
+				"taxQuery": null,
+				"parents": []
 			}
 		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
 		},
-		"layout": {
+		"displayLayout": {
 			"type": "object",
 			"default": {
 				"type": "list"
@@ -41,11 +42,20 @@
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",
-		"layout": "layout"
+		"displayLayout": "displayLayout"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-query-editor"
 }

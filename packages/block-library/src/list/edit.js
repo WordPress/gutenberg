@@ -41,49 +41,41 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	isSelected,
+	style,
 } ) {
 	const { ordered, values, type, reversed, start, placeholder } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
-			{ isSelected && (
-				<>
-					<RichTextShortcut
-						type="primary"
-						character="["
-						onUse={ () => {
-							onChange( outdentListItems( value ) );
-						} }
-					/>
-					<RichTextShortcut
-						type="primary"
-						character="]"
-						onUse={ () => {
-							onChange(
-								indentListItems( value, { type: tagName } )
-							);
-						} }
-					/>
-					<RichTextShortcut
-						type="primary"
-						character="m"
-						onUse={ () => {
-							onChange(
-								indentListItems( value, { type: tagName } )
-							);
-						} }
-					/>
-					<RichTextShortcut
-						type="primaryShift"
-						character="m"
-						onUse={ () => {
-							onChange( outdentListItems( value ) );
-						} }
-					/>
-				</>
-			) }
+			<RichTextShortcut
+				type="primary"
+				character="["
+				onUse={ () => {
+					onChange( outdentListItems( value ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primary"
+				character="]"
+				onUse={ () => {
+					onChange( indentListItems( value, { type: tagName } ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primary"
+				character="m"
+				onUse={ () => {
+					onChange( indentListItems( value, { type: tagName } ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primaryShift"
+				character="m"
+				onUse={ () => {
+					onChange( outdentListItems( value ) );
+				} }
+			/>
 			<BlockControls group="block">
 				<ToolbarButton
 					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
@@ -141,14 +133,15 @@ export default function ListEdit( {
 		</>
 	);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		style,
+	} );
 
 	return (
 		<>
 			<RichText
 				identifier="values"
 				multiline="li"
-				__unstableMultilineRootTag={ tagName }
 				tagName={ tagName }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )

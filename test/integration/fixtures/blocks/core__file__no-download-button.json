@@ -1,0 +1,16 @@
+[
+	{
+		"name": "core/file",
+		"isValid": true,
+		"attributes": {
+			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"fileId": "wp-block-file--media-_clientId_0",
+			"fileName": "lkjfijwef",
+			"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"showDownloadButton": false,
+			"downloadButtonText": "",
+			"previewHeight": 600
+		},
+		"innerBlocks": []
+	}
+]

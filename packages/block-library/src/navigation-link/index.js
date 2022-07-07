@@ -13,6 +13,7 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -84,9 +85,10 @@ export const settings = {
 			},
 		},
 	],
+	transforms,
 };
 
-// importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+// importing this file includes side effects. This is added in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
 	'core/navigation-link',

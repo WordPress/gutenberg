@@ -64,23 +64,26 @@ The `value` property is handled in a manner similar to controlled form component
 
 ```jsx
 import { FormTokenField } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyFormTokenField = withState( {
-	tokens: [],
-	suggestions: [
-		'Africa',
-		'America',
-		'Antarctica',
-		'Asia',
-		'Europe',
-		'Oceania',
-	],
-} )( ( { tokens, suggestions, setState } ) => (
-	<FormTokenField
-		value={ tokens }
-		suggestions={ suggestions }
-		onChange={ ( tokens ) => setState( { tokens } ) }
-	/>
-) );
+const continents = [
+	'Africa',
+	'America',
+	'Antarctica',
+	'Asia',
+	'Europe',
+	'Oceania',
+];
+
+const MyFormTokenField = () => {
+	const [ selectedContinents, setSelectedContinents ] = useState( [] );
+
+	return(
+		<FormTokenField
+			value={ selectedContinents }
+			suggestions={ continents }
+			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+		/>
+	);
+};
 ```

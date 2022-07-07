@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, keys, isEqual } from 'lodash';
+import { omit, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -39,7 +39,7 @@ export function getPostRawValue( value ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	return isEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -84,7 +84,6 @@ export function shouldOverwriteState( action, previousAction ) {
 export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.id;
 	}
 
@@ -94,7 +93,6 @@ export function postId( state = null, action ) {
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
 			return action.post.type;
 	}
 
@@ -115,32 +113,6 @@ export function template( state = { isValid: true }, action ) {
 			return {
 				...state,
 				isValid: action.isValid,
-			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'ENABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: true,
-			};
-
-		case 'DISABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: false,
 			};
 	}
 
@@ -174,7 +146,7 @@ export function saving( state = {}, action ) {
  *
  * @typedef {Object} PostLockState
  *
- * @property {boolean} isLocked       Whether the post is locked.
+ * @property {boolean}  isLocked       Whether the post is locked.
  * @property {?boolean} isTakeover     Whether the post editing has been taken over.
  * @property {?boolean} activePostLock Active post lock value.
  * @property {?Object}  user           User that took over the post.
@@ -184,7 +156,7 @@ export function saving( state = {}, action ) {
  * Reducer returning the post lock status.
  *
  * @param {PostLockState} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -245,7 +217,7 @@ export function postAutosavingLock( state = {}, action ) {
  * the post object is loaded properly and the initial blocks parsed.
  *
  * @param {boolean} state
- * @param {Object} action
+ * @param {Object}  action
  *
  * @return {boolean} Updated state.
  */
@@ -284,7 +256,6 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 export default combineReducers( {
 	postId,
 	postType,
-	preferences,
 	saving,
 	postLock,
 	template,

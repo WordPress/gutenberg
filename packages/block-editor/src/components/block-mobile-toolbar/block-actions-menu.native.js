@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, compact } from 'lodash';
+import { partial, first, castArray, last, compact, every } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -15,6 +15,7 @@ import {
 import {
 	getBlockType,
 	getDefaultBlockName,
+	hasBlockSupport,
 	serialize,
 	rawHandler,
 	createBlock,
@@ -38,11 +39,13 @@ import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from '../block-switcher/block-transformations-menu';
 
 const BlockActionsMenu = ( {
-	// Select
+	// Select.
 	blockTitle,
 	canInsertBlockType,
 	getBlocksByClientId,
 	isEmptyDefaultBlock,
+	isLocked,
+	canDuplicate,
 	isFirst,
 	isLast,
 	isReusableBlockType,
@@ -50,7 +53,7 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
-	// Dispatch
+	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
 	duplicateBlock,
@@ -59,7 +62,7 @@ const BlockActionsMenu = ( {
 	openGeneralSidebar,
 	pasteBlock,
 	removeBlocks,
-	// Passed in
+	// Passed in.
 	anchorNodeRef,
 	isStackedHorizontally,
 	onDelete,
@@ -203,15 +206,27 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
-		selectedBlockPossibleTransformations.length &&
+		! isLocked &&
+			selectedBlockPossibleTransformations.length &&
 			allOptions.transformButton,
-		allOptions.copyButton,
-		allOptions.cutButton,
-		isPasteEnabled && allOptions.pasteButton,
-		allOptions.duplicateButton,
+		canDuplicate && allOptions.copyButton,
+		canDuplicate && allOptions.cutButton,
+		canDuplicate && isPasteEnabled && allOptions.pasteButton,
+		canDuplicate && allOptions.duplicateButton,
 		isReusableBlockType && allOptions.convertToRegularBlocks,
-		allOptions.delete,
+		! isLocked && allOptions.delete,
 	] );
+
+	// End early if there are no options to show.
+	if ( ! options.length ) {
+		return (
+			<ToolbarButton
+				title={ __( 'Open Block Actions Menu' ) }
+				icon={ moreHorizontalMobile }
+				disabled={ true }
+			/>
+		);
+	}
 
 	function onPasteBlock() {
 		if ( ! clipboard ) {
@@ -290,6 +305,7 @@ export default compose(
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
 			canInsertBlockType,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
@@ -300,17 +316,25 @@ export default compose(
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
-		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex(
-			last( normalizedClientIds ),
-			rootClientId
-		);
+		const firstIndex = getBlockIndex( firstClientId );
+		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
+
+		const innerBlocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( innerBlocks, ( innerBlock ) => {
+			return (
+				!! innerBlock &&
+				hasBlockSupport( innerBlock.name, 'multiple', true ) &&
+				canInsertBlockType( innerBlock.name, rootClientId )
+			);
+		} );
 
 		const isDefaultBlock = blockName === getDefaultBlockName();
 		const isEmptyContent = block?.attributes.content === '';
 		const isExactlyOneBlock = blockOrder.length === 1;
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
+		const isLocked = !! getTemplateLock( rootClientId );
 
 		const selectedBlockClientId = first( getSelectedBlockClientIds() );
 		const selectedBlock = selectedBlockClientId
@@ -335,6 +359,8 @@ export default compose(
 			currentIndex: firstIndex,
 			getBlocksByClientId,
 			isEmptyDefaultBlock,
+			isLocked,
+			canDuplicate,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			isReusableBlockType,
@@ -360,14 +386,12 @@ export default compose(
 				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-			const { getBlockSelectionEnd, getBlock } = select(
-				blockEditorStore
-			);
+			const { getBlockSelectionEnd, getBlock } =
+				select( blockEditorStore );
 			const { createSuccessNotice } = dispatch( noticesStore );
 
-			const {
-				__experimentalConvertBlockToStatic: convertBlockToStatic,
-			} = dispatch( reusableBlocksStore );
+			const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+				dispatch( reusableBlocksStore );
 
 			return {
 				createSuccessNotice,

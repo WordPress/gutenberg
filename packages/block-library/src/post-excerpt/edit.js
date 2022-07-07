@@ -16,58 +16,69 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function usePostContentExcerpt( wordCount, postId, postType ) {
-	// Don't destrcuture items from content here, it can be undefined.
-	const [ , , content ] = useEntityProp(
-		'postType',
-		postType,
-		'content',
-		postId
-	);
-	const rawPostContent = content?.raw;
-	return useMemo( () => {
-		if ( ! rawPostContent ) {
-			return '';
-		}
-		const excerptElement = document.createElement( 'div' );
-		excerptElement.innerHTML = rawPostContent;
-		const excerpt =
-			excerptElement.textContent || excerptElement.innerText || '';
-		return excerpt.trim().split( ' ', wordCount ).join( ' ' );
-	}, [ rawPostContent, wordCount ] );
-}
+/**
+ * Internal dependencies
+ */
+import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
+	attributes: { textAlign, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 } ) {
-	const [ excerpt, setExcerpt ] = useEntityProp(
-		'postType',
-		postType,
-		'excerpt',
-		postId
-	);
-	const postContentExcerpt = usePostContentExcerpt(
-		wordCount,
-		postId,
-		postType
-	);
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+	const [
+		rawExcerpt,
+		setExcerpt,
+		{ rendered: renderedExcerpt, protected: isProtected } = {},
+	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
+	/**
+	 * When excerpt is editable, strip the html tags from
+	 * rendered excerpt. This will be used if the entity's
+	 * excerpt has been produced from the content.
+	 */
+	const strippedRenderedExcerpt = useMemo( () => {
+		if ( ! renderedExcerpt ) return '';
+		const document = new window.DOMParser().parseFromString(
+			renderedExcerpt,
+			'text/html'
+		);
+		return document.body.textContent || document.body.innerText || '';
+	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
+				<p>
+					{ __(
+						'This is the Post Excerpt block, it will display the excerpt from single posts.'
+					) }
+				</p>
+				<p>
+					{ __(
+						'If there are any Custom Post Types with support for excerpts, the Post Excerpt block can display the excerpts of those entries as well.'
+					) }
+				</p>
+			</div>
+		);
+	}
+	if ( isProtected && ! userCanEdit ) {
+		return (
+			<div { ...blockProps }>
 				<Warning>
-					{ __( 'Post excerpt block: no post found.' ) }
+					{ __(
+						'There is no excerpt because this is a protected post.'
+					) }
 				</Warning>
 			</div>
 		);
@@ -82,7 +93,28 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
+			withoutInteractiveFormatting={ true }
 		/>
+	);
+	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+		'is-inline': ! showMoreOnNewLine,
+	} );
+	const excerptContent = isEditable ? (
+		<RichText
+			className={ excerptClassName }
+			aria-label={ __( 'Post excerpt text' ) }
+			value={
+				rawExcerpt ||
+				strippedRenderedExcerpt ||
+				( isSelected ? '' : __( 'No post excerpt found' ) )
+			}
+			onChange={ setExcerpt }
+			tagName="p"
+		/>
+	) : (
+		<p className={ excerptClassName }>
+			{ strippedRenderedExcerpt || __( 'No post excerpt found' ) }
+		</p>
 	);
 	return (
 		<>
@@ -95,18 +127,7 @@ export default function PostExcerptEditor( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					{ ! excerpt && (
-						<RangeControl
-							label={ __( 'Max words' ) }
-							value={ wordCount }
-							onChange={ ( newExcerptLength ) =>
-								setAttributes( { wordCount: newExcerptLength } )
-							}
-							min={ 10 }
-							max={ 100 }
-						/>
-					) }
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }
@@ -119,19 +140,7 @@ export default function PostExcerptEditor( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<RichText
-					className={
-						! showMoreOnNewLine &&
-						'wp-block-post-excerpt__excerpt is-inline'
-					}
-					aria-label={ __( 'Post excerpt text' ) }
-					value={
-						excerpt ||
-						postContentExcerpt ||
-						( isSelected ? '' : __( 'No post excerpt found' ) )
-					}
-					onChange={ setExcerpt }
-				/>
+				{ excerptContent }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">

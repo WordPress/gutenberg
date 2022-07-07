@@ -20,33 +20,69 @@ const catchException = ( command ) => {
  * Internal dependencies
  */
 const {
-	publishNpmLatestDistTag,
-	publishNpmNextDistTag,
+	publishNpmGutenbergPlugin,
+	publishNpmBugfixLatest,
+	publishNpmBugfixWordPressCore,
+	publishNpmNext,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
 
+const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
+const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
+const repositoryPathOption = [
+	'--repository-path <repository-path>',
+	'Relative path to the git repository.',
+];
+
 program
 	.command( 'publish-npm-packages-latest' )
 	.alias( 'npm-latest' )
+	.option( ...semverOption )
+	.option( ...ciOption )
+	.option( ...repositoryPathOption )
 	.description(
-		'Publishes packages to npm (latest dist-tag, production version)'
+		'Publishes to npm packages synced from the Gutenberg plugin (latest dist-tag, production version)'
 	)
-	.action( catchException( publishNpmLatestDistTag ) );
+	.action( catchException( publishNpmGutenbergPlugin ) );
+
+program
+	.command( 'publish-npm-packages-bugfix-latest' )
+	.alias( 'npm-bugfix' )
+	.option( ...ciOption )
+	.option( ...repositoryPathOption )
+	.description(
+		'Publishes to npm bugfixes for packages (latest dist-tag, production version)'
+	)
+	.action( catchException( publishNpmBugfixLatest ) );
+
+program
+	.command( 'publish-npm-packages-wordpress-core' )
+	.alias( 'npm-wp' )
+	.requiredOption( '--wp-version <wpVersion>', 'WordPress version' )
+	.option( ...ciOption )
+	.option( ...repositoryPathOption )
+	.description(
+		'Publishes to npm bugfixes targeting WordPress core (wp-X.Y dist-tag, production version)'
+	)
+	.action( catchException( publishNpmBugfixWordPressCore ) );
 
 program
 	.command( 'publish-npm-packages-next' )
 	.alias( 'npm-next' )
+	.option( ...semverOption )
+	.option( ...ciOption )
+	.option( ...repositoryPathOption )
 	.description(
-		'Publishes packages to npm (next dist-tag, prerelease version)'
+		'Publishes to npm development version of packages (next dist-tag, prerelease version)'
 	)
-	.action( catchException( publishNpmNextDistTag ) );
+	.action( catchException( publishNpmNext ) );
 
 program
 	.command( 'release-plugin-changelog' )
 	.alias( 'changelog' )
 	.option( '-m, --milestone <milestone>', 'Milestone' )
-	.option( '-t, --token <token>', 'Github token' )
+	.option( '-t, --token <token>', 'GitHub token' )
 	.option(
 		'-u, --unreleased',
 		"Only include PRs that haven't been included in a release yet"
@@ -57,10 +93,14 @@ program
 program
 	.command( 'performance-tests [branches...]' )
 	.alias( 'perf' )
-	.option( '-c, --ci', 'Run in CI (non interactive)' )
+	.option( ...ciOption )
 	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
+	)
+	.option(
+		'--wp-version <version>',
+		'Specify a WordPress version on which to test all branches'
 	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'

@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import { sumBy, merge, mapValues } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
+import { merge, mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -50,8 +44,10 @@ export function getTotalColumnsWidth(
 	blocks,
 	totalBlockCount = blocks.length
 ) {
-	return sumBy( blocks, ( block ) =>
-		getEffectiveColumnWidth( block, totalBlockCount )
+	return blocks.reduce(
+		( sum, block ) =>
+			sum + getEffectiveColumnWidth( block, totalBlockCount ),
+		0
 	);
 }
 
@@ -128,7 +124,7 @@ export function getMappedColumnWidths( blocks, widths ) {
 	return blocks.map( ( block ) =>
 		merge( {}, block, {
 			attributes: {
-				width: widths[ block.clientId ],
+				width: `${ widths[ block.clientId ] }%`,
 			},
 		} )
 	);
@@ -137,8 +133,8 @@ export function getMappedColumnWidths( blocks, widths ) {
 /**
  * Returns an array with columns widths values, parsed or no depends on `withParsing` flag.
  *
- * @param {WPBlock[]} blocks			Block objects.
- * @param {?boolean} withParsing 	Whether value has to be parsed.
+ * @param {WPBlock[]} blocks      Block objects.
+ * @param {?boolean}  withParsing Whether value has to be parsed.
  *
  * @return {Array<number,string>} Column widths.
  */
@@ -154,8 +150,8 @@ export function getWidths( blocks, withParsing = true ) {
 /**
  * Returns a column width with unit.
  *
- * @param {string} width	Column width.
- * @param {string} unit 	Column width unit.
+ * @param {string} width Column width.
+ * @param {string} unit  Column width unit.
  *
  * @return {string} Column width with unit.
  */
@@ -168,36 +164,6 @@ export function getWidthWithUnit( width, unit ) {
 
 	return `${ width }${ unit }`;
 }
-
-const isWeb = Platform.OS === 'web';
-
-export const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
 
 /**
  * Returns a boolean whether passed unit is percentage

@@ -6,6 +6,11 @@ import { CheckboxControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function PostPingbacks( { pingStatus = 'open', ...props } ) {
 	const onTogglePingback = () =>
 		props.editPost( {
@@ -24,12 +29,11 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			pingStatus: select( 'core/editor' ).getEditedPostAttribute(
-				'ping_status'
-			),
+			pingStatus:
+				select( editorStore ).getEditedPostAttribute( 'ping_status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
+		editPost: dispatch( editorStore ).editPost,
 	} ) ),
 ] )( PostPingbacks );

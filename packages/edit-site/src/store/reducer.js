@@ -6,30 +6,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS } from './defaults';
 import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state Current state.
- * @param {Object}  action Dispatched action.
- * @return {Object} Updated state.
- */
-export const preferences = combineReducers( {
-	features( state = PREFERENCES_DEFAULTS.features, action ) {
-		switch ( action.type ) {
-			case 'TOGGLE_FEATURE': {
-				return {
-					...state,
-					[ action.feature ]: ! state[ action.feature ],
-				};
-			}
-			default:
-				return state;
-		}
-	},
-} );
 
 /**
  * Reducer returning the editing canvas device type.
@@ -72,7 +49,7 @@ export function settings( state = {}, action ) {
  * Reducer keeping track of the currently edited Post Type,
  * Post Id and the context provided to fill the content of the block editor.
  *
- * @param {Object} state  Current state.
+ * @param {Object} state  Current edited post.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
@@ -99,7 +76,7 @@ export function editedPost( state = {}, action ) {
 /**
  * Reducer for information about the site's homepage.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
@@ -120,7 +97,7 @@ export function homeTemplateId( state, action ) {
  * Note: this reducer interacts with the inserter and list view panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function navigationPanel(
@@ -189,7 +166,7 @@ export function blockInserterPanel( state = false, action ) {
  * Note: this reducer interacts with the navigation and inserter panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function listViewPanel( state = false, action ) {
@@ -207,7 +184,6 @@ export function listViewPanel( state = false, action ) {
 }
 
 export default combineReducers( {
-	preferences,
 	deviceType,
 	settings,
 	editedPost,

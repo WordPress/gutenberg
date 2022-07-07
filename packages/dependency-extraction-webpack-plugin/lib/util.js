@@ -1,5 +1,9 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const BUNDLED_PACKAGES = [
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/style-engine',
+];
 
 /**
  * Default request to global transformation
@@ -34,6 +38,10 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
+	if ( request.includes( 'react-refresh/runtime' ) ) {
+		return 'ReactRefreshRuntime';
+	}
+
 	if ( BUNDLED_PACKAGES.includes( request ) ) {
 		return undefined;
 	}
@@ -64,6 +72,10 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+	}
+
+	if ( request.includes( 'react-refresh/runtime' ) ) {
+		return 'wp-react-refresh-runtime';
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {

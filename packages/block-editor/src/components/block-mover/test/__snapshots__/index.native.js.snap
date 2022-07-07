@@ -1,51 +1,126 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Block Mover Picker should match snapshot 1`] = `
-<Fragment>
-  <ForwardRef(ToolbarButton)
-    extraProps={
-      Object {
-        "hint": "Double tap to move the block up",
+Array [
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the left"
+      accessibilityLabel="Move block left from position 2 to position 1"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": false,
+        }
       }
-    }
-    icon={
-      <SVG
-        viewBox="-2 -2 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <Path
-          d="M11 18H9V6l-4 4-2-1 7-7 7 7-2 1-4-4v12z"
-        />
-      </SVG>
-    }
-    onLongPress={[Function]}
-    title="Move block up from row NaN to row NaN"
-  />
-  <ForwardRef(ToolbarButton)
-    extraProps={
-      Object {
-        "hint": "Double tap to move the block down",
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
       }
-    }
-    icon={
-      <SVG
-        viewBox="-2 -2 24 24"
-        xmlns="http://www.w3.org/2000/svg"
+    >
+      <View
+        collapsable={false}
+        handlerTag={3}
+        handlerType="LongPressGestureHandler"
+        onGestureHandlerEvent={[Function]}
+        onGestureHandlerStateChange={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
       >
-        <Path
-          d="M9 2h2v12l4-4 2 1-7 7-7-7 2-1 4 4V2z"
-        />
-      </SVG>
-    }
-    onLongPress={[Function]}
-    title="Move block down from row NaN to row NaN"
-  />
-  <Picker
-    hideCancelButton={true}
-    leftAlign={true}
-    onChange={[Function]}
-    options={Array []}
-    title="Change block position"
-  />
-</Fragment>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the right"
+      accessibilityLabel="Move block right"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
+      }
+    >
+      <View
+        collapsable={false}
+        handlerTag={4}
+        handlerType="LongPressGestureHandler"
+        onGestureHandlerEvent={[Function]}
+        onGestureHandlerStateChange={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 0.3,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+]
 `;

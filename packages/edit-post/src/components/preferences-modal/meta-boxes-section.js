@@ -8,11 +8,12 @@ import { filter, map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { PreferencesModalSection } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 import { store as editPostStore } from '../../store';
 
@@ -32,7 +33,7 @@ export function MetaBoxesSection( {
 	}
 
 	return (
-		<Section { ...sectionProps }>
+		<PreferencesModalSection { ...sectionProps }>
 			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
 			) }
@@ -43,12 +44,12 @@ export function MetaBoxesSection( {
 					panelName={ `meta-box-${ id }` }
 				/>
 			) ) }
-		</Section>
+		</PreferencesModalSection>
 	);
 }
 
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/editor' );
+	const { getEditorSettings } = select( editorStore );
 	const { getAllMetaBoxes } = select( editPostStore );
 
 	return {

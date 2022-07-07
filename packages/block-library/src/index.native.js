@@ -10,7 +10,6 @@ import { sortBy } from 'lodash';
 import {
 	hasBlockSupport,
 	registerBlockType,
-	registerBlockTypeFromMetadata,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -65,6 +64,8 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
 import { transformationCategory } from './transformationCategories';
+
+const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -123,15 +124,27 @@ export const coreBlocks = [
  * @param {Object} block The block to be registered.
  *
  */
-const registerBlock = ( block ) => {
+export const registerBlock = ( block ) => {
 	if ( ! block ) {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata(
+	const { supports } = metadata;
+
+	registerBlockType(
 		{
 			name,
 			...metadata,
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT.
+			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
+			supports?.color?.gradients
+				? {
+						supports: {
+							...supports,
+							color: { ...supports.color, gradients: false },
+						},
+				  }
+				: {} ),
 		},
 		settings
 	);
@@ -158,13 +171,21 @@ const registerBlockVariations = ( block ) => {
 	} );
 };
 
-// only enable code block for development
+// Only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
 // eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
+
+// To be removed once Quote V2 is released on the web editor.
+function quoteCheck( quoteBlock, blocksFlags ) {
+	if ( blocksFlags?.__experimentalEnableQuoteBlockV2 ) {
+		quoteBlock.settings = quoteBlock?.settingsV2;
+	}
+	return quoteBlock;
+}
 
 // Hide the Classic block and SocialLink block
 addFilter(
@@ -217,8 +238,10 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
+ * @param {Object} [blocksFlags] Experimental flags
+ *
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -231,7 +254,7 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		separator,
 		list,
-		quote,
+		quoteCheck( quote, blocksFlags ),
 		mediaText,
 		preformatted,
 		gallery,
@@ -251,9 +274,9 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		file,
 		audio,
-		devOnly( reusableBlock ),
+		reusableBlock,
 		search,
-		devOnly( embed ),
+		embed,
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );
@@ -263,4 +286,19 @@ export const registerCoreBlocks = () => {
 	if ( group ) {
 		setGroupingBlockName( group.name );
 	}
+};
+
+/**
+ * Dictates which block types are considered "new." For each of the block types
+ * below, if the native host app does not already have an impression count set,
+ * an initial count will be set. When a block type's impression count is greater
+ * than 0, a "new" badge is displayed on the block type within the block
+ * inserter.
+ *
+ * @constant {{ string, number }}
+ */
+export const NEW_BLOCK_TYPES = {
+	[ embed.name ]: 40,
+	[ search.name ]: 40,
+	[ audio.name ]: 40,
 };

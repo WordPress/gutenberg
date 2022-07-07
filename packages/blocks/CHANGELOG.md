@@ -2,6 +2,64 @@
 
 ## Unreleased
 
+### New API
+
+-   The shortcode transformer now accepts a `transform` method to allow advanced controls over the transformed result. For instance, it's now possible to define custom `innerBlocks` for the transformed block. ([#42001](https://github.com/WordPress/gutenberg/pull/42001))
+
+## 11.11.0 (2022-06-29)
+
+## 11.10.0 (2022-06-15)
+
+## 11.9.0 (2022-06-01)
+
+## 11.8.0 (2022-05-18)
+
+## 11.7.0 (2022-05-04)
+
+## 11.6.0 (2022-04-21)
+
+## 11.5.0 (2022-04-08)
+
+## 11.4.0 (2022-03-23)
+
+## 11.3.0 (2022-03-11)
+
+## 11.2.0 (2022-01-27)
+
+## 11.1.0 (2021-09-09)
+
+### Backward Compatibility
+
+-   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
+
+### New API
+
+-   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
+
+## 11.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 10.0.0 (2021-07-21)
+
+### Breaking Changes
+
+-   The deprecated `registerBlockTypeFromMetadata` function was removed. Please use `registerBlockType` that covers the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
+## 9.1.0 (2021-05-20)
+
+### New API
+
+-   `registerBlockType` method can be used to register a block type using the metadata loaded from `block.json` file ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
+### Deprecations
+
+-   `registerBlockTypeFromMetadata` was deprecated in favor of `registerBlockType` that support now the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
+## 9.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

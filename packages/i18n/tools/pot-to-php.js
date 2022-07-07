@@ -36,8 +36,8 @@ function escapeSingleQuotes( input ) {
  * Converts a translation parsed from the POT file to lines of WP PHP.
  *
  * @param {Object} translation The translation to convert.
- * @param {string} textdomain The text domain to use in the WordPress translation function call.
- * @param {string} context The context for the translation.
+ * @param {string} textdomain  The text domain to use in the WordPress translation function call.
+ * @param {string} context     The context for the translation.
  * @return {string} Lines of PHP that match the translation.
  */
 function convertTranslationToPHP( translation, textdomain, context = '' ) {

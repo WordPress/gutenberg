@@ -19,6 +19,7 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import useIsFloatingKeyboard from '../utils/use-is-floating-keyboard';
 import styles from './styles.scss';
 
 const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
@@ -37,10 +38,11 @@ export const KeyboardAvoidingView = ( {
 	const [ isKeyboardOpen, setIsKeyboardOpen ] = useState( false );
 	const [ safeAreaBottomInset, setSafeAreaBottomInset ] = useState( 0 );
 	const { height = 0 } = sizes || {};
+	const floatingKeyboard = useIsFloatingKeyboard();
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
-	const { height: fullHeight } = Dimensions.get( 'window' );
+	const { height: fullHeight } = Dimensions.get( 'screen' );
 	const keyboardVerticalOffset = fullHeight - parentHeight;
 
 	useEffect( () => {
@@ -49,20 +51,23 @@ export const KeyboardAvoidingView = ( {
 				setSafeAreaBottomInset( safeAreaInsets.bottom );
 			}
 		);
-		SafeArea.addEventListener(
+		const safeAreaSubscription = SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			onSafeAreaInsetsUpdate
 		);
-		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
-		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
+		const keyboardShowSubscription = Keyboard.addListener(
+			'keyboardWillShow',
+			onKeyboardWillShow
+		);
+		const keyboardHideSubscription = Keyboard.addListener(
+			'keyboardWillHide',
+			onKeyboardWillHide
+		);
 
 		return () => {
-			SafeArea.removeEventListener(
-				'safeAreaInsetsForRootViewDidChange',
-				onSafeAreaInsetsUpdate
-			);
-			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
-			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
+			safeAreaSubscription.remove();
+			keyboardShowSubscription.remove();
+			keyboardHideSubscription.remove();
 		};
 	}, [] );
 
@@ -101,6 +106,7 @@ export const KeyboardAvoidingView = ( {
 	return (
 		<AnimatedKeyboardAvoidingView
 			{ ...otherProps }
+			enabled={ ! floatingKeyboard }
 			behavior="padding"
 			keyboardVerticalOffset={ keyboardVerticalOffset }
 			style={

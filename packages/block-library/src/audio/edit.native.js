@@ -26,11 +26,12 @@ import {
 	MediaUploadProgress,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -65,29 +66,31 @@ function AudioEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const onError = () => {
-		createErrorNotice( __( 'Failed to insert audio file.' ) );
-	};
-
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			setAttributes( { [ attribute ]: newValue } );
 		};
 	}
 
-	function onSelectURL() {
-		// TODO: Set up add audio from URL flow
+	function onSelectURL( newSrc ) {
+		if ( newSrc !== src ) {
+			if ( isURL( newSrc ) ) {
+				setAttributes( { src: newSrc, id: undefined } );
+			} else {
+				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
+			}
+		}
 	}
 
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( { src: undefined, id: undefined } );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
 		setAttributes( { src: media.url, id: media.id } );
 	}
 
@@ -136,9 +139,7 @@ function AudioEdit( {
 		return (
 			<MediaUploadProgress
 				mediaId={ id }
-				onUpdateMediaProgress={ this.updateMediaProgress }
 				onFinishMediaUploadWithSuccess={ onFileChange }
-				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
 				containerStyle={ styles.progressContainer }
 				progressBarStyle={ styles.progressBar }
@@ -150,7 +151,9 @@ function AudioEdit( {
 				} ) => {
 					return (
 						<>
-							{ ! isCaptionSelected && getBlockControls( open ) }
+							{ ! isCaptionSelected &&
+								! isUploadInProgress &&
+								getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer
 								isUploadInProgress={ isUploadInProgress }
@@ -174,11 +177,14 @@ function AudioEdit( {
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ __(
+								'Autoplay may cause usability issues for some users.'
+							) }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -186,7 +192,10 @@ function AudioEdit( {
 							checked={ loop }
 						/>
 						<SelectControl
-							label={ __( 'Preload' ) }
+							label={ _x(
+								'Preload',
+								'noun; Audio block parameter'
+							) }
 							value={ preload || '' }
 							// `undefined` is required for the preload attribute to be unset.
 							onChange={ ( value ) =>
@@ -198,7 +207,10 @@ function AudioEdit( {
 								{ value: '', label: __( 'Browser default' ) },
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
+								{
+									value: 'none',
+									label: _x( 'None', '"Preload" value' ),
+								},
 							] }
 							hideCancelButton={ true }
 						/>
@@ -208,6 +220,7 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					isReplacingMedia={ true }
 					onSelect={ onSelectAudio }
+					onSelectURL={ onSelectURL }
 					render={ ( { open, getMediaOptions } ) => {
 						return getBlockUI( open, getMediaOptions );
 					} }

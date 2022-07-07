@@ -8,14 +8,14 @@ import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
  *
  * @param {number}  selectedCount Number of blocks selected.
  * @param {string}  type          Block type - in the case of a single block, should
- *                                 define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
+ *                                define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
  * @param {number}  firstIndex    The index (position - 1) of the first block selected.
  * @param {boolean} isFirst       This is the first block.
  * @param {boolean} isLast        This is the last block.
  * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                 down, < 0 is up).
+ *                                down, < 0 is up).
  * @param {string}  orientation   The orientation of the block movers, vertical or
- * 								   horizontal.
+ *                                horizontal.
  *
  * @return {string} Label for the block movement controls.
  */
@@ -64,7 +64,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir > 0 && ! isLast ) {
-		// moving down
+		// Moving down.
 		const movementDirection = getMovementDirection( 'down' );
 
 		if ( movementDirection === 'down' ) {
@@ -105,7 +105,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir > 0 && isLast ) {
-		// moving down, and is the last item
+		// Moving down, and is the last item.
 		const movementDirection = getMovementDirection( 'down' );
 
 		if ( movementDirection === 'down' ) {
@@ -140,7 +140,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir < 0 && ! isFirst ) {
-		// moving up
+		// Moving up.
 		const movementDirection = getMovementDirection( 'up' );
 
 		if ( movementDirection === 'up' ) {
@@ -179,7 +179,7 @@ export function getBlockMoverDescription(
 	}
 
 	if ( dir < 0 && isFirst ) {
-		// moving up, and is the first item
+		// Moving up, and is the first item.
 		const movementDirection = getMovementDirection( 'up' );
 
 		if ( movementDirection === 'up' ) {
@@ -222,7 +222,7 @@ export function getBlockMoverDescription(
  * @param {boolean} isFirst       This is the first block.
  * @param {boolean} isLast        This is the last block.
  * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                 down, < 0 is up).
+ *                                down, < 0 is up).
  *
  * @return {string} Label for the block movement controls.
  */

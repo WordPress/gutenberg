@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-const { camelCase, nth, upperFirst } = require( 'lodash' );
+const { camelCase, upperFirst } = require( 'lodash' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
@@ -14,9 +15,13 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/view/README.md',
 	],
 } );
-const packagePaths = glob( 'packages/*/package.json' ).map(
-	( fileName ) => fileName.split( '/' )[ 1 ]
-);
+const packagePaths = glob( 'packages/*/package.json' )
+	.filter(
+		// Ignore private packages.
+		( fileName ) =>
+			! require( join( __dirname, '..', '..', fileName ) ).private
+	)
+	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
 /**
  * Generates the package manifest.
@@ -46,7 +51,8 @@ function getPackageManifest( packageFolderNames ) {
  */
 function getComponentManifest( paths ) {
 	return paths.map( ( filePath ) => {
-		const slug = nth( filePath.split( '/' ), -2 );
+		const pathFragments = filePath.split( '/' );
+		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
 			title: upperFirst( camelCase( slug ) ),
 			slug,
@@ -65,10 +71,14 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
+		const fileNameFragments = fileName.split( '/' );
 
-		let slug = nth( fileName.split( '/' ), -1 ).replace( '.md', '' );
+		let slug = fileNameFragments[ fileNameFragments.length - 1 ].replace(
+			'.md',
+			''
+		);
 		if ( 'readme' === slug.toLowerCase() ) {
-			slug = nth( fileName.split( '/' ), -2 );
+			slug = fileNameFragments[ fileNameFragments.length - 2 ];
 
 			// Special case - the root 'docs' readme needs the 'handbook' slug.
 			if ( parent === null && 'docs' === slug ) {

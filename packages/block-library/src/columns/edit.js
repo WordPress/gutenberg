@@ -2,17 +2,22 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, times } from 'lodash';
+import { get, times } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+import {
+	Notice,
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+} from '@wordpress/components';
 
 import {
 	InspectorControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
@@ -49,11 +54,12 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -66,6 +72,7 @@ function ColumnsEditContainer( {
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -101,6 +108,15 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<ToggleControl
+						label={ __( 'Stack on mobile' ) }
+						checked={ isStackedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
@@ -125,7 +141,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
 
-			// Update all child Column Blocks to match
+			// Update all child Column Blocks to match.
 			const innerBlockClientIds = getBlockOrder( clientId );
 			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
 				updateBlockAttributes( innerBlockClientId, {
@@ -147,9 +163,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitPercentColumnWidths(
-				innerBlocks
-			);
+			const hasExplicitWidths =
+				hasExplicitPercentColumnWidths( innerBlocks );
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -170,7 +185,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 						} );
 					} ),
 				];
@@ -183,9 +198,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 				];
 			} else {
 				// The removed column will be the last of the inner blocks.
-				innerBlocks = dropRight(
-					innerBlocks,
-					previousColumns - newColumns
+				innerBlocks = innerBlocks.slice(
+					0,
+					-( previousColumns - newColumns )
 				);
 
 				if ( hasExplicitWidths ) {

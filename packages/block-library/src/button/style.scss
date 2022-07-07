@@ -4,17 +4,12 @@ $blocks-block__margin: 0.5em;
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
-	color: $white;
-	background-color: #32373c;
-	border-radius: 9999px; // 100% causes an oval, but any explicit but really high value retains the pill shape.
 	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
-	font-size: 1.125em;
-	padding: calc(0.667em + 2px) calc(1.333em + 2px); // The extra 2px are added to size solids the same as the outline versions.
 	text-align: center;
 	text-decoration: none;
-	overflow-wrap: break-word;
+	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
 
 	&:hover,
@@ -34,7 +29,17 @@ $blocks-block__margin: 0.5em;
 	}
 }
 
-// Increased specificity needed to override margins
+// These rules are set to zero specificity to keep the default styles for buttons.
+// They are needed for backwards compatibility.
+:where(.wp-block-button__link) {
+	// 100% causes an oval, but any explicit but really high value retains the pill shape.
+	border-radius: 9999px;
+
+	// The extra 2px are added to size solids the same as the outline versions.
+	padding: calc(0.667em + 2px) calc(1.333em + 2px);
+}
+
+// Increased specificity needed to override margins.
 .wp-block-buttons > .wp-block-button {
 	&.has-custom-width {
 		max-width: none;
@@ -50,24 +55,35 @@ $blocks-block__margin: 0.5em;
 	}
 
 	&.wp-block-button__width-25 {
-		width: calc(25% - #{ $blocks-block__margin });
+		width: calc(25% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.75));
 	}
 
 	&.wp-block-button__width-50 {
-		width: calc(50% - #{ $blocks-block__margin });
+		width: calc(50% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5));
 	}
 
 	&.wp-block-button__width-75 {
-		width: calc(75% - #{ $blocks-block__margin });
+		width: calc(75% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.25));
 	}
 
 	&.wp-block-button__width-100 {
-		width: calc(100% - #{ $blocks-block__margin });
+		width: 100%;
+		flex-basis: 100%;
+	}
+}
 
-		&:only-child {
-			margin-right: 0;
-			width: 100%;
-		}
+// For vertical buttons, gap is not factored into width calculations.
+.wp-block-buttons.is-vertical > .wp-block-button {
+	&.wp-block-button__width-25 {
+		width: 25%;
+	}
+
+	&.wp-block-button__width-50 {
+		width: 50%;
+	}
+
+	&.wp-block-button__width-75 {
+		width: 75%;
 	}
 }
 
@@ -84,8 +100,8 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0 !important;
 }
 
-.is-style-outline > .wp-block-button__link,
-.wp-block-button__link.is-style-outline {
+.is-style-outline > :where(.wp-block-button__link),
+:where(.wp-block-button__link).is-style-outline {
 	border: 2px solid currentColor;
 	padding: 0.667em 1.333em;
 }

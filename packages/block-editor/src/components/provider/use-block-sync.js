@@ -1,19 +1,21 @@
 /**
  * External dependencies
  */
-import { last, noop } from 'lodash';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -46,25 +48,25 @@ import { store as blockEditorStore } from '../../store';
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object} props Props for the block sync hook
- * @param {string} props.clientId The client ID of the inner block controller.
- *                                If none is passed, then it is assumed to be a
- *                                root controller rather than an inner block
- *                                controller.
- * @param {Object[]} props.value  The control value for the blocks. This value
- *                                is used to initalize the block-editor store
- *                                and for resetting the blocks to incoming
- *                                changes like undo.
- * @param {Object} props.selection The selection state responsible to restore the selection on undo/redo.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
- *                                change has been made in the block-editor blocks
- *                                for the given clientId. For example, after
- *                                this function is called, an entity is marked
- *                                dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput Function to call when a non-persistent
- *                                change has been made in the block-editor blocks
- *                                for the given clientId. When this is called,
- *                                controlling sources do not become dirty.
+ * @param {Object}        props           Props for the block sync hook
+ * @param {string}        props.clientId  The client ID of the inner block controller.
+ *                                        If none is passed, then it is assumed to be a
+ *                                        root controller rather than an inner block
+ *                                        controller.
+ * @param {Object[]}      props.value     The control value for the blocks. This value
+ *                                        is used to initalize the block-editor store
+ *                                        and for resetting the blocks to incoming
+ *                                        changes like undo.
+ * @param {Object}        props.selection The selection state responsible to restore the selection on undo/redo.
+ * @param {onBlockUpdate} props.onChange  Function to call when a persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. For example, after
+ *                                        this function is called, an entity is marked
+ *                                        dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput   Function to call when a non-persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. When this is called,
+ *                                        controlling sources do not become dirty.
  */
 export default function useBlockSync( {
 	clientId = null,
@@ -83,6 +85,15 @@ export default function useBlockSync( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const isControlled = useSelect(
+		( select ) => {
+			return (
+				! clientId ||
+				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -97,15 +108,21 @@ export default function useBlockSync( {
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
-			setHasControlledInnerBlocks( clientId, true );
-			__unstableMarkNextChangeAsNotPersistent();
-			const storeBlocks = controlledBlocks.map( ( block ) =>
-				cloneBlock( block )
-			);
-			if ( subscribed.current ) {
-				pendingChanges.current.incoming = storeBlocks;
-			}
-			replaceInnerBlocks( clientId, storeBlocks );
+			// It is important to batch here because otherwise,
+			// as soon as `setHasControlledInnerBlocks` is called
+			// the effect to restore might be triggered
+			// before the actual blocks get set properly in state.
+			registry.batch( () => {
+				setHasControlledInnerBlocks( clientId, true );
+				const storeBlocks = controlledBlocks.map( ( block ) =>
+					cloneBlock( block )
+				);
+				if ( subscribed.current ) {
+					pendingChanges.current.incoming = storeBlocks;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				replaceInnerBlocks( clientId, storeBlocks );
+			} );
 		} else {
 			if ( subscribed.current ) {
 				pendingChanges.current.incoming = controlledBlocks;
@@ -158,12 +175,22 @@ export default function useBlockSync( {
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {
+		// When the block becomes uncontrolled, it means its inner state has been reset
+		// we need to take the blocks again from the external value property.
+		if ( ! isControlled ) {
+			pendingChanges.current.outgoing = [];
+			setControlledBlocks();
+		}
+	}, [ isControlled ] );
+
+	useEffect( () => {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
+			areInnerBlocksControlled,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
@@ -182,8 +209,17 @@ export default function useBlockSync( {
 			if ( clientId !== null && getBlockName( clientId ) === null )
 				return;
 
-			const newIsPersistent = isLastBlockChangePersistent();
+			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
+			// can reset to uncontrolled, in these situations, it means we need to populate
+			// the blocks again from the external blocks (the value property here)
+			// and we should stop triggering onChange
+			const isStillControlled =
+				! clientId || areInnerBlocksControlled( clientId );
+			if ( ! isStillControlled ) {
+				return;
+			}
 
+			const newIsPersistent = isLastBlockChangePersistent();
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
@@ -224,7 +260,8 @@ export default function useBlockSync( {
 					selection: {
 						selectionStart: getSelectionStart(),
 						selectionEnd: getSelectionEnd(),
-						initialPosition: getSelectedBlocksInitialCaretPosition(),
+						initialPosition:
+							getSelectedBlocksInitialCaretPosition(),
 					},
 				} );
 			}

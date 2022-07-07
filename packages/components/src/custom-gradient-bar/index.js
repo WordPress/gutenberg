@@ -15,10 +15,7 @@ import { useRef, useReducer } from '@wordpress/element';
  */
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
-import {
-	INSERT_POINT_WIDTH,
-	MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT,
-} from './constants';
+import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
 
 function customGradientBarReducer( state, action ) {
 	switch ( action.type ) {
@@ -78,8 +75,9 @@ export default function CustomGradientBar( {
 	onChange,
 	disableInserter = false,
 	disableAlpha = false,
+	__experimentalIsRenderedInSidebar,
 } ) {
-	const gradientPickerDomRef = useRef();
+	const gradientMarkersContainerDomRef = useRef();
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
 		customGradientBarReducer,
@@ -88,8 +86,7 @@ export default function CustomGradientBar( {
 	const onMouseEnterAndMove = ( event ) => {
 		const insertPosition = getHorizontalRelativeGradientPosition(
 			event.clientX,
-			gradientPickerDomRef.current,
-			INSERT_POINT_WIDTH
+			gradientMarkersContainerDomRef.current
 		);
 
 		// If the insert point is close to an existing control point don't show it.
@@ -120,7 +117,6 @@ export default function CustomGradientBar( {
 
 	return (
 		<div
-			ref={ gradientPickerDomRef }
 			className={ classnames(
 				'components-custom-gradient-picker__gradient-bar',
 				{ 'has-gradient': hasGradient }
@@ -130,10 +126,19 @@ export default function CustomGradientBar( {
 			style={ { background } }
 			onMouseLeave={ onMouseLeave }
 		>
-			<div className="components-custom-gradient-picker__markers-container">
+			<div
+				ref={ gradientMarkersContainerDomRef }
+				className="components-custom-gradient-picker__markers-container"
+			>
 				{ ! disableInserter &&
 					( isMovingInserter || isInsertingControlPoint ) && (
 						<ControlPoints.InsertPoint
+							__experimentalIsRenderedInSidebar={
+								__experimentalIsRenderedInSidebar
+							}
+							gradientPickerDomRef={
+								gradientMarkersContainerDomRef
+							}
 							disableAlpha={ disableAlpha }
 							insertPosition={ gradientBarState.insertPosition }
 							value={ controlPoints }
@@ -151,9 +156,12 @@ export default function CustomGradientBar( {
 						/>
 					) }
 				<ControlPoints
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
 					disableAlpha={ disableAlpha }
 					disableRemove={ disableInserter }
-					gradientPickerDomRef={ gradientPickerDomRef }
+					gradientPickerDomRef={ gradientMarkersContainerDomRef }
 					ignoreMarkerPosition={
 						isInsertingControlPoint
 							? gradientBarState.insertPosition

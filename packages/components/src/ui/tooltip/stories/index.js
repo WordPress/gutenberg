@@ -6,7 +6,7 @@ import { Tooltip } from '../index';
 
 export default {
 	component: Tooltip,
-	title: 'G2 Components (Experimental)/Tooltip',
+	title: 'Components (Experimental)/Tooltip',
 };
 
 export const _default = () => {

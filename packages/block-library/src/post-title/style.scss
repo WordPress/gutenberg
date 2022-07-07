@@ -1,3 +1,7 @@
-.wp-block-post-title a {
-	display: inline-block;
+.wp-block-post-title {
+	word-break: break-word;
+
+	a {
+		display: inline-block;
+	}
 }

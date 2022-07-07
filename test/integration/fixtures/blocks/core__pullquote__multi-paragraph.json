@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "<p>Paragraph <strong>one</strong></p><p>Paragraph two</p>",
+			"citation": "by whomever"
+		},
+		"innerBlocks": []
+	}
+]

@@ -7,8 +7,9 @@ import { useEffect, useRef } from '@wordpress/element';
  * Calculates and renders the format boundary style when the active formats
  * change.
  */
-export function useBoundaryStyle( { activeFormats } ) {
+export function useBoundaryStyle( { record } ) {
 	const ref = useRef();
+	const { activeFormats = [] } = record.current;
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
 		// active, because no boundary styles will be visible.

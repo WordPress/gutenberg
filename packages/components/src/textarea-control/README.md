@@ -76,19 +76,23 @@ When text input isn’t accepted, an error message can display instructions on h
 
 ### Usage
 
-    import { TextareaControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
+```jsx
+import { TextareaControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
-    const MyTextareaControl = withState( {
-        text: '',
-    } )( ( { text, setState } ) => (
-        <TextareaControl
-            label="Text"
-            help="Enter some text"
-            value={ text }
-            onChange={ ( text ) => setState( { text } ) }
-        />
-    ) );
+const MyTextareaControl = () => {
+	const [ text, setText ] = useState( '' );
+
+	return (
+		<TextareaControl
+			label="Text"
+			help="Enter some text"
+			value={ text }
+			onChange={ ( value ) => setText( value ) }
+		/>
+	);
+};
+```
 
 ### Props
 
@@ -96,47 +100,41 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### label
-
-If this property is added, a label will be generated using label property as the content.
-
--   Type: `String`
--   Required: No
-
-#### hideLabelFromVision
-
-If true, the label will only be visible to screen readers.
-
--   Type: `Boolean`
--   Required: No
-
-#### help
+#### `help`: `string | WPElement`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
 -   Required: No
 
-#### rows
+#### `hideLabelFromVision`: `boolean`
 
-The number of rows the textarea should contain. Defaults to four.
+If true, the label will only be visible to screen readers.
 
--   Type: `String`
 -   Required: No
--   Default: 4
 
-#### value
+#### `label`: `string`
 
-The current value of the textarea.
+If this property is added, a label will be generated using label property as the content.
 
--   Type: `String`
--   Required: Yes
+-   Required: No
 
-#### onChange
+#### `onChange`: `( value: string ) => void`
 
 A function that receives the new value of the textarea each time it changes.
 
--   Type: `function`
+-   Required: Yes
+
+#### `rows`: `number`
+
+The number of rows the textarea should contain.
+
+-   Required: No
+-   Default: 4
+
+#### `value`: `string`
+
+The current value of the textarea.
+
 -   Required: Yes
 
 ## Related components

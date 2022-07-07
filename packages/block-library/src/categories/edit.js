@@ -14,30 +14,31 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
-	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
+	attributes: {
+		displayAsDropdown,
+		showHierarchy,
+		showPostCounts,
+		showOnlyTopLevel,
+		showEmpty,
+	},
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const { categories, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const { isResolving } = select( 'core/data' );
-		const query = { per_page: -1, hide_empty: true };
-		return {
-			categories: getEntityRecords( 'taxonomy', 'category', query ),
-			isRequesting: isResolving( 'core', 'getEntityRecords', [
-				'taxonomy',
-				'category',
-				query,
-			] ),
-		};
-	}, [] );
+	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
+	if ( showOnlyTopLevel ) {
+		query.parent = 0;
+	}
+	const { records: categories, isResolving } = useEntityRecords(
+		'taxonomy',
+		'category',
+		query
+	);
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
 			return [];
@@ -128,38 +129,50 @@ export default function CategoriesEdit( {
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Categories settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
 					<ToggleControl
-						label={ __( 'Show hierarchy' ) }
-						checked={ showHierarchy }
-						onChange={ toggleAttribute( 'showHierarchy' ) }
-					/>
-					<ToggleControl
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
+					<ToggleControl
+						label={ __( 'Show only top level categories' ) }
+						checked={ showOnlyTopLevel }
+						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show empty categories' ) }
+						checked={ showEmpty }
+						onChange={ toggleAttribute( 'showEmpty' ) }
+					/>
+					{ ! showOnlyTopLevel && (
+						<ToggleControl
+							label={ __( 'Show hierarchy' ) }
+							checked={ showHierarchy }
+							onChange={ toggleAttribute( 'showHierarchy' ) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
-			{ isRequesting && (
+			{ isResolving && (
 				<Placeholder icon={ pin } label={ __( 'Categories' ) }>
 					<Spinner />
 				</Placeholder>
 			) }
-			{ ! isRequesting && categories.length === 0 && (
+			{ ! isResolving && categories?.length === 0 && (
 				<p>
 					{ __(
 						'Your site does not have any posts, so there is nothing to display here at the moment.'
 					) }
 				</p>
 			) }
-			{ ! isRequesting &&
-				categories.length > 0 &&
+			{ ! isResolving &&
+				categories?.length > 0 &&
 				( displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() ) }

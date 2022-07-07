@@ -6,7 +6,7 @@ import { isString, kebabCase, reduce, upperFirst } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -18,9 +18,7 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
-import useEditorFeature from '../use-editor-feature';
-
-const DEFAULT_COLORS = [];
+import useSetting from '../use-setting';
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -32,9 +30,8 @@ const DEFAULT_COLORS = [];
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) => ( props ) =>
+			<WrappedComponent { ...props } colors={ colorsArray } />,
 		'withCustomColorPalette'
 	);
 
@@ -47,9 +44,21 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const colors =
-				useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
-			return <WrappedComponent { ...props } colors={ colors } />;
+			// Some color settings have a special handling for deprecated flags in `useSetting`,
+			// so we can't unwrap them by doing const { ... } = useSetting('color')
+			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+			const userPalette = useSetting( 'color.palette.custom' );
+			const themePalette = useSetting( 'color.palette.theme' );
+			const defaultPalette = useSetting( 'color.palette.default' );
+			const allColors = useMemo(
+				() => [
+					...( userPalette || [] ),
+					...( themePalette || [] ),
+					...( defaultPalette || [] ),
+				],
+				[ userPalette, themePalette, defaultPalette ]
+			);
+			return <WrappedComponent { ...props } colors={ allColors } />;
 		},
 		'withEditorColorPalette'
 	);
@@ -86,9 +95,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 					this.setters = this.createSetters();
 					this.colorUtils = {
-						getMostReadableColor: this.getMostReadableColor.bind(
-							this
-						),
+						getMostReadableColor:
+							this.getMostReadableColor.bind( this ),
 					};
 
 					this.state = {};
@@ -107,9 +115,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 							colorContext,
 							colorAttributeName
 						) => {
-							const upperFirstColorAttributeName = upperFirst(
-								colorAttributeName
-							);
+							const upperFirstColorAttributeName =
+								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
 							settersAccumulator[
 								`set${ upperFirstColorAttributeName }`
@@ -171,9 +178,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 								previousColor === colorObject.color &&
 								previousColorObject
 							) {
-								newState[
-									colorAttributeName
-								] = previousColorObject;
+								newState[ colorAttributeName ] =
+									previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									...colorObject,

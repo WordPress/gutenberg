@@ -50,17 +50,65 @@ function render_block_core_template_part( $attributes ) {
 			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
 				$area = $area_terms[0]->name;
 			}
+			/**
+			 * Fires when a block template part is loaded from a template post stored in the database.
+			 *
+			 * @since 5.9.0
+			 *
+			 * @param string  $template_part_id   The requested template part namespaced to the theme.
+			 * @param array   $attributes         The block attributes.
+			 * @param WP_Post $template_part_post The template part post object.
+			 * @param string  $content            The template part content.
+			 */
+			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
 		} else {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
-			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+			$parent_theme_folders        = get_block_theme_folders( get_template() );
+			$child_theme_folders         = get_block_theme_folders( get_stylesheet() );
+			$child_theme_part_file_path  = get_theme_file_path( '/' . $child_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
+			$parent_theme_part_file_path = get_theme_file_path( '/' . $parent_theme_folders['wp_template_part'] . '/' . $attributes['slug'] . '.html' );
+			$template_part_file_path     = 0 === validate_file( $attributes['slug'] ) && file_exists( $child_theme_part_file_path ) ? $child_theme_part_file_path : $parent_theme_part_file_path;
 			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
-				$content = _inject_theme_attribute_in_content( file_get_contents( $template_part_file_path ) );
+				$content = file_get_contents( $template_part_file_path );
+				$content = is_string( $content ) && '' !== $content
+						? _inject_theme_attribute_in_block_template_content( $content )
+						: '';
+			}
+
+			if ( '' !== $content && null !== $content ) {
+				/**
+				 * Fires when a block template part is loaded from a template part in the theme.
+				 *
+				 * @since 5.9.0
+				 *
+				 * @param string $template_part_id        The requested template part namespaced to the theme.
+				 * @param array  $attributes              The block attributes.
+				 * @param string $template_part_file_path Absolute path to the template path.
+				 * @param string $content                 The template part content.
+				 */
+				do_action( 'render_block_core_template_part_file', $template_part_id, $attributes, $template_part_file_path, $content );
+			} else {
+				/**
+				 * Fires when a requested block template part does not exist in the database nor in the theme.
+				 *
+				 * @since 5.9.0
+				 *
+				 * @param string $template_part_id        The requested template part namespaced to the theme.
+				 * @param array  $attributes              The block attributes.
+				 * @param string $template_part_file_path Absolute path to the not found template path.
+				 */
+				do_action( 'render_block_core_template_part_none', $template_part_id, $attributes, $template_part_file_path );
 			}
 		}
 	}
 
-	if ( is_null( $content ) && is_user_logged_in() ) {
+	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+	// is set in `wp_debug_mode()`.
+	$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+		defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
+	if ( is_null( $content ) && $is_debug ) {
 		if ( ! isset( $attributes['slug'] ) ) {
 			// If there is no slug this is a placeholder and we dont want to return any message.
 			return;
@@ -73,21 +121,6 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
-		if ( ! is_admin() ) {
-			trigger_error(
-				sprintf(
-					// translators: %s are the block attributes.
-					__( 'Could not render Template Part block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
-					wp_json_encode( $attributes )
-				),
-				E_USER_WARNING
-			);
-		}
-
-		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
-		// is set in `wp_debug_mode()`.
-		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
-			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 		return $is_debug ?
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
 			__( '[block rendering halted]' ) :
@@ -101,15 +134,15 @@ function render_block_core_template_part( $attributes ) {
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
 	$content = shortcode_unautop( $content );
-	if ( function_exists( 'wp_filter_content_tags' ) ) {
-		$content = wp_filter_content_tags( $content );
-	} else {
-		$content = wp_make_content_images_responsive( $content );
-	}
+	$content = wp_filter_content_tags( $content );
 	$content = do_shortcode( $content );
 
+	// Handle embeds for block template parts.
+	global $wp_embed;
+	$content = $wp_embed->autoembed( $content );
+
 	if ( empty( $attributes['tagName'] ) ) {
-		$defined_areas = gutenberg_get_allowed_template_part_areas();
+		$defined_areas = get_allowed_block_template_part_areas();
 		$area_tag      = 'div';
 		foreach ( $defined_areas as $defined_area ) {
 			if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
@@ -126,6 +159,31 @@ function render_block_core_template_part( $attributes ) {
 }
 
 /**
+ * Returns an array of variation objects for the template part block.
+ *
+ * @return array Array containing the block variation objects.
+ */
+function build_template_part_block_variations() {
+	$variations    = array();
+	$defined_areas = get_allowed_block_template_part_areas();
+	foreach ( $defined_areas as $area ) {
+		if ( 'uncategorized' !== $area['area'] ) {
+			$variations[] = array(
+				'name'        => $area['area'],
+				'title'       => $area['label'],
+				'description' => $area['description'],
+				'attributes'  => array(
+					'area' => $area['area'],
+				),
+				'scope'       => array( 'inserter' ),
+				'icon'        => $area['icon'],
+			);
+		}
+	}
+	return $variations;
+}
+
+/**
  * Registers the `core/template-part` block on the server.
  */
 function register_block_core_template_part() {
@@ -133,6 +191,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
+			'variations'      => build_template_part_block_variations(),
 		)
 	);
 }

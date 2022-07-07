@@ -12,5 +12,5 @@ export const SelectWrapper = styled( FlexBlock )`
 `;
 
 export const AccessoryWrapper = styled( FlexBlock )`
-	flex-grow: 4;
+	flex-grow: 5;
 `;

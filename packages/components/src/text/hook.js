@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { css } from '@emotion/react';
 import { isPlainObject } from 'lodash';
 
 /**
@@ -20,9 +20,10 @@ import { createHighlighterText } from './utils';
 import { getFontSize } from '../ui/utils/font-size';
 import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {
@@ -73,6 +74,8 @@ export default function useText( props ) {
 		} );
 	}
 
+	const cx = useCx();
+
 	const classes = useMemo( () => {
 		const sx = {};
 
@@ -86,7 +89,10 @@ export default function useText( props ) {
 			display,
 			fontSize: getFontSize( size ),
 			/* eslint-disable jsdoc/valid-types */
-			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
+			fontWeight:
+				/** @type {import('react').CSSProperties['fontWeight']} */ (
+					weight
+				),
 			/* eslint-enable jsdoc/valid-types */
 			lineHeight,
 			letterSpacing,
@@ -102,7 +108,7 @@ export default function useText( props ) {
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: COLORS.black } )
+				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );
 		}
 
@@ -123,6 +129,7 @@ export default function useText( props ) {
 		align,
 		className,
 		color,
+		cx,
 		display,
 		isBlock,
 		isCaption,

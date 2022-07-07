@@ -266,12 +266,13 @@ const mapCountryOption = ( country ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-function CountryCodeComboboxControl() {
+function CountryCodeComboboxControl( args ) {
 	const [ value, setValue ] = useState( null );
 
 	return (
 		<>
 			<ComboboxControl
+				{ ...args }
 				value={ value }
 				onChange={ setValue }
 				label="Select a country"
@@ -281,4 +282,8 @@ function CountryCodeComboboxControl() {
 		</>
 	);
 }
-export const _default = () => <CountryCodeComboboxControl />;
+export const _default = CountryCodeComboboxControl.bind( {} );
+_default.args = {
+	__next36pxDefaultSize: false,
+	allowReset: false,
+};

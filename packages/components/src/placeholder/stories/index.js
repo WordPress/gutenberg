@@ -9,7 +9,13 @@ import { boolean, text } from '@storybook/addon-knobs';
 import Placeholder from '../';
 import TextControl from '../../text-control';
 
-export default { title: 'Components/Placeholder', component: Placeholder };
+export default {
+	title: 'Components/Placeholder',
+	component: Placeholder,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	const icon = text( 'Icon', 'smiley' );

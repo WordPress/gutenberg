@@ -59,8 +59,18 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Check the the dynamic block appears.
-		await page.waitForSelector( '.wp-block-latest-posts' );
+		// Check the dynamic block appears.
+		const latestPostsBlock = await page.waitForSelector(
+			'.wp-block-latest-posts'
+		);
+
+		expect(
+			await latestPostsBlock.evaluate( ( block ) => block.textContent )
+		).toContain( 'A published post' );
+
+		expect(
+			await latestPostsBlock.evaluate( ( block ) => block.textContent )
+		).toContain( 'Dynamic block test' );
 	} );
 
 	it( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async () => {
@@ -76,7 +86,7 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Retrieve the excerpt used as meta
+		// Retrieve the excerpt used as meta.
 		const metaExcerpt = await page.evaluate( () => {
 			return document
 				.querySelector( 'meta[property="gutenberg:hello"]' )
@@ -91,7 +101,7 @@ describe( 'Meta boxes', () => {
 		await page.keyboard.type( 'Excerpt from content.' );
 		await page.type( '.editor-post-title__input', 'A published post' );
 
-		// Open the excerpt panel
+		// Open the excerpt panel.
 		await openDocumentSettingsSidebar();
 		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
 			'Excerpt'
@@ -116,7 +126,7 @@ describe( 'Meta boxes', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Retrieve the excerpt used as meta
+		// Retrieve the excerpt used as meta.
 		const metaExcerpt = await page.evaluate( () => {
 			return document
 				.querySelector( 'meta[property="gutenberg:hello"]' )

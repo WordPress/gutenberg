@@ -55,44 +55,41 @@ When a user switches a toggle, its corresponding action takes effect immediately
 
 ```jsx
 import { FormToggle } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyFormToggle = withState( {
-	checked: true,
-} )( ( { checked, setState } ) => (
-	<FormToggle
-		checked={ checked }
-		onChange={ () =>
-			setState( ( state ) => ( { checked: ! state.checked } ) )
-		}
-	/>
-) );
+const MyFormToggle = () => {
+	const [ isChecked, setChecked ] = useState( true );
+
+	return (
+		<FormToggle
+			checked={ isChecked }
+			onChange={ () => setChecked( ( state ) => ! state ) }
+		/>
+	);
+};
 ```
 
 ### Props
 
 The component accepts the following props:
 
-#### checked
+#### `checked`: `boolean`
 
 If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.
 If no value is passed the toggle will be unchecked.
 
--   Type: `Boolean`
 -   Required: No
 
-#### disabled
+#### `disabled`: `boolean`
 
 If disabled is true the toggle will be disabled and apply the appropriate styles.
 
--   Type: `Boolean`
 -   Required: No
 
-#### onChange
+#### `onChange`: `( event: ChangeEvent<HTMLInputElement> ) => void`
 
-A function that receives the checked state (boolean) as input.
+A callback function invoked when the toggle is clicked.
 
--   Type: `function`
 -   Required: Yes
 
 ## Related components

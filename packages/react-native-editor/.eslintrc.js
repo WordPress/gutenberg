@@ -1,5 +1,4 @@
 module.exports = {
-	parser: 'babel-eslint',
 	env: {
 		browser: true,
 		'jest/globals': true,
@@ -15,6 +14,9 @@ module.exports = {
 			version: 'detect',
 			flowVersion: '0.92.0',
 		},
+		'import/resolver': require.resolve(
+			'../../tools/eslint/import-resolver'
+		),
 	},
 	rules: {
 		'no-restricted-syntax': [
@@ -65,4 +67,12 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ '**/*.js' ],
+			rules: {
+				'import/no-unresolved': 'off',
+			},
+		},
+	],
 };

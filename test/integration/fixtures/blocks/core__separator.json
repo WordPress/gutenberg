@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/separator",
+		"isValid": true,
+		"attributes": {
+			"opacity": "alpha-channel"
+		},
+		"innerBlocks": []
+	}
+]

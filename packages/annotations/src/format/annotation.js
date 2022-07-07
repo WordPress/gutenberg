@@ -15,8 +15,8 @@ import { STORE_NAME } from '../store/constants';
 /**
  * Applies given annotations to the given record.
  *
- * @param {Object} record The record to apply annotations to.
- * @param {Array} annotations The annotation to apply.
+ * @param {Object} record      The record to apply annotations to.
+ * @param {Array}  annotations The annotation to apply.
  * @return {Object} A record with the annotations applied.
  */
 export function applyAnnotations( record, annotations = [] ) {
@@ -168,20 +168,17 @@ export const annotation = {
 	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_NAME )
-				.__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_NAME )
-				.__experimentalUpdateAnnotationRange,
+			removeAnnotation:
+				dispatch( STORE_NAME ).__experimentalRemoveAnnotation,
+			updateAnnotationRange:
+				dispatch( STORE_NAME ).__experimentalUpdateAnnotationRange,
 		};
 	},
 	__experimentalCreateOnChangeEditableValue( props ) {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
-			const {
-				removeAnnotation,
-				updateAnnotationRange,
-				annotations,
-			} = props;
+			const { removeAnnotation, updateAnnotationRange, annotations } =
+				props;
 
 			updateAnnotationsWithPositions( annotations, positions, {
 				removeAnnotation,

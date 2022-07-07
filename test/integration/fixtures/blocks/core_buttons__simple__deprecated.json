@@ -1,0 +1,25 @@
+[
+	{
+		"name": "core/buttons",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"text": "My button 1"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/button",
+				"isValid": true,
+				"attributes": {
+					"text": "My button 2"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

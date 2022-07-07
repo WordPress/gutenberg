@@ -9,19 +9,19 @@ import { COLORS } from '../../utils/colors-values';
 /* eslint-disable jsdoc/valid-types */
 /**
  * @typedef Props
- * @property {import('react').CSSProperties['color']} [color] Color of `Spinner`.
- * @property {number} [size=16] Size of `Spinner`.
+ * @property {import('react').CSSProperties['color']} [color]   Color of `Spinner`.
+ * @property {number}                                 [size=16] Size of `Spinner`.
  */
 /* eslint-enable jsdoc/valid-types */
 
 /**
  *
- * @param {import('../context').ViewOwnProps<Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
+ * @param {import('react').ForwardedRef<any>}                          forwardedRef
  */
 function Spinner( props, forwardedRef ) {
 	const {
-		color = COLORS.black,
+		color = COLORS.gray[ 900 ],
 		size = BASE_SIZE,
 		...otherProps
 	} = useContextSystem( props, 'Spinner' );

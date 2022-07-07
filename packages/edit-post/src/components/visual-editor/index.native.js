@@ -24,7 +24,7 @@ export default class VisualEditor extends Component {
 		};
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		this.keyboardDidShow = Keyboard.addListener(
 			'keyboardDidShow',
 			this.keyboardDidShow

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import deepFreeze from 'deep-freeze';
-import { filter } from 'lodash';
 
 /**
  * Internal dependencies
@@ -46,7 +45,7 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {},
 			queries: {},
 			itemIsComplete: {},
@@ -65,14 +64,18 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {
-				b: { slug: 'b', title: 'beach' },
-				s: { slug: 's', title: 'sun' },
+				default: {
+					b: { slug: 'b', title: 'beach' },
+					s: { slug: 's', title: 'sun' },
+				},
 			},
 			itemIsComplete: {
-				b: true,
-				s: true,
+				default: {
+					b: true,
+					s: true,
+				},
 			},
 			queries: {},
 		} );
@@ -80,15 +83,19 @@ describe( 'entities', () => {
 
 	it( 'appends the received post types by slug', () => {
 		const originalState = deepFreeze( {
-			data: {
+			records: {
 				root: {
 					postType: {
 						queriedData: {
 							items: {
-								w: { slug: 'w', title: 'water' },
+								default: {
+									w: { slug: 'w', title: 'water' },
+								},
 							},
 							itemIsComplete: {
-								w: true,
+								default: {
+									w: true,
+								},
 							},
 							queries: {},
 						},
@@ -103,14 +110,18 @@ describe( 'entities', () => {
 			name: 'postType',
 		} );
 
-		expect( state.data.root.postType.queriedData ).toEqual( {
+		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {
-				w: { slug: 'w', title: 'water' },
-				b: { slug: 'b', title: 'beach' },
+				default: {
+					w: { slug: 'w', title: 'water' },
+					b: { slug: 'b', title: 'beach' },
+				},
 			},
 			itemIsComplete: {
-				w: true,
-				b: true,
+				default: {
+					w: true,
+					b: true,
+				},
 			},
 			queries: {},
 		} );
@@ -123,9 +134,11 @@ describe( 'entities', () => {
 			entities: [ { kind: 'postType', name: 'posts' } ],
 		} );
 
-		expect( filter( state.config, { kind: 'postType' } ) ).toEqual( [
-			{ kind: 'postType', name: 'posts' },
-		] );
+		expect(
+			Object.entries( state.config )
+				.filter( ( [ , cfg ] ) => cfg.kind === 'postType' )
+				.map( ( [ , cfg ] ) => cfg )
+		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
 } );
 

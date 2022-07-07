@@ -9,6 +9,7 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Allowed Blocks Setting on InnerBlocks', () => {
@@ -35,7 +36,9 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await page.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await expect(
-			( await getAllBlockInserterItemTitles() ).length
+			(
+				await getAllBlockInserterItemTitles()
+			 ).length
 		).toBeGreaterThan( 20 );
 	} );
 
@@ -75,6 +78,7 @@ describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();
 		await page.waitForSelector( '.product[data-number-of-children="2"]' );
+		await clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
 		// This focus shouldn't be neessary but there's a bug in trunk right now
 		// Where if you open the inserter, don't do anything and click the "appender" on the canvas
 		// the appender is not opened right away.

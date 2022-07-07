@@ -19,7 +19,7 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 
 	return selectedBlockClientId ? (
 		<Button
-			isSecondary
+			variant="secondary"
 			className="block-editor-skip-to-selected-block"
 			onClick={ onClick }
 		>
@@ -28,10 +28,12 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	) : null;
 };
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md
+ */
 export default withSelect( ( select ) => {
 	return {
-		selectedBlockClientId: select(
-			blockEditorStore
-		).getBlockSelectionStart(),
+		selectedBlockClientId:
+			select( blockEditorStore ).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

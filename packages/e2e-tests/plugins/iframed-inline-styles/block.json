@@ -1,0 +1,15 @@
+{
+	"apiVersion": 2,
+	"name": "test/iframed-inline-styles",
+	"title": "Iframed Inline Styles",
+	"category": "text",
+	"icon": "smiley",
+	"description": "",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "iframed-inline-styles",
+	"editorScript": "iframed-inline-styles-editor-script",
+	"editorStyle": "file:./editor.css",
+	"style": "iframed-inline-styles-style"
+}

@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 4.10.0 (2022-06-29)
+
+## 4.9.0 (2022-06-15)
+
+## 4.8.0 (2022-06-01)
+
+## 4.7.0 (2022-05-18)
+
+## 4.6.0 (2022-05-04)
+
+## 4.5.0 (2022-04-21)
+
+## 4.4.0 (2022-04-08)
+
+## 4.3.0 (2022-03-23)
+
+## 4.2.0 (2022-03-11)
+
+### Bug Fix
+
+- Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
+
+## 4.1.0 (2022-01-27)
+
+### Bug Fix
+
+-   Ensure that the package uses the latest version of React types ([#37365](https://github.com/WordPress/gutenberg/pull/37365)).
+
+## 4.0.3 (2021-10-22)
+
+### Bug Fix
+
+-   Update `rawHtml` to correctly concatenate multiple strings passed as children (see [35532](https://github.com/WordPress/gutenberg/pull/35532))
+
+## 4.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 3.2.0 (2021-07-21)
+
+## 3.1.0 (2021-05-20)
+
+## 3.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

@@ -34,7 +34,7 @@ const { Consumer, Provider } = createContext( () => {} );
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {
 	const BlockContent = () => {
-		// Value is an array of blocks, so defer to block serializer
+		// Value is an array of blocks, so defer to block serializer.
 		const html = serialize( innerBlocks, { isInnerBlocks: true } );
 
 		// Use special-cased raw HTML tag to avoid default escaping

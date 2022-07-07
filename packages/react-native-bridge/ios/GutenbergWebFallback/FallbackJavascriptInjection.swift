@@ -60,14 +60,6 @@ public struct FallbackJavascriptInjection {
     }
 }
 
-public extension SourceFile {
-    func jsScript(with argument: String? = nil) throws -> WKUserScript {
-        let content = try getContent()
-        let formatted = String(format: content, argument ?? [])
-        return formatted.toJsScript()
-    }
-}
-
 internal extension String {
     func toJsScript() -> WKUserScript {
         WKUserScript(source: self, injectionTime: .atDocumentEnd, forMainFrameOnly: false)

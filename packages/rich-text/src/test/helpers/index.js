@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ZWNBSP } from '../../special-characters';
+import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
 	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
@@ -32,6 +32,46 @@ export const spec = [
 			formats: [],
 			replacements: [],
 			text: '',
+		},
+	},
+	{
+		description:
+			'should ignore manually added object replacement character',
+		html: `test${ OBJECT_REPLACEMENT_CHARACTER }`,
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 4 ],
+		record: {
+			start: 0,
+			end: 4,
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'test',
+		},
+	},
+	{
+		description:
+			'should ignore manually added object replacement character with formatting',
+		html: `<em>h${ OBJECT_REPLACEMENT_CHARACTER }i</em>`,
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 2 ],
+		record: {
+			start: 0,
+			end: 2,
+			formats: [ [ em ], [ em ] ],
+			replacements: [ , , ],
+			text: 'hi',
 		},
 	},
 	{
@@ -444,8 +484,7 @@ export const spec = [
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
 		multilineWrapperTags: [ 'ul', 'ol' ],
-		html:
-			'<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
+		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -675,6 +714,56 @@ export const spec = [
 			],
 			replacements: [ , , ],
 			text: '12',
+		},
+	},
+	{
+		description: 'should disarm script',
+		html: '<script>alert("1")</script>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: { 'data-rich-text-script': 'alert(%221%22)' },
+					type: 'script',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
+	{
+		description: 'should disarm on* attribute',
+		html: '<img onerror="alert(\'1\')">',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: {
+						'data-disable-rich-text-onerror': "alert('1')",
+					},
+					type: 'img',
+				},
+			],
+			text: '\ufffc',
 		},
 	},
 ];

@@ -34,9 +34,8 @@ function EditorProvider( {
 		return { postId: post.id, postType: post.type };
 	}, [ post.id, post.type ] );
 	const { selection, isReady } = useSelect( ( select ) => {
-		const { getEditorSelection, __unstableIsEditorReady } = select(
-			editorStore
-		);
+		const { getEditorSelection, __unstableIsEditorReady } =
+			select( editorStore );
 		return {
 			isReady: __unstableIsEditorReady(),
 			selection: getEditorSelection(),
@@ -60,7 +59,7 @@ function EditorProvider( {
 	} = useDispatch( editorStore );
 	const { createWarningNotice } = useDispatch( noticesStore );
 
-	// Iniitialize and tear down the editor.
+	// Initialize and tear down the editor.
 	// Ideally this should be synced on each change and not just something you do once.
 	useLayoutEffect( () => {
 		// Assume that we don't need to initialize in the case of an error recovery.
@@ -92,7 +91,7 @@ function EditorProvider( {
 		};
 	}, [] );
 
-	// Synchronize the editor settings as they change
+	// Synchronize the editor settings as they change.
 	useEffect( () => {
 		updateEditorSettings( settings );
 	}, [ settings ] );

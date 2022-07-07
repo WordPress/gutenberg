@@ -16,7 +16,7 @@ import { readTextFile } from './file';
 /**
  * Import a reusable block from a JSON file.
  *
- * @param {File}     file File.
+ * @param {File} file File.
  * @return {Promise} Promise returning the imported reusable block.
  */
 async function importReusableBlock( file ) {

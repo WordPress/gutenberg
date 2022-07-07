@@ -11,14 +11,13 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts,tsx}' ).map(
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
-		[ `@wordpress\\/(${ transpiledPackageNames.join(
-			'|'
-		) })$` ]: 'packages/$1/src',
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'packages/$1/src',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-phase.js',
+		'<rootDir>/test/unit/config/is-gutenberg-plugin.js',
 	],
 	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',
@@ -26,6 +25,7 @@ module.exports = {
 		'/.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
+		'/packages/e2e-test-utils-playwright/src/test.ts',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+.native.js$',
@@ -36,7 +36,7 @@ module.exports = {
 	},
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
-		'jest-emotion',
+		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],
 	watchPlugins: [
@@ -45,6 +45,6 @@ module.exports = {
 	],
 	reporters: [
 		'default',
-		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 	],
 };

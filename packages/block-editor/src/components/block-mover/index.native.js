@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Picker, ToolbarButton } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ export const BLOCK_MOVER_DIRECTION_BOTTOM =
 export const BlockMover = ( {
 	isFirst,
 	isLast,
-	isLocked,
+	canMove,
 	onMoveDown,
 	onMoveUp,
 	onLongMove,
@@ -36,9 +36,9 @@ export const BlockMover = ( {
 	isStackedHorizontally,
 } ) => {
 	const pickerRef = useRef();
-	const [ blockPageMoverState, setBlockPageMoverState ] = useState(
-		undefined
-	);
+	const [ shouldPresentPicker, setShouldPresentPicker ] = useState( false );
+	const [ blockPageMoverState, setBlockPageMoverState ] =
+		useState( undefined );
 	const showBlockPageMover = ( direction ) => () => {
 		if ( ! pickerRef.current ) {
 			setBlockPageMoverState( undefined );
@@ -46,8 +46,16 @@ export const BlockMover = ( {
 		}
 
 		setBlockPageMoverState( direction );
-		pickerRef.current.presentPicker();
+		setShouldPresentPicker( true );
 	};
+
+	// Ensure that the picker is only presented after state updates.
+	useEffect( () => {
+		if ( shouldPresentPicker ) {
+			pickerRef.current?.presentPicker();
+			setShouldPresentPicker( false );
+		}
+	}, [ shouldPresentPicker ] );
 
 	const {
 		description: {
@@ -86,7 +94,16 @@ export const BlockMover = ( {
 		if ( option && option.onSelect ) option.onSelect();
 	};
 
-	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+	const onLongPressMoveUp = useCallback(
+		showBlockPageMover( BLOCK_MOVER_DIRECTION_TOP ),
+		[]
+	);
+	const onLongPressMoveDown = useCallback(
+		showBlockPageMover( BLOCK_MOVER_DIRECTION_BOTTOM ),
+		[]
+	);
+
+	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
 
@@ -96,7 +113,7 @@ export const BlockMover = ( {
 				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				onLongPress={ showBlockPageMover( BLOCK_MOVER_DIRECTION_TOP ) }
+				onLongPress={ onLongPressMoveUp }
 				icon={ backwardButtonIcon }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
@@ -105,9 +122,7 @@ export const BlockMover = ( {
 				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				onLongPress={ showBlockPageMover(
-					BLOCK_MOVER_DIRECTION_BOTTOM
-				) }
+				onLongPress={ onLongPressMoveDown }
 				icon={ forwardButtonIcon }
 				extraProps={ {
 					hint: forwardButtonHint,
@@ -130,7 +145,7 @@ export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const {
 			getBlockIndex,
-			getTemplateLock,
+			canMoveBlocks,
 			getBlockRootClientId,
 			getBlockOrder,
 		} = select( blockEditorStore );
@@ -138,25 +153,21 @@ export default compose(
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
-		const firstIndex = getBlockIndex( firstClientId, rootClientId );
-		const lastIndex = getBlockIndex(
-			last( normalizedClientIds ),
-			rootClientId
-		);
+		const firstIndex = getBlockIndex( firstClientId );
+		const lastIndex = getBlockIndex( last( normalizedClientIds ) );
 
 		return {
 			firstIndex,
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			isLocked: getTemplateLock( rootClientId ) === 'all',
+			canMove: canMoveBlocks( clientIds, rootClientId ),
 			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } = dispatch(
-			blockEditorStore
-		);
+		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } =
+			dispatch( blockEditorStore );
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),

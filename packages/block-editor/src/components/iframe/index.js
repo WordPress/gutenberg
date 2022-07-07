@@ -1,15 +1,27 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
 	useState,
 	createPortal,
-	useCallback,
 	forwardRef,
+	useMemo,
+	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useWritingFlow } from '../writing-flow';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -21,37 +33,85 @@ const BLOCK_PREFIX = 'wp-block';
  *
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
- *
- * @param {Document} doc The document to append cloned stylesheets to.
  */
-function styleSheetsCompat( doc ) {
-	// Search the document for stylesheets targetting the editor canvas.
-	Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-		try {
-			// May fail for external styles.
-			// eslint-disable-next-line no-unused-expressions
-			styleSheet.cssRules;
-		} catch ( e ) {
-			return;
-		}
+function useStylesCompatibility() {
+	return useRefEffect( ( node ) => {
+		// Search the document for stylesheets targetting the editor canvas.
+		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
+			try {
+				// May fail for external styles.
+				// eslint-disable-next-line no-unused-expressions
+				styleSheet.cssRules;
+			} catch ( e ) {
+				return;
+			}
 
-		const { ownerNode, cssRules } = styleSheet;
+			const { ownerNode, cssRules } = styleSheet;
 
-		if ( ! cssRules ) {
-			return;
-		}
+			if ( ! cssRules ) {
+				return;
+			}
 
-		const isMatch = Array.from( cssRules ).find(
-			( { selectorText } ) =>
-				selectorText &&
-				( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-					selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-		);
+			// Generally, ignore inline styles. We add inline styles belonging to a
+			// stylesheet later, which may or may not match the selectors.
+			if ( ownerNode.tagName !== 'LINK' ) {
+				return;
+			}
 
-		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
-			doc.head.appendChild( ownerNode.cloneNode( true ) );
-		}
-	} );
+			// Don't try to add the reset styles, which were removed as a dependency
+			// from `edit-blocks` for the iframe since we don't need to reset admin
+			// styles.
+			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+				return;
+			}
+
+			function matchFromRules( _cssRules ) {
+				return Array.from( _cssRules ).find(
+					( {
+						selectorText,
+						conditionText,
+						cssRules: __cssRules,
+					} ) => {
+						// If the rule is conditional then it will not have selector text.
+						// Recurse into child CSS ruleset to determine selector eligibility.
+						if ( conditionText ) {
+							return matchFromRules( __cssRules );
+						}
+
+						return (
+							selectorText &&
+							( selectorText.includes(
+								`.${ BODY_CLASS_NAME }`
+							) ||
+								selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+						);
+					}
+				);
+			}
+
+			const isMatch = matchFromRules( cssRules );
+
+			if (
+				isMatch &&
+				! node.ownerDocument.getElementById( ownerNode.id )
+			) {
+				// Display warning once we have a way to add style dependencies to the editor.
+				// See: https://github.com/WordPress/gutenberg/pull/37466.
+				node.appendChild( ownerNode.cloneNode( true ) );
+
+				// Add inline styles belonging to the stylesheet.
+				const inlineCssId = ownerNode.id.replace(
+					'-css',
+					'-inline-css'
+				);
+				const inlineCssElement = document.getElementById( inlineCssId );
+
+				if ( inlineCssElement ) {
+					node.appendChild( inlineCssElement.cloneNode( true ) );
+				}
+			}
+		} );
+	}, [] );
 }
 
 /**
@@ -93,105 +153,165 @@ function bubbleEvents( doc ) {
 		}
 	}
 
-	const eventTypes = [ 'keydown', 'keypress', 'dragover' ];
+	const eventTypes = [ 'dragover' ];
 
 	for ( const name of eventTypes ) {
 		doc.addEventListener( name, bubbleEvent );
 	}
 }
 
-/**
- * Sets the document direction.
- *
- * Sets the `editor-styles-wrapper` class name on the body.
- *
- * Copies the `admin-color-*` class name to the body so that the admin color
- * scheme applies to components in the iframe.
- *
- * @param {Document} doc Document to add class name to.
- */
-function setBodyClassName( doc ) {
-	doc.dir = document.dir;
-	doc.body.className = BODY_CLASS_NAME;
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
+}
 
-	for ( const name of document.body.classList ) {
-		if ( name.startsWith( 'admin-color-' ) ) {
-			doc.body.classList.add( name );
+async function loadScript( head, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = head.ownerDocument.createElement( 'script' );
+		script.id = id;
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
 		}
-	}
+		head.appendChild( script );
+	} );
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
-}
-
-function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
+function Iframe(
+	{ contentRef, children, head, tabIndex = 0, assets, ...props },
+	ref
+) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
-
-	const setRef = useCallback( ( node ) => {
-		if ( ! node ) {
-			return;
-		}
-
+	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const styles = useParsedAssets( assets?.styles );
+	const scripts = useParsedAssets( assets?.scripts );
+	const clearerRef = useBlockSelectionClearer();
+	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const setRef = useRefEffect( ( node ) => {
 		function setDocumentIfReady() {
-			const { contentDocument } = node;
-			const { readyState, body } = contentDocument;
+			const { contentDocument, ownerDocument } = node;
+			const { readyState, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			if ( typeof contentRef === 'function' ) {
-				contentRef( body );
-			} else if ( contentRef ) {
-				contentRef.current = body;
-			}
-
-			setHead( contentDocument, headHTML );
-			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
-			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
+			clearerRef( documentElement );
+
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			setBodyClasses(
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
+						name === 'wp-embed-responsive'
+				)
+			);
+
+			contentDocument.dir = ownerDocument.dir;
+			documentElement.removeChild( contentDocument.head );
+			documentElement.removeChild( contentDocument.body );
 
 			return true;
 		}
 
-		if ( setDocumentIfReady() ) {
-			return;
-		}
+		// Document set with srcDoc is not immediately ready.
+		node.addEventListener( 'load', setDocumentIfReady );
 
-		// Document is not immediately loaded in Firefox.
-		node.addEventListener( 'load', () => {
-			setDocumentIfReady();
-		} );
+		return () => node.removeEventListener( 'load', setDocumentIfReady );
 	}, [] );
+	const headRef = useRefEffect( ( element ) => {
+		scripts
+			.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( element, script ) ),
+				Promise.resolve()
+			)
+			.finally( () => {
+				// When script are loaded, re-render blocks to allow them
+				// to initialise.
+				forceRender();
+			} );
+	}, [] );
+	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
+	const styleCompatibilityRef = useStylesCompatibility();
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ styles.map(
+				( { tagName, href, id, rel, media, textContent } ) => {
+					const TagName = tagName.toLowerCase();
+
+					if ( TagName === 'style' ) {
+						return (
+							<TagName { ...{ id } } key={ id }>
+								{ textContent }
+							</TagName>
+						);
+					}
+
+					return (
+						<TagName { ...{ href, id, rel, media } } key={ id } />
+					);
+				}
+			) }
+			{ head }
+		</>
+	);
 
 	return (
-		<iframe
-			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
-			tabIndex="0"
-			title={ __( 'Editor canvas' ) }
-			name="editor-canvas"
-		>
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-			{ iframeDocument && createPortal( head, iframeDocument.head ) }
-		</iframe>
+		<>
+			{ tabIndex >= 0 && before }
+			<iframe
+				{ ...props }
+				ref={ useMergeRefs( [ ref, setRef ] ) }
+				tabIndex={ tabIndex }
+				// Correct doctype is required to enable rendering in standards mode
+				srcDoc="<!doctype html>"
+				title={ __( 'Editor canvas' ) }
+			>
+				{ iframeDocument &&
+					createPortal(
+						<>
+							<head ref={ headRef }>{ head }</head>
+							<body
+								ref={ bodyRef }
+								className={ classnames(
+									BODY_CLASS_NAME,
+									...bodyClasses
+								) }
+							>
+								{ /*
+								 * This is a wrapper for the extra styles and scripts
+								 * rendered imperatively by cloning the parent,
+								 * it's important that this div's content remains uncontrolled.
+								 */ }
+								<div
+									style={ { display: 'none' } }
+									ref={ styleCompatibilityRef }
+								/>
+								<StyleProvider document={ iframeDocument }>
+									{ children }
+								</StyleProvider>
+							</body>
+						</>,
+						iframeDocument.documentElement
+					) }
+			</iframe>
+			{ tabIndex >= 0 && after }
+		</>
 	);
 }
 

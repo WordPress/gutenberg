@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 const blockAttributes = {
 	align: {
@@ -68,9 +69,36 @@ const blockAttributes = {
 	},
 };
 
+const blockSupports = {
+	anchor: true,
+	color: {
+		__experimentalDuotone: 'img',
+		text: false,
+		background: false,
+	},
+	__experimentalBorder: {
+		radius: true,
+		__experimentalDefaultControls: {
+			radius: true,
+		},
+	},
+};
+
 const deprecated = [
 	{
-		attributes: blockAttributes,
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'title',
+			},
+			sizeSlug: {
+				type: 'string',
+			},
+		},
+		supports: blockSupports,
 		save( { attributes } ) {
 			const {
 				url,
@@ -78,10 +106,78 @@ const deprecated = [
 				caption,
 				align,
 				href,
+				rel,
+				linkClass,
 				width,
 				height,
 				id,
+				linkTarget,
+				sizeSlug,
+				title,
 			} = attributes;
+
+			const newRel = isEmpty( rel ) ? undefined : rel;
+
+			const classes = classnames( {
+				[ `align${ align }` ]: align,
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'is-resized': width || height,
+			} );
+
+			const image = (
+				<img
+					src={ url }
+					alt={ alt }
+					className={ id ? `wp-image-${ id }` : null }
+					width={ width }
+					height={ height }
+					title={ title }
+				/>
+			);
+
+			const figure = (
+				<>
+					{ href ? (
+						<a
+							className={ linkClass }
+							href={ href }
+							target={ linkTarget }
+							rel={ newRel }
+						>
+							{ image }
+						</a>
+					) : (
+						image
+					) }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content
+							tagName="figcaption"
+							value={ caption }
+						/>
+					) }
+				</>
+			);
+
+			if ( 'left' === align || 'right' === align || 'center' === align ) {
+				return (
+					<div { ...useBlockProps.save() }>
+						<figure className={ classes }>{ figure }</figure>
+					</div>
+				);
+			}
+
+			return (
+				<figure { ...useBlockProps.save( { className: classes } ) }>
+					{ figure }
+				</figure>
+			);
+		},
+	},
+	{
+		attributes: blockAttributes,
+		save( { attributes } ) {
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
 			const classes = classnames( {
 				[ `align${ align }` ]: align,
@@ -114,16 +210,8 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-				id,
-			} = attributes;
+			const { url, alt, caption, align, href, width, height, id } =
+				attributes;
 
 			const image = (
 				<img
@@ -151,15 +239,8 @@ const deprecated = [
 	{
 		attributes: blockAttributes,
 		save( { attributes } ) {
-			const {
-				url,
-				alt,
-				caption,
-				align,
-				href,
-				width,
-				height,
-			} = attributes;
+			const { url, alt, caption, align, href, width, height } =
+				attributes;
 			const extraImageProps = width || height ? { width, height } : {};
 			const image = (
 				<img src={ url } alt={ alt } { ...extraImageProps } />

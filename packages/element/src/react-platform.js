@@ -5,6 +5,7 @@ import {
 	createPortal,
 	findDOMNode,
 	render,
+	hydrate,
 	unmountComponentAtNode,
 } from 'react-dom';
 
@@ -13,9 +14,9 @@ import {
  *
  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
  *
- * @param {import('./react').WPElement}   child     Any renderable child, such as an element,
- *                                string, or fragment.
- * @param {HTMLElement} container DOM node into which element should be rendered.
+ * @param {import('./react').WPElement} child     Any renderable child, such as an element,
+ *                                                string, or fragment.
+ * @param {HTMLElement}                 container DOM node into which element should be rendered.
  */
 export { createPortal };
 
@@ -29,10 +30,18 @@ export { findDOMNode };
 /**
  * Renders a given element into the target DOM node.
  *
- * @param {import('./react').WPElement}   element Element to render.
- * @param {HTMLElement} target  DOM node into which element should be rendered.
+ * @param {import('./react').WPElement} element Element to render.
+ * @param {HTMLElement}                 target  DOM node into which element should be rendered.
  */
 export { render };
+
+/**
+ * Hydrates a given element into the target DOM node.
+ *
+ * @param {import('./react').WPElement} element Element to hydrate.
+ * @param {HTMLElement}                 target  DOM node into which element should be hydrated.
+ */
+export { hydrate };
 
 /**
  * Removes any mounted element from the target DOM node.

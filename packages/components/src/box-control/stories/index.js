@@ -11,10 +11,12 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import BoxControl from '../';
-import BoxControlVisualizer from '../visualizer';
 import { Flex, FlexBlock } from '../../flex';
 
-export default { title: 'Components/BoxControl', component: BoxControl };
+export default {
+	title: 'Components (Experimental)/BoxControl',
+	component: BoxControl,
+};
 
 export const _default = () => {
 	return <BoxControl />;
@@ -27,9 +29,12 @@ const defaultSideValues = {
 	left: '10px',
 };
 
-function DemoExample( { sides, defaultValues = defaultSideValues } ) {
+function DemoExample( {
+	sides,
+	defaultValues = defaultSideValues,
+	splitOnAxis = false,
+} ) {
 	const [ values, setValues ] = useState( defaultValues );
-	const [ showVisualizer, setShowVisualizer ] = useState( {} );
 
 	return (
 		<Container align="top" gap={ 8 }>
@@ -40,29 +45,13 @@ function DemoExample( { sides, defaultValues = defaultSideValues } ) {
 						values={ values }
 						sides={ sides }
 						onChange={ setValues }
-						onChangeShowVisualizer={ setShowVisualizer }
+						splitOnAxis={ splitOnAxis }
 					/>
-				</Content>
-			</FlexBlock>
-			<FlexBlock>
-				<Content>
-					<BoxContainer>
-						<BoxControlVisualizer
-							showValues={ showVisualizer }
-							values={ values }
-						>
-							<Box />
-						</BoxControlVisualizer>
-					</BoxContainer>
 				</Content>
 			</FlexBlock>
 		</Container>
 	);
 }
-
-export const visualizer = () => {
-	return <DemoExample />;
-};
 
 export const arbitrarySides = () => {
 	return (
@@ -82,18 +71,22 @@ export const singleSide = () => {
 	);
 };
 
+export const axialControls = () => {
+	return <DemoExample splitOnAxis={ true } />;
+};
+
+export const axialControlsWithSingleSide = () => {
+	return (
+		<DemoExample
+			sides={ [ 'horizontal' ] }
+			defaultValues={ { left: '10px', right: '10px' } }
+			splitOnAxis={ true }
+		/>
+	);
+};
+
 const Container = styled( Flex )`
 	max-width: 780px;
-`;
-
-const BoxContainer = styled.div`
-	width: 300px;
-	height: 300px;
-`;
-
-const Box = styled.div`
-	background: #ddd;
-	height: 300px;
 `;
 
 const Content = styled.div`

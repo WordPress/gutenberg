@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+const browserslist = require( 'browserslist' );
+
 module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
@@ -17,7 +22,10 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
-			include: [ 'proposal-nullish-coalescing-operator' ],
+			include: [
+				'proposal-nullish-coalescing-operator',
+				'proposal-logical-assignment-operators',
+			],
 		};
 
 		if ( isTestEnv ) {
@@ -26,8 +34,12 @@ module.exports = ( api ) => {
 			};
 		} else {
 			opts.modules = false;
+			const localBrowserslistConfig =
+				browserslist.findConfig( '.' ) || {};
 			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
+				browsers:
+					localBrowserslistConfig.defaults ||
+					require( '@wordpress/browserslist-config' ),
 			};
 		}
 

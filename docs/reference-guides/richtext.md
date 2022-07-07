@@ -12,7 +12,7 @@ Unlike other components that exist in the [Component Reference](/packages/compon
 
 ## Property Reference
 
-For a list of the possible properties to pass your RichText component, [check out the component documentation on Github](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md).
+For a list of the possible properties to pass your RichText component, [check out the component documentation on GitHub](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md).
 
 ## Core Blocks Using the RichText Component
 
@@ -26,9 +26,9 @@ There are a number of core blocks using the RichText component. The JavaScript e
 ## Example
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
-```js
+```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
 
@@ -66,7 +66,7 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 wp.blocks.registerBlockType( /* ... */, {
@@ -110,16 +110,9 @@ wp.blocks.registerBlockType( /* ... */, {
 
 While using the RichText component a number of common issues tend to appear.
 
-### Placeholder Content Separates from the Input
-
-In some cases the placeholder content on RichText can appear separate from the input where you would write your content. This is likely due to one of two reasons:
-
-1. You can't have an element with the CSS `display` property set to `inline`. You will need to set it to `inline-block` or any other value.
-2. The `position` CSS property value for the element must be set to `relative` or `absolute` within the admin. If the styles within style.css or editor.css modify the `position` property value for this element, you may see issues with how it displays.
-
 ### HTML Formatting Tags Display in the Content
 
-If the HTML tags from text formatting such as `<strong>` or `<em>` are being escaped and displayed on the frontend of the site, this is likely due to an issue in your save function. Make sure your code looks something like `<RichText.Content tagName="h2" value={ heading } />` (ESNext) within your save function instead of simply outputting the value with `<h2>{ heading }</h2>`.
+If the HTML tags from text formatting such as `<strong>` or `<em>` are being escaped and displayed on the frontend of the site, this is likely due to an issue in your save function. Make sure your code looks something like `<RichText.Content tagName="h2" value={ heading } />` (JSX) within your save function instead of simply outputting the value with `<h2>{ heading }</h2>`.
 
 ### Unwanted Formatting Options Still Display
 
@@ -137,4 +130,4 @@ The RichText component uses formats to display inline elements, for example imag
 wp.richText.unregisterFormatType( 'core/image' );
 ```
 
-To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/tutorials/javascript/loading-javascript/).
+To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/how-to-guides/javascript/loading-javascript/).

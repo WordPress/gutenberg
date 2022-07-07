@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useReducer } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 
@@ -13,6 +13,7 @@ import { isCollapsed } from '../is-collapsed';
 const EMPTY_ACTIVE_FORMATS = [];
 
 export function useFormatBoundaries( props ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
@@ -30,7 +31,7 @@ export function useFormatBoundaries( props ) {
 				return;
 			}
 
-			const { record, applyRecord, setActiveFormats } = propsRef.current;
+			const { record, applyRecord } = propsRef.current;
 			const {
 				text,
 				formats,
@@ -69,55 +70,28 @@ export function useFormatBoundaries( props ) {
 
 			const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
 			const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
+			const destination = isReverse ? formatsBefore : formatsAfter;
+			const isIncreasing = currentActiveFormats.every(
+				( format, index ) => format === destination[ index ]
+			);
 
 			let newActiveFormatsLength = currentActiveFormats.length;
-			let source = formatsAfter;
 
-			if ( formatsBefore.length > formatsAfter.length ) {
-				source = formatsBefore;
-			}
-
-			// If the amount of formats before the caret and after the caret is
-			// different, the caret is at a format boundary.
-			if ( formatsBefore.length < formatsAfter.length ) {
-				if (
-					! isReverse &&
-					currentActiveFormats.length < formatsAfter.length
-				) {
-					newActiveFormatsLength++;
-				}
-
-				if (
-					isReverse &&
-					currentActiveFormats.length > formatsBefore.length
-				) {
-					newActiveFormatsLength--;
-				}
-			} else if ( formatsBefore.length > formatsAfter.length ) {
-				if (
-					! isReverse &&
-					currentActiveFormats.length > formatsAfter.length
-				) {
-					newActiveFormatsLength--;
-				}
-
-				if (
-					isReverse &&
-					currentActiveFormats.length < formatsBefore.length
-				) {
-					newActiveFormatsLength++;
-				}
+			if ( ! isIncreasing ) {
+				newActiveFormatsLength--;
+			} else if ( newActiveFormatsLength < destination.length ) {
+				newActiveFormatsLength++;
 			}
 
 			if ( newActiveFormatsLength === currentActiveFormats.length ) {
-				record.current._newActiveFormats = isReverse
-					? formatsBefore
-					: formatsAfter;
+				record.current._newActiveFormats = destination;
 				return;
 			}
 
 			event.preventDefault();
 
+			const origin = isReverse ? formatsAfter : formatsBefore;
+			const source = isIncreasing ? destination : origin;
 			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
 			const newValue = {
 				...record.current,
@@ -125,7 +99,7 @@ export function useFormatBoundaries( props ) {
 			};
 			record.current = newValue;
 			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
+			forceRender();
 		}
 
 		element.addEventListener( 'keydown', onKeyDown );

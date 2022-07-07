@@ -13,11 +13,11 @@ describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 		const helpButton = await editorPage.getUnsupportedBlockHelpButton();
 		await helpButton.click();
 
-		const editButton = await editorPage.getUnsupportedBlockBottomSheetEditButton();
+		const editButton =
+			await editorPage.getUnsupportedBlockBottomSheetEditButton();
 		await editButton.click();
 
-		await expect(
-			editorPage.getUnsupportedBlockWebView()
-		).resolves.toBeTruthy();
+		const webView = await editorPage.getUnsupportedBlockWebView();
+		await expect( webView ).toBeTruthy();
 	} );
 } );

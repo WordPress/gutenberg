@@ -29,7 +29,7 @@ export default function useMenuLocations() {
 		const fetchMenuLocationsByName = async () => {
 			const newMenuLocationsByName = await apiFetch( {
 				method: 'GET',
-				path: '/__experimental/menu-locations/',
+				path: '/wp/v2/menu-locations',
 			} );
 
 			if ( isMounted ) {
@@ -51,7 +51,7 @@ export default function useMenuLocations() {
 
 			setMenuLocationsByName( newMenuLocationsByName );
 
-			const activeMenuId = oldMenuId || newMenuId;
+			const activeMenuId = newMenuId || oldMenuId;
 			editMenuEntityRecord( ...menuEntityData, {
 				locations: locationsForMenuId(
 					newMenuLocationsByName,

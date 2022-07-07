@@ -1,14 +1,15 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,18 +20,56 @@ import { VisuallyHidden } from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
+function useDeprecatedProps( {
+	isDefault,
+	isPrimary,
+	isSecondary,
+	isTertiary,
+	isLink,
+	variant,
+	...otherProps
+} ) {
+	let computedVariant = variant;
+
+	if ( isPrimary ) {
+		computedVariant ??= 'primary';
+	}
+
+	if ( isTertiary ) {
+		computedVariant ??= 'tertiary';
+	}
+
+	if ( isSecondary ) {
+		computedVariant ??= 'secondary';
+	}
+
+	if ( isDefault ) {
+		deprecated( 'Button isDefault prop', {
+			since: '5.4',
+			alternative: 'variant="secondary"',
+			version: '6.2',
+		} );
+
+		computedVariant ??= 'secondary';
+	}
+
+	if ( isLink ) {
+		computedVariant ??= 'link';
+	}
+
+	return {
+		...otherProps,
+		variant: computedVariant,
+	};
+}
+
 export function Button( props, ref ) {
 	const {
 		href,
 		target,
-		isPrimary,
 		isSmall,
-		isTertiary,
 		isPressed,
 		isBusy,
-		isDefault,
-		isSecondary,
-		isLink,
 		isDestructive,
 		className,
 		disabled,
@@ -43,26 +82,24 @@ export function Button( props, ref ) {
 		label,
 		children,
 		text,
+		variant,
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
 		...additionalProps
-	} = props;
-
-	if ( isDefault ) {
-		deprecated( 'Button isDefault prop', {
-			since: '5.4',
-			alternative: 'isSecondary',
-		} );
-	}
+	} = useDeprecatedProps( props );
+	const instanceId = useInstanceId(
+		Button,
+		'components-button__description'
+	);
 
 	const classes = classnames( 'components-button', className, {
-		'is-secondary': isDefault || isSecondary,
-		'is-primary': isPrimary,
+		'is-secondary': variant === 'secondary',
+		'is-primary': variant === 'primary',
 		'is-small': isSmall,
-		'is-tertiary': isTertiary,
+		'is-tertiary': variant === 'tertiary',
 		'is-pressed': isPressed,
 		'is-busy': isBusy,
-		'is-link': isLink,
+		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
 		'has-text': !! icon && !! children,
 		'has-icon': !! icon,
@@ -95,19 +132,18 @@ export function Button( props, ref ) {
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! trulyDisabled &&
-		// an explicit tooltip is passed or...
+		// An explicit tooltip is passed or...
 		( ( showTooltip && label ) ||
-			// there's a shortcut or...
+			// There's a shortcut or...
 			shortcut ||
-			// there's a label and...
+			// There's a label and...
 			( !! label &&
-				// the children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
-				// the tooltip is not explicitly disabled.
+				// The children are empty and...
+				! children?.length &&
+				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? uniqueId() : null;
+	const descriptionId = describedBy ? instanceId : null;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
@@ -148,7 +184,7 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ describedBy ? describedBy : label }
+				text={ children?.length && describedBy ? describedBy : label }
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>

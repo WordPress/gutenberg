@@ -1,17 +1,12 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
-	BlockControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	JustifyContentControl,
+	useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,49 +14,47 @@ import {
 import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-function ButtonsEdit( {
-	attributes: { contentJustification, orientation },
-	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
-			'is-vertical': orientation === 'vertical',
-		} ),
-	} );
+const DEFAULT_BLOCK = {
+	name: buttonBlockName,
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
+};
+
+function ButtonsEdit( { attributes: { layout = {} } } ) {
+	const blockProps = useBlockProps();
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations =
+			select( blockEditorStore ).getSettings()
+				.__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
+	}, [] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		template: BUTTONS_TEMPLATE,
-		orientation,
-		__experimentalLayout: {
-			type: 'default',
-			alignments: [],
-		},
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
+		template: [
+			[
+				buttonBlockName,
+				{ className: preferredStyle && `is-style-${ preferredStyle }` },
+			],
+		],
+		__experimentalLayout: layout,
 		templateInsertUpdatesSelection: true,
 	} );
 
-	const justifyControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
-
 	return (
 		<>
-			<BlockControls group="block">
-				<JustifyContentControl
-					allowedControls={ justifyControls }
-					value={ contentJustification }
-					onChange={ ( value ) =>
-						setAttributes( { contentJustification: value } )
-					}
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
-			</BlockControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

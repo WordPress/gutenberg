@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 const { clearTimeout, setTimeout } = window;
-
+const noop = () => {};
 const DEBOUNCE_TIMEOUT = 200;
 
 /**
@@ -44,7 +39,6 @@ export function useDebouncedShowMovers( {
 
 	const shouldHideMovers = () => {
 		const isHovered = getIsHovered();
-
 		return ! isFocused && ! isHovered;
 	};
 
@@ -82,7 +76,18 @@ export function useDebouncedShowMovers( {
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(
+		() => () => {
+			/**
+			 * We need to call the change handler with `isFocused`
+			 * set to false on unmount because we also clear the
+			 * timeout that would handle that.
+			 */
+			handleOnChange( false );
+			clearTimeoutRef();
+		},
+		[]
+	);
 
 	return {
 		showMovers,
@@ -106,11 +111,8 @@ export function useShowMoversGestures( {
 	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+	const { showMovers, debouncedShowMovers, debouncedHideMovers } =
+		useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
 
 	const registerRef = useRef( false );
 

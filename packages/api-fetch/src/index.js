@@ -99,7 +99,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 	}
 
 	const responsePromise = window.fetch(
-		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		// Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
 		url || path || window.location.href,
 		{
 			...DEFAULT_OPTIONS,
@@ -109,28 +109,27 @@ const defaultFetchHandler = ( nextOptions ) => {
 		}
 	);
 
-	return (
-		responsePromise
-			// Return early if fetch errors. If fetch error, there is most likely no
-			// network connection. Unfortunately fetch just throws a TypeError and
-			// the message might depend on the browser.
-			.then(
-				( value ) =>
-					Promise.resolve( value )
-						.then( checkStatus )
-						.catch( ( response ) =>
-							parseAndThrowError( response, parse )
-						)
-						.then( ( response ) =>
-							parseResponseAndNormalizeError( response, parse )
-						),
-				() => {
-					throw {
-						code: 'fetch_error',
-						message: __( 'You are probably offline.' ),
-					};
-				}
-			)
+	return responsePromise.then(
+		( value ) =>
+			Promise.resolve( value )
+				.then( checkStatus )
+				.catch( ( response ) => parseAndThrowError( response, parse ) )
+				.then( ( response ) =>
+					parseResponseAndNormalizeError( response, parse )
+				),
+		( err ) => {
+			// Re-throw AbortError for the users to handle it themselves.
+			if ( err && err.name === 'AbortError' ) {
+				throw err;
+			}
+
+			// Otherwise, there is most likely no network connection.
+			// Unfortunately the message might depend on the browser.
+			throw {
+				code: 'fetch_error',
+				message: __( 'You are probably offline.' ),
+			};
+		}
 	);
 };
 
@@ -158,12 +157,12 @@ function apiFetch( options ) {
 	// ```
 	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
 	// ```
-	const enhancedHandler = middlewares.reduceRight( (
-		/** @type {FetchHandler} */ next,
-		middleware
-	) => {
-		return ( workingOptions ) => middleware( workingOptions, next );
-	}, fetchHandler );
+	const enhancedHandler = middlewares.reduceRight(
+		( /** @type {FetchHandler} */ next, middleware ) => {
+			return ( workingOptions ) => middleware( workingOptions, next );
+		},
+		fetchHandler
+	);
 
 	return enhancedHandler( options ).catch( ( error ) => {
 		if ( error.code !== 'rest_cookie_invalid_nonce' ) {

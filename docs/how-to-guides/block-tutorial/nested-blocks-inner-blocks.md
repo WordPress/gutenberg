@@ -2,12 +2,12 @@
 
 You can create a single block that nests other blocks using the [InnerBlocks](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md) component. This is used in the Columns block, Social Links block, or any block you want to contain other blocks.
 
-Note: A single block can only contain one `InnerBlock` component.
+Note: A single block can only contain one `InnerBlocks` component.
 
 Here is the basic InnerBlocks usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -38,7 +38,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 } );
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 ( function ( blocks, element, blockEditor ) {
@@ -79,20 +79,20 @@ const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
 
 ## Orientation
 
-By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style InnerBlocks to appear horizontally. When blocks are styled in such a way, the `orientation` prop can be used to indicate a horizontal layout:
+By default, `InnerBlocks` expects its blocks to be shown in a vertical list. A valid use-case is to style inner blocks to appear horizontally, for instance by adding CSS flex or grid properties to the inner blocks wrapper. When blocks are styled in such a way, the `orientation` prop can be set to indicate that a horizontal layout is being used:
 
 ```js
 <InnerBlocks orientation="horizontal" />
 ```
 
-Specifying this prop will result in the block movers being shown horizontally, and also ensure drag and drop works correctly.
+Specifying this prop does not affect the layout of the inner blocks, but results in the block mover icons in the child blocks being displayed horizontally, and also ensures that drag and drop works correctly.
 
 ## Template
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
 
 {% codetabs %}
-{% ESNext %}
+{% JSX %}
 
 ```js
 const MY_TEMPLATE = [
@@ -113,7 +113,7 @@ const MY_TEMPLATE = [
 	},
 ```
 
-{% ES5 %}
+{% Plain %}
 
 ```js
 const MY_TEMPLATE = [
@@ -137,7 +137,7 @@ const MY_TEMPLATE = [
 
 {% end %}
 
-Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
+Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
 ### Post Template
 
@@ -155,18 +155,30 @@ add_action( 'init', function() {
 } );
 ```
 
-## Parent-Child InnerBlocks
+## Child InnerBlocks: Parent and Ancestors
 
-A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks. An example of this is the Columns block, that creates a single parent block called `columns` and then creates an child block called `column`. The parent block is defined to only allow the child blocks. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
+A common pattern for using InnerBlocks is to create a custom block that will be included only in the InnerBlocks. 
+
+An example of this is the Columns block, that creates a single parent block called `columns` and then creates an child block called `column`. The parent block is defined to only allow the child blocks. See [Column code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/column).
 
 When defining a child block, use the `parent` block setting to define which block is the parent. This prevents the block showing in the inserter outside of the InnerBlock it is defined for.
 
-```js
-export const settings = {
-	title: __( 'Column' ),
-	parent: [ 'core/columns' ],
-	icon,
-	description: __( 'A single column within a columns block.' ),
-	//...
-};
+```json
+{
+	"title": "Column",
+	"name": "core/column",
+	"parent": [ "core/columns" ],
+	// ...
+}
+```
+
+Another example is using the `ancestors` block setting to define a block that must be present as an ancestor, but it doesn't need to be the direct parent (like with `parent`). This prevents the block from showing in the inserter if the ancestor is not in the tree, but other blocks can be added in between, like a Columns or Group block. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
+
+```json
+{
+	"title": "Comment Author Name",
+	"name": "core/comment-author-name",
+	"ancestor": [ "core/comment-template" ],
+	// ...
+}
 ```

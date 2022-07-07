@@ -139,9 +139,9 @@ export const isRTL = i18n.isRTL.bind( i18n );
 /**
  * Check if there is a translation for a given string (in singular form).
  *
- * @param {string} single Singular form of the string to look up.
+ * @param {string} single    Singular form of the string to look up.
  * @param {string} [context] Context information for the translators.
- * @param {string} [domain] Domain to retrieve the translated text.
+ * @param {string} [domain]  Domain to retrieve the translated text.
  * @return {boolean} Whether the translation exists or not.
  */
 export const hasTranslation = i18n.hasTranslation.bind( i18n );

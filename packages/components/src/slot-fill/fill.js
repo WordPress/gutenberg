@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { isFunction } from 'lodash';
+// @ts-nocheck
 
 /**
  * WordPress dependencies
@@ -36,7 +33,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 
 	useLayoutEffect( () => {
 		if ( name === ref.current.name ) {
-			// ignore initial effect
+			// Ignore initial effect.
 			return;
 		}
 		unregisterFill( ref.current.name, ref.current );
@@ -49,7 +46,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	}
 
 	// If a function is passed as a child, provide it with the fillProps.
-	if ( isFunction( children ) ) {
+	if ( typeof children === 'function' ) {
 		children = children( slot.props.fillProps );
 	}
 

@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
-	store as coreStore,
+	useEntityRecord,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
@@ -17,46 +17,36 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( ref );
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
 		ref
 	);
-	const { isMissing, hasResolved } = useSelect(
-		( select ) => {
-			const persistedBlock = select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_block',
-				ref
-			);
-			const hasResolvedBlock = select(
-				coreStore
-			).hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				'wp_block',
-				ref,
-			] );
-			return {
-				hasResolved: hasResolvedBlock,
-				isMissing: hasResolvedBlock && ! persistedBlock,
-			};
-		},
-		[ ref, clientId ]
+	const isMissing = hasResolved && ! record;
+
+	const canRemove = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
 	);
 
-	const {
-		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( reusableBlocksStore );
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -70,19 +60,24 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
+	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const blockProps = useBlockProps(
 		{
-			value: blocks,
-			onInput,
-			onChange,
-			renderAppender: blocks?.length
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-		}
+			className: hasBlockOverlay
+				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
+				: 'block-library-block__reusable-block-container',
+		},
+		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
-	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -116,7 +111,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider>
-			<div { ...blockProps }>
+			{ canRemove && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -127,19 +122,17 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 						/>
 					</ToolbarGroup>
 				</BlockControls>
-				<InspectorControls>
-					<PanelBody>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<div className="block-library-block__reusable-block-container">
-					{ <div { ...innerBlocksProps } /> }
-				</div>
-			</div>
+			) }
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<div { ...innerBlocksProps } />
 		</RecursionProvider>
 	);
 }

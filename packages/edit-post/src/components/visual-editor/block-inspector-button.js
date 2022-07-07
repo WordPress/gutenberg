@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,6 +12,8 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editPostStore } from '../../store';
 
+const noop = () => {};
+
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
@@ -29,21 +26,8 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		editPostStore
-	);
-
-	const speakMessage = () => {
-		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Block settings closed' ) );
-		} else {
-			speak(
-				__(
-					'Additional settings are now available in the Editor block settings sidebar'
-				)
-			);
-		}
-	};
+	const { openGeneralSidebar, closeGeneralSidebar } =
+		useDispatch( editPostStore );
 
 	const label = areAdvancedSettingsOpened
 		? __( 'Hide more settings' )
@@ -54,11 +38,16 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {
 					closeGeneralSidebar();
+					speak( __( 'Block settings closed' ) );
 				} else {
 					openGeneralSidebar( 'edit-post/block' );
-					speakMessage();
-					onClick();
+					speak(
+						__(
+							'Additional settings are now available in the Editor block settings sidebar'
+						)
+					);
 				}
+				onClick();
 			} }
 			shortcut={ shortcut }
 		>

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { defaultTo } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
@@ -14,12 +9,15 @@ import {
 	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
+	CopyHandler,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -28,6 +26,9 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
+import WelcomeGuide from '../welcome-guide';
+import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -36,11 +37,30 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const hasUploadPermissions = useSelect(
-		( select ) =>
-			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
-		[]
-	);
+	const {
+		hasUploadPermissions,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		isWelcomeGuideActive,
+	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return {
+			hasUploadPermissions:
+				select( coreStore ).canUser( 'create', 'media' ) ?? true,
+			isFixedToolbarActive: !! get(
+				'core/customize-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! get(
+				'core/customize-widgets',
+				'keepCaretInsideBlock'
+			),
+			isWelcomeGuideActive: !! get(
+				'core/customize-widgets',
+				'welcomeGuide'
+			),
+		};
+	}, [] );
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
 		if ( hasUploadPermissions ) {
@@ -57,31 +77,56 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
+			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
-	}, [ hasUploadPermissions, blockEditorSettings ] );
+	}, [
+		hasUploadPermissions,
+		blockEditorSettings,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		setIsInserterOpened,
+	] );
+
+	if ( isWelcomeGuideActive ) {
+		return <WelcomeGuide sidebar={ sidebar } />;
+	}
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
+			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
+				<KeyboardShortcuts
+					undo={ sidebar.undo }
+					redo={ sidebar.redo }
+					save={ sidebar.save }
+				/>
 
 				<Header
+					sidebar={ sidebar }
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
+					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
-				<BlockTools>
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</BlockTools>
+				<CopyHandler>
+					<BlockTools>
+						<EditorStyles styles={ settings.defaultEditorStyles } />
+						<BlockSelectionClearer>
+							<WritingFlow className="editor-styles-wrapper">
+								<ObserveTyping>
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockTools>
+				</CopyHandler>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

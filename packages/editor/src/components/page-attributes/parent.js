@@ -5,9 +5,7 @@ import {
 	get,
 	unescape as unescapeString,
 	debounce,
-	repeat,
 	find,
-	flatten,
 	deburr,
 } from 'lodash';
 
@@ -19,11 +17,13 @@ import { ComboboxControl } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { buildTermsTree } from '../../utils/terms';
+import { store as editorStore } from '../../store';
 
 function getTitle( post ) {
 	return post?.title?.rendered
@@ -46,16 +46,14 @@ export const getItemPriority = ( name, searchValue ) => {
 };
 
 export function PageAttributesParent() {
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
-			const { getPostType, getEntityRecords, getEntityRecord } = select(
-				'core'
-			);
-			const { getCurrentPostId, getEditedPostAttribute } = select(
-				'core/editor'
-			);
+			const { getPostType, getEntityRecords, getEntityRecord } =
+				select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const pageId = getEditedPostAttribute( 'parent' );
 			const pType = getPostType( postTypeSlug );
@@ -99,7 +97,7 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						repeat( '— ', level ) + unescapeString( treeNode.name ),
+						'— '.repeat( level ) + unescapeString( treeNode.name ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -111,7 +109,7 @@ export function PageAttributesParent() {
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
-			return flatten( sortedNodes );
+			return sortedNodes.flat();
 		};
 
 		let tree = pageItems.map( ( item ) => ( {

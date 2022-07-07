@@ -1,6 +1,8 @@
 # View
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `View` is a core component that renders everything in the library. It is the principle component in the entire library.
 
@@ -11,7 +13,7 @@
 ```jsx
 import {
 	__experimentalText as Text,
-	__experimentalView as View
+	__experimentalView as View,
 } from '@wordpress/components';
 
 function Example() {

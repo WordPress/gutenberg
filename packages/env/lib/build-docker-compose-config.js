@@ -19,9 +19,9 @@ const { dbEnv } = require( './config' );
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {WPServiceConfig} config The service config to get the mounts from.
- * @param {string} wordpressDefault The default internal path for the WordPress
- *                                  source code (such as tests-wordpress).
+ * @param {WPServiceConfig} config           The service config to get the mounts from.
+ * @param {string}          wordpressDefault The default internal path for the WordPress
+ *                                           source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
@@ -45,7 +45,14 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
 		config.coreSource ? config.coreSource.path : wordpressDefault
 	}:/var/www/html`;
 
-	return [ coreMount, ...directoryMounts, ...pluginMounts, ...themeMounts ];
+	return [
+		...new Set( [
+			coreMount,
+			...directoryMounts,
+			...pluginMounts,
+			...themeMounts,
+		] ),
+	];
 }
 
 /**

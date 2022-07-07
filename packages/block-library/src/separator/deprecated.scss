@@ -1,0 +1,6 @@
+.wp-block-separator {
+	// V1 version of the block expects a default opactiy of 0.4 to be set.
+	&.has-css-opacity {
+		opacity: 0.4;
+	}
+}

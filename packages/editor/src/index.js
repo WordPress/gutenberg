@@ -1,11 +1,4 @@
 /**
- * WordPress dependencies
- */
-import '@wordpress/block-editor';
-import '@wordpress/core-data';
-import '@wordpress/rich-text';
-
-/**
  * Internal dependencies
  */
 import './hooks';

@@ -1,9 +1,10 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "core/embed",
 	"title": "Embed",
 	"category": "embed",
-	"description": "Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.",
+	"description": "Add a block that displays content pulled from other sites, like Twitter or YouTube.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {
@@ -34,7 +35,12 @@
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
+		}
 	},
 	"editorStyle": "wp-block-embed-editor",
 	"style": "wp-block-embed"

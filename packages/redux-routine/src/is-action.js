@@ -3,12 +3,13 @@
  */
 import { isPlainObject, isString } from 'lodash';
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Returns true if the given object quacks like an action.
  *
- * @param {*} object Object to test
+ * @param {any} object Object to test
  *
- * @return {boolean}  Whether object is an action.
+ * @return {object is import('redux').AnyAction}  Whether object is an action.
  */
 export function isAction( object ) {
 	return isPlainObject( object ) && isString( object.type );
@@ -18,11 +19,12 @@ export function isAction( object ) {
  * Returns true if the given object quacks like an action and has a specific
  * action type
  *
- * @param {*}      object       Object to test
- * @param {string} expectedType The expected type for the action.
+ * @param {unknown} object       Object to test
+ * @param {string}  expectedType The expected type for the action.
  *
- * @return {boolean} Whether object is an action and is of specific type.
+ * @return {object is import('redux').AnyAction} Whether object is an action and is of specific type.
  */
 export function isActionOfType( object, expectedType ) {
+	/* eslint-enable jsdoc/valid-types */
 	return isAction( object ) && object.type === expectedType;
 }

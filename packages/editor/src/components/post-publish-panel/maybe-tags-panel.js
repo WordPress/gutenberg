@@ -11,11 +11,13 @@ import { Component } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
+import { store as editorStore } from '../../store';
 
 const TagsPanel = () => {
 	const panelBodyTitle = [
@@ -66,11 +68,11 @@ class MaybeTagsPanel extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const postType = select( 'core/editor' ).getCurrentPostType();
-		const tagsTaxonomy = select( 'core' ).getTaxonomy( 'post_tag' );
+		const postType = select( editorStore ).getCurrentPostType();
+		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
 		const tags =
 			tagsTaxonomy &&
-			select( 'core/editor' ).getEditedPostAttribute(
+			select( editorStore ).getEditedPostAttribute(
 				tagsTaxonomy.rest_base
 			);
 		return {

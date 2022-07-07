@@ -1,8 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	forwardRef,
+	useState,
+	useCallback,
+	useMemo,
+	useImperativeHandle,
+	useRef,
+} from '@wordpress/element';
+import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -10,7 +17,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import Tips from './tips';
-import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
@@ -20,47 +26,46 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
-function InserterMenu( {
-	rootClientId,
-	clientId,
-	isAppender,
-	__experimentalInsertionIndex,
-	onSelect,
-	showInserterHelpPanel,
-	showMostUsedBlocks,
-	shouldFocusBlock = true,
-} ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
-		null
-	);
-
-	const [
-		destinationRootClientId,
-		onInsertBlocks,
-		onToggleInsertionPoint,
-	] = useInsertionPoint( {
+function InserterMenu(
+	{
 		rootClientId,
 		clientId,
 		isAppender,
-		insertionIndex: __experimentalInsertionIndex,
-		shouldFocusBlock,
-	} );
+		__experimentalInsertionIndex,
+		onSelect,
+		showInserterHelpPanel,
+		showMostUsedBlocks,
+		__experimentalFilterValue = '',
+		shouldFocusBlock = true,
+	},
+	ref
+) {
+	const [ filterValue, setFilterValue ] = useState(
+		__experimentalFilterValue
+	);
+	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] =
+		useState( null );
+
+	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
+		useInsertionPoint( {
+			rootClientId,
+			clientId,
+			isAppender,
+			insertionIndex: __experimentalInsertionIndex,
+			shouldFocusBlock,
+		} );
 	const { showPatterns, hasReusableBlocks } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } = select(
-				blockEditorStore
-			);
+			const { __experimentalGetAllowedPatterns, getSettings } =
+				select( blockEditorStore );
 
 			return {
-				showPatterns:
-					! destinationRootClientId ||
-					!! __experimentalGetAllowedPatterns(
-						destinationRootClientId
-					).length,
-				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-					?.length,
+				showPatterns: !! __experimentalGetAllowedPatterns(
+					destinationRootClientId
+				).length,
+				hasReusableBlocks:
+					!! getSettings().__experimentalReusableBlocks?.length,
 			};
 		},
 		[ destinationRootClientId ]
@@ -168,12 +173,20 @@ function InserterMenu( {
 		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
+
 	return (
 		<div className="block-editor-inserter__menu">
 			<div className="block-editor-inserter__main-area">
-				{ /* the following div is necessary to fix the sticky position of the search form */ }
+				{ /* The following div is necessary to fix the sticky position of the search form. */ }
 				<div className="block-editor-inserter__content">
-					<InserterSearchForm
+					<SearchControl
+						className="block-editor-inserter__search"
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
 							setFilterValue( value );
@@ -181,6 +194,7 @@ function InserterMenu( {
 						value={ filterValue }
 						label={ __( 'Search for blocks and patterns' ) }
 						placeholder={ __( 'Search' ) }
+						ref={ searchRef }
 					/>
 					{ !! filterValue && (
 						<InserterSearchResults
@@ -218,4 +232,4 @@ function InserterMenu( {
 	);
 }
 
-export default InserterMenu;
+export default forwardRef( InserterMenu );

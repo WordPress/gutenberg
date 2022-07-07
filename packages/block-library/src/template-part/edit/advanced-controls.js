@@ -4,9 +4,8 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { InspectorAdvancedControls } from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -30,9 +29,12 @@ export function TemplatePartAdvancedControls( {
 	);
 
 	const { areaOptions } = useSelect( ( select ) => {
-		const definedAreas = select(
-			editorStore
-		).__experimentalGetDefaultTemplatePartAreas();
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		/* eslint-disable @wordpress/data-no-store-string-literals */
+		const definedAreas =
+			select( 'core/editor' ).__experimentalGetDefaultTemplatePartAreas();
+		/* eslint-enable @wordpress/data-no-store-string-literals */
 		return {
 			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
 				label,
@@ -42,7 +44,7 @@ export function TemplatePartAdvancedControls( {
 	}, [] );
 
 	return (
-		<InspectorAdvancedControls>
+		<InspectorControls __experimentalGroup="advanced">
 			{ isEntityAvailable && (
 				<>
 					<TextControl
@@ -85,6 +87,6 @@ export function TemplatePartAdvancedControls( {
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
-		</InspectorAdvancedControls>
+		</InspectorControls>
 	);
 }

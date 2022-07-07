@@ -9,7 +9,7 @@ import Aztec
 import RNTAztecView
 
 @objc
-public class Gutenberg: NSObject {
+public class Gutenberg: UIResponder {
     public static func supportedBlocks(isDev: Bool = false) -> [String] {
         guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
         let data = Data(json.utf8)
@@ -55,21 +55,23 @@ public class Gutenberg: NSObject {
 
     private var initialProps: [String: Any]? {
         var initialProps = [String: Any]()
-        
+
         if let initialContent = dataSource.gutenbergInitialContent() {
             initialProps["initialData"] = initialContent
         }
-        
+
         if let initialTitle = dataSource.gutenbergInitialTitle() {
             initialProps["initialTitle"] = initialTitle
         }
+
+        initialProps["featuredImageId"] = dataSource.gutenbergFeaturedImageId()
 
         initialProps["postType"] = dataSource.gutenbergPostType()
 
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
-        
+
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
@@ -79,13 +81,10 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
-        let editorTheme = dataSource.gutenbergEditorTheme()
-        if let colors = editorTheme?.colors {
-            initialProps["colors"] = colors
-        }
-
-        if let gradients = editorTheme?.gradients {
-            initialProps["gradients"] = gradients
+        let editorSettings = dataSource.gutenbergEditorSettings()
+        let settingsUpdates = properties(from: editorSettings)
+        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
+            settingsUpdates
         }
 
         return initialProps
@@ -109,13 +108,17 @@ public class Gutenberg: NSObject {
     public func toggleHTMLMode() {
         sendEvent(.toggleHTMLMode)
     }
-    
+
     public func setTitle(_ title: String) {
         sendEvent(.setTitle, body: ["title": title])
     }
-    
+
     public func updateHtml(_ html: String) {
         sendEvent(.updateHtml, body: ["html": html])
+    }
+
+    public func featuredImageIdNativeUpdated(mediaId: Int32) {
+        sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
     public func replace(block: Block) {
@@ -184,19 +187,44 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
-    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+    public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
+        let settingsUpdates = properties(from: editorSettings)
+        sendEvent(.updateEditorSettings, body: settingsUpdates)
+    }
 
-        var themeUpdates = [String : Any]()
+    public func showEditorHelp() {
+        bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
+    }
 
-        if let colors = editorTheme?.colors {
-            themeUpdates["colors"] = colors
+    private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
+        var settingsUpdates = [String : Any]()
+        settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
+        
+        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
+            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
         }
 
-        if let gradients = editorTheme?.gradients {
-            themeUpdates["gradients"] = gradients
+        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
+            settingsUpdates["quoteBlockV2"] = quoteBlockV2
         }
 
-        sendEvent(.updateTheme, body:themeUpdates)
+        if let rawStyles = editorSettings?.rawStyles {
+            settingsUpdates["rawStyles"] = rawStyles
+        }
+
+        if let rawFeatures = editorSettings?.rawFeatures {
+            settingsUpdates["rawFeatures"] = rawFeatures
+        }
+
+        if let colors = editorSettings?.colors {
+            settingsUpdates["colors"] = colors
+        }
+
+        if let gradients = editorSettings?.gradients {
+            settingsUpdates["gradients"] = gradients
+        }
+
+        return settingsUpdates
     }
 
     public func showNotice(_ message: String) {

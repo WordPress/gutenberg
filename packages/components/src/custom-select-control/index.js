@@ -8,12 +8,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import { Button, VisuallyHidden } from '../';
 
-const itemToString = ( item ) => item && item.name;
+const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
@@ -53,9 +56,12 @@ const stateReducer = (
 	}
 };
 export default function CustomSelectControl( {
+	/** Start opting into the larger default height that will become the default size in a future version. */
+	__next36pxDefaultSize = false,
 	className,
 	hideLabelFromVision,
 	label,
+	describedBy,
 	options: items,
 	onChange: onSelectedItemChange,
 	value: _selectedItem,
@@ -73,22 +79,41 @@ export default function CustomSelectControl( {
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+			? { selectedItem: _selectedItem }
+			: undefined ),
 		stateReducer,
 	} );
+
+	function getDescribedBy() {
+		if ( describedBy ) {
+			return describedBy;
+		}
+
+		if ( ! selectedItem ) {
+			return __( 'No selection' );
+		}
+
+		// translators: %s: The selected option.
+		return sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+	}
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 	} );
-	// We need this here, because the null active descendant is not
-	// fully ARIA compliant.
+
+	const onKeyDownHandler = useCallback(
+		( e ) => {
+			e.stopPropagation();
+			menuProps?.onKeyDown?.( e );
+		},
+		[ menuProps ]
+	);
+
+	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
-		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice(
-			0,
-			'downshift-null'.length
-		) === 'downshift-null'
+		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
@@ -118,17 +143,28 @@ export default function CustomSelectControl( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
 					'aria-label': label,
 					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
+					className: classnames(
+						'components-custom-select-control__button',
+						{ 'is-next-36px-default-size': __next36pxDefaultSize }
+					),
+					isSmall: ! __next36pxDefaultSize,
+					describedBy: getDescribedBy(),
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
 				<Icon
 					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
+					className={ classnames(
+						'components-custom-select-control__button-icon',
+						{
+							'is-next-36px-default-size': __next36pxDefaultSize,
+						}
+					) }
+					size={ 18 }
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
@@ -143,12 +179,20 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
+										'has-hint': !! item.__experimentalHint,
+										'is-next-36px-default-size':
+											__next36pxDefaultSize,
 									}
 								),
 								style: item.style,
 							} ) }
 						>
 							{ item.name }
+							{ item.__experimentalHint && (
+								<span className="components-custom-select-control__item-hint">
+									{ item.__experimentalHint }
+								</span>
+							) }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }

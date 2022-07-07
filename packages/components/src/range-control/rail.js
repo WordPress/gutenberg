@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -43,6 +44,9 @@ function Marks( {
 	step = 1,
 	value = 0,
 } ) {
+	if ( step === 'any' ) {
+		step = 1;
+	}
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (

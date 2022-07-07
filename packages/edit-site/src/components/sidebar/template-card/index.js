@@ -10,21 +10,26 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
+import TemplateActions from './template-actions';
+import TemplateAreas from './template-areas';
 
 export default function TemplateCard() {
-	const { title, description, icon } = useSelect( ( select ) => {
+	const {
+		info: { title, description, icon },
+		template,
+	} = useSelect( ( select ) => {
 		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEntityRecord } = select( coreStore );
-		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			editorStore
-		);
+		const { getEditedEntityRecord } = select( coreStore );
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEntityRecord( 'postType', postType, postId );
+		const record = getEditedEntityRecord( 'postType', postType, postId );
+
 		const info = record ? getTemplateInfo( record ) : {};
 
-		return info;
+		return { info, template: record };
 	}, [] );
 
 	if ( ! title && ! description ) {
@@ -35,10 +40,16 @@ export default function TemplateCard() {
 		<div className="edit-site-template-card">
 			<Icon className="edit-site-template-card__icon" icon={ icon } />
 			<div className="edit-site-template-card__content">
-				<h2 className="edit-site-template-card__title">{ title }</h2>
-				<span className="edit-site-template-card__description">
+				<div className="edit-site-template-card__header">
+					<h2 className="edit-site-template-card__title">
+						{ title }
+					</h2>
+					<TemplateActions template={ template } />
+				</div>
+				<div className="edit-site-template-card__description">
 					{ description }
-				</span>
+				</div>
+				<TemplateAreas />
 			</div>
 		</div>
 	);

@@ -12,9 +12,8 @@ import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
 	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			editWidgetsStore
-		);
+		const { getEditedWidgetAreas, isSavingWidgetAreas } =
+			select( editWidgetsStore );
 
 		return {
 			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
@@ -25,7 +24,7 @@ function SaveButton() {
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }

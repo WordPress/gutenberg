@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo } from 'lodash';
+import { pick, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,8 +11,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,49 +34,94 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		isTitleSelected,
+		userCanCreatePages,
+		pageOnFront,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isPostTitleSelected } = select(
-			editorStore
-		);
-		const { canUser } = select( coreStore );
+		const { canUserUseUnfilteredHTML } = select( editorStore );
+		const isWeb = Platform.OS === 'web';
+		const { canUser, getEntityRecord } = select( coreStore );
+
+		const siteSettings = getEntityRecord( 'root', 'site' );
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_block',
-				/**
-				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
-				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
-				 */
-				{ per_page: Platform.select( { web: -1, native: 10 } ) }
-			),
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-			// This selector is only defined on mobile.
-			isTitleSelected: isPostTitleSelected && isPostTitleSelected(),
+			reusableBlocks: isWeb
+				? select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_block',
+						{ per_page: -1 }
+				  )
+				: [], // Reusable blocks are fetched in the native version of this hook.
+			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
+			userCanCreatePages: canUser( 'create', 'pages' ),
+			pageOnFront: siteSettings?.page_on_front,
 		};
 	}, [] );
 
+	const settingsBlockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		settings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		settings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
+		( select ) => ( {
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
+		} ),
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		[ settingsBlockPatterns, restBlockPatterns ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			unionBy(
+				settingsBlockPatternCategories,
+				restBlockPatternCategories,
+				'name'
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
+
 	const { undo } = useDispatch( editorStore );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	/**
+	 * Creates a Post entity.
+	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
+	 *
+	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
+	 * @return {Object} the post type object that was created.
+	 */
+	const createPageEntity = ( options ) => {
+		if ( ! userCanCreatePages ) {
+			return Promise.reject( {
+				message: __( 'You do not have permission to create Pages.' ),
+			} );
+		}
+		return saveEntityRecord( 'postType', 'page', options );
+	};
 
 	return useMemo(
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalBlockPatternCategories',
-				'__experimentalBlockPatterns',
+				'__experimentalDiscussionSettings',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithImageBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',
+				'canLockBlocks',
 				'codeEditingEnabled',
 				'colors',
 				'disableCustomColors',
@@ -87,6 +133,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'focusMode',
 				'fontSizes',
 				'gradients',
+				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
 				'imageDefaultSize',
@@ -103,26 +150,34 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'titlePlaceholder',
 				'supportsLayout',
 				'widgetTypesToHideFromLegacyWidgetBlock',
+				'__unstableResolvedAssets',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalBlockPatterns: blockPatterns,
+			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: ( url ) =>
-				fetchRemoteUrlData( url ),
+			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: isTitleSelected,
 			outlineMode: hasTemplate,
+			__experimentalCreatePageEntity: createPageEntity,
+			__experimentalUserCanCreatePages: userCanCreatePages,
+			pageOnFront,
+			__experimentalPreferPatternsOnRoot: hasTemplate,
 		} ),
 		[
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
+			blockPatterns,
+			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
-			isTitleSelected,
 			hasTemplate,
+			userCanCreatePages,
+			pageOnFront,
 		]
 	);
 }

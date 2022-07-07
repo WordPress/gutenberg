@@ -8,7 +8,13 @@ import { text } from '@storybook/addon-knobs';
  */
 import TabPanel from '../';
 
-export default { title: 'Components/TabPanel', component: TabPanel };
+export default {
+	title: 'Components/TabPanel',
+	component: TabPanel,
+	parameters: {
+		knobs: { disable: false },
+	},
+};
 
 export const _default = () => {
 	return (

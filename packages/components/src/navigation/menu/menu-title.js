@@ -12,8 +12,8 @@ import { getAnimateClassName } from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import {
+	GroupTitleUI,
 	MenuTitleActionsUI,
-	MenuTitleHeadingUI,
 	MenuTitleUI,
 } from '../styles/navigation-styles';
 import { useNavigationMenuContext } from './context';
@@ -51,10 +51,10 @@ export default function NavigationMenuTitle( {
 	return (
 		<MenuTitleUI className="components-navigation__menu-title">
 			{ ! isSearching && (
-				<MenuTitleHeadingUI
+				<GroupTitleUI
 					as="h2"
 					className="components-navigation__menu-title-heading"
-					variant="title.small"
+					level={ 3 }
 				>
 					<span id={ menuTitleId }>{ title }</span>
 
@@ -65,7 +65,7 @@ export default function NavigationMenuTitle( {
 							{ hasSearch && (
 								<Button
 									isSmall
-									isTertiary
+									variant="tertiary"
 									label={ searchButtonLabel }
 									onClick={ () => setIsSearching( true ) }
 									ref={ searchButtonRef }
@@ -75,7 +75,7 @@ export default function NavigationMenuTitle( {
 							) }
 						</MenuTitleActionsUI>
 					) }
-				</MenuTitleHeadingUI>
+				</GroupTitleUI>
 			) }
 
 			{ isSearching && (

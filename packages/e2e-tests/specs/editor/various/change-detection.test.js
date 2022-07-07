@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,7 +10,7 @@ import {
 	saveDraft,
 	openDocumentSettingsSidebar,
 	isCurrentURL,
-	pressKeyTimes,
+	openTypographyToolsPanelMenu,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -280,14 +275,17 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
 	} );
@@ -302,14 +300,17 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
 	} );
@@ -319,13 +320,14 @@ describe( 'Change detection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
-		// Save
+		// Save.
 		await saveDraft();
 
 		// Verify that the title is empty.
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			( element ) => element.innerHTML
+			// Trim padding non-breaking space.
+			( element ) => element.textContent.trim()
 		);
 		expect( title ).toBe( '' );
 
@@ -337,7 +339,7 @@ describe( 'Change detection', () => {
 		// Enter title.
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		// Save
+		// Save.
 		await saveDraft();
 		const postId = await page.evaluate( () =>
 			window.wp.data.select( 'core/editor' ).getCurrentPostId()
@@ -364,8 +366,6 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
-		const FONT_SIZE_LABEL_SELECTOR =
-			"//label[contains(text(), 'Font size')]";
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
@@ -380,11 +380,16 @@ describe( 'Change detection', () => {
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
-		// Increase the paragraph's font size.
+		// Change the paragraph's `drop cap`.
 		await page.click( '[data-type="core/paragraph"]' );
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 2 );
-		await page.keyboard.press( 'Enter' );
+
+		await openTypographyToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Drop cap"]' );
+
+		const [ dropCapToggle ] = await page.$x(
+			"//label[contains(text(), 'Drop cap')]"
+		);
+		await dropCapToggle.click();
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -396,12 +401,9 @@ describe( 'Change detection', () => {
 			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
-		// Increase the paragraph's font size again.
+		// Change the paragraph's `drop cap` again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
-		await pressKeyTimes( 'ArrowDown', 3 );
-		await page.keyboard.press( 'Enter' );
-		await page.click( '[data-type="core/paragraph"]' );
+		await dropCapToggle.click();
 
 		// Check that the post is dirty.
 		await page.waitForSelector( '.editor-post-save-draft' );

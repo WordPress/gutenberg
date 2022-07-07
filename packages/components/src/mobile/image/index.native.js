@@ -174,7 +174,7 @@ const ImageComponent = ( {
 		<View
 			style={ [
 				styles.container,
-				// only set alignItems if an image exists because alignItems causes the placeholder
+				// Only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
 				imageData && align && { alignItems: align },

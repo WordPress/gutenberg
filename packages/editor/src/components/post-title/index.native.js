@@ -19,6 +19,8 @@ import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,7 +34,7 @@ class PostTitle extends Component {
 		this.setRef = this.setRef.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected and blur the RichText
+		// Unselect if any other block is selected and blur the RichText.
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&
@@ -107,12 +109,20 @@ class PostTitle extends Component {
 			borderStyle,
 			isDimmed,
 			postType,
+			globalStyles,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
 		const borderColor = this.props.isSelected
 			? focusedBorderColor
 			: 'transparent';
+		const titleStyles = {
+			...style,
+			...( globalStyles?.text && {
+				color: globalStyles.text,
+				placeholderColor: globalStyles.text,
+			} ),
+		};
 
 		return (
 			<View
@@ -132,11 +142,12 @@ class PostTitle extends Component {
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 					multiline={ false }
-					style={ style }
+					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
+					lineHeight={ 1 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
 					onChange={ ( value ) => {
@@ -158,32 +169,30 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isPostTitleSelected, getEditedPostAttribute } = select(
-			'core/editor'
-		);
-
-		const { getSelectedBlockClientId, getBlockRootClientId } = select(
-			'core/block-editor'
-		);
+		const { isPostTitleSelected, getEditedPostAttribute } =
+			select( editorStore );
+		const { getSelectedBlockClientId, getBlockRootClientId, getSettings } =
+			select( blockEditorStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),
 			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
 			isDimmed: selectionIsNested,
+			globalStyles,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch(
-			'core/editor'
-		);
+		const { undo, redo, togglePostTitleSelection } =
+			dispatch( editorStore );
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
-			'core/block-editor'
-		);
+		const { clearSelectedBlock, insertDefaultBlock } =
+			dispatch( blockEditorStore );
 
 		return {
 			onEnterPress() {

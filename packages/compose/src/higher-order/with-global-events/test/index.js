@@ -81,9 +81,9 @@ describe( 'withGlobalEvents', () => {
 	it( 'binds events from passed object', () => {
 		mountEnhancedComponent();
 
-		// Get the HOC wrapper instance
-		const hocInstance = wrapper.root.findByType( OriginalComponent ).parent
-			.instance;
+		// Get the HOC wrapper instance.
+		const hocInstance =
+			wrapper.root.findByType( OriginalComponent ).parent.instance;
 
 		expect( Listener._instance.add ).toHaveBeenCalledWith(
 			'resize',

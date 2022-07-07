@@ -124,7 +124,7 @@ const licenseFileStrings = {
  * eg, "(MIT OR Zlib)".
  *
  * @param {string} allowedLicense The license that's allowed.
- * @param {string} licenseType The license string to check.
+ * @param {string} licenseType    The license string to check.
  *
  * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
  */
@@ -235,7 +235,7 @@ function detectTypeFromLicenseFiles( path ) {
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
 
-			// Check if the file contains any of the strings in licenseFileStrings
+			// Check if the file contains any of the strings in licenseFileStrings.
 			return Object.keys( licenseFileStrings ).reduce(
 				( stringDetectedType, licenseStringType ) => {
 					const licenseFileString =

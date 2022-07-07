@@ -1,0 +1,19 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"text": "My button",
+			"style": {
+				"border": {
+					"radius": 0
+				},
+				"color": {
+					"text": "#1b9b6c",
+					"background": "#aa5a20"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

@@ -13,11 +13,11 @@ import { store as blockEditorStore } from '../../store';
  * Contains the properties `ConvertToGroupButton` component needs.
  *
  * @typedef {Object} ConvertToGroupButtonProps
- * @property {string[]} clientIds  An array of the selected client ids.
- * @property {boolean} isGroupable Indicates if the selected blocks can be grouped.
- * @property {boolean} isUngroupable Indicates if the selected blocks can be ungrouped.
- * @property {WPBlock[]} blocksSelection An array of the selected blocks.
- * @property {string} groupingBlockName The name of block used for handling grouping interactions.
+ * @property {string[]}  clientIds         An array of the selected client ids.
+ * @property {boolean}   isGroupable       Indicates if the selected blocks can be grouped.
+ * @property {boolean}   isUngroupable     Indicates if the selected blocks can be ungrouped.
+ * @property {WPBlock[]} blocksSelection   An array of the selected blocks.
+ * @property {string}    groupingBlockName The name of block used for handling grouping interactions.
  */
 
 /**
@@ -64,12 +64,7 @@ export default function useConvertToGroupButtonProps() {
 		// Do we have
 		// 1. Grouping block available to be inserted?
 		// 2. One or more blocks selected
-		// (we allow single Blocks to become groups unless
-		// they are a soltiary group block themselves)
-		const _isGroupable =
-			groupingBlockAvailable &&
-			_blocksSelection.length &&
-			! isSingleGroupingBlock;
+		const _isGroupable = groupingBlockAvailable && _blocksSelection.length;
 
 		// Do we have a single Group Block selected and does that group have inner blocks?
 		const _isUngroupable =

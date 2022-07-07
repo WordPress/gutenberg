@@ -5,54 +5,101 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useInnerBlocksProps,
+	useSetting,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 
-function Content( { layout, postType, postId } ) {
+/**
+ * Internal dependencies
+ */
+import { useCanEditEntity } from '../utils/hooks';
+
+function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+	const [ , , content ] = useEntityProp(
+		'postType',
+		postType,
+		'content',
+		postId
+	);
+	const blockProps = useBlockProps();
+	return content?.protected && ! userCanEdit ? (
+		<div { ...blockProps }>
+			<Warning>{ __( 'This content is password protected.' ) }</Warning>
+		</div>
+	) : (
+		<div
+			{ ...blockProps }
+			dangerouslySetInnerHTML={ { __html: content?.rendered } }
+		></div>
+	);
+}
+
+function EditableContent( { layout, context = {} } ) {
+	const { postType, postId } = context;
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );
-	const defaultLayout = useEditorFeature( 'layout' ) || {};
+	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
 		{ id: postId }
 	);
+
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 	return <div { ...props } />;
+}
+
+function Content( props ) {
+	const { context: { queryId, postType, postId } = {} } = props;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
+	return isEditable ? (
+		<EditableContent { ...props } />
+	) : (
+		<ReadOnlyContent
+			userCanEdit={ userCanEdit }
+			postType={ postType }
+			postId={ postId }
+		/>
+	);
 }
 
 function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
-			<div className="wp-block-post-content__placeholder">
-				<span>{ __( 'This is a placeholder for post content.' ) }</span>
-			</div>
+			<p>
+				{ __(
+					'This is the Post Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Post Content block can display the contents of those entries as well.'
+				) }
+			</p>
 		</div>
 	);
 }
@@ -68,14 +115,11 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( {
-	context: { postId: contextPostId, postType: contextPostType },
-	attributes,
-} ) {
+export default function PostContentEdit( { context, attributes } ) {
+	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		contextPostId
-	);
+	const [ hasAlreadyRendered, RecursionProvider ] =
+		useNoRecursiveRenders( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;
@@ -84,11 +128,7 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider>
 			{ contextPostId && contextPostType ? (
-				<Content
-					postType={ contextPostType }
-					postId={ contextPostId }
-					layout={ layout }
-				/>
+				<Content context={ context } layout={ layout } />
 			) : (
 				<Placeholder />
 			) }

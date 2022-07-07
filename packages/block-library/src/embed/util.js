@@ -43,8 +43,8 @@ export const getEmbedInfoByProvider = ( provider ) =>
 /**
  * Returns true if any of the regular expressions match the URL.
  *
- * @param {string}   url      The URL to test.
- * @param {Array}    patterns The list of regular expressions to test agains.
+ * @param {string} url      The URL to test.
+ * @param {Array}  patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) =>
@@ -54,7 +54,7 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * Finds the block variation that should be used for the URL,
  * based on the provided URL and the variation's patterns.
  *
- * @param {string}  url The URL to test.
+ * @param {string} url The URL to test.
  * @return {WPBlockVariation} The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = ( url ) =>
@@ -66,9 +66,11 @@ export const isFromWordPress = ( html ) =>
 	html && html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
+	// If full image url not found use thumbnail.
+	const imageUrl = photo.url || photo.thumbnail_url;
+
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = photo.thumbnail_url || photo.url;
+	// actually the full size photo.
 	const photoPreview = (
 		<p>
 			<img src={ imageUrl } alt={ photo.title } width="100%" />
@@ -87,15 +89,16 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props                  The block's props.
- * @param {Object} [attributesFromPreview]  Attributes generated from the block's most up to date preview.
+ * @param {Object} props                   The block's props.
+ * @param {Object} [attributesFromPreview] Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = (
 	props,
 	attributesFromPreview = {}
 ) => {
-	const { preview, attributes: { url, providerNameSlug, type } = {} } = props;
+	const { preview, attributes = {} } = props;
+	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
 	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
@@ -105,8 +108,8 @@ export const createUpgradedEmbedBlock = (
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
 	const isCurrentBlockWP =
 		providerNameSlug === 'wordpress' || type === WP_EMBED_TYPE;
-	// if current block is not WordPress and a more suitable block found
-	// that is different from the current one, create the new matched block
+	// If current block is not WordPress and a more suitable block found
+	// that is different from the current one, create the new matched block.
 	const shouldCreateNewBlock =
 		! isCurrentBlockWP &&
 		matchedBlock &&
@@ -115,6 +118,7 @@ export const createUpgradedEmbedBlock = (
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
 			url,
+			...restAttributes,
 			...matchedBlock.attributes,
 		} );
 	}
@@ -288,3 +292,33 @@ export const getAttributesFromPreview = memoize(
 		return attributes;
 	}
 );
+
+/**
+ * Returns the attributes derived from the preview, merged with the current attributes.
+ *
+ * @param {Object}  currentAttributes       The current attributes of the block.
+ * @param {Object}  preview                 The preview data.
+ * @param {string}  title                   The block's title, e.g. Twitter.
+ * @param {boolean} isResponsive            Boolean indicating if the block supports responsive content.
+ * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+ * @return {Object} Merged attributes.
+ */
+export const getMergedAttributesWithPreview = (
+	currentAttributes,
+	preview,
+	title,
+	isResponsive,
+	ignorePreviousClassName = false
+) => {
+	const { allowResponsive, className } = currentAttributes;
+	return {
+		...currentAttributes,
+		...getAttributesFromPreview(
+			preview,
+			title,
+			ignorePreviousClassName ? undefined : className,
+			isResponsive,
+			allowResponsive
+		),
+	};
+};

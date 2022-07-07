@@ -14,7 +14,7 @@ _Required._ Called when the value changes.
 
 ### `tagName: String`
 
-_Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
+_Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element.
 
 ### `placeholder: String`
 

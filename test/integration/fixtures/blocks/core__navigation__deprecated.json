@@ -1,0 +1,33 @@
+[
+	{
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"style": {
+				"typography": {
+					"textTransform": "lowercase",
+					"textDecoration": "line-through",
+					"fontStyle": "italic",
+					"fontWeight": "100"
+				}
+			},
+			"layout": {
+				"type": "flex",
+				"orientation": "horizontal"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

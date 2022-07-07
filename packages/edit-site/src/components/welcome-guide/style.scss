@@ -1,0 +1,37 @@
+.edit-site-welcome-guide {
+	width: 312px;
+
+	&__image {
+		background: #00a0d2;
+		margin: 0 0 $grid-unit-20;
+		> img {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+		}
+	}
+
+	&__heading {
+		font-family: $default-font;
+		font-size: 24px;
+		line-height: 1.4;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__text {
+		font-size: $default-font-size;
+		line-height: 1.4;
+		margin: 0 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+
+		img {
+			vertical-align: bottom;
+		}
+	}
+
+	&__inserter-icon {
+		margin: 0 4px;
+		vertical-align: text-top;
+	}
+}

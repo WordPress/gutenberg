@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"separator": ", ",
+			"prefix": "",
+			"suffix": ""
+		},
+		"innerBlocks": []
+	}
+]

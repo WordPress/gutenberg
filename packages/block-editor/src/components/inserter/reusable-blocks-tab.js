@@ -43,10 +43,10 @@ function ReusableBlocksList( { onHover, onInsert, rootClientId } ) {
 /**
  * List of reusable blocks shown in the "Reusable" tab of the inserter.
  *
- * @param {Object}   props                Component props.
- * @param {?string}  props.rootClientId   Client id of block to insert into.
- * @param {Function} props.onInsert       Callback to run when item is inserted.
- * @param {Function} props.onHover        Callback to run when item is hovered.
+ * @param {Object}   props              Component props.
+ * @param {?string}  props.rootClientId Client id of block to insert into.
+ * @param {Function} props.onInsert     Callback to run when item is inserted.
+ * @param {Function} props.onHover      Callback to run when item is hovered.
  *
  * @return {WPComponent} The component.
  */

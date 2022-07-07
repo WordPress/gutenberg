@@ -130,8 +130,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 1',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-1/',
+								url: 'http://wordpress.local/about/about-sub-1/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -142,14 +141,13 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 2',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-2/',
+								url: 'http://wordpress.local/about/about-sub-2/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 				{
 					attributes: {
@@ -186,17 +184,16 @@ describe( 'page list convert to links', () => {
 										kind: 'post-type',
 										label: 'Test Sub Sub',
 										type: 'page',
-										url:
-											'http://wordpress.local/test/test-sub/test-sub-sub/',
+										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',
 								},
 							],
-							name: 'core/navigation-link',
+							name: 'core/navigation-submenu',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 			] );
 		} );
@@ -325,8 +322,7 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 1',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-1/',
+								url: 'http://wordpress.local/about/about-sub-1/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
@@ -337,14 +333,13 @@ describe( 'page list convert to links', () => {
 								kind: 'post-type',
 								label: 'About Sub 2',
 								type: 'page',
-								url:
-									'http://wordpress.local/about/about-sub-2/',
+								url: 'http://wordpress.local/about/about-sub-2/',
 							},
 							innerBlocks: [],
 							name: 'core/navigation-link',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 				{
 					attributes: {
@@ -381,17 +376,16 @@ describe( 'page list convert to links', () => {
 										kind: 'post-type',
 										label: 'Test Sub Sub',
 										type: 'page',
-										url:
-											'http://wordpress.local/test/test-sub/test-sub-sub/',
+										url: 'http://wordpress.local/test/test-sub/test-sub-sub/',
 									},
 									innerBlocks: [],
 									name: 'core/navigation-link',
 								},
 							],
-							name: 'core/navigation-link',
+							name: 'core/navigation-submenu',
 						},
 					],
-					name: 'core/navigation-link',
+					name: 'core/navigation-submenu',
 				},
 			] );
 		} );

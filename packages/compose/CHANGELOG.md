@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+## 5.10.0 (2022-06-29)
+
+## 5.9.0 (2022-06-15)
+
+## 5.8.0 (2022-06-01)
+
+## 5.7.0 (2022-05-18)
+
+### Bug Fix
+
+-   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
+
+### New Features
+
+-   Add `useDisabled` hook.
+
+### Internal
+
+-   Update the implementation of useResizeObserver to rely on the ResizableObserver API.
+
+## 5.6.0 (2022-05-04)
+
+## 5.5.0 (2022-04-21)
+
+## 5.4.0 (2022-04-08)
+
+## 5.3.0 (2022-03-23)
+
+## 5.2.0 (2022-03-11)
+
+## 5.1.0 (2022-01-27)
+
+## 5.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 4.2.0 (2021-07-21)
+
+### Deprecations
+
+-   `withState` HOC has been deprecated. Use `useState` hook instead.
+
+### New Features
+
+-   Publish TypeScript types.
+
+## 4.1.0 (2021-05-20)
+
+## 4.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

@@ -1,6 +1,6 @@
 .block-editor-block-patterns-list__list-item {
 	cursor: pointer;
-	margin-top: $grid-unit-20;
+	margin-bottom: $grid-unit-30;
 
 	&.is-placeholder {
 		min-height: 100px;
@@ -13,25 +13,35 @@
 
 .block-editor-block-patterns-list__item {
 	height: 100%;
-	border-radius: $radius-block-ui;
-	transition: all 0.05s ease-in-out;
-	position: relative;
-	border: $border-width solid transparent;
 
-	&:hover {
+	.block-editor-block-preview__container {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: $radius-block-ui;
+		border: $border-width solid $gray-100;
+	}
+
+	.block-editor-block-patterns-list__item-title {
+		padding-top: $grid-unit-10;
+		font-size: 12px;
+		text-align: center;
+	}
+
+	&:hover .block-editor-block-preview__container {
 		border: $border-width solid var(--wp-admin-theme-color);
 	}
 
-	&:focus {
+	&:focus .block-editor-block-preview__container {
 		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 	}
-}
 
-.block-editor-block-patterns-list__item-title {
-	padding: $grid-unit-05;
-	font-size: 12px;
-	text-align: center;
+
+	&:hover .block-editor-block-patterns-list__item-title,
+	&:focus .block-editor-block-patterns-list__item-title {
+		color: var(--wp-admin-theme-color);
+	}
 }

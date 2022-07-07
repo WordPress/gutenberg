@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import { get, has, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,8 +21,6 @@ import {
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-
-/* global wp */
 
 /**
  * Internal dependencies
@@ -53,7 +51,7 @@ export const pickRelevantMediaFiles = ( image, size ) => {
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
  * while the image is being uploaded and will not have an id yet allocated.
  *
- * @param {number=} id The id of the image.
+ * @param {number=} id  The id of the image.
  * @param {string=} url The url of the image.
  *
  * @return {boolean} Is the URL a Blob URL
@@ -71,6 +69,22 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  */
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
+/**
+ * Checks if WP generated default image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} defaultSize
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+function hasDefaultSize( image, defaultSize ) {
+	return (
+		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
+		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+	);
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -80,6 +94,8 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	context,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -112,6 +128,12 @@ export function ImageEdit( {
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -123,6 +145,7 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 			} );
+
 			return;
 		}
 
@@ -147,7 +170,11 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: imageDefaultSize,
+				// Fallback to size "full" if there's no default image size.
+				// It means the image is smaller, and the block will use a full-size URL.
+				sizeSlug: hasDefaultSize( media, imageDefaultSize )
+					? imageDefaultSize
+					: 'full',
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -162,7 +189,7 @@ export function ImageEdit( {
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
-				wp?.media?.view?.settings?.defaultProps?.link ||
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
 			) {
 				case 'file':
@@ -223,7 +250,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	const isTemp = isTemporaryImage( id, url );
+	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -241,12 +268,8 @@ export function ImageEdit( {
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
+					isTemp = false;
+					onUploadError( message );
 				},
 			} );
 		}
@@ -255,14 +278,12 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! temporaryURL ) {
+		if ( isTemp ) {
+			setTemporaryURL( url );
 			return;
 		}
-
-		return () => {
-			revokeBlobURL( temporaryURL );
-		};
-	}, [ temporaryURL ] );
+		revokeBlobURL( temporaryURL );
+	}, [ isTemp, url ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -300,6 +321,8 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					context={ context }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (

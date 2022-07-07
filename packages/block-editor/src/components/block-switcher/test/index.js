@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { DOWN } from '@wordpress/keycodes';
 import { Button } from '@wordpress/components';
-import { stack } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -120,6 +120,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
+			canRemove: true,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
@@ -130,7 +131,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
 		useSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [],
-			icon: stack,
+			icon: copy,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu
@@ -146,6 +147,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				{ name: 'core/heading', frecency: 1 },
 				{ name: 'core/paragraph', frecency: 1 },
 			],
+			canRemove: true,
 		} ) );
 		const wrapper = shallow(
 			<BlockSwitcherDropdownMenu
@@ -161,6 +163,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				possibleBlockTransformations: [
 					{ name: 'core/paragraph', frecency: 3 },
 				],
+				canRemove: true,
 			} ) );
 		} );
 		const getDropdown = () =>
@@ -176,7 +179,6 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 			const onToggleStub = jest.fn();
 			const mockKeyDown = {
 				preventDefault: () => {},
-				stopPropagation: () => {},
 				keyCode: DOWN,
 			};
 

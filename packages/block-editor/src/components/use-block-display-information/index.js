@@ -16,9 +16,10 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
- * @property {string} title Human-readable block type label.
- * @property {WPIcon} icon Block type icon.
+ * @property {string} title       Human-readable block type label.
+ * @property {WPIcon} icon        Block type icon.
  * @property {string} description A detailed block type description.
+ * @property {string} anchor      HTML anchor.
  */
 
 /**
@@ -40,27 +41,28 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } = select(
-				blockEditorStore
-			);
-			const { getBlockType, getActiveBlockVariation } = select(
-				blocksStore
-			);
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;
+			const attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, attributes );
 			const blockTypeInfo = {
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
+				anchor: attributes?.anchor,
 			};
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
 			if ( ! match ) return blockTypeInfo;
+
 			return {
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
+				anchor: attributes?.anchor,
 			};
 		},
 		[ clientId ]

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flowRight, omit, forEach, filter } from 'lodash';
+import { map, flowRight, omit, filter, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,16 @@ import {
 } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
+
+function getContextFromAction( action ) {
+	const { query } = action;
+	if ( ! query ) {
+		return 'default';
+	}
+
+	const queryParts = getQueryParts( query );
+	return queryParts.context;
+}
 
 /**
  * Returns a merged array of item IDs, given details of the received paginated
@@ -41,7 +51,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
 	const size = Math.max(
-		itemIds.length,
+		itemIds?.length ?? 0,
 		nextItemIdsStartIndex + nextItemIds.length
 	);
 
@@ -56,7 +66,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
-			: itemIds[ i ];
+			: itemIds?.[ i ];
 	}
 
 	return mergedItemIds;
@@ -71,24 +81,30 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  *
  * @return {Object} Next state.
  */
-function items( state = {}, action ) {
+export function items( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ITEMS':
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
 			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...action.items.reduce( ( accumulator, value ) => {
-					const itemId = value[ key ];
-					accumulator[ itemId ] = conservativeMapItem(
-						state[ itemId ],
-						value
-					);
-					return accumulator;
-				}, {} ),
+				[ context ]: {
+					...state[ context ],
+					...action.items.reduce( ( accumulator, value ) => {
+						const itemId = value[ key ];
+						accumulator[ itemId ] = conservativeMapItem(
+							state?.[ context ]?.[ itemId ],
+							value
+						);
+						return accumulator;
+					}, {} ),
+				},
 			};
+		}
 		case 'REMOVE_ITEMS':
-			const newState = omit( state, action.itemIds );
-			return newState;
+			return mapValues( state, ( contextState ) =>
+				omit( contextState, action.itemIds )
+			);
 	}
 	return state;
 }
@@ -100,38 +116,51 @@ function items( state = {}, action ) {
  * In such cases, completeness is used as an indication of whether it would be
  * safe to use queried data for a non-`_fields`-limited request.
  *
- * @param {Object<string,boolean>} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object<string,Object<string,boolean>>} state  Current state.
+ * @param {Object}                                action Dispatched action.
  *
- * @return {Object<string,boolean>} Next state.
+ * @return {Object<string,Object<string,boolean>>} Next state.
  */
 export function itemIsComplete( state = {}, action ) {
-	const { type, query, key = DEFAULT_ENTITY_KEY } = action;
-	if ( type !== 'RECEIVE_ITEMS' ) {
-		return state;
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS': {
+			const context = getContextFromAction( action );
+			const { query, key = DEFAULT_ENTITY_KEY } = action;
+
+			// An item is considered complete if it is received without an associated
+			// fields query. Ideally, this would be implemented in such a way where the
+			// complete aggregate of all fields would satisfy completeness. Since the
+			// fields are not consistent across all entities, this would require
+			// introspection on the REST schema for each entity to know which fields
+			// compose a complete item for that entity.
+			const queryParts = query ? getQueryParts( query ) : {};
+			const isCompleteQuery =
+				! query || ! Array.isArray( queryParts.fields );
+
+			return {
+				...state,
+				[ context ]: {
+					...state[ context ],
+					...action.items.reduce( ( result, item ) => {
+						const itemId = item[ key ];
+
+						// Defer to completeness if already assigned. Technically the
+						// data may be outdated if receiving items for a field subset.
+						result[ itemId ] =
+							state?.[ context ]?.[ itemId ] || isCompleteQuery;
+
+						return result;
+					}, {} ),
+				},
+			};
+		}
+		case 'REMOVE_ITEMS':
+			return mapValues( state, ( contextState ) =>
+				omit( contextState, action.itemIds )
+			);
 	}
 
-	// An item is considered complete if it is received without an associated
-	// fields query. Ideally, this would be implemented in such a way where the
-	// complete aggregate of all fields would satisfy completeness. Since the
-	// fields are not consistent across all entity types, this would require
-	// introspection on the REST schema for each entity to know which fields
-	// compose a complete item for that entity.
-	const isCompleteQuery =
-		! query || ! Array.isArray( getQueryParts( query ).fields );
-
-	return {
-		...state,
-		...action.items.reduce( ( result, item ) => {
-			const itemId = item[ key ];
-
-			// Defer to completeness if already assigned. Technically the
-			// data may be outdated if receiving items for a field subset.
-			result[ itemId ] = state[ itemId ] || isCompleteQuery;
-
-			return result;
-		}, {} ),
-	};
+	return state;
 }
 
 /**
@@ -162,6 +191,8 @@ const receiveQueries = flowRight( [
 
 		return action;
 	} ),
+
+	onSubKey( 'context' ),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
@@ -194,17 +225,18 @@ const queries = ( state = {}, action ) => {
 		case 'RECEIVE_ITEMS':
 			return receiveQueries( state, action );
 		case 'REMOVE_ITEMS':
-			const newState = { ...state };
 			const removedItems = action.itemIds.reduce( ( result, itemId ) => {
 				result[ itemId ] = true;
 				return result;
 			}, {} );
-			forEach( newState, ( queryItems, key ) => {
-				newState[ key ] = filter( queryItems, ( queryId ) => {
-					return ! removedItems[ queryId ];
+
+			return mapValues( state, ( contextQueries ) => {
+				return mapValues( contextQueries, ( queryItems ) => {
+					return filter( queryItems, ( queryId ) => {
+						return ! removedItems[ queryId ];
+					} );
 				} );
 			} );
-			return newState;
 		default:
 			return state;
 	}

@@ -5,13 +5,11 @@
 .columnPlaceholder {
 	flex: 1;
 	padding: $block-selected-to-content;
-	background-color: $white;
 	border: $border-width dashed $gray;
 	border-radius: 4px;
 }
 
 .columnPlaceholderDark {
-	background-color: $black;
 	border: $border-width dashed $gray-70;
 }
 
@@ -59,8 +57,20 @@
 }
 
 .columnAppender {
-	margin-left: $grid-unit-20;
-	margin-right: $grid-unit-20;
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
+}
+.fullwidthColumnAppender {
+	margin-left: $grid-unit * 2.5;
+	margin-right: $grid-unit * 2.5;
+}
+.fullwidthHasInnerColumnAppender {
+	margin-left: $grid-unit-15;
+	margin-right: $grid-unit-15;
+}
+.hasInnerColumnAppender {
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .wideColumnAppender {

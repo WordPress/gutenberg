@@ -32,33 +32,26 @@ export function useBlockClassNames( clientId ) {
 				getBlockName,
 				getSettings,
 				hasSelectedInnerBlock,
-				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
+				isTyping,
 			} = select( blockEditorStore );
-			const {
-				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
-			} = getSettings();
+			const { outlineMode } = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
 			const isSelected = isBlockSelected( clientId );
 			const name = getBlockName( clientId );
 			const checkDeep = true;
-			// "ancestor" is the more appropriate label due to "deep" check
+			// "ancestor" is the more appropriate label due to "deep" check.
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				checkDeep
 			);
-			const activeEntityBlockId = getActiveBlockIdByBlockNames(
-				spotlightEntityBlocks
-			);
-			return classnames( 'block-editor-block-list__block', {
+			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
 				'is-multi-selected': isBlockMultiSelected( clientId ),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,
-				'has-active-entity': activeEntityBlockId,
-				// Determine if there is an active entity area to spotlight.
-				'is-active-entity': activeEntityBlockId === clientId,
+				'remove-outline': isSelected && outlineMode && isTyping(),
 			} );
 		},
 		[ clientId ]

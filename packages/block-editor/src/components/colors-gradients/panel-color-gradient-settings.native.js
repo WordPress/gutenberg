@@ -14,13 +14,18 @@ import { useMemo } from '@wordpress/element';
  */
 import { blockSettingsScreens } from '../block-settings';
 
-export default function PanelColorGradientSettings( { settings, title } ) {
+export default function PanelColorGradientSettings( {
+	settings,
+	title,
+	children,
+} ) {
 	const navigation = useNavigation();
 
 	const mappedSettings = useMemo( () => {
 		return settings.map(
 			( {
 				onColorChange,
+				onColorCleared,
 				colorValue,
 				onGradientChange,
 				gradientValue,
@@ -33,6 +38,7 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 							colorValue: gradientValue || colorValue,
 							gradientValue,
 							onGradientChange,
+							onColorCleared,
 							label,
 						} );
 					} }
@@ -44,5 +50,10 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 		);
 	}, [ settings ] );
 
-	return <PanelBody title={ title }>{ mappedSettings }</PanelBody>;
+	return (
+		<>
+			<PanelBody title={ title }>{ mappedSettings }</PanelBody>
+			<PanelBody>{ children }</PanelBody>
+		</>
+	);
 }

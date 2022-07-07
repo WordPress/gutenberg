@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import {
+	BlockSettingsMenuControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	MenuItem,
@@ -12,10 +15,11 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { reusableBlock } from '@wordpress/icons';
+import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,10 +42,9 @@ export default function ReusableBlockConvertButton( {
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
 		( select ) => {
-			const { canUser } = select( 'core' );
-			const { getBlocksByClientId, canInsertBlockType } = select(
-				'core/block-editor'
-			);
+			const { canUser } = select( coreStore );
+			const { getBlocksByClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -49,7 +52,7 @@ export default function ReusableBlockConvertButton( {
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
-				!! select( 'core' ).getEntityRecord(
+				!! select( coreStore ).getEntityRecord(
 					'postType',
 					'wp_block',
 					blocks[ 0 ].attributes.ref
@@ -77,13 +80,11 @@ export default function ReusableBlockConvertButton( {
 		[ clientIds ]
 	);
 
-	const {
-		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( store );
+	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
+		useDispatch( store );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
@@ -109,7 +110,7 @@ export default function ReusableBlockConvertButton( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuItem
-						icon={ reusableBlock }
+						icon={ symbol }
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }
@@ -146,7 +147,7 @@ export default function ReusableBlockConvertButton( {
 								>
 									<FlexItem>
 										<Button
-											isSecondary
+											variant="tertiary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );
@@ -156,7 +157,7 @@ export default function ReusableBlockConvertButton( {
 										</Button>
 									</FlexItem>
 									<FlexItem>
-										<Button isPrimary type="submit">
+										<Button variant="primary" type="submit">
 											{ __( 'Save' ) }
 										</Button>
 									</FlexItem>

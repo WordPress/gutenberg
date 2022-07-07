@@ -6,17 +6,15 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 import { store as blockEditorStore } from '../../store';
-
-const EMPTY_ARRAY = [];
 
 export function __experimentalGetGradientClass( gradientSlug ) {
 	if ( ! gradientSlug ) {
@@ -28,8 +26,8 @@ export function __experimentalGetGradientClass( gradientSlug ) {
 /**
  * Retrieves the gradient value per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} slug Gradient slug
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} slug      Gradient slug
  *
  * @return {string} Gradient value.
  */
@@ -49,8 +47,8 @@ export function __experimentalGetGradientObjectByGradientValue(
 /**
  * Retrieves the gradient slug per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} value Gradient value
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} value     Gradient value
  * @return {string} Gradient slug.
  */
 export function getGradientSlugByValue( gradients, value ) {
@@ -67,7 +65,17 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const userGradientPalette = useSetting( 'color.gradients.custom' );
+	const themeGradientPalette = useSetting( 'color.gradients.theme' );
+	const defaultGradientPalette = useSetting( 'color.gradients.default' );
+	const allGradients = useMemo(
+		() => [
+			...( userGradientPalette || [] ),
+			...( themeGradientPalette || [] ),
+			...( defaultGradientPalette || [] ),
+		],
+		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
+	);
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
@@ -83,7 +91,10 @@ export function __experimentalUseGradient( {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(
 		( newGradientValue ) => {
-			const slug = getGradientSlugByValue( gradients, newGradientValue );
+			const slug = getGradientSlugByValue(
+				allGradients,
+				newGradientValue
+			);
 			if ( slug ) {
 				updateBlockAttributes( clientId, {
 					[ gradientAttribute ]: slug,
@@ -96,13 +107,13 @@ export function __experimentalUseGradient( {
 				[ customGradientAttribute ]: newGradientValue,
 			} );
 		},
-		[ gradients, clientId, updateBlockAttributes ]
+		[ allGradients, clientId, updateBlockAttributes ]
 	);
 
 	const gradientClass = __experimentalGetGradientClass( gradient );
 	let gradientValue;
 	if ( gradient ) {
-		gradientValue = getGradientValueBySlug( gradients, gradient );
+		gradientValue = getGradientValueBySlug( allGradients, gradient );
 	} else {
 		gradientValue = customGradient;
 	}

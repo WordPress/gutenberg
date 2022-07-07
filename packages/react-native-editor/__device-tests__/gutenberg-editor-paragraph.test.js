@@ -11,57 +11,24 @@ import {
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
-	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
-		await editorPage.removeBlockAtPosition( blockNames.paragraph );
-	} );
-
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.shortText
 		);
-		const textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
-		await clickMiddleOfElement( editorPage.driver, textViewElement );
-		await editorPage.typeTextToParagraphBlock(
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			'\n',
 			false
 		);
-		expect(
-			( await editorPage.hasBlockAtPosition(
-				1,
-				blockNames.paragraph
-			) ) &&
-				( await editorPage.hasBlockAtPosition(
-					2,
-					blockNames.paragraph
-				) )
-		).toBe( true );
-
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 		expect( text0 ).not.toBe( '' );
 		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch(
@@ -74,73 +41,43 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getBlockAtPosition(
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		await editorPage.typeTextToParagraphBlock(
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			testData.shortText
 		);
-		let textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
-		await clickMiddleOfElement( editorPage.driver, textViewElement );
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			'\n'
-		);
-		expect(
-			( await editorPage.hasBlockAtPosition(
-				1,
-				blockNames.paragraph
-			) ) &&
-				( await editorPage.hasBlockAtPosition(
-					2,
-					blockNames.paragraph
-				) )
-		).toBe( true );
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
-		paragraphBlockElement = await editorPage.getBlockAtPosition(
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
 
-		textViewElement = await editorPage.getTextViewForParagraphBlock(
+		await clickBeginningOfElement(
+			editorPage.driver,
 			paragraphBlockElement
 		);
-		await clickBeginningOfElement( editorPage.driver, textViewElement );
-		await editorPage.typeTextToParagraphBlock(
+
+		await editorPage.typeTextToTextBlock(
 			paragraphBlockElement,
 			backspace
 		);
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
-
-		expect(
-			await editorPage.hasBlockAtPosition( 2, blockNames.paragraph )
-		).toBe( false );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.paragraph
-		);
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
@@ -149,62 +86,65 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to merge blocks with unknown html elements', async () => {
-		await editorPage.setHtmlContent( `
-<!-- wp:paragraph -->
-<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
-<!-- /wp:paragraph -->
+		await editorPage.setHtmlContent(
+			[
+				testData.unknownElementParagraphBlock,
+				testData.lettersInParagraphBlock,
+			].join( '\n\n' )
+		);
 
-<!-- wp:paragraph -->
-<p>E</p>
-<!-- /wp:paragraph -->` );
-
-		// // Merge paragraphs
-		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
+		// Merge paragraphs.
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
+
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+
 		await clickBeginningOfElement(
 			editorPage.driver,
-			secondParagraphBlockElement
+			paragraphBlockElement
 		);
-		await editorPage.typeTextToParagraphBlock(
-			secondParagraphBlockElement,
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
 			backspace
 		);
 
-		// verify the editor has not crashed
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect( text.length ).not.toEqual( 0 );
+		// Verify the editor has not crashed.
+		const mergedBlockText =
+			await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text0 + text1 ).toMatch( mergedBlockText );
 
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
 	it( 'should handle multiline paragraphs from web', async () => {
-		await editorPage.setHtmlContent( `
-<!-- wp:paragraph -->
-<p>multiple lines<br><br></p>
-<!-- /wp:paragraph -->
+		await editorPage.setHtmlContent(
+			[
+				testData.multiLinesParagraphBlock,
+				testData.paragraphBlockEmpty,
+			].join( '\n\n' )
+		);
 
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->` );
-
-		// // Merge paragraphs
-		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
+		// Merge paragraphs.
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
 			2
 		);
-		await secondParagraphBlockElement.click();
-		await editorPage.typeTextToParagraphBlock(
-			secondParagraphBlockElement,
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
 			backspace
 		);
 
-		// verify the editor has not crashed
+		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
 
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 } );

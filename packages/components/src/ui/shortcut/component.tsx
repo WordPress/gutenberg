@@ -1,15 +1,17 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../context';
-// eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
+import {
+	useContextSystem,
+	contextConnect,
+	WordPressComponentProps,
+} from '../context';
+import { View } from '../../view';
 
 export interface ShortcutDescription {
 	display: string;
@@ -22,13 +24,15 @@ export interface Props {
 }
 
 function Shortcut(
-	props: ViewOwnProps< Props, 'span' >,
-	forwardedRef: Ref< any >
+	props: WordPressComponentProps< Props, 'span' >,
+	forwardedRef: ForwardedRef< any >
 ): JSX.Element | null {
-	const { shortcut, className, ...otherProps } = useContextSystem(
-		props,
-		'Shortcut'
-	);
+	const {
+		as: asProp = 'span',
+		shortcut,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'Shortcut' );
 	if ( ! shortcut ) {
 		return null;
 	}
@@ -44,14 +48,15 @@ function Shortcut(
 	}
 
 	return (
-		<span
+		<View
+			as={ asProp }
 			className={ className }
 			aria-label={ ariaLabel }
 			ref={ forwardedRef }
 			{ ...otherProps }
 		>
 			{ displayText }
-		</span>
+		</View>
 	);
 }
 

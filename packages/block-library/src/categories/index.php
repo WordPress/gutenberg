@@ -22,13 +22,17 @@ function render_block_core_categories( $attributes ) {
 		'orderby'      => 'name',
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
+		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
+	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
+		$args['parent'] = 0;
+	}
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
 		$args['show_option_none'] = __( 'Select Category' );
-		$wrapper_markup           = '<div %1$s>%2$s</div>';
+		$wrapper_markup           = '<div %1$s><label class="screen-reader-text" for="' . esc_attr( $id ) . '">' . __( 'Categories' ) . '</label>%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
 

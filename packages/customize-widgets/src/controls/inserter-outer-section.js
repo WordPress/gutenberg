@@ -3,6 +3,12 @@
  */
 import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
+import { dispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as customizeWidgetsStore } from '../store';
 
 export default function getInserterOuterSection() {
 	const {
@@ -44,20 +50,24 @@ export default function getInserterOuterSection() {
 
 			this.activeElementBeforeExpanded = null;
 
-			const ownerWindow = this.contentContainer[ 0 ].ownerDocument
-				.defaultView;
+			const ownerWindow =
+				this.contentContainer[ 0 ].ownerDocument.defaultView;
 
 			// Handle closing the inserter when pressing the Escape key.
 			ownerWindow.addEventListener(
 				'keydown',
 				( event ) => {
 					if (
-						this.isOpen &&
-						( event.keyCode === ESCAPE || event.code === 'Escape' )
+						this.expanded() &&
+						( event.keyCode === ESCAPE ||
+							event.code === 'Escape' ) &&
+						! event.defaultPrevented
 					) {
+						event.preventDefault();
 						event.stopPropagation();
-
-						this.close();
+						dispatch( customizeWidgetsStore ).setIsInserterOpened(
+							false
+						);
 					}
 				},
 				// Use capture mode to make this run before other event listeners.
@@ -65,28 +75,35 @@ export default function getInserterOuterSection() {
 			);
 
 			this.contentContainer.addClass( 'widgets-inserter' );
-		}
-		get isOpen() {
-			return this.expanded();
-		}
-		subscribe( handler ) {
-			this.expanded.bind( handler );
-			return () => this.expanded.unbind( handler );
+
+			// Set a flag if the state is being changed from open() or close().
+			// Don't propagate the event if it's an internal action to prevent infinite loop.
+			this.isFromInternalAction = false;
+			this.expanded.bind( () => {
+				if ( ! this.isFromInternalAction ) {
+					// Propagate the event to React to sync the state.
+					dispatch( customizeWidgetsStore ).setIsInserterOpened(
+						this.expanded()
+					);
+				}
+				this.isFromInternalAction = false;
+			} );
 		}
 		open() {
-			if ( ! this.isOpen ) {
+			if ( ! this.expanded() ) {
 				const contentContainer = this.contentContainer[ 0 ];
 				this.activeElementBeforeExpanded =
 					contentContainer.ownerDocument.activeElement;
+
+				this.isFromInternalAction = true;
 
 				this.expand( {
 					completeCallback() {
 						// We have to do this in a "completeCallback" or else the elements will not yet be visible/tabbable.
 						// The first one should be the close button,
 						// we want to skip it and choose the second one instead, which is the search box.
-						const searchBox = focus.tabbable.find(
-							contentContainer
-						)[ 1 ];
+						const searchBox =
+							focus.tabbable.find( contentContainer )[ 1 ];
 						if ( searchBox ) {
 							searchBox.focus();
 						}
@@ -95,10 +112,12 @@ export default function getInserterOuterSection() {
 			}
 		}
 		close() {
-			if ( this.isOpen ) {
+			if ( this.expanded() ) {
 				const contentContainer = this.contentContainer[ 0 ];
 				const activeElement =
 					contentContainer.ownerDocument.activeElement;
+
+				this.isFromInternalAction = true;
 
 				this.collapse( {
 					completeCallback() {

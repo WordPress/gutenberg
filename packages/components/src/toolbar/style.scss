@@ -72,12 +72,12 @@
 		}
 
 		// Ensure the icon buttons remain square.
-		&.has-icon {
+		// This needs specificity.
+		&.has-icon.has-icon {
 			// Reduce the default padding when a button only has an icon.
-			padding-left: $grid-unit-10;
-			padding-right: $grid-unit-10;
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
 			min-width: $block-toolbar-height;
-			justify-content: center;
 		}
 
 		// @todo: We should extract the tabs styles to the tabs component itself

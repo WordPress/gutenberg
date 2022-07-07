@@ -13,7 +13,7 @@ import supportedMatchers from './supported-matchers';
  * Sets spy on the console object's method to make it possible to fail test when method called without assertion.
  *
  * @param {string} matcherName Name of Jest matcher.
- * @param {string} methodName Name of console method.
+ * @param {string} methodName  Name of console method.
  */
 const setConsoleMethodSpy = ( matcherName, methodName ) => {
 	const spy = jest

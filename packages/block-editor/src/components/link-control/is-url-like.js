@@ -16,7 +16,8 @@ import { isURL } from '@wordpress/url';
  * creating a link it makes sense to treat it like one.
  *
  * @param {string} val the candidate for being URL-like (or not).
- * @return {boolean}   whether or not the value is potentially a URL.
+ *
+ * @return {boolean} whether or not the value is potentially a URL.
  */
 export default function isURLLike( val ) {
 	const isInternal = startsWith( val, '#' );

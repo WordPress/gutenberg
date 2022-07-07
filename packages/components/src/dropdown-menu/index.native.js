@@ -2,13 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
+import { flatMap, isEmpty } from 'lodash';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
@@ -35,6 +34,16 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	return mergedProps;
 }
 
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
 function DropdownMenu( {
 	children,
 	className,
@@ -43,24 +52,7 @@ function DropdownMenu( {
 	label,
 	popoverProps,
 	toggleProps,
-	// The following props exist for backward compatibility.
-	menuLabel,
-	position,
 } ) {
-	if ( menuLabel ) {
-		deprecated( '`menuLabel` prop in `DropdownComponent`', {
-			alternative: '`menuProps` object and its `aria-label` property',
-			plugin: 'Gutenberg',
-		} );
-	}
-
-	if ( position ) {
-		deprecated( '`position` prop in `DropdownComponent`', {
-			alternative: '`popoverProps` object and its `position` property',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
@@ -76,7 +68,6 @@ function DropdownMenu( {
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
-			position,
 		},
 		popoverProps
 	);
@@ -89,7 +80,6 @@ function DropdownMenu( {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
-						event.stopPropagation();
 						onToggle();
 					}
 				};
@@ -124,7 +114,6 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
 					>
 						{ mergedToggleProps.children }
 					</Button>

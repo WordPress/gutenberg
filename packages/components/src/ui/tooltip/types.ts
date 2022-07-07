@@ -2,9 +2,8 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { TooltipInitialState } from 'reakit';
-// eslint-disable-next-line no-restricted-imports
-import type { ReactElement } from 'react';
+import type { TooltipInitialState, TooltipProps } from 'reakit';
+import type { ReactElement, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -59,6 +58,10 @@ export type Props = TooltipInitialState &
 		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
 		 */
 		visible?: boolean;
-		children: JSX.Element;
+		children: ReactElement;
 		focusable?: boolean;
 	};
+
+export type ContentProps = TooltipProps & {
+	children: ReactNode;
+};

@@ -38,6 +38,12 @@ class KeyboardAvoidingView extends Component {
 			return 0;
 		}
 
+		const windowWidth = Dimensions.get( 'window' ).width;
+		const isFloatingKeyboard = keyboardFrame.width !== windowWidth;
+		if ( isFloatingKeyboard ) {
+			return 0;
+		}
+
 		const windowHeight = Dimensions.get( 'window' ).height;
 		const keyboardY =
 			keyboardFrame.screenY - this.props.keyboardVerticalOffset;
@@ -92,13 +98,8 @@ class KeyboardAvoidingView extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			enabled,
-			keyboardVerticalOffset, // eslint-disable-line no-unused-vars
-			style,
-			...props
-		} = this.props;
+		const { children, enabled, keyboardVerticalOffset, style, ...props } =
+			this.props;
 
 		let finalStyle = style;
 		if ( Platform.OS === 'ios' ) {

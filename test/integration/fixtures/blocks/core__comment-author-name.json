@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/comment-author-name",
+		"isValid": true,
+		"attributes": {
+			"isLink": true,
+			"linkTarget": "_self"
+		},
+		"innerBlocks": []
+	}
+]

@@ -11,15 +11,17 @@ const ToggleControl = memo(
 	( { label, checked, help, instanceId, className, onChange, ...props } ) => {
 		const id = `inspector-toggle-control-${ instanceId }`;
 
+		const helpLabel =
+			help && typeof help === 'function' ? help( checked ) : help;
+
 		return (
 			<SwitchCell
 				label={ label }
 				id={ id }
-				help={ help }
+				help={ helpLabel }
 				className={ className }
 				value={ checked }
 				onValueChange={ onChange }
-				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props }
 			/>
 		);

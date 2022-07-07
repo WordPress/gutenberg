@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, deburr } from 'lodash';
+import removeAccents from 'remove-accents';
+
 /**
  * WordPress dependencies
  */
@@ -22,12 +23,15 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { Flex, FlexBlock, FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+
+const noop = () => {};
 
 const DetectOutside = withFocusOutside(
 	class extends Component {
@@ -42,6 +46,7 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
+	__next36pxDefaultSize,
 	value,
 	label,
 	options,
@@ -55,20 +60,26 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 } ) {
-	const instanceId = useInstanceId( ComboboxControl );
-	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
-	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ inputValue, setInputValue ] = useState( '' );
-	const inputContainer = useRef();
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
+	// Use a custom prefix when generating the `instanceId` to avoid having
+	// duplicate input IDs when rendering this component and `FormTokenField`
+	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
+	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
+		currentOption || null
+	);
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ inputHasFocus, setInputHasFocus ] = useState( false );
+	const [ inputValue, setInputValue ] = useState( '' );
+	const inputContainer = useRef();
 
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = deburr( inputValue.toLocaleLowerCase() );
+		const match = removeAccents( inputValue.toLocaleLowerCase() );
 		options.forEach( ( option ) => {
-			const index = deburr( option.label )
+			const index = removeAccents( option.label )
 				.toLocaleLowerCase()
 				.indexOf( match );
 			if ( index === 0 ) {
@@ -104,6 +115,10 @@ function ComboboxControl( {
 	const onKeyDown = ( event ) => {
 		let preventDefault = false;
 
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
 		switch ( event.keyCode ) {
 			case ENTER:
 				if ( selectedSuggestion ) {
@@ -123,7 +138,6 @@ function ComboboxControl( {
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
-				event.stopPropagation();
 				break;
 			default:
 				break;
@@ -134,7 +148,12 @@ function ComboboxControl( {
 		}
 	};
 
+	const onBlur = () => {
+		setInputHasFocus( false );
+	};
+
 	const onFocus = () => {
+		setInputHasFocus( true );
 		setIsExpanded( true );
 		onFilterValueChange( '' );
 		setInputValue( '' );
@@ -148,15 +167,29 @@ function ComboboxControl( {
 		const text = event.value;
 		setInputValue( text );
 		onFilterValueChange( text );
-		setIsExpanded( true );
+		if ( inputHasFocus ) {
+			setIsExpanded( true );
+		}
 	};
 
 	const handleOnReset = () => {
 		onChange( null );
-		inputContainer.current.input.focus();
+		inputContainer.current.focus();
 	};
 
-	// Announcements
+	// Update current selections when the filter input changes.
+	useEffect( () => {
+		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+		const hasSelectedMatchingSuggestions =
+			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
+
+		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
+			setSelectedSuggestion( matchingSuggestions[ 0 ] );
+		}
+	}, [ matchingSuggestions, selectedSuggestion ] );
+
+	// Announcements.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 		if ( isExpanded ) {
@@ -198,7 +231,9 @@ function ComboboxControl( {
 					tabIndex="-1"
 					onKeyDown={ onKeyDown }
 				>
-					<Flex>
+					<InputWrapperFlex
+						__next36pxDefaultSize={ __next36pxDefaultSize }
+					>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -211,6 +246,7 @@ function ComboboxControl( {
 										: null
 								}
 								onFocus={ onFocus }
+								onBlur={ onBlur }
 								isExpanded={ isExpanded }
 								selectedSuggestionIndex={ matchingSuggestions.indexOf(
 									selectedSuggestion
@@ -229,7 +265,7 @@ function ComboboxControl( {
 								/>
 							</FlexItem>
 						) }
-					</Flex>
+					</InputWrapperFlex>
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }

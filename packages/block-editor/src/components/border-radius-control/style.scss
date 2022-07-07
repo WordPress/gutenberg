@@ -1,0 +1,61 @@
+.components-border-radius-control {
+	margin-bottom: $grid-unit-15;
+
+	legend {
+		margin-bottom: $grid-unit-10;
+	}
+
+	.components-border-radius-control__wrapper {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+
+		> .components-unit-control-wrapper {
+			width: 110px;
+			margin-bottom: 0;
+			margin-right: #{ $grid-unit-15 };
+			flex-shrink: 0;
+		}
+
+		.components-range-control {
+			flex: 1;
+			margin-bottom: 0;
+
+			.components-base-control__field {
+				margin-bottom: 0;
+				height: 30px;
+			}
+
+			.components-range-control__wrapper {
+				margin-right: 10px;
+			}
+		}
+
+		> span {
+			flex: 0 0 auto;
+		}
+	}
+
+	.components-border-radius-control__input-controls-wrapper {
+		display: flex;
+		width: 70%;
+		flex-wrap: wrap;
+
+		.components-border-radius-control__tooltip-wrapper {
+			width: calc(50% - #{ $grid-unit-10 });
+			margin-bottom: $grid-unit-10;
+			margin-right: $grid-unit-10;
+		}
+	}
+
+	.component-border-radius-control__linked-button.has-icon {
+		display: flex;
+		justify-content: center;
+		margin-left: 2px;
+		margin-top: 3px;
+
+		svg {
+			margin-right: 0;
+		}
+	}
+}

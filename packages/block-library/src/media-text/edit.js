@@ -13,7 +13,7 @@ import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
@@ -22,12 +22,14 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -44,11 +46,11 @@ const TEMPLATE = [
 	[
 		'core/paragraph',
 		{
-			fontSize: 'large',
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
 ];
+
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
@@ -70,9 +72,26 @@ function attributesFromMedia( {
 	setAttributes,
 } ) {
 	return ( media ) => {
+		if ( ! media || ! media.url ) {
+			setAttributes( {
+				mediaAlt: undefined,
+				mediaId: undefined,
+				mediaType: undefined,
+				mediaUrl: undefined,
+				mediaLink: undefined,
+				href: undefined,
+				focalPoint: undefined,
+			} );
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		let src;
-		// for media selections originated from a file upload.
+		// For media selections originated from a file upload.
 		if ( media.media_type ) {
 			if ( media.media_type === 'image' ) {
 				mediaType = 'image';
@@ -82,7 +101,7 @@ function attributesFromMedia( {
 				mediaType = 'video';
 			}
 		} else {
-			// for media selections originated from existing files in the media library.
+			// For media selections originated from existing files in the media library.
 			mediaType = media.type;
 		}
 
@@ -141,7 +160,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const image = useSelect(
 		( select ) =>
 			mediaId && isSelected
-				? select( coreStore ).getMedia( mediaId )
+				? select( coreStore ).getMedia( mediaId, { context: 'view' } )
 				: null,
 		[ isSelected, mediaId ]
 	);
@@ -197,7 +216,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const imageSizes = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return settings?.imageSizes;
-	} );
+	}, [] );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			getImageSourceUrlBySizeSlug( image, slug )
@@ -218,7 +237,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Media & Text settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ToggleControl
 				label={ __( 'Stack on mobile' ) }
 				checked={ isStackedOnMobile }
@@ -274,6 +293,15 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+				/>
+			) }
+			{ mediaUrl && (
+				<RangeControl
+					label={ __( 'Media width' ) }
+					value={ temporaryMediaWidth || mediaWidth }
+					onChange={ commitWidthChange }
+					min={ WIDTH_CONSTRAINT_PERCENTAGE }
+					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
 				/>
 			) }
 		</PanelBody>

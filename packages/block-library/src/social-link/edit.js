@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -27,6 +27,42 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import { getIconBySite, getNameBySite } from './social-list';
 
+const SocialLinkURLPopover = ( {
+	url,
+	setAttributes,
+	setPopover,
+	anchorRef,
+} ) => (
+	<URLPopover
+		anchorRef={ anchorRef?.current }
+		onClose={ () => setPopover( false ) }
+	>
+		<form
+			className="block-editor-url-popover__link-editor"
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				setPopover( false );
+			} }
+		>
+			<div className="block-editor-url-input">
+				<URLInput
+					value={ url }
+					onChange={ ( nextURL ) =>
+						setAttributes( { url: nextURL } )
+					}
+					placeholder={ __( 'Enter address' ) }
+					disableSuggestions={ true }
+				/>
+			</div>
+			<Button
+				icon={ keyboardReturn }
+				label={ __( 'Apply' ) }
+				type="submit"
+			/>
+		</form>
+	</URLPopover>
+);
+
 const SocialLinkEdit = ( {
 	attributes,
 	context,
@@ -34,14 +70,16 @@ const SocialLinkEdit = ( {
 	setAttributes,
 } ) => {
 	const { url, service, label } = attributes;
-	const { iconColorValue, iconBackgroundColorValue } = context;
+	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
+	const ref = useRef();
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
+	const socialLinkLabel = label ?? socialLinkName;
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
@@ -76,34 +114,26 @@ const SocialLinkEdit = ( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<Button onClick={ () => setPopover( true ) }>
+				<Button
+					className="wp-block-social-link-anchor"
+					ref={ ref }
+					onClick={ () => setPopover( true ) }
+				>
 					<IconComponent />
+					<span
+						className={ classNames( 'wp-block-social-link-label', {
+							'screen-reader-text': ! showLabels,
+						} ) }
+					>
+						{ socialLinkLabel }
+					</span>
 					{ isSelected && showURLPopover && (
-						<URLPopover onClose={ () => setPopover( false ) }>
-							<form
-								className="block-editor-url-popover__link-editor"
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									setPopover( false );
-								} }
-							>
-								<div className="block-editor-url-input">
-									<URLInput
-										value={ url }
-										onChange={ ( nextURL ) =>
-											setAttributes( { url: nextURL } )
-										}
-										placeholder={ __( 'Enter address' ) }
-										disableSuggestions={ true }
-									/>
-								</div>
-								<Button
-									icon={ keyboardReturn }
-									label={ __( 'Apply' ) }
-									type="submit"
-								/>
-							</form>
-						</URLPopover>
+						<SocialLinkURLPopover
+							url={ url }
+							setAttributes={ setAttributes }
+							setPopover={ setPopover }
+							anchorRef={ ref }
+						/>
 					) }
 				</Button>
 			</li>

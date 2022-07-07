@@ -6,8 +6,8 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,38 +15,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-/**
- * Returns for the deepest node at the start or end of a container node. Ignores
- * any text nodes that only contain HTML formatting whitespace.
- *
- * @param {Element} node Container to search.
- * @param {string} type 'start' or 'end'.
- */
-function getDeepestNode( node, type ) {
-	const child = type === 'start' ? 'firstChild' : 'lastChild';
-	const sibling = type === 'start' ? 'nextSibling' : 'previousSibling';
-
-	while ( node[ child ] ) {
-		node = node[ child ];
-
-		while (
-			node.nodeType === node.TEXT_NODE &&
-			/^[ \t\n]*$/.test( node.data ) &&
-			node[ sibling ]
-		) {
-			node = node[ sibling ];
-		}
-	}
-
-	return node;
-}
-
 function selector( select ) {
 	const {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
 		getSelectedBlockClientId,
+		getSelectedBlocksInitialCaretPosition,
+		__unstableIsFullySelected,
 	} = select( blockEditorStore );
 
 	return {
@@ -54,17 +30,20 @@ function selector( select ) {
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
 		selectedBlockClientId: getSelectedBlockClientId(),
+		initialPosition: getSelectedBlocksInitialCaretPosition(),
+		isFullSelection: __unstableIsFullySelected(),
 	};
 }
 
-export default function useMultiSelection( ref ) {
+export default function useMultiSelection() {
 	const {
+		initialPosition,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 		selectedBlockClientId,
+		isFullSelection,
 	} = useSelect( selector, [] );
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
 	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
@@ -74,61 +53,85 @@ export default function useMultiSelection( ref ) {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	useEffect( () => {
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
+	return useRefEffect(
+		( node ) => {
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
 
-		if ( ! hasMultiSelection || isMultiSelecting ) {
-			if ( ! selectedBlockClientId || isMultiSelecting ) {
+			// Allow initialPosition to bypass focus behavior. This is useful
+			// for the list view or other areas where we don't want to transfer
+			// focus to the editor canvas.
+			if ( initialPosition === undefined || initialPosition === null ) {
+				return;
+			}
+
+			if ( ! hasMultiSelection || isMultiSelecting ) {
+				if ( ! selectedBlockClientId || isMultiSelecting ) {
+					return;
+				}
+
+				const selection = defaultView.getSelection();
+
+				if ( selection.rangeCount && ! selection.isCollapsed ) {
+					const blockNode = selectedRef.current;
+					const { startContainer, endContainer } =
+						selection.getRangeAt( 0 );
+
+					if (
+						!! blockNode &&
+						( ! blockNode.contains( startContainer ) ||
+							! blockNode.contains( endContainer ) )
+					) {
+						selection.removeAllRanges();
+					}
+				}
+
+				return;
+			}
+
+			const { length } = multiSelectedBlockClientIds;
+
+			if ( length < 2 ) {
+				return;
+			}
+
+			if ( ! isFullSelection ) {
+				return;
+			}
+
+			// Allow cross contentEditable selection by temporarily making
+			// all content editable. We can't rely on using the store and
+			// React because re-rending happens too slowly. We need to be
+			// able to select across instances immediately.
+			node.contentEditable = true;
+
+			// For some browsers, like Safari, it is important that focus happens
+			// BEFORE selection.
+			node.focus();
+
+			// The block refs might not be immediately available
+			// when dragging blocks into another block.
+			if ( ! startRef.current || ! endRef.current ) {
 				return;
 			}
 
 			const selection = defaultView.getSelection();
+			const range = ownerDocument.createRange();
 
-			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const blockNode = selectedRef.current;
-				const { startContainer, endContainer } = selection.getRangeAt(
-					0
-				);
+			// These must be in the right DOM order.
+			range.setStartBefore( startRef.current );
+			range.setEndAfter( endRef.current );
 
-				if (
-					!! blockNode &&
-					( ! blockNode.contains( startContainer ) ||
-						! blockNode.contains( endContainer ) )
-				) {
-					selection.removeAllRanges();
-				}
-			}
-
-			return;
-		}
-
-		const { length } = multiSelectedBlockClientIds;
-
-		if ( length < 2 ) {
-			return;
-		}
-
-		// These must be in the right DOM order.
-
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-
-		// The most stable way to select the whole block contents is to start
-		// and end at the deepest points.
-		const startNode = getDeepestNode( startRef.current, 'start' );
-		const endNode = getDeepestNode( endRef.current, 'end' );
-
-		range.setStartBefore( startNode );
-		range.setEndAfter( endNode );
-
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}, [
-		hasMultiSelection,
-		isMultiSelecting,
-		multiSelectedBlockClientIds,
-		selectBlock,
-		selectedBlockClientId,
-	] );
+			selection.removeAllRanges();
+			selection.addRange( range );
+		},
+		[
+			hasMultiSelection,
+			isMultiSelecting,
+			multiSelectedBlockClientIds,
+			selectedBlockClientId,
+			initialPosition,
+			isFullSelection,
+		]
+	);
 }

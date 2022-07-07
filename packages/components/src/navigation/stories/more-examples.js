@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { Icon, wordpress } from '@wordpress/icons';
+import { Icon, wordpress, home } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,9 +20,8 @@ export function MoreExamplesStory() {
 		return () => clearTimeout( timeout );
 	} );
 	const [ backButtonBadge, setBackButtonBadge ] = useState( 1 );
-	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] = useState(
-		1
-	);
+	const [ backButtonPreventedBadge, setBackButtonPreventedBadge ] =
+		useState( 1 );
 
 	return (
 		<Navigation activeItem={ activeItem } className="navigation-story">
@@ -33,6 +32,7 @@ export function MoreExamplesStory() {
 				</NavigationGroup>
 				<NavigationGroup title="Items with Unusual Features">
 					<NavigationItem
+						icon={ home }
 						item="item-sub-menu"
 						navigateToMenu="sub-menu"
 						title="Sub-Menu with Custom Back Label"

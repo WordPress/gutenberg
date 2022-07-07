@@ -2,17 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import {
-	deburr,
-	filter,
-	findLast,
-	first,
-	flow,
-	get,
-	includes,
-	map,
-	some,
-} from 'lodash';
+import { deburr, filter, flow, get, includes, map, some } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -33,6 +23,17 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
 		: nameOrType;
 
 /**
+ * Returns all the unprocessed block types as passed during the registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block types.
+ */
+export function __experimentalGetUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}
+
+/**
  * Returns all the available block types.
  *
  * @param {Object} state Data state.
@@ -40,22 +41,15 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => {
-		return Object.values( state.blockTypes ).map( ( blockType ) => {
-			return {
-				...blockType,
-				variations: getBlockVariations( state, blockType.name ),
-			};
-		} );
-	},
-	( state ) => [ state.blockTypes, state.blockVariations ]
+	( state ) => Object.values( state.blockTypes ),
+	( state ) => [ state.blockTypes ]
 );
 
 /**
  * Returns a block type by name.
  *
  * @param {Object} state Data state.
- * @param {string} name Block type name.
+ * @param {string} name  Block type name.
  *
  * @return {Object?} Block Type.
  */
@@ -84,16 +78,22 @@ export function getBlockStyles( state, name ) {
  *
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
-export function getBlockVariations( state, blockName, scope ) {
-	const variations = state.blockVariations[ blockName ];
-	if ( ! variations || ! scope ) {
-		return variations;
-	}
-	return variations.filter( ( variation ) => {
-		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
-		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
-	} );
-}
+export const getBlockVariations = createSelector(
+	( state, blockName, scope ) => {
+		const variations = state.blockVariations[ blockName ];
+		if ( ! variations || ! scope ) {
+			return variations;
+		}
+		return variations.filter( ( variation ) => {
+			// For backward compatibility reasons, variation's scope defaults to
+			// `block` and `inserter` when not set.
+			return ( variation.scope || [ 'block', 'inserter' ] ).includes(
+				scope
+			);
+		} );
+	},
+	( state, blockName ) => [ state.blockVariations[ blockName ] ]
+);
 
 /**
  * Returns the active block variation for a given block based on its attributes.
@@ -120,7 +120,7 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const match = variations?.find( ( variation ) => {
 		if ( Array.isArray( variation.isActive ) ) {
 			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType.attributes || {} );
+			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => attributeKeys.includes( attribute )
 			);
@@ -155,7 +155,11 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 export function getDefaultBlockVariation( state, blockName, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	return findLast( variations, 'isDefault' ) || first( variations );
+	const defaultVariation = [ ...variations ]
+		.reverse()
+		.find( ( { isDefault } ) => !! isDefault );
+
+	return defaultVariation || variations[ 0 ];
 }
 
 /**
@@ -247,11 +251,11 @@ export const getChildBlockNames = createSelector(
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {Object}          state           Data state.
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {Object}          state           Data state.
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {Array|string}    feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
+ *                                          explicitly defined
  *
  * @return {?*} Block support value
  */
@@ -262,18 +266,17 @@ export const getBlockSupport = (
 	defaultSupports
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
+	if ( ! blockType?.supports ) {
+		return defaultSupports;
+	}
 
-	return get(
-		blockType,
-		[ 'supports', ...feature.split( '.' ) ],
-		defaultSupports
-	);
+	return get( blockType.supports, feature, defaultSupports );
 };
 
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param  {Object}         state           Data state.
+ * @param {Object}          state           Data state.
  * @param {(string|Object)} nameOrType      Block name or type object.
  * @param {string}          feature         Feature to test.
  * @param {boolean}         defaultSupports Whether feature is supported by
@@ -323,7 +326,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	return (
 		isSearchMatch( blockType.title ) ||
 		some( blockType.keywords, isSearchMatch ) ||
-		isSearchMatch( blockType.category )
+		isSearchMatch( blockType.category ) ||
+		isSearchMatch( blockType.description )
 	);
 }
 

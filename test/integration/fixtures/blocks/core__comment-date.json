@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/comment-date",
+		"isValid": true,
+		"attributes": {
+			"isLink": true
+		},
+		"innerBlocks": []
+	}
+]

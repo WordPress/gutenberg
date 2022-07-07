@@ -20,11 +20,11 @@ import validateHookName from './validateHookName.js';
  * Returns a function which, when invoked, will remove a specified hook or all
  * hooks by the given name.
  *
- * @param  {import('.').Hooks}    hooks Hooks instance.
- * @param  {import('.').StoreKey} storeKey
- * @param  {boolean}              [removeAll=false] Whether to remove all callbacks for a hookName,
- *                                                  without regard to namespace. Used to create
- *                                                  `removeAll*` functions.
+ * @param {import('.').Hooks}    hooks             Hooks instance.
+ * @param {import('.').StoreKey} storeKey
+ * @param {boolean}              [removeAll=false] Whether to remove all callbacks for a hookName,
+ *                                                 without regard to namespace. Used to create
+ *                                                 `removeAll*` functions.
  *
  * @return {RemoveHook} Function that removes hooks.
  */
@@ -40,7 +40,7 @@ function createRemoveHook( hooks, storeKey, removeAll = false ) {
 			return;
 		}
 
-		// Bail if no hooks exist by this name
+		// Bail if no hooks exist by this name.
 		if ( ! hooksStore[ hookName ] ) {
 			return 0;
 		}

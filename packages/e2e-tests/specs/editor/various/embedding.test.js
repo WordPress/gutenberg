@@ -16,8 +16,7 @@ import {
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
-	html:
-		'<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret"></div>',
 	type: 'rich',
 	provider_name: 'WordPress',
 	provider_url: 'https://wordpress.org',
@@ -30,6 +29,15 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	type: 'rich',
 	provider_name: 'Twitter',
 	provider_url: 'https://twitter.com',
+	version: '1.0',
+};
+
+const MOCK_EMBED_PHOTO_SUCCESS_RESPONSE = {
+	url: 'https://cloudup.com/cQFlxqtY4ob',
+	html: '<p>Mock success response.</p>',
+	type: 'photo',
+	provider_name: 'Cloudup',
+	provider_url: 'https://cloudup.com',
 	version: '1.0',
 };
 
@@ -69,8 +77,7 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 
 const MOCK_CANT_EMBED_RESPONSE = {
 	provider_name: 'Embed Handler',
-	html:
-		'<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
 };
 
 const MOCK_BAD_WORDPRESS_RESPONSE = {
@@ -123,7 +130,7 @@ const MOCK_RESPONSES = [
 	},
 	{
 		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
-		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_PHOTO_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
@@ -208,6 +215,10 @@ describe( 'Embedding content', () => {
 
 		// Photo content. Should render valid figure element.
 		await insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
+		await page.waitForSelector(
+			'iframe[title="Embedded content from cloudup"'
+		);
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

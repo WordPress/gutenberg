@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
@@ -15,7 +20,7 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -24,14 +29,13 @@ import useEditorFeature from '../components/use-editor-feature';
 // block support is being skipped for a block but the color related CSS classes
 // & styles still need to be generated so they can be applied to inner elements.
 
-const EMPTY_ARRAY = [];
-
 /**
  * Provides the CSS class names and inline styles for a block's color support
  * attributes.
  *
- * @param  {Object} attributes Block attributes.
- * @return {Object}            Color block support derived CSS classes & styles.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Color block support derived CSS classes & styles.
  */
 export function getColorClassesAndStyles( attributes ) {
 	const { backgroundColor, textColor, gradient, style } = attributes;
@@ -56,7 +60,7 @@ export function getColorClassesAndStyles( attributes ) {
 			style?.color?.background ||
 			gradient ||
 			style?.color?.gradient,
-		'has-link-color': style?.color?.link,
+		'has-link-color': style?.elements?.link?.color,
 	} );
 
 	// Collect inline styles for colors.
@@ -69,6 +73,8 @@ export function getColorClassesAndStyles( attributes ) {
 	};
 }
 
+const EMPTY_OBJECT = {};
+
 /**
  * Determines the color related props for a block derived from its color block
  * support attributes.
@@ -76,14 +82,36 @@ export function getColorClassesAndStyles( attributes ) {
  * Inline styles are forced for named colors to ensure these selections are
  * reflected when themes do not load their color stylesheets in the editor.
  *
- * @param  {Object} attributes Block attributes.
- * @return {Object}            ClassName & style props from colors block support.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} ClassName & style props from colors block support.
  */
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	// Some color settings have a special handling for deprecated flags in `useSetting`,
+	// so we can't unwrap them by doing const { ... } = useSetting('color')
+	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+	const userPalette = useSetting( 'color.palette.custom' ) || [];
+	const themePalette = useSetting( 'color.palette.theme' ) || [];
+	const defaultPalette = useSetting( 'color.palette.default' ) || [];
+	const gradientsPerOrigin = useSetting( 'color.gradients' ) || EMPTY_OBJECT;
+	const colors = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
+	const gradients = useMemo(
+		() => [
+			...( gradientsPerOrigin?.custom || [] ),
+			...( gradientsPerOrigin?.theme || [] ),
+			...( gradientsPerOrigin?.default || [] ),
+		],
+		[ gradientsPerOrigin ]
+	);
 
 	const colorProps = getColorClassesAndStyles( attributes );
 

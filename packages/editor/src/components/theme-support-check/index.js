@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { castArray, includes, isArray, get, some } from 'lodash';
+import { castArray, includes, get, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 export function ThemeSupportCheck( {
 	themeSupports,
@@ -20,7 +26,7 @@ export function ThemeSupportCheck( {
 		// In the latter case, we need to verify `postType` exists
 		// within `supported`. If `postType` isn't passed, then the check
 		// should fail.
-		if ( 'post-thumbnails' === key && isArray( supported ) ) {
+		if ( 'post-thumbnails' === key && Array.isArray( supported ) ) {
 			return includes( supported, postType );
 		}
 		return supported;
@@ -34,8 +40,8 @@ export function ThemeSupportCheck( {
 }
 
 export default withSelect( ( select ) => {
-	const { getThemeSupports } = select( 'core' );
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getThemeSupports } = select( coreStore );
+	const { getEditedPostAttribute } = select( editorStore );
 	return {
 		postType: getEditedPostAttribute( 'type' ),
 		themeSupports: getThemeSupports(),

@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 6.4.0 (2021-11-15)
+
+### Enhancements
+
+-   The bundled `@babel/core` dependency has been updated from requiring `^7.13.19` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-react-jsx` dependency has been updated from requiring `^7.12.7` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-runtime` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-env` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-typescript` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/runtime` dependency has been updated from requiring `^7.13.10` to requiring `^7.16.0` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `browserslist` dependency has been updated from requiring `^4.16.6` to requiring `^4.17.6` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `core-js` dependency has been updated from requiring `^3.12.1` to requiring `^3.19.1` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
+## 6.2.0 (2021-05-31)
+
+### New Feature
+
+-   New `build/polyfill.js` (minified version – `build/polyfill.min.js`) file is available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project. It's a drop-in replacement for the deprecated `@babel/polyfill` package ([#31279](https://github.com/WordPress/gutenberg/pull/31279)).
+
+## 6.1.0 (2021-05-20)
+
+### Bug Fixes
+
+-   Configure `@babel/preset-env` preset to respect a local Browserslist configuration.
+
+## 6.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

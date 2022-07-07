@@ -13,6 +13,11 @@ import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../store';
+
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
 
@@ -37,55 +42,56 @@ import { addFilter } from '@wordpress/hooks';
  */
 const createWithMetaAttributeSource = ( metaAttributes ) =>
 	createHigherOrderComponent(
-		( BlockEdit ) => ( { attributes, setAttributes, ...props } ) => {
-			const postType = useSelect(
-				( select ) => select( 'core/editor' ).getCurrentPostType(),
-				[]
-			);
-			const [ meta, setMeta ] = useEntityProp(
-				'postType',
-				postType,
-				'meta'
-			);
+		( BlockEdit ) =>
+			( { attributes, setAttributes, ...props } ) => {
+				const postType = useSelect(
+					( select ) => select( editorStore ).getCurrentPostType(),
+					[]
+				);
+				const [ meta, setMeta ] = useEntityProp(
+					'postType',
+					postType,
+					'meta'
+				);
 
-			const mergedAttributes = useMemo(
-				() => ( {
-					...attributes,
-					...mapValues(
-						metaAttributes,
-						( metaKey ) => meta[ metaKey ]
-					),
-				} ),
-				[ attributes, meta ]
-			);
+				const mergedAttributes = useMemo(
+					() => ( {
+						...attributes,
+						...mapValues(
+							metaAttributes,
+							( metaKey ) => meta[ metaKey ]
+						),
+					} ),
+					[ attributes, meta ]
+				);
 
-			return (
-				<BlockEdit
-					attributes={ mergedAttributes }
-					setAttributes={ ( nextAttributes ) => {
-						const nextMeta = mapKeys(
-							// Filter to intersection of keys between the updated
-							// attributes and those with an associated meta key.
-							pickBy(
-								nextAttributes,
-								( value, key ) => metaAttributes[ key ]
-							),
+				return (
+					<BlockEdit
+						attributes={ mergedAttributes }
+						setAttributes={ ( nextAttributes ) => {
+							const nextMeta = mapKeys(
+								// Filter to intersection of keys between the updated
+								// attributes and those with an associated meta key.
+								pickBy(
+									nextAttributes,
+									( value, key ) => metaAttributes[ key ]
+								),
 
-							// Rename the keys to the expected meta key name.
-							( value, attributeKey ) =>
-								metaAttributes[ attributeKey ]
-						);
+								// Rename the keys to the expected meta key name.
+								( value, attributeKey ) =>
+									metaAttributes[ attributeKey ]
+							);
 
-						if ( ! isEmpty( nextMeta ) ) {
-							setMeta( nextMeta );
-						}
+							if ( ! isEmpty( nextMeta ) ) {
+								setMeta( nextMeta );
+							}
 
-						setAttributes( nextAttributes );
-					} }
-					{ ...props }
-				/>
-			);
-		},
+							setAttributes( nextAttributes );
+						} }
+						{ ...props }
+					/>
+				);
+			},
 		'withMetaAttributeSource'
 	);
 

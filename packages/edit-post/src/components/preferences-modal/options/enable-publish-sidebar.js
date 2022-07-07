@@ -4,20 +4,16 @@
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifViewportMatches } from '@wordpress/viewport';
-
-/**
- * Internal dependencies
- */
-import BaseOption from './base';
+import { store as editorStore } from '@wordpress/editor';
+import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isChecked: select( 'core/editor' ).isPublishSidebarEnabled(),
+		isChecked: select( editorStore ).isPublishSidebarEnabled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { enablePublishSidebar, disablePublishSidebar } = dispatch(
-			'core/editor'
-		);
+		const { enablePublishSidebar, disablePublishSidebar } =
+			dispatch( editorStore );
 		return {
 			onChange: ( isEnabled ) =>
 				isEnabled ? enablePublishSidebar() : disablePublishSidebar(),

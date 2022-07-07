@@ -11,8 +11,10 @@ jest.mock( 'enzyme', () => {
 	if ( ! mockEnzymeSetup ) {
 		mockEnzymeSetup = true;
 
-		// configure enzyme 3 for React, from docs: http://airbnb.io/enzyme/docs/installation/index.html
-		const Adapter = jest.requireActual( 'enzyme-adapter-react-16' );
+		// Configure enzyme 3 for React, from docs: http://airbnb.io/enzyme/docs/installation/index.html
+		const Adapter = jest.requireActual(
+			'@wojtekmaj/enzyme-adapter-react-17'
+		);
 		actualEnzyme.configure( { adapter: new Adapter() } );
 	}
 	return actualEnzyme;
