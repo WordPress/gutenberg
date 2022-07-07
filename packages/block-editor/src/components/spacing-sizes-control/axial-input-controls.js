@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import SpacingRangeControl from './spacing-range-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
@@ -96,16 +95,17 @@ export default function AxialInputControls( {
 			className="component-box-control__vertical-horizontal-input-controls"
 		>
 			{ filteredSides.map( ( side ) => {
-				const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue(
-					side === 'vertical' ? values.top : values.left
-				);
+				// const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue(
+				// 	side === 'vertical' ? values.top : values.left
+				// );
 				return (
 					<SpacingRangeControl
 						{ ...props }
 						isFirst={ first === side }
 						isLast={ last === side }
 						isOnly={ only === side }
-						value={ [ parsedQuantity ].join( '' ) }
+						// value={ [ parsedQuantity ].join( '' ) }
+						value={ null }
 						onChange={ createHandleOnChange( side ) }
 						onFocus={ createHandleOnFocus( side ) }
 						label={ LABELS[ side ] }

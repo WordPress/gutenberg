@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import SpacingRangeControl from './spacing-range-control';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
@@ -72,12 +71,12 @@ export default function BoxInputControls( {
 				className="component-box-control__input-controls"
 			>
 				{ filteredSides.map( ( side ) => {
-					const [ parsedQuantity, parsedUnit ] =
-						parseQuantityAndUnitFromRawValue( values[ side ] );
+					// const [ parsedQuantity, parsedUnit ] =
+					// 	parseQuantityAndUnitFromRawValue( values[ side ] );
 
-					const computedUnit = values[ side ]
-						? parsedUnit
-						: selectedUnits[ side ];
+					// const computedUnit = values[ side ]
+					// 	? parsedUnit
+					// 	: selectedUnits[ side ];
 
 					return (
 						<SpacingRangeControl
@@ -85,9 +84,10 @@ export default function BoxInputControls( {
 							isFirst={ first === side }
 							isLast={ last === side }
 							isOnly={ only === side }
-							value={ [ parsedQuantity, computedUnit ].join(
-								''
-							) }
+							// value={ [ parsedQuantity, computedUnit ].join(
+							// 	''
+							// ) }
+							value={ null }
 							onChange={ createHandleOnChange( side ) }
 							onFocus={ createHandleOnFocus( side ) }
 							label={ LABELS[ side ] }

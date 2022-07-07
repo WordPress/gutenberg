@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import RangeControl from '../range-control';
+import RangeControl from '@wordpress/components';
 
 /**
  * Inspector control panel containing the spacing size related configuration
