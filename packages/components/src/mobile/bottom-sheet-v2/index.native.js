@@ -42,6 +42,7 @@ function BottomSheetWithRef(
 		( props ) => (
 			<BottomSheetBackdrop
 				{ ...props }
+				opacity={ 0.2 }
 				disappearsOnIndex={ -1 }
 				appearsOnIndex={ 0 }
 			/>
