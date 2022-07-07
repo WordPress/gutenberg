@@ -103,6 +103,14 @@ export default function TemplatePartEdit( {
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
+	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
+	// doesn't render multiple times. The block controls has similar internal check.
+	const canReplace =
+		isSelected &&
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
+
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
 	if (
@@ -156,27 +164,23 @@ export default function TemplatePartEdit( {
 					/>
 				</TagName>
 			) }
-			{ isSelected &&
-				isEntityAvailable &&
-				hasReplacements &&
-				( area === 'header' || area === 'footer' ) && (
-					<BlockSettingsMenuControls>
-						{ ( { onClose } ) => (
-							<MenuItem
-								onClick={ () => {
-									onClose();
-									setIsTemplatePartSelectionOpen( true );
-								} }
-							>
-								{ sprintf(
-									/* translators: %s: block name */
-									__( 'Replace %s' ),
-									blockTitle
-								) }
-							</MenuItem>
-						) }
-					</BlockSettingsMenuControls>
-				) }
+			{ canReplace && (
+				<BlockSettingsMenuControls>
+					{ () => (
+						<MenuItem
+							onClick={ () => {
+								setIsTemplatePartSelectionOpen( true );
+							} }
+						>
+							{ sprintf(
+								/* translators: %s: block name */
+								__( 'Replace %s' ),
+								blockTitle
+							) }
+						</MenuItem>
+					) }
+				</BlockSettingsMenuControls>
+			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
 					tagName={ TagName }
@@ -193,7 +197,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isTemplatePartSelectionOpen && (
 				<Modal
-					className="block-editor-template-part__selection-modal"
+					overlayClassName="block-editor-template-part__selection-modal"
 					title={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						__( 'Choose a %s' ),
