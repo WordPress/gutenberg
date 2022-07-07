@@ -12,8 +12,16 @@ test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
 		previousDefaultCommentsPage;
-	test.beforeEach( async ( { admin, requestUtils } ) => {
+
+	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		// Ideally, we'd set options in beforeAll. Unfortunately, these
+		// aren't exposed via the REST API, so we have to set them through the
+		// relevant wp-admin screen, which involves page utils; but those are
+		// prohibited from beforeAll.
 		previousPageComments = await admin.setOption( 'page_comments', '1' );
 		previousCommentsPerPage = await admin.setOption(
 			'comments_per_page',
@@ -138,14 +146,22 @@ test.describe( 'Comments', () => {
 			await page.locator( '.wp-block-comments-pagination-next' )
 		).toBeNull();
 	} );
-	test.afterEach( async ( { admin, requestUtils } ) => {
-		await requestUtils.deleteAllComments();
-		await requestUtils.activateTheme( 'twentytwentyone' );
+
+	test.afterEach( async ( { admin } ) => {
+		// Ideally, we'd set options in afterAll. Unfortunately, these
+		// aren't exposed via the REST API, so we have to set them through the
+		// relevant wp-admin screen, which involves page utils; but those are
+		// prohibited from beforeAll.
 		await admin.setOption( 'page_comments', previousPageComments );
 		await admin.setOption( 'comments_per_page', previousCommentsPerPage );
 		await admin.setOption(
 			'default_comments_page',
 			previousDefaultCommentsPage
 		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments();
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 } );
