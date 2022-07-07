@@ -86,12 +86,9 @@ function ListViewBlockSelectButton(
 					justify="flex-start"
 					spacing={ 1 }
 				>
-					<Truncate
-						className="block-editor-list-view-block-select-button__title"
-						ellipsizeMode="auto"
-					>
-						{ blockTitle }
-					</Truncate>
+					<span className="block-editor-list-view-block-select-button__title">
+						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
+					</span>
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
