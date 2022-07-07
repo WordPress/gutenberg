@@ -10,7 +10,6 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {

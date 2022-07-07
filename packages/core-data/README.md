@@ -322,7 +322,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord | undefined`: The autosave for the post and author.
+-   `ET.EntityRecord | undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
@@ -396,13 +396,13 @@ Returns the specified entity record, merged with its edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
--   `EntityRecord | undefined`: The entity record, merged with its edits.
+-   `R | undefined`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -484,14 +484,14 @@ entity object if it exists and is received.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< R >`: Record's key
--   _query_ Optional query.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _key_ `GenericRecordKey`: Record's key
+-   _query_ `EntityQuery< Context, false >`: Optional query.
 
 _Returns_
 
--   Record.
+-   `EntityRecord | null | undefined`: Record.
 
 ### getEntityRecordEdits
 
@@ -500,9 +500,9 @@ Returns the specified entity record's edits.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -519,9 +519,9 @@ They are defined in the entity's config.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -534,13 +534,13 @@ Returns the Entity's records.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ Optional terms query.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _query_ `EntityQuery< Context, false >`: Optional terms query.
 
 _Returns_
 
--   Records.
+-   `EntityRecord[] | null | undefined`: Records.
 
 ### getLastEntityDeleteError
 
@@ -580,13 +580,13 @@ with its attributes mapped to their raw values.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _key_ `KeyOf< K, N >`: Record's key.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _key_ `GenericRecordKey`: Record's key.
 
 _Returns_
 
--   `EntityRecord | undefined`: Object with the entity's raw attributes.
+-   `EntityRecord | null | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
 
@@ -668,9 +668,9 @@ and false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree.
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 
@@ -684,9 +684,9 @@ or false otherwise.
 _Parameters_
 
 -   _state_ `State`: State tree
--   _kind_ `K`: Entity kind.
--   _name_ `N`: Entity name.
--   _query_ `EntityQuery< C >`: Optional terms query.
+-   _kind_ `Kind`: Entity kind.
+-   _name_ `Name`: Entity name.
+-   _query_ `EntityQuery< Context >`: Optional terms query.
 
 _Returns_
 
@@ -802,7 +802,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `K`: Entity kind.
 -   _name_ `N`: Entity name.
--   _recordId_ `KeyOf< K, N >`: Record ID.
+-   _recordId_ `GenericRecordKey`: Record ID.
 
 _Returns_
 

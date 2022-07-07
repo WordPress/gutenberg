@@ -109,52 +109,6 @@ export type EntityConfigOf<
 	: Extract< EntityConfig, { config: { kind: RecordOrKind; name: N } } >;
 
 /**
- * Name of the requested entity.
- */
-export type NameOf< R extends EntityRecord > =
-	EntityConfigOf< R >[ 'config' ][ 'name' ];
-
-/**
- * Kind of the requested entity.
- */
-export type KindOf< R extends EntityRecord > =
-	EntityConfigOf< R >[ 'config' ][ 'kind' ];
-
-/**
- * Primary key type of the requested entity, sourced from PerPackageEntities.
- *
- * For core entities, the key type is computed using the entity configuration in entities.js.
- */
-export type KeyOf<
-	RecordOrKind extends EntityRecord | Kind,
-	N extends Name | undefined = undefined,
-	E extends EntityConfig = EntityConfigOf< RecordOrKind, N >
-> = ( E[ 'key' ] extends keyof E[ 'record' ]
-	? E[ 'record' ][ E[ 'key' ] ]
-	: never ) &
-	( number | string );
-
-/**
- * Default context of the requested entity, sourced from PerPackageEntities.
- *
- * For core entities, the default context is extracted from the entity configuration
- * in entities.js.
- */
-export type DefaultContextOf<
-	RecordOrKind extends EntityRecord | Kind,
-	N extends Name | undefined = undefined
-> = EntityConfigOf< RecordOrKind, N >[ 'defaultContext' ];
-
-/**
- * An entity record type associated with specified kind and name, sourced from PerPackageEntities.
- */
-export type EntityRecordOf<
-	K extends Kind,
-	N extends Name,
-	C extends Context = DefaultContextOf< K, N >
-> = Extract< EntityConfig< C >, { config: { kind: K; name: N } } >[ 'record' ];
-
-/**
  * A union of all known entity kinds.
  */
 export type Kind = EntityConfig[ 'config' ][ 'kind' ];

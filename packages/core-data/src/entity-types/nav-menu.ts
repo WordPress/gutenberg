@@ -49,5 +49,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type NavMenu< C extends Context = DefaultContextOf< 'root', 'menu' > > =
-	OmitNevers< _BaseEntityRecords.NavMenu< C > >;
+export type NavMenu< C extends Context > = OmitNevers<
+	_BaseEntityRecords.NavMenu< C >
+>;
