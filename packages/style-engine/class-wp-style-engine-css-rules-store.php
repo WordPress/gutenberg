@@ -47,6 +47,8 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	public static function get_rule( $selector ) {
 
+		$selector = trim( $selector );
+
 		// Bail early if there is no selector.
 		if ( empty( $selector ) ) {
 			return;
@@ -64,7 +66,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 		$full_selector  = '';
 		foreach ( $selector_parts as $key => $selector_part ) {
 			// Get the parent object if needed.
-			$parent = 0 === $key ? null : static::get_rule( $selector_parts[ $full_selector ] );
+			$parent = 0 === $key ? null : static::get_rule( $full_selector );
 			// Compile the full selector for the store.
 			$full_selector .= ( 0 === strpos( $selector_part, '&' ) ) ? substr( $selector_part, 1 ) : ' ' . $selector_part;
 			if ( 0 === $key ) {
