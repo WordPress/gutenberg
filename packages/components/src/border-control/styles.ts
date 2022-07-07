@@ -30,43 +30,18 @@ const focusBoxShadow = css`
 `;
 
 export const borderControl = css`
-	position: relative;
 	border: 0;
 	padding: 0;
 	margin: 0;
 `;
 
 export const innerWrapper = () => css`
-	flex: 1 0 40%;
-
-	/*
-	 * Needs more thought. Aim is to prevent the border for BorderBoxControl
-	 * showing through the control. Likely needs to take into account
-	 * light/dark themes etc.
-	 */
-	background: #fff;
-
-	/*
-	 * Forces the width control to fill available space given UnitControl
-	 * passes its className directly through to the input.
-	 */
-	${ UnitControlWrapper } {
-		flex: 1;
-		${ rtl( { marginLeft: -1 } )() }
-	}
-
 	&& ${ UnitSelect } {
-		/* Prevent default styles forcing heights larger than BorderControl */
+		/* Prevent unit select forcing min height larger than its UnitControl */
 		min-height: 0;
 		${ rtl(
-			{
-				borderRadius: '0 1px 1px 0',
-				marginRight: 0,
-			},
-			{
-				borderRadius: '1px 0 0 1px',
-				marginLeft: 0,
-			}
+			{ borderRadius: '0 2px 2px 0' },
+			{ borderRadius: '2px 0 0 2px' }
 		)() }
 		transition: box-shadow 0.1s linear, border 0.1s linear;
 
@@ -80,8 +55,10 @@ export const innerWrapper = () => css`
 
 export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
 	return css`
-		width: ${ width };
-		flex: 0 0 auto;
+		${ UnitControlWrapper } {
+			width: ${ width };
+			flex: 0 0 auto;
+		}
 	`;
 };
 
@@ -101,7 +78,7 @@ export const borderControlDropdown = () => css`
 	&& > button {
 		/*
 		 * Override button component height and padding to fit within
-		 * BorderControl
+		 * BorderControl regardless of size.
 		 */
 		height: 100%;
 		padding: ${ space( 0.75 ) };
@@ -110,7 +87,6 @@ export const borderControlDropdown = () => css`
 			{ borderRadius: `0 2px 2px 0` }
 		)() }
 		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
-		position: relative;
 
 		&:focus,
 		&:hover:not( :disabled ) {
@@ -212,17 +188,7 @@ export const resetButton = css`
 export const borderWidthControl = () => css`
 	/* Target the InputControl's backdrop */
 	&&& ${ BackdropUI } {
-		${ rtl( {
-			borderTopLeftRadius: 0,
-			borderBottomLeftRadius: 0,
-		} )() }
 		transition: box-shadow 0.1s linear;
-	}
-
-	/* Specificity required to overcome UnitControl padding */
-	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
-	&&& input {
-		${ rtl( { paddingRight: 0 } )() }
 	}
 `;
 
