@@ -96,13 +96,11 @@ type Store<
  * interdependent generic parameters.
  * For more context, see https://github.com/WordPress/gutenberg/pull/41578
  */
-type CurriedState< F > =
-	F extends SelectorWithCustomCurrySignature
-		? F['CurriedSignature']
-		: F extends ( state: any, ...args: infer P ) => infer R
-			? ( ...args: P ) => R
-			: F;
-
+type CurriedState< F > = F extends SelectorWithCustomCurrySignature
+	? F[ 'CurriedSignature' ]
+	: F extends ( state: any, ...args: infer P ) => infer R
+	? ( ...args: P ) => R
+	: F;
 /**
  * Utility to manually specify curried selector signatures.
  *
