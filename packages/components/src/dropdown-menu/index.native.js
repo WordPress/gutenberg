@@ -52,13 +52,13 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
-	if ( ( ! controls || ! controls.length ) && ! isFunction( children ) ) {
+	if ( ! controls?.length && ! isFunction( children ) ) {
 		return null;
 	}
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets;
-	if ( controls && controls.length ) {
+	if ( controls?.length ) {
 		controlSets = controls;
 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 			controlSets = [ controlSets ];
