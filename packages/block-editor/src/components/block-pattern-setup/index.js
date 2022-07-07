@@ -167,7 +167,6 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
-					height={ contentHeight - ( 74 + 60 ) } // Content - ( modal header + modal actions )
 				/>
 				<SetupToolbar
 					viewMode={ viewMode }
