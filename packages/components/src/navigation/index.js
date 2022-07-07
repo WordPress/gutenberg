@@ -6,12 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -55,15 +50,9 @@ export default function Navigation( {
 		}
 	}, [] );
 
-	// Used to prevent excessive useEffect fires when navigation is being controlled by parent component
-	const controlledMenuUpdate = useRef( { setActiveMenu, menu } );
-	useLayoutEffect( () => {
-		controlledMenuUpdate.current = { setActiveMenu, menu };
-	} );
-
 	useEffect( () => {
-		if ( activeMenu !== controlledMenuUpdate.current.menu ) {
-			controlledMenuUpdate.current.setActiveMenu( activeMenu );
+		if ( activeMenu !== menu ) {
+			setActiveMenu( activeMenu );
 		}
 	}, [ activeMenu ] );
 
