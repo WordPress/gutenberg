@@ -17,6 +17,7 @@
 -   `ColorPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41294](https://github.com/WordPress/gutenberg/pull/41294)).
 -   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
 -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
+-   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
 
 ### Bug Fix
 
