@@ -38,9 +38,7 @@ const SetupContent = ( {
 			[ activeSlide + 1, 'next-slide' ],
 		] );
 		return (
-			<div
-				className="block-editor-block-pattern-setup__carousel"
-			>
+			<div className="block-editor-block-pattern-setup__carousel">
 				<div className={ containerClass }>
 					<ul className="carousel-container">
 						{ patterns.map( ( pattern, index ) => (
@@ -56,9 +54,7 @@ const SetupContent = ( {
 		);
 	}
 	return (
-		<div
-			className="block-editor-block-pattern-setup__grid"
-		>
+		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
 				{ ...composite }
 				role="listbox"
