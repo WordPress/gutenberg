@@ -27,8 +27,6 @@ import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
