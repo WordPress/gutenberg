@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -92,19 +91,21 @@ function ToolbarGroup( {
 
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
-			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
-						containerClassName={
-							indexOfSet > 0 && indexOfControl === 0
-								? 'has-left-divider'
-								: null
-						}
-						{ ...control }
-					/>
-				) )
-			) }
+			{ controlSets
+				?.map( ( controlSet, indexOfSet ) =>
+					controlSet.map( ( control, indexOfControl ) => (
+						<ToolbarButton
+							key={ [ indexOfSet, indexOfControl ].join() }
+							containerClassName={
+								indexOfSet > 0 && indexOfControl === 0
+									? 'has-left-divider'
+									: null
+							}
+							{ ...control }
+						/>
+					) )
+				)
+				.flat() }
 			{ children }
 		</ToolbarGroupContainer>
 	);

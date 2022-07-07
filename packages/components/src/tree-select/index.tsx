@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { unescape as unescapeString, flatMap, compact } from 'lodash';
+import { unescape as unescapeString, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,14 +14,17 @@ import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, SelectOptions } from './types';
 
 function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
-	return flatMap( tree, ( treeNode ) => [
-		{
-			value: treeNode.id,
-			label:
-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
-		},
-		...getSelectOptions( treeNode.children || [], level + 1 ),
-	] );
+	return tree
+		.map( ( treeNode ) => [
+			{
+				value: treeNode.id,
+				label:
+					'\u00A0'.repeat( level * 3 ) +
+					unescapeString( treeNode.name ),
+			},
+			...getSelectOptions( treeNode.children || [], level + 1 ),
+		] )
+		.flat();
 }
 
 /**
