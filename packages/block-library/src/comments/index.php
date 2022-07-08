@@ -159,55 +159,70 @@ function render_legacy_post_comments_block( $attributes, $content, $block ) {
  */
 function register_legacy_post_comments_block() {
 	$registry = WP_Block_Type_Registry::get_instance();
+
+	/*
+	 * Remove the old `post-comments` block if it was already registered, as it
+	 * is about to be replaced by the type defined below.
+	 */
 	if ( $registry->is_registered( 'core/post-comments' ) ) {
 		unregister_block_type( 'core/post-comments' );
 	}
-	register_block_type(
-		'core/post-comments',
-		array(
-			'category'          => 'theme',
-			'attributes'        => array(
-				'textAlign' => array(
-					'type' => 'string',
+
+	// Recreate the legacy block metadata.
+	$metadata = array(
+		'name'              => 'core/post-comments',
+		'category'          => 'theme',
+		'attributes'        => array(
+			'textAlign' => array(
+				'type' => 'string',
+			),
+		),
+		'uses_context'      => array(
+			'postId',
+			'postType',
+		),
+		'supports'          => array(
+			'html'       => false,
+			'align'      => array( 'wide', 'full' ),
+			'typography' => array(
+				'fontSize'                      => true,
+				'lineHeight'                    => true,
+				'__experimentalFontStyle'       => true,
+				'__experimentalFontWeight'      => true,
+				'__experimentalLetterSpacing'   => true,
+				'__experimentalTextTransform'   => true,
+				'__experimentalDefaultControls' => array(
+					'fontSize' => true,
 				),
 			),
-			'uses_context'      => array(
-				'postId',
-				'postType',
+			'color' => array(
+				'gradients'                     => true,
+				'link'                          => true,
+				'__experimentalDefaultControls' => array(
+					'background' => true,
+					'text'       => true
+				)
 			),
-			'supports'          => array(
-				'html'       => false,
-				'align'      => array( 'wide', 'full' ),
-				'typography' => array(
-					'fontSize'                      => true,
-					'lineHeight'                    => true,
-					'__experimentalFontStyle'       => true,
-					'__experimentalFontWeight'      => true,
-					'__experimentalLetterSpacing'   => true,
-					'__experimentalTextTransform'   => true,
-					'__experimentalDefaultControls' => array(
-						'fontSize' => true,
-					),
-				),
-				'color' => array(
-					'gradients'                     => true,
-					'link'                          => true,
-					'__experimentalDefaultControls' => array(
-						'background' => true,
-						'text'       => true
-					)
-				),
-				'inserter' => false
-			),
-			'style'             => array(
-				'wp-block-post-comments',
-				'wp-block-buttons',
-				'wp-block-button'
-			),
-			'editorStyle'       => 'wp-block-post-comments-editor',
-			'render_callback'   => 'render_legacy_post_comments_block',
-			'skip_inner_blocks' => true,
-		)
+			'inserter' => false
+		),
+		'style'             => array(
+			'wp-block-post-comments',
+			"wp-block-buttons",
+			"wp-block-button"
+		),
+		'editorStyle'       => 'wp-block-post-comments-editor',
+		'render_callback'   => 'render_legacy_post_comments_block',
+		'skip_inner_blocks' => true,
 	);
+
+	/*
+	 * Filters the metadata object, the same way it's done insie
+	 * `register_block_type_from_metadata()`. This applies some default filters,
+	 * like `_wp_multiple_block_styles`, which is required in this case because
+	 * the block has multiple styles.
+	 */
+	$metadata = apply_filters( 'block_type_metadata', $metadata );
+
+	register_block_type( 'core/post-comments', $metadata );
 }
 add_action( 'init', 'register_legacy_post_comments_block', 21);
