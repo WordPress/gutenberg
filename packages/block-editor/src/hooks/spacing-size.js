@@ -1,9 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+// import { __experimentalSpacingSizesControl as SpacingSizesControl } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import SpacingSizesBoxControl from '../components/spacing-sizes-control';
-
+import { __experimentalSpacingSizesControl as SpacingSizesControl } from '../components/';
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;
@@ -27,20 +31,22 @@ export function SpacingSizeEdit( props ) {
 
 	return (
 		<>
-			<SpacingSizesBoxControl
-				values={ props.value }
-				// onChange={ props.onChange }
-				label={ props.label }
-				sides={ props.sides }
-				allowReset={ false }
-				splitOnAxis={ props.splitOnAxis }
-				onChange={ props.onChange }
-				withInputField={ false }
-				spacingSizes={ spacingSizes }
-				// ariaValueNow={ valueNow }
-				// ariaValueText={ spacingSizes[ valueNow ]?.name }
-				// renderTooltipContent={ customTooltipContent }
-			/>
+			{
+				<SpacingSizesControl
+					values={ props.value }
+					// onChange={ props.onChange }
+					label={ props.label }
+					sides={ props.sides }
+					allowReset={ false }
+					splitOnAxis={ props.splitOnAxis }
+					onChange={ props.onChange }
+					withInputField={ false }
+					spacingSizes={ spacingSizes }
+					// ariaValueNow={ valueNow }
+					// ariaValueText={ spacingSizes[ valueNow ]?.name }
+					// renderTooltipContent={ customTooltipContent }
+				/>
+			}
 		</>
 	);
 }

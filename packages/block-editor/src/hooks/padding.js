@@ -28,7 +28,7 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
-//import { SpacingSizeEdit, getSpacingPresetCssVar } from './spacing-size';
+import { SpacingSizeEdit, getSpacingPresetCssVar } from './spacing-size';
 
 /**
  * Determines if there is padding support.
@@ -148,16 +148,16 @@ export function PaddingEdit( props ) {
 					/>
 				}
 				{
-					// <SpacingSizeEdit
-					// 	values={ style?.spacing?.padding }
-					// 	onChange={ onChange }
-					// 	label={ __( 'Padding' ) }
-					// 	sides={ sides }
-					// 	units={ units }
-					// 	allowReset={ false }
-					// 	splitOnAxis={ splitOnAxis }
-					// />
-				 }
+					<SpacingSizeEdit
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				}
 			</>
 		),
 		native: null,
@@ -172,6 +172,10 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 			borderRightWidth: getSpacingPresetCssVar( padding?.right ) ?? 0,
 			borderBottomWidth: getSpacingPresetCssVar( padding?.bottom ) ?? 0,
 			borderLeftWidth: getSpacingPresetCssVar( padding?.left ) ?? 0,
+			// borderTopWidth: padding?.top ?? 0,
+			// borderRightWidth: padding?.right ?? 0,
+			// borderBottomWidth: padding?.bottom ?? 0,
+			// borderLeftWidth: padding?.left ?? 0,
 		};
 	}, [ padding ] );
 

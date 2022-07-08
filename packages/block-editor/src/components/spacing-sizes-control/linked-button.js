@@ -3,8 +3,7 @@
  */
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import Button from '@wordpress/button';
-import Tooltip from '@wordpress/tooltip';
+import { Button, Tooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies

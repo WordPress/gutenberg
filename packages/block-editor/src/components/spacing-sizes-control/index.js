@@ -52,9 +52,7 @@ export default function BoxControl( {
 	resetValues = DEFAULT_VALUES,
 	spacingSizes,
 } ) {
-	const [ values, setValues ] = useControlledState( valuesProp, {
-		fallback: DEFAULT_VALUES,
-	} );
+	const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
 	const hasOneSide = sides?.length === 1;
@@ -107,12 +105,12 @@ export default function BoxControl( {
 		<div role="region" className="components-border-radius-control">
 			<Flex className="components-border-radius-control__header">
 				<FlexItem>
-					<Text
+					<div
 						id={ headingId }
 						className="component-box-control__label"
 					>
 						{ label }
-					</Text>
+					</div>
 				</FlexItem>
 				{ allowReset && (
 					<FlexItem>
@@ -130,7 +128,7 @@ export default function BoxControl( {
 			</Flex>
 			<Flex className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<div style="font-size: 6px">Box Icon</div>
+					<div>Box Icon</div>
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>

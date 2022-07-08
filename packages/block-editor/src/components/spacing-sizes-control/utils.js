@@ -64,6 +64,7 @@ export function getAllValue(
 	selectedUnits,
 	availableSides = ALL_SIDES
 ) {
+	return null;
 	const sides = normalizeSides( availableSides );
 	const parsedQuantitiesAndUnits = sides.map(
 		( side ) => null // parseQuantityAndUnitFromRawValue( values[ side ] )
