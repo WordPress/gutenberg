@@ -30,6 +30,8 @@ async function checkSystemRequirements( engines ) {
 		} );
 
 		log.info( '' );
+		log.error( 'The program may not complete correctly if you continue.' );
+		log.info( '' );
 
 		const { yesContinue } = await inquirer.prompt( [
 			{
