@@ -41,7 +41,7 @@ test.describe( 'Comments', () => {
 	} ) => {
 		await requestUtils.deleteAllComments();
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments-query-loop' } );
+		await editor.insertBlock( { name: 'core/comments' } );
 		await page.waitForSelector(
 			'xpath=//p[contains(text(), "No results found.")]'
 		);
@@ -55,7 +55,7 @@ test.describe( 'Comments', () => {
 	} ) => {
 		const author = requestUtils.getCurrentUser();
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments-query-loop' } );
+		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
 		// Create three comments for that post.
@@ -115,7 +115,7 @@ test.describe( 'Comments', () => {
 		const author = requestUtils.getCurrentUser();
 		await admin.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments-query-loop' } );
+		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
 		// Create three comments for that post.
