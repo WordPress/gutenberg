@@ -29,7 +29,6 @@ import { requestPreview } from '@wordpress/react-native-bridge';
  */
 import * as paragraph from '../../paragraph';
 import * as embed from '..';
-import { registerBlock } from '../..';
 
 // Override modal mock to prevent unmounting it when is not visible.
 // This is required to be able to trigger onClose and onDismiss events when
@@ -180,8 +179,8 @@ const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 beforeAll( () => {
 	// Paragraph block needs to be registered because by default a paragraph
 	// block is added to empty posts.
-	registerBlock( paragraph );
-	registerBlock( embed );
+	paragraph.init();
+	embed.init();
 	setDefaultBlockName( paragraph.name );
 } );
 
