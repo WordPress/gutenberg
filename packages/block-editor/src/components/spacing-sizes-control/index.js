@@ -1,17 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Flex,
-	FlexItem,
-	FlexBlock,
-	Text,
-	Button,
-	useControlledState,
-} from '@wordpress/components';
+import { Flex, FlexItem, FlexBlock, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -34,13 +26,7 @@ const defaultInputProps = {
 
 const noop = () => {};
 
-function useUniqueId( idProp ) {
-	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
-
-	return idProp || instanceId;
-}
-export default function BoxControl( {
-	id: idProp,
+export default function SpacingSizesControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
@@ -65,9 +51,6 @@ export default function BoxControl( {
 	const [ side, setSide ] = useState(
 		getInitialSide( isLinked, splitOnAxis )
 	);
-
-	const id = useUniqueId( idProp );
-	const headingId = `${ id }-heading`;
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
@@ -102,16 +85,9 @@ export default function BoxControl( {
 	};
 
 	return (
-		<div role="region" className="components-border-radius-control">
-			<Flex className="components-border-radius-control__header">
-				<FlexItem>
-					<div
-						id={ headingId }
-						className="component-box-control__label"
-					>
-						{ label }
-					</div>
-				</FlexItem>
+		<fieldset role="region" className="component-spacing-sizes-control">
+			<Flex className="component-spacing-sizes-control__header">
+				<FlexItem as="legend">{ label }</FlexItem>
 				{ allowReset && (
 					<FlexItem>
 						<Button
@@ -155,6 +131,6 @@ export default function BoxControl( {
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }
-		</div>
+		</fieldset>
 	);
 }

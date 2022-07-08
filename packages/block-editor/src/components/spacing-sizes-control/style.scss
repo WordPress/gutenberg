@@ -15,14 +15,15 @@
 	.component-spacing-sizes-control__input-controls-wrapper {
 		justify-content: center;
 		padding-top: 8px;
+		.component-spacing-sizes-control__input-controls {
+			position: relative;
+			height: 100%;
+			width: 100%;
+			justify-content: flex-start;
+			flex-direction: column;
+		}
 	}
-	.component-spacing-sizes-control__input-controls {
-		position: relative;
-		height: 100%;
-		width: 100%;
-		justify-content: flex-start;
-		flex-direction: column;
-	}
+
 	.component-spacing-sizes-control__linked-button.has-icon {
 		display: flex;
 		justify-content: center;

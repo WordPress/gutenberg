@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-// import { __experimentalSpacingSizesControl as SpacingSizesControl } from '@wordpress/block-editor';
-
-/**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
@@ -34,7 +29,6 @@ export function SpacingSizeEdit( props ) {
 			{
 				<SpacingSizesControl
 					values={ props.value }
-					// onChange={ props.onChange }
 					label={ props.label }
 					sides={ props.sides }
 					allowReset={ false }
@@ -42,9 +36,6 @@ export function SpacingSizeEdit( props ) {
 					onChange={ props.onChange }
 					withInputField={ false }
 					spacingSizes={ spacingSizes }
-					// ariaValueNow={ valueNow }
-					// ariaValueText={ spacingSizes[ valueNow ]?.name }
-					// renderTooltipContent={ customTooltipContent }
 				/>
 			}
 		</>

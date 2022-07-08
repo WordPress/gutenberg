@@ -72,6 +72,7 @@ export default function BoxInputControls( {
 			<Flex
 				gap={ 0 }
 				align="top"
+				direction="column"
 				className="component-spacing-sizes-control__input-controls"
 			>
 				{ filteredSides.map( ( side ) => {
