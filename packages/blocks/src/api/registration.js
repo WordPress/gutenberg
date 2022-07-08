@@ -3,15 +3,7 @@
 /**
  * External dependencies
  */
-import {
-	camelCase,
-	isEmpty,
-	isObject,
-	isString,
-	mapKeys,
-	pick,
-	pickBy,
-} from 'lodash';
+import { camelCase, isEmpty, isObject, mapKeys, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -302,7 +294,7 @@ function translateBlockSettingUsingI18nSchema(
 	settingValue,
 	textdomain
 ) {
-	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+	if ( typeof i18nSchema === 'string' && typeof settingValue === 'string' ) {
 		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
 		return _x( settingValue, i18nSchema, textdomain );
 	}
