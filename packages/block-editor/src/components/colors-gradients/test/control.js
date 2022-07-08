@@ -63,8 +63,12 @@ describe( 'ColorPaletteControl', () => {
 		);
 
 		// Is showing the two tab buttons.
-		expect( screen.queryByLabelText( 'Solid' ) ).toBeInTheDocument();
-		expect( screen.queryByLabelText( 'Gradient' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'tab', { name: 'Solid color' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'tab', { name: 'Gradient' } )
+		).toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
 		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
