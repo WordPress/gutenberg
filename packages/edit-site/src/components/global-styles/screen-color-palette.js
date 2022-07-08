@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	TabPanel,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { TabPanel } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,8 +12,6 @@ import GradientPalettePanel from './gradients-palette-panel';
 import ScreenHeader from './header';
 
 function ScreenColorPalette( { name } ) {
-	const [ currentTab, setCurrentTab ] = useState( 'solid' );
-
 	return (
 		<>
 			<ScreenHeader
@@ -26,8 +21,6 @@ function ScreenColorPalette( { name } ) {
 				) }
 			/>
 			<TabPanel
-				className="block-editor-color-gradient-control__tabs"
-				onSelect={ setCurrentTab }
 				tabs={ [
 					{
 						name: 'solid',
@@ -41,12 +34,17 @@ function ScreenColorPalette( { name } ) {
 					},
 				] }
 			>
-			{ ( tab ) => <p className="screen-reader-text">Selected tab: { tab.title }</p> }
+				{ ( tab ) => (
+					<>
+						{ tab.value === 'solid' && (
+							<ColorPalettePanel name={ name } />
+						) }
+						{ tab.value === 'gradient' && (
+							<GradientPalettePanel name={ name } />
+						) }
+					</>
+				) }
 			</TabPanel>
-			{ currentTab === 'solid' && <ColorPalettePanel name={ name } /> }
-			{ currentTab === 'gradient' && (
-				<GradientPalettePanel name={ name } />
-			) }
 		</>
 	);
 }
