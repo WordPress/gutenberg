@@ -42,16 +42,6 @@
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
 	width: $sidebar-width;
-
-	.block-editor-color-gradient-control__tabs {
-		margin-top: - $grid-unit-10;
-		margin-left: - $grid-unit-10;
-		margin-right: - $grid-unit-10;
-	}
-
-	.block-editor-color-gradient-control__tab-panel {
-		padding: $grid-unit-10;
-	}
 }
 
 
@@ -112,5 +102,5 @@
 }
 
 .block-editor-color-gradient-control__tab-panel {
-	border-top: 1px solid $gray-300;
+	padding-top: $grid-unit-10;
 }
