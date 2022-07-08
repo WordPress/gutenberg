@@ -121,6 +121,7 @@ test.describe( 'Comments', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await editor.publishPost();
+
 		// Visit the post that was just published.
 		await page.click(
 			'role=region[name="Editor publish"i] >> "View Post"'
