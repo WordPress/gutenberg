@@ -20,17 +20,6 @@ const getButtonWithAriaLabelStartPredicate =
 		);
 	};
 
-const getTabWithTestPredicate = ( text ) => ( element ) => {
-	return (
-		element.type === 'button' &&
-		element.props[ 'aria-label' ] &&
-		element.props[ 'aria-label' ] === text
-	);
-};
-
-const colorTabButtonPredicate = getTabWithTestPredicate( 'Solid' );
-const gradientTabButtonPredicate = getTabWithTestPredicate( 'Gradient' );
-
 describe( 'ColorPaletteControl', () => {
 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {
 		render(
@@ -96,12 +85,12 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		// Is not showing the two tab buttons.
-		expect( wrapper.root.findAll( colorTabButtonPredicate ) ).toHaveLength(
-			0
-		);
 		expect(
-			wrapper.root.findAll( gradientTabButtonPredicate )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'tab', { name: 'Solid color' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tab', { name: 'Gradient' } )
+		).not.toBeInTheDocument();
 
 		// Is showing the two predefined Colors.
 		expect(
@@ -143,12 +132,12 @@ describe( 'ColorPaletteControl', () => {
 		} );
 
 		// Is not showing the two tab buttons.
-		expect( wrapper.root.findAll( colorTabButtonPredicate ) ).toHaveLength(
-			0
-		);
 		expect(
-			wrapper.root.findAll( gradientTabButtonPredicate )
-		).toHaveLength( 0 );
+			screen.queryByRole( 'tab', { name: 'Solid color' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'tab', { name: 'Gradient' } )
+		).not.toBeInTheDocument();
 
 		// Is showing the two predefined Gradients.
 		expect(
