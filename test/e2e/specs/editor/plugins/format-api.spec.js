@@ -25,10 +25,10 @@ test.describe( 'Using Format API', () => {
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'More' );
-		const button = await page.locator(
-			`//button[contains(text(), '${ 'Custom Link' }')]`
-		);
-		await button.click();
+
+		// Used a regex to tackle the  in name of menuitem.(Custom Link).
+		await page.click( 'role=menuitem[name=/Custom Link/i]' );
+
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
