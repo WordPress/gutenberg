@@ -141,7 +141,11 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => tabPanels[ tab.value ] }
+							{ ( tab ) => (
+								<div className="block-editor-color-gradient-control__tab-panel">
+									{ tabPanels[ tab.value ] }
+								</div>
+							) }
 						</TabPanel>
 					) }
 					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }

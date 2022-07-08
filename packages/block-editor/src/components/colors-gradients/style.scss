@@ -48,6 +48,10 @@
 		margin-left: - $grid-unit-10;
 		margin-right: - $grid-unit-10;
 	}
+
+	.block-editor-color-gradient-control__tab-panel {
+		padding: $grid-unit-10;
+	}
 }
 
 
@@ -107,7 +111,6 @@
 	width: 100%;
 }
 
-.block-editor-color-gradient-control__tabs {
-	border-bottom: 1px solid $gray-300;
-	margin-bottom: $grid-unit-10;
+.block-editor-color-gradient-control__tab-panel {
+	border-top: 1px solid $gray-300;
 }

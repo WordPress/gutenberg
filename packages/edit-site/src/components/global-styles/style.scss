@@ -83,7 +83,10 @@
 
 	.block-editor-color-gradient-control__tabs {
 		margin: - $grid-unit-20;
-		margin-bottom: $grid-unit-20;
+	}
+
+	.block-editor-color-gradient-control__tab-panel {
+		padding: $grid-unit-20;
 	}
 }
 
