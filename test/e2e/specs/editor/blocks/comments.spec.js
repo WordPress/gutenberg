@@ -74,36 +74,36 @@ test.describe( 'Comments', () => {
 
 		// We check that there is a previous comments page link.
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-previous' )
+			await page.locator( 'text="Older Comments"' )
 		).toHaveCount( 1 );
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-next' )
+			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 0 );
 
 		await Promise.all( [
-			page.click( '.wp-block-comments-pagination-previous' ),
+			page.click( 'text="Older Comments"' ),
 			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 		] );
 
 		// We check that there are a previous and a next link.
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-previous' )
+			await page.locator( 'text="Older Comments"' )
 		).toHaveCount( 1 );
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-next' )
+			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 1 );
 
 		await Promise.all( [
-			page.click( '.wp-block-comments-pagination-previous' ),
+			page.click( 'text="Older Comments"' ),
 			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 		] );
 
 		// We check that there is only have a next link
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-previous' )
+			await page.locator( 'text="Older Comments"' )
 		).toHaveCount( 0 );
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-next' )
+			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 1 );
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
@@ -134,10 +134,10 @@ test.describe( 'Comments', () => {
 
 		// We check that there are no comments page link.
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-previous' )
+			await page.locator( 'text="Older Comments"' )
 		).toHaveCount( 0 );
 		await expect(
-			await page.locator( '.wp-block-comments-pagination-next' )
+			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 0 );
 	} );
 
