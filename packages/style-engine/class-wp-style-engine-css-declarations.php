@@ -98,7 +98,9 @@ class WP_Style_Engine_CSS_Declarations {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
 		foreach ( $declarations_array as $property => $value ) {
-			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			//$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			// @TODO temporary to allow --wp--style--block-gap through.
+			$filtered_declaration = esc_html( "{$property}: {$value}" );
 			if ( $filtered_declaration ) {
 				$declarations_output .= $filtered_declaration . '; ';
 			}

@@ -142,6 +142,16 @@ class WP_Style_Engine {
 			),
 		),
 		'spacing'    => array(
+			'padding'  => array(
+				'property_keys' => array(
+					'default'    => 'padding',
+					'individual' => 'padding-%s',
+				),
+				'path'          => array( 'spacing', 'padding' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
+			),
 			'blockGap' => array(
 				'property_keys' => array(
 					// @TODO 'grid-gap' has been deprecated in favor of 'gap'.
@@ -158,16 +168,6 @@ class WP_Style_Engine {
 					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
-				'css_vars'      => array(
-					'spacing' => '--wp--preset--spacing--$slug',
-				),
-			),
-			'padding'  => array(
-				'property_keys' => array(
-					'default'    => 'padding',
-					'individual' => 'padding-%s',
-				),
-				'path'          => array( 'spacing', 'padding' ),
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
@@ -354,20 +354,22 @@ class WP_Style_Engine {
 	 *
 	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
 	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean       $should_skip_css_vars Whether to skip compiling CSS var values.
+	 * @param array<string> $options Options passed to the public generator functions.
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
+	protected static function get_css_declarations( $style_value, $style_definition, $options ) {
 		if (
 			isset( $style_definition['value_func'] ) &&
 			is_callable( $style_definition['value_func'] )
 		) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
 		}
 
-		$css_declarations    = array();
-		$style_property_keys = $style_definition['property_keys'];
+		$css_declarations     = array();
+		$style_property_keys  = $style_definition['property_keys'];
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$custom_css_property  = isset( $options['custom_properties'] ) && is_array( $options['custom_properties'] ) ? _wp_array_get( $options['custom_properties'], $style_definition['path'], null ) : null;
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
@@ -375,7 +377,8 @@ class WP_Style_Engine {
 			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
 				if ( $css_var ) {
-					$css_declarations[ $style_property_keys['default'] ] = $css_var;
+					$css_property                      = $custom_css_property ? $custom_css_property : $style_property_keys['default'];
+					$css_declarations[ $css_property ] = $css_var;
 				}
 			}
 			return $css_declarations;
@@ -389,13 +392,15 @@ class WP_Style_Engine {
 				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
-				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
+				$css_property        = $custom_css_property ? $custom_css_property : $style_property_keys['individual'];
+				$individual_property = sprintf( $css_property, _wp_to_kebab_case( $key ) );
 				if ( static::is_valid_style_value( $style_value ) ) {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
 		} else {
-			$css_declarations[ $style_property_keys['default'] ] = $style_value;
+			$css_property                      = $custom_css_property ? $custom_css_property : $style_property_keys['default'];
+			$css_declarations[ $css_property ] = $style_value;
 		}
 
 		return $css_declarations;
@@ -421,9 +426,8 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_declarations     = array();
-		$classnames           = array();
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$css_declarations = array();
+		$classnames       = array();
 
 		// Collect CSS and classnames.
 		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
@@ -438,7 +442,7 @@ class WP_Style_Engine {
 				}
 
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
+				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $options ) );
 			}
 		}
 
@@ -473,16 +477,30 @@ class WP_Style_Engine {
 			return null;
 		}
 
+		// Treat the selector value as the root selector.
+		$css_selector = isset( $options['selector'] ) ? $options['selector'] : 'body';
+
 		// The return stylesheet.
 		$global_stylesheet = '';
 
 		// Layer 0: Root.
-		$root_level_styles = $this->generate( $global_styles, array( 'selector' => 'body' ) );
+		$root_level_styles = $this->get_block_supports_styles(
+			$global_styles,
+			array(
+				'selector'          => $css_selector,
+				'custom_properties' => array(
+					'spacing' => array(
+						'blockGap' => '--wp--style--block-gap',
+					),
+				),
+			),
+		);
 
 		if ( ! empty( $root_level_styles['css'] ) ) {
 			$global_stylesheet .= $root_level_styles['css'] . ' ';
 		}
 
+		/*
 		// Layer 1: Elements.
 		if ( isset( $global_styles['elements'] ) && is_array( $global_styles['elements'] ) ) {
 			foreach ( $global_styles['elements'] as $element_name => $element_styles ) {
@@ -490,7 +508,7 @@ class WP_Style_Engine {
 				if ( ! $selector ) {
 					continue;
 				}
-				$element_level_styles = $this->generate( $element_styles, array( 'selector' => $selector ) );
+				$element_level_styles = $this->get_block_supports_styles( $element_styles, array( 'selector' => $selector ) );
 				if ( ! empty( $element_level_styles['css'] ) ) {
 					$global_stylesheet .= $element_level_styles['css'] . ' ';
 				}
@@ -501,13 +519,13 @@ class WP_Style_Engine {
 		if ( isset( $global_styles['blocks'] ) && is_array( $global_styles['blocks'] ) ) {
 			foreach ( $global_styles['blocks'] as $block_name => $block_styles ) {
 				$selector           = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
-				$block_level_styles = $this->generate( $block_styles, array( 'selector' => $selector ) );
+				$block_level_styles = $this->get_block_supports_styles( $block_styles, array( 'selector' => $selector ) );
 				if ( ! empty( $block_level_styles['css'] ) ) {
 					$global_stylesheet .= $block_level_styles['css'] . ' ';
 				}
 			}
 		}
-
+		*/
 		if ( ! empty( $global_stylesheet ) ) {
 			return rtrim( $global_stylesheet );
 		}
@@ -522,18 +540,20 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean $should_skip_css_vars           Whether to skip compiling CSS var values.
+	 * @param array         $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array         $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array<string> $options Options passed to the public generator functions.
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_skip_css_vars ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options ) {
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
 			return $css_declarations;
 		}
+
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
 
 		// The first item in $individual_property_definition['path'] array tells us the style property, e.g., "border".
 		// We use this to get a corresponding CSS style definition such as "color" or "width" from the same group.

@@ -617,8 +617,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$node = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-
+		$node     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$selector = $block_metadata['selector'];
 		$settings = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
@@ -626,10 +625,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// $block_metadata['path'] = array('styles','elements','link');
 		// Make sure that $block_metadata['path'] describes an element node, like ['styles', 'element', 'link'].
 		// Skip non-element paths like just ['styles'].
-		$is_processing_element = in_array( 'elements', $block_metadata['path'], true );
-
-		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
-
+		$is_processing_element  = in_array( 'elements', $block_metadata['path'], true );
+		$current_element        = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
 		$element_pseudo_allowed = isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ? static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] : array();
 
 		// Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
@@ -654,8 +651,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json );
 		}
 
-		$block_rules = '';
-
 		// 1. Separate the ones who use the general selector
 		// and the ones who use the duotone selector.
 		$declarations_duotone = array();
@@ -666,20 +661,34 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		/*
-		 * Reset default browser margin on the root body element.
-		 * This is set on the root selector **before** generating the ruleset
-		 * from the `theme.json`. This is to ensure that if the `theme.json` declares
-		 * `margin` in its `spacing` declaration for the `body` element then these
-		 * user-generated values take precedence in the CSS cascade.
-		 * @link https://github.com/WordPress/gutenberg/issues/36147.
-		 */
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			$block_rules .= 'body { margin: 0; }';
-		}
+		$block_rules = '';
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			/*
+			 * Reset default browser margin on the root body element.
+			 * This is set on the root selector **before** generating the ruleset
+			 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+			 * `margin` in its `spacing` declaration for the `body` element then these
+			 * user-generated values take precedence in the CSS cascade.
+			 * @link https://github.com/WordPress/gutenberg/issues/36147.
+			 */
+			$block_rules .= 'body { margin: 0; /* reset */ }';
+
+			/*
+				Style engine is generating the root styles only.
+				This way we can iteratively introduce it to start generating styles.elements, and styles.blocks.
+			*/
+			$block_rules .= gutenberg_style_engine_generate_global_styles(
+				$node,
+				array(
+					'selector' => $selector,
+				)
+			);
+
+		} else {
+			$block_rules .= static::to_ruleset( $selector, $declarations );
+		}
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
