@@ -97,7 +97,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-15 ($grid-unit-15 * 0.5) 0;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
 		color: $gray-900;
 		border-radius: $radius-block-ui;
@@ -297,8 +297,11 @@
 		}
 	}
 
-	.block-editor-list-view-block-select-button__title {
+	.block-editor-list-view-block-select-button__label-wrapper {
 		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
 		width: 100%;
 		position: relative;
 
