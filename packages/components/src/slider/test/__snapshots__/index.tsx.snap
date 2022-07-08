@@ -1,0 +1,739 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Slider should render correctly 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="100"
+  min="0"
+  style="--progress: 0%;"
+  type="range"
+  value=""
+/>
+`;
+
+exports[`Slider should render max 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="50"
+  min="0"
+  style="--progress: 0%;"
+  type="range"
+  value=""
+/>
+`;
+
+exports[`Slider should render min 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="100"
+  min="5"
+  style="--progress: 0%;"
+  type="range"
+  value=""
+/>
+`;
+
+exports[`Slider should render size 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="100"
+  min="0"
+  style="--progress: 0%;"
+  type="range"
+  value=""
+/>
+`;
+
+exports[`Slider should render unit value 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="100"
+  min="0"
+  style="--progress: 40%;"
+  type="range"
+  value="40"
+/>
+`;
+
+exports[`Slider should render value 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			#f3f4f5 calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: #f3f4f5;
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #8d96a0;
+  border-color: #8d96a0;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  class="emotion-0 components-slider"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  id="slider"
+  max="100"
+  min="0"
+  style="--progress: 40%;"
+  type="range"
+  value="40"
+/>
+`;
