@@ -260,11 +260,14 @@ export function getLayoutStyles( {
 		? getGapCSSValue( style?.spacing?.blockGap )
 		: '';
 
-	// Ensure a fallback gap value for the root layout definitions, and otherwise
-	// use a fallback value if one is provided for the current block.
-	if ( ! hasBlockGapSupport && hasFallbackGapSupport ) {
-		gapValue =
-			selector === ROOT_BLOCK_SELECTOR ? '0.5em' : fallbackGapValue;
+	// Ensure a fallback gap value for the root layout definitions,
+	// and use a fallback value if one is provided for the current block.
+	if ( hasFallbackGapSupport ) {
+		if ( selector === ROOT_BLOCK_SELECTOR ) {
+			gapValue = ! gapValue ? '0.5em' : gapValue;
+		} else if ( ! hasBlockGapSupport && fallbackGapValue ) {
+			gapValue = fallbackGapValue;
+		}
 	}
 
 	if ( gapValue && tree?.settings?.layout?.definitions ) {

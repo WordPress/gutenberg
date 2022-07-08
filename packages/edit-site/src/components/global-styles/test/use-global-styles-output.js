@@ -600,5 +600,22 @@ describe( 'global styles renderer', () => {
 				'.wp-block-group.is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group.is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group.is-layout-flex { gap: 12px; }'
 			);
 		} );
+
+		it( 'should return fallback gap flex layout style for a block if blockGap is disabled, and a fallback value is provided', () => {
+			const style = { spacing: { blockGap: '12px' } };
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: '.wp-block-group',
+				hasBlockGapSupport: false, // This means that the fallback value will be used instead of the "real" one.
+				hasFallbackGapSupport: true,
+				fallbackGapValue: '2em',
+			} );
+
+			expect( layoutStyles ).toEqual(
+				'.wp-block-group.is-layout-flex { gap: 2em; }'
+			);
+		} );
 	} );
 } );
