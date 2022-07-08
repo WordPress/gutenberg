@@ -42,9 +42,9 @@ test.describe( 'Comments', () => {
 		await requestUtils.deleteAllComments();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
-		await page.waitForSelector(
-			'xpath=//p[contains(text(), "No results found.")]'
-		);
+		await expect(
+			await page.locator( 'text="No results found."' )
+		).toHaveCount( 1 );
 	} );
 
 	test( 'Pagination links are working as expected', async ( {
@@ -80,10 +80,7 @@ test.describe( 'Comments', () => {
 			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 0 );
 
-		await Promise.all( [
-			page.click( 'text="Older Comments"' ),
-			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-		] );
+		await page.click( 'text="Older Comments"' );
 
 		// We check that there are a previous and a next link.
 		await expect(
@@ -93,10 +90,7 @@ test.describe( 'Comments', () => {
 			await page.locator( 'text="Newer Comments"' )
 		).toHaveCount( 1 );
 
-		await Promise.all( [
-			page.click( 'text="Older Comments"' ),
-			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-		] );
+		await page.click( 'text="Older Comments"' );
 
 		// We check that there is only have a next link
 		await expect(
