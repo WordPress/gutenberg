@@ -22,7 +22,9 @@
 		"openInNewTab",
 		"showLabels",
 		"iconColorValue",
-		"iconBackgroundColorValue"
+		"iconBackgroundColorValue",
+		"iconColor",
+		"iconBackgroundColor"
 	],
 	"supports": {
 		"reusable": false,

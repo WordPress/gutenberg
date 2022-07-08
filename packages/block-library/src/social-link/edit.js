@@ -70,10 +70,19 @@ const SocialLinkEdit = ( {
 	setAttributes,
 } ) => {
 	const { url, service, label } = attributes;
-	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
+	const {
+		showLabels,
+		iconColorValue,
+		iconBackgroundColorValue,
+		iconBackgroundColor,
+		iconColor,
+	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
+		[ `has-${ iconColor }-icon-color` ]: iconColor,
+		[ `has-${ iconBackgroundColor }-background-color` ]:
+			iconBackgroundColor,
 	} );
 
 	const ref = useRef();

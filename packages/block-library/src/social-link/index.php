@@ -303,12 +303,28 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 function block_core_social_link_get_color_styles( $context ) {
 	$styles = array();
 
-	if ( array_key_exists( 'iconColorValue', $context ) ) {
-		$styles[] = 'color: ' . $context['iconColorValue'] . '; ';
+	if ( array_key_exists( 'iconColor', $context ) ) {
+		if ( array_key_exists( 'iconColorValue', $context ) ) {
+			$styles[] = 'color: var(--wp--preset--color--' . $context['iconColor'] . ', ' . $context['iconColorValue'] . '); ';
+		} else {
+			$styles[] = 'color: var(--wp--preset--color--' . $context['iconColor'] . '); ';
+		}
+	} else {
+		if ( array_key_exists( 'iconColorValue', $context ) ) {
+			$styles[] = 'color: ' . $context['iconColorValue'] . '; ';
+		}
 	}
 
-	if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
-		$styles[] = 'background-color: ' . $context['iconBackgroundColorValue'] . '; ';
+	if ( array_key_exists( 'iconBackgroundColor', $context ) ) {
+		if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
+			$styles[] = 'background-color: var(--wp--preset--color--' . $context['iconBackgroundColor'] . ', ' . $context['iconBackgroundColorValue'] . '); ';
+		} else {
+			$styles[] = 'background-color: var(--wp--preset--color--' . $context['iconBackgroundColor'] . '); ';
+		}
+	} else {
+		if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
+			$styles[] = 'background-color: ' . $context['iconBackgroundColorValue'] . '; ';
+		}
 	}
 
 	return implode( '', $styles );

@@ -42,7 +42,9 @@
 		"openInNewTab": "openInNewTab",
 		"showLabels": "showLabels",
 		"iconColorValue": "iconColorValue",
-		"iconBackgroundColorValue": "iconBackgroundColorValue"
+		"iconBackgroundColorValue": "iconBackgroundColorValue",
+		"iconColor": "iconColor",
+		"iconBackgroundColor": "iconBackgroundColor"
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
