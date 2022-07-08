@@ -32,12 +32,22 @@ function UnforwardedExternalLink(
 		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
+	/* Anchor links are percieved as external links.
+	This constant helps check for on page anchor links,
+	to prevent them from being opened in the editor. */
+	const shouldPreventDefault = href.startsWith( '#' );
+
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
+			onClick={
+				shouldPreventDefault
+					? ( event ) => event.preventDefault()
+					: undefined
+			}
 			target="_blank"
 			rel={ optimizedRel }
 			ref={ ref }
