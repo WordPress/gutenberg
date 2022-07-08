@@ -58,7 +58,7 @@ test.describe( 'Comments', () => {
 		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
-			'.post-publish-panel__postpublish-buttons .is-primary'
+			'role=region[name="Editor publish"i] >> "View Post"'
 		);
 
 		// TODO: We can extract this into a util once we find we need it elsewhere.
@@ -123,7 +123,7 @@ test.describe( 'Comments', () => {
 		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
-			'.post-publish-panel__postpublish-buttons .is-primary'
+			'role=region[name="Editor publish"i] >> "View Post"'
 		);
 
 		// Create three comments for that post.
