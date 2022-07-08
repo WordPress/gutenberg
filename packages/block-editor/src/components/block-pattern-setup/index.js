@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 import { useState } from '@wordpress/element';
-import { useInstanceId, useResizeObserver } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -143,8 +143,6 @@ const BlockPatternSetup = ( {
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
 
 	if ( ! patterns?.length ) {
 		return null;
@@ -158,7 +156,6 @@ const BlockPatternSetup = ( {
 		onBlockPatternSelect || onBlockPatternSelectDefault;
 	return (
 		<>
-			{ contentResizeListener }
 			<div
 				className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
 			>
