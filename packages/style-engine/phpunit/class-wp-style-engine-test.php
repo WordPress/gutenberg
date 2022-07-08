@@ -14,12 +14,16 @@ require __DIR__ . '/../class-wp-style-engine.php';
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
-	 * Tests generating styles and classnames based on various manifestations of the $block_styles argument.
+	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @dataProvider data_generate_styles_fixtures
+	 * @dataProvider data_generate_block_supports_styles_fixtures
+	 *
+	 * @param array  $block_styles    The incoming block styles object.
+	 * @param array  $options         Style engine options.
+	 * @param string $expected_output The expected output.
 	 */
-	function test_generate_styles( $block_styles, $options, $expected_output ) {
-		$generated_styles = wp_style_engine_generate( $block_styles, $options );
+	public function test_generate_block_supports_styles( $block_styles, $options, $expected_output ) {
+		$generated_styles = wp_style_engine_get_block_supports_styles( $block_styles, $options );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
@@ -28,7 +32,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_generate_styles_fixtures() {
+	public function data_generate_block_supports_styles_fixtures() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),

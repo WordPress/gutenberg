@@ -5,7 +5,6 @@ import {
 	pickBy,
 	isEmpty,
 	isObject,
-	identity,
 	mapValues,
 	forEach,
 	get,
@@ -18,6 +17,8 @@ import {
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
+
+const identity = ( x ) => x;
 
 /**
  * Removed falsy values from nested object.

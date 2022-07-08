@@ -606,7 +606,7 @@
 				"core/comment-template": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/comments-query-loop": {
+				"core/comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/cover": {
@@ -1083,6 +1083,9 @@
 		"stylesElementsPropertiesComplete": {
 			"type": "object",
 			"properties": {
+				"button": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"link": {
 					"type": "object",
 					"allOf": [
@@ -1184,7 +1187,7 @@
 				"core/comment-template": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/comments-query-loop": {
+				"core/comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/cover": {

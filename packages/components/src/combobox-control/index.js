@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { deburr } from 'lodash';
+import removeAccents from 'remove-accents';
+
 /**
  * WordPress dependencies
  */
@@ -61,7 +62,10 @@ function ComboboxControl( {
 } ) {
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
-	const instanceId = useInstanceId( ComboboxControl );
+	// Use a custom prefix when generating the `instanceId` to avoid having
+	// duplicate input IDs when rendering this component and `FormTokenField`
+	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
+	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
 		currentOption || null
 	);
@@ -73,9 +77,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = deburr( inputValue.toLocaleLowerCase() );
+		const match = removeAccents( inputValue.toLocaleLowerCase() );
 		options.forEach( ( option ) => {
-			const index = deburr( option.label )
+			const index = removeAccents( option.label )
 				.toLocaleLowerCase()
 				.indexOf( match );
 			if ( index === 0 ) {

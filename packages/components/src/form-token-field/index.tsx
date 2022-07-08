@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { last, clone, uniq, map, difference, identity, some } from 'lodash';
+import { last, clone, uniq, map, difference, some } from 'lodash';
 import classnames from 'classnames';
 import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
@@ -34,6 +34,8 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
+
+const identity = ( value: string ) => value;
 
 /**
  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,

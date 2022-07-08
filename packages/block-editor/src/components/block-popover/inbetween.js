@@ -172,7 +172,7 @@ function BlockPopoverInbetween( {
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
-			// otherwise render in place (not in the the default popover slot).
+			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.

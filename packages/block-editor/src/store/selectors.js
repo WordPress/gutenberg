@@ -1382,7 +1382,7 @@ export function getBlockInsertionPoint( state ) {
 
 	if ( clientId ) {
 		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId, rootClientId ) + 1;
+		index = getBlockIndex( state, selectionEnd.clientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
