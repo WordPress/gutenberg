@@ -3,18 +3,14 @@
  */
 import { isString, isObject } from 'lodash';
 
-/** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
 /**
- * @typedef Props
- * @property {Shortcut} shortcut    Shortcut configuration
- * @property {string}   [className] Classname
+ * Internal dependencies
  */
+import type { ShortcutProps } from './types';
 
-/**
- * @param {Props} props Props
- * @return {JSX.Element | null} Element
- */
-function Shortcut( { shortcut, className } ) {
+function Shortcut( props: ShortcutProps ) {
+	const { shortcut, className } = props;
+
 	if ( ! shortcut ) {
 		return null;
 	}
