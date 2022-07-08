@@ -899,6 +899,7 @@ export const hasFetchedAutosaves = createRegistrySelector(
  */
 export const getReferenceByDistinctEdits = createSelector(
 	// This unused state argument is listed here for the documentation generating tool (docgen).
+	// eslint-disable-next-line no-unused-vars
 	( state ) => [],
 	( state ) => [
 		state.undo.length,
