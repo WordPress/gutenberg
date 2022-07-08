@@ -77,14 +77,11 @@
 
 .edit-site-screen-text-color__control,
 .edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control,
-.edit-site-screen-background-color__control {
+.edit-site-screen-button-color__control {
 	padding: $grid-unit-20;
+}
 
-	.block-editor-color-gradient-control__tabs {
-		margin: - $grid-unit-20;
-	}
-
+.edit-site-screen-background-color__control {
 	.block-editor-color-gradient-control__tab-panel {
 		padding: $grid-unit-20;
 	}
