@@ -688,13 +688,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		// 4. Generate Layout block gap styles.
-		$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
-		$has_block_gap_value   = _wp_array_get( $node, array( 'spacing', 'blockGap' ), false );
-
 		if (
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
-			$has_block_gap_support &&
-			$has_block_gap_value &&
 			! empty( $block_metadata['name'] )
 		) {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
@@ -707,6 +702,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
+			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
 				$block_rules .= '.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }';
 				$block_rules .= ".wp-site-blocks > * + * { margin-block-start: $block_gap_value; }";
@@ -1167,9 +1163,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_gap_value = null;
 			// Use a fallback gap value if block gap support is not available.
 			if ( ! $has_block_gap_support ) {
-				$block_gap_value = '0.5em';
+				$block_gap_value = static::ROOT_BLOCK_SELECTOR === $selector ? '0.5em' : null;
 				if ( ! empty( $block_type ) ) {
-					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
+					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), null );
 				}
 			} else {
 				$block_gap_value = _wp_array_get( $node, array( 'spacing', 'blockGap' ), null );

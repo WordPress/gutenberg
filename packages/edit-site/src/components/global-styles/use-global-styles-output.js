@@ -244,6 +244,7 @@ function getStylesDeclarations( blockStyles = {} ) {
  * @param {string}  props.selector              Selector used to group together layout styling rules.
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
  * @param {boolean} props.hasFallbackGapSupport Whether or not the theme allows fallback gap styles.
+ * @param {?string} props.fallbackGapValue      An optional fallback gap value if no real gap value is available.
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
@@ -252,20 +253,18 @@ export function getLayoutStyles( {
 	selector,
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
+	fallbackGapValue,
 } ) {
 	let ruleset = '';
 	let gapValue = hasBlockGapSupport
 		? getGapCSSValue( style?.spacing?.blockGap )
 		: '';
 
-	// Ensure a fallback gap value for the root layout definitions if no gap value exists,
-	// or if there is block styles support and blockGap has been disabled.
-	if (
-		( ! gapValue || ! hasBlockGapSupport ) &&
-		selector === ROOT_BLOCK_SELECTOR &&
-		hasFallbackGapSupport
-	) {
-		gapValue = '0.5em';
+	// Ensure a fallback gap value for the root layout definitions, and otherwise
+	// use a fallback value if one is provided for the current block.
+	if ( ! hasBlockGapSupport && hasFallbackGapSupport ) {
+		gapValue =
+			selector === ROOT_BLOCK_SELECTOR ? '0.5em' : fallbackGapValue;
 	}
 
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
@@ -398,6 +397,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
 			nodes.push( {
 				duotoneSelector: blockSelectors[ blockName ].duotoneSelector,
+				fallbackGapValue: blockSelectors[ blockName ].fallbackGapValue,
 				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
 				selector: blockSelectors[ blockName ].selector,
 				styles: blockStyles,
@@ -514,7 +514,13 @@ export const toStyles = (
 	 */
 	let ruleset = 'body {margin: 0;}';
 	nodesWithStyles.forEach(
-		( { selector, duotoneSelector, styles, hasLayoutSupport } ) => {
+		( {
+			selector,
+			duotoneSelector,
+			styles,
+			fallbackGapValue,
+			hasLayoutSupport,
+		} ) => {
 			const duotoneStyles = {};
 			if ( styles?.filter ) {
 				duotoneStyles.filter = styles.filter;
@@ -543,6 +549,7 @@ export const toStyles = (
 					selector,
 					hasBlockGapSupport,
 					hasFallbackGapSupport,
+					fallbackGapValue,
 				} );
 			}
 
@@ -646,8 +653,11 @@ const getBlockSelectors = ( blockTypes ) => {
 		const duotoneSelector =
 			blockType?.supports?.color?.__experimentalDuotone ?? null;
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
+		const fallbackGapValue =
+			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 		result[ name ] = {
 			duotoneSelector,
+			fallbackGapValue,
 			hasLayoutSupport,
 			name,
 			selector,
