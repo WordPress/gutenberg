@@ -80,8 +80,8 @@ export function getCurrentUser( state ) {
 /**
  * Returns all the users returned by a query ID.
  *
- * @param {any} state  Data state.
- * @param       string queryID Query ID.
+ * @param {any}    state  Data state.
+ * @param {string} string queryID Query ID.
  *
  * @return {Object[]} Users list.
  */

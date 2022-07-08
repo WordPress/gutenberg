@@ -7,7 +7,7 @@
 
 ### Enhancements
 
-#### UI 
+#### UI
 - Increase fade intensity during spotlight mode. ([40454](https://github.com/WordPress/gutenberg/pull/40454))
 - Improvements to "inherit default layout" toggle. ([41893](https://github.com/WordPress/gutenberg/pull/41893))
 - Make it easier to select "Edit visually" when in "Edit as HTML. ([41516](https://github.com/WordPress/gutenberg/pull/41516))
@@ -67,7 +67,7 @@
 - [Block Editor]: Fix content loss from `replaceInnerBlocks` with controlled blocks. ([41948](https://github.com/WordPress/gutenberg/pull/41948))
 - Fix action button spacing on the widget editor. ([41915](https://github.com/WordPress/gutenberg/pull/41915))
 - Render duotone presets in pattern preview. ([41249](https://github.com/WordPress/gutenberg/pull/41249))
- 
+
 #### Block Library
 - List  v2:
 - Fix impossible to outdent multiple list items. ([41713](https://github.com/WordPress/gutenberg/pull/41713))
@@ -1383,7 +1383,7 @@ The following contributors merged PRs in this release:
 
 ### Bug Fixes
 
-- Fix the position of the block inserter in between blocks ([40919](https://github.com/WordPress/gutenberg/pull/40919)) 
+- Fix the position of the block inserter in between blocks ([40919](https://github.com/WordPress/gutenberg/pull/40919))
 
 
 = 13.2.0 =
@@ -1753,7 +1753,7 @@ The following PRs were merged by first time contributors:
 - Fixed focus loss when navigating the guide component. ([40324](https://github.com/WordPress/gutenberg/pull/40324))
 - Navigation block: After choosing an option from Select Menu, focus after block rerender. ([40390](https://github.com/WordPress/gutenberg/pull/40390))
 - Block Styles: Remove unnecessary button role and 'onKeyDown' handler. ([40427](https://github.com/WordPress/gutenberg/pull/40427))
-  
+
 ### Performance
 
 - Added a context param to sidebar entity request. ([40148](https://github.com/WordPress/gutenberg/pull/40148))
@@ -1791,12 +1791,12 @@ The following PRs were merged by first time contributors:
 - Stop exporting individual color objects from color values file. ([40387](https://github.com/WordPress/gutenberg/pull/40387))
 - Added reusable BlockPopover and BlockPopoverInbetween components. ([40441](https://github.com/WordPress/gutenberg/pull/40441))
 - Cleaned BlockMover component and styles. ([40379](https://github.com/WordPress/gutenberg/pull/40379))
-  
+
 #### Packages
 
 - Block Editor: Remove unused sub-components in list view. ([40448](https://github.com/WordPress/gutenberg/pull/40448))
 - Data: Cancel render queue in a more straightforward way. ([40433](https://github.com/WordPress/gutenberg/pull/40433))
-  
+
 #### Plugin
 
 - Added `edit` context to patterns REST controllers. ([40259](https://github.com/WordPress/gutenberg/pull/40259))
