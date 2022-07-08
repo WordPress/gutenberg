@@ -25,12 +25,15 @@ test.describe( 'Using Format API', () => {
 		await page.keyboard.type( 'First paragraph' );
 		await pageUtils.pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'More' );
-		page.locator( 'role=button[name="Custom Link"i]' );
+		const button = await page.locator(
+			`//button[contains(text(), '${ 'Custom Link' }')]`
+		);
+		await button.click();
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
-<p>First paragraph</p>
+<p>First <a href="https://example.com" class="my-plugin-link">paragraph</a></p>
 <!-- /wp:paragraph -->`
 		);
 	} );
