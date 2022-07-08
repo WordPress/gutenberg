@@ -41,7 +41,7 @@ test.describe( 'Comments', () => {
 	} ) => {
 		await requestUtils.deleteAllComments();
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments' } );
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await page.waitForSelector(
 			'xpath=//p[contains(text(), "No results found.")]'
 		);
@@ -54,7 +54,7 @@ test.describe( 'Comments', () => {
 		pageUtils,
 	} ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments' } );
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
@@ -119,7 +119,7 @@ test.describe( 'Comments', () => {
 	} ) => {
 		await admin.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/comments' } );
+		await editor.insertBlock( { name: 'core/comments-query-loop' } );
 		await editor.publishPost();
 		// Visit the post that was just published.
 		await page.click(
