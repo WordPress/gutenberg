@@ -157,7 +157,7 @@ function render_legacy_post_comments_block( $attributes, $content, $block ) {
  * @see https://github.com/WordPress/gutenberg/pull/41807
  * @see https://github.com/WordPress/gutenberg/pull/32514
  */
-function gutenberg_register_legacy_post_comments_block() {
+function register_legacy_post_comments_block() {
 	$registry = WP_Block_Type_Registry::get_instance();
 	if ( $registry->is_registered( 'core/post-comments' ) ) {
 		unregister_block_type( 'core/post-comments' );
@@ -210,4 +210,4 @@ function gutenberg_register_legacy_post_comments_block() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_legacy_post_comments_block', 21);
+add_action( 'init', 'register_legacy_post_comments_block', 21);
