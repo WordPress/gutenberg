@@ -22,7 +22,7 @@ export default class ErrorBoundary extends Component {
 	}
 
 	componentDidCatch( error ) {
-		doAction( 'gb.reportErrorBoundaryException', error );
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
 	static getDerivedStateFromError( error ) {

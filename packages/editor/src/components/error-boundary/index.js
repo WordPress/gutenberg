@@ -38,7 +38,7 @@ class ErrorBoundary extends Component {
 	componentDidCatch( error ) {
 		this.setState( { error } );
 
-		doAction( 'gb.reportErrorBoundaryException', error );
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
 	reboot() {
