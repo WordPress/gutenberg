@@ -51,31 +51,26 @@ test.describe( 'Comments', () => {
 		admin,
 		editor,
 		page,
-		pageUtils,
+		requestUtils,
 	} ) => {
+		const author = requestUtils.getCurrentUser();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
-		await editor.publishPost();
+		const postId = await editor.publishPost();
+
+		// Create three comments for that post.
+		for ( let i = 0; i < 3; i++ ) {
+			await requestUtils.createComment( {
+				author: author.id,
+				content: `This is an automated comment - ${ i }`,
+				post: postId,
+			} );
+		}
+
 		// Visit the post that was just published.
 		await page.click(
 			'role=region[name="Editor publish"i] >> "View Post"'
 		);
-
-		// TODO: We can extract this into a util once we find we need it elsewhere.
-		// Create three comments for that post.
-		for ( let i = 0; i < 3; i++ ) {
-			await page.waitForSelector( 'textarea#comment' );
-			await page.click( 'textarea#comment' );
-			await page.type(
-				`textarea#comment`,
-				`This is an automated comment - ${ i }`
-			);
-			await pageUtils.pressKeyTimes( 'Tab', 1 );
-			await Promise.all( [
-				page.keyboard.press( 'Enter' ),
-				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-			] );
-		}
 
 		// We check that there is a previous comments page link.
 		await expect(
@@ -115,32 +110,28 @@ test.describe( 'Comments', () => {
 		admin,
 		editor,
 		page,
-		pageUtils,
+		requestUtils,
 	} ) => {
+		const author = requestUtils.getCurrentUser();
 		await admin.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments-query-loop' } );
-		await editor.publishPost();
+		const postId = await editor.publishPost();
+
+		// Create three comments for that post.
+		for ( let i = 0; i < 3; i++ ) {
+			await requestUtils.createComment( {
+				author: author.id,
+				content: `This is an automated comment - ${ i }`,
+				post: postId,
+			} );
+		}
 
 		// Visit the post that was just published.
 		await page.click(
 			'role=region[name="Editor publish"i] >> "View Post"'
 		);
 
-		// Create three comments for that post.
-		for ( let i = 0; i < 3; i++ ) {
-			await page.waitForSelector( 'textarea#comment' );
-			await page.click( 'textarea#comment' );
-			await page.type(
-				`textarea#comment`,
-				`This is an automated comment - ${ i }`
-			);
-			await pageUtils.pressKeyTimes( 'Tab', 1 );
-			await Promise.all( [
-				page.keyboard.press( 'Enter' ),
-				page.waitForNavigation( { waitUntil: 'networkidle0' } ),
-			] );
-		}
 		// We check that there are no comments page link.
 		await expect(
 			await page.locator( '.wp-block-comments-pagination-previous' )
