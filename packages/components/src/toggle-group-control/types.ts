@@ -109,7 +109,7 @@ export type ToggleGroupControlProps = Omit<
 	 *
 	 * @default 'default'
 	 */
-	size?: '__unstable-small' | 'default' | '__unstable-large';
+	size?: 'default' | '__unstable-large';
 };
 
 export type ToggleGroupControlContextProps = RadioStateReturn & {

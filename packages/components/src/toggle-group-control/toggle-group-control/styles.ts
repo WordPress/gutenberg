@@ -44,7 +44,6 @@ export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
 ) => {
 	const heights = {
-		'__unstable-small': '32px',
 		default: '36px',
 		'__unstable-large': '40px',
 	};

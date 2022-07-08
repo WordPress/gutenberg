@@ -26,7 +26,7 @@ export default {
 	argTypes: {
 		size: {
 			control: 'select',
-			options: [ 'default', '__unstable-small', '__unstable-large' ],
+			options: [ 'default', '__unstable-large' ],
 		},
 	},
 	parameters: {
