@@ -18,7 +18,7 @@ import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
-import { deleteAllComments } from './comments';
+import { createComment, deleteAllComments } from './comments';
 import { deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -122,6 +122,7 @@ class RequestUtils {
 	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
 	deleteAllPosts = deleteAllPosts.bind( this );
+	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );
 	addWidgetBlock = addWidgetBlock.bind( this );

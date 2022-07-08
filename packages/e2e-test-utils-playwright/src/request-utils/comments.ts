@@ -3,8 +3,24 @@
  */
 import type { RequestUtils } from './index';
 
-interface Comment {
+export interface Comment {
 	id: number;
+	author: number;
+	content: string;
+}
+
+/**
+ * Create new comment using the REST API.
+ *
+ * @param {} this    RequestUtils.
+ * @param {} comment Comment.
+ */
+export async function createComment( this: RequestUtils, comment: Comment ) {
+	this.rest( {
+		method: 'POST',
+		path: '/wp/v2/comments',
+		data: comment,
+	} );
 }
 
 /**
