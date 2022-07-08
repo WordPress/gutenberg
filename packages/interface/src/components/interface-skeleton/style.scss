@@ -66,7 +66,7 @@ html.interface-interface-skeleton__html-container {
 	// Footer overlap prevention
 	.has-footer & {
 		@include break-medium() {
-			padding-bottom: $button-size-small + $border-width;
+			padding-bottom: $button-size-small;
 		}
 	}
 }
@@ -97,7 +97,7 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
-	top: 0;
+	top: 1px;
 	right: 0;
 	bottom: 0;
 	left: 0;
@@ -116,20 +116,20 @@ html.interface-interface-skeleton__html-container {
 	overflow: auto;
 
 	@include break-medium() {
-		border-left: $border-width solid $gray-200;
+		box-shadow: ( $border-width * -1 ) 0 0 0 rgba(0, 0, 0, 0.12);
 	}
 }
 
 .interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $gray-200;
+		box-shadow: $border-width 0 0 0 rgba(0, 0, 0, 0.12);
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $gray-200;
+	box-shadow: 0 0 0 $border-width rgba(0, 0, 0, 0.12);
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
 }
@@ -137,7 +137,7 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__footer {
 	height: auto; // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $gray-200;
+	box-shadow: 0 0 0 $border-width rgba(0, 0, 0, 0.12);
 	color: $gray-900;
 	position: absolute;
 	bottom: 0;
