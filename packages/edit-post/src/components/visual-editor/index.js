@@ -260,7 +260,7 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: undefined
+										: 'wp-block-post-content'
 								}
 								__experimentalLayout={ layout }
 							/>
