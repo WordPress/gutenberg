@@ -218,7 +218,8 @@ function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
 				key === '--wp--style--root--padding' &&
 				isString( styleValue )
 			) {
-				// We don't support string values for root padding
+				// Root-level padding styles don't currently support strings with CSS shorthand values.
+				// This may change: https://github.com/WordPress/gutenberg/issues/40132.
 				return declarations;
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )

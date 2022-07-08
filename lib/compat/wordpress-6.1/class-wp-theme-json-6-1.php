@@ -792,7 +792,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
 				continue;
 			}
-			// We don't support string values.
+			// Root-level padding styles don't currently support strings with CSS shorthand values.
+			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
 			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
 				continue;
 			}
