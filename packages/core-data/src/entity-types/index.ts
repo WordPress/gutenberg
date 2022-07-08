@@ -24,6 +24,26 @@ import type { WpTemplatePart } from './wp-template-part';
 export type { EntityType } from './entities';
 export type { BaseEntityRecords } from './base-entity-records';
 
+export type EntityRecord< C extends Context > =
+	| Attachment< C >
+	| Comment< C >
+	| MenuLocation< C >
+	| NavMenu< C >
+	| NavMenuItem< C >
+	| Page< C >
+	| Plugin< C >
+	| Post< C >
+	| Settings< C >
+	| Sidebar< C >
+	| Taxonomy< C >
+	| Theme< C >
+	| User< C >
+	| Type< C >
+	| Widget< C >
+	| WidgetType< C >
+	| WpTemplate< C >
+	| WpTemplatePart< C >;
+
 export type {
 	Attachment,
 	Comment,

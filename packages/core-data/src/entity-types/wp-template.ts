@@ -89,6 +89,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WpTemplate<
-	C extends Context = DefaultContextOf< 'postType', 'wp_template' >
-> = OmitNevers< _BaseEntityRecords.WpTemplate< C > >;
+export type WpTemplate< C extends Context > = OmitNevers<
+	_BaseEntityRecords.WpTemplate< C >
+>;
