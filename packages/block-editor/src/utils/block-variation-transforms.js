@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { isMatch } from 'lodash';
-
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
@@ -24,7 +19,9 @@ export const __experimentalGetMatchingVariation = (
 	if ( ! variations || ! blockAttributes ) return;
 	const matches = variations.filter( ( { attributes } ) => {
 		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
-		return isMatch( blockAttributes, attributes );
+		return Object.entries( attributes ).every(
+			( [ key, value ] ) => blockAttributes[ key ] === value
+		);
 	} );
 	if ( matches.length !== 1 ) return;
 	return matches[ 0 ];
