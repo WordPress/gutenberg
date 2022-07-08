@@ -56,15 +56,14 @@ export function useBorderControl(
 
 			onChange( newBorder );
 		},
-		[ onChange, shouldSanitizeBorder, sanitizeBorder ]
+		[ onChange, shouldSanitizeBorder ]
 	);
 
 	const onWidthChange = useCallback(
 		( newWidth?: string ) => {
 			const newWidthValue = newWidth === '' ? undefined : newWidth;
-			const [ parsedValue ] = parseQuantityAndUnitFromRawValue(
-				newWidth
-			);
+			const [ parsedValue ] =
+				parseQuantityAndUnitFromRawValue( newWidth );
 			const hasZeroWidth = parsedValue === 0;
 
 			const updatedBorder = { ...border, width: newWidthValue };
@@ -97,7 +96,13 @@ export function useBorderControl(
 
 			onBorderChange( updatedBorder );
 		},
-		[ border, hadPreviousZeroWidth, onBorderChange ]
+		[
+			border,
+			hadPreviousZeroWidth,
+			colorSelection,
+			styleSelection,
+			onBorderChange,
+		]
 	);
 
 	const onSliderChange = useCallback(

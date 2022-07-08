@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, noop } from 'lodash';
+import { isEmpty } from 'lodash';
 import classNames from 'classnames';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
@@ -20,6 +20,8 @@ import InputBase from '../input-control/input-base';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
 import type { SelectControlProps } from './types';
+
+const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -47,6 +49,7 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		__nextHasNoMarginBottom = false,
 		...props
 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: ForwardedRef< HTMLSelectElement >
@@ -85,7 +88,11 @@ function UnforwardedSelectControl(
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		<BaseControl help={ help } id={ id }>
+		<BaseControl
+			help={ help }
+			id={ id }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+		>
 			<InputBase
 				className={ classes }
 				disabled={ disabled }

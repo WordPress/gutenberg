@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -328,7 +328,7 @@ const deprecated = [
 			return migrateCustomColorsAndFontSizes(
 				omit( {
 					...attributes,
-					customFontSize: isFinite( attributes.fontSize )
+					customFontSize: Number.isFinite( attributes.fontSize )
 						? attributes.fontSize
 						: undefined,
 					customTextColor:

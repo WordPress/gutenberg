@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import BlockView from '../block-view';
+
+const noop = () => {};
 
 describe( 'BlockView', () => {
 	test( 'should match snapshot', () => {

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 4.3.0 (2022-06-29)
+
+## 4.2.0 (2022-06-15)
+
+## 4.1.0 (2022-06-01)
+
+## 4.0.0 (2022-05-18)
+
+### Breaking Change
+
+-   The `onError` now always receives the `message` as a string ([#39448](https://github.com/WordPress/gutenberg/pull/39448)).
+
 ## 3.6.0 (2022-05-04)
 
 ## 3.5.0 (2022-04-21)

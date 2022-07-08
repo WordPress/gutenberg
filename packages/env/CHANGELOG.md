@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 4.8.0 (2022-06-01)
+### Enhancement
+-   Removed the need for quotation marks when passing options to `wp-env run`.
+-   Setting a `config` key to `null` will prevent adding the constant to `wp-config.php` even if a default value is defined by `wp-env`.
+
+## 4.7.0 (2022-05-18)
+
+### Enhancement
+-   Added SSH protocol support for git sources
+
 ## 4.2.0 (2022-01-27)
 
 ### Enhancement

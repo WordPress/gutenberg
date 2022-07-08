@@ -314,7 +314,9 @@ function getEventModifiers( event ) {
 	] ).filter(
 		( key ) =>
 			event[
-				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ ( `${ key }Key` )
+				/** @type {'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey'} */ (
+					`${ key }Key`
+				)
 			]
 	);
 }

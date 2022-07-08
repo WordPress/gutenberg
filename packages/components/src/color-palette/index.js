@@ -6,7 +6,6 @@ import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -116,18 +115,22 @@ function MultiplePalettes( {
 export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 	return (
 		<Dropdown
-			contentClassName={ classnames(
-				'components-color-palette__custom-color-dropdown-content',
-				{
-					'is-rendered-in-sidebar': isRenderedInSidebar,
-				}
-			) }
+			contentClassName="components-color-palette__custom-color-dropdown-content"
+			popoverProps={
+				isRenderedInSidebar
+					? {
+							placement: 'left-start',
+							offset: 20,
+							__unstableShift: true,
+					  }
+					: undefined
+			}
 			{ ...props }
 		/>
 	);
 }
 
-const extractColorNameFromCurrentValue = (
+export const extractColorNameFromCurrentValue = (
 	currentValue,
 	colors = [],
 	showMultiplePalettes = false
@@ -136,13 +139,20 @@ const extractColorNameFromCurrentValue = (
 		return '';
 	}
 
+	const currentValueIsCssVariable = /^var\(/.test( currentValue );
+	const normalizedCurrentValue = currentValueIsCssVariable
+		? currentValue
+		: colord( currentValue ).toHex();
+
 	// Normalize format of `colors` to simplify the following loop
 	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			if (
-				colord( currentValue ).toHex() === colord( colorValue ).toHex()
-			) {
+			const normalizedColorValue = currentValueIsCssVariable
+				? colorValue
+				: colord( colorValue ).toHex();
+
+			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
 			}
 		}
@@ -176,11 +186,6 @@ export default function ColorPalette( {
 		/>
 	);
 
-	let dropdownPosition;
-	if ( __experimentalIsRenderedInSidebar ) {
-		dropdownPosition = 'bottom left';
-	}
-
 	const colordColor = colord( value );
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
@@ -211,7 +216,6 @@ export default function ColorPalette( {
 		<VStack spacing={ 3 } className={ className }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
-					position={ dropdownPosition }
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (

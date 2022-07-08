@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { size } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -225,19 +224,17 @@ export default compose( [
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const directInsertBlock = __experimentalGetDirectInsertBlock(
-			rootClientId
-		);
+		const directInsertBlock =
+			__experimentalGetDirectInsertBlock( rootClientId );
 
 		const index = getBlockIndex( clientId );
 		const blockCount = getBlockCount();
 		const settings = getSettings();
 
 		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
+			allowedBlocks?.length === 1 &&
+			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+				?.length === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -276,9 +273,8 @@ export default compose( [
 				}
 
 				function getAdjacentBlockAttributes( attributesToCopy ) {
-					const { getBlock, getPreviousBlockClientId } = select(
-						blockEditorStore
-					);
+					const { getBlock, getPreviousBlockClientId } =
+						select( blockEditorStore );
 
 					if (
 						! attributesToCopy ||

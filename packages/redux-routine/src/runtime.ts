@@ -26,25 +26,20 @@ export default function createRuntime(
 ) {
 	const rungenControls = map(
 		controls,
-		( control, actionType ): Control => (
-			value,
-			next,
-			iterate,
-			yieldNext,
-			yieldError
-		) => {
-			if ( ! isActionOfType( value, actionType ) ) {
-				return false;
+		( control, actionType ): Control =>
+			( value, next, iterate, yieldNext, yieldError ) => {
+				if ( ! isActionOfType( value, actionType ) ) {
+					return false;
+				}
+				const routine = control( value );
+				if ( isPromise( routine ) ) {
+					// Async control routine awaits resolution.
+					routine.then( yieldNext, yieldError );
+				} else {
+					yieldNext( routine );
+				}
+				return true;
 			}
-			const routine = control( value );
-			if ( isPromise( routine ) ) {
-				// Async control routine awaits resolution.
-				routine.then( yieldNext, yieldError );
-			} else {
-				yieldNext( routine );
-			}
-			return true;
-		}
 	);
 
 	const unhandledActionControl = (

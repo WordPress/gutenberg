@@ -5,11 +5,17 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
 	postEditorTemplateMode: async (
-		{ page, pageUtils, requestUtils },
+		{ admin, editor, page, pageUtils, requestUtils },
 		use
 	) => {
 		await use(
-			new PostEditorTemplateMode( { page, pageUtils, requestUtils } )
+			new PostEditorTemplateMode( {
+				admin,
+				editor,
+				page,
+				pageUtils,
+				requestUtils,
+			} )
 		);
 	},
 } );
@@ -32,8 +38,8 @@ test.describe( 'Post Editor Template mode', () => {
 	} );
 
 	test( 'Allow to switch to template mode, edit the template and check the result', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		postEditorTemplateMode,
 	} ) => {
@@ -45,7 +51,7 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.switchToTemplateMode();
 
 		// Edit the template.
-		await pageUtils.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type(
 			'Just a random paragraph added to the template'
 		);
@@ -55,7 +61,7 @@ test.describe( 'Post Editor Template mode', () => {
 		await page.click( 'role=button[name="Save"i]' );
 
 		// Preview changes.
-		const previewPage = await pageUtils.openPreviewPage();
+		const previewPage = await editor.openPreviewPage();
 
 		await expect(
 			previewPage.locator(
@@ -65,8 +71,8 @@ test.describe( 'Post Editor Template mode', () => {
 	} );
 
 	test( 'Allow creating custom block templates in classic themes', async ( {
+		editor,
 		page,
-		pageUtils,
 		requestUtils,
 		postEditorTemplateMode,
 	} ) => {
@@ -79,7 +85,7 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.createNewTemplate( 'Blank Template' );
 
 		// Edit the template.
-		await pageUtils.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type(
 			'Just a random paragraph added to the template'
 		);
@@ -87,13 +93,13 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.saveTemplateWithoutPublishing();
 
 		// Preview changes.
-		const previewPage = await pageUtils.openPreviewPage();
-		const siteBlocks = await previewPage.waitForSelector(
-			'.wp-site-blocks'
-		);
-		const content = await siteBlocks.innerHTML();
+		const previewPage = await editor.openPreviewPage();
 
-		expect( content ).toMatchSnapshot();
+		await expect(
+			previewPage.locator(
+				'text="Just a random paragraph added to the template"'
+			)
+		).toBeVisible();
 	} );
 
 	test.describe( 'Delete Post Template Confirmation Dialog', () => {
@@ -107,6 +113,7 @@ test.describe( 'Post Editor Template mode', () => {
 
 		[ 'large', 'small' ].forEach( ( viewport ) => {
 			test( `should retain template if deletion is canceled when the viewport is ${ viewport }`, async ( {
+				editor,
 				page,
 				pageUtils,
 				postEditorTemplateMode,
@@ -125,7 +132,7 @@ test.describe( 'Post Editor Template mode', () => {
 				}
 
 				// Edit the template.
-				await pageUtils.insertBlock( { name: 'core/paragraph' } );
+				await editor.insertBlock( { name: 'core/paragraph' } );
 				await page.keyboard.type(
 					'Just a random paragraph added to the template'
 				);
@@ -134,9 +141,10 @@ test.describe( 'Post Editor Template mode', () => {
 
 				// Test deletion dialog.
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -158,23 +166,27 @@ test.describe( 'Post Editor Template mode', () => {
 				// Exit template mode.
 				await page.click( 'role=button[name="Back"i]' );
 
-				await pageUtils.openDocumentSettingsSidebar();
+				await editor.openDocumentSettingsSidebar();
 
 				// Move focus to the "Post" panel in the editor sidebar.
-				const postPanel = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=button[name="Post"i]'
-				);
+				const postPanel =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=button[name="Post"i]'
+					);
 				await postPanel.click();
 
-				const templateSelect = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i]'
+				await postEditorTemplateMode.openTemplatePopover();
+
+				const templateSelect = page.locator(
+					'role=combobox[name="Template"i]'
 				);
 				await expect( templateSelect ).toHaveValue(
-					`wp-custom-template-${ viewport }-viewport-deletion-test`
+					`${ viewport }-viewport-deletion-test`
 				);
 			} );
 
 			test( `should delete template if deletion is confirmed when the viewport is ${ viewport }`, async ( {
+				editor,
 				page,
 				pageUtils,
 				postEditorTemplateMode,
@@ -191,7 +203,7 @@ test.describe( 'Post Editor Template mode', () => {
 				}
 
 				// Edit the template.
-				await pageUtils.insertBlock( { name: 'core/paragraph' } );
+				await editor.insertBlock( { name: 'core/paragraph' } );
 				await page.keyboard.type(
 					'Just a random paragraph added to the template'
 				);
@@ -199,9 +211,10 @@ test.describe( 'Post Editor Template mode', () => {
 				await postEditorTemplateMode.saveTemplateWithoutPublishing();
 
 				{
-					const templateDropdown = postEditorTemplateMode.editorTopBar.locator(
-						'role=button[name="Template Options"i]'
-					);
+					const templateDropdown =
+						postEditorTemplateMode.editorTopBar.locator(
+							'role=button[name="Template Options"i]'
+						);
 					await templateDropdown.click();
 					await page.click(
 						'role=menuitem[name="Delete template"i]'
@@ -231,10 +244,12 @@ test.describe( 'Post Editor Template mode', () => {
 					await page.reload();
 				}
 
-				const templateOptions = postEditorTemplateMode.editorSettingsSidebar.locator(
-					'role=combobox[name="Template:"i] >> role=menuitem'
-				);
-				const availableTemplates = await templateOptions.allTextContents();
+				const templateOptions =
+					postEditorTemplateMode.editorSettingsSidebar.locator(
+						'role=combobox[name="Template:"i] >> role=menuitem'
+					);
+				const availableTemplates =
+					await templateOptions.allTextContents();
 
 				expect( availableTemplates ).not.toContain(
 					`${ viewport } Viewport Deletion Test`
@@ -245,7 +260,9 @@ test.describe( 'Post Editor Template mode', () => {
 } );
 
 class PostEditorTemplateMode {
-	constructor( { page, pageUtils, requestUtils } ) {
+	constructor( { admin, editor, page, pageUtils, requestUtils } ) {
+		this.admin = admin;
+		this.editor = editor;
 		this.page = page;
 		this.pageUtils = pageUtils;
 		this.requestUtils = requestUtils;
@@ -267,28 +284,21 @@ class PostEditorTemplateMode {
 		} );
 	}
 
-	async expandTemplatePanel() {
-		await this.pageUtils.openDocumentSettingsSidebar();
+	async openTemplatePopover() {
+		await this.editor.openDocumentSettingsSidebar();
 
-		const templatePanelButton = this.editorSettingsSidebar.locator(
-			'role=button[name=/^Template/i]'
-		);
-		const isExpanded =
-			( await templatePanelButton.getAttribute( 'aria-expanded' ) ) !==
-			'false';
-		if ( ! isExpanded ) {
-			await templatePanelButton.click();
-		}
+		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
+		await this.editorSettingsSidebar
+			.locator( 'role=button[name^="Select template"i]' )
+			.click();
 	}
 
 	async switchToTemplateMode() {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		await this.editorSettingsSidebar
-			.locator( 'role=button[name="Edit"i]' )
-			.click();
+		await this.page.locator( 'role=button[name="Edit template"i]' ).click();
 
 		// Check that we switched properly to edit mode.
 		await this.page.waitForSelector(
@@ -299,7 +309,7 @@ class PostEditorTemplateMode {
 	}
 
 	async createPostAndSaveDraft() {
-		await this.pageUtils.createNewPost();
+		await this.admin.createNewPost();
 		// Create a random post.
 		await this.page.keyboard.type( 'Just an FSE Post' );
 		await this.page.keyboard.press( 'Enter' );
@@ -322,10 +332,10 @@ class PostEditorTemplateMode {
 	async createNewTemplate( templateName ) {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		const newTemplateButton = this.editorSettingsSidebar.locator(
-			'role=button[name="New"i]'
+		const newTemplateButton = this.page.locator(
+			'role=button[name="Add template"i]'
 		);
 		await newTemplateButton.click();
 

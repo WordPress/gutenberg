@@ -19,7 +19,7 @@ describe( 'Post visibility', () => {
 
 			await openDocumentSettingsSidebar();
 
-			await page.click( '.edit-post-post-visibility__toggle' );
+			await page.click( '*[aria-label^="Select visibility"]' );
 
 			const [ privateLabel ] = await page.$x(
 				'//label[text()="Private"]'
@@ -57,7 +57,7 @@ describe( 'Post visibility', () => {
 					.getEditedPostAttribute( 'status' );
 			} );
 
-			await page.click( '.edit-post-post-visibility__toggle' );
+			await page.click( '*[aria-label^="Select visibility"]' );
 
 			const [ privateLabel ] = await page.$x(
 				'//label[text()="Private"]'
@@ -90,9 +90,9 @@ describe( 'Post visibility', () => {
 		await openDocumentSettingsSidebar();
 
 		// Set a publish date for the next month.
-		await page.click( '.edit-post-post-schedule__toggle' );
+		await page.click( '*[aria-label^="Change date"]' );
 		await page.click(
-			'div[aria-label="Move forward to switch to the next month."]'
+			'*[aria-label="Move forward to switch to the next month."]'
 		);
 		await (
 			await page.$x(
@@ -100,7 +100,7 @@ describe( 'Post visibility', () => {
 			)
 		 )[ 0 ].click();
 
-		await page.click( '.edit-post-post-visibility__toggle' );
+		await page.click( '*[aria-label^="Select visibility"]' );
 
 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
 		await privateLabel.click();

@@ -96,7 +96,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- /wp:paragraph -->`;
 
 exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
-<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption>C'est la vie my friends</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
@@ -135,7 +135,7 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <!-- /wp:cover -->`;
 
 exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
-<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->`;
 
 exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->

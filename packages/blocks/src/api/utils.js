@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString, reduce, maxBy } from 'lodash';
+import { every, has, isString, reduce, maxBy } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -77,7 +77,7 @@ export function isValidIcon( icon ) {
 		!! icon &&
 		( isString( icon ) ||
 			isValidElement( icon ) ||
-			isFunction( icon ) ||
+			typeof icon === 'function' ||
 			icon instanceof Component )
 	);
 }
@@ -161,7 +161,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {Object}  blockType              The block type.
+ * @param {?Object} blockType              The block type.
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.

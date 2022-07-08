@@ -5,6 +5,7 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
+export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
@@ -51,7 +52,7 @@ export { default as __experimentalTextTransformControl } from './text-transform-
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
-export { default as __experimentalToolsPanelColorDropdown } from './colors-gradients/tools-panel-color-dropdown';
+export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 export {
 	default as __experimentalImageEditor,
 	ImageEditingProvider as __experimentalImageEditingProvider,
@@ -148,6 +149,8 @@ export { default as useBlockDisplayInformation } from './use-block-display-infor
 export { default as __unstableIframe } from './iframe';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
+export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
+export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
 
 /*
  * State Related Components

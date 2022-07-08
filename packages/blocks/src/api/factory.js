@@ -6,10 +6,8 @@ import {
 	every,
 	castArray,
 	some,
-	isObjectLike,
 	filter,
 	first,
-	flatMap,
 	has,
 	uniq,
 	isEmpty,
@@ -294,10 +292,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	} );
 
 	// Build a list of block names using the possible 'to' transforms.
-	const blockNames = flatMap(
-		possibleTransforms,
-		( transformation ) => transformation.blocks
-	);
+	const blockNames = possibleTransforms
+		.map( ( transformation ) => transformation.blocks )
+		.flat();
 
 	// Map block names to block types.
 	return blockNames.map( ( name ) =>
@@ -345,12 +342,10 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	const blockTypesForFromTransforms = getBlockTypesForPossibleFromTransforms(
-		blocks
-	);
-	const blockTypesForToTransforms = getBlockTypesForPossibleToTransforms(
-		blocks
-	);
+	const blockTypesForFromTransforms =
+		getBlockTypesForPossibleFromTransforms( blocks );
+	const blockTypesForToTransforms =
+		getBlockTypesForPossibleToTransforms( blocks );
 
 	return uniq( [
 		...blockTypesForFromTransforms,
@@ -405,9 +400,9 @@ export function findTransform( transforms, predicate ) {
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
-		return flatMap( getBlockTypes(), ( { name } ) =>
-			getBlockTransforms( direction, name )
-		);
+		return getBlockTypes()
+			.map( ( { name } ) => getBlockTransforms( direction, name ) )
+			.flat();
 	}
 
 	// Validate that block type exists and has array of direction.
@@ -519,9 +514,8 @@ export function switchToBlockType( blocks, name ) {
 
 	if ( transformation.isMultiBlock ) {
 		if ( has( transformation, '__experimentalConvert' ) ) {
-			transformationResults = transformation.__experimentalConvert(
-				blocksArray
-			);
+			transformationResults =
+				transformation.__experimentalConvert( blocksArray );
 		} else {
 			transformationResults = transformation.transform(
 				blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
@@ -529,9 +523,8 @@ export function switchToBlockType( blocks, name ) {
 			);
 		}
 	} else if ( has( transformation, '__experimentalConvert' ) ) {
-		transformationResults = transformation.__experimentalConvert(
-			firstBlock
-		);
+		transformationResults =
+			transformation.__experimentalConvert( firstBlock );
 	} else {
 		transformationResults = transformation.transform(
 			firstBlock.attributes,
@@ -541,7 +534,10 @@ export function switchToBlockType( blocks, name ) {
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.
-	if ( ! isObjectLike( transformationResults ) ) {
+	if (
+		transformationResults === null ||
+		typeof transformationResults !== 'object'
+	) {
 		return null;
 	}
 

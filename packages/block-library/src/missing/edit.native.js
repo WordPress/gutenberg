@@ -298,9 +298,8 @@ export default compose( [
 			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' )
 					.canEnableUnsupportedBlockEditor === true,
-			isEditableInUnsupportedBlockEditor: ! UBE_INCOMPATIBLE_BLOCKS.includes(
-				attributes.originalName
-			),
+			isEditableInUnsupportedBlockEditor:
+				! UBE_INCOMPATIBLE_BLOCKS.includes( attributes.originalName ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

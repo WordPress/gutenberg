@@ -340,8 +340,8 @@ export function getCommentDelimitedContent(
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param {WPBlock}                      block   Block instance.
- * @param {WPBlockSerializationOptions}  options Serialization options.
+ * @param {WPBlock}                     block   Block instance.
+ * @param {WPBlockSerializationOptions} options Serialization options.
  *
  * @return {string} Serialized block.
  */
@@ -361,6 +361,10 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	}
 
 	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return saveContent;
+	}
+
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }

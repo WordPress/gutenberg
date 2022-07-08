@@ -1,6 +1,14 @@
 /**
  * WordPress dependencies
  */
+/**
+ * External dependencies
+ */
+import { flatMap } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
@@ -8,6 +16,41 @@ import {
 	split,
 	toHTMLString,
 } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { createListBlockFromDOMElement } from './migrate';
+
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
+	};
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
+
+function getListContentFlat( blocks ) {
+	return flatMap( blocks, ( { name, attributes, innerBlocks = [] } ) => {
+		if ( name === 'core/list-item' ) {
+			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+		}
+		return getListContentFlat( innerBlocks );
+	} );
+}
 
 const transforms = {
 	from: [
@@ -82,19 +125,26 @@ const transforms = {
 				);
 			},
 		} ) ),
+		{
+			type: 'raw',
+			selector: 'ol,ul',
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
+			transform: createListBlockFromDOMElement,
+		},
 	],
 	to: [
 		...[ 'core/paragraph', 'core/heading' ].map( ( block ) => ( {
 			type: 'block',
 			blocks: [ block ],
 			transform: ( _attributes, childBlocks ) => {
-				return childBlocks
-					.filter( ( { name } ) => name === 'core/list-item' )
-					.map( ( { attributes } ) =>
-						createBlock( block, {
-							content: attributes.content,
-						} )
-					);
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( block, {
+						content,
+					} )
+				);
 			},
 		} ) ),
 		...[ 'core/quote', 'core/pullquote' ].map( ( block ) => ( {

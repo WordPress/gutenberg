@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { isEmpty, isObject, identity, mapValues, pickBy } from 'lodash';
+import { isEmpty, isObject, mapValues, pickBy } from 'lodash';
+
+const identity = ( x ) => x;
 
 /**
  * Removed empty nodes from nested objects.

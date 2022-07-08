@@ -12,12 +12,13 @@ import InnerRangeControl from '../range-control';
 import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
 import Button from '../button';
+import { Flex } from '../flex';
+import { HStack } from '../h-stack';
 import {
 	BackdropUI,
 	Container as InputControlContainer,
 	Input,
 } from '../input-control/styles/input-control-styles';
-import InputControl from '../input-control';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
@@ -36,6 +37,7 @@ export const SelectControl = styled( InnerSelectControl )`
 
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
+	margin-right: ${ space( 2 ) };
 
 	${ StyledField } {
 		margin-bottom: 0;
@@ -58,7 +60,22 @@ const interactiveHueStyles = `
 }`;
 
 export const AuxiliaryColorArtefactWrapper = styled.div`
-	padding: ${ space( 2 ) } ${ space( 4 ) };
+	padding-top: ${ space( 2 ) };
+	padding-right: 0;
+	padding-left: 0;
+	padding-bottom: 0;
+`;
+
+export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`
+	padding-left: ${ space( 4 ) };
+	padding-right: ${ space( 4 ) };
+`;
+
+export const ColorInputWrapper = styled( Flex )`
+	padding-top: ${ space( 4 ) };
+	padding-left: ${ space( 4 ) };
+	padding-right: ${ space( 3 ) };
+	padding-bottom: ${ space( 5 ) };
 `;
 
 export const ColorfulWrapper = styled.div`
@@ -70,6 +87,7 @@ export const ColorfulWrapper = styled.div`
 		align-items: center;
 		width: 216px;
 		height: auto;
+		overflow: hidden;
 	}
 
 	.react-colorful__saturation {
@@ -111,13 +129,13 @@ export const ColorfulWrapper = styled.div`
 	${ inputHeightStyle }
 `;
 
-export const DetailsControlButton = styled( Button )`
+export const CopyButton = styled( Button )`
 	&&&&& {
 		min-width: ${ space( 6 ) };
 		padding: 0;
-	}
-`;
 
-export const ColorHexInputControl = styled( InputControl )`
-	width: 8em;
+		> svg {
+			margin-right: 0;
+		}
+	}
 `;

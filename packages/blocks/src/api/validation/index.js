@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { identity, xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import { xor, fromPairs, isEqual, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,8 @@ import { normalizeBlockType } from '../utils';
 /** @typedef {import('../parser').WPBlock} WPBlock */
 /** @typedef {import('../registration').WPBlockType} WPBlockType */
 /** @typedef {import('./logger').LoggerItem} LoggerItem */
+
+const identity = ( x ) => x;
 
 /**
  * Globally matches any consecutive whitespace
@@ -418,7 +420,7 @@ export const isEqualAttributesOfName = {
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
 	...fromPairs(
-		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] )
+		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, () => true ] )
 	),
 };
 
@@ -614,10 +616,9 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
 	}
 
 	// Tokenize input content and reserialized save content.
-	const [ actualTokens, expectedTokens ] = [
-		actual,
-		expected,
-	].map( ( html ) => getHTMLTokens( html, logger ) );
+	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
+		( html ) => getHTMLTokens( html, logger )
+	);
 
 	// If either is malformed then stop comparing - the strings are not equivalent.
 	if ( ! actualTokens || ! expectedTokens ) {

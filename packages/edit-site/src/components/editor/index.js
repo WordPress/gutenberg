@@ -47,6 +47,17 @@ import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
 
 const interfaceLabels = {
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the navigation sidebar landmark region. */
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -119,10 +130,8 @@ function Editor( { onError } ) {
 	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const [
-		isEntitiesSavedStatesOpen,
-		setIsEntitiesSavedStatesOpen,
-	] = useState( false );
+	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
+		useState( false );
 	const openEntitiesSavedStates = useCallback(
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
@@ -217,7 +226,8 @@ function Editor( { onError } ) {
 										<InterfaceSkeleton
 											labels={ {
 												...interfaceLabels,
-												secondarySidebar: secondarySidebarLabel,
+												secondarySidebar:
+													secondarySidebarLabel,
 											} }
 											className={
 												showIconLabels &&
