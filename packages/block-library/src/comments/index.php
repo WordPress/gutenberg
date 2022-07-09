@@ -222,7 +222,7 @@ function register_legacy_post_comments_block() {
 	);
 
 	/*
-	 * Filters the metadata object, the same way it's done insie
+	 * Filters the metadata object, the same way it's done inside
 	 * `register_block_type_from_metadata()`. This applies some default filters,
 	 * like `_wp_multiple_block_styles`, which is required in this case because
 	 * the block has multiple styles.
