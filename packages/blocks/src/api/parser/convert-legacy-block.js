@@ -72,11 +72,8 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		// Note that we also had to add a deprecation to the block in order
 		// for the ID change to work.
 	}
-
-	// Checks needed after merging core/comments-query-loop and core/post-comments.
-
 	if ( name === 'core/post-comments' ) {
-		name = 'core/comments-query-loop';
+		name = 'core/comments';
 		newAttributes.legacy = true;
 	}
 

@@ -1,131 +1,38 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	Warning,
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import CommentsInspectorControls from './comments-inspector-controls';
-import Placeholder from './placeholder';
+import CommentsLegacy from './comments-legacy';
 import TEMPLATE from './template';
 
-export default function PostCommentsEdit( {
-	attributes,
-	setAttributes,
-	context: { postType, postId },
-} ) {
-	const { tagName: TagName, textAlign } = attributes;
-
-	const [ commentStatus ] = useEntityProp(
-		'postType',
-		postType,
-		'comment_status',
-		postId
-	);
-
-	const { defaultCommentStatus } = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
-	);
-
-	const isSiteEditor = postType === undefined || postId === undefined;
-
-	const postTypeSupportsComments = useSelect( ( select ) =>
-		postType
-			? !! select( coreStore ).getPostType( postType )?.supports.comments
-			: false
-	);
-
-	let warning = __(
-		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
-	);
-	let showPlacholder = true;
-
-	if ( ! isSiteEditor && 'open' !== commentStatus ) {
-		if ( 'closed' === commentStatus ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments block: Comments to this %s are not allowed.'
-				),
-				postType
-			);
-			showPlacholder = false;
-		} else if ( ! postTypeSupportsComments ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments block: Comments for this post type (%s) are not enabled.'
-				),
-				postType
-			);
-			showPlacholder = false;
-		} else if ( 'open' !== defaultCommentStatus ) {
-			warning = __( 'Post Comments block: Comments are not enabled.' );
-			showPlacholder = false;
-		}
-	}
+export default function CommentsEdit( props ) {
+	const { attributes, setAttributes } = props;
+	const { tagName: TagName, legacy } = attributes;
 
 	const blockProps = useBlockProps( {
-		className: classnames(
-			// We add the previous block name for backward compatibility.
-			'wp-block-comments-query-loop',
-			{
-				[ `has-text-align-${ textAlign }` ]: textAlign,
-			}
-		),
+		// We add the previous block name for backward compatibility.
+		className: 'wp-block-comments-query-loop',
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
 
-	if ( ! attributes.legacy ) {
-		return (
-			<>
-				<CommentsInspectorControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
-				<TagName { ...innerBlocksProps } />
-			</>
-		);
+	if ( legacy ) {
+		return <CommentsLegacy { ...props } />;
 	}
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-
-			<div { ...blockProps }>
-				<Warning>{ warning }</Warning>
-
-				{ showPlacholder && (
-					<Placeholder postId={ postId } postType={ postType } />
-				) }
-			</div>
+			<CommentsInspectorControls
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+			<TagName { ...innerBlocksProps } />
 		</>
 	);
 }
