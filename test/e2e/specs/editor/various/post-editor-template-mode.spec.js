@@ -175,12 +175,13 @@ test.describe( 'Post Editor Template mode', () => {
 					);
 				await postPanel.click();
 
-				const templateSelect =
-					postEditorTemplateMode.editorSettingsSidebar.locator(
-						'role=combobox[name="Template:"i]'
-					);
+				await postEditorTemplateMode.openTemplatePopover();
+
+				const templateSelect = page.locator(
+					'role=combobox[name="Template"i]'
+				);
 				await expect( templateSelect ).toHaveValue(
-					`wp-custom-template-${ viewport }-viewport-deletion-test`
+					`${ viewport }-viewport-deletion-test`
 				);
 			} );
 
@@ -283,29 +284,21 @@ class PostEditorTemplateMode {
 		} );
 	}
 
-	async expandTemplatePanel() {
+	async openTemplatePopover() {
 		await this.editor.openDocumentSettingsSidebar();
 
-		const templatePanelButton = this.editorSettingsSidebar.locator(
-			'role=button[name=/^Template/i]'
-		);
-		const isExpanded =
-			( await templatePanelButton.getAttribute( 'aria-expanded' ) ) !==
-			'false';
-		if ( ! isExpanded ) {
-			await templatePanelButton.click();
-		}
+		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
+		await this.editorSettingsSidebar
+			.locator( 'role=button[name^="Select template"i]' )
+			.click();
 	}
 
 	async switchToTemplateMode() {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		// Only match the beginning of Edit template: because it contains the template name or slug afterwards.
-		await this.editorSettingsSidebar
-			.locator( 'role=button[name^="Edit template: "i]' )
-			.click();
+		await this.page.locator( 'role=button[name="Edit template"i]' ).click();
 
 		// Check that we switched properly to edit mode.
 		await this.page.waitForSelector(
@@ -339,10 +332,10 @@ class PostEditorTemplateMode {
 	async createNewTemplate( templateName ) {
 		await this.disableTemplateWelcomeGuide();
 
-		await this.expandTemplatePanel();
+		await this.openTemplatePopover();
 
-		const newTemplateButton = this.editorSettingsSidebar.locator(
-			'role=button[name="New template"i]'
+		const newTemplateButton = this.page.locator(
+			'role=button[name="Add template"i]'
 		);
 		await newTemplateButton.click();
 

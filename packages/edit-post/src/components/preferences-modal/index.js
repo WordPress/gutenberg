@@ -19,7 +19,6 @@ import {
 	PostTypeSupportCheck,
 	store as editorStore,
 } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	PreferencesModal,
 	PreferencesModalTabs,
@@ -45,15 +44,10 @@ const MODAL_NAME = 'edit-post/preferences';
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { closeModal } = useDispatch( editPostStore );
-	const { isModalActive, isViewable } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
-			isViewable: get( postType, [ 'viewable' ], false ),
-		};
-	}, [] );
+	const isModalActive = useSelect(
+		( select ) => select( editPostStore ).isModalActive( MODAL_NAME ),
+		[]
+	);
 	const showBlockBreadcrumbsOption = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
@@ -200,18 +194,6 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnablePluginDocumentSettingPanelOption.Slot />
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Permalink' ) }
-									panelName="post-link"
-								/>
-							) }
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Template' ) }
-									panelName="template"
-								/>
-							) }
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
@@ -260,7 +242,7 @@ export default function EditPostPreferencesModal() {
 				),
 			},
 		],
-		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
 	if ( ! isModalActive ) {

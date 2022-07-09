@@ -9,10 +9,10 @@ import type { ForwardedRef } from 'react';
 import { contextConnect, WordPressComponentProps } from '../ui/context';
 import { View } from '../view';
 import { useSpacer } from './hook';
-import type { Props } from './types';
+import type { SpacerProps } from './types';
 
 function UnconnectedSpacer(
-	props: WordPressComponentProps< Props, 'div' >,
+	props: WordPressComponentProps< SpacerProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const spacerProps = useSpacer( props );

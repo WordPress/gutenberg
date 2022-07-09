@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	mergeWith,
-	pickBy,
-	isEmpty,
-	isObject,
-	identity,
-	mapValues,
-} from 'lodash';
+import { mergeWith, pickBy, isEmpty, isObject, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +14,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { GlobalStylesContext } from './context';
+
+const identity = ( x ) => x;
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,

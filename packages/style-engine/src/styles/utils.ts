@@ -81,7 +81,9 @@ export function generateBoxRules(
 	} else {
 		const sideRules = individualProperties.reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
-				const value: string | undefined = get( boxStyle, [ side ] );
+				const value: string | undefined = getCSSVarFromStyleValue(
+					get( boxStyle, [ side ] )
+				);
 				if ( value ) {
 					acc.push( {
 						selector: options?.selector,
