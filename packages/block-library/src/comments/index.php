@@ -13,7 +13,7 @@
  * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post comments for the current post wrapped inside "p" tags.
  */
-function render_block_core_comments_query_loop( $attributes, $content, $block ) {
+function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
 
 	$is_legacy = 'core/post-comments' === $block->name || isset( $attributes['legacy'] );
@@ -83,16 +83,16 @@ function render_block_core_comments_query_loop( $attributes, $content, $block ) 
 /**
  * Registers the `core/comments` block on the server.
  */
-function register_block_core_comments_query_loop() {
+function register_block_core_comments() {
 	register_block_type_from_metadata(
 		__DIR__ . '/comments',
 		array(
-			'render_callback'   => 'render_block_core_comments_query_loop',
+			'render_callback'   => 'render_block_core_comments',
 			'skip_inner_blocks' => true,
 		)
 	);
 }
-add_action( 'init', 'register_block_core_comments_query_loop' );
+add_action( 'init', 'register_block_core_comments' );
 
 /**
  * Use the button block classes for the form-submit button.
@@ -101,7 +101,7 @@ add_action( 'init', 'register_block_core_comments_query_loop' );
  *
  * @return array Returns the modified fields.
  */
-function comments_query_loop_block_form_defaults( $fields ) {
+function comments_block_form_defaults( $fields ) {
 	if ( wp_is_block_theme() ) {
 		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link ' . WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
@@ -109,7 +109,7 @@ function comments_query_loop_block_form_defaults( $fields ) {
 
 	return $fields;
 }
-add_filter( 'comment_form_defaults', 'comments_query_loop_block_form_defaults' );
+add_filter( 'comment_form_defaults', 'comments_block_form_defaults' );
 
 /**
  * Enqueues styles from the legacy `core/post-comments` block. These styles are
@@ -150,7 +150,7 @@ function render_legacy_post_comments_block( $attributes, $content, $block ) {
 		sprintf( __( 'Block %1$s has been renamed to Comments Query Loop. %1$s will be supported until WordPress version X.X.', 'gutenberg' ), $block->name ),
 		headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
 	);
-	return render_block_core_comments_query_loop( $attributes, $content, $block );
+	return render_block_core_comments( $attributes, $content, $block );
 }
 
 /**
