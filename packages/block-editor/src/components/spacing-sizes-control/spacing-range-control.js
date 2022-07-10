@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { RangeControl } from '@wordpress/components';
 
-import { getSpacingPresetSlug } from './utils';
+import { getSpacingPresetSlug, getSliderValueFromSlug } from './utils';
 /**
  * Inspector control panel containing the spacing size related configuration
  *
@@ -22,18 +22,12 @@ export default function SpacingRangeControl( props ) {
 	// const handleOnChange = ( nextValues ) => {
 	// 	props.onChange( nextValues );
 	// };
-	const slug = getSpacingPresetSlug( props.value );
-	const value = props.spacingSizes.findIndex( ( spacingSize ) => {
-		return spacingSize.slug === parseInt( slug, 10 );
-	} );
 
+	console.log( 'value', props.value );
 	return (
 		<RangeControl
-			values={ props.value }
+			value={ props.value }
 			label={ props.label }
-			sides={ props.sides }
-			allowReset={ false }
-			splitOnAxis={ props.splitOnAxis }
 			onChange={ ( newSize ) => {
 				setValueNow( newSize );
 				props.onChange(

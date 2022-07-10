@@ -19,7 +19,8 @@ export default function AllInputControl( {
 	sides,
 	...props
 } ) {
-	const allValue = getAllValue( values, sides );
+	const allValue = getAllValue( values, sides, props.spacingSizes );
+	console.log( allValue );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : null;

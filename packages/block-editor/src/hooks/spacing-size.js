@@ -28,7 +28,7 @@ export function SpacingSizeEdit( props ) {
 		<>
 			{
 				<SpacingSizesControl
-					values={ props.value }
+					values={ props.values }
 					label={ props.label }
 					sides={ props.sides }
 					allowReset={ false }

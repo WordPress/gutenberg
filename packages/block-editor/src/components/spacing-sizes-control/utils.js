@@ -8,19 +8,21 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-//import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
 		return;
 	}
 	const slug = /var:preset\|spacing\|(.+)/.exec( value );
 
-	return slug ? slug[ 1 ] : undefined;
+	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
 }
+
+export function getSliderValueFromSlug( slug, spacingSizes ) {
+	return spacingSizes.findIndex( ( spacingSize ) => {
+		return spacingSize.slug === slug;
+	} );
+}
+
 export const LABELS = {
 	all: __( 'All' ),
 	top: __( 'Top' ),
@@ -62,70 +64,21 @@ function mode( arr ) {
  * Gets the 'all' input value and unit from values data.
  *
  * @param {Object} values         Box values.
- * @param {Object} selectedUnits  Box units.
  * @param {Array}  availableSides Available box sides to evaluate.
  *
  * @return {string} A value + unit for the 'all' input.
  */
 export function getAllValue(
 	values = {},
-	selectedUnits,
-	availableSides = ALL_SIDES
+	availableSides = ALL_SIDES,
+	spacingSizes
 ) {
-	return null;
 	const sides = normalizeSides( availableSides );
-	const parsedQuantitiesAndUnits = sides.map(
-		( side ) => null // parseQuantityAndUnitFromRawValue( values[ side ] )
-	);
-	const allParsedQuantities = parsedQuantitiesAndUnits.map(
-		( value ) => value[ 0 ] ?? ''
-	);
-	const allParsedUnits = parsedQuantitiesAndUnits.map(
-		( value ) => value[ 1 ]
+	const parsedSlugs = sides.map( ( side ) =>
+		getSpacingPresetSlug( values[ side ] )
 	);
 
-	const commonQuantity = allParsedQuantities.every(
-		( v ) => v === allParsedQuantities[ 0 ]
-	)
-		? allParsedQuantities[ 0 ]
-		: '';
-
-	/**
-	 * The typeof === 'number' check is important. On reset actions, the incoming value
-	 * may be null or an empty string.
-	 *
-	 * Also, the value may also be zero (0), which is considered a valid unit value.
-	 *
-	 * typeof === 'number' is more specific for these cases, rather than relying on a
-	 * simple truthy check.
-	 */
-	let commonUnit;
-	if ( typeof commonQuantity === 'number' ) {
-		commonUnit = mode( allParsedUnits );
-	} else {
-		// Set meaningful unit selection if no commonQuantity and user has previously
-		// selected units without assigning values while controls were unlinked.
-		commonUnit =
-			getAllUnitFallback( selectedUnits ) ?? mode( allParsedUnits );
-	}
-
-	return [ commonQuantity, commonUnit ].join( '' );
-}
-
-/**
- * Determine the most common unit selection to use as a fallback option.
- *
- * @param {Object} selectedUnits Current unit selections for individual sides.
- * @return {string} Most common unit selection.
- */
-export function getAllUnitFallback( selectedUnits ) {
-	if ( ! selectedUnits || typeof selectedUnits !== 'object' ) {
-		return undefined;
-	}
-
-	const filteredUnits = Object.values( selectedUnits ).filter( Boolean );
-
-	return mode( filteredUnits );
+	return getSliderValueFromSlug( mode( parsedSlugs ), spacingSizes );
 }
 
 /**

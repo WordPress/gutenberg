@@ -7,7 +7,12 @@ import { Flex } from '@wordpress/components';
  * Internal dependencies
  */
 import SpacingRangeControl from './spacing-range-control';
-import { ALL_SIDES, LABELS } from './utils';
+import {
+	ALL_SIDES,
+	LABELS,
+	getSpacingPresetSlug,
+	getSliderValueFromSlug,
+} from './utils';
 
 const noop = () => {};
 
@@ -66,12 +71,11 @@ export default function BoxInputControls( {
 				className="component-spacing-sizes-control__input-controls"
 			>
 				{ filteredSides.map( ( side ) => {
-					// const [ parsedQuantity, parsedUnit ] =
-					// 	parseQuantityAndUnitFromRawValue( values[ side ] );
-
-					// const computedUnit = values[ side ]
-					// 	? parsedUnit
-					// 	: selectedUnits[ side ];
+					const slug = getSpacingPresetSlug( values[ side ] );
+					const value = getSliderValueFromSlug(
+						slug,
+						props.spacingSizes
+					);
 
 					return (
 						<SpacingRangeControl
@@ -79,10 +83,7 @@ export default function BoxInputControls( {
 							isFirst={ first === side }
 							isLast={ last === side }
 							isOnly={ only === side }
-							// value={ [ parsedQuantity, computedUnit ].join(
-							// 	''
-							// ) }
-							value={ values[ side ] }
+							value={ value }
 							label={ LABELS[ side ] }
 							key={ `box-control-${ side }` }
 							withInputField={ false }

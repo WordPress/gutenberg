@@ -35,15 +35,15 @@ const noop = () => {};
 export default function SpacingSizesControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
-	label = __( 'Box Control' ),
+	label = __( 'Spacing Control' ),
 	values: valuesProp,
-	units,
 	sides,
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 	spacingSizes,
 } ) {
+	console.log( 'values from parent', valuesProp );
 	const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
@@ -67,9 +67,10 @@ export default function SpacingSizesControl( {
 		setSide( nextSide );
 	};
 
-	const handleOnChange = ( nextValues ) => {
-		onChange( nextValues );
-		setValues( nextValues );
+	const handleOnChange = ( nextValue ) => {
+		const newValues = { ...values, ...nextValue };
+		onChange( newValues );
+		setValues( newValues );
 		setIsDirty( true );
 	};
 
@@ -84,7 +85,6 @@ export default function SpacingSizesControl( {
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
 		isLinked,
-		units,
 		sides,
 		values: inputValues,
 		spacingSizes,
