@@ -22,9 +22,13 @@ function FlexBlock( props, forwardedRef ) {
  * ```jsx
  * import { Flex, FlexBlock } from '@wordpress/components';
  *
- * <Flex>
- *   <FlexBlock>...</FlexBlock>
- * </Flex>
+ * function Example() {
+ *   return (
+ *     <Flex>
+ *       <FlexBlock>...</FlexBlock>
+ *     </Flex>
+ *   );
+ * }
  * ```
  */
 const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );

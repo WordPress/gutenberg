@@ -22,9 +22,13 @@ function FlexItem( props, forwardedRef ) {
  * ```jsx
  * import { Flex, FlexItem } from '@wordpress/components';
  *
- * <Flex>
- *   <FlexItem>...</FlexItem>
- * </Flex>
+ * function Example() {
+ *   return (
+ *     <Flex>
+ *       <FlexItem>...</FlexItem>
+ *     </Flex>
+ *   );
+ * }
  * ```
  */
 const ConnectedFlexItem = contextConnect( FlexItem, 'FlexItem' );
