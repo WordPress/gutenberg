@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
 -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
 -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
 -   `Tip`: Convert to TypeScript ([#42262](https://github.com/WordPress/gutenberg/pull/42262)).
