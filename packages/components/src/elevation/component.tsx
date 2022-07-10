@@ -37,7 +37,7 @@ function UnconnectedElevation(
  *   return (
  *     <Surface>
  *       <Text>Code is Poetry</Text>
- *         <Elevation value={ 5 } />
+ *       <Elevation value={ 5 } />
  *     </Surface>
  *   );
  * }
