@@ -20,8 +20,10 @@ function FlexBlock( props, forwardedRef ) {
  *
  * @example
  * ```jsx
+ * import { Flex, FlexBlock } from '@wordpress/components';
+ *
  * <Flex>
- * 	<FlexBlock>...</FlexBlock>
+ *   <FlexBlock>...</FlexBlock>
  * </Flex>
  * ```
  */

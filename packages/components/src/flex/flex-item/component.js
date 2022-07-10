@@ -20,8 +20,10 @@ function FlexItem( props, forwardedRef ) {
  *
  * @example
  * ```jsx
+ * import { Flex, FlexItem } from '@wordpress/components';
+ *
  * <Flex>
- * 	<FlexItem>...</FlexItem>
+ *   <FlexItem>...</FlexItem>
  * </Flex>
  * ```
  */
