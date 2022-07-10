@@ -5,7 +5,7 @@ export type TextHighlightProps = {
 	 *
 	 * @default ''
 	 */
-	highlight: string;
+	highlight: string | string[];
 	/**
 	 * The string of text to be tested for occurrences of then given
 	 * `highlight`.
