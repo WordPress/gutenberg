@@ -12,10 +12,7 @@ import { useEffect } from '@wordpress/element';
  */
 let previousScrollTop = 0;
 
-/**
- * @param {boolean} locked
- */
-function setLocked( locked ) {
+function setLocked( locked: boolean ) {
 	const scrollingElement = document.scrollingElement || document.body;
 
 	if ( locked ) {
@@ -36,11 +33,39 @@ function setLocked( locked ) {
 let lockCounter = 0;
 
 /**
- * A component that will lock scrolling when it is mounted and unlock scrolling when it is unmounted.
+ * ScrollLock is a content-free React component for declaratively preventing
+ * scroll bleed from modal UI to the page body. This component applies a
+ * `lockscroll` class to the `document.documentElement` and
+ * `document.scrollingElement` elements to stop the body from scrolling. When it
+ * is present, the lock is applied.
  *
- * @return {null} Render nothing.
+ * ```jsx
+ * import { ScrollLock, Button } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyScrollLock = () => {
+ *   const [ isScrollLocked, setIsScrollLocked ] = useState( false );
+ *
+ *   const toggleLock = () => {
+ *     setIsScrollLocked( ( locked ) => ! locked ) );
+ *   };
+ *
+ *   return (
+ *     <div>
+ *       <Button variant="secondary" onClick={ toggleLock }>
+ *         Toggle scroll lock
+ *       </Button>
+ *       { isScrollLocked && <ScrollLock /> }
+ *       <p>
+ *         Scroll locked:
+ *         <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+ *       </p>
+ *     </div>
+ *   );
+ * };
+ * ```
  */
-export default function ScrollLock() {
+export function ScrollLock(): null {
 	useEffect( () => {
 		if ( lockCounter === 0 ) {
 			setLocked( true );
@@ -59,3 +84,5 @@ export default function ScrollLock() {
 
 	return null;
 }
+
+export default ScrollLock;
