@@ -26,11 +26,7 @@ function render_block_core_comments( $attributes, $content, $block ) {
 
 	$is_legacy = 'core/post-comments' === $block->name || isset( $attributes['legacy'] );
 	if ( ! $is_legacy ) {
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
-		}
-		return $inner_blocks_html;
+		return $block->render( array( 'dynamic' => false ) );
 	}
 
 	$post_id = $block->context['postId'];
