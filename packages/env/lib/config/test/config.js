@@ -265,17 +265,17 @@ describe( 'readConfig', () => {
 				pluginSources: [
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+						path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 						basename: 'relative',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*parent$/ ),
+						path: expect.stringMatching( /^(\/|\\).*parent$/ ),
 						basename: 'parent',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*home$/ ),
+						path: expect.stringMatching( /^(\/|\\).*home$/ ),
 						basename: 'home',
 					},
 				],
@@ -284,17 +284,17 @@ describe( 'readConfig', () => {
 				pluginSources: [
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+						path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 						basename: 'relative',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*parent$/ ),
+						path: expect.stringMatching( /^(\/|\\).*parent$/ ),
 						basename: 'parent',
 					},
 					{
 						type: 'local',
-						path: expect.stringMatching( /^(\/||\\).*home$/ ),
+						path: expect.stringMatching( /^(\/|\\).*home$/ ),
 						basename: 'home',
 					},
 				],
@@ -324,28 +324,28 @@ describe( 'readConfig', () => {
 			expect( config.env.development.pluginSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test1a$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test1a$/ ),
 					basename: 'test1a',
 				},
 			] );
 			expect( config.env.development.themeSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test2a$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test2a$/ ),
 					basename: 'test2a',
 				},
 			] );
 			expect( config.env.tests.pluginSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test1b$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test1b$/ ),
 					basename: 'test1b',
 				},
 			] );
 			expect( config.env.tests.themeSources ).toEqual( [
 				{
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*test2b$/ ),
+					path: expect.stringMatching( /^(\/|\\).*test2b$/ ),
 					basename: 'test2b',
 				},
 			] );
@@ -359,18 +359,18 @@ describe( 'readConfig', () => {
 			expect( config.env.development ).toMatchObject( {
 				coreSource: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					testsPath: expect.stringMatching(
-						/^(\/||\\).*tests-relative$/
+						/^(\/|\\).*tests-relative$/
 					),
 				},
 			} );
 			expect( config.env.tests ).toMatchObject( {
 				coreSource: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					testsPath: expect.stringMatching(
-						/^(\/||\\).*tests-relative$/
+						/^(\/|\\).*tests-relative$/
 					),
 				},
 			} );
@@ -396,21 +396,21 @@ describe( 'readConfig', () => {
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: undefined,
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: 'trunk',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
 						ref: '5.0',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
@@ -418,7 +418,7 @@ describe( 'readConfig', () => {
 						url: 'https://github.com/WordPress/theme-experiments.git',
 						ref: 'tt1-blocks@0.4.3',
 						path: expect.stringMatching(
-							/^(\/||\\).*theme-experiments(\/||\\)tt1-blocks$/
+							/^(\/|\\).*theme-experiments(\/|\\)tt1-blocks$/
 						),
 						basename: 'tt1-blocks',
 					},
@@ -447,20 +447,20 @@ describe( 'readConfig', () => {
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/plugin/gutenberg.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/theme/twentytwenty.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -468,7 +468,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -498,14 +498,14 @@ describe( 'readConfig', () => {
 					{
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/gutenberg.zip',
-						path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+						path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
 					{
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*gutenberg.8.1.0$/
+							/^(\/|\\).*gutenberg.8.1.0$/
 						),
 						basename: 'gutenberg.8.1.0',
 					},
@@ -513,7 +513,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/twentytwenty.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty$/
+							/^(\/|\\).*twentytwenty$/
 						),
 						basename: 'twentytwenty',
 					},
@@ -521,7 +521,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty.1.3$/
+							/^(\/|\\).*twentytwenty.1.3$/
 						),
 						basename: 'twentytwenty.1.3',
 					},
@@ -529,7 +529,7 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url: 'https://example.com/twentytwenty.1.3.zip',
 						path: expect.stringMatching(
-							/^(\/||\\).*twentytwenty.1.3$/
+							/^(\/|\\).*twentytwenty.1.3$/
 						),
 						basename: 'twentytwenty.1.3',
 					},
@@ -571,12 +571,12 @@ describe( 'readConfig', () => {
 			const matchObj = {
 				test: {
 					type: 'local',
-					path: expect.stringMatching( /^(\/||\\).*relative$/ ),
+					path: expect.stringMatching( /^(\/|\\).*relative$/ ),
 					basename: 'relative',
 				},
 				test2: {
 					type: 'git',
-					path: expect.stringMatching( /^(\/||\\).*gutenberg$/ ),
+					path: expect.stringMatching( /^(\/|\\).*gutenberg$/ ),
 					basename: 'gutenberg',
 				},
 			};
