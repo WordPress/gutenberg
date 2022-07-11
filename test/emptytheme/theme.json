@@ -7,26 +7,5 @@
 			"wideSize": "1100px"
 		}
 	},
-	"styles": {
-		"spacing": {
-			"margin": {
-				"top": "12px"
-			}
-		},
-		"blocks": {
-			"core/columns": {
-				"spacing": {
-					"blockGap": "22px"
-				},
-				"blocks": {
-					"core/social-links": {
-						"spacing": {
-							"blockGap": "55px"
-						}
-					}
-				}
-			}
-		}
-	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

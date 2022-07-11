@@ -232,16 +232,6 @@ class WP_Style_Engine {
 	);
 
 	/**
-	 * The valid elements that can be found under styles.
-	 *
-	 * @var string[]
-	 */
-	const ELEMENTS = array(
-		'link' => 'a',
-		'h1'   => 'h1',
-	);
-
-	/**
 	 * Utility method to retrieve the main instance of the class.
 	 *
 	 * The instance will be created if it does not exist yet.
@@ -433,7 +423,7 @@ class WP_Style_Engine {
 	 *
 	 * @param array $block_styles Styles from a block's attributes object.
 	 * @param array $options      array(
-	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'selector'                   => (string) When a selector is passed, the style engine will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
 	 * );.
 	 *
@@ -498,13 +488,20 @@ class WP_Style_Engine {
 		return $styles_output;
 	}
 
+	/**
+	 * Returns a stylesheet of CSS rules from a theme.json/global styles object.
+	 *
+	 * @param array $global_styles Styles object from theme.json.
+	 * @param array $options       array(
+	 *     'selector' => (string) When a selector is passed, the style engine will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 * );.
+	 *
+	 * @return string A stylesheet.
+	 */
 	public function generate_global_styles( $global_styles, $options ) {
 		if ( empty( $global_styles ) || ! is_array( $global_styles ) ) {
 			return null;
 		}
-
-		// Treat the selector value as the root selector.
-		$css_selector = isset( $options['selector'] ) ? $options['selector'] : 'body';
 
 		// The return stylesheet.
 		$global_stylesheet = '';
@@ -513,15 +510,13 @@ class WP_Style_Engine {
 		$root_level_options_defaults = array(
 			'selector'          => 'body',
 			'custom_properties' => array(
-				'spacing' => array(
-					'blockGap' => '--wp--style--block-gap',
-				),
+				'spacing' => array( 'blockGap' => '--wp--style--block-gap' ),
 			),
 		);
 		$root_level_options          = wp_parse_args( $options, $root_level_options_defaults );
 		$root_level_styles           = $this->get_block_supports_styles(
 			$global_styles,
-			$root_level_options,
+			$root_level_options
 		);
 
 		if ( ! empty( $root_level_styles['css'] ) ) {
@@ -622,7 +617,22 @@ function wp_style_engine_get_block_supports_styles( $block_styles, $options = ar
 	return null;
 }
 
-
+/**
+ * Global public interface method to WP_Style_Engine->generate_global_styles to generate a stylesheet styles from a single theme.json style object.
+ * See: https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles
+ *
+ * Example usage:
+ *
+ * $styles = wp_style_engine_generate_global_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * // Returns `body { color: #cccccc }`.
+ *
+ * @access public
+ *
+ * @param array         $global_styles The value of a block's attributes.style.
+ * @param array<string> $options      An array of options to determine the output.
+ *
+ * @return string A stylesheet.
+ */
 function wp_style_engine_generate_global_styles( $global_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
