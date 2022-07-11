@@ -389,6 +389,7 @@ class WP_Style_Engine {
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	 *     'output_css_as_array'        => (boolean) Whether to skip converting CSS to a declaration string. Default is `false`.
 	 * );.
 	 *
 	 * @return array|null array(
@@ -401,9 +402,10 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$css_declarations     = array();
-		$classnames           = array();
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$css_declarations               = array();
+		$classnames                     = array();
+		$should_skip_css_vars           = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$should_skip_declaration_string = isset( $options['output_css_as_array'] ) && true === $options['output_css_as_array'];
 
 		// Collect CSS and classnames.
 		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
@@ -428,7 +430,12 @@ class WP_Style_Engine {
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_declarations_string();
+
+		if ( $should_skip_declaration_string ) {
+			$css = $css_declarations;
+		} else {
+			$css = $style_rules->get_declarations_string();
+		}
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {

@@ -64,15 +64,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 			$style .= "$selector .alignfull { max-width: none; }";
 
-			// Handle negative margins for alignfull children of blocks with custom padding set.
-			// They're added separately because padding might only be set on one side.
-			if ( isset( $block_padding['right'] ) ) {
-				$padding_right = $block_padding['right'];
-				$style        .= "$selector > .alignfull { margin-right: -$padding_right; }";
-			}
-			if ( isset( $block_padding['left'] ) ) {
-				$padding_left = $block_padding['left'];
-				$style       .= "$selector > .alignfull { margin-left: -$padding_left; }";
+			if ( isset( $block_padding ) ) {
+				$block_padding_values = gutenberg_style_engine_get_block_supports_styles(
+					array(
+						'spacing' => array( 'padding' => $block_padding ),
+
+					),
+					array( 'output_css_as_array' => true )
+				);
+
+				// Handle negative margins for alignfull children of blocks with custom padding set.
+				// They're added separately because padding might only be set on one side.
+				if ( isset( $block_padding_values['css']['padding-right'] ) ) {
+					$padding_right = $block_padding_values['css']['padding-right'];
+					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
+				}
+				if ( isset( $block_padding_values['css']['padding-left'] ) ) {
+					$padding_left = $block_padding_values['css']['padding-left'];
+					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
+				}
 			}
 		}
 
