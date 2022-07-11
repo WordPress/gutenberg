@@ -91,21 +91,19 @@ function ToolbarGroup( {
 
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
-			{ controlSets
-				?.map( ( controlSet, indexOfSet ) =>
-					controlSet.map( ( control, indexOfControl ) => (
-						<ToolbarButton
-							key={ [ indexOfSet, indexOfControl ].join() }
-							containerClassName={
-								indexOfSet > 0 && indexOfControl === 0
-									? 'has-left-divider'
-									: null
-							}
-							{ ...control }
-						/>
-					) )
-				)
-				.flat() }
+			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+				controlSet.map( ( control, indexOfControl ) => (
+					<ToolbarButton
+						key={ [ indexOfSet, indexOfControl ].join() }
+						containerClassName={
+							indexOfSet > 0 && indexOfControl === 0
+								? 'has-left-divider'
+								: null
+						}
+						{ ...control }
+					/>
+				) )
+			) }
 			{ children }
 		</ToolbarGroupContainer>
 	);

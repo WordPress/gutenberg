@@ -14,17 +14,14 @@ import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, SelectOptions } from './types';
 
 function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
-	return tree
-		.map( ( treeNode ) => [
-			{
-				value: treeNode.id,
-				label:
-					'\u00A0'.repeat( level * 3 ) +
-					unescapeString( treeNode.name ),
-			},
-			...getSelectOptions( treeNode.children || [], level + 1 ),
-		] )
-		.flat();
+	return tree.flatMap( ( treeNode ) => [
+		{
+			value: treeNode.id,
+			label:
+				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+		},
+		...getSelectOptions( treeNode.children || [], level + 1 ),
+	] );
 }
 
 /**
