@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find, deburr } from 'lodash';
+import { escapeRegExp, find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -284,7 +285,7 @@ function useAutocomplete( {
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = removeAccents( textContent );
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
