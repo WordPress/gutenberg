@@ -5,11 +5,9 @@ import {
 	Button,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
-	ToggleControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,7 +16,6 @@ import useSetting from '../components/use-setting';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
-import { store as blockEditorStore } from '../store';
 
 export default {
 	name: 'default',
@@ -27,7 +24,7 @@ export default {
 		layout,
 		onChange,
 	} ) {
-		const { wideSize, contentSize, useGlobalPadding = false } = layout;
+		const { wideSize, contentSize } = layout;
 		const units = useCustomUnits( {
 			availableUnits: useSetting( 'spacing.units' ) || [
 				'%',
@@ -36,14 +33,6 @@ export default {
 				'rem',
 				'vw',
 			],
-		} );
-
-		const { useRootVariables } = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return {
-				useRootVariables:
-					getSettings().__experimentalFeatures?.useRootVariables,
-			};
 		} );
 
 		return (
@@ -115,18 +104,6 @@ export default {
 						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
-				{ useRootVariables && ! contentSize && (
-					<ToggleControl
-						label={ __( 'Use global padding' ) }
-						checked={ useGlobalPadding }
-						onChange={ () =>
-							onChange( {
-								...layout,
-								useGlobalPadding: ! useGlobalPadding,
-							} )
-						}
-					/>
-				) }
 			</>
 		);
 	},
