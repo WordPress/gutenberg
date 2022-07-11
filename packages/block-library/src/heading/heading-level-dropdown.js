@@ -60,6 +60,7 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 						onClick() {
 							onChange( targetLevel );
 						},
+						role: 'menuitemradio',
 					};
 				}
 			} ) }
