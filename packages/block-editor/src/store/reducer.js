@@ -11,7 +11,6 @@ import {
 	mapValues,
 	isEqual,
 	isEmpty,
-	identity,
 	omitBy,
 } from 'lodash';
 
@@ -25,6 +24,8 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+
+const identity = ( x ) => x;
 
 /**
  * Given an array of blocks, returns an object where each key is a nesting
@@ -1690,7 +1691,7 @@ export function lastBlockAttributesChange( state, action ) {
 /**
  * Reducer returning automatic change state.
  *
- * @param {boolean} state  Current state.
+ * @param {?string} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {string} Updated state.

@@ -17,6 +17,8 @@
 			display: block;
 			width: 100%;
 			padding: $grid-unit-40;
+			padding-bottom: 0;
+			padding-top: 0;
 			column-count: 2;
 
 			@include break-huge() {
@@ -53,8 +55,9 @@
 		text-align: left;
 		margin: 0;
 		color: $gray-900;
+		position: absolute;
+		bottom: 0;
 		// Block UI appearance.
-		border-radius: $radius-block-ui $radius-block-ui 0 0;
 		background-color: $white;
 		display: flex;
 		flex-direction: row;
@@ -129,5 +132,4 @@
 .block-editor-block-pattern-setup__carousel,
 .block-editor-block-pattern-setup__grid {
 	width: 100%;
-	overflow-y: auto;
 }
