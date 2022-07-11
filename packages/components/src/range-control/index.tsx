@@ -110,14 +110,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
 	const currentValue = value !== undefined ? value : currentInput;
 
 	const inputSliderValue = isValueReset ? '' : currentValue;
-	const numericValue = parseFloat( `${ value }` );
-	const rangeFillValue = isValueReset
-		? ( max - min ) / 2 + min
-		: numericValue;
+	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
 
-	const calculatedFillValue =
-		( ( rangeFillValue - min ) / ( max - min ) ) * 100;
-	const fillValue = isValueReset ? 50 : calculatedFillValue;
+	const fillValue = isValueReset
+		? 50
+		: ( ( value - min ) / ( max - min ) ) * 100;
 	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
 	const classes = classnames( 'components-range-control', className );

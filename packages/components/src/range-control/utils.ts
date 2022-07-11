@@ -68,7 +68,9 @@ export function useControlledRangeValue( {
 		[ min, max ]
 	);
 
-	return [ state, setState ] as const;
+	// `state` can't be an empty string because we specified a fallback value of
+	// `null` in `useControlledState`
+	return [ state as Exclude< typeof state, '' >, setState ] as const;
 }
 
 /**
