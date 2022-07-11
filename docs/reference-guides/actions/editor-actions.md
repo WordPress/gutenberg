@@ -8,7 +8,7 @@ To help you hook into the editor lifecycle and extend it, the following Actions 
 
 Allows you to hook into the editor Error Boundaries' `componentDidCatch` and gives you access to the error object.
 
-You can use If you want to get hold of the error object that's handled by the boundaries, i.e to send them to an external error tracking tool.
+You can use if you want to get hold of the error object that's handled by the boundaries, i.e to send them to an external error tracking tool.
 
 _Example_:
 
