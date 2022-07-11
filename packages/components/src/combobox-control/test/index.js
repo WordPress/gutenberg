@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,18 +56,32 @@ const timezoneOptions = timezones.map( mapTimezoneOption );
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
 const getInput = () => screen.getByRole( 'combobox' );
+const getRenderedOptions = () =>
+	document.querySelectorAll(
+		'.components-combobox-control__suggestions-container ul[role="listbox"] li[role="option"]'
+	);
 
 describe( 'ComboboxControl', () => {
-	const TestComboboxControl = ( props ) => (
-		<>
-			<ComboboxControl
-				{ ...props }
-				value={ null }
-				label={ defaultLabelText }
-				options={ timezoneOptions }
-			/>
-		</>
-	);
+	// Use real timers to avoid timeout errors from userEvent
+	beforeEach( () => {
+		jest.useRealTimers();
+	} );
+
+	const TestComboboxControl = ( props ) => {
+		const [ value, setValue ] = useState( null );
+		return (
+			<>
+				<ComboboxControl
+					{ ...props }
+					value={ value }
+					label={ defaultLabelText }
+					options={ timezoneOptions }
+					onChange={ setValue }
+				/>
+				<p data-testid="value-output">{ value }</p>
+			</>
+		);
+	};
 
 	it( 'should render', () => {
 		render( <TestComboboxControl /> );
@@ -92,9 +112,7 @@ describe( 'ComboboxControl', () => {
 
 		getInput().focus();
 
-		const renderedOptions = document.querySelectorAll(
-			'.components-combobox-control__suggestions-container ul[role="listbox"] li[role="option"]'
-		);
+		const renderedOptions = getRenderedOptions();
 
 		expect( renderedOptions.length ).toEqual( timezones.length );
 
@@ -106,5 +124,21 @@ describe( 'ComboboxControl', () => {
 		const timezoneNames = timezones.map( ( tz ) => tz.name );
 
 		expect( renderedOptionNames ).toEqual( timezoneNames );
+	} );
+
+	it( 'should select the correct option with click', async () => {
+		render( <TestComboboxControl /> );
+		const targetIndex = 2;
+		const input = getInput();
+		input.focus();
+		await userEvent.click(
+			screen.getByRole( 'option', {
+				name: timezones[ targetIndex ].name,
+			} )
+		);
+		const currentValue = screen.getByTestId( 'value-output' ).textContent;
+
+		expect( input.value ).toEqual( timezones[ targetIndex ].name );
+		expect( currentValue ).toEqual( timezones[ targetIndex ].abbreviation );
 	} );
 } );
