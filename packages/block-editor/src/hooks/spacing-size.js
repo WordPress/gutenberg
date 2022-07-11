@@ -1,8 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
 import { __experimentalSpacingSizesControl as SpacingSizesControl } from '../components/';
+
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;
@@ -23,7 +29,8 @@ export function getSpacingPresetCssVar( value ) {
  */
 export function SpacingSizeEdit( props ) {
 	const spacingSizes = [
-		{ name: 0, slug: 0, size: 0 },
+		{ name: __( 'Default' ), slug: 'default', size: undefined },
+		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
 	];
 

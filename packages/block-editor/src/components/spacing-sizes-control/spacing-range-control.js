@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import {
-	RangeControl,
-	__experimentalUnitControl as UnitControl,
-} from '@wordpress/components';
+import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,10 +18,20 @@ export default function SpacingRangeControl( props ) {
 	const createHandleOnFocus = ( side ) => () => {
 		props.onFocus( side );
 	};
-	const reset = () => {
-		props.onChange( undefined );
+
+	const getNewSizeValue = ( newSize ) => {
+		setValueNow( newSize );
+		if ( newSize === 0 ) {
+			return undefined;
+		}
+		if ( newSize === 1 ) {
+			return '0';
+		}
+		return `var:preset|spacing|${ props.spacingSizes[ newSize ]?.slug }`;
 	};
+
 	const currentValueHint = customTooltipContent( props.value );
+
 	return (
 		<>
 			{ /* <UnitControl label={ props.label } /> */ }
@@ -37,20 +44,12 @@ export default function SpacingRangeControl( props ) {
 							{ currentValueHint !== undefined
 								? currentValueHint
 								: __( 'Default' ) }
-						</span>{ ' ' }
-						{ currentValueHint === undefined && (
-							<span onClick={ reset }> [-] </span>
-						) }
+						</span>
 					</>
 				}
-				onChange={ ( newSize ) => {
-					setValueNow( newSize );
-					const size =
-						newSize !== 0
-							? `var:preset|spacing|${ props.spacingSizes[ newSize ]?.slug }`
-							: '0';
-					props.onChange( size );
-				} }
+				onChange={ ( newSize ) =>
+					props.onChange( getNewSizeValue( newSize ) )
+				}
 				onFocus={ createHandleOnFocus( props.side ) }
 				withInputField={ false }
 				aria-valuenow={ valueNow }

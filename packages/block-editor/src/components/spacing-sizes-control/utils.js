@@ -12,6 +12,11 @@ export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
 		return;
 	}
+
+	if ( value === '0' || value === 'default' ) {
+		return value;
+	}
+
 	const slug = /var:preset\|spacing\|(.+)/.exec( value );
 
 	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
