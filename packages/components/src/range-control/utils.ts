@@ -14,7 +14,10 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
 
-import type { useControlledRangeValueArgs } from './types';
+import type {
+	useControlledRangeValueArgs,
+	useDebouncedHoverInteractionArgs,
+} from './types';
 
 const noop = () => {};
 
@@ -38,20 +41,13 @@ export function floatClamp( value: number | null, min: number, max: number ) {
 /**
  * Hook to store a clamped value, derived from props.
  *
- * @param  settings         Hook settings.
- * @param  settings.min     The minimum value.
- * @param  settings.max     The maximum value.
- * @param  settings.value   The current value.
- * @param  settings.initial The initial value.
- *
+ * @param  settings
  * @return The controlled value and the value setter.
  */
-export function useControlledRangeValue( {
-	min,
-	max,
-	value: valueProp,
-	initial,
-}: useControlledRangeValueArgs ) {
+export function useControlledRangeValue(
+	settings: useControlledRangeValueArgs
+) {
+	const { min, max, value: valueProp, initial } = settings;
 	const [ state, setInternalState ] = useControlledState(
 		floatClamp( valueProp, min, max ),
 		{ initial, fallback: null }
@@ -77,22 +73,20 @@ export function useControlledRangeValue( {
  * Hook to encapsulate the debouncing "hover" to better handle the showing
  * and hiding of the Tooltip.
  *
- * @param  settings                     Hook settings.
- * @param  [settings.onShow=noop]       A callback function invoked when the element is shown.
- * @param  [settings.onHide=noop]       A callback function invoked when the element is hidden.
- * @param  [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
- * @param  [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
- * @param  [settings.timeout=300]       Timeout before the element is shown or hidden.
- *
+ * @param  settings
  * @return Bound properties for use on a React.Node.
  */
-export function useDebouncedHoverInteraction( {
-	onHide = noop,
-	onMouseLeave = noop as MouseEventHandler,
-	onMouseMove = noop as MouseEventHandler,
-	onShow = noop,
-	timeout = 300,
-} ) {
+export function useDebouncedHoverInteraction(
+	settings: useDebouncedHoverInteractionArgs
+) {
+	const {
+		onHide = noop,
+		onMouseLeave = noop as MouseEventHandler,
+		onMouseMove = noop as MouseEventHandler,
+		onShow = noop,
+		timeout = 300,
+	} = settings;
+
 	const [ show, setShow ] = useState( false );
 	const timeoutRef = useRef< number | undefined >();
 

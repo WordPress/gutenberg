@@ -269,10 +269,55 @@ export type TrackProps = {
 };
 
 export type useControlledRangeValueArgs = {
+	/**
+	 * The initial value.
+	 */
 	initial?: number;
+	/**
+	 * The maximum value.
+	 */
 	max: number;
+	/**
+	 * The minimum value.
+	 */
 	min: number;
+	/**
+	 * The current value.
+	 */
 	value: number | null;
+};
+
+export type useDebouncedHoverInteractionArgs = {
+	/**
+	 *  A callback function invoked when the element is hidden.
+	 *
+	 * @default () => {}
+	 */
+	onHide?: () => void;
+	/**
+	 * A callback function invoked when the mouse is moved out of the element.
+	 *
+	 * @default () => {}
+	 */
+	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
+	/**
+	 * A callback function invoked when the mouse is moved.
+	 *
+	 * @default () => {}
+	 */
+	onMouseMove?: MouseEventHandler< HTMLInputElement >;
+	/**
+	 * A callback function invoked when the element is shown.
+	 *
+	 * @default () => {}
+	 */
+	onShow?: () => void;
+	/**
+	 * Timeout before the element is shown or hidden.
+	 *
+	 * @default 300
+	 */
+	timeout?: number;
 };
 
 export type useMarksArgs = NumericProps & {
