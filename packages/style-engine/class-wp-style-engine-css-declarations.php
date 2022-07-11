@@ -41,6 +41,22 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
+	 * Checks a CSS property string to see whether it is a valid CSS custom property.
+	 * In conjuction with static:sanitize_property it only allows `--wp--${slug}--{$kebab_case_css_property}`.
+	 *
+	 * This explicit checks is required because
+	 * safecss_filter_attr_allow_css filter in safecss_filter_attr (kses.php)
+	 * does not let through CSS custom variables.
+	 *
+	 * @param string $css_property The CSS property.
+	 *
+	 * @return boolean
+	 */
+	protected function is_valid_custom_property( $css_property ) {
+		return 1 === preg_match( '/^--wp--[a-z]+--[a-z0-9-]+$/', $css_property );
+	}
+
+	/**
 	 * Add a single declaration.
 	 *
 	 * @param string $property The CSS property.
@@ -92,20 +108,32 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Filters and compiles the CSS declarations.
 	 *
+	 * @param array $options array(
+	 *     'prettify' => (boolean) Whether to format the output with indents and new lines.
+	 * );.
+	 *
 	 * @return string The CSS declarations.
 	 */
-	public function get_declarations_string() {
+	public function get_declarations_string( $options ) {
+		$should_prettify     = isset( $options['prettify'] ) ? $options['prettify'] : null;
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
+
 		foreach ( $declarations_array as $property => $value ) {
-			//$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
-			// @TODO temporary to allow --wp--style--block-gap through.
-			$filtered_declaration = esc_html( "{$property}: {$value}" );
+			$declaration = "{$property}: {$value}";
+			if ( ! static::is_valid_custom_property( $property ) ) {
+				$declaration = safecss_filter_attr( $declaration );
+			}
+			$filtered_declaration = esc_html( $declaration );
 			if ( $filtered_declaration ) {
-				$declarations_output .= $filtered_declaration . '; ';
+				if ( $should_prettify ) {
+					$declarations_output .= "\t$filtered_declaration;\n";
+				} else {
+					$declarations_output .= $filtered_declaration . '; ';
+				}
 			}
 		}
-		return rtrim( $declarations_output );
+		return rtrim( $declarations_output, ' ' );
 	}
 
 	/**

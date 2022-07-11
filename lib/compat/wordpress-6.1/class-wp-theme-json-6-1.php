@@ -679,10 +679,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				Style engine is generating the root styles only.
 				This way we can iteratively introduce it to start generating styles.elements, and styles.blocks.
 			*/
+
 			$block_rules .= gutenberg_style_engine_generate_global_styles(
 				$node,
 				array(
 					'selector' => $selector,
+					'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
 				)
 			);
 
