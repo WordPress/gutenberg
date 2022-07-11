@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find, isString } from 'lodash';
+import { get, find } from 'lodash';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -213,7 +213,7 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 }
 
 export function getValueFromVariable( features, blockName, variable ) {
-	if ( ! variable || ! isString( variable ) ) {
+	if ( ! variable || typeof variable !== 'string' ) {
 		return variable;
 	}
 	const USER_VALUE_PREFIX = 'var:';

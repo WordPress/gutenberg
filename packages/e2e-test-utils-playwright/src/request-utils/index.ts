@@ -18,8 +18,10 @@ import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
+import { createComment, deleteAllComments } from './comments';
 import { deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
+import { getCurrentUser } from './user';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -121,6 +123,8 @@ class RequestUtils {
 	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
 	deleteAllPosts = deleteAllPosts.bind( this );
+	createComment = createComment.bind( this );
+	deleteAllComments = deleteAllComments.bind( this );
 	deleteAllWidgets = deleteAllWidgets.bind( this );
 	addWidgetBlock = addWidgetBlock.bind( this );
 	deleteAllTemplates = deleteAllTemplates.bind( this );
@@ -129,6 +133,7 @@ class RequestUtils {
 	uploadMedia = uploadMedia.bind( this );
 	deleteMedia = deleteMedia.bind( this );
 	deleteAllMedia = deleteAllMedia.bind( this );
+	getCurrentUser = getCurrentUser.bind( this );
 }
 
 export type { StorageState };
