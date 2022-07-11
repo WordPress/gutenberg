@@ -51,7 +51,7 @@ export default function CommentsLegacy( {
 	);
 
 	let warning = __(
-		'Post Comments block: This is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider replacing this block with the "Comments Query Loop" block.'
+		'Comments block: You're currently using this block in legacy mode. The following is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider switching the block to its editable mode.'
 	);
 	let showPlacholder = true;
 
