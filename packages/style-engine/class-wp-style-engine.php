@@ -432,7 +432,8 @@ class WP_Style_Engine {
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
-			$styles_output['css'] = $css;
+			$styles_output['css']          = $css;
+			$styles_output['declarations'] = $style_rules->get_declarations();
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
