@@ -2217,7 +2217,7 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
-	if ( allowedBlockTypes === true || allowedBlockTypes === false ) {
+	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
 
