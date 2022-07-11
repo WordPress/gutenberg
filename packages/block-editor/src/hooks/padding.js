@@ -11,10 +11,12 @@ import {
 } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
+	Button,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -102,6 +104,9 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const [ showCustomValueControl, setShowCustomValueControl ] =
+		useState( false );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
@@ -136,7 +141,20 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				{
+				<Button
+					label={
+						showCustomValueControl
+							? __( 'Use size preset' )
+							: __( 'Set custom size' )
+					}
+					icon={ settings }
+					onClick={ () => {
+						setShowCustomValueControl( ! showCustomValueControl );
+					} }
+					isPressed={ showCustomValueControl }
+					isSmall
+				/>
+				{ showCustomValueControl && (
 					<BoxControl
 						values={ style?.spacing?.padding }
 						onChange={ onChange }
@@ -146,8 +164,8 @@ export function PaddingEdit( props ) {
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
-				}
-				{
+				) }
+				{ ! showCustomValueControl && (
 					<SpacingSizeEdit
 						values={ style?.spacing?.padding }
 						onChange={ onChange }
@@ -157,7 +175,7 @@ export function PaddingEdit( props ) {
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
-				}
+				) }
 			</>
 		),
 		native: null,

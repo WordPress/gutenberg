@@ -22,7 +22,10 @@ export function getSpacingPresetCssVar( value ) {
  * @return {WPElement} Font size edit element.
  */
 export function SpacingSizeEdit( props ) {
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const spacingSizes = [
+		{ name: 0, slug: 0, size: 0 },
+		...useSetting( 'spacing.spacingSizes' ),
+	];
 
 	return (
 		<>
