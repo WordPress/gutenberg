@@ -476,12 +476,12 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 */
 	public function data_generate_global_styles_fixtures() {
 		return array(
-			'default_return_value'                         => array(
+			'default_return_value'                     => array(
 				'global_styles'   => array(),
 				'options'         => null,
 				'expected_output' => null,
 			),
-			'default_return_valid_top_level_css_rules'     => array(
+			'default_return_valid_top_level_css_rules' => array(
 				'global_styles'   => array(
 					'color'      => array(
 						'text'       => 'var(--wp--preset--color--foreground)',
@@ -503,12 +503,58 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => null,
-				'expected_output' => 'body { color: var(--wp--preset--color--foreground); background-color: var(--wp--preset--color--background); padding-top: 10%; padding-right: 20%; padding-bottom: 10%; padding-left: 20%; font-size: 1rem; font-family: var(--wp--preset--font-family--system-font); line-height: 2; }',
+				'expected_output' => 'body { color: var(--wp--preset--color--foreground); background-color: var(--wp--preset--color--background); padding-top: 10%; padding-right: 20%; padding-bottom: 10%; padding-left: 20%; --wp--style--block-gap: 2rem; font-size: 1rem; font-family: var(--wp--preset--font-family--system-font); line-height: 2; }',
 			),
-			'default_return_valid_element_level_css_rules' => array(
+			'compiles_with_ref_pointers'               => array(
+				'global_styles'   => array(
+					'color'   => array(
+						'background' => '#ffffff',
+						'text'       => array( 'ref' => 'styles.color.background' ),
+					),
+					'spacing' => array(
+						'blockGap' => '2rem',
+						'padding'  => array(
+							'top'    => array( 'ref' => 'styles.spacing.blockGap' ),
+							'right'  => '20%',
+							'bottom' => array( 'ref' => 'styles.spacing.blockGap' ),
+							'left'   => '20%',
+						),
+					),
+					'border'  => array(
+						'top' => array(
+							'width' => array( 'ref' => 'styles.spacing.padding.left' ),
+							'style' => 'dashed',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => 'body { color: #ffffff; background-color: #ffffff; border-top-width: 20%; border-top-style: dashed; padding-top: 2rem; padding-right: 20%; padding-bottom: 2rem; padding-left: 20%; --wp--style--block-gap: 2rem; }',
+			),
+			'ignores_other_top_level_keys'             => array(
 				'global_styles'   => array(
 					'spacing'  => array(
 						'margin' => '20%',
+					),
+					'blocks'   => array(
+						'core/button'     => array(
+							'border' => array(
+								'radius' => '0',
+							),
+							'color'  => array(
+								'text'       => 'piano-red',
+								'background' => 'muddy-waters',
+							),
+						),
+						'core/site-title' => array(
+							'typography' => array(
+								'fontSize'   => 'clamp(2em, 2vw, 4em)',
+								'fontFamily' => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+								'fontStyle'  => 'italic',
+							),
+							'margin'     => array(
+								'bottom' => '20px',
+							),
+						),
 					),
 					'elements' => array(
 						'h1'   => array(
@@ -534,37 +580,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => null,
-				'expected_output' => 'body { margin: 20%; } h1 { color: #ffffff; background-color: #000000; border-radius: 0; } a { color: var(--wp--preset--color--foreground); font-style: underline; }',
-			),
-			'default_return_valid_block_level_css_rules'   => array(
-				'global_styles'   => array(
-					'spacing' => array(
-						'margin' => '20%',
-					),
-					'blocks'  => array(
-						'core/button'     => array(
-							'border' => array(
-								'radius' => '0',
-							),
-							'color'  => array(
-								'text'       => 'piano-red',
-								'background' => 'muddy-waters',
-							),
-						),
-						'core/site-title' => array(
-							'typography' => array(
-								'fontSize'   => 'clamp(2em, 2vw, 4em)',
-								'fontFamily' => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
-								'fontStyle'  => 'italic',
-							),
-							'margin'     => array(
-								'bottom' => '20px',
-							),
-						),
-					),
-				),
-				'options'         => null,
-				'expected_output' => 'body { margin: 20%; } .wp-block-button { color: piano-red; background-color: muddy-waters; border-radius: 0; } .wp-block-site-title { font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; }',
+				'expected_output' => 'body { margin: 20%; }',
 			),
 		);
 	}

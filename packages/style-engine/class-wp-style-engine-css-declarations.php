@@ -108,14 +108,9 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Filters and compiles the CSS declarations.
 	 *
-	 * @param array $options array(
-	 *     'prettify' => (boolean) Whether to format the output with indents and new lines.
-	 * );.
-	 *
 	 * @return string The CSS declarations.
 	 */
-	public function get_declarations_string( $options ) {
-		$should_prettify     = isset( $options['prettify'] ) ? $options['prettify'] : null;
+	public function get_declarations_string() {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
 
@@ -126,14 +121,10 @@ class WP_Style_Engine_CSS_Declarations {
 			}
 			$filtered_declaration = esc_html( $declaration );
 			if ( $filtered_declaration ) {
-				if ( $should_prettify ) {
-					$declarations_output .= "\t$filtered_declaration;\n";
-				} else {
-					$declarations_output .= $filtered_declaration . '; ';
-				}
+				$declarations_output .= $filtered_declaration . '; ';
 			}
 		}
-		return rtrim( $declarations_output, ' ' );
+		return rtrim( $declarations_output );
 	}
 
 	/**
