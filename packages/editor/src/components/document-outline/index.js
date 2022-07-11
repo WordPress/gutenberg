@@ -45,18 +45,16 @@ const multipleH1Headings = [
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
-	return blocks
-		.map( ( block = {} ) => {
-			if ( block.name === 'core/heading' ) {
-				return {
-					...block,
-					level: block.attributes.level,
-					isEmpty: isEmptyHeading( block ),
-				};
-			}
-			return computeOutlineHeadings( block.innerBlocks );
-		} )
-		.flat();
+	return blocks.flatMap( ( block = {} ) => {
+		if ( block.name === 'core/heading' ) {
+			return {
+				...block,
+				level: block.attributes.level,
+				isEmpty: isEmptyHeading( block ),
+			};
+		}
+		return computeOutlineHeadings( block.innerBlocks );
+	} );
 };
 
 const isEmptyHeading = ( heading ) =>
