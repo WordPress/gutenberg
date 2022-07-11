@@ -69,18 +69,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					array(
 						'spacing' => array( 'padding' => $block_padding ),
 
-					),
-					array( 'output_css_as_array' => true )
+					)
 				);
 
 				// Handle negative margins for alignfull children of blocks with custom padding set.
 				// They're added separately because padding might only be set on one side.
-				if ( isset( $block_padding_values['css']['padding-right'] ) ) {
-					$padding_right = $block_padding_values['css']['padding-right'];
+				if ( isset( $block_padding_values['declarations']['padding-right'] ) ) {
+					$padding_right = $block_padding_values['declarations']['padding-right'];
 					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
 				}
-				if ( isset( $block_padding_values['css']['padding-left'] ) ) {
-					$padding_left = $block_padding_values['css']['padding-left'];
+				if ( isset( $block_padding_values['declarations']['padding-left'] ) ) {
+					$padding_left = $block_padding_values['declarations']['padding-left'];
 					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
 				}
 			}
