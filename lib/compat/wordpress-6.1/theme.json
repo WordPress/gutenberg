@@ -2,7 +2,7 @@
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
-		"useRootVariables": false,
+		"useRootPaddingAwareAlignments": false,
 		"border": {
 			"color": false,
 			"radius": false,

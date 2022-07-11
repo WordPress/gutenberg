@@ -623,7 +623,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	public function get_styles_for_block( $block_metadata ) {
 		$node          = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-		$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootVariables' ), array() );
+		$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootPaddingAwareAlignments' ), array() );
 		$selector      = $block_metadata['selector'];
 		$settings      = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
@@ -1021,15 +1021,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
-		'appearanceTools'  => null,
-		'useRootVariables' => null,
-		'border'           => array(
+		'appearanceTools'               => null,
+		'useRootPaddingAwareAlignments' => null,
+		'border'                        => array(
 			'color'  => null,
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
-		'color'            => array(
+		'color'                         => array(
 			'background'       => null,
 			'custom'           => null,
 			'customDuotone'    => null,
@@ -1043,13 +1043,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'palette'          => null,
 			'text'             => null,
 		),
-		'custom'           => null,
-		'layout'           => array(
+		'custom'                        => null,
+		'layout'                        => array(
 			'contentSize' => null,
 			'definitions' => null,
 			'wideSize'    => null,
 		),
-		'spacing'          => array(
+		'spacing'                       => array(
 			'customSpacingSize' => null,
 			'spacingSizes'      => null,
 			'spacingScale'      => null,
@@ -1058,7 +1058,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			'padding'           => null,
 			'units'             => null,
 		),
-		'typography'       => array(
+		'typography'                    => array(
 			'customFontSize' => null,
 			'dropCap'        => null,
 			'fontFamilies'   => null,

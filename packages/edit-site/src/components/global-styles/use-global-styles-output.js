@@ -172,15 +172,19 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object}  blockStyles Block styles.
+ * @param {Object}  blockStyles         Block styles.
  *
- * @param {string}  selector    The selector these declarations should attach to.
+ * @param {string}  selector            The selector these declarations should attach to.
  *
- * @param {boolean} useRootVars Whether to use CSS custom properties in root selector.
+ * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
+function getStylesDeclarations(
+	blockStyles = {},
+	selector = '',
+	useRootPaddingAlign
+) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
 		STYLE_PROPERTY,
@@ -237,7 +241,7 @@ function getStylesDeclarations( blockStyles = {}, selector = '', useRootVars ) {
 		[]
 	);
 
-	if ( isRoot && useRootVars ) {
+	if ( isRoot && useRootPaddingAlign ) {
 		return output;
 	}
 
@@ -526,7 +530,7 @@ export const toStyles = (
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	const useRootVars = tree?.settings?.useRootVariables;
+	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 
 	/*
 	 * Reset default browser margin on the root body element.
@@ -538,7 +542,7 @@ export const toStyles = (
 	 */
 	let ruleset = 'body {margin: 0;}';
 
-	if ( useRootVars ) {
+	if ( useRootPaddingAlign ) {
 		ruleset =
 			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull),p,h1,h2,h3,h4,h5,h6, ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 	}
@@ -587,7 +591,7 @@ export const toStyles = (
 			const declarations = getStylesDeclarations(
 				styles,
 				selector,
-				useRootVars
+				useRootPaddingAlign
 			);
 			if ( declarations?.length ) {
 				ruleset =
