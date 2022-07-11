@@ -130,8 +130,8 @@ function DropdownMenu( {
 							title={ label }
 							style={ { paddingLeft: 0, paddingRight: 0 } }
 						>
-							{ controlSets
-								?.map( ( controlSet, indexOfSet ) =>
+							{ controlSets?.flatMap(
+								( controlSet, indexOfSet ) =>
 									controlSet.map(
 										( control, indexOfControl ) => (
 											<BottomSheet.Cell
@@ -158,8 +158,7 @@ function DropdownMenu( {
 											/>
 										)
 									)
-								)
-								.flat() }
+							) }
 						</PanelBody>
 					</BottomSheet>
 				);

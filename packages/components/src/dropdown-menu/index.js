@@ -145,54 +145,50 @@ function DropdownMenu( dropdownMenuProps ) {
 				return (
 					<NavigableMenu { ...mergedMenuProps } role="menu">
 						{ isFunction( children ) ? children( props ) : null }
-						{ controlSets
-							?.map( ( controlSet, indexOfSet ) =>
-								controlSet.map( ( control, indexOfControl ) => (
-									<Button
-										key={ [
-											indexOfSet,
-											indexOfControl,
-										].join() }
-										onClick={ ( event ) => {
-											event.stopPropagation();
-											props.onClose();
-											if ( control.onClick ) {
-												control.onClick();
-											}
-										} }
-										className={ classnames(
-											'components-dropdown-menu__menu-item',
-											{
-												'has-separator':
-													indexOfSet > 0 &&
-													indexOfControl === 0,
-												'is-active': control.isActive,
-												'is-icon-only': ! control.title,
-											}
-										) }
-										icon={ control.icon }
-										label={ control.label }
-										aria-checked={
-											control.role ===
-												'menuitemcheckbox' ||
-											control.role === 'menuitemradio'
-												? control.isActive
-												: undefined
+						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+							controlSet.map( ( control, indexOfControl ) => (
+								<Button
+									key={ [
+										indexOfSet,
+										indexOfControl,
+									].join() }
+									onClick={ ( event ) => {
+										event.stopPropagation();
+										props.onClose();
+										if ( control.onClick ) {
+											control.onClick();
 										}
-										role={
-											control.role ===
-												'menuitemcheckbox' ||
-											control.role === 'menuitemradio'
-												? control.role
-												: 'menuitem'
+									} }
+									className={ classnames(
+										'components-dropdown-menu__menu-item',
+										{
+											'has-separator':
+												indexOfSet > 0 &&
+												indexOfControl === 0,
+											'is-active': control.isActive,
+											'is-icon-only': ! control.title,
 										}
-										disabled={ control.isDisabled }
-									>
-										{ control.title }
-									</Button>
-								) )
-							)
-							.flat() }
+									) }
+									icon={ control.icon }
+									label={ control.label }
+									aria-checked={
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
+											? control.isActive
+											: undefined
+									}
+									role={
+										control.role === 'menuitemcheckbox' ||
+										control.role === 'menuitemradio'
+											? control.role
+											: 'menuitem'
+									}
+									disabled={ control.isDisabled }
+								>
+									{ control.title }
+								</Button>
+							) )
+						) }
 					</NavigableMenu>
 				);
 			} }
