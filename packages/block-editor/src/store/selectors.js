@@ -1444,7 +1444,7 @@ export function getTemplateLock( state, rootClientId ) {
 }
 
 const checkAllowList = ( list, item, defaultResult = null ) => {
-	if ( list === true || list === false ) {
+	if ( typeof list === 'boolean' ) {
 		return list;
 	}
 	if ( Array.isArray( list ) ) {
