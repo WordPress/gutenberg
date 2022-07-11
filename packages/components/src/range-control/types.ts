@@ -115,7 +115,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		currentInput?: number;
 		/**
-		 * An icon to be shown above the slider next to it's container title.
+		 * An icon to be shown above the slider next to its container title.
 		 */
 		icon?: string;
 		/**

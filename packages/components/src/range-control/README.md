@@ -177,7 +177,7 @@ Provides control over whether the label will only be visible to screen readers.
 
 ### `icon`: `string`
 
-An icon to be shown above the slider next to it's container title.
+An icon to be shown above the slider next to its container title.
 
 -   Required: No
 -   Platform: Mobile
