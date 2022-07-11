@@ -7,16 +7,13 @@ import { every, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	TabPanel,
 	ColorPalette,
 	GradientPicker,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,6 +26,19 @@ const colorsAndGradientKeys = [
 	'gradients',
 	'disableCustomGradients',
 ];
+
+const TAB_COLOR = {
+	name: 'color',
+	title: 'Solid color',
+	value: 'color',
+};
+const TAB_GRADIENT = {
+	name: 'gradient',
+	title: 'Gradient',
+	value: 'gradient',
+};
+
+const TABS_SETTINGS = [ TAB_COLOR, TAB_GRADIENT ];
 
 function ColorGradientControlInner( {
 	colors,
@@ -52,13 +62,57 @@ function ColorGradientControlInner( {
 	const canChooseAGradient =
 		onGradientChange &&
 		( ! isEmpty( gradients ) || ! disableCustomGradients );
-	const [ currentTab, setCurrentTab ] = useState(
-		gradientValue ? 'gradient' : !! canChooseAColor && 'color'
-	);
 
 	if ( ! canChooseAColor && ! canChooseAGradient ) {
 		return null;
 	}
+
+	const tabPanels = {
+		[ TAB_COLOR.value ]: (
+			<ColorPalette
+				value={ colorValue }
+				onChange={
+					canChooseAGradient
+						? ( newColor ) => {
+								onColorChange( newColor );
+								onGradientChange();
+						  }
+						: onColorChange
+				}
+				{ ...{ colors, disableCustomColors } }
+				__experimentalHasMultipleOrigins={
+					__experimentalHasMultipleOrigins
+				}
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				clearable={ clearable }
+				enableAlpha={ enableAlpha }
+			/>
+		),
+		[ TAB_GRADIENT.value ]: (
+			<GradientPicker
+				value={ gradientValue }
+				onChange={
+					canChooseAColor
+						? ( newGradient ) => {
+								onGradientChange( newGradient );
+								onColorChange();
+						  }
+						: onGradientChange
+				}
+				{ ...{ gradients, disableCustomGradients } }
+				__experimentalHasMultipleOrigins={
+					__experimentalHasMultipleOrigins
+				}
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				clearable={ clearable }
+			/>
+		),
+	};
+
 	return (
 		<BaseControl
 			className={ classnames(
@@ -78,66 +132,24 @@ function ColorGradientControlInner( {
 						</legend>
 					) }
 					{ canChooseAColor && canChooseAGradient && (
-						<ToggleGroupControl
-							value={ currentTab }
-							onChange={ setCurrentTab }
-							label={ __( 'Select color type' ) }
-							hideLabelFromVision
-							isBlock
+						<TabPanel
+							className="block-editor-color-gradient-control__tabs"
+							tabs={ TABS_SETTINGS }
+							initialTabName={
+								gradientValue
+									? TAB_GRADIENT.value
+									: !! canChooseAColor && TAB_COLOR.value
+							}
 						>
-							<ToggleGroupControlOption
-								value="color"
-								label={ __( 'Solid' ) }
-							/>
-							<ToggleGroupControlOption
-								value="gradient"
-								label={ __( 'Gradient' ) }
-							/>
-						</ToggleGroupControl>
+							{ ( tab ) => (
+								<div className="block-editor-color-gradient-control__tab-panel">
+									{ tabPanels[ tab.value ] }
+								</div>
+							) }
+						</TabPanel>
 					) }
-					{ ( currentTab === 'color' || ! canChooseAGradient ) && (
-						<ColorPalette
-							value={ colorValue }
-							onChange={
-								canChooseAGradient
-									? ( newColor ) => {
-											onColorChange( newColor );
-											onGradientChange();
-									  }
-									: onColorChange
-							}
-							{ ...{ colors, disableCustomColors } }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
-							__experimentalIsRenderedInSidebar={
-								__experimentalIsRenderedInSidebar
-							}
-							clearable={ clearable }
-							enableAlpha={ enableAlpha }
-						/>
-					) }
-					{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
-						<GradientPicker
-							value={ gradientValue }
-							onChange={
-								canChooseAColor
-									? ( newGradient ) => {
-											onGradientChange( newGradient );
-											onColorChange();
-									  }
-									: onGradientChange
-							}
-							{ ...{ gradients, disableCustomGradients } }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
-							__experimentalIsRenderedInSidebar={
-								__experimentalIsRenderedInSidebar
-							}
-							clearable={ clearable }
-						/>
-					) }
+					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
+					{ ! canChooseAColor && tabPanels[ TAB_GRADIENT.value ] }
 				</VStack>
 			</fieldset>
 		</BaseControl>
