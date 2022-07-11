@@ -8,8 +8,11 @@ import {
 	__experimentalBoxControl as BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
+import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,11 +22,27 @@ import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
 export function useHasDimensionsPanel( name ) {
+	const hasContentSize = useHasContentSize( name );
+	const hasWideSize = useHasWideSize( name );
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
 
-	return hasPadding || hasMargin || hasGap;
+	return hasContentSize || hasWideSize || hasPadding || hasMargin || hasGap;
+}
+
+function useHasContentSize( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'layout.contentSize', name );
+
+	return settings && supports.includes( 'contentSize' );
+}
+
+function useHasWideSize( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'layout.wideSize', name );
+
+	return settings && supports.includes( 'wideSize' );
 }
 
 function useHasPadding( name ) {
@@ -86,6 +105,8 @@ function splitStyleValue( value ) {
 }
 
 export default function DimensionsPanel( { name } ) {
+	const showContentSizeControl = useHasContentSize( name );
+	const showWideSizeControl = useHasWideSize( name );
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
@@ -98,6 +119,22 @@ export default function DimensionsPanel( { name } ) {
 			'vw',
 		],
 	} );
+
+	const [ contentSizeValue, setContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name
+	);
+
+	const hasContentSizeValue = () => !! contentSizeValue;
+	const resetContentSizeValue = () => setContentSizeValue( '' );
+
+	const [ wideSizeValue, setWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name
+	);
+
+	const hasWideSizeValue = () => !! wideSizeValue;
+	const resetWideSizeValue = () => setWideSizeValue( '' );
 
 	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
 	const paddingValues = splitStyleValue( rawPadding );
@@ -141,6 +178,66 @@ export default function DimensionsPanel( { name } ) {
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+			<Flex>
+				<FlexItem>
+					{ showContentSizeControl && (
+						<ToolsPanelItem
+							label={ __( 'Content size' ) }
+							hasValue={ hasContentSizeValue }
+							onDeselect={ resetContentSizeValue }
+							isShownByDefault={ true }
+						>
+							<Flex>
+								<FlexItem>
+									<UnitControl
+										label={ __( 'Content' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ contentSizeValue || '' }
+										onChange={ ( nextContentSize ) => {
+											setContentSizeValue(
+												nextContentSize
+											);
+										} }
+										units={ units }
+									/>
+								</FlexItem>
+								<FlexItem>
+									<Icon icon={ positionCenter } />
+								</FlexItem>
+							</Flex>
+						</ToolsPanelItem>
+					) }
+				</FlexItem>
+				<FlexItem>
+					{ showWideSizeControl && (
+						<ToolsPanelItem
+							label={ __( 'Wide size' ) }
+							hasValue={ hasWideSizeValue }
+							onDeselect={ resetWideSizeValue }
+							isShownByDefault={ true }
+						>
+							<Flex>
+								<FlexItem>
+									<UnitControl
+										label={ __( 'Wide' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ wideSizeValue || '' }
+										onChange={ ( nextWideSize ) => {
+											setWideSizeValue( nextWideSize );
+										} }
+										units={ units }
+									/>
+								</FlexItem>
+								<FlexItem>
+									<Icon icon={ stretchWide } />
+								</FlexItem>
+							</Flex>
+						</ToolsPanelItem>
+					) }
+				</FlexItem>
+			</Flex>
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
