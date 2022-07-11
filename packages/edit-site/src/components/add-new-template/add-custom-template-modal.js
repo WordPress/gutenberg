@@ -22,7 +22,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { mapToIHasNameAndId } from './utils';
+import { mapToIHasNameAndId, needsUniqueIdentifier } from './utils';
 
 const EMPTY_ARRAY = [];
 
@@ -38,17 +38,27 @@ function selectSuggestion( suggestion, onSelect, entityForSuggestions ) {
 		labels.singular_name,
 		suggestion.name
 	);
+	const description = sprintf(
+		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
+		__( 'Template for %1$s' ),
+		title
+	);
+	const _needsUniqueIdentifier = needsUniqueIdentifier( labels, slug );
+	const augmentedTitle = _needsUniqueIdentifier
+		? sprintf(
+				// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the taxonomy, e.g. "Category: shoes (product_tag)"
+				__( '%1$s %2$s' ),
+				title,
+				_needsUniqueIdentifier ? `(${ slug })` : ''
+		  )
+		: title;
 	let newTemplateSlug = `${ templateSlug || slug }-${ suggestion.slug }`;
 	if ( templatePrefix ) {
 		newTemplateSlug = templatePrefix + newTemplateSlug;
 	}
 	const newTemplate = {
-		title,
-		description: sprintf(
-			// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Post: Hello, WordPress"
-			__( 'Template for %1$s' ),
-			title
-		),
+		title: augmentedTitle,
+		description,
 		slug: newTemplateSlug,
 	};
 	onSelect( newTemplate );

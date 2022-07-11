@@ -62,22 +62,24 @@ export const mapToIHasNameAndId = ( entities, path ) => {
  *                                     on `tag` alias.
  */
 
+// We need to keep a reference to each `labels.singular_name` declared
+// in the registered taxonomies to avoid ambiguity if a taxonomy is using
+// the same label with another taxonomy. This can usually happen when a
+// taxonomy uses the same `singular_name` with the `category` or `post_tag`
+// taxonomies. In the case of such a conflict we augment the respective
+// information with something unique per taxonomy.
+let taxonomyLabels;
+export const needsUniqueIdentifier = ( labels, slug ) => {
+	const singularName = labels.singular_name.toLowerCase();
+	return taxonomyLabels[ singularName ] > 1 && singularName !== slug;
+};
+
 const taxonomyBaseConfig = {
 	entityName: 'taxonomy',
 	getOrderBy: ( { search } ) => ( search ? 'name' : 'count' ),
 	getIcon: () => blockMeta,
-	getTitle: ( labels ) =>
-		sprintf(
-			// translators: %s: Name of the taxonomy e.g: "Cagegory".
-			__( 'Single taxonomy: %s' ),
-			labels.singular_name
-		),
-	getDescription: ( labels ) =>
-		sprintf(
-			// translators: %s: Name of the taxonomy e.g: "Product Categories".
-			__( 'Displays a single taxonomy: %s.' ),
-			labels.singular_name
-		),
+	getTitle: () => {},
+	getDescription: () => {},
 };
 const postTypeBaseConfig = {
 	entityName: 'postType',
@@ -110,12 +112,23 @@ export const entitiesConfig = {
 	taxonomy: {
 		...taxonomyBaseConfig,
 		templatePrefix: 'taxonomy-',
-		getDescription: ( labels, slug ) =>
-			sprintf(
-				// translators: %1s: Name of the taxonomy e.g: "Product Categories"; %2s: Slug of the taxonomy e.g: "product-categories".
-				__( 'Displays a single taxonomy: %1$s (%2$s).' ),
-				labels.singular_name,
+		getTitle: ( labels, slug ) => {
+			const _needsUniqueIdentifier = needsUniqueIdentifier(
+				labels,
 				slug
+			);
+			return sprintf(
+				// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product-categories".
+				__( 'Taxonomy: %1$s %2$s' ),
+				labels.singular_name,
+				_needsUniqueIdentifier ? `(${ slug })` : ''
+			);
+		},
+		getDescription: ( labels ) =>
+			sprintf(
+				// translators: %1s: Name of the taxonomy e.g: "Product Categories";
+				__( 'Displays taxonomy: %1$s' ),
+				labels.singular_name
 			),
 	},
 	category: { ...taxonomyBaseConfig },
@@ -176,9 +189,19 @@ const usePublicTaxonomies = () => {
 		[]
 	);
 	return useMemo( () => {
-		return taxonomies?.filter(
+		const publicTaxonomies = taxonomies?.filter(
 			( { visibility } ) => visibility?.publicly_queryable
 		);
+		taxonomyLabels = publicTaxonomies?.reduce(
+			( accumulator, { labels } ) => {
+				const singularName = labels.singular_name.toLowerCase();
+				accumulator[ singularName ] =
+					( accumulator[ singularName ] || 0 ) + 1;
+				return accumulator;
+			},
+			{}
+		);
+		return publicTaxonomies;
 	}, [ taxonomies ] );
 };
 
@@ -343,11 +366,8 @@ export const useExtraTemplates = (
 				? { ...defaultTemplateType }
 				: {
 						slug: generalTemplateSlug,
-						title: entityConfig.getTitle( labels ),
-						description: entityConfig.getDescription(
-							labels,
-							slug
-						),
+						title: entityConfig.getTitle( labels, slug ),
+						description: entityConfig.getDescription( labels ),
 						icon: entityConfig.getIcon?.( icon ),
 				  };
 			const hasEntities = entitiesInfo?.[ slug ]?.hasEntities;
