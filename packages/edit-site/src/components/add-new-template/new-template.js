@@ -37,6 +37,7 @@ import {
 	useDefaultTemplateTypes,
 	entitiesConfig,
 	usePostTypes,
+	usePostTypePage,
 	useTaxonomies,
 	useTaxonomyCategory,
 	useTaxonomyTag,
@@ -198,6 +199,7 @@ function useMissingTemplates(
 	setShowCustomTemplateModal
 ) {
 	const postTypes = usePostTypes();
+	const pagePostType = usePostTypePage();
 	const taxonomies = useTaxonomies();
 	const categoryTaxonomy = useTaxonomyCategory();
 	const tagTaxonomy = useTaxonomyTag();
@@ -229,12 +231,17 @@ function useMissingTemplates(
 		entitiesConfig.tag,
 		onClickMenuItem
 	);
+	const pageMenuItem = useExtraTemplates(
+		pagePostType,
+		entitiesConfig.page,
+		onClickMenuItem
+	);
 	// We need to replace existing default template types with
 	// the create specific template functionality. The original
 	// info (title, description, etc.) is preserved in the
 	// `useExtraTemplates` hook.
 	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
-	[ categoryMenuItem, tagMenuItem ].forEach( ( menuItem ) => {
+	[ categoryMenuItem, tagMenuItem, pageMenuItem ].forEach( ( menuItem ) => {
 		if ( ! menuItem?.length ) {
 			return;
 		}
