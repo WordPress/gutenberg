@@ -293,13 +293,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 							'left'   => 'var:preset|spaceman|10',
 							'right'  => 'var:preset|spaceman|20',
 							'top'    => '1rem',
-							'bottom' => '1rem',
+							'bottom' => '0',
 						),
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'margin-top: 1rem; margin-bottom: 1rem;',
+					'css' => 'margin-top: 1rem; margin-bottom: 0;',
 				),
 			),
 
