@@ -5,6 +5,8 @@
 ### Bug Fix
 
 -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
+-   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
+-   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
 
 ### Internal
 
@@ -23,14 +25,6 @@
 -   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
 -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
 -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
-
-### Bug Fix
-
--   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
-
-### Bug Fix
-
--   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
 
 ## 19.14.0 (2022-06-29)
 
