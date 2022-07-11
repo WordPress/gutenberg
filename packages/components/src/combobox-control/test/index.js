@@ -42,15 +42,14 @@ const timezones = [
 	{ name: 'Central African Time', abbreviation: 'CAT' },
 ];
 const mapTimezoneOption = ( tz ) => ( {
-	value: tz.name,
-	label: tz.abbreviation,
+	value: tz.abbreviation,
+	label: tz.name,
 } );
 
 const timezoneOptions = timezones.map( mapTimezoneOption );
 const defaultLabelText = 'Select a timezone';
-const getLabel = ( text = defaultLabelText ) => {
-	return screen.getByText( text );
-};
+const getLabel = () => screen.getByText( defaultLabelText );
+const getInput = () => screen.getByRole( 'combobox' );
 
 describe( 'ComboboxControl', () => {
 	const TestComboboxControl = ( props ) => (
@@ -64,29 +63,48 @@ describe( 'ComboboxControl', () => {
 		</>
 	);
 
-	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			render( <TestComboboxControl /> );
+	it( 'should render', () => {
+		render( <TestComboboxControl /> );
 
-			const input = screen.getByRole( 'combobox' );
-			expect( input ).toBeVisible();
-		} );
+		const input = getInput();
+		expect( input ).toBeVisible();
+	} );
 
-		it( 'should render with visible label', () => {
-			render( <TestComboboxControl /> );
-			const label = getLabel();
-			expect( label ).toBeVisible();
-		} );
+	it( 'should render with visible label', () => {
+		render( <TestComboboxControl /> );
+		const label = getLabel();
+		expect( label ).toBeVisible();
+	} );
 
-		it( 'should render with hidden label', () => {
-			render( <TestComboboxControl hideLabelFromVision={ true } /> );
-			const label = getLabel();
+	it( 'should render with hidden label', () => {
+		render( <TestComboboxControl hideLabelFromVision={ true } /> );
+		const label = getLabel();
 
-			expect( label ).toBeInTheDocument();
-			expect( label ).toHaveAttribute(
-				'data-wp-component',
-				'VisuallyHidden'
-			);
-		} );
+		expect( label ).toBeInTheDocument();
+		expect( label ).toHaveAttribute(
+			'data-wp-component',
+			'VisuallyHidden'
+		);
+	} );
+
+	it( 'should render with the correct options', () => {
+		render( <TestComboboxControl /> );
+
+		getInput().focus();
+
+		const renderedOptions = document.querySelectorAll(
+			'.components-combobox-control__suggestions-container ul[role="listbox"] li[role="option"]'
+		);
+
+		expect( renderedOptions.length ).toEqual( timezones.length );
+
+		// Confirm the rendered options match the provided dataset.
+		const renderedOptionNames = [];
+		for ( const option of renderedOptions.values() ) {
+			renderedOptionNames.push( option.textContent );
+		}
+		const timezoneNames = timezones.map( ( tz ) => tz.name );
+
+		expect( renderedOptionNames ).toEqual( timezoneNames );
 	} );
 } );
