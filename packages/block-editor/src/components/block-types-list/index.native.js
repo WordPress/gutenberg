@@ -3,6 +3,7 @@
  */
 import {
 	Dimensions,
+	FlatList,
 	SectionList,
 	StyleSheet,
 	Text,
@@ -81,13 +82,35 @@ export default function BlockTypesList( {
 		listProps.contentContainerStyle
 	);
 
+	const renderSection = ( { item } ) => {
+		return (
+			<FlatList
+				data={ item.list }
+				numColumns={ numberOfColumns }
+				renderItem={ renderListItem }
+			/>
+		);
+	};
+
+	const renderListItem = ( { item } ) => {
+		return (
+			<InserterButton
+				{ ...{
+					item,
+					itemWidth,
+					maxWidth,
+					onSelect,
+				} }
+			/>
+		);
+	};
+
 	return (
 		<SectionList
 			onLayout={ onLayout }
 			key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
-			numColumns={ numberOfColumns }
 			sections={ items }
 			initialNumToRender={ initialNumToRender }
 			ItemSeparatorComponent={ () => (
@@ -100,22 +123,20 @@ export default function BlockTypesList( {
 			keyExtractor={ ( item ) => item.id }
 			renderSectionHeader={ ( { section: { metadata } } ) => {
 				return metadata.title ? (
-					<>
+					<View
+						style={ {
+							justifyContent: 'center',
+							flexDirection: 'row',
+							paddingTop: 32,
+							paddingBottom: 32,
+						} }
+					>
 						{ metadata.icon || null }
 						<Text>{ metadata.title }</Text>
-					</>
+					</View>
 				) : null;
 			} }
-			renderItem={ ( { item } ) => (
-				<InserterButton
-					{ ...{
-						item,
-						itemWidth,
-						maxWidth,
-						onSelect,
-					} }
-				/>
-			) }
+			renderItem={ renderSection }
 			{ ...listProps }
 			contentContainerStyle={ {
 				...contentContainerStyle,

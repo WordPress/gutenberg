@@ -56,7 +56,12 @@ function BlockTypesTab( {
 						icon: collections[ namespace ].icon,
 						title: collections[ namespace ].title,
 					},
-					data,
+					data: [
+						{
+							key: collections[ namespace ].title,
+							list: data,
+						},
+					],
 				} );
 			}
 		} );
@@ -72,7 +77,13 @@ function BlockTypesTab( {
 	return (
 		<BlockTypesList
 			name="Blocks"
-			items={ [ { metadata: {}, data: items }, ...itemsPerCollection ] }
+			items={ [
+				{
+					metadata: {},
+					data: [ { key: 1, list: items } ],
+				},
+				...itemsPerCollection,
+			] }
 			onSelect={ handleSelect }
 			listProps={ listProps }
 		/>
