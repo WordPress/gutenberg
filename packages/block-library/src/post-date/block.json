@@ -16,6 +16,10 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"displayType": {
+			"type": "string",
+			"default": "date"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

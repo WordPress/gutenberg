@@ -33,7 +33,7 @@ import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
 export default function PostDateEdit( {
-	attributes: { textAlign, format, isLink },
+	attributes: { textAlign, format, isLink, displayType },
 	context: { postId, postType: postTypeSlug, queryId },
 	setAttributes,
 } ) {
@@ -58,9 +58,10 @@ export default function PostDateEdit( {
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postTypeSlug,
-		'date',
+		displayType,
 		postId
 	);
+
 	const postType = useSelect(
 		( select ) =>
 			postTypeSlug
@@ -154,6 +155,15 @@ export default function PostDateEdit( {
 						}
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
+					/>
+					<ToggleControl
+						label={ __( 'Display last modified date' ) }
+						onChange={ ( value ) =>
+							setAttributes( {
+								displayType: value ? 'modified' : 'date',
+							} )
+						}
+						checked={ displayType === 'modified' }
 					/>
 				</PanelBody>
 			</InspectorControls>
