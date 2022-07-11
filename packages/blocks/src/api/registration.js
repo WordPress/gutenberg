@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { camelCase, isEmpty, isObject, mapKeys, pick, pickBy } from 'lodash';
+import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -130,6 +130,10 @@ import { store as blocksStore } from '../store';
  */
 
 export const serverSideBlockDefinitions = {};
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Sets the server side block definition of blocks.
