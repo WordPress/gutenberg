@@ -3,8 +3,9 @@
  */
 import {
 	Dimensions,
-	FlatList,
+	SectionList,
 	StyleSheet,
+	Text,
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
@@ -81,13 +82,13 @@ export default function BlockTypesList( {
 	);
 
 	return (
-		<FlatList
+		<SectionList
 			onLayout={ onLayout }
 			key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
-			data={ items }
+			sections={ items }
 			initialNumToRender={ initialNumToRender }
 			ItemSeparatorComponent={ () => (
 				<TouchableWithoutFeedback accessible={ false }>
@@ -97,6 +98,14 @@ export default function BlockTypesList( {
 				</TouchableWithoutFeedback>
 			) }
 			keyExtractor={ ( item ) => item.id }
+			renderSectionHeader={ ( { section: { metadata } } ) => {
+				return metadata.title ? (
+					<>
+						{ metadata.icon || null }
+						<Text>{ metadata.title }</Text>
+					</>
+				) : null;
+			} }
 			renderItem={ ( { item } ) => (
 				<InserterButton
 					{ ...{

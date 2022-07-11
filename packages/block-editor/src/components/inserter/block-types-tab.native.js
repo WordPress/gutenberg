@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
-import InserterPanel from './panel';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 import { filterInserterItems } from './utils';
 import useBlockTypesState from './hooks/use-block-types-state';
+
+const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 function BlockTypesTab( {
 	onSelect,
@@ -21,9 +23,7 @@ function BlockTypesTab( {
 	listProps,
 } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
-	const [ _items, categories, collections, onSelectItem ] =
-		useBlockTypesState( rootClientId, onInsert );
-	console.log( '>>>', { categories } );
+	const [ , , collections ] = useBlockTypesState( rootClientId, onInsert );
 
 	const { blockTypes } = useSelect(
 		( select ) => {
@@ -44,24 +44,38 @@ function BlockTypesTab( {
 	const { items, trackBlockTypeSelected } =
 		useBlockTypeImpressions( blockTypes );
 
+	const itemsPerCollection = useMemo( () => {
+		const result = [];
+		Object.keys( collections ).forEach( ( namespace ) => {
+			const data = items.filter(
+				( item ) => getBlockNamespace( item ) === namespace
+			);
+			if ( data.length > 0 ) {
+				result.push( {
+					metadata: {
+						icon: collections[ namespace ].icon,
+						title: collections[ namespace ].title,
+					},
+					data,
+				} );
+			}
+		} );
+
+		return result;
+	}, [ items, collections ] );
+
 	const handleSelect = ( ...args ) => {
 		trackBlockTypeSelected( ...args );
 		onSelect( ...args );
 	};
 
 	return (
-		<InserterPanel
-			key={ categories[ categories.length - 1 ].slug }
-			title={ categories[ categories.length - 1 ].title }
-			icon={ categories[ categories.length - 1 ].icon }
-		>
-			<BlockTypesList
-				name="Blocks"
-				items={ items }
-				onSelect={ handleSelect }
-				listProps={ listProps }
-			/>
-		</InserterPanel>
+		<BlockTypesList
+			name="Blocks"
+			items={ [ { metadata: {}, data: items }, ...itemsPerCollection ] }
+			onSelect={ handleSelect }
+			listProps={ listProps }
+		/>
 	);
 }
 
