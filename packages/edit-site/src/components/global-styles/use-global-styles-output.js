@@ -6,7 +6,6 @@ import {
 	forEach,
 	get,
 	isEmpty,
-	isString,
 	kebabCase,
 	pickBy,
 	reduce,
@@ -185,7 +184,7 @@ function getStylesDeclarations( blockStyles = {} ) {
 
 			const styleValue = get( blockStyles, pathToValue );
 
-			if ( !! properties && ! isString( styleValue ) ) {
+			if ( !! properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
 					const [ name, prop ] = entry;
 
