@@ -65,6 +65,7 @@ function mode( arr ) {
  *
  * @param {Object} values         Box values.
  * @param {Array}  availableSides Available box sides to evaluate.
+ * @param {Array}  spacingSizes   Spacing size preset values.
  *
  * @return {string} A value + unit for the 'all' input.
  */

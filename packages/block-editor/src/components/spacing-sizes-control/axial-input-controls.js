@@ -7,60 +7,22 @@ import { Flex } from '@wordpress/components';
  * Internal dependencies
  */
 import SpacingRangeControl from './spacing-range-control';
-import { LABELS } from './utils';
+import { LABELS, getSpacingPresetSlug, getSliderValueFromSlug } from './utils';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
 export default function AxialInputControls( {
 	onChange,
 	onFocus,
-	onHoverOn,
-	onHoverOff,
 	values,
 	sides,
 	...props
 } ) {
-	const createHandleOnFocus = ( side ) => ( event ) => {
+	const createHandleOnFocus = ( side ) => () => {
 		if ( ! onFocus ) {
 			return;
 		}
-		onFocus( event, { side } );
-	};
-
-	const createHandleOnHoverOn = ( side ) => () => {
-		if ( ! onHoverOn ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOn( {
-				top: true,
-				bottom: true,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOn( {
-				left: true,
-				right: true,
-			} );
-		}
-	};
-
-	const createHandleOnHoverOff = ( side ) => () => {
-		if ( ! onHoverOff ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOff( {
-				top: false,
-				bottom: false,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOff( {
-				left: false,
-				right: false,
-			} );
-		}
+		onFocus( side );
 	};
 
 	const createHandleOnChange = ( side ) => ( next ) => {
@@ -88,36 +50,34 @@ export default function AxialInputControls( {
 		? groupedSides.filter( ( side ) => sides.includes( side ) )
 		: groupedSides;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last;
-
 	return (
-		<Flex
-			gap={ 0 }
-			align="top"
-			className="component-box-control__vertical-horizontal-input-controls"
-		>
-			{ filteredSides.map( ( side ) => {
-				// const [ parsedQuantity ] = parseQuantityAndUnitFromRawValue(
-				// 	side === 'vertical' ? values.top : values.left
-				// );
-				return (
-					<SpacingRangeControl
-						{ ...props }
-						isFirst={ first === side }
-						isLast={ last === side }
-						isOnly={ only === side }
-						// value={ [ parsedQuantity ].join( '' ) }
-						value={ null }
-						onChange={ createHandleOnChange( side ) }
-						onFocus={ createHandleOnFocus( side ) }
-						label={ LABELS[ side ] }
-						key={ `box-control-${ side }` }
-						withInputField={ false }
-					/>
-				);
-			} ) }
+		<Flex className="component-spacing-sizes-control__input-controls-wrapper">
+			<Flex
+				gap={ 0 }
+				align="top"
+				className="component-spacing-sizes-control__input-controls"
+			>
+				{ filteredSides.map( ( side ) => {
+					const axisValue =
+						side === 'vertical' ? values.top : values.left;
+					const slug = getSpacingPresetSlug( axisValue );
+					const value = getSliderValueFromSlug(
+						slug,
+						props.spacingSizes
+					);
+					return (
+						<SpacingRangeControl
+							{ ...props }
+							value={ value }
+							onChange={ createHandleOnChange( side ) }
+							onFocus={ createHandleOnFocus( side ) }
+							label={ LABELS[ side ] }
+							key={ `box-control-${ side }` }
+							withInputField={ false }
+						/>
+					);
+				} ) }
+			</Flex>
 		</Flex>
 	);
 }

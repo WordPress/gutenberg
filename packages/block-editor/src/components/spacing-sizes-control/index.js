@@ -43,7 +43,6 @@ export default function SpacingSizesControl( {
 	resetValues = DEFAULT_VALUES,
 	spacingSizes,
 } ) {
-	console.log( 'values from parent', valuesProp );
 	const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
@@ -120,11 +119,6 @@ export default function SpacingSizesControl( {
 						/>
 					</FlexBlock>
 				) }
-				{ ! isLinked && splitOnAxis && (
-					<FlexBlock>
-						<AxialInputControls { ...inputControlProps } />
-					</FlexBlock>
-				) }
 				{ ! hasOneSide && (
 					<FlexItem>
 						<LinkedButton
@@ -134,6 +128,11 @@ export default function SpacingSizesControl( {
 					</FlexItem>
 				) }
 			</Flex>
+			{ ! isLinked && splitOnAxis && (
+				<FlexBlock>
+					<AxialInputControls { ...inputControlProps } />
+				</FlexBlock>
+			) }
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }

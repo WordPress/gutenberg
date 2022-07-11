@@ -14,8 +14,6 @@ import {
 	getSliderValueFromSlug,
 } from './utils';
 
-const noop = () => {};
-
 export default function BoxInputControls( {
 	values,
 	selectedUnits,
@@ -29,9 +27,6 @@ export default function BoxInputControls( {
 		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
 		: ALL_SIDES;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
 	const createHandleOnChange = ( side ) => ( next ) => {
 		// const { altKey } = event;
 		const altKey = null;
@@ -80,9 +75,6 @@ export default function BoxInputControls( {
 					return (
 						<SpacingRangeControl
 							{ ...props }
-							isFirst={ first === side }
-							isLast={ last === side }
-							isOnly={ only === side }
 							value={ value }
 							label={ LABELS[ side ] }
 							key={ `box-control-${ side }` }

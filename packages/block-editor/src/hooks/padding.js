@@ -120,7 +120,6 @@ export function PaddingEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		console.log( 'next', next );
 		const newStyle = {
 			...style,
 			spacing: {

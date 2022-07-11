@@ -20,7 +20,6 @@ export default function AllInputControl( {
 	...props
 } ) {
 	const allValue = getAllValue( values, sides, props.spacingSizes );
-	console.log( allValue );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
@@ -62,7 +61,6 @@ export default function AllInputControl( {
 	return (
 		<SpacingRangeControl
 			{ ...props }
-			isOnly
 			value={ allValue }
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }
