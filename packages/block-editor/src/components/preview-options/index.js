@@ -9,7 +9,9 @@ import classnames from 'classnames';
 import { useViewportMatch } from '@wordpress/compose';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
+import { check, external } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as editSiteStore } from '../../store';
 
 export default function PreviewOptions( {
 	children,
@@ -33,11 +35,24 @@ export default function PreviewOptions( {
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
 		/* translators: button label text should, if possible, be under 16 characters. */
-		children: __( 'Preview' ),
+		children: __( 'View' ),
 	};
 	const menuProps = {
-		'aria-label': __( 'Preview options' ),
+		'aria-label': __( 'View options' ),
 	};
+
+	const {
+		settings,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+		} = select( editSiteStore );
+
+		return {
+			settings: getSettings(),
+		};
+	}, [] );
+
 	return (
 		<DropdownMenu
 			className="block-editor-post-preview__dropdown"
@@ -69,6 +84,15 @@ export default function PreviewOptions( {
 							icon={ deviceType === 'Mobile' && check }
 						>
 							{ __( 'Mobile' ) }
+						</MenuItem>
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							href={ settings?.siteUrl }
+							target="_blank"
+							icon={ external }
+						>
+							{ __( 'View Site' ) }
 						</MenuItem>
 					</MenuGroup>
 					{ children }
