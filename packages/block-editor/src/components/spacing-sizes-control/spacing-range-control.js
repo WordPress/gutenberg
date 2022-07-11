@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { RangeControl } from '@wordpress/components';
+import { RangeControl, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,13 +18,13 @@ export default function SpacingRangeControl( props ) {
 	const createHandleOnFocus = ( side ) => () => {
 		props.onFocus( side );
 	};
-
+	//console.log( props.value );
 	const getNewSizeValue = ( newSize ) => {
-		setValueNow( newSize );
-		if ( newSize === 0 ) {
+		const size = parseInt( newSize, 10 );
+		if ( size === 0 ) {
 			return undefined;
 		}
-		if ( newSize === 1 ) {
+		if ( size === 1 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ props.spacingSizes[ newSize ]?.slug }`;
@@ -35,7 +35,7 @@ export default function SpacingRangeControl( props ) {
 	return (
 		<>
 			{ /* <UnitControl label={ props.label } /> */ }
-			<RangeControl
+			{ /* <RangeControl
 				value={ props.value }
 				label={
 					<>
@@ -57,6 +57,18 @@ export default function SpacingRangeControl( props ) {
 				renderTooltipContent={ customTooltipContent }
 				min={ 0 }
 				max={ props.spacingSizes.length - 1 }
+			/> */ }
+			<SelectControl
+				value={ props.value }
+				label={ props.label }
+				onChange={ ( newSize ) =>
+					props.onChange( getNewSizeValue( newSize ) )
+				}
+				onFocus={ createHandleOnFocus( props.side ) }
+				options={ props.spacingSizes.map( ( size, index ) => ( {
+					value: index,
+					label: size.name,
+				} ) ) }
 			/>
 		</>
 	);

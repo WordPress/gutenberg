@@ -141,7 +141,7 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<Button
+				{ /* <Button
 					label={
 						showCustomValueControl
 							? __( 'Use size preset' )
@@ -153,7 +153,7 @@ export function PaddingEdit( props ) {
 					} }
 					isPressed={ showCustomValueControl }
 					isSmall
-				/>
+				/> */ }
 				{ showCustomValueControl && (
 					<BoxControl
 						values={ style?.spacing?.padding }
