@@ -149,7 +149,13 @@ function PostTitle( _, forwardedRef ) {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
+		event.preventDefault();
+
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
 			event.preventDefault();
 
 			const [ firstBlock ] = content;
@@ -164,6 +170,8 @@ function PostTitle( _, forwardedRef ) {
 			} else {
 				onInsertBlockAfter( content );
 			}
+		} else {
+			onUpdate( content );
 		}
 	}
 
