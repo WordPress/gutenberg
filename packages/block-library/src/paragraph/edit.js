@@ -70,6 +70,15 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 
+	let helpText;
+	if ( align ) {
+		helpText = __( 'Aligned text can not have a drop cap.' );
+	} else if ( dropCap ) {
+		helpText = __( 'Showing large initial letter.' );
+	} else {
+		helpText = __( 'Toggle to show a large initial letter.' );
+	}
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -103,13 +112,8 @@ function ParagraphBlock( {
 							onChange={ () =>
 								setAttributes( { dropCap: ! dropCap } )
 							}
-							help={
-								dropCap
-									? __( 'Showing large initial letter.' )
-									: __(
-											'Toggle to show a large initial letter.'
-									  )
-							}
+							help={ helpText }
+							disabled={ align ? true : false }
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
