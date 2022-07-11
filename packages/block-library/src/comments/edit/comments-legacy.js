@@ -14,8 +14,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,6 +28,7 @@ export default function CommentsLegacy( {
 	attributes,
 	setAttributes,
 	context: { postType, postId },
+	clientId,
 } ) {
 	const { textAlign } = attributes;
 
@@ -80,6 +83,22 @@ export default function CommentsLegacy( {
 		}
 	}
 
+	const { replaceBlock } = useDispatch( blockEditorStore );
+
+	const removeLegacy = () => {
+		const { legacy, ...attributesWithoutLegacy } = attributes;
+		replaceBlock(
+			clientId,
+			createBlock( 'core/comments', attributesWithoutLegacy )
+		);
+	};
+
+	const actions = [
+		<Button key="convert" onClick={ removeLegacy } variant="primary">
+			{ __( 'Switch to editable mode' ) }
+		</Button>,
+	];
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -98,7 +117,7 @@ export default function CommentsLegacy( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				<Warning>{ warning }</Warning>
+				<Warning actions={ actions }>{ warning }</Warning>
 
 				{ showPlacholder && (
 					<Placeholder postId={ postId } postType={ postType } />
