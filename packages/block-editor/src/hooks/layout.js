@@ -113,11 +113,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const {
-		inherit = false,
-		type = 'default',
-		useGlobalPadding = false,
-	} = usedLayout;
+	const { inherit = false, type = 'default' } = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow`
 	 * layout and it should not be taken into account when other
@@ -146,8 +142,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 									setAttributes( {
 										layout: {
 											inherit: ! inherit,
-											useGlobalPadding:
-												! inherit || useGlobalPadding,
+											useGlobalPadding: ! inherit,
 										},
 									} )
 								}
