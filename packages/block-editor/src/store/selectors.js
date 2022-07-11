@@ -4,7 +4,6 @@
 import {
 	castArray,
 	first,
-	isBoolean,
 	last,
 	map,
 	reduce,
@@ -1445,7 +1444,7 @@ export function getTemplateLock( state, rootClientId ) {
 }
 
 const checkAllowList = ( list, item, defaultResult = null ) => {
-	if ( isBoolean( list ) ) {
+	if ( typeof list === 'boolean' ) {
 		return list;
 	}
 	if ( Array.isArray( list ) ) {
@@ -2218,7 +2217,7 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
-	if ( isBoolean( allowedBlockTypes ) ) {
+	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
 
