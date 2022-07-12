@@ -109,14 +109,14 @@ export function isMediaDestroyed( id ) {
 /**
  * A placeholder component that displays if an image has been deleted or cannot be loaded.
  *
- * @param {Object} props Component props.
- * @param {number} props.id The attachment id.
- * @param {string} props.url Image url.
- * @param {Function} props.onClear Clears the image attributes.
- * @param {Function} props.onSelect Callback for <MediaReplaceFlow /> when an image is selected.
- * @param {Function} props.onSelectURL Callback for <MediaReplaceFlow /> when an image URL is selected.
+ * @param {Object}   props               Component props.
+ * @param {number}   props.id            The attachment id.
+ * @param {string}   props.url           Image url.
+ * @param {Function} props.onClear       Clears the image attributes.
+ * @param {Function} props.onSelect      Callback for <MediaReplaceFlow /> when an image is selected.
+ * @param {Function} props.onSelectURL   Callback for <MediaReplaceFlow /> when an image URL is selected.
  * @param {Function} props.onUploadError Callback for <MediaReplaceFlow /> when an upload fails.
- * @param {Function} props.onCloseModal Callback for <MediaReplaceFlow /> when the media library overlay is closed.
+ * @param {Function} props.onCloseModal  Callback for <MediaReplaceFlow /> when the media library overlay is closed.
  *
  * @return {boolean} Whether the image has been destroyed.
  */
@@ -134,41 +134,39 @@ const ImageErrorPlaceholder = ( {
 		icon={ icon }
 		label={ __( 'This image could not be loaded' ) }
 	>
-		<>
-			<p>{ url }</p>
-			<p>
-				{ __(
-					'This might be due to a network error, or the image may have been deleted.'
-				) }
-			</p>
-			<HStack justify="flex-start" spacing={ 2 }>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					onSelect={ ( media ) => {
-						onClear();
-						onSelect( media );
-					} }
-					onSelectURL={ ( selectedUrl ) => {
-						onClear();
-						onSelectURL( selectedUrl );
-					} }
-					onError={ onUploadError }
-					onCloseModal={ onCloseModal }
-					buttonVariant="primary"
-				/>
-				<Button
-					className="wp-block-image__error-placeholder__button"
-					title={ __( 'Clear and replace image' ) }
-					variant="secondary"
-					onClick={ onClear }
-				>
-					{ __( 'Clear' ) }
-				</Button>
-			</HStack>
-		</>
+		<p>{ url }</p>
+		<p>
+			{ __(
+				'This might be due to a network error, or the image may have been deleted.'
+			) }
+		</p>
+		<HStack justify="flex-start" spacing={ 2 }>
+			<MediaReplaceFlow
+				mediaId={ id }
+				mediaURL={ url }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept="image/*"
+				onSelect={ ( media ) => {
+					onClear();
+					onSelect( media );
+				} }
+				onSelectURL={ ( selectedUrl ) => {
+					onClear();
+					onSelectURL( selectedUrl );
+				} }
+				onError={ onUploadError }
+				onCloseModal={ onCloseModal }
+				buttonVariant="primary"
+			/>
+			<Button
+				className="wp-block-image__error-placeholder__button"
+				title={ __( 'Clear and replace image' ) }
+				variant="secondary"
+				onClick={ onClear }
+			>
+				{ __( 'Clear' ) }
+			</Button>
+		</HStack>
 	</Placeholder>
 );
 
@@ -224,16 +222,19 @@ export function ImageEdit( {
 	function clearImageAttributes() {
 		setHasImageLoadError( false );
 		setAttributes( {
-			url: undefined,
+			src: undefined,
 			id: undefined,
+			url: undefined,
 		} );
 	}
 
-	/*
-		 Runs an error callback if the image does not load.
-		 If the error callback is triggered, we infer that that image
-		 has been deleted.
-	*/
+	/**
+	 * Runs an error callback if the image does not load.
+	 * If the error callback is triggered, we infer that that image
+	 * has been deleted.
+	 *
+	 * @param {boolean} isReplaced Whether the image has been replaced.
+	 */
 	function onImageError( isReplaced = false ) {
 		// If the image block was not replaced with an embed,
 		// and it's not an external image,
