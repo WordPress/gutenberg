@@ -137,6 +137,7 @@ export default function useArrowNav() {
 		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
+		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
@@ -191,6 +192,12 @@ export default function useArrowNav() {
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
+				// Only handle if we have a full selection (not a native partial
+				// selection).
+				if ( ! __unstableIsFullySelected() ) {
+					return;
+				}
+
 				if ( event.defaultPrevented ) {
 					return;
 				}
