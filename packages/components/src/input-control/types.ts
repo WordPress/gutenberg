@@ -17,6 +17,7 @@ import type { useDrag } from '@use-gesture/react';
 import type { StateReducer } from './reducer/state';
 import type { WordPressComponentProps } from '../ui/context';
 import type { FlexProps } from '../flex/types';
+import type { SpacerProps } from '../spacer';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -123,10 +124,38 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	children: ReactNode;
 	/**
 	 * Renders an element on the left side of the input.
+	 *
+	 * By default, the prefix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlPrefix>` convenience wrapper.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlPrefix as InputControlPrefix,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   prefix={<InputControlPrefix>@</InputControlPrefix>}
+	 * />
 	 */
 	prefix?: ReactNode;
 	/**
 	 * Renders an element on the right side of the input.
+	 *
+	 * By default, the suffix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlSuffix>` convenience wrapper.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlSuffix as InputControlSuffix,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   suffix={<InputControlSuffix>%</InputControlSuffix>}
+	 * />
 	 */
 	suffix?: ReactNode;
 	/**
@@ -168,3 +197,27 @@ export interface InputControlLabelProps {
 	labelPosition?: BaseProps[ 'labelPosition' ];
 	size?: BaseProps[ 'size' ];
 }
+
+export type InputControlPrefixProps = {
+	/**
+	 * The prefix to be inserted.
+	 */
+	children: ReactNode;
+	/**
+	 * The padding to be applied before the prefix.
+	 * Defaults to the standard padding for the size variant.
+	 */
+	paddingLeft?: SpacerProps[ 'paddingLeft' ];
+};
+
+export type InputControlSuffixProps = {
+	/**
+	 * The suffix to be inserted.
+	 */
+	children: ReactNode;
+	/**
+	 * The padding to be applied after the suffix.
+	 * Defaults to the standard padding for the size variant.
+	 */
+	paddingRight?: SpacerProps[ 'paddingRight' ];
+};
