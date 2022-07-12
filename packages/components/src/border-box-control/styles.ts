@@ -12,7 +12,11 @@ import { space } from '../ui/utils/space';
 import type { Border } from '../border-control/types';
 import type { Borders } from './types';
 
-export const BorderBoxControl = css``;
+export const BorderBoxControl = css`
+	border: 0;
+	padding: 0;
+	margin: 0;
+`;
 
 export const LinkedBorderControl = css`
 	flex: 1;
@@ -77,4 +81,9 @@ export const CenteredBorderControl = css`
 
 export const rightBorderControl = () => css`
 	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
+`;
+
+export const borderLabel = css`
+	display: inline-block;
+	margin-bottom: ${ space( 2 ) };
 `;
