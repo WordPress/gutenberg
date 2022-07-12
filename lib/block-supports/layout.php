@@ -132,7 +132,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				$declarations[ $selector ]        = isset( $declarations[ $selector ] ) ? $declarations[ $selector ] : array();
 				$declarations[ $selector ]['gap'] = $gap_value;
 			}
 		}
