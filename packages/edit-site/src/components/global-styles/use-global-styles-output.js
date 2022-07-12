@@ -220,7 +220,7 @@ function getStylesDeclarations(
 				} );
 			} else if (
 				key === '--wp--style--root--padding' &&
-				typeof styleValue !== 'string'
+				typeof styleValue === 'string'
 			) {
 				// Root-level padding styles don't currently support strings with CSS shorthand values.
 				// This may change: https://github.com/WordPress/gutenberg/issues/40132.
