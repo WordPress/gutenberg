@@ -92,6 +92,7 @@ class MenuItem extends Component {
 						) }
 						<View style={ modalIconStyle }>
 							<BlockIcon
+								showColors
 								icon={ item.icon }
 								size={ modalIconStyle.width }
 							/>
