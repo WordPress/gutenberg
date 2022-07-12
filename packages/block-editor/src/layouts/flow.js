@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -151,21 +152,26 @@ export default {
 				: '';
 
 		// If there is custom padding, add negative margins for alignfull blocks.
-		// They're added separately because padding might only be set on one side.
-		if ( style?.spacing?.padding?.right ) {
-			output += `
-			${ appendSelectors( selector, '> .alignfull' ) } {
-				margin-right: -${ style.spacing.padding.right };
-			}
-			`;
+		if ( style?.spacing?.padding ) {
+			// The style object might be storing a preset so we need to make sure we get a usable value.
+			const paddingValues = getCSSRules( style );
+			paddingValues.forEach( ( rule ) => {
+				if ( rule.key === 'paddingRight' ) {
+					output += `
+					${ appendSelectors( selector, '> .alignfull' ) } {
+						margin-right: calc(${ rule.value } * -1);
+					}
+					`;
+				} else if ( rule.key === 'paddingLeft' ) {
+					output += `
+					${ appendSelectors( selector, '> .alignfull' ) } {
+						margin-left: calc(${ rule.value } * -1);
+					}
+					`;
+				}
+			} );
 		}
-		if ( style?.spacing?.padding?.left ) {
-			output += `
-			${ appendSelectors( selector, '> .alignfull' ) } {
-				margin-left: -${ style.spacing.padding.left };
-			}
-			`;
-		}
+
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
 		if ( hasBlockGapSupport && blockGapValue ) {
 			output += getBlockGapCSS(
