@@ -25,6 +25,7 @@ import {
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
+import useSetting from '../use-setting';
 
 const defaultInputProps = {
 	min: 0,
@@ -41,9 +42,12 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
-	spacingSizes,
-	useSelect,
 } ) {
+	const spacingSizes = [
+		{ name: __( 'Default' ), slug: 'default', size: undefined },
+		{ name: 0, slug: '0', size: 0 },
+		...useSetting( 'spacing.spacingSizes' ),
+	];
 	const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
@@ -88,7 +92,6 @@ export default function SpacingSizesControl( {
 		sides,
 		values: inputValues,
 		spacingSizes,
-		useSelect,
 	};
 
 	return (

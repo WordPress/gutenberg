@@ -2,8 +2,14 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { RangeControl, SelectControl } from '@wordpress/components';
+import {
+	Button,
+	RangeControl,
+	SelectControl,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { settings } from '@wordpress/icons';
 
 /**
  * Inspector control panel containing the spacing size related configuration
@@ -14,6 +20,8 @@ import { __ } from '@wordpress/i18n';
  */
 export default function SpacingRangeControl( props ) {
 	const [ valueNow, setValueNow ] = useState( null );
+	const [ showCustomValueControl, setShowCustomValueControl ] =
+		useState( false );
 	const customTooltipContent = ( value ) => props.spacingSizes[ value ]?.name;
 	const createHandleOnFocus = ( side ) => () => {
 		props.onFocus( side );
@@ -31,11 +39,29 @@ export default function SpacingRangeControl( props ) {
 	};
 
 	const currentValueHint = customTooltipContent( props.value );
-	console.log( props.useSelect );
+
 	return (
 		<>
-			{ /* <UnitControl label={ props.label } /> */ }
-			{ ! props.useSelect && (
+			<Button
+				label={
+					showCustomValueControl
+						? __( 'Use size preset' )
+						: __( 'Set custom size' )
+				}
+				icon={ settings }
+				onClick={ () => {
+					setShowCustomValueControl( ! showCustomValueControl );
+				} }
+				isPressed={ showCustomValueControl }
+				isSmall
+			/>
+			{ showCustomValueControl && (
+				<UnitControl
+					label={ props.label }
+					onChange={ ( value ) => console.log( value ) }
+				/>
+			) }
+			{ ! props.useSelect && ! showCustomValueControl && (
 				<RangeControl
 					value={ props.value }
 					label={
@@ -60,7 +86,7 @@ export default function SpacingRangeControl( props ) {
 					max={ props.spacingSizes.length - 1 }
 				/>
 			) }
-			{ props.useSelect && (
+			{ props.useSelect && ! showCustomValueControl && (
 				<SelectControl
 					value={ props.value }
 					label={ props.label }

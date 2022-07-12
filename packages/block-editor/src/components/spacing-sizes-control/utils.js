@@ -8,6 +8,17 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 
+export function getSpacingPresetCssVar( value ) {
+	if ( ! value ) {
+		return;
+	}
+	const slug = /var:preset\|spacing\|(.+)/.exec( value );
+	if ( ! slug ) {
+		return value;
+	}
+	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
+}
+
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
 		return;
