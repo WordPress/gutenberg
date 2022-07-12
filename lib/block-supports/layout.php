@@ -41,7 +41,9 @@ function gutenberg_register_layout_support( $block_type ) {
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
+	// An array of CSS declarations (selector => [ property => value ] pairs).
 	$declarations = array( $selector => array() );
+
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
