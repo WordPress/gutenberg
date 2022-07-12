@@ -370,7 +370,7 @@ class WP_Style_Engine {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
 				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
-				if ( $value ) {
+				if ( static::is_valid_style_value( $style_value ) ) {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
@@ -432,7 +432,8 @@ class WP_Style_Engine {
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
-			$styles_output['css'] = $css;
+			$styles_output['css']          = $css;
+			$styles_output['declarations'] = $style_rules->get_declarations();
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';

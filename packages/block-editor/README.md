@@ -246,6 +246,7 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
 -   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
+-   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
 
 _Returns_
 

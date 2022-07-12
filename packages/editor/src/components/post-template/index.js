@@ -16,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostTemplate( {} ) {
+export function PostTemplate() {
 	const { availableTemplates, selectedTemplate, isViewable } = useSelect(
 		( select ) => {
 			const {

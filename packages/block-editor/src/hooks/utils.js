@@ -4,7 +4,6 @@
 import {
 	pickBy,
 	isEmpty,
-	isObject,
 	mapValues,
 	forEach,
 	get,
@@ -27,7 +26,11 @@ const identity = ( x ) => x;
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(
