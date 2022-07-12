@@ -11,7 +11,7 @@ import {
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -131,12 +131,14 @@ export function getClosestTabbable(
 export default function useArrowNav() {
 	const {
 		getSelectedBlockClientId,
+		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
 		getSettings,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -186,7 +188,29 @@ export default function useArrowNav() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
+			// If there is a multi-selection, the arrow keys should collapse the
+			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
+
+				if ( ! isNav ) {
+					return;
+				}
+
+				if ( isShift ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				if ( isReverse ) {
+					selectBlock( getMultiSelectedBlocksStartClientId() );
+				} else {
+					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
+				}
+
 				return;
 			}
 
