@@ -672,9 +672,11 @@ describe( 'global styles renderer', () => {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,
 					duotoneSelector: imageSupports.color.__experimentalDuotone,
+					fallbackGapValue: undefined,
 					featureSelectors: {
 						border: '.my-image img, .my-image .crop-area',
 					},
+					hasLayoutSupport: false,
 				},
 			} );
 		} );
