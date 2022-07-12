@@ -113,7 +113,7 @@ const emitToChild = ( children, eventName, event ) => {
 function Tooltip( props ) {
 	const {
 		children,
-		position = 'bottom right',
+		position = 'bottom middle',
 		text,
 		shortcut,
 		delay = TOOLTIP_DELAY,
