@@ -102,6 +102,7 @@ module.exports = {
 							'isFunction',
 							'isNil',
 							'isNumber',
+							'isObject',
 							'isObjectLike',
 							'isString',
 							'isUndefined',
