@@ -142,7 +142,7 @@ class WP_Style_Engine {
 			),
 		),
 		'spacing'    => array(
-			'padding'  => array(
+			'padding' => array(
 				'property_keys' => array(
 					'default'    => 'padding',
 					'individual' => 'padding-%s',
@@ -152,17 +152,7 @@ class WP_Style_Engine {
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
-			'blockGap' => array(
-				'property_keys' => array(
-					// @TODO 'grid-gap' has been deprecated in favor of 'gap'.
-					// See: https://developer.mozilla.org/en-US/docs/Web/CSS/gap.
-					// Update the white list in safecss_filter_attr (kses.php).
-					// See: https://core.trac.wordpress.org/ticket/56122
-					'default' => 'grid-gap',
-				),
-				'path'          => array( 'spacing', 'blockGap' ),
-			),
-			'margin'   => array(
+			'margin'  => array(
 				'property_keys' => array(
 					'default'    => 'margin',
 					'individual' => 'margin-%s',
@@ -374,7 +364,6 @@ class WP_Style_Engine {
 		$css_declarations     = array();
 		$style_property_keys  = $style_definition['property_keys'];
 		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
-		$custom_css_property  = isset( $options['custom_properties'] ) && is_array( $options['custom_properties'] ) ? _wp_array_get( $options['custom_properties'], $style_definition['path'], null ) : null;
 
 		// Build CSS var values from var:? values, e.g, `var(--wp--css--rule-slug )`
 		// Check if the value is a CSS preset and there's a corresponding css_var pattern in the style definition.
@@ -382,8 +371,7 @@ class WP_Style_Engine {
 			if ( ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 				$css_var = static::get_css_var_value( $style_value, $style_definition['css_vars'] );
 				if ( $css_var ) {
-					$css_property                      = $custom_css_property ? $custom_css_property : $style_property_keys['default'];
-					$css_declarations[ $css_property ] = $css_var;
+					$css_declarations[ $style_property_keys['default'] ] = $css_var;
 				}
 			}
 			return $css_declarations;
@@ -397,8 +385,7 @@ class WP_Style_Engine {
 				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
-				$css_property        = $custom_css_property ? $custom_css_property : $style_property_keys['individual'];
-				$individual_property = sprintf( $css_property, _wp_to_kebab_case( $key ) );
+				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
 
 				// If the style value contains a reference to another value in the tree.
 				if ( isset( $value['ref'] ) ) {
@@ -410,8 +397,7 @@ class WP_Style_Engine {
 				}
 			}
 		} else {
-			$css_property                      = $custom_css_property ? $custom_css_property : $style_property_keys['default'];
-			$css_declarations[ $css_property ] = $style_value;
+			$css_declarations[ $style_property_keys['default'] ] = $style_value;
 		}
 
 		return $css_declarations;
@@ -508,10 +494,7 @@ class WP_Style_Engine {
 
 		// Layer 0: Root.
 		$root_level_options_defaults = array(
-			'selector'          => 'body',
-			'custom_properties' => array(
-				'spacing' => array( 'blockGap' => '--wp--style--block-gap' ),
-			),
+			'selector' => 'body',
 		);
 		$root_level_options          = wp_parse_args( $options, $root_level_options_defaults );
 		$root_level_styles           = $this->get_block_supports_styles(

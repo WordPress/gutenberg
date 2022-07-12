@@ -488,8 +488,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'background' => 'var(--wp--preset--color--background)',
 					),
 					'spacing'    => array(
-						'blockGap' => '2rem',
-						'padding'  => array(
+						'padding' => array(
 							'top'    => '10%',
 							'right'  => '20%',
 							'bottom' => '10%',
@@ -503,7 +502,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => null,
-				'expected_output' => 'body { color: var(--wp--preset--color--foreground); background-color: var(--wp--preset--color--background); padding-top: 10%; padding-right: 20%; padding-bottom: 10%; padding-left: 20%; --wp--style--block-gap: 2rem; font-size: 1rem; font-family: var(--wp--preset--font-family--system-font); line-height: 2; }',
+				'expected_output' => 'body { color: var(--wp--preset--color--foreground); background-color: var(--wp--preset--color--background); padding-top: 10%; padding-right: 20%; padding-bottom: 10%; padding-left: 20%; font-size: 1rem; font-family: var(--wp--preset--font-family--system-font); line-height: 2; }',
 			),
 			'compiles_with_ref_pointers'               => array(
 				'global_styles'   => array(
@@ -512,11 +511,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'text'       => array( 'ref' => 'styles.color.background' ),
 					),
 					'spacing' => array(
-						'blockGap' => '2rem',
-						'padding'  => array(
-							'top'    => array( 'ref' => 'styles.spacing.blockGap' ),
+						'margin'  => '2rem',
+						'padding' => array(
+							'top'    => array( 'ref' => 'styles.spacing.margin' ),
 							'right'  => '20%',
-							'bottom' => array( 'ref' => 'styles.spacing.blockGap' ),
+							'bottom' => array( 'ref' => 'styles.spacing.margin' ),
 							'left'   => '20%',
 						),
 					),
@@ -528,7 +527,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 				'options'         => null,
-				'expected_output' => 'body { color: #ffffff; background-color: #ffffff; border-top-width: 20%; border-top-style: dashed; padding-top: 2rem; padding-right: 20%; padding-bottom: 2rem; padding-left: 20%; --wp--style--block-gap: 2rem; }',
+				'expected_output' => 'body { color: #ffffff; background-color: #ffffff; border-top-width: 20%; border-top-style: dashed; padding-top: 2rem; padding-right: 20%; padding-bottom: 2rem; padding-left: 20%; margin: 2rem; }',
 			),
 			'ignores_other_top_level_keys'             => array(
 				'global_styles'   => array(

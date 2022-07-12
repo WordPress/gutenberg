@@ -41,22 +41,6 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Checks a CSS property string to see whether it is a valid CSS custom property.
-	 * In conjuction with static:sanitize_property it only allows `--wp--${slug}--{$kebab_case_css_property}`.
-	 *
-	 * This explicit checks is required because
-	 * safecss_filter_attr_allow_css filter in safecss_filter_attr (kses.php)
-	 * does not let through CSS custom variables.
-	 *
-	 * @param string $css_property The CSS property.
-	 *
-	 * @return boolean
-	 */
-	protected function is_valid_custom_property( $css_property ) {
-		return 1 === preg_match( '/^--wp--[a-z]+--[a-z0-9-]+$/', $css_property );
-	}
-
-	/**
 	 * Add a single declaration.
 	 *
 	 * @param string $property The CSS property.
@@ -115,11 +99,7 @@ class WP_Style_Engine_CSS_Declarations {
 		$declarations_output = '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			$declaration = "{$property}: {$value}";
-			if ( ! static::is_valid_custom_property( $property ) ) {
-				$declaration = safecss_filter_attr( $declaration );
-			}
-			$filtered_declaration = esc_html( $declaration );
+			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
 			if ( $filtered_declaration ) {
 				$declarations_output .= $filtered_declaration . '; ';
 			}
