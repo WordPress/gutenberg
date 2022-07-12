@@ -64,14 +64,17 @@ function ParagraphBlock( {
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
-			'has-drop-cap': dropCap,
+			'has-drop-cap':
+				align === ( isRTL() ? 'left' : 'right' ) || align === 'center'
+					? false
+					: dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
 		style: { direction },
 	} );
 
 	let helpText;
-	if ( align ) {
+	if ( align === ( isRTL() ? 'left' : 'right' ) || align === 'center' ) {
 		helpText = __( 'Aligned text can not have a drop cap.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
@@ -113,7 +116,12 @@ function ParagraphBlock( {
 								setAttributes( { dropCap: ! dropCap } )
 							}
 							help={ helpText }
-							disabled={ align ? true : false }
+							disabled={
+								align === ( isRTL() ? 'left' : 'right' ) ||
+								align === 'center'
+									? true
+									: false
+							}
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
