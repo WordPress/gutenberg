@@ -93,6 +93,7 @@ module.exports = {
 							'findIndex',
 							'findKey',
 							'findLast',
+							'flatMap',
 							'flatten',
 							'flattenDeep',
 							'fromPairs',
