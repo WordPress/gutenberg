@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import './matchers';
@@ -12,10 +7,11 @@ import supportedMatchers from './supported-matchers';
 /**
  * Sets spy on the console object's method to make it possible to fail test when method called without assertion.
  *
- * @param {string} matcherName Name of Jest matcher.
- * @param {string} methodName  Name of console method.
+ * @param {Array}  args
+ * @param {string} args."0" Name of console method.
+ * @param {string} args."1" Name of Jest matcher.
  */
-const setConsoleMethodSpy = ( matcherName, methodName ) => {
+const setConsoleMethodSpy = ( [ methodName, matcherName ] ) => {
 	const spy = jest
 		.spyOn( console, methodName )
 		.mockName( `console.${ methodName }` );
@@ -47,4 +43,4 @@ const setConsoleMethodSpy = ( matcherName, methodName ) => {
 	afterEach( assertExpectedCalls );
 };
 
-forEach( supportedMatchers, setConsoleMethodSpy );
+Object.entries( supportedMatchers ).forEach( setConsoleMethodSpy );
