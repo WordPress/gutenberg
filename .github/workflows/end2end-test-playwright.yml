@@ -47,7 +47,7 @@ jobs:
 
             - name: Run the tests
               run: |
-                  npm run test-e2e:playwright
+                  npm run test:e2e:playwright
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
