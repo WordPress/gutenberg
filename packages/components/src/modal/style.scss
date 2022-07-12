@@ -119,7 +119,7 @@
 .components-modal__content {
 	flex: 1;
 	margin-top: $header-height + $grid-unit-20;
-	padding: 0 $grid-unit-40 $grid-unit-30;
+	padding: 0 $grid-unit-40 $grid-unit-40;
 	overflow: auto;
 
 	&.hide-header {
