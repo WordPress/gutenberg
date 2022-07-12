@@ -174,7 +174,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
 
--	**Name:** core/comments-query-loop
+-	**Name:** core/comments
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
 -	**Attributes:** tagName

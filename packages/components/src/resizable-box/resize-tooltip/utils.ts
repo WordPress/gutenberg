@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
-const { clearTimeout, setTimeout } = window;
 const noop = () => {};
 
 export type Axis = 'x' | 'y';
@@ -97,10 +96,10 @@ export function useResizeLabel( {
 
 	const debounceUnsetMoveXY = () => {
 		if ( moveTimeoutRef.current ) {
-			clearTimeout( moveTimeoutRef.current );
+			window.clearTimeout( moveTimeoutRef.current );
 		}
 
-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
+		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
 	};
 
 	useEffect( () => {

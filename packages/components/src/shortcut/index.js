@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { isString, isObject } from 'lodash';
-
 /** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
 /**
  * @typedef Props
@@ -22,11 +17,11 @@ function Shortcut( { shortcut, className } ) {
 	let displayText;
 	let ariaLabel;
 
-	if ( isString( shortcut ) ) {
+	if ( typeof shortcut === 'string' ) {
 		displayText = shortcut;
 	}
 
-	if ( isObject( shortcut ) ) {
+	if ( shortcut !== null && typeof shortcut === 'object' ) {
 		displayText = shortcut.display;
 		ariaLabel = shortcut.ariaLabel;
 	}

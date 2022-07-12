@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { unescape as unescapeString, flatMap, compact } from 'lodash';
+import { unescape as unescapeString, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, SelectOptions } from './types';
 
 function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
-	return flatMap( tree, ( treeNode ) => [
+	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
 			label:

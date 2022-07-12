@@ -6,7 +6,7 @@ const glob = require( 'fast-glob' );
 const { resolve } = require( 'path' );
 const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
-const { fromPairs, isObject } = require( 'lodash' );
+const { fromPairs } = require( 'lodash' );
 const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
@@ -103,7 +103,7 @@ const configToTemplate = async ( {
 	assetsPath,
 	...deprecated
 } ) => {
-	if ( ! isObject( defaultValues ) ) {
+	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
 		throw new CLIError( 'Template found but invalid definition provided.' );
 	}
 

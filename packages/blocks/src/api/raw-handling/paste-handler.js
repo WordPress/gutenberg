@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flatMap, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
@@ -174,8 +169,8 @@ export function pasteHandler( {
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
 	const blockContentSchema = getBlockContentSchema( 'paste' );
 
-	const blocks = compact(
-		flatMap( pieces, ( piece ) => {
+	const blocks = pieces
+		.map( ( piece ) => {
 			// Already a block from shortcode.
 			if ( typeof piece !== 'string' ) {
 				return piece;
@@ -216,7 +211,8 @@ export function pasteHandler( {
 
 			return htmlToBlocks( piece );
 		} )
-	);
+		.flat()
+		.filter( Boolean );
 
 	// If we're allowed to return inline content, and there is only one
 	// inlineable block, and the original plain text content does not have any
