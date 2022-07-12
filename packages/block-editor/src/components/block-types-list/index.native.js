@@ -84,20 +84,23 @@ export default function BlockTypesList( {
 
 	const renderSection = ( { item } ) => {
 		return (
-			<FlatList
-				data={ item.list }
-				numColumns={ numberOfColumns }
-				ItemSeparatorComponent={ () => (
-					<TouchableWithoutFeedback accessible={ false }>
-						<View
-							style={
-								styles[ 'block-types-list__row-separator' ]
-							}
-						/>
-					</TouchableWithoutFeedback>
-				) }
-				renderItem={ renderListItem }
-			/>
+			<TouchableWithoutFeedback accessible={ false }>
+				<FlatList
+					data={ item.list }
+					numColumns={ numberOfColumns }
+					ItemSeparatorComponent={ () => (
+						<TouchableWithoutFeedback accessible={ false }>
+							<View
+								style={
+									styles[ 'block-types-list__row-separator' ]
+								}
+							/>
+						</TouchableWithoutFeedback>
+					) }
+					scrollEnabled={ false }
+					renderItem={ renderListItem }
+				/>
+			</TouchableWithoutFeedback>
 		);
 	};
 
@@ -125,17 +128,19 @@ export default function BlockTypesList( {
 			keyExtractor={ ( item ) => item.id }
 			renderSectionHeader={ ( { section: { metadata } } ) => {
 				return metadata.title ? (
-					<View
-						style={ {
-							justifyContent: 'center',
-							flexDirection: 'row',
-							paddingTop: 32,
-							paddingBottom: 32,
-						} }
-					>
-						{ metadata.icon || null }
-						<Text>{ metadata.title }</Text>
-					</View>
+					<TouchableWithoutFeedback accessible={ false }>
+						<View
+							style={ {
+								justifyContent: 'center',
+								flexDirection: 'row',
+								paddingTop: 32,
+								paddingBottom: 32,
+							} }
+						>
+							{ metadata.icon || null }
+							<Text>{ metadata.title }</Text>
+						</View>
+					</TouchableWithoutFeedback>
 				) : null;
 			} }
 			renderItem={ renderSection }
