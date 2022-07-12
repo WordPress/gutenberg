@@ -36,7 +36,7 @@ const getDisabledElement = ( {
 	eventHandlers,
 	child,
 	childrenWithPopover,
-	anchorRef,
+	mergedRefs,
 } ) => {
 	return cloneElement(
 		<span className="disabled-element-wrapper">
@@ -45,7 +45,7 @@ const getDisabledElement = ( {
 				children: childrenWithPopover,
 			} ) }
 		</span>,
-		{ ...eventHandlers, ref: anchorRef }
+		{ ...eventHandlers, ref: mergedRefs }
 	);
 };
 
@@ -256,7 +256,6 @@ function Tooltip( props ) {
 		child,
 		eventHandlers,
 		childrenWithPopover,
-		anchorRef: childRef,
 		mergedRefs: mergedChildRefs,
 	} );
 }
