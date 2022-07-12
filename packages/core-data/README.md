@@ -263,6 +263,26 @@ Calling this may trigger an OPTIONS request to the REST API via the
 
 <https://developer.wordpress.org/rest-api/reference/>
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const canUpdatePost = useSelect( ( select ) =>
+		select( coreDataStore ).canUser( 'create', 'media' )
+	);
+
+	return canUpdatePost ? (
+		<div>{ __( 'This user can upload media' ) }</div>
+	) : (
+		<div>{ __( 'This user cannot upload media' ) }</div>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.
@@ -282,6 +302,26 @@ Calling this may trigger an OPTIONS request to the REST API via the
 `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
+
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const canEdit = useSelect( ( select ) =>
+		select( coreDataStore ).canUserEditEntityRecord( 'postType', 'post', 1 )
+	);
+
+	return canEdit ? (
+		<div>{ __( 'This user can edit post ID 1' ) }</div>
+	) : (
+		<div>{ __( 'This user cannot edit post ID 1' ) }</div>
+	);
+};
+```
 
 _Parameters_
 
@@ -313,6 +353,28 @@ _Returns_
 
 Returns the autosave for the post and author.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+    const postId = 1;
+    const userId = 1;
+    const autosave = useSelect( ( select ) =>
+        select( coreDataStore ).getAutosave( 'post', postId, userId )
+    );
+
+    return autosave ? (
+        <div>{ sprintf( 'Last autosave: %s', autosave.date ) }</div>
+    ) : (
+        <div>{ __( 'There is no Autosave for this post and this user' ) }</div>
+    ;
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: State tree.
@@ -331,6 +393,31 @@ Returns the latest autosaves for the post.
 May return multiple autosaves since the backend stores one autosave per
 author for each post.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const postId = 1;
+	const autosaves = useSelect( ( select ) =>
+		select( coreDataStore ).getAutosaves( 'post', postId )
+	);
+
+	return (
+		<ul>
+			{ autosaves?.map( ( autosave ) => (
+				<li key={ autosave.ID }>
+					{ sprintf( 'Date: %s', autosave.date ) }
+				</li>
+			) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: State tree.
@@ -345,6 +432,28 @@ _Returns_
 
 Retrieve the list of registered block pattern categories.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const blockPatternCategories = useSelect( ( select ) =>
+		select( coreDataStore ).getBlockPatternCategories()
+	);
+
+	return (
+		<ul>
+			{ blockPatternCategories?.map( ( pattern ) => (
+				<li key={ pattern.name }>{ pattern.label }</li>
+			) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.
@@ -357,6 +466,28 @@ _Returns_
 
 Retrieve the list of registered block patterns.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const blockPatterns = useSelect( ( select ) =>
+		select( coreDataStore ).getBlockPatterns()
+	);
+
+	return (
+		<ul>
+			{ blockPatterns?.map( ( pattern ) => (
+				<li key={ pattern.name }>{ pattern.title }</li>
+			) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.
@@ -368,6 +499,31 @@ _Returns_
 ### getCurrentTheme
 
 Return the current theme.
+
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const currentTheme = useSelect( ( select ) =>
+		select( coreDataStore ).getCurrentTheme()
+	);
+
+	return currentTheme ? (
+		<div>
+			{ sprintf(
+				__( 'Current Theme: %s' ),
+				currentTheme?.name.rendered
+			) }
+		</div>
+	) : (
+		<div>{ __( 'Loading theme information…' ) }</div>
+	);
+};
+```
 
 _Parameters_
 
