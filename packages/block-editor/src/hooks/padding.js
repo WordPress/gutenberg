@@ -166,15 +166,28 @@ export function PaddingEdit( props ) {
 					/>
 				) }
 				{ ! showCustomValueControl && (
-					<SpacingSizeEdit
-						values={ style?.spacing?.padding }
-						onChange={ onChange }
-						label={ __( 'Padding' ) }
-						sides={ sides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ splitOnAxis }
-					/>
+					<>
+						<SpacingSizeEdit
+							values={ style?.spacing?.padding }
+							onChange={ onChange }
+							label={ __( 'Padding' ) }
+							sides={ sides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ splitOnAxis }
+							useSelect={ false }
+						/>
+						<SpacingSizeEdit
+							values={ style?.spacing?.padding }
+							onChange={ onChange }
+							label={ __( 'Padding' ) }
+							sides={ sides }
+							units={ units }
+							allowReset={ false }
+							splitOnAxis={ splitOnAxis }
+							useSelect={ true }
+						/>
+					</>
 				) }
 			</>
 		),

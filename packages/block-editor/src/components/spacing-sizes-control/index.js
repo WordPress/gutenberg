@@ -42,6 +42,7 @@ export default function SpacingSizesControl( {
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 	spacingSizes,
+	useSelect,
 } ) {
 	const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
@@ -87,6 +88,7 @@ export default function SpacingSizesControl( {
 		sides,
 		values: inputValues,
 		spacingSizes,
+		useSelect,
 	};
 
 	return (

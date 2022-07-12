@@ -46,6 +46,7 @@ export function SpacingSizeEdit( props ) {
 					onChange={ props.onChange }
 					withInputField={ false }
 					spacingSizes={ spacingSizes }
+					useSelect={ props.useSelect }
 				/>
 			}
 		</>

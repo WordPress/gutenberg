@@ -31,45 +31,49 @@ export default function SpacingRangeControl( props ) {
 	};
 
 	const currentValueHint = customTooltipContent( props.value );
-
+	console.log( props.useSelect );
 	return (
 		<>
 			{ /* <UnitControl label={ props.label } /> */ }
-			{ /* <RangeControl
-				value={ props.value }
-				label={
-					<>
-						<span>{ props.label }</span>{ ' ' }
-						<span className="components-spacing-sizes-control__hint">
-							{ currentValueHint !== undefined
-								? currentValueHint
-								: __( 'Default' ) }
-						</span>
-					</>
-				}
-				onChange={ ( newSize ) =>
-					props.onChange( getNewSizeValue( newSize ) )
-				}
-				onFocus={ createHandleOnFocus( props.side ) }
-				withInputField={ false }
-				aria-valuenow={ valueNow }
-				aria-valuetext={ props.spacingSizes[ valueNow ]?.name }
-				renderTooltipContent={ customTooltipContent }
-				min={ 0 }
-				max={ props.spacingSizes.length - 1 }
-			/> */ }
-			<SelectControl
-				value={ props.value }
-				label={ props.label }
-				onChange={ ( newSize ) =>
-					props.onChange( getNewSizeValue( newSize ) )
-				}
-				onFocus={ createHandleOnFocus( props.side ) }
-				options={ props.spacingSizes.map( ( size, index ) => ( {
-					value: index,
-					label: size.name,
-				} ) ) }
-			/>
+			{ ! props.useSelect && (
+				<RangeControl
+					value={ props.value }
+					label={
+						<>
+							<span>{ props.label }</span>{ ' ' }
+							<span className="components-spacing-sizes-control__hint">
+								{ currentValueHint !== undefined
+									? currentValueHint
+									: __( 'Default' ) }
+							</span>
+						</>
+					}
+					onChange={ ( newSize ) =>
+						props.onChange( getNewSizeValue( newSize ) )
+					}
+					onFocus={ createHandleOnFocus( props.side ) }
+					withInputField={ false }
+					aria-valuenow={ valueNow }
+					aria-valuetext={ props.spacingSizes[ valueNow ]?.name }
+					renderTooltipContent={ customTooltipContent }
+					min={ 0 }
+					max={ props.spacingSizes.length - 1 }
+				/>
+			) }
+			{ props.useSelect && (
+				<SelectControl
+					value={ props.value }
+					label={ props.label }
+					onChange={ ( newSize ) =>
+						props.onChange( getNewSizeValue( newSize ) )
+					}
+					onFocus={ createHandleOnFocus( props.side ) }
+					options={ props.spacingSizes.map( ( size, index ) => ( {
+						value: index,
+						label: size.name,
+					} ) ) }
+				/>
+			) }
 		</>
 	);
 }

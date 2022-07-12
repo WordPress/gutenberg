@@ -4,8 +4,11 @@
 	padding-bottom: 12px;
 	width: 100%;
 
-	.components-spacing-sizes-control__header {
+	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
+		legend {
+			margin-bottom: 12px;
+		}
 	}
 
 	.components-spacing-sizes-control__hint {
