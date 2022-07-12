@@ -50,7 +50,7 @@ jobs:
                   api-level: 28
                   emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
                   profile: pixel_xl
-                  script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
+                  script: npm run other:native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
               if: always()

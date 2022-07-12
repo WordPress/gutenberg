@@ -14,7 +14,7 @@ git clone git@github.com:WordPress/gutenberg.git
 
 If you’re working in multiple JS projects, a node version manager may make sense. A manager will let you switch between different node and npm versions of your choosing.
 
-We recommend [nvm](https://github.com/nvm-sh/nvm). 
+We recommend [nvm](https://github.com/nvm-sh/nvm).
 
 After installing nvm, run the following from the top-level directory of the cloned project:
 
@@ -36,7 +36,7 @@ If you have an existing Gutenberg checkout be sure to fully clean `node_modules`
 This may help avoid errors in the future.
 
 ```sh
-npm run distclean
+npm run other:distclean
 npm ci
 ```
 
@@ -63,9 +63,9 @@ arch -x86_64 pod install
 
 #### Ruby Manager
 
-It may not be necessary to manually install Cocoapods or the `ffi` package if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance. 
+It may not be necessary to manually install Cocoapods or the `ffi` package if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance.
 
-[`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app). 
+[`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app).
 
 ### Set up Xcode
 
@@ -93,13 +93,13 @@ See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android
 Once all common and iOS issues are resolved, try:
 
 ```
-npm run native start:reset #starts metro
+npm run other:native start:reset #starts metro
 ```
 
 In another terminal type:
 
 ```
-npm run native ios
+npm run other:native ios
 ```
 
 After waiting for everything to build, the demo app should be running from the iOS simulator:
@@ -121,9 +121,9 @@ If you already have a JDK installed on your system, it should be JDK 11 or newer
 
 ### Set up Android Studio
 
-To compile the Android app, [download Android Studio](https://developer.android.com/studio). 
+To compile the Android app, [download Android Studio](https://developer.android.com/studio).
 
-Next, open an existing project and select the Gutenberg folder you cloned. 
+Next, open an existing project and select the Gutenberg folder you cloned.
 
 From here, click on the cube icon that's highlighted in the following screenshot to access the SDK Manager. Another way to the SDK Manager is to navigate to `Tools > SDK Manager`:
 
@@ -196,13 +196,13 @@ There are some advanced settings we can toggle, but these are optional. Click fi
 Start metro:
 
 ```
-npm run native start:reset
+npm run other:native start:reset
 ```
 
 In another terminal run the following to launch the demo app in the Android emulator (if the emulator isn't already running, it'll also be launched as part of this command):
 
 ```
-npm run native android
+npm run other:native android
 ```
 
 After a bit of a wait, we’ll see something like this:
@@ -212,7 +212,7 @@ After a bit of a wait, we’ll see something like this:
 ## Unit Tests
 
 ```sh
-npm run native test
+npm run other:native test
 ```
 
 ## Integration Tests
@@ -229,18 +229,18 @@ Resolve any required dependencies.
 
 ### iOS Integration Tests
 
-If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run native start:reset`.
+If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run other:native start:reset`.
 
 Then in terminal type:
 
 ```sh
-npm run native test:e2e:ios:local
+npm run other:native test:e2e:ios:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```sh
-npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
+npm run other:native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 ```
 
 If all things go well, it should look like:
@@ -255,18 +255,18 @@ Start the virtual device first. Go back to the AVD by clicking on the phone icon
 
 <img src="https://developer.wordpress.org/files/2021/10/adv-integration.png" width="700px" alt="A screenshot of how to start the Android Simulator.">
 
-Make sure no metro processes are running. This was launched previously with `npm run native start:reset`.
+Make sure no metro processes are running. This was launched previously with `npm run other:native start:reset`.
 
 Then in a terminal run:
 
 ```sh
-npm run native test:e2e:android:local
+npm run other:native test:e2e:android:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```
-npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
+npm run other:native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 After a bit of a wait we should see:
