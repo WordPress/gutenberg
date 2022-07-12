@@ -445,11 +445,6 @@ class WP_Style_Engine {
 			$styles_output['classnames'] = implode( ' ', array_unique( $classnames ) );
 		}
 
-		// Return array of CSS values, if any.
-		if ( ! empty( $css_declarations ) ) {
-			$styles_output['declarations'] = $css_declarations;
-		}
-
 		return $styles_output;
 	}
 
