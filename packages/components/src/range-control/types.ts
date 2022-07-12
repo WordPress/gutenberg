@@ -268,7 +268,7 @@ export type TrackProps = {
 	trackColor: CSSProperties[ 'color' ];
 };
 
-export type useControlledRangeValueArgs = {
+export type UseControlledRangeValueArgs = {
 	/**
 	 * The initial value.
 	 */
@@ -287,7 +287,7 @@ export type useControlledRangeValueArgs = {
 	value: number | null;
 };
 
-export type useDebouncedHoverInteractionArgs = {
+export type UseDebouncedHoverInteractionArgs = {
 	/**
 	 *  A callback function invoked when the element is hidden.
 	 *
@@ -320,7 +320,7 @@ export type useDebouncedHoverInteractionArgs = {
 	timeout?: number;
 };
 
-export type useMarksArgs = NumericProps & {
+export type UseMarksArgs = NumericProps & {
 	marks: RangeMarks;
 	step: number;
 };

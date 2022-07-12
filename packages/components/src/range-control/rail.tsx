@@ -14,7 +14,7 @@ import type {
 	MarksProps,
 	RangeMarkProps,
 	RailProps,
-	useMarksArgs,
+	UseMarksArgs,
 } from './types';
 
 export default function RangeRail(
@@ -83,7 +83,7 @@ function useMarks( {
 	max = 100,
 	step = 1,
 	value = 0,
-}: useMarksArgs ) {
+}: UseMarksArgs ) {
 	if ( ! marks ) {
 		return [];
 	}

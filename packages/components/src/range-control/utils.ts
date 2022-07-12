@@ -15,8 +15,8 @@ import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
 
 import type {
-	useControlledRangeValueArgs,
-	useDebouncedHoverInteractionArgs,
+	UseControlledRangeValueArgs,
+	UseDebouncedHoverInteractionArgs,
 } from './types';
 
 const noop = () => {};
@@ -45,7 +45,7 @@ export function floatClamp( value: number | null, min: number, max: number ) {
  * @return The controlled value and the value setter.
  */
 export function useControlledRangeValue(
-	settings: useControlledRangeValueArgs
+	settings: UseControlledRangeValueArgs
 ) {
 	const { min, max, value: valueProp, initial } = settings;
 	const [ state, setInternalState ] = useControlledState(
@@ -77,7 +77,7 @@ export function useControlledRangeValue(
  * @return Bound properties for use on a React.Node.
  */
 export function useDebouncedHoverInteraction(
-	settings: useDebouncedHoverInteractionArgs
+	settings: UseDebouncedHoverInteractionArgs
 ) {
 	const {
 		onHide = noop,
