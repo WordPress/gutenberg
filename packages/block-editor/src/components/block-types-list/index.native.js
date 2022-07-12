@@ -87,6 +87,15 @@ export default function BlockTypesList( {
 			<FlatList
 				data={ item.list }
 				numColumns={ numberOfColumns }
+				ItemSeparatorComponent={ () => (
+					<TouchableWithoutFeedback accessible={ false }>
+						<View
+							style={
+								styles[ 'block-types-list__row-separator' ]
+							}
+						/>
+					</TouchableWithoutFeedback>
+				) }
 				renderItem={ renderListItem }
 			/>
 		);
@@ -113,13 +122,6 @@ export default function BlockTypesList( {
 			keyboardShouldPersistTaps="always"
 			sections={ items }
 			initialNumToRender={ initialNumToRender }
-			ItemSeparatorComponent={ () => (
-				<TouchableWithoutFeedback accessible={ false }>
-					<View
-						style={ styles[ 'block-types-list__row-separator' ] }
-					/>
-				</TouchableWithoutFeedback>
-			) }
 			keyExtractor={ ( item ) => item.id }
 			renderSectionHeader={ ( { section: { metadata } } ) => {
 				return metadata.title ? (
