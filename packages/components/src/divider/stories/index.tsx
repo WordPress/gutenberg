@@ -16,27 +16,12 @@ const meta: ComponentMeta< typeof Divider > = {
 	argTypes: {
 		margin: {
 			control: { type: 'text' },
-			table: {
-				type: {
-					summary: 'number | string',
-				},
-			},
 		},
 		marginStart: {
 			control: { type: 'text' },
-			table: {
-				type: {
-					summary: 'number | string',
-				},
-			},
 		},
 		marginEnd: {
 			control: { type: 'text' },
-			table: {
-				type: {
-					summary: 'number | string',
-				},
-			},
 		},
 	},
 	parameters: {
