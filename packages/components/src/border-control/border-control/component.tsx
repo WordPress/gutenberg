@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import BorderControlDropdown from '../border-control-dropdown';
@@ -86,6 +91,8 @@ const UnconnectedBorderControl = (
 						__next36pxDefaultSize={ __next36pxDefaultSize }
 					/>
 					<UnitControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ widthControlClassName }
 						min={ 0 }
 						onChange={ onWidthChange }
@@ -95,6 +102,8 @@ const UnconnectedBorderControl = (
 				</HStack>
 				{ withSlider && (
 					<RangeControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ sliderClassName }
 						initialPosition={ 0 }
 						max={ 100 }
