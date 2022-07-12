@@ -60,8 +60,11 @@ const queryButton = ( name ) => {
 	return screen.queryByRole( 'button', { name } );
 };
 
+const getWidthInput = () => {
+	return screen.getByRole( 'spinbutton', { name: 'Border width' } );
+};
 const updateLinkedWidthInput = ( value ) => {
-	const widthInput = screen.getByRole( 'spinbutton' );
+	const widthInput = getWidthInput();
 	widthInput.focus();
 	fireEvent.change( widthInput, { target: { value } } );
 };
@@ -79,9 +82,13 @@ describe( 'BorderBoxControl', () => {
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
-			const widthInput = screen.getByRole( 'spinbutton' );
-			const unitSelect = screen.getByRole( 'combobox' );
-			const slider = screen.getByRole( 'slider' );
+			const widthInput = getWidthInput();
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			const slider = screen.getByRole( 'slider', {
+				name: 'Border width',
+			} );
 			const linkedButton = screen.getByLabelText( 'Unlink sides' );
 
 			expect( label ).toBeInTheDocument();
@@ -108,14 +115,14 @@ describe( 'BorderBoxControl', () => {
 
 		it( 'should show correct width value when flat border value provided', () => {
 			renderBorderBoxControl( { value: defaultBorder } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = getWidthInput();
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
 
 		it( 'should show correct width value when consistent split borders provided', () => {
 			renderBorderBoxControl( { value: defaultBorders } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = getWidthInput();
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -126,7 +133,7 @@ describe( 'BorderBoxControl', () => {
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
 
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = getWidthInput();
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
 
@@ -143,7 +150,7 @@ describe( 'BorderBoxControl', () => {
 
 			// First render of control with mixed values should show split view.
 			clickButton( 'Link sides' );
-			const linkedInput = screen.getByRole( 'spinbutton' );
+			const linkedInput = getWidthInput();
 
 			expect( linkedInput.value ).toBe( '5' );
 		} );
