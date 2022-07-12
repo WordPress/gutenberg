@@ -59,7 +59,7 @@ export default function FocalPointPicker( {
 
 	const dragAreaRef = useRef();
 	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
-	const { current: updateBounds } = useRef( () => {
+	const refUpdateBounds = useRef( () => {
 		const { clientWidth: width, clientHeight: height } =
 			dragAreaRef.current;
 		// Falls back to initial bounds if the ref has no size. Since styles
@@ -71,12 +71,18 @@ export default function FocalPointPicker( {
 	} );
 
 	useEffect( () => {
+		const updateBounds = refUpdateBounds.current;
 		const { defaultView } = dragAreaRef.current.ownerDocument;
 		defaultView.addEventListener( 'resize', updateBounds );
-		return () => {
-			defaultView.removeEventListener( 'resize', updateBounds );
-		};
+		return () => defaultView.removeEventListener( 'resize', updateBounds );
 	}, [] );
+
+	useEffect( () => {
+		// Updates bounds if there’s no media (and thus no load event to trigger
+		// a bounds update). Even then, this will only have an effect if the
+		// component is styled to non-default dimensions.
+		if ( ! url ) refUpdateBounds.current();
+	}, [ url ] );
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
@@ -173,7 +179,7 @@ export default function FocalPointPicker( {
 					<Media
 						alt={ __( 'Media preview' ) }
 						autoPlay={ autoPlay }
-						onLoad={ updateBounds }
+						onLoad={ refUpdateBounds.current }
 						src={ url }
 					/>
 					<FocalPoint
