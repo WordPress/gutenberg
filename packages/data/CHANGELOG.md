@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use `useDebugValue` in `useSelect` to better display data in React DevTools ([#42225](https://github.com/WordPress/gutenberg/pull/42225)).
+
 ## 6.12.0 (2022-06-29)
 
 ## 6.11.0 (2022-06-15)
