@@ -10,9 +10,9 @@ import { useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	useBlockProps,
-	useBlockDisplayTitle,
 	Warning,
 	store as blockEditorStore,
+	__experimentalUseBlockDisplayTitle as useBlockDisplayTitle,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
@@ -82,7 +82,7 @@ export default function TemplatePartEdit( {
 		},
 		[ templatePartId, clientId ]
 	);
-	const blockTitle = useBlockDisplayTitle( clientId, 25 );
+	const blockTitle = useBlockDisplayTitle( { clientId, maximumLength: 25 } );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
