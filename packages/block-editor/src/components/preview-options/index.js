@@ -18,7 +18,6 @@ export default function PreviewOptions( {
 	className,
 	isEnabled = true,
 	deviceType,
-	viewSite = false,
 	setDeviceType,
 } ) {
 	const isMobile = useViewportMatch( 'small', '<' );
@@ -87,17 +86,15 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
-					{ viewSite && (
-						<MenuGroup>
-							<MenuItem
-								href={ settings?.siteUrl }
-								target="_blank"
-								icon={ external }
-							>
-								{ __( 'View Site' ) }
-							</MenuItem>
-						</MenuGroup>
-					)}
+					<MenuGroup>
+						<MenuItem
+							href={ settings?.siteUrl }
+							target="_blank"
+							icon={ external }
+						>
+							{ __( 'View Site' ) }
+						</MenuItem>
+					</MenuGroup>
 					{ children }
 				</>
 			) }

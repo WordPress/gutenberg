@@ -201,7 +201,6 @@ export default function Header( {
 						<PreviewOptions
 							deviceType={ deviceType }
 							setDeviceType={ setPreviewDeviceType }
-							viewSite={ true }
 						/>
 					) }
 					<SaveButton
