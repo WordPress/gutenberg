@@ -44,18 +44,18 @@ export default function FocalPointPicker( {
 	},
 } ) {
 	const [ point, setPoint ] = useState( valueProp );
-	// Tracks whether the internal point value has not propagated.
-	const isPointHeld = useRef();
-	const { current: keepPoint } = useRef( ( value ) => {
+	// Tracks the internal point value when it’s yet to be propagated.
+	const refPoint = useRef();
+	const keepPoint = ( value ) => {
 		setPoint( value );
-		isPointHeld.current = true;
-	} );
-	const sendPoint = ( value = point ) => {
+		refPoint.current = value;
+	};
+	const sendPoint = ( value = refPoint.current ) => {
 		onChange?.( value );
-		isPointHeld.current = false;
+		refPoint.current = undefined;
 	};
 	// Uses the internal point if it is held or else the value from props.
-	const { x, y } = isPointHeld.current ? point : valueProp;
+	const { x, y } = refPoint.current !== undefined ? point : valueProp;
 
 	const dragAreaRef = useRef();
 	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
@@ -94,13 +94,9 @@ export default function FocalPointPicker( {
 		},
 		onDragEnd: ( event ) => {
 			onDragEnd?.( event );
+			sendPoint();
 		},
 	} );
-
-	// Propagates the value when a drag gesture has ended.
-	useEffect( () => {
-		if ( ! isDragging && isPointHeld.current ) sendPoint();
-	}, [ isDragging ] );
 
 	const getValueWithinDragArea = ( { clientX, clientY, shiftKey } ) => {
 		const { top, left } = dragAreaRef.current.getBoundingClientRect();
