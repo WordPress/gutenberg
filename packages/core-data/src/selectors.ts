@@ -155,6 +155,25 @@ export function getAuthors(
  *
  * @param  state Data state.
  *
+ * @example
+ * ```jsx
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const currentUser = useSelect( ( select ) =>
+ *         select( coreDataStore ).getCurrentUser()
+ *     );
+ *
+ *     return currentUser ? (
+ *         <div>{ sprintf( __( 'Hello, %s!' ), currentUser.name ) }</div>
+ *         ) : (
+ *         <div>{ __( 'Loading User information…' ) }</div>
+ *     );
+ * };
+ * ```
+ *
  * @return Current user object.
  */
 export function getCurrentUser( state: State ): User< 'edit' > {

@@ -290,6 +290,26 @@ _Returns_
 
 Returns the current user.
 
+_Usage_
+
+```jsx
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const currentUser = useSelect( ( select ) =>
+		select( coreDataStore ).getCurrentUser()
+	);
+
+	return currentUser ? (
+		<div>{ sprintf( __( 'Hello, %s!' ), currentUser.name ) }</div>
+	) : (
+		<div>{ __( 'Loading User information…' ) }</div>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.
