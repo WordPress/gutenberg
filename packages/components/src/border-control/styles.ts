@@ -31,6 +31,14 @@ const focusBoxShadow = css`
 
 export const borderControl = css`
 	position: relative;
+	border: 0;
+	padding: 0;
+	margin: 0;
+`;
+
+export const borderLabel = css`
+	display: inline-block;
+	margin-bottom: ${ space( 2 ) };
 `;
 
 export const innerWrapper = () => css`
@@ -185,7 +193,6 @@ export const borderControlPopoverControls = css`
 		margin-bottom: 0;
 		${ labelStyles }
 	}
-
 	&& ${ StyledLabel } + button:not( .has-text ) {
 		min-width: 24px;
 		padding: 0;

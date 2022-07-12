@@ -5,7 +5,6 @@ import BorderControlDropdown from '../border-control-dropdown';
 import UnitControl from '../../unit-control';
 import RangeControl from '../../range-control';
 import { HStack } from '../../h-stack';
-import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
@@ -14,16 +13,16 @@ import { useBorderControl } from './hook';
 import type { BorderControlProps, LabelProps } from '../types';
 
 const BorderLabel = ( props: LabelProps ) => {
-	const { label, hideLabelFromVision } = props;
+	const { className, label, hideLabelFromVision } = props;
 
 	if ( ! label ) {
 		return null;
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<legend className={ className }>{ label }</legend>
 	);
 };
 
@@ -32,6 +31,7 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
+		borderLabelClassName,
 		colors,
 		disableCustomColors,
 		enableAlpha,
@@ -59,10 +59,11 @@ const UnconnectedBorderControl = (
 	} = useBorderControl( props );
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
+		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
+				className={ borderLabelClassName }
 			/>
 			<HStack spacing={ 3 }>
 				<HStack className={ innerWrapperClassName } alignment="stretch">
