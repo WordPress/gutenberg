@@ -36,11 +36,6 @@ export const borderControl = css`
 	margin: 0;
 `;
 
-export const borderLabel = css`
-	display: inline-block;
-	margin-bottom: ${ space( 2 ) };
-`;
-
 export const innerWrapper = () => css`
 	flex: 1 0 40%;
 
