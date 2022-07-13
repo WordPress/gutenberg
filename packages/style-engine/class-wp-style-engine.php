@@ -31,197 +31,6 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
-	 * Style definitions that contain the instructions to
-	 * parse/output valid Gutenberg styles from a block's attributes.
-	 * For every style definition, the follow properties are valid:
-	 *  - classnames    => (array) an array of classnames to be returned for block styles. The key is a classname or pattern.
-	 *                    A value of `true` means the classname should be applied always. Otherwise, a valid CSS property (string)
-	 *                    to match the incoming value, e.g., "color" to match var:preset|color|somePresetSlug.
-	 *  - css_vars      => (array) an array of key value pairs used to generate CSS var values. The key is a CSS var pattern, whose `$slug` fragment will be replaced with a preset slug.
-	 *                    The value should be a valid CSS property (string) to match the incoming value, e.g., "color" to match var:preset|color|somePresetSlug.
-	 *  - property_keys => (array) array of keys whose values represent a valid CSS property, e.g., "margin" or "border".
-	 *  - path          => (array) a path that accesses the corresponding style value in the block style object.
-	 *  - value_func    => (string) the name of a function to generate a CSS definition array for a particular style object. The output of this function should be `array( "$property" => "$value", ... )`.
-	 */
-	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
-		'color'      => array(
-			'text'       => array(
-				'property_keys' => array(
-					'default' => 'color',
-				),
-				'path'          => array( 'color', 'text' ),
-				'css_vars'      => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-				'classnames'    => array(
-					'has-text-color'  => true,
-					'has-$slug-color' => 'color',
-				),
-			),
-			'background' => array(
-				'property_keys' => array(
-					'default' => 'background-color',
-				),
-				'path'          => array( 'color', 'background' ),
-				'classnames'    => array(
-					'has-background'             => true,
-					'has-$slug-background-color' => 'color',
-				),
-			),
-			'gradient'   => array(
-				'property_keys' => array(
-					'default' => 'background',
-				),
-				'path'          => array( 'color', 'gradient' ),
-				'classnames'    => array(
-					'has-background'                => true,
-					'has-$slug-gradient-background' => 'gradient',
-				),
-			),
-		),
-		'border'     => array(
-			'color'  => array(
-				'property_keys' => array(
-					'default'    => 'border-color',
-					'individual' => 'border-%s-color',
-				),
-				'path'          => array( 'border', 'color' ),
-				'classnames'    => array(
-					'has-border-color'       => true,
-					'has-$slug-border-color' => 'color',
-				),
-			),
-			'radius' => array(
-				'property_keys' => array(
-					'default'    => 'border-radius',
-					'individual' => 'border-%s-radius',
-				),
-				'path'          => array( 'border', 'radius' ),
-			),
-			'style'  => array(
-				'property_keys' => array(
-					'default'    => 'border-style',
-					'individual' => 'border-%s-style',
-				),
-				'path'          => array( 'border', 'style' ),
-			),
-			'width'  => array(
-				'property_keys' => array(
-					'default'    => 'border-width',
-					'individual' => 'border-%s-width',
-				),
-				'path'          => array( 'border', 'width' ),
-			),
-			'top'    => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
-				'path'       => array( 'border', 'top' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'right'  => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
-				'path'       => array( 'border', 'right' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'bottom' => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
-				'path'       => array( 'border', 'bottom' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'left'   => array(
-				'value_func' => 'static::get_individual_property_css_declarations',
-				'path'       => array( 'border', 'left' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-		),
-		'spacing'    => array(
-			'padding' => array(
-				'property_keys' => array(
-					'default'    => 'padding',
-					'individual' => 'padding-%s',
-				),
-				'path'          => array( 'spacing', 'padding' ),
-				'css_vars'      => array(
-					'spacing' => '--wp--preset--spacing--$slug',
-				),
-			),
-			'margin'  => array(
-				'property_keys' => array(
-					'default'    => 'margin',
-					'individual' => 'margin-%s',
-				),
-				'path'          => array( 'spacing', 'margin' ),
-				'css_vars'      => array(
-					'spacing' => '--wp--preset--spacing--$slug',
-				),
-			),
-		),
-		'typography' => array(
-			'fontSize'       => array(
-				'property_keys' => array(
-					'default' => 'font-size',
-				),
-				'path'          => array( 'typography', 'fontSize' ),
-				'classnames'    => array(
-					'has-$slug-font-size' => 'font-size',
-				),
-			),
-			'fontFamily'     => array(
-				'property_keys' => array(
-					'default' => 'font-family',
-				),
-				'path'          => array( 'typography', 'fontFamily' ),
-				'classnames'    => array(
-					'has-$slug-font-family' => 'font-family',
-				),
-			),
-			'fontStyle'      => array(
-				'property_keys' => array(
-					'default' => 'font-style',
-				),
-				'path'          => array( 'typography', 'fontStyle' ),
-			),
-			'fontWeight'     => array(
-				'property_keys' => array(
-					'default' => 'font-weight',
-				),
-				'path'          => array( 'typography', 'fontWeight' ),
-			),
-			'lineHeight'     => array(
-				'property_keys' => array(
-					'default' => 'line-height',
-				),
-				'path'          => array( 'typography', 'lineHeight' ),
-			),
-			'textDecoration' => array(
-				'property_keys' => array(
-					'default' => 'text-decoration',
-				),
-				'path'          => array( 'typography', 'textDecoration' ),
-			),
-			'textTransform'  => array(
-				'property_keys' => array(
-					'default' => 'text-transform',
-				),
-				'path'          => array( 'typography', 'textTransform' ),
-			),
-			'letterSpacing'  => array(
-				'property_keys' => array(
-					'default' => 'letter-spacing',
-				),
-				'path'          => array( 'typography', 'letterSpacing' ),
-			),
-		),
-	);
-
-	/**
 	 * Utility method to retrieve the main instance of the class.
 	 *
 	 * The instance will be created if it does not exist yet.
@@ -238,7 +47,7 @@ class WP_Style_Engine {
 
 	/**
 	 * Returns classnames and CSS based on the values in a block attributes.styles object.
-	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * Return values are parsed based on the instructions in WP_Style_Engine_Parser.
 	 *
 	 * @param array $block_styles Styles from a block's attributes object.
 	 * @param array $options      array(
@@ -256,22 +65,18 @@ class WP_Style_Engine {
 			return null;
 		}
 
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
-		$style_parser         = new WP_Style_Engine_Parser( static::BLOCK_STYLE_DEFINITIONS_METADATA );
-		$parsed_styles        = $style_parser->parse( $block_styles, $should_skip_css_vars );
-
-		// Build CSS rules output.
-		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = new WP_Style_Engine_CSS_Declarations( $parsed_styles['css_declarations'] );
+		$parser           = new WP_Style_Engine_Parser( $block_styles, $options );
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $parser->get_css_declarations() );
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_declarations_string();
 
 		// Return css, if any.
+		$css = $css_declarations->get_declarations_string();
 		if ( ! empty( $css ) ) {
 			$styles_output['css']          = $css;
-			$styles_output['declarations'] = $style_rules->get_declarations();
+			$styles_output['declarations'] = $css_declarations->get_declarations();
+			$css_selector                  = isset( $options['selector'] ) ? $options['selector'] : null;
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
@@ -279,8 +84,9 @@ class WP_Style_Engine {
 		}
 
 		// Return classnames, if any.
-		if ( ! empty( $parsed_styles['classnames'] ) ) {
-			$styles_output['classnames'] = implode( ' ', array_unique( $parsed_styles['classnames'] ) );
+		$classnames = $parser->get_classnames_string();
+		if ( ! empty( $classnames ) ) {
+			$styles_output['classnames'] = $classnames;
 		}
 
 		return $styles_output;
