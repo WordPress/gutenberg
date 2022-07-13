@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 
 const getMovementDirection = ( moveDirection, orientation ) => {
 	if ( moveDirection === 'up' ) {
@@ -246,11 +246,7 @@ export function getMultiBlockMoverDescription(
 		if ( movementDirection === 'up' ) {
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				_n(
-					'Move %1$d block from position %2$d up by one place',
-					'Move %1$d blocks from position %2$d up by one place',
-					selectedCount
-				),
+				__( 'Move %1$d blocks from position %2$d up by one place' ),
 				selectedCount,
 				position
 			);
@@ -259,11 +255,7 @@ export function getMultiBlockMoverDescription(
 		if ( movementDirection === 'left' ) {
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				_n(
-					'Move %1$d block from position %2$d left by one place',
-					'Move %1$d blocks from position %2$d left by one place',
-					selectedCount
-				),
+				__( 'Move %1$d blocks from position %2$d left by one place' ),
 				selectedCount,
 				position
 			);
@@ -294,11 +286,7 @@ export function getMultiBlockMoverDescription(
 		if ( movementDirection === 'down' ) {
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				_n(
-					'Move %1$d block from position %2$d down by one place',
-					'Move %1$d blocks from position %2$d down by one place',
-					selectedCount
-				),
+				__( 'Move %1$d blocks from position %2$d down by one place' ),
 				selectedCount,
 				position
 			);
@@ -307,11 +295,7 @@ export function getMultiBlockMoverDescription(
 		if ( movementDirection === 'right' ) {
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				_n(
-					'Move %1$d block from position %2$d right by one place',
-					'Move %1$d blocks from position %2$d right by one place',
-					selectedCount
-				),
+				__( 'Move %1$d blocks from position %2$d right by one place' ),
 				selectedCount,
 				position
 			);
