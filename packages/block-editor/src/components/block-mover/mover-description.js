@@ -3,6 +3,21 @@
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 
+const getMovementDirection = ( moveDirection, orientation ) => {
+	if ( moveDirection === 'up' ) {
+		if ( orientation === 'horizontal' ) {
+			return isRTL() ? 'right' : 'left';
+		}
+		return 'up';
+	} else if ( moveDirection === 'down' ) {
+		if ( orientation === 'horizontal' ) {
+			return isRTL() ? 'left' : 'right';
+		}
+		return 'down';
+	}
+	return null;
+};
+
 /**
  * Return a label for the block movement controls depending on block position.
  *
@@ -30,21 +45,6 @@ export function getBlockMoverDescription(
 ) {
 	const position = firstIndex + 1;
 
-	const getMovementDirection = ( moveDirection ) => {
-		if ( moveDirection === 'up' ) {
-			if ( orientation === 'horizontal' ) {
-				return isRTL() ? 'right' : 'left';
-			}
-			return 'up';
-		} else if ( moveDirection === 'down' ) {
-			if ( orientation === 'horizontal' ) {
-				return isRTL() ? 'left' : 'right';
-			}
-			return 'down';
-		}
-		return null;
-	};
-
 	if ( selectedCount > 1 ) {
 		return getMultiBlockMoverDescription(
 			selectedCount,
@@ -52,7 +52,7 @@ export function getBlockMoverDescription(
 			isFirst,
 			isLast,
 			dir,
-			getMovementDirection
+			orientation
 		);
 	}
 
@@ -66,13 +66,13 @@ export function getBlockMoverDescription(
 
 	if ( dir > 0 && ! isLast ) {
 		// Moving down.
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection( 'down', orientation );
 
 		if ( movementDirection === 'down' ) {
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					'Move %1$s block from position %2$d down to position %3$d'
+					`Move %1$s block from position %2$d down to position %3$d`
 				),
 				type,
 				position,
@@ -107,7 +107,7 @@ export function getBlockMoverDescription(
 
 	if ( dir > 0 && isLast ) {
 		// Moving down, and is the last item.
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection( 'down', orientation );
 
 		if ( movementDirection === 'down' ) {
 			return sprintf(
@@ -142,7 +142,7 @@ export function getBlockMoverDescription(
 
 	if ( dir < 0 && ! isFirst ) {
 		// Moving up.
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection( 'up', orientation );
 
 		if ( movementDirection === 'up' ) {
 			return sprintf(
@@ -181,7 +181,7 @@ export function getBlockMoverDescription(
 
 	if ( dir < 0 && isFirst ) {
 		// Moving up, and is the first item.
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection( 'up', orientation );
 
 		if ( movementDirection === 'up' ) {
 			return sprintf(
@@ -218,14 +218,14 @@ export function getBlockMoverDescription(
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param {number}   selectedCount        Number of blocks selected.
- * @param {number}   firstIndex           The index (position - 1) of the first block selected.
- * @param {boolean}  isFirst              This is the first block.
- * @param {boolean}  isLast               This is the last block.
- * @param {number}   dir                  Direction of movement (> 0 is considered to be going
- *                                        down, < 0 is up).
- * @param {Function} getMovementDirection Returns movement direction (string) based on the orientation
- *                                        of the selected blocks
+ * @param {number}  selectedCount Number of blocks selected.
+ * @param {number}  firstIndex    The index (position - 1) of the first block selected.
+ * @param {boolean} isFirst       This is the first block.
+ * @param {boolean} isLast        This is the last block.
+ * @param {number}  dir           Direction of movement (> 0 is considered to be going
+ *                                down, < 0 is up).
+ * @param {string}  orientation   The orientation of the block movers, vertical or
+ *                                horizontal.
  *
  * @return {string} Label for the block movement controls.
  */
@@ -235,13 +235,13 @@ export function getMultiBlockMoverDescription(
 	isFirst,
 	isLast,
 	dir,
-	getMovementDirection
+	orientation
 ) {
 	const position = firstIndex + 1;
 
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection( 'up', orientation );
 
 		if ( movementDirection === 'up' ) {
 			return sprintf(
@@ -272,7 +272,7 @@ export function getMultiBlockMoverDescription(
 
 	if ( dir < 0 && isFirst ) {
 		// moving up, and the selected blocks are the first item
-		const movementDirection = getMovementDirection( 'up' );
+		const movementDirection = getMovementDirection( 'up', orientation );
 
 		if ( movementDirection === 'up' ) {
 			return __(
@@ -289,7 +289,7 @@ export function getMultiBlockMoverDescription(
 
 	if ( dir > 0 && ! isLast ) {
 		// moving down
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection( 'down', orientation );
 
 		if ( movementDirection === 'down' ) {
 			return sprintf(
@@ -320,7 +320,7 @@ export function getMultiBlockMoverDescription(
 
 	if ( dir > 0 && isLast ) {
 		// moving down, and the selected blocks are the last item
-		const movementDirection = getMovementDirection( 'down' );
+		const movementDirection = getMovementDirection( 'down', orientation );
 
 		if ( movementDirection === 'down' ) {
 			return __(
