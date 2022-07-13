@@ -26,18 +26,6 @@ describe( 'hooks', () => {
 				three: 'three',
 			} );
 		} );
-		it( 'adds fallback variations when variations are missing', () => {
-			const updatedSettings = enhanceNavigationLinkVariations(
-				{
-					name: 'core/navigation-link',
-					one: 'one',
-					two: 'two',
-					three: 'three',
-				},
-				'core/navigation-link'
-			);
-			expect( updatedSettings ).toMatchSnapshot();
-		} );
 		it( 'enhances variations with icon and isActive functions', () => {
 			const updatedSettings = enhanceNavigationLinkVariations(
 				{

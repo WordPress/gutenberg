@@ -319,13 +319,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			post, // eslint-disable-line no-unused-vars
-			capabilities,
-			settings,
-			...props
-		} = this.props;
+		const { children, post, capabilities, settings, ...props } = this.props;
 		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (

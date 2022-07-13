@@ -76,7 +76,7 @@ module.exports = async ( {
 	}
 
 	if ( wpScripts ) {
-		if ( npmDependencies.length ) {
+		if ( npmDependencies && npmDependencies.length ) {
 			info( '' );
 			info(
 				'Installing npm dependencies. It might take a couple of minutes...'
@@ -99,7 +99,7 @@ module.exports = async ( {
 			}
 		}
 
-		if ( npmDevDependencies.length ) {
+		if ( npmDevDependencies && npmDevDependencies.length ) {
 			info( '' );
 			info(
 				'Installing npm devDependencies. It might take a couple of minutes...'

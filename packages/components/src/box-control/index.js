@@ -117,7 +117,7 @@ export default function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="region" aria-labelledby={ headingId }>
+		<Root id={ id } role="group" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
 				<FlexItem>
 					<Text

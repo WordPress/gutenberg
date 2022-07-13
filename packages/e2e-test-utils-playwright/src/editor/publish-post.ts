@@ -29,4 +29,9 @@ export async function publishPost( this: Editor ) {
 	await this.page.click(
 		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
 	);
+
+	const urlString = await this.page.inputValue( 'text="Post address"' );
+	const url = new URL( urlString );
+	const postId = url.searchParams.get( 'p' );
+	return postId;
 }

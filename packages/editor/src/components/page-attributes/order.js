@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { invoke } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -24,10 +19,7 @@ export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
 	const setUpdatedOrder = ( value ) => {
 		setOrderInput( value );
 		const newOrder = Number( value );
-		if (
-			Number.isInteger( newOrder ) &&
-			invoke( value, [ 'trim' ] ) !== ''
-		) {
+		if ( Number.isInteger( newOrder ) && value.trim?.() !== '' ) {
 			onUpdateOrder( Number( value ) );
 		}
 	};

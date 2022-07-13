@@ -82,6 +82,8 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							units={ units }
 						/>
 						<RangeControl
+							label={ __( 'Border radius' ) }
+							hideLabelFromVision
 							className="components-border-radius-control__range-control"
 							value={ allValue ?? '' }
 							min={ MIN_BORDER_RADIUS_VALUE }

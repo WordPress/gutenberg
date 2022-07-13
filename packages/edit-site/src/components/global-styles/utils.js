@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find, isString } from 'lodash';
+import { get, find } from 'lodash';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -11,6 +11,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -75,6 +76,8 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
+	'elements.button.color.text': 'color',
+	'elements.button.backgroundColor': 'background-color',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
@@ -210,7 +213,7 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 }
 
 export function getValueFromVariable( features, blockName, variable ) {
-	if ( ! variable || ! isString( variable ) ) {
+	if ( ! variable || typeof variable !== 'string' ) {
 		return variable;
 	}
 	const USER_VALUE_PREFIX = 'var:';

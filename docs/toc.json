@@ -98,9 +98,13 @@
 					},
 					{
 						"docs/how-to-guides/data-basics/4-building-a-create-page-form.md": []
+					},
+					{
+						"docs/how-to-guides/data-basics/5-adding-a-delete-button.md": []
 					}
 				]
 			},
+			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{

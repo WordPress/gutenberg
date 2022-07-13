@@ -76,11 +76,9 @@ export default function PageListEdit( { context, clientId } ) {
 
 			{ hasResolvedPages && totalPages === null && (
 				<div { ...blockProps }>
-					<div { ...blockProps }>
-						<Notice status={ 'warning' } isDismissible={ false }>
-							{ __( 'Page List: Cannot retrieve Pages.' ) }
-						</Notice>
-					</div>
+					<Notice status={ 'warning' } isDismissible={ false }>
+						{ __( 'Page List: Cannot retrieve Pages.' ) }
+					</Notice>
 				</div>
 			) }
 

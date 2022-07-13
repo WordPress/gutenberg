@@ -11,10 +11,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
-import { ColorHexInputControl } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { StateReducer } from '../input-control/reducer/state';
 
@@ -49,7 +49,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	};
 
 	return (
-		<ColorHexInputControl
+		<InputControl
 			prefix={
 				<Spacer
 					as={ Text }
@@ -66,6 +66,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
 			__unstableStateReducer={ stateReducer }
+			__unstableInputWidth="9em"
 		/>
 	);
 };
