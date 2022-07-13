@@ -40,23 +40,8 @@ export type ElevationProps = {
 	offset?: number;
 	/**
 	 * Size of the shadow, based on the Style system's elevation system. The
-	 * `value` determines the strength of the shadow, which creates the sense of depth.
-	 *
-	 * In the example below, `isInteractive` is activated to give a better sense
-	 * of depth.
-	 *
-	 * @example
-	 * ```jsx
-	 * import { __experimentalElevation as Elevation } from '@wordpress/components';
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <div>
-	 *       <Elevation isInteractive value={ 200 } />
-	 *     </div>
-	 *   );
-	 * }
-	 * ```
+	 * `value` determines the strength of the shadow, which creates the sense of
+	 * depth.
 	 *
 	 * @default 0
 	 */
