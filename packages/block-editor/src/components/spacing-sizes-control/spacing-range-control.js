@@ -5,8 +5,9 @@ import { useState } from '@wordpress/element';
 import {
 	Button,
 	RangeControl,
-	SelectControl,
+	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -26,8 +27,12 @@ export default function SpacingRangeControl( props ) {
 	const createHandleOnFocus = ( side ) => () => {
 		props.onFocus( side );
 	};
-	//console.log( props.value );
-	const getNewSizeValue = ( newSize ) => {
+	const useSelect = props.useSelect;
+	const getNewCustomValue = ( newSize ) => {
+		return newSize;
+	};
+	const getNewRangeValue = ( newSize ) => {
+		setValueNow( newSize );
 		const size = parseInt( newSize, 10 );
 		if ( size === 0 ) {
 			return undefined;
@@ -40,9 +45,13 @@ export default function SpacingRangeControl( props ) {
 
 	const currentValueHint = customTooltipContent( props.value );
 
+	const options = props.spacingSizes.map( ( size, index ) => ( {
+		key: index,
+		name: size.name,
+	} ) );
 	return (
 		<>
-			<Button
+			{ /* <Button
 				label={
 					showCustomValueControl
 						? __( 'Use size preset' )
@@ -54,14 +63,17 @@ export default function SpacingRangeControl( props ) {
 				} }
 				isPressed={ showCustomValueControl }
 				isSmall
-			/>
+			/> */ }
 			{ showCustomValueControl && (
 				<UnitControl
 					label={ props.label }
-					onChange={ ( value ) => console.log( value ) }
+					onChange={ ( newSize ) =>
+						props.onChange( getNewCustomValue( newSize ) )
+					}
+					value="28%"
 				/>
 			) }
-			{ ! props.useSelect && ! showCustomValueControl && (
+			{ ! useSelect && ! showCustomValueControl && (
 				<RangeControl
 					value={ props.value }
 					label={
@@ -75,7 +87,7 @@ export default function SpacingRangeControl( props ) {
 						</>
 					}
 					onChange={ ( newSize ) =>
-						props.onChange( getNewSizeValue( newSize ) )
+						props.onChange( getNewRangeValue( newSize ) )
 					}
 					onFocus={ createHandleOnFocus( props.side ) }
 					withInputField={ false }
@@ -86,18 +98,24 @@ export default function SpacingRangeControl( props ) {
 					max={ props.spacingSizes.length - 1 }
 				/>
 			) }
-			{ props.useSelect && ! showCustomValueControl && (
-				<SelectControl
-					value={ props.value }
+			{ useSelect && ! showCustomValueControl && (
+				<CustomSelectControl
+					value={ options.find(
+						( option ) => option.key === valueNow
+					) }
 					label={ props.label }
-					onChange={ ( newSize ) =>
-						props.onChange( getNewSizeValue( newSize ) )
-					}
+					onChange={ ( selectedItem ) => {
+						props.onChange( getNewRangeValue( selectedItem.key ) );
+					} }
 					onFocus={ createHandleOnFocus( props.side ) }
-					options={ props.spacingSizes.map( ( size, index ) => ( {
-						value: index,
-						label: size.name,
-					} ) ) }
+					options={ options }
+					onHighlightedIndexChange={ ( index ) => {
+						if ( index.type === '__item_mouse_move__' ) {
+							props.onChange(
+								getNewRangeValue( index.highlightedIndex )
+							);
+						}
+					} }
 				/>
 			) }
 		</>

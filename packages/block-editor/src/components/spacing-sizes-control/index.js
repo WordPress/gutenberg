@@ -42,6 +42,7 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
+	useSelect,
 } ) {
 	const spacingSizes = [
 		{ name: __( 'Default' ), slug: 'default', size: undefined },
@@ -92,6 +93,7 @@ export default function SpacingSizesControl( {
 		sides,
 		values: inputValues,
 		spacingSizes,
+		useSelect,
 	};
 
 	return (

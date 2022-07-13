@@ -4,6 +4,12 @@
 	padding-bottom: 12px;
 	width: 100%;
 
+	.components-custom-select-control {
+		button {
+			width: 100%;
+		}
+	}
+
 	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
 		legend {

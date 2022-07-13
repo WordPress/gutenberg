@@ -71,6 +71,7 @@ export default function CustomSelectControl( {
 	/** @type {import('../select-control/types').SelectControlProps.size} */
 	size = 'default',
 	value: _selectedItem,
+	onHighlightedIndexChange,
 } ) {
 	const {
 		getLabelProps,
@@ -89,6 +90,7 @@ export default function CustomSelectControl( {
 			? { selectedItem: _selectedItem }
 			: undefined ),
 		stateReducer,
+		onHighlightedIndexChange,
 	} );
 
 	const [ isFocused, setIsFocused ] = useState( false );

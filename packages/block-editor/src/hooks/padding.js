@@ -143,6 +143,16 @@ export function PaddingEdit( props ) {
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
+					<SpacingSizesControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						useSelect={ true }
+					/>
 				</>
 			</>
 		),
