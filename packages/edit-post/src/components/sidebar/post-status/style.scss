@@ -1,5 +1,7 @@
 .edit-post-post-status {
-	[class].components-panel__body-title {
-		margin-bottom: 0;
+	// Counteract the 5px of bottom margin on .components-panel__body-title.
+	.edit-post-post-featured-image:first-of-type,
+	.edit-post-post-summary:first-of-type {
+		margin-top: -5px;
 	}
 }
