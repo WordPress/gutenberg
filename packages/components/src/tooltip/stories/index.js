@@ -32,22 +32,42 @@ export const _default = () => {
 		'bottom right': 'bottom right',
 	};
 	const tooltipText = text( 'Text', 'More information' );
+	const longTooltipText = text( 'Text', 'Long explanatory information' );
 	const position = select( 'Position', positionOptions, 'top center' );
 	const delay = number( 'Delay', 700 );
 	return (
-		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
-			<div
-				style={ {
-					margin: '50px auto',
-					width: '200px',
-					padding: '20px',
-					textAlign: 'center',
-					border: '1px solid #ccc',
-				} }
+		<>
+			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
+				<div
+					style={ {
+						margin: '50px auto',
+						width: '200px',
+						padding: '20px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+					} }
+				>
+					Hover for more information
+				</div>
+			</Tooltip>
+			<Tooltip
+				text={ longTooltipText }
+				position={ position }
+				delay={ delay }
 			>
-				Hover for more information
-			</div>
-		</Tooltip>
+				<div
+					style={ {
+						margin: '50px auto',
+						width: 'min-content',
+						padding: '4px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+					} }
+				>
+					Small target
+				</div>
+			</Tooltip>
+		</>
 	);
 };
 
