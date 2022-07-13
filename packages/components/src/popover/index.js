@@ -116,7 +116,7 @@ const Popover = (
 		__unstableObserveElement,
 		__unstableForcePosition,
 		__unstableShift = false,
-		__unstableMiddleware,
+		__unstableAvoidOverflow,
 		...contentProps
 	},
 	ref
@@ -182,10 +182,58 @@ const Popover = (
 		};
 	}, [ ownerDocument ] );
 
+	const avoidOverflow = useMemo(
+		() =>
+			__unstableAvoidOverflow
+				? {
+						name: 'avoidOverflow',
+						async fn( middlewareProps ) {
+							const {
+								x,
+								y,
+								rects,
+								placement: currentPlacement,
+							} = middlewareProps;
+							const isTopPlacement =
+								currentPlacement.includes( 'top' );
+
+							if ( ! isTopPlacement ) {
+								return { x, y };
+							}
+
+							const referenceRect = rects.reference;
+							const floatingRect = rects.floating;
+
+							// Flip the popover placement to the bottom if there's not
+							// enough space above the reference element.
+							if ( floatingRect.height > referenceRect.y ) {
+								const newPlacement = currentPlacement.replace(
+									'top',
+									'bottom'
+								);
+								return {
+									reset: {
+										placement: newPlacement,
+									},
+								};
+							}
+
+							// Else shift it.
+							return shift( {
+								crossAxis: true,
+								limiter: limitShift(),
+								padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+							} ).fn( middlewareProps );
+						},
+				  }
+				: undefined,
+		[ __unstableAvoidOverflow ]
+	);
+
 	const middlewares = [
 		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
-		...( __unstableMiddleware ?? [] ),
+		avoidOverflow,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
