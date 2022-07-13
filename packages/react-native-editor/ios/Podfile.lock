@@ -18,6 +18,15 @@ PODS:
     - React-CoreModules (= 0.66.2)
     - React-RCTImage (= 0.66.2)
     - RNTAztecView
+  - libwebp (1.2.1):
+    - libwebp/demux (= 1.2.1)
+    - libwebp/mux (= 1.2.1)
+    - libwebp/webp (= 1.2.1)
+  - libwebp/demux (1.2.1):
+    - libwebp/webp
+  - libwebp/mux (1.2.1):
+    - libwebp/demux
+  - libwebp/webp (1.2.1)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
     - DoubleConversion
@@ -304,6 +313,10 @@ PODS:
     - React-Core
   - RNCMaskedView (0.2.6):
     - React-Core
+  - RNFastImage (8.5.11):
+    - React-Core
+    - SDWebImage (~> 5.11.1)
+    - SDWebImageWebPCoder (~> 0.8.4)
   - RNGestureHandler (2.3.2-wp-1):
     - React-Core
   - RNReanimated (2.4.1-wp-3):
@@ -340,6 +353,12 @@ PODS:
   - RNTAztecView (1.79.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.8)
+  - SDWebImage (5.11.1):
+    - SDWebImage/Core (= 5.11.1)
+  - SDWebImage/Core (5.11.1)
+  - SDWebImageWebPCoder (0.8.5):
+    - libwebp (~> 1.0)
+    - SDWebImage/Core (~> 5.10)
   - WordPress-Aztec-iOS (1.19.8)
   - Yoga (1.14.0)
 
@@ -387,6 +406,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - "RNCClipboard (from `../../../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-masked-view/masked-view`)"
+  - RNFastImage (from `../../../node_modules/react-native-fast-image`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
@@ -397,6 +417,9 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - fmt
+    - libwebp
+    - SDWebImage
+    - SDWebImageWebPCoder
     - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
@@ -482,6 +505,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../../../node_modules/@react-native-masked-view/masked-view"
+  RNFastImage:
+    :path: "../../../node_modules/react-native-fast-image"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNReanimated:
@@ -504,6 +529,7 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 5337263514dd6f09803962437687240c5dc39aa4
   Gutenberg: 03d969bd5acf0f2787b81fd83a9af36efecaaee9
+  libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
   RCTRequired: 5e9e85f48da8dd447f5834ce14c6799ea8c7f41a
   RCTTypeSafety: aba333d04d88d1f954e93666a08d7ae57a87ab30
@@ -518,12 +544,12 @@ SPEC CHECKSUMS:
   React-logger: faee236598b0f7e1a5e3b68577016ac451f1f993
   react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
-  react-native-keyboard-aware-scroll-view: 374b637c8684d7de50bd930df1a2d2b8fd49daa5
+  react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: e471852c5ed67eea4b10c5d9d43c1cebae3b231d
+  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-slider: d4c3367c5db5d2bec3ac0ab9d15ebb73d896034c
-  react-native-video: 2ad952d1a9ce83e058dcb4a1800af3a99cb7edee
-  react-native-webview: 1f56115845c98f0a59dfbbac685797c014a821be
+  react-native-video: 0b09cc469df0249509def5dc1484e0419342de9b
+  react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
   React-perflogger: 5ab487cacfe6ec19bfe3d3f8072bf71eb07d63da
   React-RCTActionSheet: 03f25695e095fb5aa003828620943c74cc281fec
   React-RCTAnimation: eaf82da39f0c36fb0ef2a28df797c5f73a2a98ea
@@ -536,13 +562,16 @@ SPEC CHECKSUMS:
   React-RCTVibration: 3e815c3d2dd2e0e931b68595b5b92d23ba38b3fb
   React-runtimeexecutor: 393e26602c1b248683372051e34db63e359e3b01
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
-  RNCClipboard: f49f3de56b40d0f4104680dabadc7a1f063f4fd4
-  RNCMaskedView: d367b2a8df3992114e31b32b091a0c00dc800827
+  RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
+  RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
+  RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: 3b13cc25407d1cdbee33b6ae65790a55c032d2a9
   RNReanimated: b413cc7aa3e2a740d9804cda3a9396a68f9eea7f
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
   RNTAztecView: 48124f42ccc72c4b00a5aa4982ee3a816860b7c3
+  SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
+  SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
   Yoga: 9a08effa851c1d8cc1647691895540bc168ea65f
 

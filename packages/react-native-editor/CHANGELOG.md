@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Add React Native FastImage [#42009]
+
 ## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
 -   [*] Image block copies the alt text from the media library when selecting an item [#41839]

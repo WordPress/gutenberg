@@ -33,6 +33,7 @@ export function PostVisibility() {
 								// when the label changes.
 								anchorRef: rowRef.current,
 							} }
+							focusOnMount
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<PostVisibilityToggle
 									isOpen={ isOpen }
