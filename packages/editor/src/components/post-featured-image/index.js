@@ -246,7 +246,8 @@ const applyWithDispatch = withDispatch(
 			onUpdateImage( image ) {
 				editPost( { featured_media: image.id } );
 			},
-			// todo: this is dead code, but I suppose we can't remove it because of the filter?
+			// This is dead code, but can't be removed, as third parties using
+			// the 'editor.PostFeaturedImage' filter might rely on it.
 			onDropImage( filesList ) {
 				select( blockEditorStore )
 					.getSettings()
