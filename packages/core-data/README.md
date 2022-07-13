@@ -584,6 +584,27 @@ _Returns_
 
 Returns the embed preview for the given URL.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const embedPreview = useSelect( ( select ) =>
+		select( coreDataStore ).getEmbedPreview(
+			'https://twitter.com/wordpress'
+		)
+	);
+
+	return embedPreview ? (
+		<div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+	) : (
+		<div>{ __( 'Loading Tweets…' ) }</div>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.

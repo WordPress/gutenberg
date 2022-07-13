@@ -1166,6 +1166,26 @@ export function getThemeSupports( state: State ): any {
  * @param  state Data state.
  * @param  url   Embedded URL.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const embedPreview = useSelect( ( select ) =>
+ *         select( coreDataStore ).getEmbedPreview(
+ *             'https://twitter.com/wordpress'
+ *         )
+ *     );
+ *
+ *     return embedPreview ? (
+ *         <div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+ *     ) : (
+ *     <div>{ __( 'Loading Tweets…' ) }</div>
+ *     );
+ * };
+ * ```
+ *
  * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
 export function getEmbedPreview( state: State, url: string ): any {
