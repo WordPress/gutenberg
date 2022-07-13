@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
+
 ## 19.15.0 (2022-07-13)
 
 ### Bug Fix
