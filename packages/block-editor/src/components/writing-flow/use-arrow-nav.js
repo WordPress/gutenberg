@@ -319,7 +319,9 @@ export default function useArrowNav() {
 					? startContainer
 					: startContainer.parentElement;
 
-			startContainer.closest( '[contenteditable]' )?.focus();
+			startContainer
+				.closest( '[contenteditable],[tabindex="0"]' )
+				?.focus();
 		}
 
 		function restoreOnNextSelectionChange() {
