@@ -39,21 +39,25 @@ function getTemplateLockValue( lock ) {
 }
 
 export default function BlockLockModal( { clientId, onClose } ) {
-	const [ applyTemplateLock, setApplyTemplateLock ] = useState( false );
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { canEdit, canMove, canRemove } = useBlockLock( clientId );
-	const { isReusable, hasTemplateLock } = useSelect(
+	const { isReusable, templateLock, hasTemplateLock } = useSelect(
 		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 
 			return {
 				isReusable: isReusableBlock( blockType ),
+				templateLock: getBlockAttributes( clientId )?.templateLock,
 				hasTemplateLock: !! blockType?.attributes?.templateLock,
 			};
 		},
 		[ clientId ]
+	);
+	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
+		templateLock ?? false
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
