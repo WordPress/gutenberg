@@ -304,7 +304,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 
 	// We get a 'preferred' unit to keep units consistent when calculating,
 	// otherwise the result will not be accurate.
-	$font_size_unit = $minimum_font_size['unit'];
+	$font_size_unit = isset( $minimum_font_size['unit'] ) ? $minimum_font_size['unit'] : 'rem';
 
 	// Grab the maximum font size and normalize it in order to use the value for calculations.
 	$maximum_font_size = gutenberg_get_typography_value_and_unit(

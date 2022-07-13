@@ -320,13 +320,25 @@
 							"description": "Enables fluid typography and allows users to set global fluid typography parameters.",
 							"type": "object",
 							"properties": {
-								"max": {
-									"description": "Allow users to set custom a max viewport width in px, rem or em.",
+								"maxViewPortWidth": {
+									"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid font.",
 									"type": "string"
 								},
-								"min": {
-									"description": "Allow users to set custom a min viewport width in px, rem or em.",
+								"minViewPortWidth": {
+									"description": "Allow users to set custom a min viewport width in px, rem or em, used to set the minimum size boundary of a fluid font",
 									"type": "string"
+								},
+								"minFontSizeFactor": {
+									"description": "Used to calculate a minimum font size from a single size value, where `fluidSize.min` is not set.",
+									"type": "number"
+								},
+								"maxFontSizeFactor": {
+									"description": "Used to calculate a maximum font size from a single size value, where `fluidSize.max` is not set.",
+									"type": "number"
+								},
+								"scaleFactor": {
+									"description": "Determines the rate of font size change between the minimum and maximum font sizes. The higher the value the faster the change.",
+									"type": "number"
 								}
 							}
 						},
