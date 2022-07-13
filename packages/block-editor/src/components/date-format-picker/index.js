@@ -90,6 +90,7 @@ function NonDefaultControls( { format, onChange } ) {
 		_x( 'M j, Y', 'medium date format' ),
 		_x( 'M j, Y g:i A', 'medium date format with time' ),
 		_x( 'F j, Y', 'long date format' ),
+		_x( 'M j', 'short date format without the year' ),
 	] );
 
 	const suggestedOptions = suggestedFormats.map(
