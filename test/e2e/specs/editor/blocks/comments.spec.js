@@ -135,7 +135,7 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 
-	test.afterEach( async ( { admin } ) => {
+	test.afterEach( async ( { admin, requestUtils } ) => {
 		// Ideally, we'd set options in afterAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
@@ -146,10 +146,10 @@ test.describe( 'Comments', () => {
 			'default_comments_page',
 			previousDefaultCommentsPage
 		);
+		await requestUtils.deleteAllComments();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllComments();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 } );
