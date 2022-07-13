@@ -212,15 +212,11 @@ const Popover = (
 							// Checking against `referenceRect.y` seems to be all that's
 							// needed.
 							if ( floatingRect.height > referenceRect.y ) {
-								const newPlacement = currentPlacement.replace(
-									'top',
-									'bottom'
-								);
-								return {
-									reset: {
-										placement: newPlacement,
-									},
-								};
+								return flip( {
+									crossAxis: false,
+									fallbackPlacements: [ 'bottom-start' ],
+									fallbackStrategy: 'initialPlacement',
+								} ).fn( middlewareProps );
 							}
 
 							// Else shift it, so that it's 'sticky'. This can't be
