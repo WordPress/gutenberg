@@ -5,3 +5,10 @@
 .block-types-list__column {
 	padding: $grid-unit-20;
 }
+
+.block-types-list__section-header {
+	flex-direction: row;
+	justify-content: center;
+	padding-bottom: 16;
+	padding-top: 32;
+}

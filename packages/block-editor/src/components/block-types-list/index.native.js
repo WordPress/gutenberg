@@ -4,6 +4,7 @@
 import {
 	Dimensions,
 	FlatList,
+	SectionList,
 	StyleSheet,
 	TouchableWithoutFeedback,
 	View,
@@ -24,7 +25,7 @@ const MIN_COL_NUM = 3;
 
 export default function BlockTypesList( {
 	name,
-	items,
+	sections,
 	onSelect,
 	listProps,
 	initialNumToRender = 3,
@@ -80,33 +81,66 @@ export default function BlockTypesList( {
 		listProps.contentContainerStyle
 	);
 
+	const renderSection = ( { item } ) => {
+		return (
+			<TouchableWithoutFeedback accessible={ false }>
+				<FlatList
+					data={ item.list }
+					key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
+					numColumns={ numberOfColumns }
+					ItemSeparatorComponent={ () => (
+						<TouchableWithoutFeedback accessible={ false }>
+							<View
+								style={
+									styles[ 'block-types-list__row-separator' ]
+								}
+							/>
+						</TouchableWithoutFeedback>
+					) }
+					scrollEnabled={ false }
+					renderItem={ renderListItem }
+				/>
+			</TouchableWithoutFeedback>
+		);
+	};
+
+	const renderListItem = ( { item } ) => {
+		return (
+			<InserterButton
+				{ ...{
+					item,
+					itemWidth,
+					maxWidth,
+					onSelect,
+				} }
+			/>
+		);
+	};
+
+	const renderSectionHeader = ( { section: { metadata } } ) => {
+		if ( ! metadata?.icon ) {
+			return null;
+		}
+
+		return (
+			<TouchableWithoutFeedback accessible={ false }>
+				<View style={ styles[ 'block-types-list__section-header' ] }>
+					{ metadata?.icon }
+				</View>
+			</TouchableWithoutFeedback>
+		);
+	};
+
 	return (
-		<FlatList
+		<SectionList
 			onLayout={ onLayout }
-			key={ `InserterUI-${ name }-${ numberOfColumns }` } // Re-render when numberOfColumns changes.
 			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
-			numColumns={ numberOfColumns }
-			data={ items }
+			sections={ sections }
 			initialNumToRender={ initialNumToRender }
-			ItemSeparatorComponent={ () => (
-				<TouchableWithoutFeedback accessible={ false }>
-					<View
-						style={ styles[ 'block-types-list__row-separator' ] }
-					/>
-				</TouchableWithoutFeedback>
-			) }
 			keyExtractor={ ( item ) => item.id }
-			renderItem={ ( { item } ) => (
-				<InserterButton
-					{ ...{
-						item,
-						itemWidth,
-						maxWidth,
-						onSelect,
-					} }
-				/>
-			) }
+			renderItem={ renderSection }
+			renderSectionHeader={ renderSectionHeader }
 			{ ...listProps }
 			contentContainerStyle={ {
 				...contentContainerStyle,

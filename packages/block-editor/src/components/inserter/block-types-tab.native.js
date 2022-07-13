@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,9 +11,13 @@ import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
-import { filterInserterItems } from './utils';
+import { createInserterSection, filterInserterItems } from './utils';
+import useBlockTypesState from './hooks/use-block-types-state';
+
+const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
+	const [ , , collections ] = useBlockTypesState( rootClientId, onSelect );
 	const clipboardBlock = useClipboardBlock( rootClientId );
 
 	const { blockTypes } = useSelect(
@@ -39,10 +44,38 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		onSelect( ...args );
 	};
 
+	const collectionSections = useMemo( () => {
+		const result = [];
+		Object.keys( collections ).forEach( ( namespace ) => {
+			const data = items.filter(
+				( item ) => getBlockNamespace( item ) === namespace
+			);
+			if ( data.length > 0 ) {
+				result.push(
+					createInserterSection( {
+						key: `collection-${ namespace }`,
+						metadata: {
+							icon: collections[ namespace ].icon,
+							title: collections[ namespace ].title,
+						},
+						items: data,
+					} )
+				);
+			}
+		} );
+
+		return result;
+	}, [ items, collections ] );
+
+	const sections = [
+		createInserterSection( { key: 'default', items } ),
+		...collectionSections,
+	];
+
 	return (
 		<BlockTypesList
 			name="Blocks"
-			items={ items }
+			sections={ sections }
 			onSelect={ handleSelect }
 			listProps={ listProps }
 		/>

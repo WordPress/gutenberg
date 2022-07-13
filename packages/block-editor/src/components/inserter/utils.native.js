@@ -33,3 +33,10 @@ export function filterInserterItems(
 		blockAllowed( block, { onlyReusable, allowReusable } )
 	);
 }
+
+export function createInserterSection( { key, metadata, items } ) {
+	return {
+		metadata,
+		data: [ { key, list: items } ],
+	};
+}
