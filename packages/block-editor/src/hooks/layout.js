@@ -58,7 +58,7 @@ function getLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
-	if ( layout?.inherit || layout?.contentSize || layout?.useGlobalPadding ) {
+	if ( layout?.inherit || layout?.contentSize ) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -142,7 +142,6 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 									setAttributes( {
 										layout: {
 											inherit: ! inherit,
-											useGlobalPadding: ! inherit,
 										},
 									} )
 								}

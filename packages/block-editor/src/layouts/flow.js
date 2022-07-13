@@ -53,7 +53,6 @@ export default {
 								onChange( {
 									...layout,
 									contentSize: nextWidth,
-									useGlobalPadding: true,
 								} );
 							} }
 							units={ units }
@@ -74,7 +73,6 @@ export default {
 								onChange( {
 									...layout,
 									wideSize: nextWidth,
-									useGlobalPadding: true,
 								} );
 							} }
 							units={ units }
@@ -92,7 +90,6 @@ export default {
 								contentSize: undefined,
 								wideSize: undefined,
 								inherit: false,
-								useGlobalPadding: false,
 							} )
 						}
 					>
