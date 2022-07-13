@@ -22,7 +22,7 @@ Snapshot Diff:
       >
         <input
           autocomplete="off"
-          class="components-input-control__input css-gzm6eu-Input-dragStyles-fontSizeStyles-sizeStyles em5sgkm5"
+          class="components-input-control__input css-nzdm9k-Input-dragStyles-fontSizeStyles-sizeStyles em5sgkm5"
 -         id="inspector-input-control-1"
 +         id="inspector-input-control-2"
           inputmode="numeric"
