@@ -140,6 +140,8 @@ export default function useArrowNav() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.
@@ -185,7 +187,6 @@ export default function useArrowNav() {
 			const hasModifier =
 				isShift || event.ctrlKey || event.altKey || event.metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-			const { defaultView } = ownerDocument;
 
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
@@ -300,10 +301,30 @@ export default function useArrowNav() {
 		function restore() {
 			node.contentEditable = false;
 			ownerDocument.removeEventListener( 'selectionchange', restore );
+			node.removeEventListener( 'keyup', restore );
+
+			if ( ownerDocument.activeElement !== node ) {
+				return;
+			}
+
+			const selection = defaultView.getSelection();
+
+			if ( ! selection.rangeCount ) {
+				return;
+			}
+
+			let { startContainer } = selection.getRangeAt( 0 );
+			startContainer =
+				startContainer.nodeType === startContainer.ELEMENT_NODE
+					? startContainer
+					: startContainer.parentElement;
+
+			startContainer.closest( '[contenteditable]' ).focus();
 		}
 
 		function restoreOnNextSelectionChange() {
 			ownerDocument.addEventListener( 'selectionchange', restore );
+			node.addEventListener( 'keyup', restore );
 		}
 
 		node.addEventListener( 'mousedown', onMouseDown );
