@@ -72,7 +72,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		name = 'core/comment-date';
 	}
 
-	return applyFilters( 'editor.convertLegacyBlockNameAndAttributes', [
+	return applyFilters( 'blocks.convertLegacyBlockNameAndAttributes', [
 		name,
 		newAttributes,
 	] );
