@@ -51,7 +51,9 @@ function InserterSearchResults( {
 		<BlockTypesList
 			name="Blocks"
 			initialNumToRender={ isFullScreen ? 10 : 3 }
-			{ ...{ items, onSelect: handleSelect, listProps } }
+			items={ [ { metadata: {}, data: [ { key: 1, list: items } ] } ] }
+			onSelect={ handleSelect }
+			listProps={ listProps }
 		/>
 	);
 }
