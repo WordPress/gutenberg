@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
@@ -35,20 +34,26 @@ export const borderControl = css`
 `;
 
 export const innerWrapper = () => css`
+	${ UnitControlWrapper } {
+		flex: 1 1 40%;
+	}
 	&& ${ UnitSelect } {
 		/* Prevent unit select forcing min height larger than its UnitControl */
 		min-height: 0;
 	}
 `;
 
-export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
-	return css`
-		${ UnitControlWrapper } {
-			width: ${ width };
-			flex: 0 0 auto;
-		}
-	`;
-};
+/*
+ * This style is only applied to the UnitControl wrapper when the border width
+ * field should be a set width. Omitting this allows the UnitControl &
+ * RangeControl to share the available width in a 40/60 split respectively.
+ */
+export const wrapperWidth = css`
+	${ UnitControlWrapper } {
+		/* Force the UnitControl's set width. */
+		flex: 0 0 auto;
+	}
+`;
 
 /*
  * When default control height is 36px the following should be removed.

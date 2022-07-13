@@ -43,6 +43,7 @@ const UnconnectedBorderControl = (
 		enableStyle = true,
 		hideLabelFromVision,
 		innerWrapperClassName,
+		inputWidth,
 		label,
 		onBorderChange,
 		onSliderChange,
@@ -96,6 +97,7 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					__unstableInputWidth={ inputWidth }
 				/>
 				{ withSlider && (
 					<RangeControl

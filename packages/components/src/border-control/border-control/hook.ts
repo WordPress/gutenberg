@@ -118,14 +118,13 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
+	const wrapperWidth = isCompact ? '90px' : width;
 	const innerWrapperClassName = useMemo( () => {
-		const wrapperWidth = isCompact ? '90px' : width;
-		const widthStyle =
-			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
+		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
 		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
+	}, [ wrapperWidth, cx, __next36pxDefaultSize ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -135,6 +134,7 @@ export function useBorderControl(
 		...otherProps,
 		className: classes,
 		innerWrapperClassName,
+		inputWidth: wrapperWidth,
 		onBorderChange,
 		onSliderChange,
 		onWidthChange,
