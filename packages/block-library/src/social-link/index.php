@@ -27,6 +27,22 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		return '';
 	}
 
+	/**
+	 * Prepend emails with `mailto:` if not set.
+	 * The `is_email` returns false for emails with schema.
+	 */
+	if ( is_email( $url ) ) {
+		$url = 'mailto:' . $url;
+	}
+
+	/**
+	 * Prepend URL with https:// if it doesn't appear to contain a scheme
+	 * and it's not a relative link starting with //.
+	 */
+	if ( ! parse_url( $url, PHP_URL_SCHEME ) && ! str_starts_with( $url, '//' ) ) {
+		$url = 'https://' . $url;
+	}
+
 	$rel_target_attributes = '';
 	if ( $open_in_new_tab ) {
 		$rel_target_attributes = 'rel="noopener nofollow" target="_blank"';

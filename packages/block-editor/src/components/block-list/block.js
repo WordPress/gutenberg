@@ -56,10 +56,10 @@ function mergeWrapperProps( propsA, propsB ) {
 		...propsB,
 	};
 
-	if ( propsA && propsB && propsA.className && propsB.className ) {
+	if ( propsA?.className && propsB?.className ) {
 		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	if ( propsA && propsB && propsA.style && propsB.style ) {
+	if ( propsA?.style && propsB?.style ) {
 		newProps.style = { ...propsA.style, ...propsB.style };
 	}
 

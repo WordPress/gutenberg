@@ -27,8 +27,8 @@ export default function PostTemplate() {
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;
-		if ( hasTemplates ) {
-			return true;
+		if ( ! hasTemplates && ! settings.supportsTemplateMode ) {
+			return false;
 		}
 
 		const canCreateTemplates =
@@ -48,6 +48,7 @@ export default function PostTemplate() {
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
+				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<PostTemplateToggle
 						isOpen={ isOpen }
@@ -95,7 +96,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			}
 			onClick={ onClick }
 		>
-			{ templateTitle ?? __( '(none)' ) }
+			{ templateTitle ?? __( 'Default template' ) }
 		</Button>
 	);
 }

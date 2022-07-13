@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { compact, uniq } from 'lodash';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -28,9 +27,16 @@ function UnforwardedExternalLink(
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
 	const { href, children, className, rel = '', ...additionalProps } = props;
-	const optimizedRel = uniq(
-		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
-	).join( ' ' );
+	const optimizedRel = [
+		...new Set(
+			[
+				...rel.split( ' ' ),
+				'external',
+				'noreferrer',
+				'noopener',
+			].filter( Boolean )
+		),
+	].join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
 		/* eslint-disable react/jsx-no-target-blank */

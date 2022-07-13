@@ -209,7 +209,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 					icon={ captionIcon }
 				/>
 			) }
-			renderContent={ ( {} ) => {
+			renderContent={ () => {
 				if ( trackBeingEdited !== null ) {
 					return (
 						<SingleTrackEditor

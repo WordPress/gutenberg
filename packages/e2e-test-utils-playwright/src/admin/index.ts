@@ -11,6 +11,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
  */
 import { createNewPost } from './create-new-post';
 import { getPageError } from './get-page-error';
+import { setOption } from './set-option';
 import { visitAdminPage } from './visit-admin-page';
 import { visitSiteEditor } from './visit-site-editor';
 import type { PageUtils } from '../page-utils';
@@ -33,8 +34,9 @@ export class Admin {
 		this.pageUtils = pageUtils;
 	}
 
-	createNewPost = createNewPost;
-	getPageError = getPageError;
-	visitAdminPage = visitAdminPage;
-	visitSiteEditor = visitSiteEditor;
+	createNewPost = createNewPost.bind( this );
+	getPageError = getPageError.bind( this );
+	setOption = setOption.bind( this );
+	visitAdminPage = visitAdminPage.bind( this );
+	visitSiteEditor = visitSiteEditor.bind( this );
 }

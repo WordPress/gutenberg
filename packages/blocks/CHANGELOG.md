@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).
+
+### New API
+
+-   The shortcode transformer now accepts a `transform` method to allow advanced controls over the transformed result. For instance, it's now possible to define custom `innerBlocks` for the transformed block. ([#42001](https://github.com/WordPress/gutenberg/pull/42001))
+
 ## 11.11.0 (2022-06-29)
 
 ## 11.10.0 (2022-06-15)
