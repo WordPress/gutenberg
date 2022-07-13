@@ -34,11 +34,11 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param string  $gap_value                     The block gap value to apply.
  * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  * @param string  $fallback_gap_value            The block gap value to apply.
- * @param array   $block_padding                 Custom padding set on the block.
+ * @param array   $block_spacing                 Custom spacing set on the block.
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_padding = null ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -64,22 +64,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 			$style .= "$selector .alignfull { max-width: none; }";
 
-			if ( isset( $block_padding ) ) {
-				$block_padding_values = gutenberg_style_engine_get_block_supports_styles(
+			if ( isset( $block_spacing ) ) {
+				$block_spacing_values = gutenberg_style_engine_get_block_supports_styles(
 					array(
-						'spacing' => array( 'padding' => $block_padding ),
+						'spacing' => $block_spacing,
 
 					)
 				);
 
 				// Handle negative margins for alignfull children of blocks with custom padding set.
 				// They're added separately because padding might only be set on one side.
-				if ( isset( $block_padding_values['declarations']['padding-right'] ) ) {
-					$padding_right = $block_padding_values['declarations']['padding-right'];
+				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+					$padding_right = $block_spacing_values['declarations']['padding-right'];
 					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
 				}
-				if ( isset( $block_padding_values['declarations']['padding-left'] ) ) {
-					$padding_left = $block_padding_values['declarations']['padding-left'];
+				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+					$padding_left = $block_spacing_values['declarations']['padding-left'];
 					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
 				}
 			}
@@ -240,12 +240,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
-	$block_padding      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'padding' ), null );
+	$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
 
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_padding );
+	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
 
 	// Only add container class and enqueue block support styles if unique styles were generated.
 	if ( ! empty( $style ) ) {
