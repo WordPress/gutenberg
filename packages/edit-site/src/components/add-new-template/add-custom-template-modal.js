@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -145,18 +145,13 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		debouncedSearch
 	);
 	const { labels } = entityForSuggestions;
-	// If there are less suggestions than our initial ones with no `search`(10),
-	// there is no need to show the `SearchControl`. We use a `ref` to track
-	// this because the initial search request is enough to let us decide.
-	const showSearchControl = useRef( false );
-	useEffect( () => {
-		if ( ! showSearchControl.current && suggestions?.length > 9 ) {
-			showSearchControl.current = true;
-		}
-	}, [ suggestions ] );
+	const [ showSearchControl, setShowSearchControl ] = useState( false );
+	if ( ! showSearchControl && suggestions?.length > 9 ) {
+		setShowSearchControl( true );
+	}
 	return (
 		<>
-			{ showSearchControl.current && (
+			{ showSearchControl && (
 				<SearchControl
 					onChange={ setSearch }
 					value={ search }
