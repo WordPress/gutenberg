@@ -33,5 +33,6 @@ export async function publishPost( this: Editor ) {
 	const urlString = await this.page.inputValue( 'text="Post address"' );
 	const url = new URL( urlString );
 	const postId = url.searchParams.get( 'p' );
-	return postId;
+
+	return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
 }
