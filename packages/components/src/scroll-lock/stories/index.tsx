@@ -73,7 +73,12 @@ export const Default: ComponentStory< typeof ScrollLock > = () => {
 				} }
 			>
 				<StripedBackground>
-					<div>Start scrolling down...</div>
+					<div>
+						Start scrolling down. Once you scroll to the end of this
+						container with the stripes, the rest of the page will
+						continue scrolling. <code>ScrollLock</code> prevents
+						this &quot;scroll bleed&quot; from happening.
+					</div>
 					<ToggleContainer>
 						<Button variant="primary" onClick={ toggleLock }>
 							Toggle Scroll Lock
