@@ -742,6 +742,31 @@ _Returns_
 
 Returns the Entity's records.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const posts = useSelect( ( select ) =>
+		select( coreDataStore ).getEntityRecords( 'postType', 'post', {
+			per_page: 5,
+		} )
+	);
+
+	return posts ? (
+		<ul>
+			{ posts.map( ( post ) => {
+				return <li key={ post?.id }>{ post?.title.rendered }</li>;
+			} ) }
+		</ul>
+	) : (
+		<div>{ __( 'Loading…' ) }</div>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: State tree
