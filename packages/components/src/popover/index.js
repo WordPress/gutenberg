@@ -4,7 +4,6 @@
  */
 import classnames from 'classnames';
 import {
-	detectOverflow,
 	useFloating,
 	flip,
 	shift,
@@ -114,10 +113,10 @@ const Popover = (
 		expandOnMobile,
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
-		__unstableAvoidOverflow,
 		__unstableObserveElement,
 		__unstableForcePosition,
 		__unstableShift = false,
+		__unstableMiddleware,
 		...contentProps
 	},
 	ref
@@ -183,42 +182,10 @@ const Popover = (
 		};
 	}, [ ownerDocument ] );
 
-	const avoidOverflow = useMemo( () => {
-		if ( ! __unstableAvoidOverflow ) {
-			return;
-		}
-
-		return {
-			name: 'avoidOverflow',
-			async fn( middlewareArgs ) {
-				const overflow = await detectOverflow( middlewareArgs );
-				const { placement: currentPlacement } = middlewareArgs;
-
-				const hasOverflowTop =
-					currentPlacement.includes( 'top' ) && overflow.top > 0;
-				const hasOverflowBottom =
-					currentPlacement.includes( 'bottom' ) &&
-					overflow.bottom > 0;
-
-				if ( hasOverflowTop || hasOverflowBottom ) {
-					return {
-						reset: {
-							placement: hasOverflowTop
-								? currentPlacement.replace( 'top', 'bottom' )
-								: currentPlacement.replace( 'bottom', 'top' ),
-						},
-					};
-				}
-
-				return middlewareArgs;
-			},
-		};
-	}, [ __unstableAvoidOverflow ] );
-
 	const middlewares = [
 		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
-		avoidOverflow,
+		...( __unstableMiddleware ?? [] ),
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -233,7 +200,7 @@ const Popover = (
 						} );
 					},
 			  } ),
-		__unstableShift && ! avoidOverflow
+		__unstableShift
 			? shift( {
 					crossAxis: true,
 					limiter: limitShift(),

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { shift, limitShift } from '@floating-ui/react-dom';
 
 /**
  * WordPress dependencies
@@ -40,6 +41,52 @@ export default function BlockPopover( {
 		};
 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
 
+	const middleware = useMemo(
+		() => [
+			{
+				name: 'flipShiftBlockPopover',
+				async fn( middlewareProps ) {
+					const {
+						x,
+						y,
+						rects,
+						placement: currentPlacement,
+					} = middlewareProps;
+					const isTopPlacement = currentPlacement.includes( 'top' );
+
+					if ( ! isTopPlacement ) {
+						return { x, y };
+					}
+
+					const referenceRect = rects.reference;
+					const floatingRect = rects.floating;
+
+					// Flip the popover placement to the bottom if there's not
+					// enough space above the reference element.
+					if ( floatingRect.height > referenceRect.y ) {
+						const newPlacement = currentPlacement.replace(
+							'top',
+							'bottom'
+						);
+						return {
+							reset: {
+								placement: newPlacement,
+							},
+						};
+					}
+
+					// Else shift it.
+					return shift( {
+						crossAxis: true,
+						limiter: limitShift(),
+						padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+					} ).fn( middlewareProps );
+				},
+			},
+		],
+		[]
+	);
+
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
 		return null;
 	}
@@ -61,9 +108,8 @@ export default function BlockPopover( {
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
+			__unstableMiddleware={ middleware }
 			__unstableForcePosition
-			__unstableShift
-			__unstableAvoidOverflow
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
