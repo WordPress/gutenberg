@@ -17,7 +17,6 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
  * @access private
  */
 class WP_Style_Engine_CSS_Declarations {
-
 	/**
 	 * An array of CSS declarations (property => value pairs).
 	 *
