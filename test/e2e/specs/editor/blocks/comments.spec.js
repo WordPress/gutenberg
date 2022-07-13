@@ -43,8 +43,8 @@ test.describe( 'Comments', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		await expect(
-			await page.locator( 'text="No results found."' )
-		).toHaveCount( 1 );
+			page.locator( 'role=document[name="Block: Comment Template"]' )
+		).toContainText( 'No results found.' );
 	} );
 
 	test( 'Pagination links are working as expected', async ( {
@@ -69,36 +69,36 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"i] >> "View Post"'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"]'
 		);
 
 		// We check that there is a previous comments page link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Older Comments"]' )
+		).toBeVisible();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Newer Comments"]' )
+		).toBeHidden();
 
-		await page.click( 'text="Older Comments"' );
+		await page.click( 'role=link[name="Older Comments"]' );
 
 		// We check that there are a previous and a next link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Older Comments"]' )
+		).toBeVisible();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Newer Comments"]' )
+		).toBeVisible();
 
-		await page.click( 'text="Older Comments"' );
+		await page.click( 'role=link[name="Older Comments"]' );
 
 		// We check that there is only have a next link
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Older Comments"]' )
+		).toBeHidden();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Newer Comments"]' )
+		).toBeVisible();
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
 		admin,
@@ -123,16 +123,16 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"i] >> "View Post"'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"]'
 		);
 
 		// We check that there are no comments page link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Older Comments"]' )
+		).toBeHidden();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Newer Comments"]' )
+		).toBeHidden();
 	} );
 
 	test.afterEach( async ( { admin } ) => {
