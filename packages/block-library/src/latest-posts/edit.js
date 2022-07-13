@@ -3,6 +3,7 @@
  */
 import { get, includes, pickBy } from 'lodash';
 import classnames from 'classnames';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -68,6 +69,9 @@ function getFeaturedImageDetails( post, size ) {
 }
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
+	const createUpdater = memoize( ( name ) => ( nextValue ) => {
+		setAttributes( { [ name ]: nextValue } );
+	} );
 	const instanceId = useInstanceId( LatestPostsEdit );
 	const {
 		postsToShow,
@@ -209,9 +213,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToggleControl
 					label={ __( 'Post content' ) }
 					checked={ displayPostContent }
-					onChange={ ( value ) =>
-						setAttributes( { displayPostContent: value } )
-					}
+					onChange={ createUpdater( 'displayPostContent' ) }
 				/>
 				{ displayPostContent && (
 					<RadioControl
@@ -224,11 +226,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								value: 'full_post',
 							},
 						] }
-						onChange={ ( value ) =>
-							setAttributes( {
-								displayPostContentRadio: value,
-							} )
-						}
+						onChange={ createUpdater( 'displayPostContentRadio' ) }
 					/>
 				) }
 				{ displayPostContent &&
@@ -236,9 +234,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						<RangeControl
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
-							onChange={ ( value ) =>
-								setAttributes( { excerptLength: value } )
-							}
+							onChange={ createUpdater( 'excerptLength' ) }
 							min={ MIN_EXCERPT_LENGTH }
 							max={ MAX_EXCERPT_LENGTH }
 						/>
@@ -249,16 +245,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToggleControl
 					label={ __( 'Display author name' ) }
 					checked={ displayAuthor }
-					onChange={ ( value ) =>
-						setAttributes( { displayAuthor: value } )
-					}
+					onChange={ createUpdater( 'displayAuthor' ) }
 				/>
 				<ToggleControl
 					label={ __( 'Display post date' ) }
 					checked={ displayPostDate }
-					onChange={ ( value ) =>
-						setAttributes( { displayPostDate: value } )
-					}
+					onChange={ createUpdater( 'displayPostDate' ) }
 				/>
 			</PanelBody>
 
@@ -266,9 +258,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToggleControl
 					label={ __( 'Display featured image' ) }
 					checked={ displayFeaturedImage }
-					onChange={ ( value ) =>
-						setAttributes( { displayFeaturedImage: value } )
-					}
+					onChange={ createUpdater( 'displayFeaturedImage' ) }
 				/>
 				{ displayFeaturedImage && (
 					<>
@@ -305,11 +295,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							</BaseControl.VisualLabel>
 							<BlockAlignmentToolbar
 								value={ featuredImageAlign }
-								onChange={ ( value ) =>
-									setAttributes( {
-										featuredImageAlign: value,
-									} )
-								}
+								onChange={ createUpdater(
+									'featuredImageAlign'
+								) }
 								controls={ [ 'left', 'center', 'right' ] }
 								isCollapsed={ false }
 							/>
@@ -317,11 +305,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						<ToggleControl
 							label={ __( 'Add link to featured image' ) }
 							checked={ addLinkToFeaturedImage }
-							onChange={ ( value ) =>
-								setAttributes( {
-									addLinkToFeaturedImage: value,
-								} )
-							}
+							onChange={ createUpdater(
+								'addLinkToFeaturedImage'
+							) }
 						/>
 					</>
 				) }
@@ -331,15 +317,9 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<QueryControls
 					{ ...{ order, orderBy } }
 					numberOfItems={ postsToShow }
-					onOrderChange={ ( value ) =>
-						setAttributes( { order: value } )
-					}
-					onOrderByChange={ ( value ) =>
-						setAttributes( { orderBy: value } )
-					}
-					onNumberOfItemsChange={ ( value ) =>
-						setAttributes( { postsToShow: value } )
-					}
+					onOrderChange={ createUpdater( 'order' ) }
+					onOrderByChange={ createUpdater( 'orderBy' ) }
+					onNumberOfItemsChange={ createUpdater( 'postsToShow' ) }
 					categorySuggestions={ categorySuggestions }
 					onCategoryChange={ selectCategories }
 					selectedCategories={ categories }
@@ -357,9 +337,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
-						onChange={ ( value ) =>
-							setAttributes( { columns: value } )
-						}
+						onChange={ createUpdater( 'columns' ) }
 						min={ 2 }
 						max={
 							! hasPosts
