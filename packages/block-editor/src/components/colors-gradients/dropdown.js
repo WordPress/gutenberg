@@ -60,8 +60,8 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem 
-			className="block-editor-panel-color-gradient-settings__color-name" 
+		<FlexItem
+			className="block-editor-panel-color-gradient-settings__color-name"
 			title={ label }
 		>
 			{ label }
