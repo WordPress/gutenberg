@@ -53,13 +53,10 @@ function isKeyDownEligibleForStartTyping( event ) {
  * element.
  */
 export function useMouseMoveTypingReset() {
-	const { isTyping, hasInlineToolbar } = useSelect( ( select ) => {
-		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
-		return {
-			isTyping: _isTyping(),
-			hasInlineToolbar: getSettings().hasInlineToolbar,
-		};
-	}, [] );
+	const isTyping = useSelect(
+		( select ) => select( blockEditorStore ).isTyping(),
+		[]
+	);
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
@@ -69,8 +66,6 @@ export function useMouseMoveTypingReset() {
 			}
 
 			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
 			let lastClientX;
 			let lastClientY;
 
@@ -81,10 +76,6 @@ export function useMouseMoveTypingReset() {
 			 */
 			function stopTypingOnMouseMove( event ) {
 				const { clientX, clientY } = event;
-
-				if ( hasInlineToolbar && ! selection.isCollapsed ) {
-					return;
-				}
 
 				// We need to check that the mouse really moved because Safari
 				// triggers mousemove events when shift or ctrl are pressed.
@@ -250,29 +241,12 @@ export function useTypingObserver() {
 				startTyping();
 			}
 
-			function startTypingOnSelection() {
-				if ( ! selection.isCollapsed ) {
-					startTyping();
-				}
-			}
-
 			node.addEventListener( 'keypress', startTypingInTextField );
 			node.addEventListener( 'keydown', startTypingInTextField );
-
-			if ( hasInlineToolbar ) {
-				ownerDocument.addEventListener(
-					'selectionchange',
-					startTypingOnSelection
-				);
-			}
 
 			return () => {
 				node.removeEventListener( 'keypress', startTypingInTextField );
 				node.removeEventListener( 'keydown', startTypingInTextField );
-				ownerDocument.removeEventListener(
-					'selectionchange',
-					startTypingOnSelection
-				);
 			};
 		},
 		[ isTyping, hasInlineToolbar, startTyping, stopTyping ]

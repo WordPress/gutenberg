@@ -3,7 +3,12 @@
  */
 import { Popover, ToolbarGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { isCollapsed, useAnchorRef } from '@wordpress/rich-text';
+import {
+	isCollapsed,
+	getActiveFormats,
+	useAnchorRef,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -17,17 +22,33 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
 		[]
 	);
-	const selectionRef = useAnchorRef( { ref: anchorRef, value } );
+	const activeFormats = getActiveFormats( value );
+	const lastFormat = activeFormats[ activeFormats.length - 1 ];
+	const lastFormatType = lastFormat?.type;
+	const settings = useSelect(
+		( select ) =>
+			select( richTextStore ).getFormatType( lastFormatType ) || {},
+		[ lastFormatType ]
+	);
+	const selectionRef = useAnchorRef( {
+		ref: anchorRef,
+		value,
+		settings,
+	} );
 
 	if ( hasInlineToolbar || inline ) {
-		if ( hasInlineToolbar && isCollapsed( value ) ) {
+		if (
+			hasInlineToolbar &&
+			isCollapsed( value ) &&
+			! activeFormats.length
+		) {
 			return null;
 		}
 
 		// Render in popover.
 		return (
 			<Popover
-				position="top center"
+				position="bottom center"
 				focusOnMount={ false }
 				anchorRef={ hasInlineToolbar ? selectionRef : anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
