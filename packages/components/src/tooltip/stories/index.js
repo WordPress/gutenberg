@@ -32,7 +32,6 @@ export const _default = () => {
 		'bottom right': 'bottom right',
 	};
 	const tooltipText = text( 'Text', 'More information' );
-	const longTooltipText = text( 'Text', 'Long explanatory information' );
 	const position = select( 'Position', positionOptions, 'top center' );
 	const delay = number( 'Delay', 700 );
 	return (
@@ -50,11 +49,7 @@ export const _default = () => {
 					Hover for more information
 				</div>
 			</Tooltip>
-			<Tooltip
-				text={ longTooltipText }
-				position={ position }
-				delay={ delay }
-			>
+			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
 				<div
 					style={ {
 						margin: '50px auto',
