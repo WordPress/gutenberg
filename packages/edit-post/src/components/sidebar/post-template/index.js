@@ -48,6 +48,7 @@ export default function PostTemplate() {
 				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
+				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<PostTemplateToggle
 						isOpen={ isOpen }

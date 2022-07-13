@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.15.0 (2022-07-13)
+
 ### Bug Fix
 
 -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
