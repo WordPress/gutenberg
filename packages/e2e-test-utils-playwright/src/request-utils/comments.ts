@@ -7,6 +7,7 @@ export interface Comment {
 	id: number;
 	author: number;
 	content: string;
+	post: number;
 }
 
 /**
@@ -15,12 +16,17 @@ export interface Comment {
  * @param {} this    RequestUtils.
  * @param {} comment Comment.
  */
-export async function createComment( this: RequestUtils, comment: Comment ) {
-	this.rest( {
+export async function createComment(
+	this: RequestUtils,
+	comment: Partial< Comment >
+) {
+	const response = await this.rest( {
 		method: 'POST',
 		path: '/wp/v2/comments',
 		data: comment,
 	} );
+
+	return response;
 }
 
 /**
