@@ -118,10 +118,6 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
-	const borderLabelClassName = useMemo( () => {
-		return cx( styles.borderLabel );
-	}, [ cx ] );
-
 	const innerWrapperClassName = useMemo( () => {
 		const wrapperWidth = isCompact ? '90px' : width;
 		const widthStyle =
@@ -141,7 +137,6 @@ export function useBorderControl(
 
 	return {
 		...otherProps,
-		borderLabelClassName,
 		className: classes,
 		innerWrapperClassName,
 		onBorderChange,
