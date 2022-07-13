@@ -174,6 +174,7 @@ function PostFeaturedImage( {
 							<Dropdown
 								className="editor-post-featured-image__dropdown"
 								position="center left"
+								focusOnMount
 								renderToggle={ ( { isOpen, onToggle } ) =>
 									featuredImageId ? (
 										<PostFeaturedImagePreview
