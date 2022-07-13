@@ -622,10 +622,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$node          = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
-		$use_root_vars = _wp_array_get( $this->theme_json, array( 'settings', 'useRootPaddingAwareAlignments' ), array() );
-		$selector      = $block_metadata['selector'];
-		$settings      = _wp_array_get( $this->theme_json, array( 'settings' ) );
+		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$use_root_padding = _wp_array_get( $this->theme_json, array( 'settings', 'useRootPaddingAwareAlignments' ), false );
+		$selector         = $block_metadata['selector'];
+		$settings         = _wp_array_get( $this->theme_json, array( 'settings' ) );
 
 		// Get a reference to element name from path.
 		// $block_metadata['path'] = array('styles','elements','link');
@@ -654,9 +654,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		// element then compute the style properties for it.
 		// Otherwise just compute the styles for the default selector as normal.
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) && isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) && in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true ) ) {
-			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_vars );
+			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
-			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_vars );
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
 
 		$block_rules = '';
@@ -703,7 +703,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			$block_gap_value = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
 
-			if ( $use_root_vars ) {
+			if ( $use_root_padding ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 				$block_rules .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
@@ -771,10 +771,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array   $properties Properties metadata.
 	 * @param array   $theme_json Theme JSON array.
 	 * @param string  $selector The style block selector.
-	 * @param boolean $use_root_vars Whether to add custom properties at root level.
+	 * @param boolean $use_root_padding Whether to add custom properties at root level.
 	 * @return array  Returns the modified $declarations.
 	 */
-	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_vars = null ) {
+	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
@@ -798,7 +798,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				continue;
 			}
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_vars ) {
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && $use_root_padding ) {
 				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
 			}
 
