@@ -5,6 +5,7 @@
 ### Internal
 
 -   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
+-   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
 
 ## 19.15.0 (2022-07-13)
 
