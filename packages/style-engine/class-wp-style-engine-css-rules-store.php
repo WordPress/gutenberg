@@ -19,33 +19,49 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 class WP_Style_Engine_CSS_Rules_Store {
 
 	/**
-	 * An array of CSS Rules objects.
+	 * An array of named WP_Style_Engine_CSS_Rules_Store objects.
 	 *
 	 * @static
+	 *
+	 * @var WP_Style_Engine_CSS_Rules_Store[]
+	 */
+	protected static $stores = array();
+
+	/**
+	 * An array of CSS Rules objects assigned to the store.
 	 *
 	 * @var WP_Style_Engine_CSS_Rule[]
 	 */
-	protected static $rules = array();
+	protected $rules = array();
 
+	/**
+	 * Get an instance of the store.
+	 *
+	 * @param string $store_name The name of the store.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store
+	 */
+	public static function get_store( $store_name ) {
+		if ( ! isset( static::$stores[ $store_name ] ) ) {
+			static::$stores[ $store_name ] = new WP_Style_Engine_CSS_Rules_Store( $store_name );
+		}
+		return static::$stores[ $store_name ];
+	}
 	/**
 	 * Get an array of all rules.
 	 *
-	 * @static
-	 *
 	 * @return WP_Style_Engine_CSS_Rule[]
 	 */
-	public static function get_all_rules() {
-		return static::$rules;
+	public function get_all_rules() {
+		return $this->rules;
 	}
 
 	/**
 	 * Get a WP_Style_Engine_CSS_Rule object by its selector.
 	 *
-	 * @static
-	 *
 	 * @param string $selector The CSS selector.
 	 */
-	public static function get_rule( $selector ) {
+	public function get_rule( $selector ) {
 
 		$selector = trim( $selector );
 
@@ -55,10 +71,10 @@ class WP_Style_Engine_CSS_Rules_Store {
 		}
 
 		// Create the rule if it doesn't exist.
-		if ( empty( static::$rules[ $selector ] ) ) {
-			static::$rules[ $selector ] = new WP_Style_Engine_CSS_Rule( $selector );
+		if ( empty( $this->rules[ $selector ] ) ) {
+			$this->rules[ $selector ] = new WP_Style_Engine_CSS_Rule( $selector );
 		}
 
-		return static::$rules[ $selector ];
+		return $this->rules[ $selector ];
 	}
 }
