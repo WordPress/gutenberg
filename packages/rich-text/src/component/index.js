@@ -18,6 +18,7 @@ import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
+import { useArrowKeysWithPlaceholder } from './use-arrow-keys-with-placeholder';
 import {
 	useInputAndSelection,
 	EMPTY_ACTIVE_FORMATS,
@@ -241,6 +242,7 @@ export function useRichText( {
 			handleChange,
 			multilineTag,
 		} ),
+		useArrowKeysWithPlaceholder(),
 		useIndentListItemOnSpace( {
 			multilineTag,
 			createRecord,
