@@ -47,10 +47,12 @@ export default function useBlockAttribute( name, transform ) {
 	const setCurrentValue = useCallback(
 		( newValue ) => {
 			updateBlockAttributes( clientId, {
-				[ name ]: transform ? transform( newValue ) : newValue,
+				[ name ]: transform
+					? transform( newValue, currentValue )
+					: newValue,
 			} );
 		},
-		[ updateBlockAttributes, transform ]
+		[ transform, currentValue ]
 	);
 
 	return [ currentValue, setCurrentValue ];

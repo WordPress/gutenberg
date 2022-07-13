@@ -8,11 +8,25 @@ import {
 	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockAttribute,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
-export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showPostCounts, displayAsDropdown, type } = attributes;
+const flipOldValue = ( _, oldValue ) => ! oldValue;
+
+export default function ArchivesEdit( { attributes } ) {
+	const [ displayAsDropdown, setDisplayAsDropdown ] = useBlockAttribute(
+		'displayAsDropdown',
+		flipOldValue
+	);
+	const [ showPostCounts, setShowPostCounts ] = useBlockAttribute(
+		'showPostCounts',
+		flipOldValue
+	);
+	const [ type, setType ] = useBlockAttribute( 'type' );
 
 	return (
 		<>
@@ -21,20 +35,12 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
-						onChange={ () =>
-							setAttributes( {
-								displayAsDropdown: ! displayAsDropdown,
-							} )
-						}
+						onChange={ setDisplayAsDropdown }
 					/>
 					<ToggleControl
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
-						onChange={ () =>
-							setAttributes( {
-								showPostCounts: ! showPostCounts,
-							} )
-						}
+						onChange={ setShowPostCounts }
 					/>
 					<SelectControl
 						label={ __( 'Group by:' ) }
@@ -45,9 +51,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							{ label: __( 'Day' ), value: 'daily' },
 						] }
 						value={ type }
-						onChange={ ( value ) =>
-							setAttributes( { type: value } )
-						}
+						onChange={ setType }
 					/>
 				</PanelBody>
 			</InspectorControls>
