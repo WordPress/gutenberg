@@ -127,10 +127,6 @@ export function useBorderControl(
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
 	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
 
-	const widthControlClassName = useMemo( () => {
-		return cx( styles.borderWidthControl() );
-	}, [ cx ] );
-
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
 	}, [ cx ] );
@@ -145,7 +141,6 @@ export function useBorderControl(
 		previousStyleSelection: styleSelection,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
 		__next36pxDefaultSize,

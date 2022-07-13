@@ -13,7 +13,6 @@ import {
 	StyledField,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { BackdropUI } from '../input-control/styles/input-control-styles';
 import {
 	Root as UnitControlWrapper,
 	UnitSelect,
@@ -39,17 +38,6 @@ export const innerWrapper = () => css`
 	&& ${ UnitSelect } {
 		/* Prevent unit select forcing min height larger than its UnitControl */
 		min-height: 0;
-		${ rtl(
-			{ borderRadius: '0 2px 2px 0' },
-			{ borderRadius: '2px 0 0 2px' }
-		)() }
-		transition: box-shadow 0.1s linear, border 0.1s linear;
-
-		&:focus {
-			z-index: 1;
-			${ focusBoxShadow }
-			border: 1px solid ${ COLORS.ui.borderFocus };
-		}
 	}
 `;
 
@@ -182,13 +170,6 @@ export const resetButton = css`
 	&& {
 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
 		height: 46px;
-	}
-`;
-
-export const borderWidthControl = () => css`
-	/* Target the InputControl's backdrop */
-	&&& ${ BackdropUI } {
-		transition: box-shadow 0.1s linear;
 	}
 `;
 

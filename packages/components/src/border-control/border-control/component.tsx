@@ -53,7 +53,6 @@ const UnconnectedBorderControl = (
 		showDropdownHeader,
 		sliderClassName,
 		value: border,
-		widthControlClassName,
 		widthUnit,
 		widthValue,
 		withSlider,
@@ -93,7 +92,6 @@ const UnconnectedBorderControl = (
 					}
 					label={ __( 'Border width' ) }
 					hideLabelFromVision
-					className={ widthControlClassName }
 					min={ 0 }
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
