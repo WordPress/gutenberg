@@ -317,6 +317,40 @@ interface GetEntityRecord {
  * @param  key   Record's key
  * @param  query Optional query.
  *
+ * @example
+ * ```jsx
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const { postData, termData } = useSelect( ( select ) => {
+ *         return {
+ *             postData: select( coreDataStore ).getEntityRecord(
+ *                 postType',
+ *                 'post',
+ *                 1
+ *             ),
+ *             termData: select( coreDataStore ).getEntityRecord(
+ *                 'taxonomy',
+ *                 'category',
+ *                 1
+ *             ),
+ *         };
+ *     } );
+ *
+ *     return postData && termData ? (
+ *         <div>
+ *             { sprintf( __( 'Post Title:, %s' ), postData?.title.rendered ) }
+ *             <br />
+ *             { sprintf( __( 'Term Name: %s' ), termData?.name ) }
+ *         </div>
+ *     ) : (
+ *         <div>{ __( 'Loading…' ) }</div>
+ *     ;
+ * };
+ * ```
+ *
  * @return Record.
  */
 export const getEntityRecord: GetEntityRecord = createSelector(

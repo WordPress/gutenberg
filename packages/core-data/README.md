@@ -657,6 +657,41 @@ Returns the Entity's record object by key. Returns `null` if the value is not
 yet received, undefined if the value entity is known to not exist, or the
 entity object if it exists and is received.
 
+_Usage_
+
+```jsx
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { sprintf, __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+    const { postData, termData } = useSelect( ( select ) => {
+        return {
+            postData: select( coreDataStore ).getEntityRecord(
+                postType',
+                'post',
+                1
+            ),
+            termData: select( coreDataStore ).getEntityRecord(
+                'taxonomy',
+                'category',
+                1
+            ),
+        };
+    } );
+
+    return postData && termData ? (
+        <div>
+            { sprintf( __( 'Post Title:, %s' ), postData?.title.rendered ) }
+            <br />
+            { sprintf( __( 'Term Name: %s' ), termData?.name ) }
+        </div>
+    ) : (
+        <div>{ __( 'Loading…' ) }</div>
+    ;
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: State tree
