@@ -53,7 +53,6 @@ test.describe( 'Comments', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const author = requestUtils.getCurrentUser();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
@@ -61,7 +60,6 @@ test.describe( 'Comments', () => {
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
 			await requestUtils.createComment( {
-				author: author.id,
 				content: `This is an automated comment - ${ i }`,
 				post: postId,
 			} );
@@ -106,7 +104,6 @@ test.describe( 'Comments', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const author = requestUtils.getCurrentUser();
 		await admin.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
@@ -115,7 +112,6 @@ test.describe( 'Comments', () => {
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
 			await requestUtils.createComment( {
-				author: author.id,
 				content: `This is an automated comment - ${ i }`,
 				post: postId,
 			} );

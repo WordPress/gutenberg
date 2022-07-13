@@ -13,17 +13,20 @@ export interface Comment {
 /**
  * Create new comment using the REST API.
  *
- * @param {} this    RequestUtils.
- * @param {} comment Comment.
+ * It uses the current user if no author is defined inside `comment`.
+ *
+ * @param {} this           RequestUtils.
+ * @param {} comment        Partial<Comment>.
  */
 export async function createComment(
 	this: RequestUtils,
 	comment: Partial< Comment >
 ) {
+	const author = comment.author ?? ( await this.getCurrentUser() )?.id;
 	const response = await this.rest( {
 		method: 'POST',
 		path: '/wp/v2/comments',
-		data: comment,
+		data: { ...comment, author },
 	} );
 
 	return response;
