@@ -13,9 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	PostTaxonomies,
-	PostExcerptCheck,
 	PageAttributesCheck,
-	PostFeaturedImageCheck,
 	PostTypeSupportCheck,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -205,18 +203,6 @@ export default function EditPostPreferencesModal() {
 									/>
 								) }
 							/>
-							<PostFeaturedImageCheck>
-								<EnablePanelOption
-									label={ __( 'Featured image' ) }
-									panelName="featured-image"
-								/>
-							</PostFeaturedImageCheck>
-							<PostExcerptCheck>
-								<EnablePanelOption
-									label={ __( 'Excerpt' ) }
-									panelName="post-excerpt"
-								/>
-							</PostExcerptCheck>
 							<PostTypeSupportCheck
 								supportKeys={ [ 'comments', 'trackbacks' ] }
 							>

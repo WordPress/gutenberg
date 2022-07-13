@@ -1,0 +1,21 @@
+.edit-post-post-summary {
+	border-bottom: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-200;
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+	padding: $grid-unit-10 $grid-unit-20 $grid-unit-20;
+
+	.edit-post-post-featured-image + & {
+		margin-top: -1px;
+	}
+}
+
+.edit-post-post-summary__title,
+.edit-post-post-summary__excerpt {
+	margin-top: $grid-unit-10;
+}
+
+.edit-post-post-summary__title {
+	font-size: 16px;
+	font-weight: 600;
+}

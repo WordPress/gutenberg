@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,13 +18,20 @@ import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 export default function InspectorPopoverHeader( {
+	className,
 	title,
 	help,
 	actions = [],
 	onClose,
 } ) {
 	return (
-		<VStack className="block-editor-inspector-popover-header" spacing={ 4 }>
+		<VStack
+			className={ classnames(
+				'block-editor-inspector-popover-header',
+				className
+			) }
+			spacing={ 4 }
+		>
 			<HStack alignment="center">
 				<Heading
 					className="block-editor-inspector-popover-header__heading"

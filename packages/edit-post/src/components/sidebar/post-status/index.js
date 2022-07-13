@@ -9,6 +9,8 @@ import { compose, ifCondition } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import PostFeaturedImage from '../post-featured-image';
+import PostSummary from '../post-summary';
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
@@ -38,6 +40,8 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PostFeaturedImage />
+						<PostSummary />
 						<PostVisibility />
 						<PostSchedule />
 						<PostURL />

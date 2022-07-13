@@ -48,6 +48,11 @@
 			opacity: 0.3;
 		}
 	}
+
+	// Don't show red outline on destructive menu items.
+	&.is-destructive {
+		box-shadow: none;
+	}
 }
 
 .components-menu-item__info-wrapper {

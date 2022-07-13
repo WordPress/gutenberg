@@ -1,0 +1,11 @@
+.edit-post-post-featured-image {
+	.editor-post-featured-image__container {
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
+	}
+
+	.editor-post-featured-image__toggle {
+		border-bottom: $border-width solid $gray-200;
+		border-top: $border-width solid $gray-200;
+	}
+}

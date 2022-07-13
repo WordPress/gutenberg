@@ -1,9 +1,12 @@
 .editor-post-featured-image {
 	padding: 0;
 
-	&__container {
-		margin-bottom: 1em;
+	.editor-post-featured-image__container {
 		position: relative;
+	}
+
+	.editor-post-featured-image__dropdown {
+		display: block;
 	}
 
 	.components-spinner {
@@ -12,12 +15,6 @@
 		left: 50%;
 		margin-top: -9px;
 		margin-left: -9px;
-	}
-
-	// Stack consecutive buttons.
-	.components-button + .components-button {
-		display: block;
-		margin-top: 1em;
 	}
 
 	// This keeps images at their intrinsic size (eg. a 50px
@@ -33,29 +30,26 @@
 	display: block;
 	width: 100%;
 	padding: 0;
-	transition: all 0.1s ease-out;
-	@include reduce-motion("transition");
-	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+	border-radius: 0;
 }
 
 .editor-post-featured-image__preview {
 	height: auto;
 }
 
-.editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
-	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
-}
+// .editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
+// 	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
+// }
 
 .editor-post-featured-image__toggle {
-	border-radius: $radius-block-ui;
-	background-color: $gray-100;
-	min-height: 90px;
-	line-height: 20px;
-	padding: $grid-unit-10 0;
-	text-align: center;
+	min-height: $grid-unit-80;
+}
 
-	&:hover {
-		background: $gray-300;
-		color: $gray-900;
-	}
+.editor-post-featured-image__menu {
+	margin: $grid-unit-10 0;
+}
+
+.editor-post-featured-image__menu-header {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
 }
