@@ -8,6 +8,8 @@ import {
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -27,7 +29,7 @@ export default function SpacingRangeControl( props ) {
 	const createHandleOnFocus = ( side ) => () => {
 		props.onFocus( side );
 	};
-	const useSelect = props.useSelect;
+	const useSelect = false; //props.useSelect;
 	const getNewCustomValue = ( newSize ) => {
 		return newSize;
 	};
@@ -64,6 +66,35 @@ export default function SpacingRangeControl( props ) {
 				isPressed={ showCustomValueControl }
 				isSmall
 			/> */ }
+			<Flex>
+				<FlexItem>
+					<div>
+						<span>{ props.label }</span>{ ' ' }
+						<span className="components-spacing-sizes-control__hint">
+							{ currentValueHint !== undefined
+								? currentValueHint
+								: __( 'Default' ) }
+						</span>
+					</div>
+				</FlexItem>
+				<FlexItem>
+					<Button
+						label={
+							showCustomValueControl
+								? __( 'Use size preset' )
+								: __( 'Set custom size' )
+						}
+						icon={ settings }
+						onClick={ () => {
+							setShowCustomValueControl(
+								! showCustomValueControl
+							);
+						} }
+						isPressed={ showCustomValueControl }
+						isSmall
+					/>
+				</FlexItem>
+			</Flex>
 			{ showCustomValueControl && (
 				<UnitControl
 					label={ props.label }
@@ -76,16 +107,7 @@ export default function SpacingRangeControl( props ) {
 			{ ! useSelect && ! showCustomValueControl && (
 				<RangeControl
 					value={ props.value }
-					label={
-						<>
-							<span>{ props.label }</span>{ ' ' }
-							<span className="components-spacing-sizes-control__hint">
-								{ currentValueHint !== undefined
-									? currentValueHint
-									: __( 'Default' ) }
-							</span>
-						</>
-					}
+					label={ <></> }
 					onChange={ ( newSize ) =>
 						props.onChange( getNewRangeValue( newSize ) )
 					}
