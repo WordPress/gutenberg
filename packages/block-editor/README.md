@@ -671,6 +671,34 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockAttribute
+
+Returns the current value for a block attribute and a function to update it.
+It automatically detects the block instance that should get updated based on the block edit context.
+
+_Usage_
+
+```jsx
+import { useBlockAttribute } from '@wordpress/block-editor';
+import { TextControl } from '@wordpress/components';
+
+function ContentInput() {
+    const [ content, setContent ] = useBlockAttribute( 'content' );
+    return (
+        <TextControl value={ content } onChange={ setContent ) } />
+    );
+}
+```
+
+_Parameters_
+
+-   _name_ `string`: Attribute name.
+-   _transform_ `[Function]`: Optional transform function applied when setting attribute value.
+
+_Returns_
+
+-   `[*, Function]`: A tuple of the current attribute value and a function to update it.
+
 ### useBlockDisplayInformation
 
 Hook used to try to find a matching block variation and return
