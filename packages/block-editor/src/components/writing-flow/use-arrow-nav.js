@@ -6,8 +6,6 @@ import {
 	focus,
 	isHorizontalEdge,
 	isVerticalEdge,
-	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
 	isRTL,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
@@ -141,6 +139,7 @@ export default function useArrowNav() {
 	} = useSelect( blockEditorStore );
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
+		const { ownerDocument } = node;
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.
@@ -186,7 +185,6 @@ export default function useArrowNav() {
 			const hasModifier =
 				isShift || event.ctrlKey || event.altKey || event.metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
 			// If there is a multi-selection, the arrow keys should collapse the
@@ -282,35 +280,30 @@ export default function useArrowNav() {
 				isVerticalEdge( target, isReverse ) &&
 				! keepCaretInsideBlock
 			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverse,
-					node,
-					true
-				);
-
-				if ( closestTabbable ) {
-					placeCaretAtVerticalEdge(
-						closestTabbable,
-						isReverse,
-						verticalRect
-					);
-					event.preventDefault();
-				}
+				node.contentEditable = true;
+				// Firefox doesn't automatically move focus.
+				node.focus();
+				restoreOnNextSelectionChange();
 			} else if (
 				isHorizontal &&
 				defaultView.getSelection().isCollapsed &&
 				isHorizontalEdge( target, isReverseDir ) &&
 				! keepCaretInsideBlock
 			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverseDir,
-					node
-				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-				event.preventDefault();
+				node.contentEditable = true;
+				// Firefox doesn't automatically move focus.
+				node.focus();
+				restoreOnNextSelectionChange();
 			}
+		}
+
+		function restore() {
+			node.contentEditable = false;
+			ownerDocument.removeEventListener( 'selectionchange', restore );
+		}
+
+		function restoreOnNextSelectionChange() {
+			ownerDocument.addEventListener( 'selectionchange', restore );
 		}
 
 		node.addEventListener( 'mousedown', onMouseDown );
@@ -318,6 +311,7 @@ export default function useArrowNav() {
 		return () => {
 			node.removeEventListener( 'mousedown', onMouseDown );
 			node.removeEventListener( 'keydown', onKeyDown );
+			ownerDocument.removeEventListener( 'selectionchange', restore );
 		};
 	}, [] );
 }
