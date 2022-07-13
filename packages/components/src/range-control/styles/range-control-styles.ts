@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -11,6 +10,15 @@ import styled from '@emotion/styled';
 import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
+
+import type {
+	RangeMarkProps,
+	RailProps,
+	ThumbProps,
+	TooltipProps,
+	TrackProps,
+	WrapperProps,
+} from '../types';
 
 const rangeHeightValue = 30;
 const railHeight = 4;
@@ -30,13 +38,13 @@ export const Root = styled.div`
 	width: 100%;
 `;
 
-const wrapperColor = ( { color: colorProp = COLORS.ui.borderFocus } ) => {
-	return css( { color: colorProp } );
-};
-const wrapperMargin = ( { marks } ) =>
-	css( { marginBottom: marks ? 16 : null } );
+const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
+	css( { color } );
 
-export const Wrapper = styled.div`
+const wrapperMargin = ( { marks }: WrapperProps ) =>
+	css( { marginBottom: marks ? 16 : undefined } );
+
+export const Wrapper = styled.div< WrapperProps >`
 	box-sizing: border-box;
 	color: ${ COLORS.blue.medium.focus };
 	display: block;
@@ -61,16 +69,14 @@ export const AfterIconWrapper = styled.span`
 	${ rtl( { marginLeft: 6 } ) }
 `;
 
-const railBackgroundColor = ( { disabled, railColor } ) => {
-	let background = railColor || null;
+const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
+	let background = railColor || '';
 
 	if ( disabled ) {
 		background = COLORS.lightGray[ 400 ];
 	}
 
-	return css( {
-		background,
-	} );
+	return css( { background } );
 };
 
 export const Rail = styled.span`
@@ -89,16 +95,14 @@ export const Rail = styled.span`
 	${ railBackgroundColor };
 `;
 
-const trackBackgroundColor = ( { disabled, trackColor } ) => {
+const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 	let background = trackColor || 'currentColor';
 
 	if ( disabled ) {
 		background = COLORS.lightGray[ 800 ];
 	}
 
-	return css( {
-		background,
-	} );
+	return css( { background } );
 };
 
 export const Track = styled.span`
@@ -124,7 +128,7 @@ export const MarksWrapper = styled.span`
 	user-select: none;
 `;
 
-const markFill = ( { disabled, isFilled } ) => {
+const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
 	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
 
 	if ( disabled ) {
@@ -147,7 +151,7 @@ export const Mark = styled.span`
 	${ markFill };
 `;
 
-const markLabelFill = ( { isFilled } ) => {
+const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
 		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
 	} );
@@ -166,7 +170,7 @@ export const MarkLabel = styled.span`
 	${ markLabelFill };
 `;
 
-const thumbColor = ( { disabled } ) =>
+const thumbColor = ( { disabled }: ThumbProps ) =>
 	disabled
 		? css`
 				background-color: ${ COLORS.lightGray[ 800 ] };
@@ -198,7 +202,7 @@ export const ThumbWrapper = styled.span`
 	) };
 `;
 
-const thumbFocus = ( { isFocused } ) => {
+const thumbFocus = ( { isFocused }: ThumbProps ) => {
 	return isFocused
 		? css`
 				&::before {
@@ -216,7 +220,7 @@ const thumbFocus = ( { isFocused } ) => {
 		: '';
 };
 
-export const Thumb = styled.span`
+export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
 	border-radius: 50%;
 	box-sizing: border-box;
@@ -245,13 +249,13 @@ export const InputRange = styled.input`
 	width: calc( 100% + ${ thumbSize }px );
 `;
 
-const tooltipShow = ( { show } ) => {
+const tooltipShow = ( { show }: TooltipProps ) => {
 	return css( {
 		opacity: show ? 1 : 0,
 	} );
 };
 
-const tooltipPosition = ( { position } ) => {
+const tooltipPosition = ( { position }: TooltipProps ) => {
 	const isBottom = position === 'bottom';
 
 	if ( isBottom ) {
@@ -265,7 +269,7 @@ const tooltipPosition = ( { position } ) => {
 	`;
 };
 
-export const Tooltip = styled.span`
+export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: 2px;
 	box-sizing: border-box;

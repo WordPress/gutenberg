@@ -199,10 +199,6 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalLetterSpacing' ],
 		useEngine: true,
 	},
-	'--wp--style--block-gap': {
-		value: [ 'spacing', 'blockGap' ],
-		support: [ 'spacing', 'blockGap' ],
-	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {

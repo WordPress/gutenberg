@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -10,10 +9,16 @@ import { forwardRef } from '@wordpress/element';
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 import { useDebouncedHoverInteraction } from './utils';
 
+import type { InputRangeProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
+
 const noop = () => {};
 
 function InputRange(
-	{
+	props: WordPressComponentProps< InputRangeProps, 'input' >,
+	ref: React.ForwardedRef< HTMLInputElement >
+) {
+	const {
 		describedBy,
 		label,
 		onHideTooltip = noop,
@@ -21,10 +26,9 @@ function InputRange(
 		onMouseMove = noop,
 		onShowTooltip = noop,
 		value,
-		...props
-	},
-	ref
-) {
+		...otherProps
+	} = props;
+
 	const hoverInteractions = useDebouncedHoverInteraction( {
 		onHide: onHideTooltip,
 		onMouseLeave,
@@ -34,7 +38,7 @@ function InputRange(
 
 	return (
 		<BaseInputRange
-			{ ...props }
+			{ ...otherProps }
 			{ ...hoverInteractions }
 			aria-describedby={ describedBy }
 			aria-label={ label }

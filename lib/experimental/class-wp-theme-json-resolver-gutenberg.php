@@ -111,6 +111,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $block_type->supports['__experimentalStyle'] );
 			}
+
+			if (
+				isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) &&
+				null === _wp_array_get( $config, array( 'styles', 'blocks', $block_name, 'spacing', 'blockGap' ), null )
+			) {
+				// Ensure an empty placeholder value exists for the block, if it provides a default blockGap value.
+				// The real blockGap value to be used will be determined when the styles are rendered for output.
+				$config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] = null;
+			}
 		}
 
 		// Core here means it's the lower level part of the styles chain.

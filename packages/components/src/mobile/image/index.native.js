@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Image, Text, View } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 /**
  * WordPress dependencies
@@ -210,7 +211,7 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Image
+						<FastImage
 							{ ...( ! resizeMode && {
 								aspectRatio: imageData?.aspectRatio,
 							} ) }
@@ -219,7 +220,7 @@ const ImageComponent = ( {
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
-							resizeMode={ resizeMode }
+							resizeMode={ FastImage.resizeMode[ resizeMode ] }
 						/>
 					</View>
 				) }

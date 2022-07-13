@@ -148,7 +148,7 @@ const Popover = (
 			return anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			return anchorRect.ownerDocument;
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			return (
 				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
 				document
@@ -275,7 +275,7 @@ const Popover = (
 					return anchorRect;
 				},
 			};
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			usedRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );
