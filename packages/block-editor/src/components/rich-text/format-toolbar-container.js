@@ -17,17 +17,11 @@ import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
-	const hasInlineToolbar = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
-		[]
-	);
-	const activeFormats = getActiveFormats( value );
+function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
 	const lastFormatType = lastFormat?.type;
 	const settings = useSelect(
-		( select ) =>
-			select( richTextStore ).getFormatType( lastFormatType ) || {},
+		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
 		[ lastFormatType ]
 	);
 	const selectionRef = useAnchorRef( {
@@ -36,30 +30,50 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
 		settings,
 	} );
 
-	if ( hasInlineToolbar || inline ) {
-		if (
-			hasInlineToolbar &&
-			isCollapsed( value ) &&
-			! activeFormats.length
-		) {
+	return <InlineToolbar anchorRef={ selectionRef } />;
+}
+
+function InlineToolbar( { anchorRef } ) {
+	return (
+		<Popover
+			position="bottom center"
+			focusOnMount={ false }
+			anchorRef={ anchorRef }
+			className="block-editor-rich-text__inline-format-toolbar"
+			__unstableSlotName="block-toolbar"
+		>
+			<div className="block-editor-rich-text__inline-format-toolbar-group">
+				<ToolbarGroup>
+					<FormatToolbar />
+				</ToolbarGroup>
+			</div>
+		</Popover>
+	);
+}
+
+const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
+	const hasInlineToolbar = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
+		[]
+	);
+
+	if ( inline ) {
+		return <InlineToolbar anchorRef={ anchorRef } />;
+	}
+
+	if ( hasInlineToolbar ) {
+		const activeFormats = getActiveFormats( value );
+
+		if ( isCollapsed( value ) && ! activeFormats.length ) {
 			return null;
 		}
 
-		// Render in popover.
 		return (
-			<Popover
-				position="bottom center"
-				focusOnMount={ false }
-				anchorRef={ hasInlineToolbar ? selectionRef : anchorRef }
-				className="block-editor-rich-text__inline-format-toolbar"
-				__unstableSlotName="block-toolbar"
-			>
-				<div className="block-editor-rich-text__inline-format-toolbar-group">
-					<ToolbarGroup>
-						<FormatToolbar />
-					</ToolbarGroup>
-				</div>
-			</Popover>
+			<InlineSelectionToolbar
+				anchorRef={ anchorRef }
+				value={ value }
+				activeFormats={ activeFormats }
+			/>
 		);
 	}
 

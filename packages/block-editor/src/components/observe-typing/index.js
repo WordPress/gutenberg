@@ -124,11 +124,7 @@ export function useTypingObserver() {
 	}, [] );
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
-	const ref1 = useMouseMoveTypingReset( {
-		isTyping,
-		hasInlineToolbar,
-		stopTyping,
-	} );
+	const ref1 = useMouseMoveTypingReset();
 	const ref2 = useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
