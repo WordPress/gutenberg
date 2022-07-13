@@ -56,10 +56,7 @@ const timezoneOptions = timezones.map( mapTimezoneOption );
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
 const getInput = () => screen.getByRole( 'combobox' );
-const getRenderedOptions = () =>
-	document.querySelectorAll(
-		'.components-combobox-control__suggestions-container ul[role="listbox"] li[role="option"]'
-	);
+const getRenderedOptions = () => screen.getAllByRole( 'option' );
 
 describe( 'ComboboxControl', () => {
 	// Use real timers to avoid timeout errors from userEvent
