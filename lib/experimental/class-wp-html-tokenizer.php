@@ -242,50 +242,6 @@ class WP_HTML_Tokenizer {
 
 }
 
-function tokenizeHTML( $html, $start_at ) {
-	$tokenizer = new WP_HTML_Tokenizer( $html );
-	yield from $tokenizer->stream( $start_at );
-}
-
-class Matcher_Match {
-	private $tag;
-	private $attribute;
-	private $attribute_value;
-
-	/**
-	 * @param $tag
-	 * @param $attribute
-	 */
-	public function __construct( $tag, $attribute_name, $attribute_value ) {
-		$this->tag             = $tag;
-		$this->attribute_name  = $attribute_name;
-		$this->attribute_value = $attribute_value;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getTag() {
-		return $this->tag;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getAttributeName() {
-		return $this->attribute_name;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getAttributeValue() {
-		return $this->attribute_value;
-	}
-
-}
-
-
 class WP_HTML_Token {
 
 	const TAG_OPENER = 'TAG_OPENER';
@@ -383,8 +339,7 @@ class WP_HTML_Attribute extends WP_HTML_Token {
 
 class FluidMamo {
 	private $html;
-	private $match;
-	private $tokenizer;
+	private $matched_tag;
 
 	public function __construct( $html ) {
 		$this->html = $html;
@@ -407,7 +362,7 @@ class FluidMamo {
 		$current_match     = $match_template;
 		$current_attribute = null;
 
-		$start_at = $this->match ? $this->match->getTag()->getEndOffset() - 1 : 0;
+		$start_at = $this->matched_tag ? $this->matched_tag->getEndOffset() - 1 : 0;
 		foreach ( $this->tokenize( $start_at ) as $token ) {
 			if ( $token->getType() === WP_HTML_Token::TAG_OPENER ) {
 				$current_tag           = $token;
@@ -447,7 +402,7 @@ class FluidMamo {
 			$does_match = count( array_filter( array_values( $current_match ) ) ) === count( $current_match );
 			if ( $does_match ) {
 				if ( $n_matched_so_far === $nth_match ) {
-					$this->match = new Matcher_Match( $current_tag, $current_attribute, $token );
+					$this->matched_tag = $current_tag;
 					break;
 				}
 				++ $n_matched_so_far;
@@ -495,7 +450,7 @@ class FluidMamo {
 	}
 
 	function updateAttribute( $attr_name, $updater ) {
-		foreach ( $this->tokenize( $this->match->getTag()->getStartOffset() - 1 ) as $token ) {
+		foreach ( $this->tokenize( $this->matched_tag->getStartOffset() - 1 ) as $token ) {
 			if ( $token->getType() === WP_HTML_Token::ATTRIBUTE && $token->getName()->getValue() === $attr_name ) {
 				$current_value = $token->getValue()->getValue();
 				$before_value  = substr(
@@ -543,7 +498,7 @@ class FluidMamo {
 	}
 
 	function removeAttribute( $attr_name ) {
-		foreach ( $this->tokenize( $this->match->getTag()->getStartOffset() - 1 ) as $token ) {
+		foreach ( $this->tokenize( $this->matched_tag->getStartOffset() - 1 ) as $token ) {
 			if ( $token->getType() === WP_HTML_Token::ATTRIBUTE && $token->getName()->getValue() === $attr_name ) {
 				$before_declaration = substr(
 					$this->html,
