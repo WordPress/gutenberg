@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Button, ResponsiveWrapper, Spinner } from '@wordpress/components';
+import {
+	Button,
+	ResponsiveWrapper,
+	Spinner,
+	Icon,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { pencil } from '@wordpress/icons';
 
 export default function PostFeaturedImagePreview( {
 	mediaDetails,
@@ -25,6 +31,10 @@ export default function PostFeaturedImagePreview( {
 				</ResponsiveWrapper>
 			) }
 			{ isLoading && <Spinner /> }
+			<Icon
+				className="editor-post-featured-image__preview-icon"
+				icon={ pencil }
+			/>
 		</Button>
 	);
 }
