@@ -82,7 +82,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
-	return applyFilters( 'editor.convertLegacyBlockNameAndAttributes', [
+	return applyFilters( 'blocks.convertLegacyBlockNameAndAttributes', [
 		name,
 		newAttributes,
 	] );
