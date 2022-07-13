@@ -25,25 +25,20 @@ const meta: ComponentMeta< typeof Elevation > = {
 export default meta;
 
 const Template: ComponentStory< typeof Elevation > = ( args ) => {
-	/* eslint-disable jsx-a11y/anchor-is-valid */
 	return (
-		<a
-			href="#"
-			onClick={ ( e ) => e.preventDefault() }
+		<button
 			style={ {
 				border: 0,
 				background: 'transparent',
-				display: 'block',
 				width: 150,
 				height: 150,
 				position: 'relative',
-				margin: '20vh auto',
 			} }
 		>
+			Click me
 			<Elevation { ...args } />
-		</a>
+		</button>
 	);
-	/* eslint-enable jsx-a11y/anchor-is-valid */
 };
 
 export const Default: ComponentStory< typeof Elevation > = Template.bind( {} );

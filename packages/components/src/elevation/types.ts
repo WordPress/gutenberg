@@ -40,7 +40,7 @@ export type ElevationProps = {
 	offset?: number;
 	/**
 	 * Size of the shadow, based on the Style system's elevation system. The
-	 * `value` determines the strength of the shadow, which sense of depth.
+	 * `value` determines the strength of the shadow, which creates the sense of depth.
 	 *
 	 * In the example below, `isInteractive` is activated to give a better sense
 	 * of depth.
