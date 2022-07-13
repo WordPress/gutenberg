@@ -33,9 +33,11 @@ const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
  * If the selection is set on the placeholder element, collapse the selection to
  * the start (before the placeholder).
  *
- * @param {Window} defaultView
+ * @param {Element} element
  */
-function fixPlaceholderSelection( defaultView ) {
+function fixPlaceholderSelection( element ) {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
 	const selection = defaultView.getSelection();
 	const { anchorNode, anchorOffset } = selection;
 
@@ -46,13 +48,14 @@ function fixPlaceholderSelection( defaultView ) {
 	const targetNode = anchorNode.childNodes[ anchorOffset ];
 
 	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
+		targetNode &&
+		( targetNode.nodeType !== targetNode.ELEMENT_NODE ||
+			! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME ) )
 	) {
 		return;
 	}
 
+	selection.selectAllChildren( element );
 	selection.collapseToStart();
 }
 
@@ -199,7 +202,7 @@ export function useInputAndSelection( props ) {
 				// element, in which case the caret is not visible. We need to set
 				// the caret before the placeholder if that's the case.
 				if ( oldRecord.text.length === 0 && start === 0 ) {
-					fixPlaceholderSelection( defaultView );
+					fixPlaceholderSelection( element );
 				}
 
 				return;

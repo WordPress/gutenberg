@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 
@@ -8,8 +9,11 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { ZWNBSP } from '../special-characters';
+import { isEmpty } from '../is-empty';
 
-export function useArrowKeysWithPlaceholder() {
+export function useArrowKeysWithPlaceholder( props ) {
+	const propsRef = useRef( props );
+	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
@@ -22,9 +26,18 @@ export function useArrowKeysWithPlaceholder() {
 				return;
 			}
 
+			const { record } = propsRef.current;
 			const { ownerDocument } = element;
 			const { defaultView } = ownerDocument;
 			const selection = defaultView.getSelection();
+
+			if ( isEmpty( record.current ) ) {
+				selection.selectAllChildren( element );
+				const action =
+					keyCode === LEFT ? 'collapseToStart' : 'collapseToEnd';
+				selection[ action ]();
+				return;
+			}
 
 			if ( ! selection.rangeCount || ! selection.isCollapsed ) {
 				return;

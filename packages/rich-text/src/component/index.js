@@ -242,7 +242,7 @@ export function useRichText( {
 			handleChange,
 			multilineTag,
 		} ),
-		useArrowKeysWithPlaceholder(),
+		useArrowKeysWithPlaceholder( { record } ),
 		useIndentListItemOnSpace( {
 			multilineTag,
 			createRecord,

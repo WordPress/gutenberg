@@ -82,6 +82,15 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
+
+	if ( range.startContainer === container ) {
+		if ( isReverseDir ) {
+			return range.startOffset === 0;
+		}
+
+		return range.startOffset === container.childNodes.length;
+	}
+
 	const containerRect = container.getBoundingClientRect();
 
 	// To check if a selection is at the edge, we insert a test selection at the
