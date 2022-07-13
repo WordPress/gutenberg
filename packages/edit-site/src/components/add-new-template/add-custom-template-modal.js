@@ -158,6 +158,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 					{ ...composite }
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
+					aria-label={ __( 'Suggestions list' ) }
 				>
 					{ suggestions.map( ( suggestion ) => (
 						<SuggestionListItem
