@@ -206,6 +206,11 @@ const Popover = (
 
 							// Flip the popover placement to the bottom if there's not
 							// enough space above the reference element.
+							// Note - floating-ui seems to automatically offset
+							// coordinates so that they're relative to the parent
+							// scrollable element (the child of a scroll container).
+							// Checking against `referenceRect.y` seems to be all that's
+							// needed.
 							if ( floatingRect.height > referenceRect.y ) {
 								const newPlacement = currentPlacement.replace(
 									'top',
@@ -218,7 +223,9 @@ const Popover = (
 								};
 							}
 
-							// Else shift it.
+							// Else shift it, so that it's 'sticky'. This can't be
+							// done via the `__unstableShift` prop as the `flip` code
+							// above doesn't work when that's `true`.
 							return shift( {
 								crossAxis: true,
 								limiter: limitShift(),
