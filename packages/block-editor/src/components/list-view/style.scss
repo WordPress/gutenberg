@@ -301,7 +301,8 @@
 		min-width: 120px;
 	}
 
-	.block-editor-list-view-block-select-button__title {
+	.block-editor-list-view-block-select-button__title,
+	.block-editor-list-view-block-select-button__partial-content {
 		flex: 1;
 		position: relative;
 
@@ -310,6 +311,10 @@
 			width: 100%;
 			transform: translateY(-50%);
 		}
+	}
+
+	.block-editor-list-view-block-select-button__partial-content {
+		opacity: 0.5;
 	}
 
 	.block-editor-list-view-block-select-button__anchor {

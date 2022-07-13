@@ -11,6 +11,9 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
+import { getDefaultBlockName } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { forwardRef } from '@wordpress/element';
 import { Icon, lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
@@ -23,6 +26,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
+import { store as blockEditorStore } from '../../store';
 
 function ListViewBlockSelectButton(
 	{
@@ -38,6 +42,20 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const { partialContent } = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock( clientId );
+			const isDefaultBlock = block?.name === getDefaultBlockName();
+
+			return {
+				partialContent: isDefaultBlock
+					? stripHTML( block?.attributes?.content )
+					: undefined,
+			};
+		},
+		[ clientId ]
+	);
+
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -89,6 +107,13 @@ function ListViewBlockSelectButton(
 					<span className="block-editor-list-view-block-select-button__title">
 						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
+					{ !! partialContent && (
+						<span className="block-editor-list-view-block-select-button__partial-content">
+							<Truncate ellipsizeMode="auto">
+								{ partialContent }
+							</Truncate>
+						</span>
+					) }
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
