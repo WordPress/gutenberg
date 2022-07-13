@@ -188,6 +188,7 @@ export const borderControlPopoverControls = css`
 		margin-bottom: 0;
 		${ labelStyles }
 	}
+
 	&& ${ StyledLabel } + button:not( .has-text ) {
 		min-width: 24px;
 		padding: 0;
