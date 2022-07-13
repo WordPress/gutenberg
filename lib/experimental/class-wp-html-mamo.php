@@ -3,7 +3,7 @@
 /**
  * Matches HTML and modifies matched content.
  */
-class WP_HTML_MaMo {
+class WP_HTML_Matcher {
 	/**
 	 * @var {string} The document being matched
 	 */
@@ -43,9 +43,8 @@ class WP_HTML_MaMo {
 	 */
 	public $match_already_failed;
 
-	public function __construct( $input ) {
-		$this->input = $input;
-		$this->match_already_failed = true;
+	public function __construct( WP_HTML_Tokenizer $tokenizer ) {
+		$this->tokenizer = $tokenizer;
 	}
 
 	public function find( $descriptor ) {
