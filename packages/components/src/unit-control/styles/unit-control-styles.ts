@@ -18,21 +18,12 @@ type SelectProps = {
 
 type InputProps = {
 	disableUnits?: boolean;
-	size: SelectSize;
 };
 
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
 `;
-
-const paddingStyles = ( { disableUnits }: InputProps ) => {
-	if ( disableUnits ) return '';
-
-	return css`
-		${ rtl( { paddingRight: 8 } )() };
-	`;
-};
 
 const arrowStyles = ( { disableUnits }: InputProps ) => {
 	if ( disableUnits ) return '';
@@ -58,7 +49,6 @@ export const ValueInput = styled( NumberControl )`
 			width: 100%;
 
 			${ arrowStyles };
-			${ paddingStyles };
 		}
 	}
 `;
