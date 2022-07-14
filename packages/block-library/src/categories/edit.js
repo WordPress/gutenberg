@@ -142,6 +142,9 @@ export default function CategoriesEdit( {
 	// for the range control.
 	const currentNumberCategories = categories?.length || 1;
 
+	const numberOfItemsToShow =
+		termsToShow === SHOW_ALL ? currentNumberCategories : termsToShow;
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
@@ -175,22 +178,32 @@ export default function CategoriesEdit( {
 					) }
 				</PanelBody>
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
-					<RangeControl
-						label={ __( 'Number of items' ) }
-						value={
-							termsToShow === SHOW_ALL
-								? currentNumberCategories
-								: termsToShow
-						}
-						onChange={ ( newValue ) =>
+					<ToggleControl
+						label={ __( 'Limit items' ) }
+						checked={ termsToShow !== SHOW_ALL }
+						onChange={ () => {
 							setAttributes( {
-								termsToShow: newValue,
-							} )
-						}
-						min={ 1 }
-						max={ MAX_TERMS_LIMIT }
-						required
+								termsToShow:
+									termsToShow === SHOW_ALL
+										? numberOfItemsToShow
+										: SHOW_ALL,
+							} );
+						} }
 					/>
+					{ termsToShow !== SHOW_ALL && (
+						<RangeControl
+							label={ __( 'Number of items' ) }
+							value={ numberOfItemsToShow }
+							onChange={ ( newValue ) =>
+								setAttributes( {
+									termsToShow: newValue,
+								} )
+							}
+							min={ 1 }
+							max={ MAX_TERMS_LIMIT }
+							required
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ isResolving && (
