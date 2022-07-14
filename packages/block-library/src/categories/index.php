@@ -16,6 +16,10 @@ function render_block_core_categories( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
 
+	// WP_Term_Query `number` parameter uses 0 to represent "all".
+	// https://developer.wordpress.org/reference/classes/wp_term_query/__construct/#parameters
+	$term_query_show_all = 0;
+
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
@@ -23,6 +27,7 @@ function render_block_core_categories( $attributes ) {
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
+		'number'       => $attributes['termsToShow'] === -1 ? $term_query_show_all : $attributes['termsToShow']
 	);
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;
