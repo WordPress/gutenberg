@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Add React Native FastImage [#42009]
+-   [*] Block inserter displays block collections [#42405]
 
 ## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
