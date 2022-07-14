@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -9,7 +8,6 @@ import { useMemo } from '@wordpress/element';
  */
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
-import { store as blockEditorStore } from '../../store';
 import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 import { createInserterSection, filterInserterItems } from './utils';
 import useBlockTypesState from './hooks/use-block-types-state';
@@ -17,31 +15,21 @@ import useBlockTypesState from './hooks/use-block-types-state';
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
-	const [ , , collections ] = useBlockTypesState( rootClientId, onSelect );
-	const clipboardBlock = useClipboardBlock( rootClientId );
-
-	const { blockTypes } = useSelect(
-		( select ) => {
-			const { getInserterItems } = select( blockEditorStore );
-			const blockItems = filterInserterItems(
-				getInserterItems( rootClientId )
-			);
-
-			return {
-				blockTypes: clipboardBlock
-					? [ clipboardBlock, ...blockItems ]
-					: blockItems,
-			};
-		},
-		[ rootClientId ]
+	const [ rawBlockTypes, , collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onSelect
 	);
-
+	const clipboardBlock = useClipboardBlock( rootClientId );
+	const filteredBlockTypes = filterInserterItems( rawBlockTypes );
+	const blockTypes = clipboardBlock
+		? [ clipboardBlock, ...filteredBlockTypes ]
+		: filteredBlockTypes;
 	const { items, trackBlockTypeSelected } =
 		useBlockTypeImpressions( blockTypes );
 
 	const handleSelect = ( ...args ) => {
 		trackBlockTypeSelected( ...args );
-		onSelect( ...args );
+		onSelectItem( ...args );
 	};
 
 	const collectionSections = useMemo( () => {
