@@ -47,6 +47,7 @@ function ToggleGroupControl(
 		hideLabelFromVision = false,
 		help,
 		onChange = noop,
+		size = 'default',
 		value,
 		children,
 		...otherProps
@@ -83,12 +84,11 @@ function ToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl,
+				styles.ToggleGroupControl( { size } ),
 				isBlock && styles.block,
-				'medium',
 				className
 			),
-		[ className, cx, isBlock ]
+		[ className, cx, isBlock, size ]
 	);
 	return (
 		<BaseControl help={ help }>
