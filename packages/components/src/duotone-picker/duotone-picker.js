@@ -28,6 +28,7 @@ function DuotonePicker( {
 	value,
 	onChange,
 } ) {
+	console.log(colorPalette);
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]

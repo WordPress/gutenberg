@@ -63,6 +63,11 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 		useSetting( `${ presetSetting }.theme` ) || EMPTY_ARRAY;
 	const defaultPresets =
 		useSetting( `${ presetSetting }.default` ) || EMPTY_ARRAY;
+
+		console.log( 'userPresets', userPresets );
+		console.log( 'themePresets', themePresets );
+		console.log( 'defaultPresets', defaultPresets );
+
 	return useMemo(
 		() => [
 			...userPresets,
