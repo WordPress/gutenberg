@@ -349,7 +349,7 @@ export function getMultiBlockMoverDescription(
 
 		if ( movementDirection === 'right' ) {
 			return __(
-				'Blocks cannot be moved right as they are already are at the leftmost position'
+				'Blocks cannot be moved right as they are already are at the rightmost position'
 			);
 		}
 	}
