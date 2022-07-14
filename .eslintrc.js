@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'chunk',
 							'clamp',
+							'compact',
 							'concat',
 							'countBy',
 							'defaults',
