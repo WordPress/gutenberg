@@ -93,6 +93,12 @@ const placementToAnimationOrigin = ( placement ) => {
 	return x + ' ' + y;
 };
 
+const getMainAxis = ( placement ) =>
+	placement.includes( 'top' ) || placement.includes( 'bottom' ) ? 'y' : 'x';
+
+const getCrossAxis = ( placement ) =>
+	getMainAxis( placement ) === 'x' ? 'y' : 'x';
+
 const Popover = (
 	{
 		range,
@@ -170,20 +176,33 @@ const Popover = (
 		}
 
 		const iframeRect = frameElement.getBoundingClientRect();
-		return {
-			name: 'iframeOffset',
-			fn( { x, y } ) {
-				return {
-					x: x + iframeRect.left,
-					y: y + iframeRect.top,
-				};
-			},
-		};
+		return { x: iframeRect.left, y: iframeRect.top };
 	}, [ ownerDocument ] );
 
 	const middlewares = [
-		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
+		frameOffset
+			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+					const mainAxis = getMainAxis( currentPlacement );
+					const crossAxis = getCrossAxis( currentPlacement );
+
+					// When the popover is before the reference, subtract the offset,
+					// else add it.
+					const mainAxisModifier = currentPlacement.includes( 'top' )
+						? -1
+						: 1;
+					const crossAxisModifier = currentPlacement.includes(
+						'left'
+					)
+						? -1
+						: 1;
+
+					return {
+						mainAxis: frameOffset[ mainAxis ] * mainAxisModifier,
+						crossAxis: frameOffset[ crossAxis ] * crossAxisModifier,
+					};
+			  } )
+			: undefined,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
