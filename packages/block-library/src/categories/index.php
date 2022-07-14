@@ -23,11 +23,12 @@ function render_block_core_categories( $attributes ) {
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
-		'orderby'      => 'name',
+		'orderby'      => $attributes['orderBy'],
+		'order'        => $attributes['order'],
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
-		'number'       => $attributes['termsToShow'] === -1 ? $term_query_show_all : $attributes['termsToShow']
+		'number'       => $attributes['termsToShow'] === -1 ? $term_query_show_all : $attributes['termsToShow'],
 	);
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;

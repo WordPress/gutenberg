@@ -13,6 +13,7 @@ import {
 	ToggleControl,
 	VisuallyHidden,
 	RangeControl,
+	SelectControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
@@ -35,6 +36,8 @@ export default function CategoriesEdit( {
 		showOnlyTopLevel,
 		showEmpty,
 		termsToShow,
+		order,
+		orderBy,
 	},
 	setAttributes,
 } ) {
@@ -43,6 +46,8 @@ export default function CategoriesEdit( {
 		per_page: termsToShow,
 		hide_empty: ! showEmpty,
 		context: 'view',
+		order,
+		orderby: orderBy,
 	};
 	if ( showOnlyTopLevel ) {
 		query.parent = 0;
@@ -210,6 +215,43 @@ export default function CategoriesEdit( {
 							required
 						/>
 					) }
+					<SelectControl
+						label={ __( 'Order by' ) }
+						value={ `${ orderBy }/${ order }` }
+						options={ [
+							{
+								label: __( 'Name (ascending)' ),
+								value: 'name/asc',
+							},
+							{
+								label: __( 'Name (descending)' ),
+								value: 'name/desc',
+							},
+							{
+								/* translators: label for ordering posts by title in ascending order */
+								label: __( 'Count (ascending)' ),
+								value: 'count/asc',
+							},
+							{
+								/* translators: label for ordering posts by count in descending order */
+								label: __( 'Count (descending)' ),
+								value: 'count/desc',
+							},
+						] }
+						onChange={ ( value ) => {
+							const [ newOrderBy, newOrder ] = value.split( '/' );
+							if ( newOrder !== order ) {
+								setAttributes( {
+									order: newOrder,
+								} );
+							}
+							if ( newOrderBy !== orderBy ) {
+								setAttributes( {
+									orderBy: newOrderBy,
+								} );
+							}
+						} }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ isResolving && (
