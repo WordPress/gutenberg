@@ -136,7 +136,6 @@ export default function BlockTypesList( {
 			keyboardShouldPersistTaps="always"
 			sections={ sections }
 			initialNumToRender={ initialNumToRender }
-			keyExtractor={ ( item ) => item.id }
 			renderItem={ renderSection }
 			renderSectionHeader={ renderSectionHeader }
 			{ ...listProps }
