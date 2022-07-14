@@ -4,7 +4,8 @@
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
- * Get the rectangle of a given Range.
+ * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
+ * can be found.
  *
  * @param {Range} range The range.
  *

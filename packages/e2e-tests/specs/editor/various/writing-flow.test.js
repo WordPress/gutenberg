@@ -778,7 +778,15 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		// Insert a "." for testing.
 		await page.keyboard.type( '.' );
-		// Expect the "." to be at the start of the paragraph.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Expect the "." to be added at the start of the paragraph.
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			)
+		).toBe( 'core/paragraph' );
+		expect(
+			await page.evaluate( () => document.activeElement.textContent )
+		).toMatch( /^\.a+$/ );
 	} );
 } );
