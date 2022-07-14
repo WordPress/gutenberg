@@ -72,7 +72,7 @@ export function getBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Type of block (i.e. Text, Image etc), 2: Position of selected block, 3: New position
 				__(
-					`Move %1$s block from position %2$d down to position %3$d`
+					'Move %1$s block from position %2$d down to position %3$d'
 				),
 				type,
 				position,
