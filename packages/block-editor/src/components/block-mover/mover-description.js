@@ -239,14 +239,14 @@ export function getMultiBlockMoverDescription(
 ) {
 	const position = firstIndex + 1;
 
-	if ( dir < 0 && ! isFirst ) {
-		// moving up
-		const movementDirection = getMovementDirection( 'up', orientation );
+	if ( dir > 0 && ! isLast ) {
+		// moving down
+		const movementDirection = getMovementDirection( 'down', orientation );
 
-		if ( movementDirection === 'up' ) {
+		if ( movementDirection === 'down' ) {
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				__( 'Move %1$d blocks from position %2$d up by one place' ),
+				__( 'Move %1$d blocks from position %2$d down by one place' ),
 				selectedCount,
 				position
 			);
@@ -256,37 +256,6 @@ export function getMultiBlockMoverDescription(
 			return sprintf(
 				// translators: 1: Number of selected blocks, 2: Position of selected blocks
 				__( 'Move %1$d blocks from position %2$d left by one place' ),
-				selectedCount,
-				position
-			);
-		}
-	}
-
-	if ( dir < 0 && isFirst ) {
-		// moving up, and the selected blocks are the first item
-		const movementDirection = getMovementDirection( 'up', orientation );
-
-		if ( movementDirection === 'up' ) {
-			return __(
-				'Blocks cannot be moved up as they are already at the top'
-			);
-		}
-
-		if ( movementDirection === 'left' ) {
-			return __(
-				'Blocks cannot be moved left as they are already are at the leftmost position'
-			);
-		}
-	}
-
-	if ( dir > 0 && ! isLast ) {
-		// moving down
-		const movementDirection = getMovementDirection( 'down', orientation );
-
-		if ( movementDirection === 'down' ) {
-			return sprintf(
-				// translators: 1: Number of selected blocks, 2: Position of selected blocks
-				__( 'Move %1$d blocks from position %2$d down by one place' ),
 				selectedCount,
 				position
 			);
@@ -312,9 +281,70 @@ export function getMultiBlockMoverDescription(
 			);
 		}
 
+		if ( movementDirection === 'left' ) {
+			return __(
+				'Blocks cannot be moved left as they are already are at the leftmost position'
+			);
+		}
+
 		if ( movementDirection === 'right' ) {
 			return __(
 				'Blocks cannot be moved right as they are already are at the rightmost position'
+			);
+		}
+	}
+
+	if ( dir < 0 && ! isFirst ) {
+		// moving up
+		const movementDirection = getMovementDirection( 'up', orientation );
+
+		if ( movementDirection === 'up' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				__( 'Move %1$d blocks from position %2$d up by one place' ),
+				selectedCount,
+				position
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				__( 'Move %1$d blocks from position %2$d left by one place' ),
+				selectedCount,
+				position
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				__( 'Move %1$d blocks from position %2$d right by one place' ),
+				selectedCount,
+				position
+			);
+		}
+	}
+
+	if ( dir < 0 && isFirst ) {
+		// moving up, and the selected blocks are the first item
+		const movementDirection = getMovementDirection( 'up', orientation );
+
+		if ( movementDirection === 'up' ) {
+			return __(
+				'Blocks cannot be moved up as they are already at the top'
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return __(
+				'Blocks cannot be moved left as they are already are at the leftmost position'
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return __(
+				'Blocks cannot be moved right as they are already are at the leftmost position'
 			);
 		}
 	}
