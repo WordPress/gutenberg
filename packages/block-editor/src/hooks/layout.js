@@ -49,7 +49,12 @@ const layoutBlockSupportKey = '__experimentalLayout';
  *
  * @return { Array } Array of CSS classname strings.
  */
-function getLayoutClasses( layout, layoutDefinitions ) {
+function useLayoutClasses( layout, layoutDefinitions ) {
+	const rootPaddingAlignment = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalFeatures
+			?.useRootPaddingAwareAlignments;
+	}, [] );
 	const layoutClassnames = [];
 
 	if ( layoutDefinitions?.[ layout?.type || 'default' ]?.className ) {
@@ -58,7 +63,7 @@ function getLayoutClasses( layout, layoutDefinitions ) {
 		);
 	}
 
-	if ( layout?.inherit || layout?.contentSize ) {
+	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -273,7 +278,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
 		const layoutClasses = shouldRenderLayoutStyles
-			? getLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
+			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
 		const selector = `.${ getBlockDefaultClassName(
 			name

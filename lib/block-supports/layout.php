@@ -194,7 +194,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
-	$use_global_padding = isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'];
+	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
 
 	if ( $use_global_padding ) {
 		$class_names[] = 'has-global-padding';
