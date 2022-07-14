@@ -8,26 +8,48 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
  */
 
+/**
+ * Sets a site option, from the options-general admin page.
+ *
+ * This is a temporary solution until we can handle WP options through the REST
+ * API. Note that this function needs to be binded to work properly.
+ *
+ * @param {string} setting The option, used to get the option by id.
+ * @param {string} value   The value to set the option to.
+ *
+ * @return {Promise<string>} A Promise that resolves to the option's previous value.
+ */
+async function _setOption( setting, value ) {
+	await this.admin.visitAdminPage( 'options.php', '' );
+	const previousValue = await this.page.inputValue( `#${ setting }` );
+
+	await this.page.fill( `#${ setting }`, value );
+	await this.page.click( '#Update' );
+
+	return previousValue;
+}
+
 test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
-		previousDefaultCommentsPage;
+		previousDefaultCommentsPage,
+		setOption;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
+		// Initializes `setOption`, binding it with required dependencies.
+		setOption = _setOption.bind( { admin, page } );
+
 		// Ideally, we'd set options in beforeAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		previousPageComments = await admin.setOption( 'page_comments', '1' );
-		previousCommentsPerPage = await admin.setOption(
-			'comments_per_page',
-			'1'
-		);
-		previousDefaultCommentsPage = await admin.setOption(
+		previousPageComments = await setOption( 'page_comments', '1' );
+		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
+		previousDefaultCommentsPage = await setOption(
 			'default_comments_page',
 			'newest'
 		);
@@ -104,7 +126,7 @@ test.describe( 'Comments', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await admin.setOption( 'page_comments', '0' );
+		await setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
@@ -131,17 +153,14 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 
-	test.afterEach( async ( { admin, requestUtils } ) => {
+	test.afterEach( async ( { requestUtils } ) => {
 		// Ideally, we'd set options in afterAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		await admin.setOption( 'page_comments', previousPageComments );
-		await admin.setOption( 'comments_per_page', previousCommentsPerPage );
-		await admin.setOption(
-			'default_comments_page',
-			previousDefaultCommentsPage
-		);
+		await setOption( 'page_comments', previousPageComments );
+		await setOption( 'comments_per_page', previousCommentsPerPage );
+		await setOption( 'default_comments_page', previousDefaultCommentsPage );
 		await requestUtils.deleteAllComments();
 	} );
 
