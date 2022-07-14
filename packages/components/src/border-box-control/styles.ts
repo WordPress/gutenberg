@@ -82,8 +82,3 @@ export const CenteredBorderControl = css`
 export const rightBorderControl = () => css`
 	${ rtl( { marginLeft: 'auto' }, { marginRight: 'auto' } )() }
 `;
-
-export const borderLabel = css`
-	display: inline-block;
-	margin-bottom: ${ space( 2 ) };
-`;

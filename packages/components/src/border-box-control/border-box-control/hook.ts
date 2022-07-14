@@ -100,17 +100,12 @@ export function useBorderBoxControl(
 		return cx( styles.BorderBoxControl, className );
 	}, [ cx, className ] );
 
-	const borderLabelClassName = useMemo( () => {
-		return cx( styles.borderLabel );
-	}, [ cx ] );
-
 	const linkedControlClassName = useMemo( () => {
 		return cx( styles.LinkedBorderControl );
 	}, [ cx ] );
 
 	return {
 		...otherProps,
-		borderLabelClassName,
 		className: classes,
 		hasMixedBorders: mixedBorders,
 		isLinked,
