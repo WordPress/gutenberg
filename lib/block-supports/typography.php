@@ -356,29 +356,27 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
  * @param array   $preset                      fontSizes preset value as seen in theme.json.
- * @param boolean $should_use_fluid_typography An override to switch fluid typography "on".
+ * @param boolean $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
  * @return string Font-size value.
  */
 function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
 	// Check if fluid font sizes are activated.
-	$typography_settings = gutenberg_get_global_settings( array( 'typography' ) );
-	$fluid_settings      = isset( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : $should_use_fluid_typography;
+	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
+	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
 
-	if ( ! $fluid_settings ) {
+	if ( ! $should_use_fluid_typography ) {
 		return $preset['size'];
 	}
 
 	// Defaults.
 	$default_maximum_viewport_width   = '1600px';
 	$default_minimum_viewport_width   = '768px';
-	$default_minimum_font_size_factor = isset( $fluid_settings['minFontSizeFactor'] ) && is_numeric( $fluid_settings['minFontSizeFactor'] ) ? $fluid_settings['minFontSizeFactor'] : 0.75;
-	$default_maximum_font_size_factor = isset( $fluid_settings['maxFontSizeFactor'] ) && is_numeric( $fluid_settings['minFontSizeFactor'] ) ? $fluid_settings['maxFontSizeFactor'] : 2;
-	$default_scale_factor             = isset( $fluid_settings['scaleFactor'] ) && is_numeric( $fluid_settings['scaleFactor'] ) ? $fluid_settings['scaleFactor'] : 1;
-	$maximum_viewport_width_raw       = null;
-	$minimum_viewport_width_raw       = null;
+	$default_minimum_font_size_factor = 0.75;
+	$default_maximum_font_size_factor = 1.5;
+	$default_scale_factor             = 1;
 
 	// Font sizes.
-	$fluid_font_size_settings = isset( $preset['fluidSize'] ) ? $preset['fluidSize'] : null;
+	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
 
 	// Try to grab explicit min and max fluid font sizes.
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;
@@ -401,33 +399,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		$maximum_font_size_raw = ( $preferred_size['value'] * $default_maximum_font_size_factor ) . $preferred_size['unit'];
 	}
 
-	// Set min and max viewport sizes, if any.
-	if ( isset( $fluid_settings['maxViewPortWidth'] ) ) {
-		$maximum_viewport_width_raw = $fluid_settings['maxViewPortWidth'];
-	}
-
-	if ( isset( $fluid_settings['minViewPortWidth'] ) ) {
-		$minimum_viewport_width_raw = $fluid_settings['minViewPortWidth'];
-	}
-
-	// Apply viewport width fallbacks.
-	// First from "layout.contentSize" for min width and "layout.wideSize" for max width.
-	// Then from the hardcoded defaults.
-	if ( ! $maximum_viewport_width_raw || ! $minimum_viewport_width_raw ) {
-		$layout_settings = gutenberg_get_global_settings( array( 'layout' ) );
-		if ( ! $maximum_viewport_width_raw ) {
-			$maximum_viewport_width_raw = isset( $layout_settings['wideSize'] ) ? $layout_settings['wideSize'] : $default_maximum_viewport_width;
-		}
-
-		if ( ! $minimum_viewport_width_raw ) {
-			$minimum_viewport_width_raw = isset( $layout_settings['contentSize'] ) ? $layout_settings['contentSize'] : $default_minimum_viewport_width;
-		}
-	}
-
 	$fluid_font_size_value = gutenberg_get_computed_fluid_typography_value(
 		array(
-			'minimum_viewport_width' => $minimum_viewport_width_raw,
-			'maximum_viewport_width' => $maximum_viewport_width_raw,
+			'minimum_viewport_width' => $default_maximum_viewport_width,
+			'maximum_viewport_width' => $default_minimum_viewport_width,
 			'minimum_font_size'      => $minimum_font_size_raw,
 			'maximum_font_size'      => $maximum_font_size_raw,
 			'scale_factor'           => $default_scale_factor,
