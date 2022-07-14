@@ -50,10 +50,6 @@ export type ColorProps = {
 
 export type LabelProps = {
 	/**
-	 * CSS class name to apply to label.
-	 */
-	className?: string;
-	/**
 	 * Provides control over whether the label will only be visible to
 	 * screen readers.
 	 */
