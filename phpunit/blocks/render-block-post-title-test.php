@@ -114,6 +114,8 @@ class Tests_Blocks_Render_Post_Title extends WP_UnitTestCase {
 		$rendered                       = render_block_core_post_title( self::$attributes, '', $block );
 		$this->assertStringContainsString( get_permalink( self::$post->ID ), $rendered );
 		$this->assertStringContainsString( '<a href=', $rendered );
+		$this->assertStringContainsString( '_blank', $rendered );
+		$this->assertStringContainsString( 'no-relative', $rendered );
 
 	}
 }
