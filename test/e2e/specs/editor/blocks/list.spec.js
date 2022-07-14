@@ -322,7 +322,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
-<blockquote class="wp-block-quote"><p>one</p><p>two</p></blockquote>
+<blockquote class="wp-block-quote"><!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list --></blockquote>
 <!-- /wp:quote -->`
 		);
 	} );

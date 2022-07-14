@@ -69,7 +69,6 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 export default function QuoteEdit( {
 	attributes,
 	setAttributes,
-	isSelected,
 	insertBlocksAfter,
 	clientId,
 	className,
@@ -79,10 +78,11 @@ export default function QuoteEdit( {
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const isAncestorOfSelectedBlock = useSelect( ( select ) =>
-		select( blockEditorStore ).hasSelectedInnerBlock( clientId )
-	);
-	const hasSelection = isSelected || isAncestorOfSelectedBlock;
+	const hasSelection = useSelect( ( select ) => {
+		const { isBlockSelected, hasSelectedInnerBlock } =
+			select( blockEditorStore );
+		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
+	}, [] );
 
 	const blockProps = useBlockProps( {
 		className: classNames( className, {

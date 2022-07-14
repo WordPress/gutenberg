@@ -94,12 +94,6 @@ exports[`Quote can be created by using > at the start of a paragraph block 1`] =
 <!-- /wp:quote -->"
 `;
 
-exports[`Quote can be merged into from a paragraph 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
-<!-- /wp:quote -->"
-`;
-
 exports[`Quote can be split at the end 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
