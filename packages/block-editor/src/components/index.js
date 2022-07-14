@@ -120,7 +120,6 @@ export {
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
-export { default as __experimentalUseBlockDisplayTitle } from './block-title/use-block-display-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
 export {

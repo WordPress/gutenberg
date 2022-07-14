@@ -9,17 +9,17 @@ import { isEmpty } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
+	BlockTitle,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
-	__experimentalUseBlockDisplayTitle as useBlockDisplayTitle,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -82,7 +82,6 @@ export default function TemplatePartEdit( {
 		},
 		[ templatePartId, clientId ]
 	);
-	const blockTitle = useBlockDisplayTitle( { clientId, maximumLength: 25 } );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -172,10 +171,16 @@ export default function TemplatePartEdit( {
 								setIsTemplatePartSelectionOpen( true );
 							} }
 						>
-							{ sprintf(
-								/* translators: %s: block name */
-								__( 'Replace %s' ),
-								blockTitle
+							{ createInterpolateElement(
+								__( 'Replace <BlockTitle />' ),
+								{
+									BlockTitle: (
+										<BlockTitle
+											clientId={ clientId }
+											maximumLength={ 25 }
+										/>
+									),
+								}
 							) }
 						</MenuItem>
 					) }
