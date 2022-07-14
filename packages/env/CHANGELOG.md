@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+-   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for `wp-phpunit/wp-phpunit`**.
+-   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
+
+### Enhancement
+-   Read WordPress' version and include the correspond PHPUnit test files in the environment.
+-   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
+
 ## 4.8.0 (2022-06-01)
 ### Enhancement
 -   Removed the need for quotation marks when passing options to `wp-env run`.
