@@ -36,7 +36,7 @@ function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
 function InlineToolbar( { anchorRef } ) {
 	return (
 		<Popover
-			position="bottom center"
+			position="top center"
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-rich-text__inline-format-toolbar"
