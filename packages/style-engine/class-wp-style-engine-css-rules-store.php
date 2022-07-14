@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	public static function get_store( $store_name = 'default' ) {
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
-			static::$stores[ $store_name ] = new WP_Style_Engine_CSS_Rules_Store( $store_name );
+			static::$stores[ $store_name ] = new static( $store_name );
 		}
 		return static::$stores[ $store_name ];
 	}
