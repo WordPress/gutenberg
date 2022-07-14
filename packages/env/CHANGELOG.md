@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fix
+- Used WP_TESTS_EMAIL and WP_TESTS_TITLE when creating environments
+
 ## 4.8.0 (2022-06-01)
 ### Enhancement
 -   Removed the need for quotation marks when passing options to `wp-env run`.
