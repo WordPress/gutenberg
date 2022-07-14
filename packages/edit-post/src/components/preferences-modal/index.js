@@ -124,13 +124,6 @@ export default function EditPostPreferencesModal() {
 								label={ __( 'Reduce the interface' ) }
 							/>
 							<EnableFeature
-								featureName="inlineToolbar"
-								help={ __(
-									'Only show the rich text toolbar when selecting text.'
-								) }
-								label={ __( 'Inline toolbar' ) }
-							/>
-							<EnableFeature
 								featureName="themeStyles"
 								help={ __(
 									'Make the editor look like your theme.'
