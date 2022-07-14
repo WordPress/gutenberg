@@ -19,8 +19,10 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 const SHOW_ALL = -1;
+const DEFAULT_ITEMS_LIMIT = 5;
 
 // 100 is the max RangeControl supports
 const MAX_TERMS_LIMIT = 100;
@@ -50,6 +52,9 @@ export default function CategoriesEdit( {
 		'category',
 		query
 	);
+
+	const [ localTermsToShow, setLocalTermsToShow ] =
+		useState( DEFAULT_ITEMS_LIMIT );
 
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
@@ -138,13 +143,6 @@ export default function CategoriesEdit( {
 		];
 	};
 
-	// Fallback to 1 is required to ensure a valid value
-	// for the range control.
-	const currentNumberCategories = categories?.length || 1;
-
-	const numberOfItemsToShow =
-		termsToShow === SHOW_ALL ? currentNumberCategories : termsToShow;
-
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
@@ -179,13 +177,13 @@ export default function CategoriesEdit( {
 				</PanelBody>
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<ToggleControl
-						label={ __( 'Limit items' ) }
+						label={ __( 'Limit number of items' ) }
 						checked={ termsToShow !== SHOW_ALL }
 						onChange={ () => {
 							setAttributes( {
 								termsToShow:
 									termsToShow === SHOW_ALL
-										? numberOfItemsToShow
+										? localTermsToShow
 										: SHOW_ALL,
 							} );
 						} }
@@ -193,12 +191,20 @@ export default function CategoriesEdit( {
 					{ termsToShow !== SHOW_ALL && (
 						<RangeControl
 							label={ __( 'Number of items' ) }
-							value={ numberOfItemsToShow }
-							onChange={ ( newValue ) =>
+							value={
+								termsToShow === SHOW_ALL
+									? DEFAULT_ITEMS_LIMIT
+									: termsToShow
+							}
+							onChange={ ( newValue ) => {
 								setAttributes( {
 									termsToShow: newValue,
-								} )
-							}
+								} );
+
+								// Local backup to avoid Limit Items toggle
+								// wiping out the user's selection.
+								setLocalTermsToShow( newValue );
+							} }
 							min={ 1 }
 							max={ MAX_TERMS_LIMIT }
 							required
