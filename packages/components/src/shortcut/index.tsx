@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isString, isObject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import type { ShortcutProps } from './types';
@@ -18,11 +13,11 @@ function Shortcut( props: ShortcutProps ) {
 	let displayText;
 	let ariaLabel;
 
-	if ( isString( shortcut ) ) {
+	if ( typeof shortcut === 'string' ) {
 		displayText = shortcut;
 	}
 
-	if ( isObject( shortcut ) ) {
+	if ( shortcut !== null && typeof shortcut === 'object' ) {
 		displayText = shortcut.display;
 		ariaLabel = shortcut.ariaLabel;
 	}

@@ -66,20 +66,16 @@
 	margin: 0;
 }
 
-.edit-site-screen-color-palette-toggle.edit-site-screen-color-palette-toggle {
-	margin-right: $grid-unit-20;
-	margin-left: $grid-unit-20;
-	width: unset;
-	.components-toggle-group-control {
-		min-height: $grid-unit-40;
-	}
-}
-
 .edit-site-screen-text-color__control,
 .edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control,
-.edit-site-screen-background-color__control {
+.edit-site-screen-button-color__control {
 	padding: $grid-unit-20;
+}
+
+.edit-site-screen-background-color__control {
+	.block-editor-color-gradient-control__tab-panel {
+		padding: $grid-unit-20;
+	}
 }
 
 .edit-site-global-styles-variations_item {

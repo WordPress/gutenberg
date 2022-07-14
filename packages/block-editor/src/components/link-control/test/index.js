@@ -2417,10 +2417,12 @@ describe( 'Controlling link title text', () => {
 			Simulate.keyDown( textInput, { keyCode: ENTER } );
 		} );
 
-		expect( mockOnChange ).toHaveBeenCalledWith( {
-			title: textValue,
-			url: selectedLink.url,
-		} );
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: textValue,
+				url: selectedLink.url,
+			} )
+		);
 
 		// The text input should not be showing as the form is submitted.
 		expect(
