@@ -15,7 +15,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
-	const [ rawBlockTypes, , collections, onSelectItem ] = useBlockTypesState(
+	const [ rawBlockTypes, , collections ] = useBlockTypesState(
 		rootClientId,
 		onSelect
 	);
@@ -29,7 +29,7 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 
 	const handleSelect = ( ...args ) => {
 		trackBlockTypeSelected( ...args );
-		onSelectItem( ...args );
+		onSelect( ...args );
 	};
 
 	const collectionSections = useMemo( () => {
