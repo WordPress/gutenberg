@@ -26,6 +26,10 @@
 		"showEmpty": {
 			"type": "boolean",
 			"default": false
+		},
+		"termsToShow": {
+			"type": "number",
+			"default": -1
 		}
 	},
 	"supports": {

@@ -12,12 +12,18 @@ import {
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
+	RangeControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+
+const SHOW_ALL = -1;
+
+// 100 is the max RangeControl supports
+const MAX_TERMS_LIMIT = 100;
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -26,11 +32,16 @@ export default function CategoriesEdit( {
 		showPostCounts,
 		showOnlyTopLevel,
 		showEmpty,
+		termsToShow,
 	},
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
+	const query = {
+		per_page: termsToShow,
+		hide_empty: ! showEmpty,
+		context: 'view',
+	};
 	if ( showOnlyTopLevel ) {
 		query.parent = 0;
 	}
@@ -39,6 +50,7 @@ export default function CategoriesEdit( {
 		'category',
 		query
 	);
+
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
 			return [];
@@ -126,6 +138,10 @@ export default function CategoriesEdit( {
 		];
 	};
 
+	// Fallback to 1 is required to ensure a valid value
+	// for the range control.
+	const currentNumberCategories = categories?.length || 1;
+
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
@@ -157,6 +173,24 @@ export default function CategoriesEdit( {
 							onChange={ toggleAttribute( 'showHierarchy' ) }
 						/>
 					) }
+				</PanelBody>
+				<PanelBody title={ __( 'Sorting and filtering' ) }>
+					<RangeControl
+						label={ __( 'Number of items' ) }
+						value={
+							termsToShow === SHOW_ALL
+								? currentNumberCategories
+								: termsToShow
+						}
+						onChange={ ( newValue ) =>
+							setAttributes( {
+								termsToShow: newValue,
+							} )
+						}
+						min={ 1 }
+						max={ MAX_TERMS_LIMIT }
+						required
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ isResolving && (
