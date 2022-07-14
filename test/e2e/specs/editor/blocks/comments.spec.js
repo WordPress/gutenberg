@@ -43,7 +43,7 @@ test.describe( 'Comments', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		await expect(
-			page.locator( 'role=document[name="Block: Comment Template"]' )
+			page.locator( 'role=document[name="Block: Comment Template"i]' )
 		).toContainText( 'No results found.' );
 	} );
 
@@ -67,35 +67,35 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"]'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
 		);
 
 		// We check that there is a previous comments page link.
 		await expect(
-			page.locator( 'role=link[name="Older Comments"]' )
+			page.locator( 'role=link[name="Older Comments"i]' )
 		).toBeVisible();
 		await expect(
-			page.locator( 'role=link[name="Newer Comments"]' )
+			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 
-		await page.click( 'role=link[name="Older Comments"]' );
+		await page.click( 'role=link[name="Older Comments"i]' );
 
 		// We check that there are a previous and a next link.
 		await expect(
-			page.locator( 'role=link[name="Older Comments"]' )
+			page.locator( 'role=link[name="Older Comments"i]' )
 		).toBeVisible();
 		await expect(
-			page.locator( 'role=link[name="Newer Comments"]' )
+			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeVisible();
 
-		await page.click( 'role=link[name="Older Comments"]' );
+		await page.click( 'role=link[name="Older Comments"i]' );
 
 		// We check that there is only have a next link
 		await expect(
-			page.locator( 'role=link[name="Older Comments"]' )
+			page.locator( 'role=link[name="Older Comments"i]' )
 		).toBeHidden();
 		await expect(
-			page.locator( 'role=link[name="Newer Comments"]' )
+			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeVisible();
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
@@ -119,15 +119,15 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"]'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
 		);
 
 		// We check that there are no comments page link.
 		await expect(
-			page.locator( 'role=link[name="Older Comments"]' )
+			page.locator( 'role=link[name="Older Comments"i]' )
 		).toBeHidden();
 		await expect(
-			page.locator( 'role=link[name="Newer Comments"]' )
+			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 	} );
 

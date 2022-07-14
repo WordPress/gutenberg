@@ -31,7 +31,7 @@ export async function publishPost( this: Editor ) {
 	);
 
 	const urlString = await this.page.inputValue(
-		'role=textbox[name="Post address"]'
+		'role=textbox[name="Post address"i]'
 	);
 	const url = new URL( urlString );
 	const postId = url.searchParams.get( 'p' );
