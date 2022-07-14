@@ -5,7 +5,6 @@ import {
 	createBlock,
 	parseWithAttributeSchema,
 	rawHandler,
-	serialize,
 } from '@wordpress/blocks';
 
 const transforms = {
@@ -110,8 +109,13 @@ const transforms = {
 				{ citation, anchor, fontSize, style },
 				innerBlocks
 			) => {
+				const value = innerBlocks
+					.map(
+						( { attributes } ) => `<p>${ attributes.content }</p>`
+					)
+					.join( '' );
 				return createBlock( 'core/pullquote', {
-					value: serialize( innerBlocks ),
+					value,
 					citation,
 					anchor,
 					fontSize,
