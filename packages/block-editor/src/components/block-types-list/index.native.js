@@ -107,12 +107,10 @@ export default function BlockTypesList( {
 	const renderListItem = ( { item } ) => {
 		return (
 			<InserterButton
-				{ ...{
-					item,
-					itemWidth,
-					maxWidth,
-					onSelect,
-				} }
+				item={ item }
+				itemWidth={ itemWidth }
+				maxWidth={ maxWidth }
+				onSelect={ onSelect }
 			/>
 		);
 	};
