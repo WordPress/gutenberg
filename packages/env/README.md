@@ -300,7 +300,7 @@ Positionals:
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
 <div class="callout callout-alert">
-In some cases, `wp-env` may consume options that you are attempting to pass to 
+In some cases, `wp-env` may consume options that you are attempting to pass to
 the container. This happens with options that `wp-env` has already declared,
 such as `--debug`, `--help`, and `--version`. When this happens, you should fall
 back to using quotation marks; `wp-env` considers everything inside the
@@ -509,7 +509,7 @@ On the development instance, these wp-config values are defined by default:
 WP_DEBUG: true,
 SCRIPT_DEBUG: true,
 WP_PHP_BINARY: 'php',
-WP_TESTS_EMAIL: 'admin@example.org',
+WP_TESTS_EMAIL: 'wordpress@example.com',
 WP_TESTS_TITLE: 'Test Blog',
 WP_TESTS_DOMAIN: 'http://localhost',
 WP_SITEURL: 'http://localhost',
