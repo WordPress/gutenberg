@@ -13,9 +13,6 @@ import {
 } from './styles/focal-point-picker-style';
 import { useUpdateEffect } from '../utils/hooks';
 
-const { clearTimeout, setTimeout } =
-	typeof window !== 'undefined' ? window : {};
-
 export default function FocalPointPickerGrid( {
 	bounds = {},
 	value,
@@ -52,11 +49,11 @@ function useRevealAnimation( value ) {
 
 	useUpdateEffect( () => {
 		setIsActive( true );
-		const timeout = setTimeout( () => {
+		const timeout = window.setTimeout( () => {
 			setIsActive( false );
 		}, 600 );
 
-		return () => clearTimeout( timeout );
+		return () => window.clearTimeout( timeout );
 	}, [ value ] );
 
 	return {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,13 +54,21 @@ const hasLinkColorSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.link;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.link
+	);
 };
 
 const hasGradientSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.gradients;
+	return (
+		colorSupport !== null &&
+		typeof colorSupport === 'object' &&
+		!! colorSupport.gradients
+	);
 };
 
 const hasBackgroundColorSupport = ( blockType ) => {

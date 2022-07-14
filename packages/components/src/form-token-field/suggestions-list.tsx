@@ -17,8 +17,6 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import type { SuggestionsListProps } from './types';
 
-const { setTimeout, clearTimeout } = window;
-
 const handleMouseDown: MouseEventHandler = ( e ) => {
 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
 	e.preventDefault();
@@ -54,14 +52,14 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						onlyScrollIfNeeded: true,
 					}
 				);
-				id = setTimeout( () => {
+				id = window.setTimeout( () => {
 					setScrollingIntoView( false );
 				}, 100 );
 			}
 
 			return () => {
 				if ( id !== undefined ) {
-					clearTimeout( id );
+					window.clearTimeout( id );
 				}
 			};
 		},

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- `getRectangleFromRange` may now return `null`.
+
+## 3.13.0 (2022-07-13)
+
+## 3.12.0 (2022-06-29)
+
 ## 3.11.0 (2022-06-15)
 
 ## 3.10.0 (2022-06-01)

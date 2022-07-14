@@ -9,7 +9,6 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -101,11 +100,13 @@ const SegmentedControls = ( {
 		const { paddingLeft: offset } = isIOS
 			? styles.containerIOS
 			: styles.container;
-		const widths = map( values( segmentsDimensions ), 'width' );
+		const widths = Object.values( segmentsDimensions ).map(
+			( dimension ) => dimension.width
+		);
 		const widthsDistance = widths.slice( 0, index );
-		const widthsDistanceSum = reduce(
-			widthsDistance,
-			( sum, n ) => sum + n
+		const widthsDistanceSum = widthsDistance.reduce(
+			( sum, n ) => sum + n,
+			0
 		);
 
 		const endValue = index === 0 ? 0 : widthsDistanceSum;
