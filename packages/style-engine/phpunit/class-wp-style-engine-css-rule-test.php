@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 			'font-size' => '4px',
 		);
 		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, $first_declaration );
-		$css_rule->add_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
+		$css_rule->set_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
 
 		$expected = '.taggart {font-size: 4px;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
