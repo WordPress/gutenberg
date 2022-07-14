@@ -22,7 +22,13 @@ export async function createComment(
 	this: RequestUtils,
 	comment: Partial< Comment >
 ) {
-	const author = comment.author ?? ( await this.getCurrentUser() )?.id;
+	const currentUser = await this.rest( {
+		path: '/wp/v2/users/me',
+		method: 'GET',
+	} );
+
+	const author = currentUser?.id;
+
 	const response = await this.rest( {
 		method: 'POST',
 		path: '/wp/v2/comments',
