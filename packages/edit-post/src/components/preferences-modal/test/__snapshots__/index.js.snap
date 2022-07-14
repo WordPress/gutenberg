@@ -94,19 +94,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               <WithSelect(PostTaxonomies)
                 taxonomyWrapper={[Function]}
               />
-              <PostFeaturedImageCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Featured image"
-                  panelName="featured-image"
-                />
-              </PostFeaturedImageCheck>
-              <PostExcerptCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Excerpt"
-                  panelName="post-excerpt"
-                />
-              </PostExcerptCheck>
-              <WithSelect(PostTypeSupportCheck)
+              <PostTypeSupportCheck
                 supportKeys={
                   Array [
                     "comments",
@@ -118,7 +106,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                   label="Discussion"
                   panelName="discussion-panel"
                 />
-              </WithSelect(PostTypeSupportCheck)>
+              </PostTypeSupportCheck>
               <PageAttributesCheck>
                 <WithSelect(IfCondition(WithDispatch(BaseOption)))
                   label="Page attributes"
@@ -225,19 +213,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               <WithSelect(PostTaxonomies)
                 taxonomyWrapper={[Function]}
               />
-              <PostFeaturedImageCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Featured image"
-                  panelName="featured-image"
-                />
-              </PostFeaturedImageCheck>
-              <PostExcerptCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Excerpt"
-                  panelName="post-excerpt"
-                />
-              </PostExcerptCheck>
-              <WithSelect(PostTypeSupportCheck)
+              <PostTypeSupportCheck
                 supportKeys={
                   Array [
                     "comments",
@@ -249,7 +225,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                   label="Discussion"
                   panelName="discussion-panel"
                 />
-              </WithSelect(PostTypeSupportCheck)>
+              </PostTypeSupportCheck>
               <PageAttributesCheck>
                 <WithSelect(IfCondition(WithDispatch(BaseOption)))
                   label="Page attributes"
