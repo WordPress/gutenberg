@@ -183,9 +183,7 @@ describe( 'block mover', () => {
 					true,
 					negativeDirection
 				)
-			).toBe(
-				'Blocks cannot be moved up as they are already at the top'
-			);
+			).toBe( 'All blocks are selected, and cannot be moved' );
 		} );
 
 		it( 'generates a title for a selection of blocks at the bottom', () => {
@@ -238,9 +236,7 @@ describe( 'block mover', () => {
 					negativeDirection,
 					'horizontal'
 				)
-			).toBe(
-				'Blocks cannot be moved left as they are already are at the leftmost position'
-			);
+			).toBe( 'All blocks are selected, and cannot be moved' );
 		} );
 
 		it( 'indicates that blocks cannot be moved right when the orientation is horizontal and the block is the last block', () => {
