@@ -239,6 +239,11 @@ export function getMultiBlockMoverDescription(
 ) {
 	const position = firstIndex + 1;
 
+	if ( isFirst && isLast ) {
+		// All blocks are selected
+		return __( 'All blocks are selected, and cannot be moved' );
+	}
+
 	if ( dir > 0 && ! isLast ) {
 		// moving down
 		const movementDirection = getMovementDirection( 'down', orientation );
