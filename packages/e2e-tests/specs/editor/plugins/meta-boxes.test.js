@@ -5,7 +5,6 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
-	findSidebarPanelToggleButtonWithTitle,
 	insertBlock,
 	openDocumentSettingsSidebar,
 	publishPost,
@@ -101,19 +100,13 @@ describe( 'Meta boxes', () => {
 		await page.keyboard.type( 'Excerpt from content.' );
 		await page.type( '.editor-post-title__input', 'A published post' );
 
-		// Open the excerpt panel.
+		// Add an excerpt.
 		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
-			'Excerpt'
+		await page.waitForSelector(
+			'*[aria-label="Editor settings"] *[aria-label="Add excerpt"]'
 		);
-		if ( excerptButton ) {
-			await excerptButton.click( 'button' );
-		}
-
-		await page.waitForSelector( '.editor-post-excerpt textarea' );
-
 		await page.type(
-			'.editor-post-excerpt textarea',
+			'*[aria-label="Editor settings"] *[aria-label="Add excerpt"]',
 			'Explicitly set excerpt.'
 		);
 

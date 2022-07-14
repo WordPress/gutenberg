@@ -25,7 +25,9 @@ test.describe( 'new editor state', () => {
 		await expect( page ).toHaveURL( /post-new.php/ );
 
 		// Should display the blank title.
-		const title = page.locator( 'role=textbox[name="Add title"i]' );
+		const title = page.locator(
+			'role=region[name="Editor content"i] >> role=textbox[name="Add title"i]'
+		);
 		await expect( title ).toBeEditable();
 		await expect( title ).toHaveText( '' );
 
@@ -58,7 +60,9 @@ test.describe( 'new editor state', () => {
 		await admin.createNewPost();
 
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			page.locator(
+				'role=region[name="Editor content"i] >> role=textbox[name="Add title"i]'
+			)
 		).toBeFocused();
 	} );
 
@@ -70,7 +74,7 @@ test.describe( 'new editor state', () => {
 
 		// Enter a title for this post.
 		await page.type(
-			'role=textbox[name="Add title"i]',
+			'role=region[name="Editor content"i] >> role=textbox[name="Add title"i]',
 			'Here is the title'
 		);
 		// Save the post as a draft.

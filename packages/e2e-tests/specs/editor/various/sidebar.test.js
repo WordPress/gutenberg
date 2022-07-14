@@ -126,10 +126,6 @@ describe( 'Sidebar', () => {
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
-		expect(
-			await findSidebarPanelWithTitle( 'Featured image' )
-		).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Summary' ) ).toBeDefined();
 
@@ -138,8 +134,6 @@ describe( 'Sidebar', () => {
 
 			removeEditorPanel( 'taxonomy-panel-category' );
 			removeEditorPanel( 'taxonomy-panel-post_tag' );
-			removeEditorPanel( 'featured-image' );
-			removeEditorPanel( 'post-excerpt' );
 			removeEditorPanel( 'discussion-panel' );
 			removeEditorPanel( 'post-status' );
 		} );
@@ -152,12 +146,6 @@ describe( 'Sidebar', () => {
 			await page.$x( getPanelToggleSelector( 'Categories' ) )
 		).toEqual( [] );
 		expect( await page.$x( getPanelToggleSelector( 'Tags' ) ) ).toEqual(
-			[]
-		);
-		expect(
-			await page.$x( getPanelToggleSelector( 'Featured image' ) )
-		).toEqual( [] );
-		expect( await page.$x( getPanelToggleSelector( 'Excerpt' ) ) ).toEqual(
 			[]
 		);
 		expect(
