@@ -230,7 +230,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
-					WP_PHPUNIT__DIR: '/wordpress-phpunit',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: developmentMounts,
 			},
@@ -241,7 +241,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
-					WP_PHPUNIT__DIR: '/wordpress-phpunit',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: testsMounts,
 			},
@@ -253,7 +253,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
-					WP_PHPUNIT__DIR: '/wordpress-phpunit',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 			},
 			'tests-cli': {
@@ -264,7 +264,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
-					WP_PHPUNIT__DIR: '/wordpress-phpunit',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 			},
 			composer: {
@@ -282,9 +282,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				],
 				environment: {
 					LOCAL_DIR: 'html',
-					WP_PHPUNIT__TESTS_CONFIG:
-						'/var/www/html/phpunit-wp-config.php',
-					WP_PHPUNIT__DIR: '/wordpress-phpunit',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 					...dbEnv.credentials,
 					...dbEnv.tests,
 				},
