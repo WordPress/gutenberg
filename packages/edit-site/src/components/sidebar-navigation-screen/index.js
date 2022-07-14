@@ -63,7 +63,10 @@ export default function SidebarNavigationScreen( {
 				{ actions }
 			</HStack>
 
-			<nav className="edit-site-sidebar-navigation-screen__content">
+			<nav
+				aria-label={ __( 'Editor' ) }
+				className="edit-site-sidebar-navigation-screen__content"
+			>
 				{ description && (
 					<p className="edit-site-sidebar-navigation-screen__description">
 						{ description }

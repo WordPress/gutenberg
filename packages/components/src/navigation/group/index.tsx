@@ -59,7 +59,10 @@ export function NavigationGroup( {
 						{ title }
 					</GroupTitleUI>
 				) }
-				<ul aria-labelledby={ groupTitleId } role="group">
+				<ul
+					aria-labelledby={ title ? groupTitleId : undefined }
+					role="group"
+				>
 					{ children }
 				</ul>
 			</li>

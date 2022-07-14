@@ -87,7 +87,7 @@ export function NavigationMenu( props: NavigationMenuProps ) {
 				) }
 
 				<NavigableMenu>
-					<ul aria-labelledby={ menuTitleId }>
+					<ul aria-labelledby={ title ? menuTitleId : undefined }>
 						{ children }
 						{ search && ! isSearchDebouncing && (
 							<NavigationSearchNoResultsFound search={ search } />
