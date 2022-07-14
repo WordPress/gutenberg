@@ -1,10 +1,12 @@
 /**
  * Internal dependencies
  */
-import PostTypeSupportCheck from '../post-type-support-check';
+import { usePostTypeSupportCheck } from '../post-type-support-check';
 
-function PostExcerptCheck( props ) {
-	return <PostTypeSupportCheck { ...props } supportKeys="excerpt" />;
+export default function PostExcerptCheck( children ) {
+	return usePostExcerptCheck() ? children : null;
 }
 
-export default PostExcerptCheck;
+export function usePostExcerptCheck() {
+	return usePostTypeSupportCheck( 'excerpt' );
+}

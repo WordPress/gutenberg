@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { some, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -19,34 +19,27 @@ import { store as editorStore } from '../../store';
  * type supports one of the given `supportKeys` prop.
  *
  * @param {Object}            props             Props.
- * @param {string}            [props.postType]  Current post type.
- * @param {WPElement}         props.children    Children to be rendered if post
- *                                              type supports.
  * @param {(string|string[])} props.supportKeys String or string array of keys
  *                                              to test.
+ * @param {WPElement}         props.children    Children to be rendered if post
+ *                                              type supports.
  *
  * @return {WPComponent} The component to be rendered.
  */
-export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
-	let isSupported = true;
-	if ( postType ) {
-		isSupported = some(
-			castArray( supportKeys ),
-			( key ) => !! postType.supports[ key ]
-		);
-	}
-
-	if ( ! isSupported ) {
-		return null;
-	}
-
-	return children;
+export default function PostTypeSupportCheck( { supportKeys, children } ) {
+	return usePostTypeSupportCheck( supportKeys ) ? children : null;
 }
 
-export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( editorStore );
-	const { getPostType } = select( coreStore );
-	return {
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-	};
-} )( PostTypeSupportCheck );
+export function usePostTypeSupportCheck( supportKeys ) {
+	return useSelect( ( select ) => {
+		const postTypeSlug =
+			select( editorStore ).getEditedPostAttribute( 'type' );
+		const postType = select( coreStore ).getPostType( postTypeSlug );
+		if ( postType ) {
+			return castArray( supportKeys ).some(
+				( key ) => !! postType.supports[ key ]
+			);
+		}
+		return true;
+	}, [] );
+}

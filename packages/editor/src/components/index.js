@@ -23,7 +23,10 @@ export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
-export { default as PostExcerptCheck } from './post-excerpt/check';
+export {
+	default as PostExcerptCheck,
+	usePostExcerptCheck,
+} from './post-excerpt/check';
 export { default as PostFeaturedImage } from './post-featured-image';
 export { default as PostFeaturedImageCheck } from './post-featured-image/check';
 export { default as PostFormat } from './post-format';
@@ -58,7 +61,10 @@ export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
-export { default as PostTypeSupportCheck } from './post-type-support-check';
+export {
+	default as PostTypeSupportCheck,
+	usePostTypeSupportCheck,
+} from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
 export { default as PostURLLabel, usePostURLLabel } from './post-url/label';
