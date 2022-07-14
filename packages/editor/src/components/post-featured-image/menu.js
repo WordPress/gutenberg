@@ -48,7 +48,6 @@ export default function PostFeaturedImageMenu( {
 				</MenuItem>
 				{ onRemoveImage && (
 					<MenuItem
-						className="editor-post-featured-image__remove-image"
 						icon={ trashIcon }
 						iconPosition="left"
 						isDestructive
