@@ -73,13 +73,14 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	 * Should set selector and rules on instantiation.
 	 */
 	public function test_set_declarations() {
-		$selector                   = '.hill-street-blues';
-		$some_css_declarations      = new WP_Style_Engine_CSS_Declarations( array( 'margin-top' => '10px' ) );
-		$some_more_css_declarations = new WP_Style_Engine_CSS_Declarations( array( 'font-size' => '1rem' ) );
+		// Declarations using a WP_Style_Engine_CSS_Declarations object.
+		$some_css_declarations = new WP_Style_Engine_CSS_Declarations( array( 'margin-top' => '10px' ) );
+		// Declarations using a property => value array.
+		$some_more_css_declarations = array( 'font-size' => '1rem' );
 		$css_rule                   = new WP_Style_Engine_CSS_Rule( '.hill-street-blues', $some_css_declarations );
 		$css_rule->set_declarations( $some_more_css_declarations );
 
-		$expected = "$selector {{$some_css_declarations->get_declarations_string()}{$some_more_css_declarations->get_declarations_string()}}";
+		$expected = '.hill-street-blues {margin-top: 10px; font-size: 1rem;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
