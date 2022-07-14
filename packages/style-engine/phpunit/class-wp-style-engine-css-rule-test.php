@@ -42,11 +42,10 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$overwrite_first_declaration = array(
 			'font-size' => '4px',
 		);
-		$css_declarations            = new WP_Style_Engine_CSS_Declarations( $first_declaration );
-		$more_css_declarations       = new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration );
-		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, array( $css_declarations, $more_css_declarations ) );
+		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, $first_declaration );
+		$css_rule->add_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
 
-		$expected = "$selector {{$more_css_declarations->get_declarations_string()}}";
+		$expected = '.taggart {font-size: 4px;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
