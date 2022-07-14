@@ -1,12 +1,17 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
-import { usePostTypeSupportCheck } from '../post-type-support-check';
+import PostTypeSupportCheck from '../post-type-support-check';
 
-export default function PostExcerptCheck( children ) {
-	return usePostExcerptCheck() ? children : null;
-}
-
-export function usePostExcerptCheck() {
-	return usePostTypeSupportCheck( 'excerpt' );
+export default function PostExcerptCheck( props ) {
+	deprecated( 'PostExcerptCheck', {
+		since: '6.1',
+		alternative: '<PostTypeSupportCheck supportKeys="excerpt">',
+	} );
+	return <PostTypeSupportCheck { ...props } supportKeys="excerpt" />;
 }
