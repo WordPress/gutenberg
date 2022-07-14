@@ -19,13 +19,16 @@
 // cannot be set around it, caret position calculation fails in Chrome, and
 // typing at the end of the paragraph doesn't work.
 .has-drop-cap:not(:focus)::first-letter {
-	float: left;
 	font-size: 8.4em;
 	line-height: 0.68;
 	font-weight: 100;
 	margin: 0.05em 0.1em 0 0;
 	text-transform: uppercase;
 	font-style: normal;
+}
+
+body.rtl .has-drop-cap:not(:focus)::first-letter {
+	margin-left: 0.1em;
 }
 
 // Prevent the dropcap from breaking out of the box when a background is applied.
