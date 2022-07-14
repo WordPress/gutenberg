@@ -98,7 +98,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @return void
 	 */
-	public function remove_declarations( $declarations ) {
+	public function remove_declarations( $declarations = array() ) {
 		foreach ( $declarations as $property ) {
 			$this->remove_declaration( $property );
 		}
