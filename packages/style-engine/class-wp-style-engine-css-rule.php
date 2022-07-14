@@ -50,12 +50,16 @@ class WP_Style_Engine_CSS_Rule {
 	 * Set the selector.
 	 *
 	 * @param string $selector The CSS selector.
+	 *
+	 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 	 */
 	public function set_selector( $selector ) {
 		if ( empty( $selector ) ) {
 			return;
 		}
 		$this->selector = esc_html( $selector );
+
+		return $this;
 	}
 
 	/**
@@ -63,6 +67,8 @@ class WP_Style_Engine_CSS_Rule {
 	 *
 	 * @param array|WP_Style_Engine_CSS_Declarations $declarations An array of declarations (property => value pairs),
 	 *                                                             or a WP_Style_Engine_CSS_Declarations object.
+	 *
+	 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 	 */
 	public function set_declarations( $declarations ) {
 		$is_declarations_object = ! is_array( $declarations );
@@ -74,6 +80,8 @@ class WP_Style_Engine_CSS_Rule {
 			$this->declarations = new WP_Style_Engine_CSS_Declarations( $declarations_array );
 		}
 		$this->declarations->add_declarations( $declarations_array );
+
+		return $this;
 	}
 
 	/**
