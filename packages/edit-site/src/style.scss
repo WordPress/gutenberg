@@ -33,11 +33,11 @@
 @import "./components/style-book/style.scss";
 @import "./hooks/push-changes-to-global-styles/style.scss";
 
-html #wpadminbar {
+body.js #wpadminbar {
 	display: none;
 }
 
-html #wpbody {
+body.js #wpbody {
 	padding-top: 0;
 }
 
@@ -45,11 +45,10 @@ html #wpbody {
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.
 html.wp-toolbar {
 	background: $white;
-	padding-top: 0;
 }
 
-body.appearance_page_gutenberg-template-parts,
-body.site-editor-php {
+body.js.appearance_page_gutenberg-template-parts,
+body.js.site-editor-php {
 	@include wp-admin-reset(".edit-site");
 }
 
@@ -71,6 +70,10 @@ body.site-editor-php {
 		position: fixed;
 		right: 0;
 		top: 0;
+	}
+
+	.no-js & {
+		min-height: 0;
 	}
 
 	.interface-interface-skeleton {
