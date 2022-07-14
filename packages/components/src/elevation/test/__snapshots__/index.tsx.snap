@@ -10,7 +10,7 @@ exports[`props should render active 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+  box-shadow: 0 7px 14px 0 rgba(0, 0, 0, 0.35);
   opacity: 1;
   left: 0;
   right: 0;
@@ -26,16 +26,17 @@ exports[`props should render active 1`] = `
 }
 
 *:hover>.emotion-0 {
-  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+  box-shadow: 0 14px 28px 0 rgba(0, 0, 0, 0.7);
 }
 
 *:active>.emotion-0 {
-  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.25);
 }
 
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -51,7 +52,7 @@ exports[`props should render correctly 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -69,6 +70,7 @@ exports[`props should render correctly 1`] = `
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -84,7 +86,7 @@ exports[`props should render hover 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+  box-shadow: 0 7px 14px 0 rgba(0, 0, 0, 0.35);
   opacity: 1;
   left: 0;
   right: 0;
@@ -100,12 +102,13 @@ exports[`props should render hover 1`] = `
 }
 
 *:hover>.emotion-0 {
-  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+  box-shadow: 0 14px 28px 0 rgba(0, 0, 0, 0.7);
 }
 
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -121,7 +124,7 @@ exports[`props should render isInteractive 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -137,16 +140,17 @@ exports[`props should render isInteractive 1`] = `
 }
 
 *:hover>.emotion-0 {
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
 }
 
 *:active>.emotion-0 {
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
 }
 
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -162,7 +166,7 @@ exports[`props should render offset 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: -2px;
-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+  box-shadow: 0 7px 14px 0 rgba(0, 0, 0, 0.35);
   opacity: 1;
   left: -2px;
   right: -2px;
@@ -178,16 +182,17 @@ exports[`props should render offset 1`] = `
 }
 
 *:hover>.emotion-0 {
-  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+  box-shadow: 0 14px 28px 0 rgba(0, 0, 0, 0.7);
 }
 
 *:active>.emotion-0 {
-  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.25);
 }
 
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -203,7 +208,7 @@ exports[`props should render value 1`] = `
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+  box-shadow: 0 7px 14px 0 rgba(0, 0, 0, 0.35);
   opacity: 1;
   left: 0;
   right: 0;
@@ -221,6 +226,7 @@ exports[`props should render value 1`] = `
 <div
   aria-hidden="true"
   class="components-elevation emotion-0 emotion-1"
+  data-testid="elevation"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />

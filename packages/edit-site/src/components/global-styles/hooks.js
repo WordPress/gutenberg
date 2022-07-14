@@ -182,6 +182,21 @@ export function getSupportedGlobalStylesPanels( name ) {
 	}
 
 	const supportKeys = [];
+
+	// Check for blockGap support.
+	// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
+	// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		blockType?.supports?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.__experimentalSkipSerialization !==
+			true &&
+		! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+			( spacingType ) => spacingType === 'blockGap'
+		)
+	) {
+		supportKeys.push( 'blockGap' );
+	}
+
 	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
 		if ( ! STYLE_PROPERTY[ styleName ].support ) {
 			return;

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,7 +33,7 @@ const ShortcutList = ( { shortcuts } ) => (
 				className="edit-site-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
-				{ isString( shortcut ) ? (
+				{ typeof shortcut === 'string' ? (
 					<DynamicShortcut name={ shortcut } />
 				) : (
 					<Shortcut { ...shortcut } />

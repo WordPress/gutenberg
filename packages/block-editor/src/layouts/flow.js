@@ -13,7 +13,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { appendSelectors } from './utils';
+import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -107,15 +107,15 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( {
+	getLayoutStyle: function getLayoutStyle( {
 		selector,
 		layout = {},
 		style,
 		blockName,
+		hasBlockGapSupport,
+		layoutDefinitions,
 	} ) {
 		const { contentSize, wideSize } = layout;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const blockGapStyleValue = getGapBoxControlValueFromStyle(
 			style?.spacing?.blockGap
 		);
@@ -125,7 +125,7 @@ export default {
 			blockGapStyleValue?.top &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? blockGapStyleValue?.top
-				: 'var( --wp--style--block-gap )';
+				: '';
 
 		let output =
 			!! contentSize || !! wideSize
@@ -147,37 +147,16 @@ export default {
 				`
 				: '';
 
-		output += `
-			${ appendSelectors( selector, '> .alignleft' ) } {
-				float: left;
-				margin-inline-start: 0;
-				margin-inline-end: 2em;
-			}
-			${ appendSelectors( selector, '> .alignright' ) } {
-				float: right;
-				margin-inline-start: 2em;
-				margin-inline-end: 0;
-			}
-
-			${ appendSelectors( selector, '> .aligncenter' ) } {
-				margin-left: auto !important;
-				margin-right: auto !important;
-			}
-		`;
-
-		if ( hasBlockGapStylesSupport ) {
-			output += `
-				${ appendSelectors( selector, '> *' ) } {
-					margin-block-start: 0;
-					margin-block-end: 0;
-				}
-				${ appendSelectors( selector, '> * + *' ) } {
-					margin-block-start: ${ blockGapValue };
-				}
-			`;
+		// Output blockGap styles based on rules contained in layout definitions in theme.json.
+		if ( hasBlockGapSupport && blockGapValue ) {
+			output += getBlockGapCSS(
+				selector,
+				layoutDefinitions,
+				'default',
+				blockGapValue
+			);
 		}
-
-		return <style>{ output }</style>;
+		return output;
 	},
 	getOrientation() {
 		return 'vertical';

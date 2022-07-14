@@ -25,6 +25,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
     - The naming schema of CSS Custom Properties
     - Why using -- as a separator?
     - How settings under "custom" create new CSS Custom Properties
+    - Why does it take so long to update the styles in the browser?
 
 ## Rationale
 
@@ -1200,3 +1201,7 @@ The default value is 2em.
 	}
 }
 ```
+
+### Why does it take so long to update the styles in the browser?
+
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/support/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/support/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.

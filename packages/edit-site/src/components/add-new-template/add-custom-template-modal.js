@@ -145,19 +145,26 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		debouncedSearch
 	);
 	const { labels } = entityForSuggestions;
+	const [ showSearchControl, setShowSearchControl ] = useState( false );
+	if ( ! showSearchControl && suggestions?.length > 9 ) {
+		setShowSearchControl( true );
+	}
 	return (
 		<>
-			<SearchControl
-				onChange={ setSearch }
-				value={ search }
-				label={ labels.search_items }
-				placeholder={ labels.search_items }
-			/>
+			{ showSearchControl && (
+				<SearchControl
+					onChange={ setSearch }
+					value={ search }
+					label={ labels.search_items }
+					placeholder={ labels.search_items }
+				/>
+			) }
 			{ !! suggestions?.length && (
 				<Composite
 					{ ...composite }
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
+					aria-label={ __( 'Suggestions list' ) }
 				>
 					{ suggestions.map( ( suggestion ) => (
 						<SuggestionListItem
