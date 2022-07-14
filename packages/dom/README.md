@@ -130,7 +130,7 @@ _Parameters_
 
 _Returns_
 
--   `DOMRect`: The rectangle.
+-   `DOMRect?`: The rectangle.
 
 ### getScrollContainer
 

@@ -122,6 +122,12 @@ exports[`Writing Flow should merge paragraphs 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should move to the start of the first line on ArrowUp 1`] = `
+"<!-- wp:paragraph -->
+<p>.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>
