@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -74,10 +74,16 @@ export function InputBase(
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
-	const sizeConfig = getSizeConfig( {
+	const { paddingLeft, paddingRight } = getSizeConfig( {
 		inputSize: size,
 		__next36pxDefaultSize,
 	} );
+	const prefixSuffixContextValue = useMemo( () => {
+		return {
+			InputControlPrefix: { paddingLeft },
+			InputControlSuffix: { paddingRight },
+		};
+	}, [ paddingLeft, paddingRight ] );
 
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
@@ -107,33 +113,19 @@ export function InputBase(
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }
 			>
-				{ prefix && (
-					<ContextSystemProvider
-						value={ {
-							InputControlPrefix: {
-								paddingLeft: sizeConfig.paddingLeft,
-							},
-						} }
-					>
+				<ContextSystemProvider value={ prefixSuffixContextValue }>
+					{ prefix && (
 						<Prefix className="components-input-control__prefix">
 							{ prefix }
 						</Prefix>
-					</ContextSystemProvider>
-				) }
-				{ children }
-				{ suffix && (
-					<ContextSystemProvider
-						value={ {
-							InputControlSuffix: {
-								paddingRight: sizeConfig.paddingRight,
-							},
-						} }
-					>
+					) }
+					{ children }
+					{ suffix && (
 						<Suffix className="components-input-control__suffix">
 							{ suffix }
 						</Suffix>
-					</ContextSystemProvider>
-				) }
+					) }
+				</ContextSystemProvider>
 				<Backdrop disabled={ disabled } isFocused={ isFocused } />
 			</Container>
 		</Root>
