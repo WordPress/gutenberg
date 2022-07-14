@@ -18,10 +18,19 @@ function UnconnectedInputControlPrefix(
 	props: WordPressComponentProps< InputControlPrefixProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const derivedProps = useContextSystem( props, 'InputControlPrefix' );
+	const {
+		hasInlineStartSpacing = true,
+		paddingLeft,
+		...derivedProps
+	} = useContextSystem( props, 'InputControlPrefix' );
 
 	return (
-		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
+		<Spacer
+			marginBottom={ 0 }
+			paddingLeft={ hasInlineStartSpacing ? paddingLeft : undefined }
+			{ ...derivedProps }
+			ref={ forwardedRef }
+		/>
 	);
 }
 
