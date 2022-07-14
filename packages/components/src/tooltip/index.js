@@ -133,10 +133,8 @@ function Tooltip( props ) {
 	// so that the Tooltip can be correctly positioned. Also, merge with the
 	// existing ref for the first child, so that its ref is preserved.
 	const childRef = useRef( null );
-	const mergedChildRefs = useMergeRefs( [
-		childRef,
-		Children.toArray( children )[ 0 ]?.ref,
-	] );
+	const child = Children.toArray( children )[ 0 ];
+	const mergedChildRefs = useMergeRefs( [ childRef, child?.ref ] );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior.
@@ -234,7 +232,6 @@ function Tooltip( props ) {
 		onMouseDown: createMouseEvent( 'mouseDown' ),
 	};
 
-	const child = Children.only( children );
 	const { children: grandchildren, disabled } = child.props;
 	const getElementWithPopover = disabled
 		? getDisabledElement
