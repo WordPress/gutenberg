@@ -57,7 +57,7 @@ class WP_Style_Engine_CSS_Rule {
 		if ( empty( $selector ) ) {
 			return;
 		}
-		$this->selector = esc_html( $selector );
+		$this->selector = $selector;
 
 		return $this;
 	}
