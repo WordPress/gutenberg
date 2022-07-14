@@ -32,25 +32,6 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should set an array of declarations on instantiation.
-	 */
-	public function test_instantiate_with_selector_and_array_of_rules() {
-		$selector                = '#miami-vice';
-		$input_declarations      = array(
-			'font-size' => '2rem',
-		);
-		$more_input_declarations = array(
-			'margin-top' => '10px',
-		);
-		$css_declarations        = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-		$more_css_declarations   = new WP_Style_Engine_CSS_Declarations( $more_input_declarations );
-		$css_rule                = new WP_Style_Engine_CSS_Rule( $selector, array( $css_declarations, $more_css_declarations ) );
-
-		$expected = "$selector {{$css_declarations->get_declarations_string()}{$more_css_declarations->get_declarations_string()}}";
-		$this->assertSame( $expected, $css_rule->get_css() );
-	}
-
-	/**
 	 * Test dedupe declaration properties.
 	 */
 	public function test_dedupe_properties_in_rules() {
