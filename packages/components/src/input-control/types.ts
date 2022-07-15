@@ -17,7 +17,6 @@ import type { useDrag } from '@use-gesture/react';
 import type { StateReducer } from './reducer/state';
 import type { WordPressComponentProps } from '../ui/context';
 import type { FlexProps } from '../flex/types';
-import type { SpacerProps } from '../spacer';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -210,11 +209,6 @@ export type InputControlPrefixProps = {
 	 * The prefix to be inserted.
 	 */
 	children: ReactNode;
-	/**
-	 * The padding to be applied before the prefix.
-	 * Defaults to the standard padding for the size variant.
-	 */
-	paddingLeft?: SpacerProps[ 'paddingLeft' ];
 };
 
 export type InputControlSuffixProps = {
@@ -222,9 +216,4 @@ export type InputControlSuffixProps = {
 	 * The suffix to be inserted.
 	 */
 	children: ReactNode;
-	/**
-	 * The padding to be applied after the suffix.
-	 * Defaults to the standard padding for the size variant.
-	 */
-	paddingRight?: SpacerProps[ 'paddingRight' ];
 };
