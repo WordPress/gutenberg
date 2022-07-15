@@ -281,6 +281,9 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 		{}
 	);
 	const needsUniqueIdentifier = ( labels, slug ) => {
+		if ( [ 'category', 'post_tag' ].includes( slug ) ) {
+			return false;
+		}
 		const singularName = labels.singular_name.toLowerCase();
 		return taxonomyLabels[ singularName ] > 1 && singularName !== slug;
 	};
@@ -304,15 +307,11 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 				labels,
 				slug
 			);
-			let menuItemTitle = sprintf(
-				// translators: %1s: Name of the taxonomy e.g: "Category".
-				__( 'Taxonomy: %1$s' ),
-				labels.singular_name
-			);
+			let menuItemTitle = labels.singular_name;
 			if ( _needsUniqueIdentifier ) {
 				menuItemTitle = sprintf(
 					// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product_cat".
-					__( 'Taxonomy: %1$s (%2$s)' ),
+					__( '%1$s (%2$s)' ),
 					labels.singular_name,
 					slug
 				);
