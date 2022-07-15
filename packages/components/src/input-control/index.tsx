@@ -16,6 +16,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
+import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
 
 const noop = () => {};
@@ -85,6 +86,8 @@ export function UnforwardedInputControl(
 				isPressEnterToChange={ isPressEnterToChange }
 				onKeyDown={ onKeyDown }
 				onValidate={ onValidate }
+				paddingInlineStart={ prefix ? space( 2 ) : undefined }
+				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
 				size={ size }

@@ -110,6 +110,8 @@ type InputProps = {
 	inputSize?: Size;
 	isDragging?: boolean;
 	dragCursor?: CSSProperties[ 'cursor' ];
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
@@ -145,6 +147,7 @@ const sizeStyles = ( {
 	inputSize: size,
 	__next36pxDefaultSize,
 }: InputProps ) => {
+	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
 			height: 36,
@@ -182,6 +185,13 @@ const sizeStyles = ( {
 	const style = sizes[ size as Size ] || sizes.default;
 
 	return css( style );
+};
+
+const customPaddings = ( {
+	paddingInlineStart,
+	paddingInlineEnd,
+}: InputProps ) => {
+	return css( { paddingInlineStart, paddingInlineEnd } );
 };
 
 const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
@@ -235,6 +245,7 @@ export const Input = styled.input< InputProps >`
 		${ disabledStyles }
 		${ fontSizeStyles }
 		${ sizeStyles }
+		${ customPaddings }
 
 		&::-webkit-input-placeholder {
 			line-height: normal;

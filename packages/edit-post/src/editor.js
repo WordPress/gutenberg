@@ -39,6 +39,7 @@ function Editor( {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
+		hasInlineToolbar,
 		hasThemeStyles,
 		post,
 		preferredStyleVariations,
@@ -84,6 +85,7 @@ function Editor( {
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
@@ -116,6 +118,7 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
+			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
