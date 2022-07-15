@@ -122,7 +122,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
-			$declarations[ $selector ] = array( 'flex-wrap' => 'nowrap' );
+			$declarations[ $selector ]['flex-wrap'] = 'nowrap';
 		}
 
 		if ( $has_block_gap_support ) {
