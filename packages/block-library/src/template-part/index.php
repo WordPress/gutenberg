@@ -159,7 +159,7 @@ function render_block_core_template_part( $attributes ) {
 }
 
 /**
- * Returns an array of variation objects for the template part block.
+ * Returns an array of area variation objects for the template part block.
  *
  * @return array Array containing the block variation objects.
  */
@@ -183,14 +183,22 @@ function build_template_part_block_area_variations() {
 	return $variations;
 }
 
+/**
+ * Returns an array of instance variation objects for the template part block
+ *
+ * @return array Array containing the block variation objects.
+ */
 function build_template_part_block_instance_variations() {
 	$variations     = array();
-	$template_parts = get_block_templates( array(
-		'post_type'      => 'wp_template_part',
-    ), 'wp_template_part' );
+	$template_parts = get_block_templates(
+		array(
+			'post_type' => 'wp_template_part',
+		),
+		'wp_template_part'
+	);
 
 	$defined_areas = get_allowed_block_template_part_areas();
-	$icon_by_area = array_combine( array_column( $defined_areas, 'area' ), array_column( $defined_areas, 'icon' ) );
+	$icon_by_area  = array_combine( array_column( $defined_areas, 'area' ), array_column( $defined_areas, 'icon' ) );
 
 	foreach ( $template_parts as $template_part ) {
 		$variations[] = array(
@@ -198,19 +206,19 @@ function build_template_part_block_instance_variations() {
 			'title'       => $template_part->title,
 			'description' => $template_part->description,
 			'attributes'  => array(
-				'slug' => $template_part->slug,
+				'slug'  => $template_part->slug,
 				'theme' => $template_part->theme,
-				'area' => $template_part->area,
+				'area'  => $template_part->area,
 			),
 			'scope'       => array( 'inserter' ),
-			'icon'        => $icon_by_area[$template_part->area],
+			'icon'        => $icon_by_area[ $template_part->area ],
 			'example'     => array(
-				'attributes'  => array(
-					'slug' => $template_part->slug,
+				'attributes' => array(
+					'slug'  => $template_part->slug,
 					'theme' => $template_part->theme,
-					'area' => $template_part->area,
+					'area'  => $template_part->area,
 				),
-			)
+			),
 		);
 	}
 	return $variations;
@@ -224,7 +232,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
-			'variations'      => array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() )
+			'variations'      => array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() ),
 		)
 	);
 }
