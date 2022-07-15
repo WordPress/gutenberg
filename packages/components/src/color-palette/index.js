@@ -162,6 +162,10 @@ export const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
+export const showTransparentBackground = ( currentValue ) => {
+	return colord( currentValue ).alpha() === 0;
+};
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -229,7 +233,7 @@ export default function ColorPalette( {
 							onClick={ onToggle }
 							aria-label={ customColorAccessibleLabel }
 							style={
-								'transparent' === value
+								showTransparentBackground( value )
 									? { color: '#000' }
 									: {
 											background: value,
