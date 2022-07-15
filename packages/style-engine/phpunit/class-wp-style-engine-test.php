@@ -7,6 +7,8 @@
  */
 
 require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
+require __DIR__ . '/../class-wp-style-engine-css-rule.php';
+require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
 require __DIR__ . '/../class-wp-style-engine.php';
 
 /**

@@ -518,9 +518,10 @@ class WP_Style_Engine {
 			$styles_output['declarations'] = $css_declarations->get_declarations();
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				$css_rule             = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
+				$styles_output['css'] = $css_rule->get_css();
 				if ( $should_store_and_enqueue ) {
-					$stored_css_rule = static::$stores['block-supports']->get_rule( $css_selector );
+					$stored_css_rule = static::$stores['block-supports']->add_rule( $css_selector );
 					$stored_css_rule->set_declarations( $css_declarations );
 				}
 			}
