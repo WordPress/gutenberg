@@ -98,7 +98,7 @@ export default function Table( { templateType } ) {
 						role="row"
 					>
 						<td className="edit-site-list-table-column" role="cell">
-							<Heading level={ 4 }>
+							<Heading level={ 3 } size={ 16 }>
 								<Link
 									params={ {
 										postId: template.id,

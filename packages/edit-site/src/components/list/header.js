@@ -30,7 +30,7 @@ export default function Header( { templateType } ) {
 
 	return (
 		<header className="edit-site-list-header">
-			<Heading level={ 1 } className="edit-site-list-header__title">
+			<Heading level={ 2 } className="edit-site-list-header__title">
 				{ postType.labels?.name }
 			</Heading>
 
