@@ -68,7 +68,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$block_spacing_values = gutenberg_style_engine_get_block_supports_styles(
 					array(
 						'spacing' => $block_spacing,
-
 					)
 				);
 
