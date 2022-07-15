@@ -78,4 +78,15 @@ class WP_Style_Engine_CSS_Rules_Store {
 
 		return $this->rules[ $selector ];
 	}
+
+	/**
+	 * Remove a selector from the store.
+	 *
+	 * @param string $selector The CSS selector.
+	 *
+	 * @return void
+	 */
+	public function remove_rule( $selector ) {
+		unset( $this->rules[ $selector ] );
+	}
 }
