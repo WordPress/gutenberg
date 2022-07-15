@@ -6,6 +6,7 @@ import {
 	FlatList,
 	SectionList,
 	StyleSheet,
+	Text,
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
@@ -15,7 +16,10 @@ import {
  */
 import { useState, useEffect } from '@wordpress/element';
 import { BottomSheet, Gradient, InserterButton } from '@wordpress/components';
-import { usePreferredColorScheme } from '@wordpress/compose';
+import {
+	usePreferredColorScheme,
+	usePreferredColorSchemeStyle,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -121,9 +125,13 @@ export default function BlockTypesList( {
 		colorScheme === 'light'
 			? 'linear-gradient(#fff 70%, rgba(255, 255, 255, 0))'
 			: 'linear-gradient(#2e2e2e 70%, rgba(46, 46, 46, 0))';
+	const sectionHeaderTitleStyles = usePreferredColorSchemeStyle(
+		styles[ 'block-types-list__section-header-title' ],
+		styles[ 'block-types-list__section-header-title--dark' ]
+	);
 
 	const renderSectionHeader = ( { section: { metadata } } ) => {
-		if ( ! metadata?.icon ) {
+		if ( ! metadata?.icon || ! metadata?.title ) {
 			return null;
 		}
 
@@ -134,6 +142,9 @@ export default function BlockTypesList( {
 					style={ styles[ 'block-types-list__section-header' ] }
 				>
 					{ metadata?.icon }
+					<Text style={ sectionHeaderTitleStyles }>
+						{ metadata?.title }
+					</Text>
 				</Gradient>
 			</TouchableWithoutFeedback>
 		);
