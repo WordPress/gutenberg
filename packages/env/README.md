@@ -190,17 +190,11 @@ wp-env start --debug
 
 ## Using included WordPress PHPUnit test files
 
-Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself.
+Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
 
-### Custom `wp-tests-config.php` file
+### Customizing the `wp-tests-config.php` file
 
-WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
-
-### Using `wp-phpunit/wp-phpunit`
-
-By including these test files, we remove the need for using packages like `wp-phpunit/wp-phpunit`. One of the issues with the package approach is that the version of the test files it includes may not correspond to the version of WordPress in the container. We solve this by instead reading the version of WordPress installed and downloading the files _for that version_.
-
-However, if you would still like to use a package, you can do so by not using the `WP_TESTS_DIR` environment variable in your `bootstrap.php`. If this is not an option, you can also set the environment variable to an empty string in your `phpunit.xml` file. You will also need to set the `WP_PHPUNIT__TESTS_CONFIG` environment variable to a custom `wp-tests-config.php` file for your test suite.
+While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
 
 ## Using Xdebug
 
