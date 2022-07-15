@@ -1201,7 +1201,7 @@ The setting for `blockGap` is either a boolean or `null` value and is `null` by 
 
 - `true`: Opt into displaying _Block spacing_ controls in the editor UI and output `blockGap` styles.
 - `false`: Opt out of displaying _Block spacing_ controls in the editor UI, with `blockGap` styles stored in `theme.json` still being rendered. This allows themes to use `blockGap` values without allowing users to make changes within the editor.
-- `null` (default): Opt out of displaying _Block spacing_ controls, _and_ prevent output of `blockGap` styles.
+- `null` (default): Opt out of displaying _Block spacing_ controls, _and_ prevent the output of `blockGap` styles.
 
 The value defined for the root `styles.spacing.blockGap` style is also output as a CSS property, named `--wp--style--block-gap`.
 
