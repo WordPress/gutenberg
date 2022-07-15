@@ -129,7 +129,7 @@ export default function DocumentActions() {
 				<Text
 					size="body"
 					className="edit-site-document-actions__title"
-					as="h1"
+					as="h2"
 				>
 					<VisuallyHidden as="span">
 						{ sprintf(

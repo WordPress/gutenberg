@@ -30,18 +30,14 @@
 		}
 	}
 
-	.edit-site-document-actions__title-wrapper > h1 {
-		margin: 0;
-
-		// See comment above about min-width
-		min-width: 0;
-	}
-
 	.edit-site-document-actions__title {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		color: currentColor;
+
+		// See comment above about min-width
+		min-width: 0;
 	}
 
 	.edit-site-document-actions__secondary-item {
