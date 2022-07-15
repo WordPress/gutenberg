@@ -201,6 +201,8 @@
 video.wp-block-cover__video-background {
 	&.has-parallax {
 		background-attachment: fixed;
+		background-position: 50%;
+		background-size: cover;
 
 		// Mobile Safari does not support fixed background attachment properly.
 		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios

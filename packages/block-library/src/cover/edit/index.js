@@ -161,7 +161,9 @@ function CoverEdit( {
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
-	const backgroundPosition = mediaPosition( focalPoint );
+	const backgroundPosition = focalPoint
+		? mediaPosition( focalPoint )
+		: undefined;
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {

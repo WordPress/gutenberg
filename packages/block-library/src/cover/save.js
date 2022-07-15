@@ -77,7 +77,9 @@ export default function save( { attributes } ) {
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
-	const backgroundPosition = mediaPosition( focalPoint );
+	const backgroundPosition = focalPoint
+		? mediaPosition( focalPoint )
+		: undefined;
 
 	const classes = classnames(
 		{
