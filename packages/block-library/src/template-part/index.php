@@ -189,6 +189,9 @@ function build_template_part_block_instance_variations() {
 		'post_type'      => 'wp_template_part',
     ), 'wp_template_part' );
 
+	$defined_areas = get_allowed_block_template_part_areas();
+	$icon_by_area = array_combine( array_column( $defined_areas, 'area' ), array_column( $defined_areas, 'icon' ) );
+
 	foreach ( $template_parts as $template_part ) {
 		$variations[] = array(
 			'name'        => sanitize_title( $template_part->slug ),
@@ -197,7 +200,7 @@ function build_template_part_block_instance_variations() {
 			'attributes'  => array(
 				'slug' => $template_part->slug,
 				'theme' => $template_part->theme,
-				'area' => $template_part->area,
+				'area' => $icon_by_area[$template_part->area],
 			),
 			'scope'       => array( 'inserter' ),
 			'icon'        => $template_part->area,
