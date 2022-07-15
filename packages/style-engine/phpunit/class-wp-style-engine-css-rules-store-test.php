@@ -29,20 +29,20 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
 		$selector       = '.haddock';
 
-		$new_fish_store->get_rule( $selector )->get_selector();
-		$this->assertEquals( $selector, $new_fish_store->get_rule( $selector )->get_selector() );
+		$new_fish_store->add_rule( $selector )->get_selector();
+		$this->assertEquals( $selector, $new_fish_store->add_rule( $selector )->get_selector() );
 
 		$the_same_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
-		$this->assertEquals( $selector, $the_same_fish_store->get_rule( $selector )->get_selector() );
+		$this->assertEquals( $selector, $the_same_fish_store->add_rule( $selector )->get_selector() );
 	}
 
 	/**
 	 * Should return a stored rule.
 	 */
-	public function test_get_rule() {
+	public function test_add_rule() {
 		$new_pie_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'meat-pie' );
 		$selector      = '.wp-block-sauce a:hover';
-		$store_rule    = $new_pie_store->get_rule( $selector );
+		$store_rule    = $new_pie_store->add_rule( $selector );
 		$expected      = "$selector {}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 
@@ -54,7 +54,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $pie_declarations );
 		$store_rule->set_declarations( $css_declarations );
 
-		$store_rule = $new_pie_store->get_rule( $selector );
+		$store_rule = $new_pie_store->add_rule( $selector );
 		$expected   = "$selector {{$css_declarations->get_declarations_string()}}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
@@ -65,7 +65,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	public function test_get_all_rules() {
 		$new_pizza_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'pizza-with-mozzarella' );
 		$selector        = '.wp-block-anchovies a:hover';
-		$store_rule      = $new_pizza_store->get_rule( $selector );
+		$store_rule      = $new_pizza_store->add_rule( $selector );
 		$expected        = array(
 			$selector => $store_rule,
 		);
@@ -102,7 +102,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$newer_pizza_declarations = array(
 			'padding' => '100px',
 		);
-		$new_store_rule           = $new_pizza_store->get_rule( $new_selector );
+		$new_store_rule           = $new_pizza_store->add_rule( $new_selector );
 		$css_declarations         = new WP_Style_Engine_CSS_Declarations( $newer_pizza_declarations );
 		$new_store_rule->set_declarations( array( $css_declarations ) );
 

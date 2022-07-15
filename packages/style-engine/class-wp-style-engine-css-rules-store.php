@@ -58,10 +58,11 @@ class WP_Style_Engine_CSS_Rules_Store {
 
 	/**
 	 * Get a WP_Style_Engine_CSS_Rule object by its selector.
+	 * If the rule does not exist, it will be created.
 	 *
 	 * @param string $selector The CSS selector.
 	 */
-	public function get_rule( $selector ) {
+	public function add_rule( $selector ) {
 
 		$selector = trim( $selector );
 
