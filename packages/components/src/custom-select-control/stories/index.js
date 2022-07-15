@@ -7,9 +7,8 @@ export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
 	argTypes: {
-		__next36pxDefaultSize: {
-			control: { type: 'boolean' },
-		},
+		__next36pxDefaultSize: { control: { type: 'boolean' } },
+		__nextUnconstrainedWidth: { control: { type: 'boolean' } },
 		size: {
 			control: {
 				type: 'radio',

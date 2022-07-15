@@ -60,6 +60,8 @@ const stateReducer = (
 export default function CustomSelectControl( {
 	/** Start opting into the larger default height that will become the default size in a future version. */
 	__next36pxDefaultSize = false,
+	/** Start opting into the unconstrained width that will become the default in a future version. */
+	__nextUnconstrainedWidth = false,
 	className,
 	hideLabelFromVision,
 	label,
@@ -144,7 +146,13 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<InputBase isFocused={ isOpen || isFocused }>
+			<InputBase
+				isFocused={ isOpen || isFocused }
+				__unstableInputWidth={
+					__nextUnconstrainedWidth ? undefined : 'auto'
+				}
+				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+			>
 				<SelectControlSelect
 					as="button"
 					onFocus={ () => setIsFocused( true ) }
@@ -155,7 +163,13 @@ export default function CustomSelectControl( {
 						// This is needed because some speech recognition software don't support `aria-labelledby`.
 						'aria-label': label,
 						'aria-labelledby': undefined,
-						className: 'components-custom-select-control__button',
+						className: classnames(
+							'components-custom-select-control__button',
+							{
+								'is-next-unconstrained-width':
+									__nextUnconstrainedWidth,
+							}
+						),
 						describedBy: getDescribedBy(),
 					} ) }
 				>
