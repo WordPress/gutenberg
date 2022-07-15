@@ -200,7 +200,7 @@ describe( 'Order of block keyboard navigation', () => {
 			'Multiple selected blocks'
 		);
 
-		await pressKeyWithModifier( 'alt', 'F10' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'ArrowRight' );
 		await expect( await getActiveLabel() ).toBe( 'Move up' );
 	} );
