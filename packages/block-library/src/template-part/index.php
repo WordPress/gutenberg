@@ -163,7 +163,7 @@ function render_block_core_template_part( $attributes ) {
  *
  * @return array Array containing the block variation objects.
  */
-function build_template_part_block_variations() {
+function build_template_part_block_area_variations() {
 	$variations    = array();
 	$defined_areas = get_allowed_block_template_part_areas();
 	foreach ( $defined_areas as $area ) {
@@ -183,6 +183,29 @@ function build_template_part_block_variations() {
 	return $variations;
 }
 
+function build_template_part_block_instance_variations() {
+	$variations     = array();
+	$template_parts = get_block_templates( array(
+		'post_type'      => 'wp_template_part',
+    ), 'wp_template_part' );
+
+	foreach ( $template_parts as $template_part ) {
+		$variations[] = array(
+			'name'        => sanitize_title( $template_part->slug ),
+			'title'       => $template_part->title,
+			'description' => $template_part->description,
+			'attributes'  => array(
+				'slug' => $template_part->slug,
+				'theme' => $template_part->theme,
+				'area' => $template_part->area,
+			),
+			'scope'       => array( 'inserter' ),
+			'icon'        => $template_part->area,
+		);
+	}
+	return $variations;
+}
+
 /**
  * Registers the `core/template-part` block on the server.
  */
@@ -191,7 +214,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
-			'variations'      => build_template_part_block_variations(),
+			'variations'      => array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() )
 		)
 	);
 }
