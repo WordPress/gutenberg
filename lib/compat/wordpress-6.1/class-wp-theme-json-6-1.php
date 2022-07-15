@@ -789,7 +789,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
 
-			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && static::ROOT_BLOCK_SELECTOR !== $selector ) {
+			if ( strpos( $css_property, '--wp--style--root--' ) === 0 && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
 				continue;
 			}
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
