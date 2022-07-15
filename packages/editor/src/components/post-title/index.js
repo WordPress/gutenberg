@@ -156,8 +156,6 @@ function PostTitle( _, forwardedRef ) {
 		}
 
 		if ( typeof content !== 'string' ) {
-			event.preventDefault();
-
 			const [ firstBlock ] = content;
 
 			if (
