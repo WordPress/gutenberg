@@ -1197,7 +1197,7 @@ For blocks that contain inner blocks, such as Group, Columns, Buttons, and Socia
 }
 ```
 
-The setting for `blockGap` is a boolean, and its default value is `null`. This allows an extra level of control over style output. The `settings.spacing.blockGap` setting in a `theme.json` file accepts the following values:
+The setting for `blockGap` is either a boolean or `null` value and is `null` by default. This allows an extra level of control over style output. The `settings.spacing.blockGap` setting in a `theme.json` file accepts the following values:
 
 - `true`: Opt in to displaying _Block spacing_ controls in the editor UI, and output `blockGap` styles.
 - `false`: Opt out of displaying _Block spacing_ controls in the editor UI, with `blockGap` styles stored in `theme.json` still being rendered. This allows themes to make use of `blockGap` values, without allowing users to make changes within the editor.
