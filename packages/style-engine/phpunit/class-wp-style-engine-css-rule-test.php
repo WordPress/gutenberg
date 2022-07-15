@@ -27,7 +27,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $selector, $css_rule->get_selector() );
 
-		$expected = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected = "$selector { {$css_declarations->get_declarations_string()} }";
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
@@ -45,7 +45,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, $first_declaration );
 		$css_rule->add_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
 
-		$expected = '.taggart {font-size: 4px;}';
+		$expected = '.taggart { font-size: 4px; }';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
@@ -60,7 +60,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_rule                   = new WP_Style_Engine_CSS_Rule( '.hill-street-blues', $some_css_declarations );
 		$css_rule->add_declarations( $some_more_css_declarations );
 
-		$expected = '.hill-street-blues {margin-top: 10px; font-size: 1rem;}';
+		$expected = '.hill-street-blues { margin-top: 10px; font-size: 1rem; }';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
@@ -89,7 +89,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
-		$expected           = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected           = "$selector { {$css_declarations->get_declarations_string()} }";
 
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
