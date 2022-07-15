@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
 	useInstanceId,
+	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
 
 /**
@@ -77,12 +78,8 @@ export default function FocalPointPicker( {
 		return () => defaultView.removeEventListener( 'resize', updateBounds );
 	}, [] );
 
-	useEffect( () => {
-		// Updates bounds if there’s no media (and thus no load event to trigger
-		// a bounds update). Even then, this will only have an effect if the
-		// component is styled to non-default dimensions.
-		if ( ! url ) refUpdateBounds.current();
-	}, [ url ] );
+	// Updates the bounds to cover cases of unspecified media or load failures.
+	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
 
 	const { startDrag, endDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
