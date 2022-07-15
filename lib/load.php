@@ -116,6 +116,12 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenb
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
 }
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
+}
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
