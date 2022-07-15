@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	public static function get_store( $store_name = 'default' ) {
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
-			static::$stores[ $store_name ] = new static( $store_name );
+			static::$stores[ $store_name ] = new static();
 		}
 		return static::$stores[ $store_name ];
 	}
@@ -61,6 +61,8 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 * If the rule does not exist, it will be created.
 	 *
 	 * @param string $selector The CSS selector.
+	 *
+	 * @return WP_Style_Engine_CSS_Rule|null Returns a WP_Style_Engine_CSS_Rule object, or null if the selector is empty.
 	 */
 	public function add_rule( $selector ) {
 
