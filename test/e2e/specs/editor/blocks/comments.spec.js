@@ -8,48 +8,35 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
  */
 
-/**
- * Sets a site option, from the options-general admin page.
- *
- * This is a temporary solution until we can handle WP options through the REST
- * API. Note that this function needs to be binded to work properly.
- *
- * @param {string} setting The option, used to get the option by id.
- * @param {string} value   The value to set the option to.
- *
- * @return {Promise<string>} A Promise that resolves to the option's previous value.
- */
-async function _setOption( setting, value ) {
-	await this.admin.visitAdminPage( 'options.php', '' );
-	const previousValue = await this.page.inputValue( `#${ setting }` );
-
-	await this.page.fill( `#${ setting }`, value );
-	await this.page.click( '#Update' );
-
-	return previousValue;
-}
+test.use( {
+	commentsBlockUtils: async ( { page, admin }, use ) => {
+		await use( new CommentsBlockUtils( { page, admin } ) );
+	},
+} );
 
 test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
-		previousDefaultCommentsPage,
-		setOption;
+		previousDefaultCommentsPage;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		// Initializes `setOption`, binding it with required dependencies.
-		setOption = _setOption.bind( { admin, page } );
-
+	test.beforeEach( async ( { commentsBlockUtils } ) => {
 		// Ideally, we'd set options in beforeAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		previousPageComments = await setOption( 'page_comments', '1' );
-		previousCommentsPerPage = await setOption( 'comments_per_page', '1' );
-		previousDefaultCommentsPage = await setOption(
+		previousPageComments = await commentsBlockUtils.setOption(
+			'page_comments',
+			'1'
+		);
+		previousCommentsPerPage = await commentsBlockUtils.setOption(
+			'comments_per_page',
+			'1'
+		);
+		previousDefaultCommentsPage = await commentsBlockUtils.setOption(
 			'default_comments_page',
 			'newest'
 		);
@@ -125,8 +112,9 @@ test.describe( 'Comments', () => {
 		editor,
 		page,
 		requestUtils,
+		commentsBlockUtils,
 	} ) => {
-		await setOption( 'page_comments', '0' );
+		await commentsBlockUtils.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
@@ -153,14 +141,23 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
 		// Ideally, we'd set options in afterAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		await setOption( 'page_comments', previousPageComments );
-		await setOption( 'comments_per_page', previousCommentsPerPage );
-		await setOption( 'default_comments_page', previousDefaultCommentsPage );
+		await commentsBlockUtils.setOption(
+			'page_comments',
+			previousPageComments
+		);
+		await commentsBlockUtils.setOption(
+			'comments_per_page',
+			previousCommentsPerPage
+		);
+		await commentsBlockUtils.setOption(
+			'default_comments_page',
+			previousDefaultCommentsPage
+		);
 		await requestUtils.deleteAllComments();
 	} );
 
@@ -168,3 +165,32 @@ test.describe( 'Comments', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 } );
+
+class CommentsBlockUtils {
+	constructor( { page, admin } ) {
+		this.page = page;
+		this.admin = admin;
+	}
+
+	/**
+	 * Sets a site option, from the options-general admin page.
+	 *
+	 * This is a temporary solution until we can handle options through the REST
+	 * API.
+	 *
+	 * @param {string} setting The option, used to get the option by id.
+	 * @param {string} value   The value to set the option to.
+	 *
+	 * @return {Promise<string>} A Promise that resolves to the option's
+	 * previous value.
+	 */
+	async setOption( setting, value ) {
+		await this.admin.visitAdminPage( 'options.php', '' );
+		const previousValue = await this.page.inputValue( `#${ setting }` );
+
+		await this.page.fill( `#${ setting }`, value );
+		await this.page.click( '#Update' );
+
+		return previousValue;
+	}
+}
