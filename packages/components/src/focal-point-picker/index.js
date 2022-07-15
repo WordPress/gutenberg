@@ -170,7 +170,9 @@ export default function FocalPointPicker( {
 					className="components-focal-point-picker"
 					onKeyDown={ arrowKeyStep }
 					onMouseDown={ startDrag }
-					onBlur={ endDrag }
+					onBlur={ () => {
+						if ( isDragging ) endDrag();
+					} }
 					ref={ dragAreaRef }
 					role="button"
 					tabIndex="-1"
