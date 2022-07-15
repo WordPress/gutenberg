@@ -14,7 +14,8 @@ import {
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { BottomSheet, InserterButton } from '@wordpress/components';
+import { BottomSheet, Gradient, InserterButton } from '@wordpress/components';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -115,6 +116,12 @@ export default function BlockTypesList( {
 		);
 	};
 
+	const colorScheme = usePreferredColorScheme();
+	const sectionHeaderGradientValue =
+		colorScheme === 'light'
+			? 'linear-gradient(#fff 70%, rgba(255, 255, 255, 0))'
+			: 'linear-gradient(#2e2e2e 70%, rgba(46, 46, 46, 0))';
+
 	const renderSectionHeader = ( { section: { metadata } } ) => {
 		if ( ! metadata?.icon ) {
 			return null;
@@ -122,9 +129,12 @@ export default function BlockTypesList( {
 
 		return (
 			<TouchableWithoutFeedback accessible={ false }>
-				<View style={ styles[ 'block-types-list__section-header' ] }>
+				<Gradient
+					gradientValue={ sectionHeaderGradientValue }
+					style={ styles[ 'block-types-list__section-header' ] }
+				>
 					{ metadata?.icon }
-				</View>
+				</Gradient>
 			</TouchableWithoutFeedback>
 		);
 	};
