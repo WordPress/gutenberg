@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import { kebabCase, isPlainObject } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,7 @@ import {
  */
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
+import { isPlainObject } from './utils';
 
 /** @typedef {import('./react').WPElement} WPElement */
 
