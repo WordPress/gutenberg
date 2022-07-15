@@ -31,6 +31,15 @@ class WP_Style_Engine {
 	private static $instance = null;
 
 	/**
+	 * Instance of WP_Style_Engine_CSS_Rules_Store to hold block supports CSS rules.
+	 *
+	 * @var array<string, WP_Style_Engine_CSS_Rules_Store|null>
+	 */
+	private static $stores = array(
+		'block-supports' => null,
+	);
+
+	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
@@ -222,6 +231,16 @@ class WP_Style_Engine {
 	);
 
 	/**
+	 * Private constructor to prevent instantiation.
+	 */
+	private function __construct() {
+		foreach ( static::$stores as $store_key => $store_instance ) {
+			static::$stores[ $store_key ] = WP_Style_Engine_CSS_Rules_Store::get_store( $store_key );
+		}
+		static::enqueue_registered_styles( array( __CLASS__, 'enqueue_rendered_styles' ) );
+	}
+
+	/**
 	 * Utility method to retrieve the main instance of the class.
 	 *
 	 * The instance will be created if it does not exist yet.
@@ -234,6 +253,67 @@ class WP_Style_Engine {
 		}
 
 		return static::$instance;
+	}
+
+	/**
+	 * Taken from gutenberg_enqueue_block_support_styles()
+	 *
+	 * This function takes care of adding inline styles
+	 * in the proper place, depending on the theme in use.
+	 *
+	 * For block themes, it's loaded in the head.
+	 * For classic ones, it's loaded in the body
+	 * because the wp_head action  happens before
+	 * the render_block.
+	 *
+	 * @param callable $callable A user-defined callback function for a WordPress hook.
+	 * @param int      $priority To set the priority for the add_action.
+	 *
+	 * @see gutenberg_enqueue_block_support_styles()
+	 */
+	protected static function enqueue_registered_styles( $callable, $priority = 10 ) {
+		if ( ! $callable ) {
+			return;
+		}
+		$action_hook_name = 'wp_footer';
+		if ( wp_is_block_theme() ) {
+			$action_hook_name = 'wp_head';
+		}
+		add_action( 'wp_enqueue_scripts', $callable );
+		add_action(
+			$action_hook_name,
+			$callable,
+			$priority
+		);
+	}
+
+	/**
+	 * Fetches, processes and compiles stored styles, then renders them to the page.
+	 */
+	public static function enqueue_rendered_styles() {
+		foreach ( static::$stores as $store_key => $store_instance ) {
+			if ( ! $store_instance ) {
+				continue;
+			}
+
+			$css_rules = $store_instance->get_all_rules();
+
+			if ( empty( $css_rules ) ) {
+				continue;
+			}
+
+			$styles_output = '';
+
+			foreach ( $css_rules as $selector => $css_rule ) {
+				$styles_output .= $css_rule->get_css();
+			}
+
+			if ( ! empty( $styles_output ) ) {
+				wp_register_style( $store_key, false, array(), true, true );
+				wp_add_inline_style( $store_key, $styles_output );
+				wp_enqueue_style( $store_key );
+			}
+		}
 	}
 
 	/**
@@ -388,6 +468,7 @@ class WP_Style_Engine {
 	 * @param array $block_styles The style object.
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
 	 * );.
 	 *
@@ -423,8 +504,9 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$css_selector     = isset( $options['selector'] ) ? $options['selector'] : null;
-		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		$css_selector             = isset( $options['selector'] ) ? $options['selector'] : null;
+		$should_store_and_enqueue = isset( $options['enqueue'] ) && true === $options['enqueue'];
+		$css_declarations         = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 
 		// The return object.
 		$styles_output = array();
@@ -437,6 +519,10 @@ class WP_Style_Engine {
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				if ( $should_store_and_enqueue ) {
+					$stored_css_rule = static::$stores['block-supports']->get_rule( $css_selector );
+					$stored_css_rule->set_declarations( $css_declarations );
+				}
 			}
 		}
 
@@ -526,6 +612,35 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
 		return $style_engine->get_styles( $block_styles, $options );
+	}
+	return null;
+}
+
+/**
+ * Global public interface method to WP_Style_Engine->get_block_supports_styles to generate block styles from a single block style object
+ * and then, via the `enqueue` flag, will enqueue them for rendering on the frontend in a block-supports inline style tag.
+ *
+ * @access public
+ *
+ * @param string $selector     A CSS selector.
+ * @param array  $block_styles The value of a block's attributes.style.
+ *
+ * @return array<string>|null array(
+ *     'styles'        => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+ *     'declarations'  => (array) An array of property/value pairs representing parsed CSS declarations.
+ *     'classnames'    => (string) Classnames separated by a space.
+ * );
+ */
+function wp_style_engine_enqueue_block_supports_styles( $selector, $block_styles ) {
+	if ( empty( $selector ) || empty( $block_styles ) ) {
+		return null;
+	}
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		$options = array(
+			'enqueue'  => true,
+			'selector' => $selector,
+		);
+		return WP_Style_Engine::get_instance()->get_block_supports_styles( $block_styles, $options );
 	}
 	return null;
 }

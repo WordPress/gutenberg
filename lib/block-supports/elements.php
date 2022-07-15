@@ -104,18 +104,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$class_name        = gutenberg_get_elements_class_name( $block );
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_get_styles(
-			$link_block_styles,
-			array(
-				'selector' => ".$class_name a",
-			)
-		);
-
-		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
-		}
-	}
+	gutenberg_style_engine_enqueue_block_supports_styles( ".$class_name a", $link_block_styles );
 
 	return null;
 }
