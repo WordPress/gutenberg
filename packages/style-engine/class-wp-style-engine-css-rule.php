@@ -76,7 +76,9 @@ class WP_Style_Engine_CSS_Rule {
 
 		if ( null === $this->declarations && $is_declarations_object ) {
 			$this->declarations = $declarations;
-		} elseif ( null === $this->declarations ) {
+			return $this;
+		}
+		if ( null === $this->declarations ) {
 			$this->declarations = new WP_Style_Engine_CSS_Declarations( $declarations_array );
 		}
 		$this->declarations->add_declarations( $declarations_array );
