@@ -6,6 +6,9 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
@@ -19,8 +22,4 @@
 			<group>ms-required</group>
 		</exclude>
 	</groups>
-	<php>
-		<env name="WP_PHPUNIT__TESTS_CONFIG" value="/wordpress-phpunit/wp-tests-config.php" />
-		<env name="WP_TESTS_DIR" value="" force="true" />
-    </php>
 </phpunit>

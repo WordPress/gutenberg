@@ -17,11 +17,6 @@ if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
-// Next, try the WP_PHPUNIT composer package.
-if ( ! $_tests_dir ) {
-	$_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
-}
-
 // See if we're installed inside an existing WP dev instance.
 if ( ! $_tests_dir ) {
 	$_try_tests_dir = __DIR__ . '/../../../../../tests/phpunit';
