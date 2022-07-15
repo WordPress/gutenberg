@@ -239,7 +239,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'size' => '1.75rem',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 1rem) * -2.524), 2.625rem)',
+				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
 			),
 
 			'return_default_fluid_values_with_empty_fluidSize' => array(
@@ -248,7 +248,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'fluid' => array(),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 16px) * -2.524), 42px)',
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
 			),
 
 			'return_size_with_invalid_fluid_units' => array(
@@ -272,7 +272,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(20px, 1.25rem + ((1vw - 16px) * -93.75), 50rem)',
+				'expected_output'             => 'clamp(20px, 1.25rem + ((1vw - 7.68px) * 93.75), 50rem)',
 			),
 
 			'return_clamp_value_with_default_fluid_max_value' => array(
@@ -283,7 +283,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(2.6rem, 2.6rem + ((1vw - 1rem) * -0.048), 42px)',
+				'expected_output'             => 'clamp(2.6rem, 2.6rem + ((1vw - 0.48rem) * 0.048), 42px)',
 			),
 
 			'default_return_clamp_value_with_default_fluid_min_value' => array(
@@ -294,7 +294,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 16px) * -7.091), 80px)',
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 7.091), 80px)',
 			),
 		);
 	}
