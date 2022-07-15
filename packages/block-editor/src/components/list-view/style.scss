@@ -97,7 +97,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-15 ($grid-unit-15 * 0.5) 0;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
 		color: $gray-900;
 		border-radius: $radius-block-ui;
@@ -207,7 +207,7 @@
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-right: 5px;
+		padding-right: $grid-unit-05;
 
 		.components-button.has-icon {
 			height: 24px;
@@ -297,13 +297,27 @@
 		}
 	}
 
+	.block-editor-list-view-block-select-button__label-wrapper {
+		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
+		flex: 1;
+		position: relative;
+
+		.components-truncate {
+			position: absolute;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+	}
+
 	.block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.1);
 		border-radius: $radius-block-ui;
 		display: inline-block;
 		padding: 2px 6px;
-		margin: 0 $grid-unit-10;
-		max-width: 120px;
+		max-width: min(100px, 40%);
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}

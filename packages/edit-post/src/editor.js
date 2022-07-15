@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, size, map, without } from 'lodash';
+import { forEach, map, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,6 +39,7 @@ function Editor( {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
+		hasInlineToolbar,
 		hasThemeStyles,
 		post,
 		preferredStyleVariations,
@@ -84,6 +85,7 @@ function Editor( {
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
 				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
@@ -116,6 +118,7 @@ function Editor( {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
+			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -126,7 +129,7 @@ function Editor( {
 		};
 
 		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
+		if ( hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).

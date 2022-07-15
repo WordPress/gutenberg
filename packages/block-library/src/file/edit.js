@@ -22,7 +22,7 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	__experimentalElementButtonClassName,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -302,7 +302,9 @@ function FileEdit( {
 								aria-label={ __( 'Download button text' ) }
 								className={ classnames(
 									'wp-block-file__button',
-									__experimentalElementButtonClassName
+									__experimentalGetElementClassName(
+										'button'
+									)
 								) }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting

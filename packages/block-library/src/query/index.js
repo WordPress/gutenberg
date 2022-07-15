@@ -25,6 +25,6 @@ export const settings = {
 	deprecated,
 };
 
-// Importing this file includes side effects and is whitelisted
+// Importing this file includes side effects and is added
 // in block-library/package.json under `sideEffects`.
 addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );

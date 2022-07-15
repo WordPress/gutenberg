@@ -9,10 +9,8 @@ import {
 	omit,
 	without,
 	mapValues,
-	keys,
 	isEqual,
 	isEmpty,
-	identity,
 	omitBy,
 } from 'lodash';
 
@@ -26,6 +24,8 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+
+const identity = ( x ) => x;
 
 /**
  * Given an array of blocks, returns an object where each key is a nesting
@@ -148,7 +148,7 @@ function getMutateSafeObject( original, working ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	return isEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -399,12 +399,11 @@ const withBlockTree =
 				const updatedBlockUids = [];
 				if ( action.fromRootClientId ) {
 					updatedBlockUids.push( action.fromRootClientId );
+				} else {
+					updatedBlockUids.push( '' );
 				}
 				if ( action.toRootClientId ) {
 					updatedBlockUids.push( action.toRootClientId );
-				}
-				if ( ! action.fromRootClientId || ! action.fromRootClientId ) {
-					updatedBlockUids.push( '' );
 				}
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
@@ -428,7 +427,7 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = keys(
+				const updatedBlockUids = Object.keys(
 					omitBy( newState.attributes, ( attributes, clientId ) => {
 						return (
 							newState.byClientId[ clientId ].name !==
@@ -690,9 +689,9 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 			index: 0,
 		} );
 
-		// We need to re-attach the block order of the controlled inner blocks.
-		// Otherwise, an inner block controller's blocks will be deleted entirely
-		// from its entity..
+		// We need to re-attach the controlled inner blocks to the blocks tree and
+		// preserve their block order. Otherwise, an inner block controller's blocks
+		// will be deleted entirely from its entity.
 		stateAfterInsert.order = {
 			...stateAfterInsert.order,
 			...reduce(
@@ -700,6 +699,20 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 				( result, value, key ) => {
 					if ( state.order[ key ] ) {
 						result[ key ] = state.order[ key ];
+					}
+					return result;
+				},
+				{}
+			),
+		};
+		stateAfterInsert.tree = {
+			...stateAfterInsert.tree,
+			...reduce(
+				nestedControllers,
+				( result, value, _key ) => {
+					const key = `controlled||${ _key }`;
+					if ( state.tree[ key ] ) {
+						result[ key ] = state.tree[ key ];
 					}
 					return result;
 				},
@@ -1678,7 +1691,7 @@ export function lastBlockAttributesChange( state, action ) {
 /**
  * Reducer returning automatic change state.
  *
- * @param {boolean} state  Current state.
+ * @param {?string} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {string} Updated state.

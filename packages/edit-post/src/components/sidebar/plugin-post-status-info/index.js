@@ -1,5 +1,5 @@
 /**
- * Defines as extensibility slot for the Status & visibility panel.
+ * Defines as extensibility slot for the Summary panel.
  */
 
 /**
@@ -10,7 +10,7 @@ import { createSlotFill, PanelRow } from '@wordpress/components';
 export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
 /**
- * Renders a row in the Status & visibility panel of the Document sidebar.
+ * Renders a row in the Summary panel of the Document sidebar.
  * It should be noted that this is named and implemented around the function it serves
  * and not its location, which may change in future iterations.
  *

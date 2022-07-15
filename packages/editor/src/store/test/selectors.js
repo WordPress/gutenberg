@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -227,7 +222,9 @@ describe( 'selectors', () => {
 	let cachedSelectors;
 
 	beforeAll( () => {
-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
+		cachedSelectors = Object.entries( selectors )
+			.filter( ( [ , selector ] ) => selector.clear )
+			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
@@ -1598,10 +1595,11 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true if title or excerpt have changed', () => {
-			for ( const variantField of [ 'title', 'excerpt' ] ) {
-				for ( const constantField of without(
-					[ 'title', 'excerpt' ],
-					variantField
+			const fields = [ 'title', 'excerpt' ];
+
+			for ( const variantField of fields ) {
+				for ( const constantField of fields.filter(
+					( f ) => f !== variantField
 				) ) {
 					const state = {
 						editor: {

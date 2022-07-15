@@ -11,7 +11,17 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Add React Native FastImage [#42009]
+
+## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
+-   [*] Image block copies the alt text from the media library when selecting an item [#41839]
+-   [*] Introduce "block recovery" option for invalid blocks [#41988]
+
+## 1.78.1
+
+-   [**] Re-introduce support for v1 of the Gallery block to the native version of the editor [#41533]
+-   [**] Fix missing translations for locales that include region (only on Android) [#41685]
 
 ## 1.78.0
 

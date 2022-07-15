@@ -26,7 +26,7 @@ export const InputWithSlider = ( {
 	value,
 }: InputWithSliderProps ) => {
 	return (
-		<Spacer as={ HStack } spacing={ 4 }>
+		<HStack spacing={ 4 }>
 			<NumberControlWrapper
 				min={ min }
 				max={ max }
@@ -52,9 +52,11 @@ export const InputWithSlider = ( {
 				min={ min }
 				max={ max }
 				value={ value }
+				// @ts-expect-error
+				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }
 			/>
-		</Spacer>
+		</HStack>
 	);
 };

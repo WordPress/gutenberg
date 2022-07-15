@@ -15,6 +15,10 @@ export default function isFormElement(
 	element,
 	options = { includeContentEditable: false }
 ) {
+	if ( ! element ) {
+		return false;
+	}
+
 	const { tagName } = element;
 	const checkForInputTextarea = isInputOrTextArea( element );
 	const checkContentEditable =

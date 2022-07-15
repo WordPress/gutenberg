@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { snakeCase } from 'lodash';
+import { snakeCase } from 'change-case';
 
 /**
  * Internal dependencies

@@ -7,6 +7,7 @@ import { Button } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -36,6 +37,8 @@ class ErrorBoundary extends Component {
 
 	componentDidCatch( error ) {
 		this.setState( { error } );
+
+		doAction( 'editor.ErrorBoundary.errorLogged', error );
 	}
 
 	reboot() {
