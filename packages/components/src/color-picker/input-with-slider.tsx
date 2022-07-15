@@ -37,7 +37,7 @@ export const InputWithSlider = ( {
 				prefix={
 					<Spacer
 						as={ Text }
-						paddingLeft={ space( 3.5 ) }
+						paddingLeft={ space( 4 ) }
 						color={ COLORS.ui.theme }
 						lineHeight={ 1 }
 					>

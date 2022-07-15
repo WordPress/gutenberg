@@ -53,7 +53,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			prefix={
 				<Spacer
 					as={ Text }
-					marginLeft={ space( 3.5 ) }
+					marginLeft={ space( 4 ) }
 					color={ COLORS.ui.theme }
 					lineHeight={ 1 }
 				>
