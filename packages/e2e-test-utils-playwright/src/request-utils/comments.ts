@@ -29,7 +29,7 @@ export async function createComment(
 
 	const author = currentUser.id;
 
-	const response = await this.rest( {
+	const response = await this.rest< Comment >( {
 		method: 'POST',
 		path: '/wp/v2/comments',
 		data: { ...comment, author },
