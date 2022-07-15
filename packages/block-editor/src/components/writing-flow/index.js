@@ -21,6 +21,7 @@ import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
 import useClickSelection from './use-click-selection';
+import useClickRedirect from './use-click-redirect';
 import useInput from './use-input';
 import { store as blockEditorStore } from '../../store';
 
@@ -39,6 +40,7 @@ export function useWritingFlow() {
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),
+			useClickRedirect(),
 			useMultiSelection(),
 			useSelectAll(),
 			useArrowNav(),

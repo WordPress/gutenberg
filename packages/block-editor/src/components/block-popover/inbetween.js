@@ -179,7 +179,7 @@ function BlockPopoverInbetween( {
 			key={ nextClientId + '--' + rootClientId }
 			{ ...props }
 			className={ classnames(
-				'block-editor-block-popover',
+				'block-editor-block-popover block-editor-block-popover-in-between',
 				props.className
 			) }
 			__unstableForcePosition
