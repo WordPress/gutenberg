@@ -19,11 +19,12 @@ if ( class_exists( 'WP_Style_Engine_Renderer' ) ) {
 class WP_Style_Engine_Renderer {
 
 	/**
-	 * The store of CSS rules.
+	 * The Style-Engine Store object.
 	 *
 	 * @var WP_Style_Engine_CSS_Rules_Store
 	 */
 	protected $store;
+
 	/**
 	 * Constructor.
 	 *
@@ -39,13 +40,14 @@ class WP_Style_Engine_Renderer {
 	 * @return string The rendered CSS.
 	 */
 	public function get_css() {
+		// Combine CSS selectors that have identical declarations.
+		$this->combine_rules_selectors();
+
+		// Build the CSS.
 		$css   = '';
-		$rules = $this->combine_rules_selectors();
-		foreach ( $rules as $selector => $rule ) {
-			if ( empty( $selector ) || ! $rule instanceof WP_Style_Engine_CSS_Rule ) {
-				continue;
-			}
-			$css .= $selector . ' {' . $rule->get_declarations()->get_declarations_string() . '}';
+		$rules = $this->store->get_all_rules();
+		foreach ( $rules as $rule ) {
+			$css .= $rule->get_css();
 		}
 		return $css;
 	}
@@ -54,7 +56,7 @@ class WP_Style_Engine_Renderer {
 	 * Combines selectors from the $styles_array
 	 * when they have the same styles.
 	 *
-	 * @return array
+	 * @return void
 	 */
 	private function combine_rules_selectors() {
 		$rules           = $this->store->get_all_rules();
@@ -64,20 +66,27 @@ class WP_Style_Engine_Renderer {
 		}
 
 		// Combine selectors that have the same styles.
-		$selector_rules = array();
 		foreach ( $selector_hashes as $selector => $hash ) {
 			// Get selectors that use the same styles.
 			$duplicates = array_keys( $selector_hashes, $hash, true );
-			// Add item directly if there are no duplicates.
-			if ( 1 === count( $duplicates ) ) {
-				$selector_rules[ $selector ] = $rules[ $selector ];
+			// Skip if there are no duplicates.
+			if ( 1 >= count( $duplicates ) ) {
 				continue;
 			}
+			// Get the declarations.
+			$declarations = $rules[ $selector ]->get_declarations();
 			foreach ( $duplicates as $key ) {
+				// Unset the duplicates from the hashes array to avoid looping through them as well.
 				unset( $selector_hashes[ $key ] );
+				// Remove the rules from the store.
+				$this->store->remove_rule( $key );
 			}
-			$selector_rules[ implode( ',', $duplicates ) ] = $rules[ $selector ];
+			// Create a new rule with the combined selectors.
+			$new_rule = $this->store->add_rule( implode( ',', $duplicates ) );
+			// Set the declarations. The extra check is in place because `add_rule` in the store can return `null`.
+			if ( $new_rule ) {
+				$new_rule->set_declarations( $declarations );
+			}
 		}
-		return $selector_rules;
 	}
 }
