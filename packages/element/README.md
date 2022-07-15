@@ -246,6 +246,23 @@ _Returns_
 
 -   `boolean`: True when an element is considered empty.
 
+### isPlainObject
+
+Checks if the provided value is a plain object.
+
+Plain objects are objects that are either:
+
+-   created by the `Object` constructor, or
+-   with a `[[Prototype]]` of `null`.
+
+_Parameters_
+
+-   _value_ `*`: Value to check.
+
+_Returns_
+
+-   `boolean`: True when value is considered a plain object.
+
 ### isValidElement
 
 Checks if an object is a valid WPElement.
