@@ -200,15 +200,15 @@ function build_template_part_block_instance_variations() {
 			'attributes'  => array(
 				'slug' => $template_part->slug,
 				'theme' => $template_part->theme,
-				'area' => $icon_by_area[$template_part->area],
+				'area' => $template_part->area,
 			),
 			'scope'       => array( 'inserter' ),
-			'icon'        => $template_part->area,
+			'icon'        => $icon_by_area[$template_part->area],
 			'example'     => array(
 				'attributes'  => array(
 					'slug' => $template_part->slug,
 					'theme' => $template_part->theme,
-					'area' => $icon_by_area[$template_part->area],
+					'area' => $template_part->area,
 				),
 			)
 		);
