@@ -9,12 +9,14 @@ import classnames from 'classnames';
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { Button, VisuallyHidden } from '../';
+import { VisuallyHidden } from '../';
+import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+import InputBase from '../input-control/input-base';
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -64,6 +66,8 @@ export default function CustomSelectControl( {
 	describedBy,
 	options: items,
 	onChange: onSelectedItemChange,
+	/** @type {import('../select-control/types').SelectControlProps.size} */
+	size = 'default',
 	value: _selectedItem,
 } ) {
 	const {
@@ -84,6 +88,8 @@ export default function CustomSelectControl( {
 			: undefined ),
 		stateReducer,
 	} );
+
+	const [ isFocused, setIsFocused ] = useState( false );
 
 	function getDescribedBy() {
 		if ( describedBy ) {
@@ -138,31 +144,29 @@ export default function CustomSelectControl( {
 					{ label }
 				</label>
 			) }
-			<Button
-				{ ...getToggleButtonProps( {
-					// This is needed because some speech recognition software don't support `aria-labelledby`.
-					'aria-label': label,
-					'aria-labelledby': undefined,
-					className: classnames(
-						'components-custom-select-control__button',
-						{ 'is-next-36px-default-size': __next36pxDefaultSize }
-					),
-					isSmall: ! __next36pxDefaultSize,
-					describedBy: getDescribedBy(),
-				} ) }
-			>
-				{ itemToString( selectedItem ) }
-				<Icon
-					icon={ chevronDown }
-					className={ classnames(
-						'components-custom-select-control__button-icon',
-						{
-							'is-next-36px-default-size': __next36pxDefaultSize,
-						}
-					) }
-					size={ 18 }
-				/>
-			</Button>
+			<InputBase isFocused={ isOpen || isFocused }>
+				<SelectControlSelect
+					as="button"
+					onFocus={ () => setIsFocused( true ) }
+					onBlur={ () => setIsFocused( false ) }
+					selectSize={ size }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					{ ...getToggleButtonProps( {
+						// This is needed because some speech recognition software don't support `aria-labelledby`.
+						'aria-label': label,
+						'aria-labelledby': undefined,
+						className: 'components-custom-select-control__button',
+						describedBy: getDescribedBy(),
+					} ) }
+				>
+					{ itemToString( selectedItem ) }
+					<Icon
+						icon={ chevronDown }
+						className="components-custom-select-control__button-icon"
+						size={ 18 }
+					/>
+				</SelectControlSelect>
+			</InputBase>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&

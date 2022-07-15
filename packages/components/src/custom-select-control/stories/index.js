@@ -10,6 +10,12 @@ export default {
 		__next36pxDefaultSize: {
 			control: { type: 'boolean' },
 		},
+		size: {
+			control: {
+				type: 'radio',
+				options: [ 'small', 'default', '__unstable-large' ],
+			},
+		},
 	},
 };
 
