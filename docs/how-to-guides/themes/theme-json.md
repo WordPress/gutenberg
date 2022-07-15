@@ -1203,7 +1203,7 @@ The setting for `blockGap` is a boolean, and its default value is `null`. This a
 - `false`: Opt out of displaying _Block spacing_ controls in the editor UI, with `blockGap` styles stored in `theme.json` still being rendered. This allows themes to make use of `blockGap` values, without allowing users to make changes within the editor.
 - `null` (default): Opt out of displaying _Block spacing_ controls, _and_ prevent output of `blockGap` styles.
 
-The value defined for the root `blockGap` style is also output as a CSS property, named `--wp--style--block-gap`.
+The value defined for the root `styles.spacing.blockGap` style is also output as a CSS property, named `--wp--style--block-gap`.
 
 ### Why does it take so long to update the styles in the browser?
 
