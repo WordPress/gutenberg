@@ -5,7 +5,6 @@
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
 		convertWarningsToExceptions="true"
-		beStrictAboutTestsThatDoNotTestAnything="false"
 >
 	<php>
 		<env name="WP_MULTISITE" value="1" />
@@ -21,7 +20,4 @@
 			<group>ms-excluded</group>
 		</exclude>
 	</groups>
-	<php>
-		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
-    </php>
 </phpunit>

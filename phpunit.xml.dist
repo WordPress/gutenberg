@@ -5,8 +5,10 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	beStrictAboutTestsThatDoNotTestAnything="false"
 	>
+	<php>
+		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
+	</php>
 	<testsuites>
 		<testsuite name="default">
 			<directory suffix="-test.php">./phpunit/</directory>
@@ -20,7 +22,4 @@
 			<group>ms-required</group>
 		</exclude>
 	</groups>
-	<php>
-		<env name="WORDPRESS_TABLE_PREFIX" value="wptests_" />
-    </php>
 </phpunit>
