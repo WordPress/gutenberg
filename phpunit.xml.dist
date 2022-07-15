@@ -21,6 +21,6 @@
 	</groups>
 	<php>
 		<env name="WP_PHPUNIT__TESTS_CONFIG" value="/wordpress-phpunit/wp-tests-config.php" />
-		<env name="WP_TESTS_DIR" value="" />
+		<env name="WP_TESTS_DIR" value="" force="true" />
     </php>
 </phpunit>
