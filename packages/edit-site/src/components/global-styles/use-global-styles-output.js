@@ -31,9 +31,18 @@ import {
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR } from './utils';
+import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
+
+// List of block support features that can have their related styles
+// generated under their own feature level selector rather than the block's.
+const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
+	__experimentalBorder: 'border',
+	color: 'color',
+	spacing: 'spacing',
+	typography: 'typography',
+};
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -172,14 +181,26 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles Block styles.
+ * @param {Object}  blockStyles         Block styles.
+ *
+ * @param {string}  selector            The selector these declarations should attach to.
+ *
+ * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations( blockStyles = {} ) {
+function getStylesDeclarations(
+	blockStyles = {},
+	selector = '',
+	useRootPaddingAlign
+) {
+	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
 		STYLE_PROPERTY,
-		( declarations, { value, properties, useEngine }, key ) => {
+		( declarations, { value, properties, useEngine, rootOnly }, key ) => {
+			if ( rootOnly && ! isRoot ) {
+				return declarations;
+			}
 			const pathToValue = value;
 			if ( first( pathToValue ) === 'elements' || useEngine ) {
 				return declarations;
@@ -197,13 +218,22 @@ function getStylesDeclarations( blockStyles = {} ) {
 						return;
 					}
 
-					const cssProperty = kebabCase( name );
+					const cssProperty = name.startsWith( '--' )
+						? name
+						: kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
 							get( styleValue, [ prop ] )
 						) }`
 					);
 				} );
+			} else if (
+				key === '--wp--style--root--padding' &&
+				typeof styleValue === 'string'
+			) {
+				// Root-level padding styles don't currently support strings with CSS shorthand values.
+				// This may change: https://github.com/WordPress/gutenberg/issues/40132.
+				return declarations;
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key
@@ -219,6 +249,10 @@ function getStylesDeclarations( blockStyles = {} ) {
 		},
 		[]
 	);
+
+	if ( isRoot && useRootPaddingAlign ) {
+		return output;
+	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
@@ -403,6 +437,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				hasLayoutSupport: blockSelectors[ blockName ].hasLayoutSupport,
 				selector: blockSelectors[ blockName ].selector,
 				styles: blockStyles,
+				featureSelectors: blockSelectors[ blockName ].featureSelectors,
 			} );
 		}
 
@@ -505,6 +540,7 @@ export const toStyles = (
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 
 	/*
 	 * Reset default browser margin on the root body element.
@@ -515,6 +551,12 @@ export const toStyles = (
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
 	let ruleset = 'body {margin: 0;}';
+
+	if ( useRootPaddingAlign ) {
+		ruleset =
+			'body { margin: 0; padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } .has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } .has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } .has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
+	}
+
 	nodesWithStyles.forEach(
 		( {
 			selector,
@@ -522,7 +564,33 @@ export const toStyles = (
 			styles,
 			fallbackGapValue,
 			hasLayoutSupport,
+			featureSelectors,
 		} ) => {
+			// Process styles for block support features with custom feature level
+			// CSS selectors set.
+			if ( featureSelectors ) {
+				Object.entries( featureSelectors ).forEach(
+					( [ featureName, featureSelector ] ) => {
+						if ( styles?.[ featureName ] ) {
+							const featureStyles = {
+								[ featureName ]: styles[ featureName ],
+							};
+							const featureDeclarations =
+								getStylesDeclarations( featureStyles );
+							delete styles[ featureName ];
+
+							if ( !! featureDeclarations.length ) {
+								ruleset =
+									ruleset +
+									`${ featureSelector }{${ featureDeclarations.join(
+										';'
+									) } }`;
+							}
+						}
+					}
+				);
+			}
+
 			const duotoneStyles = {};
 			if ( styles?.filter ) {
 				duotoneStyles.filter = styles.filter;
@@ -556,7 +624,11 @@ export const toStyles = (
 			}
 
 			// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-			const declarations = getStylesDeclarations( styles );
+			const declarations = getStylesDeclarations(
+				styles,
+				selector,
+				useRootPaddingAlign
+			);
 			if ( declarations?.length ) {
 				ruleset =
 					ruleset + `${ selector }{${ declarations.join( ';' ) };}`;
@@ -579,7 +651,7 @@ export const toStyles = (
 
 						// `selector` maybe provided in a form
 						// where block level selectors have sub element
-						// selectors appended to them as a comma seperated
+						// selectors appended to them as a comma separated
 						// string.
 						// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
 						// Split and append pseudo selector to create
@@ -645,7 +717,7 @@ export function toSvgFilters( tree, blockSelectors ) {
 	} );
 }
 
-const getBlockSelectors = ( blockTypes ) => {
+export const getBlockSelectors = ( blockTypes ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
@@ -657,9 +729,29 @@ const getBlockSelectors = ( blockTypes ) => {
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+
+		// For each block support feature add any custom selectors.
+		const featureSelectors = {};
+		Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
+			( [ featureKey, featureName ] ) => {
+				const featureSelector =
+					blockType?.supports?.[ featureKey ]?.__experimentalSelector;
+
+				if ( featureSelector ) {
+					featureSelectors[ featureName ] = scopeSelector(
+						selector,
+						featureSelector
+					);
+				}
+			}
+		);
+
 		result[ name ] = {
 			duotoneSelector,
 			fallbackGapValue,
+			featureSelectors: Object.keys( featureSelectors ).length
+				? featureSelectors
+				: undefined,
 			hasLayoutSupport,
 			name,
 			selector,
