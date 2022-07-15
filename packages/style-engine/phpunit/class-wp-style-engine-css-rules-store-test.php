@@ -25,16 +25,16 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	/**
 	 * Should return previously created store when the same selector key is passed.
 	 */
-	// public function test_get_store() {
-	// $new_pancakes_store   = WP_Style_Engine_CSS_Rules_Store::get_store( 'pancakes-with-strawberries' );
-	// $selector             = '.cream';
-	// $pancake_declarations = array(
-	// 'color' => 'white',
-	// );
-	// $new_pancakes_store->set_rule( $selector, $pancake_declarations );
-	// $the_same_pancakes_store   = WP_Style_Engine_CSS_Rules_Store::get_store( 'pancakes-with-strawberries' );
-	// $this->assertEquals( $pancake_declarations, $the_same_pancakes_store->get_rule( $selector )->get_declarations_array() );
-	// }
+	public function test_get_store() {
+		$new_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
+		$selector       = '.haddock';
+
+		$new_fish_store->get_rule( $selector )->get_selector();
+		$this->assertEquals( $selector, $new_fish_store->get_rule( $selector )->get_selector() );
+
+		$the_same_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
+		$this->assertEquals( $selector, $the_same_fish_store->get_rule( $selector )->get_selector() );
+	}
 
 	/**
 	 * Should return a stored rule.
