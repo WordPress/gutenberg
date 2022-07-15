@@ -11,11 +11,14 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
+	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 
 export default function VerseEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	mergeBlocks,
 	onRemove,
@@ -28,6 +31,7 @@ export default function VerseEdit( {
 		} ),
 		style,
 	} );
+	const { insertBeforeBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<>
@@ -53,6 +57,9 @@ export default function VerseEdit( {
 				placeholder={ __( 'Write verse…' ) }
 				onRemove={ onRemove }
 				onMerge={ mergeBlocks }
+				__unstableOnSplitAtStart={ () => {
+					insertBeforeBlock( clientId );
+				} }
 				textAlign={ textAlign }
 				{ ...blockProps }
 				__unstablePastePlainText

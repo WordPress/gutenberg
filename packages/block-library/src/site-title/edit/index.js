@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -14,6 +14,7 @@ import {
 	AlignmentControl,
 	InspectorControls,
 	BlockControls,
+	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
@@ -27,6 +28,7 @@ import LevelControl from './level-toolbar';
 
 export default function SiteTitleEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
@@ -48,6 +50,8 @@ export default function SiteTitleEdit( {
 				! canUserEdit && ! readOnlyTitle,
 		} ),
 	} );
+	const { insertBeforeBlock } = useDispatch( blockEditorStore );
+
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
 			<RichText
@@ -59,6 +63,9 @@ export default function SiteTitleEdit( {
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks
+				__unstableOnSplitAtStart={ () => {
+					insertBeforeBlock( clientId );
+				} }
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}

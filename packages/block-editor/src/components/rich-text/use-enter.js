@@ -40,6 +40,7 @@ export function useEnter( props ) {
 				multilineTag,
 				onChange,
 				disableLineBreaks,
+				onSplitAtStart,
 				onSplitAtEnd,
 			} = propsRef.current;
 
@@ -89,13 +90,23 @@ export function useEnter( props ) {
 				}
 			} else {
 				const { text, start, end } = _value;
+				const canSplitAtStart =
+					onSplitAtStart &&
+					start === 0 &&
+					end === 0 &&
+					text.length > 0;
 				const canSplitAtEnd =
 					onSplitAtEnd && start === end && end === text.length;
 
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+				if (
+					event.shiftKey ||
+					( ! canSplit && ! canSplitAtStart && ! canSplitAtEnd )
+				) {
 					if ( ! disableLineBreaks ) {
 						onChange( insert( _value, '\n' ) );
 					}
+				} else if ( ! canSplit && canSplitAtStart ) {
+					onSplitAtStart();
 				} else if ( ! canSplit && canSplitAtEnd ) {
 					onSplitAtEnd();
 				} else if ( canSplit ) {

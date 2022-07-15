@@ -2,10 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 
-export default function CodeEdit( { attributes, setAttributes, onRemove } ) {
+export default function CodeEdit( {
+	attributes,
+	clientId,
+	setAttributes,
+	onRemove,
+} ) {
 	const blockProps = useBlockProps();
+	const { insertBeforeBlock } = useDispatch( blockEditorStore );
+
 	return (
 		<pre { ...blockProps }>
 			<RichText
@@ -16,6 +28,9 @@ export default function CodeEdit( { attributes, setAttributes, onRemove } ) {
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 				preserveWhiteSpace
+				__unstableOnSplitAtStart={ () => {
+					insertBeforeBlock( clientId );
+				} }
 				__unstablePastePlainText
 			/>
 		</pre>

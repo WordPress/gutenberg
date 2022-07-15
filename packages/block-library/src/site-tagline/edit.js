@@ -6,19 +6,21 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	AlignmentControl,
 	useBlockProps,
 	BlockControls,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 export default function SiteTaglineEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
@@ -43,6 +45,8 @@ export default function SiteTaglineEdit( {
 				! canUserEdit && ! readOnlySiteTagLine,
 		} ),
 	} );
+	const { insertBeforeBlock } = useDispatch( blockEditorStore );
+
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }
@@ -52,6 +56,9 @@ export default function SiteTaglineEdit( {
 			tagName="p"
 			value={ siteTagline }
 			disableLineBreaks
+			__unstableOnSplitAtStart={ () => {
+				insertBeforeBlock( clientId );
+			} }
 			__unstableOnSplitAtEnd={ () =>
 				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 			}
