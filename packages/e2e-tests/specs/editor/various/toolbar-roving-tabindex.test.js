@@ -124,11 +124,11 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures block toolbar remembers the last focused item', async () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph' );
-		await focusBlockToolbar();
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'ArrowRight' );
 		await expectLabelToHaveFocus( 'Move up' );
 		await page.keyboard.press( 'Tab' );
-		await focusBlockToolbar();
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expectLabelToHaveFocus( 'Move up' );
 	} );
 
