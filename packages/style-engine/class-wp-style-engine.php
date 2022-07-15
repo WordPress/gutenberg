@@ -304,7 +304,7 @@ class WP_Style_Engine {
 
 			$styles_output = '';
 
-			foreach ( $css_rules as $selector => $css_rule ) {
+			foreach ( $css_rules as $selector => $css_rule ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 				$styles_output .= $css_rule->get_css();
 			}
 
