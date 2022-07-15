@@ -27,7 +27,7 @@ export async function createComment(
 		method: 'GET',
 	} );
 
-	const author = currentUser?.id;
+	const author = currentUser.id;
 
 	const response = await this.rest( {
 		method: 'POST',
