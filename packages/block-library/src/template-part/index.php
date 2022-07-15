@@ -204,6 +204,13 @@ function build_template_part_block_instance_variations() {
 			),
 			'scope'       => array( 'inserter' ),
 			'icon'        => $template_part->area,
+			'example'     => array(
+				'attributes'  => array(
+					'slug' => $template_part->slug,
+					'theme' => $template_part->theme,
+					'area' => $icon_by_area[$template_part->area],
+				),
+			)
 		);
 	}
 	return $variations;
