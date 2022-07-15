@@ -10,19 +10,28 @@ export interface Comment {
 	post: number;
 }
 
+export interface CreateCommentPayload {
+	content: string;
+	post: number;
+}
+
+export interface User {
+	id: number;
+}
+
 /**
  * Create new comment using the REST API.
  *
  * It uses the current user if no author is defined inside `comment`.
  *
- * @param {} this           RequestUtils.
- * @param {} comment        Partial<Comment>.
+ * @param {} this    RequestUtils.
+ * @param {} comment CreateCommentPayload.
  */
 export async function createComment(
 	this: RequestUtils,
-	comment: Partial< Comment >
+	comment: CreateCommentPayload
 ) {
-	const currentUser = await this.rest( {
+	const currentUser = await this.rest< User >( {
 		path: '/wp/v2/users/me',
 		method: 'GET',
 	} );
