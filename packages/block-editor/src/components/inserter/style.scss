@@ -1,5 +1,6 @@
 $block-inserter-preview-height: 350px;
 $block-inserter-width: 350px;
+$block-inserter-scrollbar-width: 17px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -13,11 +14,15 @@ $block-inserter-tabs-height: 44px;
 
 	@include break-medium {
 		position: relative;
+		scrollbar-width: $block-inserter-scrollbar-width;
 	}
 }
 
 .block-editor-inserter__content {
 	position: relative;
+	@include break-medium {
+		width: calc(#{ $block-inserter-width } - #{$block-inserter-scrollbar-width});
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
