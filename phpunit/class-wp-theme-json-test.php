@@ -974,4 +974,63 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	function test_get_styles_for_block_with_padding_aware_alignments() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'styles'   => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => '10px',
+							'right'  => '12px',
+							'bottom' => '10px',
+							'left'   => '12px',
+						),
+					),
+				),
+				'settings' => array(
+					'useRootPaddingAwareAlignments' => true,
+				),
+			)
+		);
+
+		$metadata = array(
+			'path'     => array(
+				'0' => 'styles',
+			),
+			'selector' => 'body',
+		);
+
+		$expected = 'body { margin: 0; }body{--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding > .alignfull > :where([class*="wp-block-"]:not(.alignfull):not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_styles_for_block( $metadata ) );
+	}
+
+	function test_get_styles_for_block_without_padding_aware_alignments() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => 2,
+				'styles'  => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => '10px',
+							'right'  => '12px',
+							'bottom' => '10px',
+							'left'   => '12px',
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'path'     => array(
+				'0' => 'styles',
+			),
+			'selector' => 'body',
+		);
+
+		$expected = 'body { margin: 0; }body{padding-top: 10px;padding-right: 12px;padding-bottom: 10px;padding-left: 12px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_styles_for_block( $metadata ) );
+	}
 }
