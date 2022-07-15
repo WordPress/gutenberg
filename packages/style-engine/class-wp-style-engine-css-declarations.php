@@ -140,4 +140,15 @@ class WP_Style_Engine_CSS_Declarations {
 	protected function sanitize_property( $property ) {
 		return sanitize_key( $property );
 	}
+
+	/**
+	 * Get a hash for the defined declarations.
+	 *
+	 * @return string The hash.
+	 */
+	public function get_hash() {
+		$declarations = $this->get_declarations();
+		ksort( $declarations );
+		return md5( json_encode( $declarations ) );
+	}
 }
