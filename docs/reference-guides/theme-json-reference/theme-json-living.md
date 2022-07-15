@@ -98,13 +98,13 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | object |  |  |
+| fluid | boolean |  |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | fluidSize, name, size, slug |
+| fontSizes | array |  | fluid, name, size, slug |
 | fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
