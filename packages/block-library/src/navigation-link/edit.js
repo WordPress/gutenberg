@@ -338,7 +338,7 @@ function getMissingText( type ) {
 	}
 
 	return missingText;
-};
+}
 
 /**
  * Removes HTML from a given string.
