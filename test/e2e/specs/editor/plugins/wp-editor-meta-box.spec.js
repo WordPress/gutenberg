@@ -22,21 +22,17 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await page.type( '.editor-post-title__input', 'Hello Meta' );
 
 		// Type something.
-		await page.click( '#test_tinymce_id-html' );
+		await page.click( 'role=button[name="Text"i]' );
 		await page.click( '#test_tinymce_id' );
 		await page.keyboard.type( 'Typing in a metabox' );
 		await page.type( '#test_tinymce_id-html', 'Typing in a metabox' );
-		await page.click( '#test_tinymce_id-tmce' );
+		await page.click( 'role=button[name="Visual"i]' );
 
 		await editor.publishPost();
 
 		await expect( page.locator( '.edit-post-layout' ) ).toBeVisible();
 
-		await page.click( '#test_tinymce_id-html' );
-		const content = await page.$eval(
-			'#test_tinymce_id',
-			( textarea ) => textarea.value
-		);
+		await page.click( 'role=button[name="Text"i]' );
 
 		/*
 		 * `content` may or may not contain the <p> tags depending on hasWpautop value in this line:
@@ -52,6 +48,9 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		 *
 		 * For more context, see https://github.com/WordPress/gutenberg/pull/33228/files#r666897885
 		 */
-		expect( content ).toBe( 'Typing in a metabox' );
+		const content = page.locator( '#test_tinymce_id' );
+		expect( await content.evaluate( ( node ) => node.value ) ).toBe(
+			'Typing in a metabox'
+		);
 	} );
 } );
