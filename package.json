@@ -284,6 +284,7 @@
 		"publish:check": "lerna updated",
 		"publish:latest": "lerna publish --no-private",
 		"publish:patch": "lerna publish patch --no-private --dist-tag patch",
+		"start": "npm run dev",
 		"prestorybook:build": "npm run build:packages",
 		"storybook:build": "build-storybook -c ./storybook -o ./storybook/build",
 		"prestorybook:dev": "npm run build:packages",
