@@ -19,6 +19,10 @@ export interface InputState {
 	value?: string;
 }
 
+export type LeadStateReducer = Reducer<
+	InputState,
+	InputAction | Partial< InputState >
+>;
 export type StateReducer = Reducer< InputState, InputAction >;
 
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;

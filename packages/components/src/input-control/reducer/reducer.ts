@@ -13,6 +13,7 @@ import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import {
 	InputState,
+	LeadStateReducer,
 	StateReducer,
 	initialInputControlState,
 	initialStateReducer,
@@ -50,8 +51,18 @@ function mergeInitialState(
  */
 function inputControlStateReducer(
 	composedStateReducers: StateReducer
-): StateReducer {
+): LeadStateReducer {
 	return ( state, action ) => {
+		if ( ! ( 'type' in action ) ) {
+			// Returns the new state without running other reducers. These are
+			// controlled updates from props and need no specialization.
+			return {
+				...state,
+				value: `${ action.value ?? '' }`,
+				isDirty: false,
+				_event: undefined,
+			};
+		}
 		const nextState = { ...state };
 
 		switch ( action.type ) {
@@ -140,7 +151,7 @@ export function useInputControlStateReducer(
 	initialState: Partial< InputState > = initialInputControlState,
 	onChangeHandler: InputChangeCallback
 ) {
-	const [ state, dispatch ] = useReducer< StateReducer >(
+	const [ state, dispatch ] = useReducer< LeadStateReducer >(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
@@ -210,10 +221,7 @@ export function useInputControlStateReducer(
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
-			dispatch( {
-				type: actions.RESET,
-				payload: { value: initialState.value },
-			} );
+			dispatch( { value: initialState.value } );
 		}
 	}, [ initialState.value ] );
 
