@@ -8,6 +8,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  * Internal dependencies
  */
 const { getArgFromCLI, getWebpackArgs, hasArgInCLI } = require( '../utils' );
+const EXIT_ERROR_CODE = 1;
 
 if ( hasArgInCLI( '--webpack-no-externals' ) ) {
 	process.env.WP_NO_EXTERNALS = true;
@@ -36,4 +37,4 @@ const { status } = spawn(
 		stdio: 'inherit',
 	}
 );
-process.exit( status );
+process.exit( status === null ? EXIT_ERROR_CODE : status );

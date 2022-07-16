@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes } from 'lodash';
+import { xor, isEqual, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -398,7 +398,7 @@ export function getStyleProperties( text ) {
 			return [ key.trim(), getNormalizedStyleValue( value.trim() ) ];
 		} );
 
-	return fromPairs( pairs );
+	return Object.fromEntries( pairs );
 }
 
 /**
@@ -419,7 +419,7 @@ export const isEqualAttributesOfName = {
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.
-	...fromPairs(
+	...Object.fromEntries(
 		BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, () => true ] )
 	),
 };

@@ -34,7 +34,6 @@ const CommentsForm = () => {
 						name="submit"
 						type="submit"
 						className={ classnames(
-							'submit',
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }

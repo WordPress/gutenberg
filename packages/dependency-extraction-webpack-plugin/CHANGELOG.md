@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.7.0 (2022-07-13)
+
 ### New Features
 
 -   Output asset files for shared chunks, too ([#41002](https://github.com/WordPress/gutenberg/pull/41002)).

@@ -136,6 +136,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',
