@@ -2,7 +2,6 @@
  * External dependencies
  */
 const {
-	countBy,
 	groupBy,
 	escapeRegExp,
 	uniq,
@@ -90,7 +89,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
 	'[Type] Performance': 'Performance',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
 };
@@ -144,7 +143,7 @@ const LABEL_FEATURE_MAPPING = {
 	'Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
 	'npm Packages': 'npm Packages',
@@ -309,7 +308,17 @@ function getIssueFeature( issue ) {
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
 		// Get occurances of the feature labels.
-		const featureCounts = countBy( featureCandidates );
+		const featureCounts = featureCandidates.reduce(
+			/**
+			 * @param {Record<string,number>} acc     Accumulator
+			 * @param {string}                feature Feature label
+			 */
+			( acc, feature ) => ( {
+				...acc,
+				[ feature ]: ( acc[ feature ] || 0 ) + 1,
+			} ),
+			{}
+		);
 
 		// Check which matching label occurs most often.
 		const rankedFeatures = Object.keys( featureCounts ).sort(

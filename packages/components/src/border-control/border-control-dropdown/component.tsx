@@ -176,6 +176,8 @@ const BorderControlDropdown = (
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
 			position={ dropdownPosition }
+			label={ __( 'Border color and style picker' ) }
+			showTooltip={ true }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator

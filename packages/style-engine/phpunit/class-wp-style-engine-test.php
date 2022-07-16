@@ -89,8 +89,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
-					'css'        => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;',
-					'classnames' => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
+					'css'          => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;',
+					'declarations' => array(
+						'border-style' => 'dotted',
+						'border-width' => '2rem',
+						'padding'      => '0',
+						'margin'       => '111px',
+					),
+					'classnames'   => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
 				),
 			),
 
@@ -121,7 +127,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css' => 'border-top-left-radius: 99px; border-top-right-radius: 98px; border-bottom-left-radius: 97px; border-bottom-right-radius: 96px; padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+					'css'          => 'border-top-left-radius: 99px; border-top-right-radius: 98px; border-bottom-left-radius: 97px; border-bottom-right-radius: 96px; padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+					'declarations' => array(
+						'border-top-left-radius'     => '99px',
+						'border-top-right-radius'    => '98px',
+						'border-bottom-left-radius'  => '97px',
+						'border-bottom-right-radius' => '96px',
+						'padding-top'                => '42px',
+						'padding-left'               => '2%',
+						'padding-bottom'             => '44px',
+						'padding-right'              => '5rem',
+						'margin-top'                 => '12rem',
+						'margin-left'                => '2vh',
+						'margin-bottom'              => '2px',
+						'margin-right'               => '10em',
+					),
 				),
 			),
 
@@ -140,7 +160,17 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css' => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+					'css'          => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+					'declarations' => array(
+						'font-size'       => 'clamp(2em, 2vw, 4em)',
+						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+						'font-style'      => 'italic',
+						'font-weight'     => '800',
+						'line-height'     => '1.3',
+						'text-decoration' => 'underline',
+						'text-transform'  => 'uppercase',
+						'letter-spacing'  => '2',
+					),
 				),
 			),
 
@@ -157,7 +187,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'selector' => '.wp-selector > p' ),
 				'expected_output' => array(
-					'css' => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
+					'css'          => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
+					'declarations' => array(
+						'padding-top'    => '42px',
+						'padding-left'   => '2%',
+						'padding-bottom' => '44px',
+						'padding-right'  => '5rem',
+					),
 				),
 			),
 
@@ -171,8 +207,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'        => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
-					'classnames' => 'has-text-color has-my-little-pony-color',
+					'css'          => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
+					'declarations' => array(
+						'color' => 'var(--wp--preset--color--my-little-pony)',
+					),
+					'classnames'   => 'has-text-color has-my-little-pony-color',
 				),
 			),
 
@@ -214,8 +253,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'        => 'color: var(--wp--preset--color--teal-independents);',
-					'classnames' => 'has-text-color has-teal-independents-color',
+					'css'          => 'color: var(--wp--preset--color--teal-independents);',
+					'declarations' => array(
+						'color' => 'var(--wp--preset--color--teal-independents)',
+					),
+					'classnames'   => 'has-text-color has-teal-independents-color',
 				),
 			),
 
@@ -228,8 +270,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'        => 'color: #fff;',
-					'classnames' => 'has-text-color',
+					'css'          => 'color: #fff;',
+					'declarations' => array(
+						'color' => '#fff',
+					),
+					'classnames'   => 'has-text-color',
 				),
 			),
 
@@ -259,7 +304,11 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'padding: var(--wp--preset--spacing--20); margin: var(--wp--preset--spacing--10);',
+					'css'          => 'padding: var(--wp--preset--spacing--20); margin: var(--wp--preset--spacing--10);',
+					'declarations' => array(
+						'padding' => 'var(--wp--preset--spacing--20)',
+						'margin'  => 'var(--wp--preset--spacing--10)',
+					),
 				),
 			),
 
@@ -282,7 +331,17 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'padding-left: var(--wp--preset--spacing--30); padding-right: var(--wp--preset--spacing--40); padding-top: 14px; padding-bottom: 14px; margin-left: var(--wp--preset--spacing--10); margin-right: var(--wp--preset--spacing--20); margin-top: 1rem; margin-bottom: 1rem;',
+					'css'          => 'padding-left: var(--wp--preset--spacing--30); padding-right: var(--wp--preset--spacing--40); padding-top: 14px; padding-bottom: 14px; margin-left: var(--wp--preset--spacing--10); margin-right: var(--wp--preset--spacing--20); margin-top: 1rem; margin-bottom: 1rem;',
+					'declarations' => array(
+						'padding-left'   => 'var(--wp--preset--spacing--30)',
+						'padding-right'  => 'var(--wp--preset--spacing--40)',
+						'padding-top'    => '14px',
+						'padding-bottom' => '14px',
+						'margin-left'    => 'var(--wp--preset--spacing--10)',
+						'margin-right'   => 'var(--wp--preset--spacing--20)',
+						'margin-top'     => '1rem',
+						'margin-bottom'  => '1rem',
+					),
 				),
 			),
 
@@ -293,13 +352,17 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 							'left'   => 'var:preset|spaceman|10',
 							'right'  => 'var:preset|spaceman|20',
 							'top'    => '1rem',
-							'bottom' => '1rem',
+							'bottom' => '0',
 						),
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'margin-top: 1rem; margin-bottom: 1rem;',
+					'css'          => 'margin-top: 1rem; margin-bottom: 0;',
+					'declarations' => array(
+						'margin-top'    => '1rem',
+						'margin-bottom' => '0',
+					),
 				),
 			),
 
@@ -344,7 +407,20 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
+					'css'          => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
+					'declarations' => array(
+						'border-top-color'    => '#fe1',
+						'border-top-width'    => '1.5rem',
+						'border-top-style'    => 'dashed',
+						'border-right-color'  => '#fe2',
+						'border-right-width'  => '1.4rem',
+						'border-right-style'  => 'solid',
+						'border-bottom-color' => '#fe3',
+						'border-bottom-width' => '1.3rem',
+						'border-left-color'   => 'var(--wp--preset--color--swampy-yellow)',
+						'border-left-width'   => '0.5rem',
+						'border-left-style'   => 'dotted',
+					),
 				),
 			),
 
@@ -374,7 +450,10 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css' => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+					'css'          => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+					'declarations' => array(
+						'border-bottom-color' => 'var(--wp--preset--color--terrible-lizard)',
+					),
 				),
 			),
 		);

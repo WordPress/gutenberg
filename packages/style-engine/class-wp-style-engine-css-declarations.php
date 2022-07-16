@@ -68,6 +68,17 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
+	 * Remove a single declaration.
+	 *
+	 * @param string $property The CSS property.
+	 *
+	 * @return void
+	 */
+	public function remove_declaration( $property ) {
+		unset( $this->declarations[ $property ] );
+	}
+
+	/**
 	 * Add multiple declarations.
 	 *
 	 * @param array $declarations An array of declarations.
@@ -77,6 +88,19 @@ class WP_Style_Engine_CSS_Declarations {
 	public function add_declarations( $declarations ) {
 		foreach ( $declarations as $property => $value ) {
 			$this->add_declaration( $property, $value );
+		}
+	}
+
+	/**
+	 * Remove multiple declarations.
+	 *
+	 * @param array $declarations An array of properties.
+	 *
+	 * @return void
+	 */
+	public function remove_declarations( $declarations = array() ) {
+		foreach ( $declarations as $property ) {
+			$this->remove_declaration( $property );
 		}
 	}
 

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import BorderControlDropdown from '../border-control-dropdown';
@@ -21,9 +26,9 @@ const BorderLabel = ( props: LabelProps ) => {
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<StyledLabel as="legend">{ label }</StyledLabel>
 	);
 };
 
@@ -59,7 +64,7 @@ const UnconnectedBorderControl = (
 	} = useBorderControl( props );
 
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
+		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -85,6 +90,8 @@ const UnconnectedBorderControl = (
 						__next36pxDefaultSize={ __next36pxDefaultSize }
 					/>
 					<UnitControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ widthControlClassName }
 						min={ 0 }
 						onChange={ onWidthChange }
@@ -94,6 +101,8 @@ const UnconnectedBorderControl = (
 				</HStack>
 				{ withSlider && (
 					<RangeControl
+						label={ __( 'Border width' ) }
+						hideLabelFromVision
 						className={ sliderClassName }
 						initialPosition={ 0 }
 						max={ 100 }
