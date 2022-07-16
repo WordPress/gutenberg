@@ -1,7 +1,7 @@
 const stories = [
 	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|tsx|mdx)',
 	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
+	'../packages/components/src/**/stories/index.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
 ].filter( Boolean );
 
@@ -25,9 +25,11 @@ module.exports = {
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
 	],
+	framework: '@storybook/react',
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
+		storyStoreV7: true,
 	},
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270
