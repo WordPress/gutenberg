@@ -254,6 +254,7 @@
 		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"docs:build": "npm-run-all docs:gen api-docs:*",
 		"docs:gen": "node ./docs/tool/index.js",
+		"env": "wp-env",
 		"fixtures:clean": "rimraf \"test/integration/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
