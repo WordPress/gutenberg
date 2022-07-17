@@ -214,6 +214,18 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			id: undefined,
+			url: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: useFeaturedImage
+				? IMAGE_BACKGROUND_TYPE
+				: undefined,
+		} );
+	};
+
 	const blockControls = (
 		<CoverBlockControls
 			attributes={ attributes }
@@ -221,6 +233,7 @@ function CoverEdit( {
 			onSelectMedia={ onSelectMedia }
 			onSelectURL={ onSelectURL }
 			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 		/>
 	);
 
@@ -232,6 +245,7 @@ function CoverEdit( {
 			setOverlayColor={ setOverlayColor }
 			coverRef={ ref }
 			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 		/>
 	);
 
@@ -254,6 +268,7 @@ function CoverEdit( {
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
+						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -390,6 +405,7 @@ function CoverEdit( {
 					onSelectMedia={ onSelectMedia }
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>

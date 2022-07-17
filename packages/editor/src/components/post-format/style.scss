@@ -1,18 +1,3 @@
-.editor-post-format {
-	flex-direction: column;
-	align-items: stretch;
-	width: 100%;
-}
-
-.editor-post-format__content {
-	display: inline-flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-}
-
-.editor-post-format__suggestion {
-	padding: $grid-unit-15 * 0.5;
-	text-align: right;
-	font-size: $default-font-size;
+[class].editor-post-format__suggestion {
+	margin: $grid-unit-05 0 0 0;
 }

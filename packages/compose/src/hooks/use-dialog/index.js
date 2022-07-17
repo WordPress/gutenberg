@@ -13,13 +13,14 @@ import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
 
-/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef {import('../use-focus-on-mount').default} useFocusOnMount
+ */
 /**
  * @typedef DialogOptions
  * @property {Parameters<useFocusOnMount>[0]} focusOnMount Focus on mount arguments.
  * @property {() => void}                     onClose      Function to call when the dialog is closed.
  */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:

@@ -125,7 +125,10 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: firstBlockClientId,
+		maximumLength: 25,
+	} );
 
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock

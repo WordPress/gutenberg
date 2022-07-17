@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
@@ -14,6 +9,8 @@ export default function save( { attributes: { customText, noTeaser } } ) {
 	const noTeaserTag = noTeaser ? '<!--noteaser-->' : '';
 
 	return (
-		<RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>
+		<RawHTML>
+			{ [ moreTag, noTeaserTag ].filter( Boolean ).join( '\n' ) }
+		</RawHTML>
 	);
 }

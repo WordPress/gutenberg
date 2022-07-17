@@ -17,6 +17,7 @@ export default function CoverPlaceholder( {
 	onSelectURL,
 	onError,
 	style,
+	toggleUseFeaturedImage,
 } ) {
 	return (
 		<MediaPlaceholder
@@ -32,6 +33,7 @@ export default function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			disableMediaButtons={ disableMediaButtons }
+			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			onError={ onError }
 			style={ style }
 		>

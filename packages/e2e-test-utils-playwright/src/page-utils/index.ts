@@ -29,11 +29,11 @@ class PageUtils {
 		this.browser = this.context.browser()!;
 	}
 
-	isCurrentURL = isCurrentURL;
-	pressKeyTimes = pressKeyTimes;
-	pressKeyWithModifier = pressKeyWithModifier;
-	setBrowserViewport = setBrowserViewport;
-	setClipboardData = setClipboardData;
+	isCurrentURL = isCurrentURL.bind( this );
+	pressKeyTimes = pressKeyTimes.bind( this );
+	pressKeyWithModifier = pressKeyWithModifier.bind( this );
+	setBrowserViewport = setBrowserViewport.bind( this );
+	setClipboardData = setClipboardData.bind( this );
 }
 
 export { PageUtils };

@@ -149,9 +149,13 @@ function PostTitle( _, forwardedRef ) {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
-			event.preventDefault();
+		event.preventDefault();
 
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
 			if (
@@ -164,6 +168,8 @@ function PostTitle( _, forwardedRef ) {
 			} else {
 				onInsertBlockAfter( content );
 			}
+		} else {
+			onUpdate( content );
 		}
 	}
 

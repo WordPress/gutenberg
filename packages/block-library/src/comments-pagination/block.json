@@ -4,7 +4,7 @@
 	"name": "core/comments-pagination",
 	"title": "Comments Pagination",
 	"category": "theme",
-	"parent": [ "core/comments-query-loop" ],
+	"parent": [ "core/comments" ],
 	"description": "Displays a paginated navigation to next/previous set of comments, when applicable.",
 	"textdomain": "default",
 	"attributes": {
