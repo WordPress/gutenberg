@@ -54,11 +54,11 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test render_block_core_cover() method.
+	 * Test gutenberg_render_block_core_cover() method.
 	 *
-	 * @covers ::render_block_core_cover
+	 * @covers ::gutenberg_render_block_core_cover
 	 */
-	public function test_render_block_core_cover() {
+	public function test_gutenberg_render_block_core_cover() {
 
 		global $wp_query;
 
@@ -78,7 +78,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		);
 
 		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
-		$rendered = render_block_core_cover( $attributes, $content );
+		$rendered = gutenberg_render_block_core_cover( $attributes, $content );
 
 		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
 		$this->assertStringContainsString( 'background-image', $rendered );
@@ -86,22 +86,22 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 
 		// If cover background type is not image.
 		$attributes['backgroundType'] = 'color';
-		$rendered                     = render_block_core_cover( $attributes, '' );
+		$rendered                     = gutenberg_render_block_core_cover( $attributes, '' );
 		$this->assertEmpty( $rendered );
 
 		// If cover background is not post featured image.
 		$attributes['backgroundType']   = 'image';
 		$attributes['useFeaturedImage'] = false;
-		$rendered                       = render_block_core_cover( $attributes, '' );
+		$rendered                       = gutenberg_render_block_core_cover( $attributes, '' );
 		$this->assertEmpty( $rendered );
 	}
 
 	/**
-	 * Test render_block_core_cover() method.
+	 * Test gutenberg_render_block_core_cover() method.
 	 *
-	 * @covers ::render_block_core_cover
+	 * @covers ::gutenberg_render_block_core_cover
 	 */
-	public function test_render_block_core_cover_fixed_or_repeated_background() {
+	public function test_gutenberg_render_block_core_cover_fixed_or_repeated_background() {
 
 		global $wp_query;
 
@@ -122,7 +122,7 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		);
 
 		$content  = '<div class="wp-block-cover"><span></span><div class="wp-block-cover__inner-container"></div></div>';
-		$rendered = render_block_core_cover( $attributes, $content );
+		$rendered = gutenberg_render_block_core_cover( $attributes, $content );
 
 		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
 		$this->assertStringContainsString( 'object-position', $rendered );
