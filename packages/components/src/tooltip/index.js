@@ -112,6 +112,10 @@ function Tooltip( props ) {
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
 
 	const createMouseDown = ( event ) => {
+		// In firefox, the mouse down event is also fired when the select
+		// list is chosen.
+		// Cancel further processing because re-rendering of child components
+		// causes onChange to be triggered with the old value.
 		if ( event.target.tagName === 'OPTION' ) {
 			return;
 		}
