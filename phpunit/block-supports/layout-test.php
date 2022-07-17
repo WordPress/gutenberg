@@ -7,8 +7,8 @@
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
-	function setUp() {
-		parent::setUp();
+	function set_up() {
+		parent::set_up();
 		$this->theme_root     = realpath( __DIR__ . '/../data/themedir1' );
 		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
 
@@ -24,11 +24,11 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_themes'] );
 	}
 
-	function tearDown() {
+	function tear_down() {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	function filter_set_theme_root() {

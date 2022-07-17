@@ -9,8 +9,8 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 	private $theme_root;
 	private $orig_theme_dir;
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$this->provider = new WP_Webfonts_Provider_Local();
 

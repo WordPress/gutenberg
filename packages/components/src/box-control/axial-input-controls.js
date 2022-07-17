@@ -106,7 +106,7 @@ export default function AxialInputControls( {
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last;
+	const only = first === last && first;
 
 	return (
 		<Layout

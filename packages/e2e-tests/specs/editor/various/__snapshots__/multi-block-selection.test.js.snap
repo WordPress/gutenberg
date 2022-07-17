@@ -146,22 +146,6 @@ exports[`Multi-block selection should handle Enter across blocks 2`] = `
 <!-- /wp:heading -->"
 `;
 
-exports[`Multi-block selection should merge into quote with correct selection 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1[</p></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:paragraph -->
-<p>]2</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Multi-block selection should merge into quote with correct selection 2`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p>&amp;2</p></blockquote>
-<!-- /wp:quote -->"
-`;
-
 exports[`Multi-block selection should multi-select from within the list block 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

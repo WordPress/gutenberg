@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter, compact } from 'lodash';
+import { set, map, find, get, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -1115,7 +1115,7 @@ export function canUser(
 	resource: string,
 	id?: GenericRecordKey
 ): boolean | undefined {
-	const key = compact( [ action, resource, id ] ).join( '/' );
+	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
 

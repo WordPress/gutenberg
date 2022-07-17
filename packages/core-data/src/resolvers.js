@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	camelCase,
-	compact,
-	find,
-	get,
-	includes,
-	map,
-	mapKeys,
-	uniq,
-} from 'lodash';
+import { camelCase, find, get, includes, map, mapKeys, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -313,7 +304,7 @@ export const canUser =
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
 		const allowHeader = response.headers?.get( 'allow' );
-		const key = compact( [ action, resource, id ] ).join( '/' );
+		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 		const isAllowed = includes( allowHeader, method );
 		dispatch.receiveUserPermission( key, isAllowed );
 	};

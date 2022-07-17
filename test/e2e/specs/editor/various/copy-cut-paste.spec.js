@@ -397,4 +397,23 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'should paste single line in post title', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		// This test checks whether we are correctly handling single line
+		// pasting in the post title. Previously we were accidentally falling
+		// back to default browser behaviour, allowing the browser to insert
+		// unfiltered HTML. When we swap out the post title in the post editor
+		// with the proper block, this test can be removed.
+		await pageUtils.setClipboardData( {
+			html: '<span style="border: 1px solid black">Hello World</span>',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Expect the span to be filtered out.
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toMatchSnapshot();
+	} );
 } );

@@ -3,7 +3,9 @@
 exports[`RenderAppender prop of InnerBlocks Users can customize the appender and can still insert blocks using exposed components 1`] = `
 "<!-- wp:test/inner-blocks-render-appender -->
 <div style=\\"outline:1px solid gray;padding:5px\\" class=\\"wp-block-test-inner-blocks-render-appender\\"><!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote --></div>
 <!-- /wp:test/inner-blocks-render-appender -->"
 `;
@@ -11,7 +13,9 @@ exports[`RenderAppender prop of InnerBlocks Users can customize the appender and
 exports[`RenderAppender prop of InnerBlocks Users can dynamically customize the appender 1`] = `
 "<!-- wp:test/inner-blocks-render-appender-dynamic -->
 <div style=\\"outline:1px solid gray;padding:5px\\" class=\\"wp-block-test-inner-blocks-render-appender-dynamic\\"><!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:video -->

@@ -95,6 +95,10 @@
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
 		border-bottom-color: $gray-300;
 	}
+
+	& + p {
+		margin-top: 0;
+	}
 }
 
 .components-modal__header-heading-container {

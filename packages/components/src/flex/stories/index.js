@@ -6,7 +6,7 @@ import { View } from '../../view';
 
 export default {
 	component: Flex,
-	title: 'Components (Experimental)/Flex',
+	title: 'Components/Flex',
 };
 
 export const _default = () => {

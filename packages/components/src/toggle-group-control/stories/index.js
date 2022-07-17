@@ -23,6 +23,12 @@ import Button from '../../button';
 export default {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
+	argTypes: {
+		size: {
+			control: 'select',
+			options: [ 'default', '__unstable-large' ],
+		},
+	},
 	parameters: {
 		knobs: { disable: false },
 	},
@@ -33,7 +39,7 @@ const KNOBS_GROUPS = {
 	ToggleGroupControlOption: 'ToggleGroupControlOption',
 };
 
-const _default = ( { options } ) => {
+const _default = ( { options, ...props } ) => {
 	const [ value, setValue ] = useState( options[ 0 ].value );
 	const label = text(
 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
@@ -87,6 +93,7 @@ const _default = ( { options } ) => {
 	return (
 		<View>
 			<ToggleGroupControl
+				{ ...props }
 				onChange={ setValue }
 				value={ value }
 				label={ label }
@@ -109,6 +116,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	],
+	size: 'default',
 };
 
 export const WithTooltip = _default.bind( {} );
@@ -130,10 +138,11 @@ WithAriaLabel.args = {
 	],
 };
 
-export const WithIcons = () => {
+export const WithIcons = ( props ) => {
 	const [ state, setState ] = useState();
 	return (
 		<ToggleGroupControl
+			{ ...props }
 			onChange={ setState }
 			value={ state }
 			label={ 'With icons' }
@@ -154,8 +163,11 @@ export const WithIcons = () => {
 		</ToggleGroupControl>
 	);
 };
+WithIcons.args = {
+	...Default.args,
+};
 
-export const WithReset = () => {
+export const WithReset = ( props ) => {
 	const [ alignState, setAlignState ] = useState();
 	const aligns = [ 'Left', 'Center', 'Right' ];
 	const alignOptions = aligns.map( ( key, index ) => (
@@ -172,6 +184,7 @@ export const WithReset = () => {
 	return (
 		<View>
 			<ToggleGroupControl
+				{ ...props }
 				onChange={ setAlignState }
 				value={ alignState }
 				label={ 'Toggle Group Control' }
@@ -184,4 +197,7 @@ export const WithReset = () => {
 			</Button>
 		</View>
 	);
+};
+WithReset.args = {
+	...Default.args,
 };

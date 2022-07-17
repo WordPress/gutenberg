@@ -8,7 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockTypesList from '../block-types-list';
 import { store as blockEditorStore } from '../../store';
-import { filterInserterItems } from './utils';
+import { createInserterSection, filterInserterItems } from './utils';
 
 function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 	const { items } = useSelect(
@@ -23,10 +23,12 @@ function ReusableBlocksTab( { onSelect, rootClientId, listProps } ) {
 		[ rootClientId ]
 	);
 
+	const sections = [ createInserterSection( { key: 'reuseable', items } ) ];
+
 	return (
 		<BlockTypesList
 			name="ReusableBlocks"
-			items={ items }
+			sections={ sections }
 			onSelect={ onSelect }
 			listProps={ listProps }
 		/>

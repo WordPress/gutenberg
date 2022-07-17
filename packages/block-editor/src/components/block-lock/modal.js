@@ -88,6 +88,11 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
+			<p>
+				{ __(
+					'Choose specific attributes to restrict or lock all available options.'
+				) }
+			</p>
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
@@ -100,11 +105,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					onClose();
 				} }
 			>
-				<p>
-					{ __(
-						'Choose specific attributes to restrict or lock all available options.'
-					) }
-				</p>
 				<div
 					role="group"
 					aria-labelledby={ instanceId }

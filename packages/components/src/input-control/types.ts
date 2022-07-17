@@ -102,6 +102,8 @@ export interface InputFieldProps extends BaseProps {
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >
 	) => void;
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	/**
@@ -152,12 +154,17 @@ export interface InputControlProps
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
 		 *
-		 * `isFocused` and `setIsFocused` are managed internally by the InputControl, but the rest of the props
-		 * for InputField are passed through.
+		 * `isFocused`, `setIsFocused`, `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
+		 * the InputControl, but the rest of the props for InputField are passed through.
 		 */
 		Omit<
 			WordPressComponentProps< InputFieldProps, 'input', false >,
-			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
+			| 'stateReducer'
+			| 'prefix'
+			| 'isFocused'
+			| 'setIsFocused'
+			| 'paddingInlineStart'
+			| 'paddingInlineEnd'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { snakeCase, camelCase, upperFirst } = require( 'lodash' );
+const { camelCase, snakeCase } = require( 'change-case' );
 
 /**
  * Internal dependencies
@@ -12,6 +12,10 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+
+function upperFirst( str ) {
+	return str.charAt( 0 ).toUpperCase() + str.substr( 1 );
+}
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },

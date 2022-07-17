@@ -11,19 +11,14 @@ import {
  * Internal dependencies
  */
 import { migrateToQuoteV2 } from '../deprecated';
-import * as paragraph from '../../../paragraph';
-import * as quote from '../../../quote';
-import * as quoteV2 from '../../../quote/v2';
+import * as paragraph from '../../paragraph';
+import * as quote from '../../quote';
 
 describe( 'Migrate quote block', () => {
 	beforeAll( () => {
 		registerBlockType(
 			{ name: paragraph.name, ...paragraph.metadata },
 			paragraph.settings
-		);
-		registerBlockType(
-			{ name: quote.name, ...quote.metadata },
-			quoteV2.settings
 		);
 	} );
 

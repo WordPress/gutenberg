@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'chunk',
 							'clamp',
+							'compact',
 							'concat',
 							'countBy',
 							'defaults',
@@ -94,6 +95,7 @@ module.exports = {
 							'findLast',
 							'flatten',
 							'flattenDeep',
+							'fromPairs',
 							'identity',
 							'invoke',
 							'isArray',
@@ -121,6 +123,7 @@ module.exports = {
 							'repeat',
 							'reverse',
 							'size',
+							'snakeCase',
 							'stubFalse',
 							'stubTrue',
 							'sum',

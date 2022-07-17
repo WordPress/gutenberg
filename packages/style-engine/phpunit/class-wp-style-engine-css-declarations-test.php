@@ -105,4 +105,50 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 			$css_declarations->get_declarations_string()
 		);
 	}
+
+	/**
+	 * Should remove a declaration
+	 */
+	public function test_remove_declaration() {
+		$input_declarations = array(
+			'color'       => 'tomato',
+			'margin'      => '10em 10em 20em 1px',
+			'font-family' => 'Happy Font serif',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'color: tomato; margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			$css_declarations->get_declarations_string()
+		);
+
+		$css_declarations->remove_declaration( 'color' );
+		$this->assertSame(
+			'margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			$css_declarations->get_declarations_string()
+		);
+	}
+
+	/**
+	 * Should remove declarations
+	 */
+	public function test_remove_declarations() {
+		$input_declarations = array(
+			'color'       => 'cucumber',
+			'margin'      => '10em 10em 20em 1px',
+			'font-family' => 'Happy Font serif',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'color: cucumber; margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			$css_declarations->get_declarations_string()
+		);
+
+		$css_declarations->remove_declarations( array( 'color', 'margin' ) );
+		$this->assertSame(
+			'font-family: Happy Font serif;',
+			$css_declarations->get_declarations_string()
+		);
+	}
 }

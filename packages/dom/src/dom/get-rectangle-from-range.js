@@ -4,11 +4,12 @@
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
- * Get the rectangle of a given Range.
+ * Get the rectangle of a given Range. Returns `null` if no suitable rectangle
+ * can be found.
  *
  * @param {Range} range The range.
  *
- * @return {DOMRect} The rectangle.
+ * @return {DOMRect?} The rectangle.
  */
 export default function getRectangleFromRange( range ) {
 	// For uncollapsed ranges, get the rectangle that bounds the contents of the
@@ -73,7 +74,15 @@ export default function getRectangleFromRange( range ) {
 		range.setEnd( parentNode, index );
 	}
 
-	let rect = range.getClientRects()[ 0 ];
+	const rects = range.getClientRects();
+
+	// If we have multiple rectangles for a collapsed range, there's no way to
+	// know which it is, so don't return anything.
+	if ( rects.length > 1 ) {
+		return null;
+	}
+
+	let rect = rects[ 0 ];
 
 	// If the collapsed range starts (and therefore ends) at an element node,
 	// `getClientRects` can be empty in some browsers. This can be resolved

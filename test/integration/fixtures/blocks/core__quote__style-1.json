@@ -3,9 +3,19 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>",
+			"value": "",
 			"citation": "Matt Mullenweg, 2017"
 		},
-		"innerBlocks": []
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
 	}
 ]

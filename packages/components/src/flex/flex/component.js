@@ -33,27 +33,21 @@ function Flex( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import {
- * 	__experimentalFlex as Flex,
- * 	__experimentalFlexBlock as FlexBlock,
- * 	__experimentalFlexItem as FlexItem,
- * 	__experimentalText as Text
- * } from `@wordpress/components`;
+ * import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
  *
  * function Example() {
- * 	return (
- * 		<Flex>
- * 			<FlexItem>
- * 				<Text>Code</Text>
- * 			</FlexItem>
- * 			<FlexBlock>
- * 				<Text>Poetry</Text>
- * 			</FlexBlock>
- * 		</Flex>
- * 	);
+ *   return (
+ *     <Flex>
+ *       <FlexItem>
+ *         <p>Code</p>
+ *       </FlexItem>
+ *       <FlexBlock>
+ *         <p>Poetry</p>
+ *       </FlexBlock>
+ *     </Flex>
+ *   );
  * }
  * ```
- *
  */
 const ConnectedFlex = contextConnect( Flex, 'Flex' );
 
