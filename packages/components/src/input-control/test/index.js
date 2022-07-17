@@ -95,7 +95,7 @@ describe( 'InputControl', () => {
 					spy( value );
 				};
 				const onKeyDown = ( { key } ) => {
-					if ( key === 'Escape' ) setState( 'three' );
+					if ( key === 'Escape' ) setState( '' );
 				};
 				return (
 					<InputControl
@@ -112,7 +112,7 @@ describe( 'InputControl', () => {
 			// Make a controlled update.
 			await user.keyboard( '{Escape}' );
 
-			expect( input ).toHaveValue( 'three' );
+			expect( input ).toHaveValue( '' );
 			/*
 			 * onChange called only once. onChange is not called when a
 			 * parent component explicitly passed a (new value) change down to
