@@ -128,7 +128,7 @@ function Tooltip( props ) {
 		// instance property and remove its own event handler. The bind is
 		// made on the document since the `mouseup` might not occur within
 		// the bounds of the element.
-		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+		document.addEventListener( 'mouseup', cancelIsMouseDown );
 		setIsMouseDown( true );
 	};
 
