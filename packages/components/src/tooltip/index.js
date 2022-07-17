@@ -112,6 +112,10 @@ function Tooltip( props ) {
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
 
 	const createMouseDown = ( event ) => {
+		if ( event.target.tagName === 'OPTION' ) {
+			return;
+		}
+
 		// Preserve original child callback behavior.
 		emitToChild( children, 'onMouseDown', event );
 
@@ -119,7 +123,7 @@ function Tooltip( props ) {
 		// instance property and remove its own event handler. The bind is
 		// made on the document since the `mouseup` might not occur within
 		// the bounds of the element.
-		document.addEventListener( 'mouseup', cancelIsMouseDown );
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 		setIsMouseDown( true );
 	};
 
