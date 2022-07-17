@@ -116,6 +116,7 @@ function Tooltip( props ) {
 		// list is chosen.
 		// Cancel further processing because re-rendering of child components
 		// causes onChange to be triggered with the old value.
+		// See https://github.com/WordPress/gutenberg/pull/42483
 		if ( event.target.tagName === 'OPTION' ) {
 			return;
 		}
