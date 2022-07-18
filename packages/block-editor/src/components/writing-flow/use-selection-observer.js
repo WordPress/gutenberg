@@ -97,14 +97,17 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					const selectedNode = extractSelectionStartNode( selection );
+					let selectedNode = extractSelectionStartNode( selection );
 
 					setContentEditableWrapper( node, false );
 
-					if (
-						selectedNode.nodeType === selectedNode.ELEMENT_NODE &&
-						selectedNode.hasAttribute( 'tabindex' )
-					) {
+					if ( selectedNode.nodeType !== selectedNode.ELEMENT_NODE ) {
+						selectedNode = selectedNode.parentElement;
+					}
+
+					selectedNode = selectedNode.closest( '[tabindex]' );
+
+					if ( selectedNode.hasAttribute( 'tabindex' ) ) {
 						selectedNode.focus();
 					}
 
