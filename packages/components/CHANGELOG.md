@@ -17,6 +17,7 @@
 -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
 -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+-   `BorderBoxControl`: Improve accessibility and labelling ([#42351](https://github.com/WordPress/gutenberg/pull/42351)).
 
 ### Internal
 
