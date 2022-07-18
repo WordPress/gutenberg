@@ -19,8 +19,9 @@
 
 .block-library-template-part__selection-search {
 	background: $white;
-	padding-top: $grid-unit-20;
-	position: sticky;
-	top: 0;
-	z-index: z-index(".block-library-template-part__selection-search");
+	position: absolute;
+	top: $grid-unit-20;
+	// Gap + close button size + header padding.
+	right: $grid-unit-10 + $button-size + $grid-unit-40;
+	z-index: z-index(".block-editor-template-part__selection-modal");
 }
