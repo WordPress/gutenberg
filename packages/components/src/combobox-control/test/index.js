@@ -50,7 +50,7 @@ const timezones = [
 
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
-const getInput = () => screen.getByRole( 'combobox' );
+const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getRenderedOptions = () => screen.getAllByRole( 'option' );
 const setupUser = () =>
 	userEvent.setup( {
@@ -77,7 +77,7 @@ describe( 'ComboboxControl', () => {
 	it( 'should render', () => {
 		render( <TestComboboxControl /> );
 
-		const input = getInput();
+		const input = getInput( defaultLabelText );
 		expect( input ).toBeVisible();
 	} );
 
@@ -101,7 +101,7 @@ describe( 'ComboboxControl', () => {
 	it( 'should render with the correct options', () => {
 		render( <TestComboboxControl /> );
 
-		getInput().focus();
+		getInput( defaultLabelText ).focus();
 
 		const renderedOptions = getRenderedOptions();
 
@@ -121,7 +121,7 @@ describe( 'ComboboxControl', () => {
 		const user = setupUser();
 		render( <TestComboboxControl /> );
 		const targetIndex = 2;
-		const input = getInput();
+		const input = getInput( defaultLabelText );
 		input.focus();
 		await user.click(
 			screen.getByRole( 'option', {
