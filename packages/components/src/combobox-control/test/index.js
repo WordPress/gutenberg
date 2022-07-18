@@ -49,7 +49,7 @@ const timezones = [
 ];
 
 const defaultLabelText = 'Select a timezone';
-const getLabel = () => screen.getByText( defaultLabelText );
+const getLabel = ( labelText ) => screen.getByText( labelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
@@ -59,7 +59,7 @@ const setupUser = () =>
 	} );
 
 describe( 'ComboboxControl', () => {
-	const TestComboboxControl = ( { onChange, ...props } ) => {
+	const TestComboboxControl = ( { label, onChange, ...props } ) => {
 		const [ value, setValue ] = useState( null );
 		const handleOnChange = ( newValue ) => {
 			setValue( newValue );
@@ -70,7 +70,7 @@ describe( 'ComboboxControl', () => {
 				<ComboboxControl
 					{ ...props }
 					value={ value }
-					label={ defaultLabelText }
+					label={ label }
 					options={ timezones }
 					onChange={ handleOnChange }
 				/>
@@ -79,21 +79,26 @@ describe( 'ComboboxControl', () => {
 	};
 
 	it( 'should render', () => {
-		render( <TestComboboxControl /> );
+		render( <TestComboboxControl label={ defaultLabelText } /> );
 
 		const input = getInput( defaultLabelText );
 		expect( input ).toBeVisible();
 	} );
 
 	it( 'should render with visible label', () => {
-		render( <TestComboboxControl /> );
-		const label = getLabel();
+		render( <TestComboboxControl label={ defaultLabelText } /> );
+		const label = getLabel( defaultLabelText );
 		expect( label ).toBeVisible();
 	} );
 
 	it( 'should render with hidden label', () => {
-		render( <TestComboboxControl hideLabelFromVision={ true } /> );
-		const label = getLabel();
+		render(
+			<TestComboboxControl
+				label={ defaultLabelText }
+				hideLabelFromVision={ true }
+			/>
+		);
+		const label = getLabel( defaultLabelText );
 
 		expect( label ).toBeInTheDocument();
 		expect( label ).toHaveAttribute(
@@ -103,7 +108,7 @@ describe( 'ComboboxControl', () => {
 	} );
 
 	it( 'should render with the correct options', () => {
-		render( <TestComboboxControl /> );
+		render( <TestComboboxControl label={ defaultLabelText } /> );
 
 		getInput( defaultLabelText ).focus();
 
@@ -125,7 +130,12 @@ describe( 'ComboboxControl', () => {
 		const user = setupUser();
 		const targetOption = timezones[ 2 ];
 		const onChangeSpy = jest.fn();
-		render( <TestComboboxControl onChange={ onChangeSpy } /> );
+		render(
+			<TestComboboxControl
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+			/>
+		);
 		const input = getInput( defaultLabelText );
 
 		// Clicking on the input shows the options
