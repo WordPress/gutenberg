@@ -92,30 +92,30 @@ const positionToPlacement = ( position ) => {
 };
 
 const placementToAnimationOrigin = ( placement ) => {
-	const [ a, b ] = placement.split( '-' );
+	const [ placementX, placementY ] = placement.split( '-' );
 
-	let x, y;
-	if ( a === 'top' || a === 'bottom' ) {
-		x = a === 'top' ? 'bottom' : 'top';
-		y = 'middle';
-		if ( b === 'start' ) {
-			y = 'left';
-		} else if ( b === 'end' ) {
-			y = 'right';
+	let animOriginX, animOriginY;
+	if ( placementX === 'top' || placementX === 'bottom' ) {
+		animOriginX = placementX === 'top' ? 'bottom' : 'top';
+		animOriginY = 'middle';
+		if ( placementY === 'start' ) {
+			animOriginY = 'left';
+		} else if ( placementY === 'end' ) {
+			animOriginY = 'right';
 		}
 	}
 
-	if ( a === 'left' || a === 'right' ) {
-		x = 'center';
-		y = a === 'left' ? 'right' : 'left';
-		if ( b === 'start' ) {
-			x = 'top';
-		} else if ( b === 'end' ) {
-			x = 'bottom';
+	if ( placementX === 'left' || placementX === 'right' ) {
+		animOriginX = 'center';
+		animOriginY = placementX === 'left' ? 'right' : 'left';
+		if ( placementY === 'start' ) {
+			animOriginX = 'top';
+		} else if ( placementY === 'end' ) {
+			animOriginX = 'bottom';
 		}
 	}
 
-	return x + ' ' + y;
+	return animOriginX + ' ' + animOriginY;
 };
 
 const Popover = (
