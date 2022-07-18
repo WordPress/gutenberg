@@ -21,7 +21,6 @@ import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
-import { getCurrentUser } from './user';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
 interface StorageState {
@@ -133,7 +132,6 @@ class RequestUtils {
 	uploadMedia = uploadMedia.bind( this );
 	deleteMedia = deleteMedia.bind( this );
 	deleteAllMedia = deleteAllMedia.bind( this );
-	getCurrentUser = getCurrentUser.bind( this );
 }
 
 export type { StorageState };

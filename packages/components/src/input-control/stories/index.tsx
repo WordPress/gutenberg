@@ -40,13 +40,13 @@ Default.args = {
 export const WithPrefix = Template.bind( {} );
 WithPrefix.args = {
 	...Default.args,
-	prefix: <span style={ { paddingLeft: 8 } }>@</span>,
+	prefix: <span style={ { marginInlineStart: 8 } }>@</span>,
 };
 
 export const WithSuffix = Template.bind( {} );
 WithSuffix.args = {
 	...Default.args,
-	suffix: <button style={ { marginRight: 4 } }>Send</button>,
+	suffix: <button style={ { marginInlineEnd: 4 } }>Send</button>,
 };
 
 export const WithSideLabel = Template.bind( {} );

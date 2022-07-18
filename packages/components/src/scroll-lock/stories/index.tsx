@@ -64,18 +64,33 @@ export const Default: ComponentStory< typeof ScrollLock > = () => {
 	const toggleLock = () => setScrollLocked( ! isScrollLocked );
 
 	return (
-		<StripedBackground>
-			<div>Start scrolling down...</div>
-			<ToggleContainer>
-				<Button variant="primary" onClick={ toggleLock }>
-					Toggle Scroll Lock
-				</Button>
-				{ isScrollLocked && <ScrollLock /> }
-				<p>
-					Scroll locked:{ ' ' }
-					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
-				</p>
-			</ToggleContainer>
-		</StripedBackground>
+		<div style={ { height: 1000 } }>
+			<div
+				style={ {
+					overflow: 'auto',
+					height: 240,
+					border: '1px solid lightgray',
+				} }
+			>
+				<StripedBackground>
+					<div>
+						Start scrolling down. Once you scroll to the end of this
+						container with the stripes, the rest of the page will
+						continue scrolling. <code>ScrollLock</code> prevents
+						this &quot;scroll bleed&quot; from happening.
+					</div>
+					<ToggleContainer>
+						<Button variant="primary" onClick={ toggleLock }>
+							Toggle Scroll Lock
+						</Button>
+						{ isScrollLocked && <ScrollLock /> }
+						<p>
+							Scroll locked:{ ' ' }
+							<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+						</p>
+					</ToggleContainer>
+				</StripedBackground>
+			</div>
+		</div>
 	);
 };
