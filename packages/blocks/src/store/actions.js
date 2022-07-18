@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { castArray, isPlainObject, omit, pick, some } from 'lodash';
+import isPlainObject from 'is-plain-obj';
+import { castArray, omit, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies

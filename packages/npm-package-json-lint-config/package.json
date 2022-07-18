@@ -26,6 +26,9 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"dependencies": {
+		"is-plain-obj": "^4.1.0"
+	},
 	"peerDependencies": {
 		"npm-package-json-lint": ">=3.6.0"
 	},

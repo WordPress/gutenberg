@@ -106,6 +106,7 @@ module.exports = {
 							'isNumber',
 							'isObject',
 							'isObjectLike',
+							'isPlainObject',
 							'isString',
 							'isUndefined',
 							'keyBy',
