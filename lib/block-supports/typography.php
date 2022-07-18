@@ -451,17 +451,17 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Checks if fluid font sizes are activated.
 	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
-	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && true === $typography_settings['fluid'] ? true : $should_use_fluid_typography;
+	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && ! empty( $typography_settings['fluid'] ) ? true : $should_use_fluid_typography;
 
 	if ( ! $should_use_fluid_typography ) {
 		return $preset['size'];
 	}
 
 	// Defaults.
-	$default_maximum_viewport_width   = '1600px';
-	$default_minimum_viewport_width   = '768px';
-	$default_minimum_font_size_factor = 0.75;
-	$default_scale_factor             = 1;
+	$default_maximum_viewport_width   = isset( $fluid_settings['maxViewPortWidth'] ) ? $fluid_settings['maxViewPortWidth'] : '1600px';
+	$default_minimum_viewport_width   = isset( $fluid_settings['minViewPortWidth'] ) ? $fluid_settings['minViewPortWidth'] : '768px';
+	$default_minimum_font_size_factor = isset( $fluid_settings['minFontSizeFactor'] ) && is_numeric( $fluid_settings['minFontSizeFactor'] ) ? $fluid_settings['minFontSizeFactor'] : 0.75;
+	$default_scale_factor             = isset( $fluid_settings['scaleFactor'] ) && is_numeric( $fluid_settings['scaleFactor'] ) ? $fluid_settings['scaleFactor'] : 1;
 	$default_minimum_font_size_limit  = '14px';
 
 	// Font sizes.

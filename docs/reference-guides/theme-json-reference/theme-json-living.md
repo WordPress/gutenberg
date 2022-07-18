@@ -119,7 +119,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | boolean |  |  |
+| fluid | object |  |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
