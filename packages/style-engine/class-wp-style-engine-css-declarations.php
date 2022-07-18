@@ -146,9 +146,9 @@ class WP_Style_Engine_CSS_Declarations {
 	 *
 	 * @return string The hash.
 	 */
-	public function get_hash() {
+	public function get_json() {
 		$declarations = $this->get_declarations();
 		ksort( $declarations );
-		return md5( json_encode( $declarations ) );
+		return json_encode( $declarations );
 	}
 }

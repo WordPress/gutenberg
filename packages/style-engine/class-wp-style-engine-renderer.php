@@ -59,16 +59,16 @@ class WP_Style_Engine_Renderer {
 	 * @return void
 	 */
 	private function combine_rules_selectors() {
-		$rules           = $this->store->get_all_rules();
-		$selector_hashes = array();
+		$rules          = $this->store->get_all_rules();
+		$selectors_json = array();
 		foreach ( $rules as $selector => $rule ) {
-			$selector_hashes[ $selector ] = $rule->get_declarations()->get_hash();
+			$selectors_json[ $selector ] = $rule->get_declarations()->get_json();
 		}
 
 		// Combine selectors that have the same styles.
-		foreach ( $selector_hashes as $selector => $hash ) {
+		foreach ( $selectors_json as $selector => $hash ) {
 			// Get selectors that use the same styles.
-			$duplicates = array_keys( $selector_hashes, $hash, true );
+			$duplicates = array_keys( $selectors_json, $hash, true );
 			// Skip if there are no duplicates.
 			if ( 1 >= count( $duplicates ) ) {
 				continue;
@@ -77,7 +77,7 @@ class WP_Style_Engine_Renderer {
 			$declarations = $rules[ $selector ]->get_declarations();
 			foreach ( $duplicates as $key ) {
 				// Unset the duplicates from the hashes array to avoid looping through them as well.
-				unset( $selector_hashes[ $key ] );
+				unset( $selectors_json[ $key ] );
 				// Remove the rules from the store.
 				$this->store->remove_rule( $key );
 			}
