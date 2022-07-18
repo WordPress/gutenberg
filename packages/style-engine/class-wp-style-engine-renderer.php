@@ -85,7 +85,7 @@ class WP_Style_Engine_Renderer {
 			$new_rule = $this->store->add_rule( implode( ',', $duplicates ) );
 			// Set the declarations. The extra check is in place because `add_rule` in the store can return `null`.
 			if ( $new_rule ) {
-				$new_rule->set_declarations( $declarations );
+				$new_rule->add_declarations( $declarations );
 			}
 		}
 	}

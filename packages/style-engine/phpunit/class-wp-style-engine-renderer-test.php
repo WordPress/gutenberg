@@ -20,13 +20,13 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	public function test_return_store_rules_as_css() {
 		$a_nice_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'nice' );
 		$a_nice_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_nice_store );
-		$a_nice_store->add_rule( '.a-nice-rule' )->set_declarations(
+		$a_nice_store->add_rule( '.a-nice-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--nice-color)',
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_store->add_rule( '.a-nicer-rule' )->set_declarations(
+		$a_nice_store->add_rule( '.a-nicer-rule' )->add_declarations(
 			array(
 				'font-family'      => 'Nice sans',
 				'font-size'        => '1em',
@@ -43,13 +43,13 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	public function test_dedupe_and_merge_css_declarations() {
 		$an_excellent_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'excellent' );
 		$an_excellent_renderer = new WP_Style_Engine_Renderer_Gutenberg( $an_excellent_store );
-		$an_excellent_store->add_rule( '.an-excellent-rule' )->set_declarations(
+		$an_excellent_store->add_rule( '.an-excellent-rule' )->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
 				'border-style' => 'dotted',
 			)
 		);
-		$an_excellent_store->add_rule( '.an-excellent-rule' )->set_declarations(
+		$an_excellent_store->add_rule( '.an-excellent-rule' )->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
 				'border-style' => 'dotted',
@@ -59,7 +59,7 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( '.an-excellent-rule {color: var(--excellent-color); border-style: dotted; border-color: brown;}', $an_excellent_renderer->get_css() );
 
-		$an_excellent_store->add_rule( '.an-excellent-rule' )->set_declarations(
+		$an_excellent_store->add_rule( '.an-excellent-rule' )->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
 				'border-style' => 'dashed',
@@ -76,13 +76,13 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	public function test_combine_css_rules() {
 		$a_sweet_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'sweet' );
 		$a_sweet_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_sweet_store );
-		$a_sweet_store->add_rule( '.a-sweet-rule' )->set_declarations(
+		$a_sweet_store->add_rule( '.a-sweet-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--sweet-color)',
 				'background-color' => 'purple',
 			)
 		);
-		$a_sweet_store->add_rule( '#an-even-sweeter-rule > marquee' )->set_declarations(
+		$a_sweet_store->add_rule( '#an-even-sweeter-rule > marquee' )->add_declarations(
 			array(
 				'color'            => 'var(--sweet-color)',
 				'background-color' => 'purple',
@@ -98,12 +98,12 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	public function test_store_combined_css_rules() {
 		$a_lovely_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'lovely' );
 		$a_lovely_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_lovely_store );
-		$a_lovely_store->add_rule( '.a-lovely-rule' )->set_declarations(
+		$a_lovely_store->add_rule( '.a-lovely-rule' )->add_declarations(
 			array(
 				'border-color' => 'purple',
 			)
 		);
-		$a_lovely_store->add_rule( '.a-lovelier-rule' )->set_declarations(
+		$a_lovely_store->add_rule( '.a-lovelier-rule' )->add_declarations(
 			array(
 				'border-color' => 'purple',
 			)
@@ -111,12 +111,12 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule {border-color: purple;}', $a_lovely_renderer->get_css() );
 
-		$a_lovely_store->add_rule( '.a-most-lovely-rule' )->set_declarations(
+		$a_lovely_store->add_rule( '.a-most-lovely-rule' )->add_declarations(
 			array(
 				'border-color' => 'purple',
 			)
 		);
-		$a_lovely_store->add_rule( '.a-perfectly-lovely-rule' )->set_declarations(
+		$a_lovely_store->add_rule( '.a-perfectly-lovely-rule' )->add_declarations(
 			array(
 				'border-color' => 'purple',
 			)
