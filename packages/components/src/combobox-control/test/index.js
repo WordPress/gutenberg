@@ -51,6 +51,7 @@ const timezones = [
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
+const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const setupUser = () =>
 	userEvent.setup( {
@@ -58,8 +59,12 @@ const setupUser = () =>
 	} );
 
 describe( 'ComboboxControl', () => {
-	const TestComboboxControl = ( props ) => {
+	const TestComboboxControl = ( { onChange, ...props } ) => {
 		const [ value, setValue ] = useState( null );
+		const handleOnChange = ( newValue ) => {
+			setValue( newValue );
+			onChange?.( newValue );
+		};
 		return (
 			<>
 				<ComboboxControl
@@ -67,9 +72,8 @@ describe( 'ComboboxControl', () => {
 					value={ value }
 					label={ defaultLabelText }
 					options={ timezones }
-					onChange={ setValue }
+					onChange={ handleOnChange }
 				/>
-				<p data-testid="value-output">{ value }</p>
 			</>
 		);
 	};
@@ -117,20 +121,21 @@ describe( 'ComboboxControl', () => {
 		expect( renderedOptionNames ).toEqual( timezoneNames );
 	} );
 
-	it( 'should select the correct option with click', async () => {
+	it( 'should select the correct option via click events', async () => {
 		const user = setupUser();
-		render( <TestComboboxControl /> );
-		const targetIndex = 2;
+		const targetOption = timezones[ 2 ];
+		const onChangeSpy = jest.fn();
+		render( <TestComboboxControl onChange={ onChangeSpy } /> );
 		const input = getInput( defaultLabelText );
-		input.focus();
-		await user.click(
-			screen.getByRole( 'option', {
-				name: timezones[ targetIndex ].label,
-			} )
-		);
-		const currentValue = screen.getByTestId( 'value-output' ).textContent;
 
-		expect( input.value ).toEqual( timezones[ targetIndex ].label );
-		expect( currentValue ).toEqual( timezones[ targetIndex ].value );
+		// Clicking on the input shows the options
+		await user.click( input );
+
+		// Select the target option
+		await user.click( getOption( targetOption.label ) );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+		expect( input ).toHaveValue( targetOption.name );
 	} );
 } );
