@@ -43,7 +43,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 		const siteSettings = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )
-			: {};
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
