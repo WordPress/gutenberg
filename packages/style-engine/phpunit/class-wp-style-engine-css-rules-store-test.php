@@ -52,7 +52,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 			'border-radius' => '10rem',
 		);
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $pie_declarations );
-		$store_rule->set_declarations( $css_declarations );
+		$store_rule->add_declarations( $css_declarations );
 
 		$store_rule = $new_pie_store->add_rule( $selector );
 		$expected   = "$selector {{$css_declarations->get_declarations_string()}}";
@@ -78,7 +78,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 			'border-radius' => '10rem',
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $pizza_declarations );
-		$store_rule->set_declarations( array( $css_declarations ) );
+		$store_rule->add_declarations( array( $css_declarations ) );
 
 		$expected = array(
 			$selector => $store_rule,
@@ -91,7 +91,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 			'font-size'    => '10rem',
 		);
 		$css_declarations       = new WP_Style_Engine_CSS_Declarations( $new_pizza_declarations );
-		$store_rule->set_declarations( array( $css_declarations ) );
+		$store_rule->add_declarations( array( $css_declarations ) );
 
 		$expected = array(
 			$selector => $store_rule,
@@ -104,7 +104,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		);
 		$new_store_rule           = $new_pizza_store->add_rule( $new_selector );
 		$css_declarations         = new WP_Style_Engine_CSS_Declarations( $newer_pizza_declarations );
-		$new_store_rule->set_declarations( array( $css_declarations ) );
+		$new_store_rule->add_declarations( array( $css_declarations ) );
 
 		$expected = array(
 			$selector     => $store_rule,
