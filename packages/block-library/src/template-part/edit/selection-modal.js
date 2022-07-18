@@ -25,7 +25,7 @@ import {
 	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 import { createTemplatePartId } from './utils/create-template-part-id';
-import { searchItems } from './utils/search';
+import { searchPatterns } from './utils/search';
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,
@@ -52,12 +52,12 @@ export default function TemplatePartSelectionModal( {
 			templatePart,
 		} ) );
 
-		return searchItems( partsAsPatterns, searchValue );
+		return searchPatterns( partsAsPatterns, searchValue );
 	}, [ templateParts, searchValue ] );
 	const shownTemplateParts = useAsyncList( filteredTemplateParts );
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const filteredBlockPatterns = useMemo( () => {
-		return searchItems( blockPatterns, searchValue );
+		return searchPatterns( blockPatterns, searchValue );
 	}, [ blockPatterns, searchValue ] );
 	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
