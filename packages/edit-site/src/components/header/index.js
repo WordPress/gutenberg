@@ -12,7 +12,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, external } from '@wordpress/icons';
-import { Button, ToolbarItem, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	Button,
+	ToolbarItem,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -108,8 +113,6 @@ export default function Header( {
 	);
 
 	const isFocusMode = templateType === 'wp_template_part';
-
-
 
 	return (
 		<div className="edit-site-header">
