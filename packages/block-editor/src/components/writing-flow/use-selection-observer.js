@@ -107,7 +107,10 @@ export default function useSelectionObserver() {
 
 					selectedNode = selectedNode.closest( '[tabindex]' );
 
-					if ( selectedNode.hasAttribute( 'tabindex' ) ) {
+					if (
+						node.contains( selectedNode ) &&
+						selectedNode !== node
+					) {
 						selectedNode.focus();
 					}
 
