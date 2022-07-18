@@ -15,44 +15,39 @@ import { useState } from '@wordpress/element';
 import ComboboxControl from '../';
 
 const timezones = [
-	{ name: 'Greenwich Mean Time', abbreviation: 'GMT' },
-	{ name: 'Universal Coordinated Time', abbreviation: 'UTC' },
-	{ name: 'European Central Time', abbreviation: 'ECT' },
-	{ name: '(Arabic) Egypt Standard Time', abbreviation: 'ART' },
-	{ name: 'Eastern African Time', abbreviation: 'EAT' },
-	{ name: 'Middle East Time', abbreviation: 'MET' },
-	{ name: 'Near East Time', abbreviation: 'NET' },
-	{ name: 'Pakistan Lahore Time', abbreviation: 'PLT' },
-	{ name: 'India Standard Time', abbreviation: 'IST' },
-	{ name: 'Bangladesh Standard Time', abbreviation: 'BST' },
-	{ name: 'Vietnam Standard Time', abbreviation: 'VST' },
-	{ name: 'China Taiwan Time', abbreviation: 'CTT' },
-	{ name: 'Japan Standard Time', abbreviation: 'JST' },
-	{ name: 'Australia Central Time', abbreviation: 'ACT' },
-	{ name: 'Australia Eastern Time', abbreviation: 'AET' },
-	{ name: 'Solomon Standard Time', abbreviation: 'SST' },
-	{ name: 'New Zealand Standard Time', abbreviation: 'NST' },
-	{ name: 'Midway Islands Time', abbreviation: 'MIT' },
-	{ name: 'Hawaii Standard Time', abbreviation: 'HST' },
-	{ name: 'Alaska Standard Time', abbreviation: 'AST' },
-	{ name: 'Pacific Standard Time', abbreviation: 'PST' },
-	{ name: 'Phoenix Standard Time', abbreviation: 'PNT' },
-	{ name: 'Mountain Standard Time', abbreviation: 'MST' },
-	{ name: 'Central Standard Time', abbreviation: 'CST' },
-	{ name: 'Eastern Standard Time', abbreviation: 'EST' },
-	{ name: 'Indiana Eastern Standard Time', abbreviation: 'IET' },
-	{ name: 'Puerto Rico and US Virgin Islands Time', abbreviation: 'PRT' },
-	{ name: 'Canada Newfoundland Time', abbreviation: 'CNT' },
-	{ name: 'Argentina Standard Time', abbreviation: 'AGT' },
-	{ name: 'Brazil Eastern Time', abbreviation: 'BET' },
-	{ name: 'Central African Time', abbreviation: 'CAT' },
+	{ label: 'Greenwich Mean Time', value: 'GMT' },
+	{ label: 'Universal Coordinated Time', value: 'UTC' },
+	{ label: 'European Central Time', value: 'ECT' },
+	{ label: '(Arabic) Egypt Standard Time', value: 'ART' },
+	{ label: 'Eastern African Time', value: 'EAT' },
+	{ label: 'Middle East Time', value: 'MET' },
+	{ label: 'Near East Time', value: 'NET' },
+	{ label: 'Pakistan Lahore Time', value: 'PLT' },
+	{ label: 'India Standard Time', value: 'IST' },
+	{ label: 'Bangladesh Standard Time', value: 'BST' },
+	{ label: 'Vietnam Standard Time', value: 'VST' },
+	{ label: 'China Taiwan Time', value: 'CTT' },
+	{ label: 'Japan Standard Time', value: 'JST' },
+	{ label: 'Australia Central Time', value: 'ACT' },
+	{ label: 'Australia Eastern Time', value: 'AET' },
+	{ label: 'Solomon Standard Time', value: 'SST' },
+	{ label: 'New Zealand Standard Time', value: 'NST' },
+	{ label: 'Midway Islands Time', value: 'MIT' },
+	{ label: 'Hawaii Standard Time', value: 'HST' },
+	{ label: 'Alaska Standard Time', value: 'AST' },
+	{ label: 'Pacific Standard Time', value: 'PST' },
+	{ label: 'Phoenix Standard Time', value: 'PNT' },
+	{ label: 'Mountain Standard Time', value: 'MST' },
+	{ label: 'Central Standard Time', value: 'CST' },
+	{ label: 'Eastern Standard Time', value: 'EST' },
+	{ label: 'Indiana Eastern Standard Time', value: 'IET' },
+	{ label: 'Puerto Rico and US Virgin Islands Time', value: 'PRT' },
+	{ label: 'Canada Newfoundland Time', value: 'CNT' },
+	{ label: 'Argentina Standard Time', value: 'AGT' },
+	{ label: 'Brazil Eastern Time', value: 'BET' },
+	{ label: 'Central African Time', value: 'CAT' },
 ];
-const mapTimezoneOption = ( tz ) => ( {
-	value: tz.abbreviation,
-	label: tz.name,
-} );
 
-const timezoneOptions = timezones.map( mapTimezoneOption );
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
 const getInput = () => screen.getByRole( 'combobox' );
@@ -71,7 +66,7 @@ describe( 'ComboboxControl', () => {
 					{ ...props }
 					value={ value }
 					label={ defaultLabelText }
-					options={ timezoneOptions }
+					options={ timezones }
 					onChange={ setValue }
 				/>
 				<p data-testid="value-output">{ value }</p>
@@ -117,7 +112,7 @@ describe( 'ComboboxControl', () => {
 		for ( const option of renderedOptions.values() ) {
 			renderedOptionNames.push( option.textContent );
 		}
-		const timezoneNames = timezones.map( ( tz ) => tz.name );
+		const timezoneNames = timezones.map( ( tz ) => tz.label );
 
 		expect( renderedOptionNames ).toEqual( timezoneNames );
 	} );
@@ -130,12 +125,12 @@ describe( 'ComboboxControl', () => {
 		input.focus();
 		await user.click(
 			screen.getByRole( 'option', {
-				name: timezones[ targetIndex ].name,
+				name: timezones[ targetIndex ].label,
 			} )
 		);
 		const currentValue = screen.getByTestId( 'value-output' ).textContent;
 
-		expect( input.value ).toEqual( timezones[ targetIndex ].name );
-		expect( currentValue ).toEqual( timezones[ targetIndex ].abbreviation );
+		expect( input.value ).toEqual( timezones[ targetIndex ].label );
+		expect( currentValue ).toEqual( timezones[ targetIndex ].value );
 	} );
 } );
