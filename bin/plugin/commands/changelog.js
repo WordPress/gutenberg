@@ -89,7 +89,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Enhancement': 'Enhancements',
 	'[Type] New API': 'New APIs',
 	'[Type] Performance': 'Performance',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'[Type] Code Quality': 'Code Quality',
 	'[Type] Security': 'Security',
 };
@@ -143,7 +143,7 @@ const LABEL_FEATURE_MAPPING = {
 	'Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
-	'[Type] Documentation': 'Documentation',
+	'[Type] Developer Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
 	'npm Packages': 'npm Packages',

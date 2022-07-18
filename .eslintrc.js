@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'chunk',
 							'clamp',
+							'compact',
 							'concat',
 							'countBy',
 							'defaults',
@@ -94,6 +95,7 @@ module.exports = {
 							'findLast',
 							'flatten',
 							'flattenDeep',
+							'fromPairs',
 							'identity',
 							'invoke',
 							'isArray',
@@ -102,6 +104,7 @@ module.exports = {
 							'isFunction',
 							'isNil',
 							'isNumber',
+							'isObject',
 							'isObjectLike',
 							'isString',
 							'isUndefined',
@@ -120,6 +123,7 @@ module.exports = {
 							'repeat',
 							'reverse',
 							'size',
+							'snakeCase',
 							'stubFalse',
 							'stubTrue',
 							'sum',
@@ -343,6 +347,12 @@ module.exports = {
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
 			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 	],
 };

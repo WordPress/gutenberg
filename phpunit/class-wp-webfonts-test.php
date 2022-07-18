@@ -399,7 +399,7 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 @font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
 EOF;
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			$expected,
 			get_echo( 'wp_print_styles' )
 		);
@@ -443,7 +443,7 @@ EOF;
 @font-face{font-family:Roboto;font-style:normal;font-weight:400;font-display:fallback;font-stretch:normal;src:local(Roboto), url('https://example.com/assets/fonts/roboto/Roboto-Regular.ttf') format('truetype');}@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
 EOF;
 
-		$this->assertContains(
+		$this->assertStringContainsString(
 			$expected,
 			get_echo( 'wp_print_styles' )
 		);

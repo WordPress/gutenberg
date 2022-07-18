@@ -91,10 +91,7 @@ const TEMPLATE = [
 export default function CommentsEdit( { attributes, setAttributes } ) {
 	const { tagName: TagName } = attributes;
 
-	const blockProps = useBlockProps( {
-		// We add the previous block name for backward compatibility.
-		className: 'wp-block-comments-query-loop',
-	} );
+	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
