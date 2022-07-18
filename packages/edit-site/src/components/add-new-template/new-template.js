@@ -38,6 +38,7 @@ import {
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
+	useAuthorMenuItem,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import { useHistory } from '../routes';
@@ -243,7 +244,9 @@ function useMissingTemplates(
 		useTaxonomiesMenuItems( onClickMenuItem );
 	const { defaultPostTypesMenuItems, postTypesMenuItems } =
 		usePostTypeMenuItems( onClickMenuItem );
-	[ ...defaultTaxonomiesMenuItems, ...defaultPostTypesMenuItems ].forEach(
+
+	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	[ ...defaultTaxonomiesMenuItems, ...defaultPostTypesMenuItems, authorMenuItem ].forEach(
 		( menuItem ) => {
 			if ( ! menuItem ) {
 				return;
