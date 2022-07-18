@@ -613,6 +613,9 @@ describe( 'Writing Flow', () => {
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
 		await page.mouse.click( x, lowerInserterY );
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
 		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

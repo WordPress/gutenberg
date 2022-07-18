@@ -264,7 +264,7 @@ exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>23</p>
+<p>32</p>
 <!-- /wp:paragraph -->"
 `;
 

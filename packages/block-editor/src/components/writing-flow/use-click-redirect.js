@@ -6,7 +6,9 @@ import { useRefEffect } from '@wordpress/compose';
 export default function useClickSelection() {
 	return useRefEffect( ( node ) => {
 		function onMouseDown( event ) {
-			if ( event.target.closest( '[contenteditable]' ) !== node ) {
+			if (
+				event.target.closest( '[contenteditable],[tabindex]' ) !== node
+			) {
 				return;
 			}
 
