@@ -761,7 +761,7 @@ export function isAutosavingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return state.saving.options?.isAutosave ?? false;
+	return Boolean( state.saving.options?.isAutosave );
 }
 
 /**
