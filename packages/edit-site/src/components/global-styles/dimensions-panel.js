@@ -90,7 +90,7 @@ function filterValuesBySides( values, sides ) {
 }
 
 function splitStyleValue( value ) {
-	// Check for shorthand value ( a string value ).
+	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
 		return {
@@ -102,6 +102,25 @@ function splitStyleValue( value ) {
 	}
 
 	return value;
+}
+
+function splitGapValue( value ) {
+	// Check for shorthand value (a string value).
+	if ( value && typeof value === 'string' ) {
+		// Convert to value for individual sides for BoxControl.
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	return {
+		...value,
+		right: value?.left,
+		bottom: value?.top,
+	};
 }
 
 // Props for managing `layout.contentSize`.
@@ -204,12 +223,29 @@ function useMarginProps( name ) {
 // Props for managing `spacing.blockGap`.
 function useBlockGapProps( name ) {
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
+	const gapValues = splitGapValue( gapValue );
+	const setGapValues = ( nextBoxGapValue ) => {
+		if ( ! nextBoxGapValue ) {
+			setGapValue( null );
+		}
+		setGapValue( {
+			top: nextBoxGapValue?.top,
+			left: nextBoxGapValue?.left,
+		} );
+	};
+	const gapSides = useCustomSides( name, 'blockGap' );
+	const isAxialGap =
+		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const resetGapValue = () => setGapValue( undefined );
 	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
 	const hasGapValue = () => !! userSetGapValue;
 	return {
 		gapValue,
+		gapValues,
+		gapSides,
+		isAxialGap,
 		setGapValue,
+		setGapValues,
 		resetGapValue,
 		hasGapValue,
 	};
@@ -268,8 +304,16 @@ export default function DimensionsPanel( { name } ) {
 	} = useMarginProps( name );
 
 	// Props for managing `spacing.blockGap`.
-	const { gapValue, setGapValue, resetGapValue, hasGapValue } =
-		useBlockGapProps( name );
+	const {
+		gapValue,
+		gapValues,
+		gapSides,
+		isAxialGap,
+		setGapValue,
+		setGapValues,
+		resetGapValue,
+		hasGapValue,
+	} = useBlockGapProps( name );
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -379,14 +423,27 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
 				>
-					<UnitControl
-						label={ __( 'Block spacing' ) }
-						__unstableInputWidth="80px"
-						min={ 0 }
-						onChange={ setGapValue }
-						units={ units }
-						value={ gapValue }
-					/>
+					{ isAxialGap ? (
+						<BoxControl
+							label={ __( 'Block spacing' ) }
+							min={ 0 }
+							onChange={ setGapValues }
+							units={ units }
+							sides={ gapSides }
+							values={ gapValues }
+							allowReset={ false }
+							splitOnAxis={ isAxialGap }
+						/>
+					) : (
+						<UnitControl
+							label={ __( 'Block spacing' ) }
+							__unstableInputWidth="80px"
+							min={ 0 }
+							onChange={ setGapValue }
+							units={ units }
+							value={ gapValue }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 		</ToolsPanel>
