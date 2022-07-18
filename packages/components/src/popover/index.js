@@ -373,7 +373,7 @@ const Popover = (
 		);
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
-	// This is only needed for a smoth transition when moving blocks.
+	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
 		if ( ! __unstableObserveElement ) {
 			return;
