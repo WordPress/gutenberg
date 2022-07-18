@@ -301,12 +301,20 @@ const Popover = (
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementProp, middleware } );
 
-	// Updates references
+	// Update the `reference`'s ref.
+	//
+	// In floating-ui's terms:
+	// - "reference" refers to the popover's anchor element.
+	// - "floating" refers the floating popover's element.
+	// A floating element can also be positioned relative to a virtual element,
+	// instead of a real one — a virtual element is represented by an object
+	// with the `getBoundingClientRect()` function (like real elements).
+	// See https://floating-ui.com/docs/virtual-elements for more info.
 	useLayoutEffect( () => {
-		// No ref or position have been passed
-		let usedRef;
+		let resultingReferenceRef;
+
 		if ( anchorRef?.top ) {
-			usedRef = {
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const topRect = anchorRef.top.getBoundingClientRect();
 					const bottomRect = anchorRef.bottom.getBoundingClientRect();
@@ -319,17 +327,21 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRef?.current ) {
-			usedRef = anchorRef.current;
+			// Use the anchor's reference (real element)
+			resultingReferenceRef = anchorRef.current;
 		} else if ( anchorRef ) {
-			usedRef = anchorRef;
+			// TODO: Is this for older-style refs?
+			resultingReferenceRef = anchorRef;
 		} else if ( anchorRect ) {
-			usedRef = {
+			// Virtual element
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					return anchorRect;
 				},
 			};
 		} else if ( getAnchorRect ) {
-			usedRef = {
+			// Virtual element
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );
 					return new window.DOMRect(
@@ -341,20 +353,24 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRefFallback.current ) {
-			usedRef = anchorRefFallback.current;
+			resultingReferenceRef = anchorRefFallback.current;
 		}
 
-		if ( ! usedRef ) {
+		if ( ! resultingReferenceRef ) {
 			return;
 		}
 
-		reference( usedRef );
+		reference( resultingReferenceRef );
 
 		if ( ! refs.floating.current ) {
 			return;
 		}
 
-		return autoUpdate( usedRef, refs.floating.current, update );
+		return autoUpdate(
+			resultingReferenceRef,
+			refs.floating.current,
+			update
+		);
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	// This is only needed for a smoth transition when moving blocks.
