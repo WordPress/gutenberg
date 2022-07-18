@@ -7,14 +7,15 @@ exports[`Slider should render correctly 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
@@ -117,9 +118,9 @@ exports[`Slider should render correctly 1`] = `
   id="slider"
   max="100"
   min="0"
-  style="--progress: 0%;"
+  style="--progress: 50%;"
   type="range"
-  value=""
+  value="50"
 />
 `;
 
@@ -130,14 +131,15 @@ exports[`Slider should render max 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
@@ -240,9 +242,9 @@ exports[`Slider should render max 1`] = `
   id="slider"
   max="50"
   min="0"
-  style="--progress: 0%;"
+  style="--progress: 100%;"
   type="range"
-  value=""
+  value="50"
 />
 `;
 
@@ -253,14 +255,15 @@ exports[`Slider should render min 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
@@ -363,9 +366,9 @@ exports[`Slider should render min 1`] = `
   id="slider"
   max="100"
   min="5"
-  style="--progress: 0%;"
+  style="--progress: 47.368421052631575%;"
   type="range"
-  value=""
+  value="50"
 />
 `;
 
@@ -376,14 +379,15 @@ exports[`Slider should render size 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
@@ -479,16 +483,20 @@ exports[`Slider should render size 1`] = `
   box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #00669b);
 }
 
+.emotion-1 {
+  height: calc( 36px * 0.8 );
+}
+
 <input
-  class="emotion-0 components-slider"
+  class="emotion-0 emotion-1 components-slider"
   data-wp-c16t="true"
   data-wp-component="Slider"
   id="slider"
   max="100"
   min="0"
-  style="--progress: 0%;"
+  style="--progress: 50%;"
   type="range"
-  value=""
+  value="50"
 />
 `;
 
@@ -499,14 +507,15 @@ exports[`Slider should render unit value 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
@@ -622,14 +631,15 @@ exports[`Slider should render value 1`] = `
   -ms-appearance: none;
   appearance: none;
   background-color: transparent;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 2px;
   cursor: pointer;
   display: block;
   height: 36px;
   max-width: 100%;
   min-width: 0;
-  padding: calc(4px * 1);
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
