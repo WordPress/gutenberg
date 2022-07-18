@@ -7,19 +7,6 @@
  */
 class WP_HTML_Processor {
 	/**
-	 * Input HTML document to process set by constructor.
-	 *
-	 * Example:
-	 * <code>
-	 *     $processor = new WP_HTML_Processor( '<div class="wp-block-group">Content</div>' );
-	 * </code>
-	 *
-	 * @var string
-	 */
-	public $input;
-
-
-	/**
 	 * Describes the constraints imposed on the HTML tag we're trying to match.
 	 *
 	 * @see WP_Tag_Find_Descriptor::parse()
@@ -27,6 +14,14 @@ class WP_HTML_Processor {
 	 * @var WP_Tag_Find_Descriptor
 	 */
 	public $descriptor;
+
+
+	/**
+	 * Tracks parsing while scanning input document.
+	 *
+	 * @var WP_HTML_Processor_Parse_State
+	 */
+	public $state;
 
 
 	/**
@@ -39,7 +34,29 @@ class WP_HTML_Processor {
 
 
 	public function __construct( $input ) {
-		$this->input = $input;
+		$this->state = new WP_HTML_Processor_Parse_State( $input );
+	}
+
+
+	public function find( WP_Tag_Find_Descriptor $descriptor ) {
+		$this->state->reset();
+		$this->descriptor = $descriptor;
+		$this->modifications = new WP_Tag_Modifications();
+	}
+
+
+	public function apply() {
+		// find tag
+		// apply modifications
+		// construct output
+
+		// @TODO: This is a stub; implement the real apply() behavior.
+		return $this->state->document;
+	}
+
+
+	public function __toString() {
+		return $this->apply();
 	}
 }
 
@@ -178,13 +195,44 @@ class WP_Tag_Find_Descriptor {
 }
 
 
-class WP_Tag_Finder_Tag {
+class WP_HTML_Processor_Parse_State {
 	/**
-	 * The matched tag name within an HTML tag match.
+	 * Input HTML document we're processing.
 	 *
 	 * @var string
 	 */
-	public $tag_name;
+	public $document;
+
+	/**
+	 * Byte offset in the input document we will start or continue parsing.
+	 *
+	 * @var int
+	 */
+	public $start_at = 0;
+
+
+	/**
+	 * Whether we've already found the tag meeting our search constraints.
+	 *
+	 * @var boolean
+	 */
+	public $did_match = false;
+
+
+	/**
+	 * Byte offset in the current tag being inspected starts, includes leading `<`.
+	 *
+	 * @var int|null
+	 */
+	public $tag_start = null;
+
+
+	/**
+	 * Start and end of matched tag name, or `null` if not yet found.
+	 *
+	 * @var array<int|string>|null
+	 */
+	public $tag_name = null;
 
 	/**
 	 * Lazily-built index of found attributes within an HTML tag match.
@@ -209,7 +257,20 @@ class WP_Tag_Finder_Tag {
 	 *
 	 * @var array<int|string>
 	 */
-	public $attributes;
+	public $attributes = array();
+
+
+	public function __construct( $input ) {
+		$this->document = $input;
+	}
+
+
+	public function reset() {
+		$this->tag_name = null;
+		$this->attributes = array();
+		$this->did_match = false;
+		$this->tag_start = null;
+	}
 }
 
 
