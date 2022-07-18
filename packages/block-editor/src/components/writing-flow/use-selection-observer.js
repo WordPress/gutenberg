@@ -102,6 +102,7 @@ export default function useSelectionObserver() {
 					setContentEditableWrapper( node, false );
 
 					if ( ! selectedNode ) return;
+					if ( selectedNode === ownerDocument.activeElement ) return;
 
 					if ( selectedNode.nodeType !== selectedNode.ELEMENT_NODE ) {
 						selectedNode = selectedNode.parentElement;
