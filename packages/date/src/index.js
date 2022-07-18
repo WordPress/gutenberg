@@ -570,9 +570,9 @@ export function getDate( dateString ) {
  */
 export function humanTimeDiff( from, to, includeAffix ) {
 	// Normalize inputs to a moment object, defaults to current time.
-	from = momentLib( from );
-	to = momentLib( to );
-	return from.from( to, ! includeAffix );
+	const momentFrom = momentLib( from );
+	const momentTo = momentLib( to );
+	return momentFrom.from( momentTo, ! includeAffix );
 }
 
 /**
