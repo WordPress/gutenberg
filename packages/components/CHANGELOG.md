@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `Tooltip`: Don't re-render child components when select list is chosen ([#42483](https://github.com/WordPress/gutenberg/pull/42483)).
+
+
 ### Enhancements
 
 -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
