@@ -5,7 +5,11 @@ import { useRefEffect } from '@wordpress/compose';
 
 export default function useClickSelection() {
 	return useRefEffect( ( node ) => {
-		function onMouseDown() {
+		function onMouseDown( event ) {
+			if ( event.target.closest( '[contenteditable]' ) !== node ) {
+				return;
+			}
+
 			node.contentEditable = true;
 			// Firefox doesn't automatically move focus.
 			node.focus();
