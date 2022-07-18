@@ -75,8 +75,6 @@ class WP_Style_Engine_Renderer {
 			if ( 1 >= count( $duplicates ) ) {
 				continue;
 			}
-			// Get the declarations.
-			$declarations = $rules[ $selector ]->get_declarations();
 			foreach ( $duplicates as $key ) {
 				// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
 				unset( $selectors_json[ $key ] );
@@ -87,7 +85,7 @@ class WP_Style_Engine_Renderer {
 			$new_rule = $this->store->add_rule( implode( ',', $duplicates ) );
 			// Set the declarations. The extra check is in place because `add_rule` in the store can return `null`.
 			if ( $new_rule ) {
-				$new_rule->add_declarations( $declarations );
+				$new_rule->add_declarations( $rules[ $selector ]->get_declarations() );
 			}
 		}
 	}
