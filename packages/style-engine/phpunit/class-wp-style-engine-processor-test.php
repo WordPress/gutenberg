@@ -8,7 +8,7 @@
 require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
 require __DIR__ . '/../class-wp-style-engine-css-rule.php';
 require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
-require __DIR__ . '/../class-wp-style-engine-renderer.php';
+require __DIR__ . '/../class-wp-style-engine-processor.php';
 
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
