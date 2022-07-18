@@ -130,6 +130,8 @@ If set to false the user will not be able to switch between visual and code edit
 
 ## Logging errors
 
+_Since WordPress 6.1._
+
 A JavaScript error in a part of the UI shouldn’t break the whole app. To solve this problem for users, React library uses a concept of an [“error boundary”](https://reactjs.org/docs/error-boundaries.html). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, and display a fallback UI instead of the component tree that crashed.
 
 ### `editor.ErrorBoundary.errorLogged`
