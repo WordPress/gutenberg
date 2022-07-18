@@ -20,6 +20,12 @@ export type SliderProps = {
 	 */
 	onChange?: ( value: string ) => void;
 	/**
+	 * Toggles which sized height the slider is rendered at.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'small' | 'default' | 'large';
+	/**
 	 * The Slider's current value.
 	 */
 	value?: string;

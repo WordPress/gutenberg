@@ -16,7 +16,14 @@ import { Slider } from '../';
 const meta: ComponentMeta< typeof Slider > = {
 	title: 'Components (Experimental)/Slider',
 	component: Slider,
-	argTypes: { onChange: { action: 'onChange' } },
+	argTypes: {
+		onChange: { action: 'onChange' },
+		size: {
+			control: 'select',
+			options: [ 'small', 'default', 'large' ],
+		},
+		value: { control: { type: null } },
+	},
 	parameters: {
 		controls: { expanded: true, exclude: [ 'heading' ] },
 		docs: { source: { state: 'open' } },

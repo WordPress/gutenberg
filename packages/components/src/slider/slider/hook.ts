@@ -8,12 +8,11 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useControlledValue } from '../../utils/hooks';
-import { useCx } from '../../utils/hooks/use-cx';
 import { useFormGroupContextId } from '../../ui/form-group';
+import { useControlledValue, useCx } from '../../utils/hooks';
+import { interpolate } from '../../utils/interpolate';
 import { parseCSSUnitValue, createCSSUnitValue } from '../../utils/unit-values';
 import { isValueNumeric } from '../../utils/values';
-import { interpolate } from '../../utils/interpolate';
 
 import type { SliderProps } from '../types';
 
@@ -33,14 +32,14 @@ export function useSlider(
 		isFocused: isFocusedProp = false,
 		max = 100,
 		min = 0,
-		size = 'medium',
+		size = 'default',
 		style,
 		value: valueProp,
 		...otherProps
 	} = useContextSystem( props, 'Slider' );
 
 	const [ _value, onChange ] = useControlledValue( {
-		defaultValue,
+		defaultValue: defaultValue || '50',
 		onChange: onChangeProp,
 		value: valueProp,
 	} );

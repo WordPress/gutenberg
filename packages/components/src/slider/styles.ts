@@ -52,14 +52,15 @@ export const focusedError = css`
 export const slider = css`
 	appearance: none;
 	background-color: transparent;
-	border: 1px solid transparent;
+	border: 0;
 	border-radius: ${ CONFIG.controlBorderRadius };
 	cursor: pointer;
 	display: block;
 	height: ${ CONFIG.controlHeight };
 	max-width: 100%;
 	min-width: 0;
-	padding: ${ space( 1 ) };
+	padding: 0;
+	margin: 0;
 	width: 100%;
 
 	&:focus {
@@ -173,4 +174,16 @@ export const error = css`
 	&:focus {
 		${ getFocusBoxShadow( errorBoxShadow ) };
 	}
+`;
+
+export const large = css`
+	/*
+	 * Uses hardcoded 40px height to match design goal instead of
+	 * CONFIG.controlHeightLarge which is only 36px.
+	 */
+	height: 40px;
+`;
+
+export const small = css`
+	height: ${ CONFIG.controlHeightSmall };
 `;
