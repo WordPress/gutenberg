@@ -37,7 +37,7 @@ class WP_Style_Engine_Processor {
 	/**
 	 * Get the CSS rules as a string.
 	 *
-	 * @return string The rendered CSS.
+	 * @return string The computed CSS.
 	 */
 	public function get_css() {
 		// Combine CSS selectors that have identical declarations.
@@ -53,13 +53,14 @@ class WP_Style_Engine_Processor {
 	}
 
 	/**
-	 * Combines selectors from the $styles_array
-	 * when they have the same styles.
+	 * Combines selectors from the rules store when they have the same styles.
 	 *
 	 * @return void
 	 */
 	private function combine_rules_selectors() {
-		$rules          = $this->store->get_all_rules();
+		$rules = $this->store->get_all_rules();
+
+		// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
 		$selectors_json = array();
 		foreach ( $rules as $selector => $rule ) {
 			$declarations = $rule->get_declarations()->get_declarations();
