@@ -204,7 +204,11 @@ function build_template_part_block_instance_variations() {
 		$variations[] = array(
 			'name'        => sanitize_title( $template_part->slug ),
 			'title'       => $template_part->title,
-			'description' => $template_part->description,
+			// If there's no description for the template part don't show the
+			// block description. This is a bit hacky, but prevent the fallback
+			// by using a non-breaking space so that the value of description
+			// isn't falsey.
+			'description' => $template_part->description || '&nbsp;',
 			'attributes'  => array(
 				'slug'  => $template_part->slug,
 				'theme' => $template_part->theme,
