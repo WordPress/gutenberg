@@ -143,7 +143,7 @@ const Popover = (
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
 		__unstableObserveElement,
-		__unstableForcePosition,
+		__unstableForcePosition = false,
 		__unstableShift = false,
 		...contentProps
 	},
