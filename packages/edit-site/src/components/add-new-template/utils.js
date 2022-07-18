@@ -408,6 +408,62 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	return taxonomiesMenuItems;
 };
 
+const AUTHOR_TEMPLATE_PREFIX = { user: 'author' };
+export function useAuthorMenuItem( onClickMenuItem ) {
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const authorInfo = useEntitiesInfo( 'root', AUTHOR_TEMPLATE_PREFIX );
+	const authorMenuItem = defaultTemplateTypes?.find(
+		( { slug } ) => slug === 'author'
+	);
+	if ( authorMenuItem && authorInfo.user?.hasEntities ) {
+		authorMenuItem.onClick = ( template ) => {
+			onClickMenuItem( {
+				type: 'root',
+				slug: 'user',
+				config: {
+					queryArgs: ( { search } ) => {
+						return {
+							_fields: 'id,name,slug,link',
+							orderBy: search ? 'name' : 'count',
+							exclude: authorInfo.user.existingEntitiesIds,
+							who: 'authors',
+						};
+					},
+					getSpecificTemplate: ( suggestion ) => {
+						const title = sprintf(
+							// translators: %s: Represents the name of an author e.g: "Jorge".
+							__( 'Author: %s' ),
+							suggestion.name
+						);
+						const description = sprintf(
+							// translators: %s: Represents the name of an author e.g: "Jorge".
+							__( 'Template for Author: %s' ),
+							suggestion.name
+						);
+						return {
+							title,
+							description,
+							slug: `author-${ suggestion.slug }`,
+						};
+					},
+				},
+				labels: {
+					singular_name: __( 'Author' ),
+					search_items: __( 'Search Authors' ),
+					not_found: __( 'No authors found.' ),
+					all_items: __( 'All Authors' ),
+				},
+				hasGeneralTemplate: !! existingTemplates.find(
+					( { slug } ) => slug === 'author'
+				),
+				template,
+			} );
+		};
+	}
+	return authorMenuItem;
+}
+
 /**
  * Helper hook that filters all the existing templates by the given
  * object with the entity's slug as key and the template prefix as value.

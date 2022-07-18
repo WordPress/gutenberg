@@ -38,6 +38,7 @@ import {
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
+	useAuthorMenuItem,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import { useHistory } from '../routes';
@@ -243,26 +244,30 @@ function useMissingTemplates(
 		useTaxonomiesMenuItems( onClickMenuItem );
 	const { defaultPostTypesMenuItems, postTypesMenuItems } =
 		usePostTypeMenuItems( onClickMenuItem );
-	[ ...defaultTaxonomiesMenuItems, ...defaultPostTypesMenuItems ].forEach(
-		( menuItem ) => {
-			if ( ! menuItem ) {
-				return;
-			}
-			const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
-				( template ) => template.slug === menuItem.slug
-			);
-			// Some default template types might have been filtered above from
-			// `missingDefaultTemplates` because they only check for the general
-			// template. So here we either replace or append the item, augmented
-			// with the check if it has available specific item to create a
-			// template for.
-			if ( matchIndex > -1 ) {
-				enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
-			} else {
-				enhancedMissingDefaultTemplateTypes.push( menuItem );
-			}
+
+	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	[
+		...defaultTaxonomiesMenuItems,
+		...defaultPostTypesMenuItems,
+		authorMenuItem,
+	].forEach( ( menuItem ) => {
+		if ( ! menuItem ) {
+			return;
 		}
-	);
+		const matchIndex = enhancedMissingDefaultTemplateTypes.findIndex(
+			( template ) => template.slug === menuItem.slug
+		);
+		// Some default template types might have been filtered above from
+		// `missingDefaultTemplates` because they only check for the general
+		// template. So here we either replace or append the item, augmented
+		// with the check if it has available specific item to create a
+		// template for.
+		if ( matchIndex > -1 ) {
+			enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
+		} else {
+			enhancedMissingDefaultTemplateTypes.push( menuItem );
+		}
+	} );
 	// Update the sort order to match the DEFAULT_TEMPLATE_SLUGS order.
 	enhancedMissingDefaultTemplateTypes?.sort( ( template1, template2 ) => {
 		return (
