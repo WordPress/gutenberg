@@ -1,22 +1,22 @@
 <?php
 /**
- * WP_Style_Engine_Renderer
+ * WP_Style_Engine_Processor
  *
- * Compiles and renders styles from a store of CSS rules.
+ * Compiles styles from a store of CSS rules.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine_Renderer' ) ) {
+if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
 	return;
 }
 
 /**
- * Compiles and renders styles from a store of CSS rules.
+ * Compiles styles from a store of CSS rules.
  *
  * @access private
  */
-class WP_Style_Engine_Renderer {
+class WP_Style_Engine_Processor {
 
 	/**
 	 * The Style-Engine Store object.

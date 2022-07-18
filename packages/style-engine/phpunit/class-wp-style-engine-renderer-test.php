@@ -13,13 +13,13 @@ require __DIR__ . '/../class-wp-style-engine-renderer.php';
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
  */
-class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
+class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * Should compile CSS rules from the store.
 	 */
 	public function test_return_store_rules_as_css() {
 		$a_nice_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'nice' );
-		$a_nice_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_nice_store );
+		$a_nice_renderer = new WP_Style_Engine_Processor_Gutenberg( $a_nice_store );
 		$a_nice_store->add_rule( '.a-nice-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--nice-color)',
@@ -42,7 +42,7 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	 */
 	public function test_dedupe_and_merge_css_declarations() {
 		$an_excellent_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'excellent' );
-		$an_excellent_renderer = new WP_Style_Engine_Renderer_Gutenberg( $an_excellent_store );
+		$an_excellent_renderer = new WP_Style_Engine_Processor_Gutenberg( $an_excellent_store );
 		$an_excellent_store->add_rule( '.an-excellent-rule' )->add_declarations(
 			array(
 				'color'        => 'var(--excellent-color)',
@@ -75,7 +75,7 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	 */
 	public function test_combine_css_rules() {
 		$a_sweet_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'sweet' );
-		$a_sweet_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_sweet_store );
+		$a_sweet_renderer = new WP_Style_Engine_Processor_Gutenberg( $a_sweet_store );
 		$a_sweet_store->add_rule( '.a-sweet-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--sweet-color)',
@@ -97,7 +97,7 @@ class WP_Style_Engine_Renderer_Test extends WP_UnitTestCase {
 	 */
 	public function test_store_combined_css_rules() {
 		$a_lovely_store    = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'lovely' );
-		$a_lovely_renderer = new WP_Style_Engine_Renderer_Gutenberg( $a_lovely_store );
+		$a_lovely_renderer = new WP_Style_Engine_Processor_Gutenberg( $a_lovely_store );
 		$a_lovely_store->add_rule( '.a-lovely-rule' )->add_declarations(
 			array(
 				'border-color' => 'purple',
