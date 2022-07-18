@@ -68,9 +68,9 @@ class WP_Style_Engine_Renderer {
 		}
 
 		// Combine selectors that have the same styles.
-		foreach ( $selectors_json as $selector => $hash ) {
+		foreach ( $selectors_json as $selector => $json ) {
 			// Get selectors that use the same styles.
-			$duplicates = array_keys( $selectors_json, $hash, true );
+			$duplicates = array_keys( $selectors_json, $json, true );
 			// Skip if there are no duplicates.
 			if ( 1 >= count( $duplicates ) ) {
 				continue;
@@ -78,7 +78,7 @@ class WP_Style_Engine_Renderer {
 			// Get the declarations.
 			$declarations = $rules[ $selector ]->get_declarations();
 			foreach ( $duplicates as $key ) {
-				// Unset the duplicates from the hashes array to avoid looping through them as well.
+				// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
 				unset( $selectors_json[ $key ] );
 				// Remove the rules from the store.
 				$this->store->remove_rule( $key );
