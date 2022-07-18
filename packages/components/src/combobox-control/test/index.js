@@ -107,10 +107,13 @@ describe( 'ComboboxControl', () => {
 		);
 	} );
 
-	it( 'should render with the correct options', () => {
+	it( 'should render with the correct options', async () => {
+		const user = setupUser();
 		render( <TestComboboxControl label={ defaultLabelText } /> );
+		const input = getInput( defaultLabelText );
 
-		getInput( defaultLabelText ).focus();
+		// Clicking on the input shows the options
+		await user.click( input );
 
 		const renderedOptions = getAllOptions();
 
