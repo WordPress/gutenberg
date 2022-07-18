@@ -17,6 +17,7 @@ import {
 	ToolbarItem,
 	MenuGroup,
 	MenuItem,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
@@ -217,6 +218,12 @@ export default function Header( {
 									icon={ external }
 								>
 									{ __( 'View Site' ) }
+									<VisuallyHidden as="span"> 
+										{ 
+											/* translators: accessibility text */ 
+											__( '(opens in a new tab)' ) 
+										} 
+									</VisuallyHidden>
 								</MenuItem>
 							</MenuGroup>
 						</PreviewOptions>
