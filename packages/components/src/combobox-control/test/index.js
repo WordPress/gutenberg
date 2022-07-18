@@ -120,13 +120,10 @@ describe( 'ComboboxControl', () => {
 		expect( renderedOptions.length ).toEqual( timezones.length );
 
 		// Confirm the rendered options match the provided dataset.
-		const renderedOptionNames = [];
-		for ( const option of renderedOptions.values() ) {
-			renderedOptionNames.push( option.textContent );
-		}
-		const timezoneNames = timezones.map( ( tz ) => tz.label );
-
-		expect( renderedOptionNames ).toEqual( timezoneNames );
+		expect( renderedOptions ).toHaveLength( timezones.length );
+		renderedOptions.forEach( ( option, optionIndex ) => {
+			expect( option ).toHaveTextContent( timezones[ optionIndex ].name );
+		} );
 	} );
 
 	it( 'should select the correct option via click events', async () => {
