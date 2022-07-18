@@ -39,13 +39,13 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
 				'options'         => null,
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_empty'            => array(
 				'block_styles'    => 'hello world!',
 				'options'         => null,
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_style'    => array(
@@ -189,7 +189,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'selector' => '.wp-selector > p' ),
 				'expected_output' => array(
-					'css'          => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
+					'css'          => '.wp-selector > p {padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem;}',
 					'declarations' => array(
 						'padding-top'    => '42px',
 						'padding-left'   => '2%',
@@ -209,7 +209,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'          => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
+					'css'          => '.wp-selector {color: var(--wp--preset--color--my-little-pony);}',
 					'declarations' => array(
 						'color' => 'var(--wp--preset--color--my-little-pony)',
 					),
