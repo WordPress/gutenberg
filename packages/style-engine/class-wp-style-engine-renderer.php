@@ -62,7 +62,9 @@ class WP_Style_Engine_Renderer {
 		$rules          = $this->store->get_all_rules();
 		$selectors_json = array();
 		foreach ( $rules as $selector => $rule ) {
-			$selectors_json[ $selector ] = $rule->get_declarations()->get_json();
+			$declarations = $rule->get_declarations()->get_declarations();
+			ksort( $declarations );
+			$selectors_json[ $selector ] = json_encode( $declarations );
 		}
 
 		// Combine selectors that have the same styles.
