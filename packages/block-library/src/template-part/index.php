@@ -229,6 +229,15 @@ function build_template_part_block_instance_variations() {
 }
 
 /**
+ * Returns an array of all template part block variations.
+ *
+ * @return array Array containing the block variation objects.
+ */
+function build_template_part_block_variations() {
+	return array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() );
+}
+
+/**
  * Registers the `core/template-part` block on the server.
  */
 function register_block_core_template_part() {
@@ -236,7 +245,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
-			'variations'      => array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() ),
+			'variations'      => build_template_part_block_variations(),
 		)
 	);
 }
