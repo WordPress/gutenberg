@@ -234,7 +234,7 @@ function build_template_part_block_instance_variations() {
  * @return array Array containing the block variation objects.
  */
 function build_template_part_block_variations() {
-	return array_merge( build_template_part_block_variations(), build_template_part_block_instance_variations() );
+	return array_merge( build_template_part_block_area_variations(), build_template_part_block_instance_variations() );
 }
 
 /**
