@@ -51,7 +51,7 @@ const timezones = [
 const defaultLabelText = 'Select a timezone';
 const getLabel = () => screen.getByText( defaultLabelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
-const getRenderedOptions = () => screen.getAllByRole( 'option' );
+const getAllOptions = () => screen.getAllByRole( 'option' );
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,
@@ -103,7 +103,7 @@ describe( 'ComboboxControl', () => {
 
 		getInput( defaultLabelText ).focus();
 
-		const renderedOptions = getRenderedOptions();
+		const renderedOptions = getAllOptions();
 
 		expect( renderedOptions.length ).toEqual( timezones.length );
 
