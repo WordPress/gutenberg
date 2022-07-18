@@ -88,6 +88,9 @@ export default function TemplatePartSelectionModal( {
 		setAttributes
 	);
 
+	const hasTemplateParts = !! filteredTemplateParts.length;
+	const hasBlockPatterns = !! filteredBlockPatterns.length;
+
 	return (
 		<div className="block-library-template-part__selection-content">
 			<div className="block-library-template-part__selection-search">
@@ -98,7 +101,7 @@ export default function TemplatePartSelectionModal( {
 					placeholder={ __( 'Search' ) }
 				/>
 			</div>
-			{ !! filteredTemplateParts.length && (
+			{ hasTemplateParts && (
 				<div>
 					<h2>{ __( 'Existing template parts' ) }</h2>
 					<BlockPatternsList
@@ -111,7 +114,7 @@ export default function TemplatePartSelectionModal( {
 				</div>
 			) }
 
-			{ !! filteredBlockPatterns.length && (
+			{ hasBlockPatterns && (
 				<div>
 					<h2>{ __( 'Patterns' ) }</h2>
 					<BlockPatternsList
@@ -130,12 +133,11 @@ export default function TemplatePartSelectionModal( {
 				</div>
 			) }
 
-			{ ! filteredTemplateParts.length &&
-				! filteredBlockPatterns.length && (
-					<HStack alignment="center">
-						<p>{ __( 'No results found.' ) }</p>
-					</HStack>
-				) }
+			{ ! hasTemplateParts && ! hasBlockPatterns && (
+				<HStack alignment="center">
+					<p>{ __( 'No results found.' ) }</p>
+				</HStack>
+			) }
 		</div>
 	);
 }
