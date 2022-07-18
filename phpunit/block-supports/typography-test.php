@@ -825,4 +825,40 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: array' => array( array( '10' ) ),
 		);
 	}
+
+	/**
+	 * Tests bypassing WordPress font size calculations using the `pre_get_computed_fluid_typography_value` filter.
+	 */
+	public function test_gutenberg_get_computed_fluid_typography_value_filter() {
+		add_filter( 'pre_get_computed_fluid_font_size_value', array( $this, 'filter_fluid_font_size' ), 10, 2 );
+		$filtered_fluid_font_size_value = gutenberg_get_computed_fluid_font_size_value(
+			array(
+				'minimum_viewport_width' => '100px',
+				'maximum_viewport_width' => '200px',
+				'minimum_font_size'      => '1em',
+				'maximum_font_size'      => '2em',
+				'scale_factor'           => '.9',
+			)
+		);
+		remove_filter( 'pre_get_computed_fluid_font_size_value', array( $this, 'filter_fluid_font_size' ) );
+		$this->assertSame( 'clamp(1em, 0.818rem + .9vw, 2em)', $filtered_fluid_font_size_value );
+	}
+
+	/**
+	 * Filters the fluid font size arguments array before the internal calculations take place.
+	 *
+	 * @param string|null $fluid_typography_value Return a font-size value using the passed arguments to short-circuit the default calculations,
+	 *                                            or null to allow WordPress to calculate the font size value.
+	 * @param array       $args array(
+	 *           'maximum_viewport_width' => (string) Maximum size up to which type will have fluidity.
+	 *           'minimum_viewport_width' => (string) Minimum viewport size from which type will have fluidity.
+	 *           'maximum_font_size'      => (string) Maximum font size.
+	 *           'minimum_font_size'      => (string) Minimum font size.
+	 *           'scale_factor'           => (number) A scale factor to determine how fast a font scales within boundaries.
+	 *       );.
+	 * @return string A font-size value
+	 */
+	public function filter_fluid_font_size( $fluid_typography_value, $args ) {
+		return "clamp({$args['minimum_font_size']}, 0.818rem + {$args['scale_factor']}vw, {$args['maximum_font_size']})";
+	}
 }
