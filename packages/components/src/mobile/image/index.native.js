@@ -157,6 +157,9 @@ const ImageComponent = ( {
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
+		! resizeMode && {
+			aspectRatio: imageData?.aspectRatio,
+		},
 		focalPoint && styles.focalPoint,
 		focalPoint &&
 			getImageWithFocalPointStyles(
@@ -217,9 +220,6 @@ const ImageComponent = ( {
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
-							{ ...( ! resizeMode && {
-								aspectRatio: imageData?.aspectRatio,
-							} ) }
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
