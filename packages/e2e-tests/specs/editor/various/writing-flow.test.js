@@ -621,6 +621,33 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not have a dead zone abover separator', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '---' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		// Test setup: "1" + separator.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const paragraphRect = await paragraph.boundingBox();
+		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
+		const y = paragraphRect.y + paragraphRect.height + 1;
+
+		await page.mouse.click( x, y );
+		await page.waitForFunction(
+			() => window.getSelection().type === 'Caret'
+		);
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not have a dead zone above an aligned block', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
