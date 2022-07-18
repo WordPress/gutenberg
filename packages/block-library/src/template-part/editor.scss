@@ -24,4 +24,10 @@
 	// Gap + close button size + header padding.
 	right: $grid-unit-10 + $button-size + $grid-unit-40;
 	z-index: z-index(".block-editor-template-part__selection-modal");
+
+	.components-search-control {
+		input[type=search].components-search-control__input {
+			height: $grid-unit * 5.5;
+		}
+	}
 }
