@@ -80,8 +80,8 @@ export function InputBase(
 	} );
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefix: { paddingLeft },
-			InputControlSuffix: { paddingRight },
+			InputControlPrefixWrapper: { paddingLeft },
+			InputControlSuffixWrapper: { paddingRight },
 		};
 	}, [ paddingLeft, paddingRight ] );
 

@@ -128,16 +128,16 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 *
 	 * By default, the prefix is aligned with the edge of the input border, with no padding.
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
-	 * the provided `<InputControlPrefix>` convenience wrapper.
+	 * the provided `<InputControlPrefixWrapper>` component.
 	 *
 	 * @example
 	 * import {
 	 *   __experimentalInputControl as InputControl,
-	 *   __experimentalInputControlPrefix as InputControlPrefix,
+	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	 * } from '@wordpress/components';
 	 *
 	 * <InputControl
-	 *   prefix={<InputControlPrefix>@</InputControlPrefix>}
+	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
 	 * />
 	 */
 	prefix?: ReactNode;
@@ -146,16 +146,16 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 *
 	 * By default, the suffix is aligned with the edge of the input border, with no padding.
 	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
-	 * the provided `<InputControlSuffix>` convenience wrapper.
+	 * the provided `<InputControlSuffixWrapper>` component.
 	 *
 	 * @example
 	 * import {
 	 *   __experimentalInputControl as InputControl,
-	 *   __experimentalInputControlSuffix as InputControlSuffix,
+	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	 * } from '@wordpress/components';
 	 *
 	 * <InputControl
-	 *   suffix={<InputControlSuffix>%</InputControlSuffix>}
+	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
 	 * />
 	 */
 	suffix?: ReactNode;
@@ -204,14 +204,14 @@ export interface InputControlLabelProps {
 	size?: BaseProps[ 'size' ];
 }
 
-export type InputControlPrefixProps = {
+export type InputControlPrefixWrapperProps = {
 	/**
 	 * The prefix to be inserted.
 	 */
 	children: ReactNode;
 };
 
-export type InputControlSuffixProps = {
+export type InputControlSuffixWrapperProps = {
 	/**
 	 * The suffix to be inserted.
 	 */

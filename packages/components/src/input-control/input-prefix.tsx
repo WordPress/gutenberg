@@ -12,13 +12,13 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../ui/context';
-import type { InputControlPrefixProps } from './types';
+import type { InputControlPrefixWrapperProps } from './types';
 
-function UnconnectedInputControlPrefix(
-	props: WordPressComponentProps< InputControlPrefixProps, 'div' >,
+function UnconnectedInputControlPrefixWrapper(
+	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const derivedProps = useContextSystem( props, 'InputControlPrefix' );
+	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
 
 	return (
 		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
@@ -32,17 +32,17 @@ function UnconnectedInputControlPrefix(
  * ```jsx
  * import {
  *   __experimentalInputControl as InputControl,
- *   __experimentalInputControlPrefix as InputControlPrefix,
+ *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
  * } from '@wordpress/components';
  *
  * <InputControl
- *   prefix={<InputControlPrefix>@</InputControlPrefix>}
+ *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
  * />
  * ```
  */
-export const InputControlPrefix = contextConnect(
-	UnconnectedInputControlPrefix,
-	'InputControlPrefix'
+export const InputControlPrefixWrapper = contextConnect(
+	UnconnectedInputControlPrefixWrapper,
+	'InputControlPrefixWrapper'
 );
 
-export default InputControlPrefix;
+export default InputControlPrefixWrapper;

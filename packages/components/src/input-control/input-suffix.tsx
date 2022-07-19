@@ -12,13 +12,13 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../ui/context';
-import type { InputControlSuffixProps } from './types';
+import type { InputControlSuffixWrapperProps } from './types';
 
-function UnconnectedInputControlSuffix(
-	props: WordPressComponentProps< InputControlSuffixProps, 'div' >,
+function UnconnectedInputControlSuffixWrapper(
+	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const derivedProps = useContextSystem( props, 'InputControlSuffix' );
+	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );
 
 	return (
 		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
@@ -32,17 +32,17 @@ function UnconnectedInputControlSuffix(
  * ```jsx
  * import {
  *   __experimentalInputControl as InputControl,
- *   __experimentalInputControlSuffix as InputControlSuffix,
+ *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
  * } from '@wordpress/components';
  *
  * <InputControl
- *   suffix={<InputControlSuffix>%</InputControlSuffix>}
+ *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
  * />
  * ```
  */
-export const InputControlSuffix = contextConnect(
-	UnconnectedInputControlSuffix,
-	'InputControlSuffix'
+export const InputControlSuffixWrapper = contextConnect(
+	UnconnectedInputControlSuffixWrapper,
+	'InputControlSuffixWrapper'
 );
 
-export default InputControlSuffix;
+export default InputControlSuffixWrapper;
