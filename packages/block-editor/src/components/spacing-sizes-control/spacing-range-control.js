@@ -37,9 +37,6 @@ export default function SpacingRangeControl( props ) {
 		setValueNow( newSize );
 		const size = parseInt( newSize, 10 );
 		if ( size === 0 ) {
-			return undefined;
-		}
-		if ( size === 1 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ props.spacingSizes[ newSize ]?.slug }`;
@@ -51,21 +48,13 @@ export default function SpacingRangeControl( props ) {
 		key: index,
 		name: size.name,
 	} ) );
+	const marks = props.spacingSizes.map( ( value, index ) => ( {
+		value: index,
+		lable: undefined,
+	} ) );
+
 	return (
 		<>
-			{ /* <Button
-				label={
-					showCustomValueControl
-						? __( 'Use size preset' )
-						: __( 'Set custom size' )
-				}
-				icon={ settings }
-				onClick={ () => {
-					setShowCustomValueControl( ! showCustomValueControl );
-				} }
-				isPressed={ showCustomValueControl }
-				isSmall
-			/> */ }
 			<Flex>
 				<FlexItem>
 					<div>
@@ -96,13 +85,26 @@ export default function SpacingRangeControl( props ) {
 				</FlexItem>
 			</Flex>
 			{ showCustomValueControl && (
-				<UnitControl
-					label={ props.label }
-					onChange={ ( newSize ) =>
-						props.onChange( getNewCustomValue( newSize ) )
-					}
-					value="28%"
-				/>
+				<div>
+					<UnitControl
+						label={ props.label }
+						onChange={ ( newSize ) =>
+							props.onChange( getNewCustomValue( newSize ) )
+						}
+						value="28%"
+					/>
+
+					<RangeControl
+						value={ props.value }
+						label={ <></> }
+						min={ 0 }
+						max={ 50 }
+						// initialPosition={ 0 }
+						withInputField={ false }
+						onChange={ ( value ) => console.log( value ) }
+						// step={ step }
+					/>
+				</div>
 			) }
 			{ ! useSelect && ! showCustomValueControl && (
 				<RangeControl
@@ -118,6 +120,7 @@ export default function SpacingRangeControl( props ) {
 					renderTooltipContent={ customTooltipContent }
 					min={ 0 }
 					max={ props.spacingSizes.length - 1 }
+					marks={ marks }
 				/>
 			) }
 			{ useSelect && ! showCustomValueControl && (
