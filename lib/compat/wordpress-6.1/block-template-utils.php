@@ -306,7 +306,7 @@ function gutenberg_build_block_template_result_from_post( $post ) {
  * @param string $slug The slug from which to extract the template hierarchy.
  * @return array<string> The template hierarchy.
  */
-function gutenberg_get_template__hierarchy( $slug ) {
+function gutenberg_get_template_hierarchy( $slug ) {
 	if ( 'front-page' === $slug ) {
 		return array( 'front-page', 'home', 'index' );
 	}
