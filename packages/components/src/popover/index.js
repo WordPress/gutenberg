@@ -180,6 +180,9 @@ const Popover = (
 					const isTopBottomPlacement =
 						currentPlacement.includes( 'top' ) ||
 						currentPlacement.includes( 'bottom' );
+
+					// The axes here seem to be opposite to what the floating-ui docs
+					// state, but this seems to work. :confused-emoji:
 					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
 					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
