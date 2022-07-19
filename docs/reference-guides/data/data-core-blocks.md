@@ -379,6 +379,23 @@ _Returns_
 
 Returns an action object used to set the default block name.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { setDefaultBlockName } = useDispatch( blocksStore );
+
+	return (
+		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _name_ `string`: Block name.

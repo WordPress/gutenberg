@@ -297,6 +297,22 @@ export function removeBlockVariations( blockName, variationNames ) {
  *
  * @param {string} name Block name.
  *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { setDefaultBlockName } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+ *             { __( 'Set the default block to Heading' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function setDefaultBlockName( name ) {
