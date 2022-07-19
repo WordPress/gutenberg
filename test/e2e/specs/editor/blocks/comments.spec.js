@@ -9,8 +9,11 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  */
 
 test.use( {
-	commentsBlockUtils: async ( { page, admin }, use ) => {
-		await use( new CommentsBlockUtils( { page, admin } ) );
+	commentsBlockUtils: async ( { page, admin, requestUtils }, use ) => {
+		await use( new CommentsBlockUtils( { page, admin, requestUtils } ) );
+	},
+	codeEditorUtils: async ( { page }, use ) => {
+		await use( new CodeEditorUtils( { page } ) );
 	},
 } );
 
@@ -107,6 +110,7 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeVisible();
 	} );
+
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
 		admin,
 		editor,
@@ -141,6 +145,78 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 
+	test( 'The old Post Comments block is still supported', async ( {
+		page,
+		requestUtils,
+		commentsBlockUtils,
+	} ) => {
+		// Create a post with the old "Post Comments" block.
+		const postId = await commentsBlockUtils.createNewPost( {
+			content: '<!-- wp:post-comments /-->',
+		} );
+
+		// Publish a comment on that post.
+		await requestUtils.createComment( {
+			content: 'This is an automated comment',
+			post: postId,
+		} );
+
+		// Visit created post.
+		await page.goto( `/?p=${ postId }` );
+
+		// Ensure that the rendered post is the legacy version of Post Comments.
+		await expect( page.locator( '.wp-block-post-comments' ) ).toBeVisible();
+		await expect( page.locator( '.comment-content' ) ).toContainText(
+			'This is an automated comment'
+		);
+	} );
+
+	test( 'The old Post Comments is converted to Comments with legacy attribute', async ( {
+		page,
+		admin,
+		requestUtils,
+		codeEditorUtils,
+		commentsBlockUtils,
+	} ) => {
+		// Create a post with the old "Post Comments" block.
+		const postId = await commentsBlockUtils.createNewPost( {
+			content: '<!-- wp:post-comments /-->',
+		} );
+		await requestUtils.createComment( {
+			content: 'This is an automated comment',
+			post: postId,
+		} );
+
+		// Go to the post editor.
+		await admin.visitAdminPage(
+			'/post.php',
+			`post=${ postId }&action=edit`
+		);
+
+		// Hide welcome guide.
+		await commentsBlockUtils.hideWelcomeGuide();
+
+		// Check that the Post Comments block has been replaced by Comments (legacy)
+		await expect( page.locator( '.wp-block-post-comments' ) ).toBeHidden();
+		await expect( page.locator( '.wp-block-comments' ) ).toBeVisible();
+
+		// Open code editor and check its content.
+		await codeEditorUtils.open();
+		await expect( codeEditorUtils.textbox() ).toContainText(
+			'<!-- wp:comments {"legacy":true} /-->'
+		);
+		await codeEditorUtils.close();
+
+		// Visit post
+		await page.goto( `/?p=${ postId }` );
+
+		// Rendered block should be the same as Post Comments
+		await expect( page.locator( '.wp-block-post-comments' ) ).toBeVisible();
+		await expect( page.locator( '.comment-content' ) ).toContainText(
+			'This is an automated comment'
+		);
+	} );
+
 	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
 		// Ideally, we'd set options in afterAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
@@ -167,9 +243,10 @@ test.describe( 'Comments', () => {
 } );
 
 class CommentsBlockUtils {
-	constructor( { page, admin } ) {
+	constructor( { page, admin, requestUtils } ) {
 		this.page = page;
 		this.admin = admin;
+		this.requestUtils = requestUtils;
 	}
 
 	/**
@@ -192,5 +269,66 @@ class CommentsBlockUtils {
 		await this.page.click( '#Update' );
 
 		return previousValue;
+	}
+
+	/**
+	 * Creates a post with the given content.
+	 *
+	 * @param {string} content The content for the post.
+	 *
+	 * @return {Promise<number>} Post ID.
+	 */
+	async createNewPost( { content } ) {
+		const post = await this.requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts`,
+			params: { status: 'publish', content },
+		} );
+
+		return post.id;
+	}
+
+	async hideWelcomeGuide() {
+		await this.page.evaluate( async () => {
+			const isWelcomeGuideActive = window.wp.data
+				.select( 'core/edit-post' )
+				.isFeatureActive( 'welcomeGuide' );
+
+			if ( isWelcomeGuideActive ) {
+				window.wp.data
+					.dispatch( 'core/edit-post' )
+					.toggleFeature( 'welcomeGuide' );
+			}
+		} );
+
+		await this.page.reload();
+		await this.page.waitForSelector( '.edit-post-layout' );
+	}
+}
+
+class CodeEditorUtils {
+	constructor( { page } ) {
+		this.page = page;
+	}
+
+	async open() {
+		await this.page
+			.locator(
+				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
+			)
+			.click();
+		await this.page
+			.locator( 'role=menuitemradio[name*="Code editor"i]' )
+			.click();
+	}
+
+	textbox() {
+		return this.page.locator( 'role=textbox[name="Type text or HTML"i]' );
+	}
+
+	async close() {
+		await this.page
+			.locator( 'role=button[name="Exit code editor"i]' )
+			.click();
 	}
 }
