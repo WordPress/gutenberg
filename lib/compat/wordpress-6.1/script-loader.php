@@ -37,6 +37,30 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 }
 
 /**
+ * This function takes care of adding inline styles
+ * from a Style-Engine store.
+ *
+ * @param string $store_name The name of the store.
+ */
+function gutenberg_enqueue_style_engine_store( $store_name ) {
+	$action_hook_name = 'wp_footer';
+	if ( wp_is_block_theme() ) {
+		$action_hook_name = 'wp_head';
+	}
+	add_action(
+		$action_hook_name,
+		static function () use ( $store_name ) {
+			$store     = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( $store_name );
+			$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
+			$css       = $processor->get_css();
+			if ( $css ) {
+				echo '<style id="wp-style-engine-' . esc_attr( str_replace( '/', '-', $store_name ) ) . '">' . $css . '</style>';
+			}
+		}
+	);
+}
+
+/**
  * This applies a filter to the list of style nodes that comes from `get_style_nodes` in WP_Theme_JSON.
  * This particular filter removes all of the blocks from the array.
  *

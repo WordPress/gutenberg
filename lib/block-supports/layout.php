@@ -39,10 +39,32 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string                                CSS style.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
+	gutenberg_set_layout_style( $selector, $layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
+
+	// Use a unique store to avoid conflicts with other stores and implementations.
+	$store     = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'block-supports/layout/' . md5( $selector ) );
+	$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
+	return $processor->get_css();
+}
+
+/**
+ * Adds the provided layout to the "block-supports/layout" Style-Engine store.
+ *
+ * @param string  $selector                      CSS selector.
+ * @param array   $layout                        Layout object. The one that is passed has already checked the existence of default block layout.
+ * @param boolean $has_block_gap_support         Whether the theme has support for the block gap.
+ * @param string  $gap_value                     The block gap value to apply.
+ * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
+ * @param string  $fallback_gap_value            The block gap value to apply.
+ * @param array   $block_spacing                 Custom spacing set on the block.
+ *
+ * @return bool Returns true if the layout style was successfully generated, otherwise false.
+ */
+function gutenberg_set_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	// Get the block-supports Style-Engine Store.
-	$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'block-supports' );
+	$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'block-supports/layout' );
 
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
@@ -167,13 +189,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	}
 
-	$style = '';
-	$rules = $store->get_all_rules();
-	foreach ( $rules as $rule ) {
-		$style .= $rule->get_css();
-	}
-
-	return $style;
+	return ! empty( $store->get_all_rules() );
 }
 
 /**
@@ -259,12 +275,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
+	$has_style                     = gutenberg_set_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
 
 	// Only add container class and enqueue block support styles if unique styles were generated.
-	if ( ! empty( $style ) ) {
+	if ( $has_style ) {
 		$class_names[] = $container_class;
-		wp_enqueue_block_support_styles( $style );
+		gutenberg_enqueue_style_engine_store( 'block-supports/layout' );
 	}
 
 	// This assumes the hook only applies to blocks with a single wrapper.
