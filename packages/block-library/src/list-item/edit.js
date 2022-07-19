@@ -28,6 +28,7 @@ import {
 	useOutdentListItem,
 	useSplit,
 } from './hooks';
+import { convertToListItems } from './utils';
 
 function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
@@ -88,7 +89,9 @@ export default function ListItemEdit( {
 					placeholder={ placeholder || __( 'List' ) }
 					onSplit={ onSplit }
 					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
+					onReplace={ ( blocks, ...args ) => {
+						onReplace( convertToListItems( blocks ), ...args );
+					} }
 				/>
 				{ innerBlocksProps.children }
 			</li>
