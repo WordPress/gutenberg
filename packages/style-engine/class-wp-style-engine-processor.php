@@ -47,7 +47,10 @@ class WP_Style_Engine_Processor {
 		$css   = '';
 		$rules = $this->store->get_all_rules();
 		foreach ( $rules as $rule ) {
+			// Add the CSS.
 			$css .= $rule->get_css();
+			// Remove the rule from the store to avoid double-rendering.
+			$this->store->remove_rule( $rule->get_selector() );
 		}
 		return $css;
 	}
