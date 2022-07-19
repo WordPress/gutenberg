@@ -400,7 +400,8 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement ] );
 
-	// If we're using getAnchorRect, we need to update the position as we scroll the iframe.
+	// If the reference element is in a different ownerDocument (e.g. iFrame),
+	// we need to manually update the floating's position on scroll.
 	useLayoutEffect( () => {
 		if ( ownerDocument === document ) {
 			return;
