@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## Bug Fix
+
+-   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+
 ### Enhancements
 
 -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
