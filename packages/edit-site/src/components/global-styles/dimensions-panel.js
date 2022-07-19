@@ -178,66 +178,71 @@ export default function DimensionsPanel( { name } ) {
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
-			<Flex>
-				<FlexItem>
+			{ ( showContentSizeControl || showWideSizeControl ) && (
+				<Flex>
 					{ showContentSizeControl && (
-						<ToolsPanelItem
-							label={ __( 'Content size' ) }
-							hasValue={ hasContentSizeValue }
-							onDeselect={ resetContentSizeValue }
-							isShownByDefault={ true }
-						>
-							<Flex align="flex-end">
-								<FlexItem>
-									<UnitControl
-										label={ __( 'Content' ) }
-										labelPosition="top"
-										__unstableInputWidth="80px"
-										value={ contentSizeValue || '' }
-										onChange={ ( nextContentSize ) => {
-											setContentSizeValue(
-												nextContentSize
-											);
-										} }
-										units={ units }
-									/>
-								</FlexItem>
-								<FlexItem>
-									<Icon icon={ positionCenter } />
-								</FlexItem>
-							</Flex>
-						</ToolsPanelItem>
+						<FlexItem>
+							<ToolsPanelItem
+								label={ __( 'Content size' ) }
+								hasValue={ hasContentSizeValue }
+								onDeselect={ resetContentSizeValue }
+								isShownByDefault={ true }
+							>
+								<Flex align="flex-end">
+									<FlexItem>
+										<UnitControl
+											label={ __( 'Content' ) }
+											labelPosition="top"
+											__unstableInputWidth="80px"
+											value={ contentSizeValue || '' }
+											onChange={ ( nextContentSize ) => {
+												setContentSizeValue(
+													nextContentSize
+												);
+											} }
+											units={ units }
+										/>
+									</FlexItem>
+									<FlexItem>
+										<Icon icon={ positionCenter } />
+									</FlexItem>
+								</Flex>
+							</ToolsPanelItem>
+						</FlexItem>
 					) }
-				</FlexItem>
-				<FlexItem>
+
 					{ showWideSizeControl && (
-						<ToolsPanelItem
-							label={ __( 'Wide size' ) }
-							hasValue={ hasWideSizeValue }
-							onDeselect={ resetWideSizeValue }
-							isShownByDefault={ true }
-						>
-							<Flex align="flex-end">
-								<FlexItem>
-									<UnitControl
-										label={ __( 'Wide' ) }
-										labelPosition="top"
-										__unstableInputWidth="80px"
-										value={ wideSizeValue || '' }
-										onChange={ ( nextWideSize ) => {
-											setWideSizeValue( nextWideSize );
-										} }
-										units={ units }
-									/>
-								</FlexItem>
-								<FlexItem>
-									<Icon icon={ stretchWide } />
-								</FlexItem>
-							</Flex>
-						</ToolsPanelItem>
+						<FlexItem>
+							<ToolsPanelItem
+								label={ __( 'Wide size' ) }
+								hasValue={ hasWideSizeValue }
+								onDeselect={ resetWideSizeValue }
+								isShownByDefault={ true }
+							>
+								<Flex align="flex-end">
+									<FlexItem>
+										<UnitControl
+											label={ __( 'Wide' ) }
+											labelPosition="top"
+											__unstableInputWidth="80px"
+											value={ wideSizeValue || '' }
+											onChange={ ( nextWideSize ) => {
+												setWideSizeValue(
+													nextWideSize
+												);
+											} }
+											units={ units }
+										/>
+									</FlexItem>
+									<FlexItem>
+										<Icon icon={ stretchWide } />
+									</FlexItem>
+								</Flex>
+							</ToolsPanelItem>
+						</FlexItem>
 					) }
-				</FlexItem>
-			</Flex>
+				</Flex>
+			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
