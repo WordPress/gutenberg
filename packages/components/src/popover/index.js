@@ -93,12 +93,6 @@ const placementToAnimationOrigin = ( placement ) => {
 	return x + ' ' + y;
 };
 
-const getMainAxis = ( placement ) =>
-	placement.includes( 'top' ) || placement.includes( 'bottom' ) ? 'y' : 'x';
-
-const getCrossAxis = ( placement ) =>
-	getMainAxis( placement ) === 'x' ? 'y' : 'x';
-
 const Popover = (
 	{
 		range,
@@ -183,23 +177,22 @@ const Popover = (
 		offset ? offsetMiddleware( offset ) : undefined,
 		frameOffset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
-					const mainAxis = getMainAxis( currentPlacement );
-					const crossAxis = getCrossAxis( currentPlacement );
+					const isTopBottomPlacement =
+						currentPlacement.includes( 'top' ) ||
+						currentPlacement.includes( 'bottom' );
+					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
 					// When the popover is before the reference, subtract the offset,
-					// else add it.
-					const mainAxisModifier = currentPlacement.includes( 'top' )
-						? -1
-						: 1;
-					const crossAxisModifier = currentPlacement.includes(
-						'left'
-					)
-						? -1
-						: 1;
+					// of the main axis else add it.
+					const hasBeforePlacement =
+						currentPlacement.includes( 'top' ) ||
+						currentPlacement.includes( 'left' );
+					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
 
 					return {
 						mainAxis: frameOffset[ mainAxis ] * mainAxisModifier,
-						crossAxis: frameOffset[ crossAxis ] * crossAxisModifier,
+						crossAxis: frameOffset[ crossAxis ],
 					};
 			  } )
 			: undefined,
@@ -224,6 +217,7 @@ const Popover = (
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
+
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
