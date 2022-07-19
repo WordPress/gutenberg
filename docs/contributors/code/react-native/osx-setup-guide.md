@@ -36,7 +36,7 @@ If you have an existing Gutenberg checkout be sure to fully clean `node_modules`
 This may help avoid errors in the future.
 
 ```sh
-npm run other:distclean
+npm run distclean
 npm ci
 ```
 

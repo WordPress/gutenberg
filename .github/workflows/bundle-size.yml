@@ -51,4 +51,4 @@ jobs:
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.min.js,build/**/*.css}'
-                  clean-script: 'other:distclean'
+                  clean-script: 'distclean'
