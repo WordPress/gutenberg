@@ -195,65 +195,61 @@ export default function DimensionsPanel( { name } ) {
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<Flex>
 					{ showContentSizeControl && (
-						<FlexItem>
-							<ToolsPanelItem
-								label={ __( 'Content size' ) }
-								hasValue={ hasUserSetContentSizeValue }
-								onDeselect={ resetContentSizeValue }
-								isShownByDefault={ true }
-							>
-								<Flex align="flex-end">
-									<FlexItem>
-										<UnitControl
-											label={ __( 'Content' ) }
-											labelPosition="top"
-											__unstableInputWidth="80px"
-											value={ contentSizeValue || '' }
-											onChange={ ( nextContentSize ) => {
-												setContentSizeValue(
-													nextContentSize
-												);
-											} }
-											units={ units }
-										/>
-									</FlexItem>
-									<FlexItem>
-										<Icon icon={ positionCenter } />
-									</FlexItem>
-								</Flex>
-							</ToolsPanelItem>
-						</FlexItem>
+						<ToolsPanelItem
+							as={ FlexItem }
+							label={ __( 'Content size' ) }
+							hasValue={ hasUserSetContentSizeValue }
+							onDeselect={ resetContentSizeValue }
+							isShownByDefault={ true }
+						>
+							<Flex align="flex-end">
+								<FlexItem>
+									<UnitControl
+										label={ __( 'Content' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ contentSizeValue || '' }
+										onChange={ ( nextContentSize ) => {
+											setContentSizeValue(
+												nextContentSize
+											);
+										} }
+										units={ units }
+									/>
+								</FlexItem>
+								<FlexItem>
+									<Icon icon={ positionCenter } />
+								</FlexItem>
+							</Flex>
+						</ToolsPanelItem>
 					) }
 
 					{ showWideSizeControl && (
-						<FlexItem>
-							<ToolsPanelItem
-								label={ __( 'Wide size' ) }
-								hasValue={ hasUserSetWideSizeValue }
-								onDeselect={ resetWideSizeValue }
-								isShownByDefault={ true }
-							>
-								<Flex align="flex-end">
-									<FlexItem>
-										<UnitControl
-											label={ __( 'Wide' ) }
-											labelPosition="top"
-											__unstableInputWidth="80px"
-											value={ wideSizeValue || '' }
-											onChange={ ( nextWideSize ) => {
-												setWideSizeValue(
-													nextWideSize
-												);
-											} }
-											units={ units }
-										/>
-									</FlexItem>
-									<FlexItem>
-										<Icon icon={ stretchWide } />
-									</FlexItem>
-								</Flex>
-							</ToolsPanelItem>
-						</FlexItem>
+						<ToolsPanelItem
+							as={ FlexItem }
+							label={ __( 'Wide size' ) }
+							hasValue={ hasUserSetWideSizeValue }
+							onDeselect={ resetWideSizeValue }
+							isShownByDefault={ true }
+						>
+							<Flex align="flex-end">
+								<FlexItem>
+									<UnitControl
+										label={ __( 'Wide' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ wideSizeValue || '' }
+										onChange={ ( nextWideSize ) => {
+											setWideSizeValue( nextWideSize );
+										} }
+										units={ units }
+									/>
+								</FlexItem>
+								<FlexItem>
+									<Icon icon={ stretchWide } />
+								</FlexItem>
+							</Flex>
+						</ToolsPanelItem>
 					) }
 				</Flex>
 			) }
