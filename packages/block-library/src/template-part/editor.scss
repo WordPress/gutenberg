@@ -19,19 +19,23 @@
 
 .block-library-template-part__selection-search {
 	background: $white;
-	position: absolute;
-	top: $grid-unit-20;
-	// Gap + close button size + header padding.
-	right: $grid-unit-10 + $button-size + $grid-unit-40;
 	z-index: z-index(".block-editor-template-part__selection-modal");
+	position: sticky;
+	top: 0;
+	padding: $grid-unit-20 0;
+
+	@include break-small() {
+		position: absolute;
+		top: $grid-unit-20;
+		// Gap + close button size + header padding.
+		right: $grid-unit-10 + $button-size + $grid-unit-40;
+		padding: 0;
+	}
 
 	.components-search-control {
 		input[type="search"].components-search-control__input {
-			height: $grid-unit * 5.5;
-			width: $grid-unit * 16;
-
 			@include break-small() {
-				width: auto;
+				height: $grid-unit * 5.5;
 			}
 		}
 	}
