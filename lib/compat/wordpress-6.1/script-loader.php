@@ -52,7 +52,7 @@ function gutenberg_enqueue_style_engine_store( $store_name ) {
 		static function () use ( $store_name ) {
 			$store     = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( $store_name );
 			$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-			$css       = $processor->get_css();
+			$css       = $processor->get_css( true );
 			if ( $css ) {
 				echo '<style id="wp-style-engine-' . esc_attr( str_replace( '/', '-', $store_name ) ) . '">' . $css . '</style>';
 			}

@@ -44,7 +44,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	// Use a unique store to avoid conflicts with other stores and implementations.
 	$store     = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'block-supports/layout/' . md5( $selector ) );
 	$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-	return $processor->get_css();
+	return $processor->get_css( true );
 }
 
 /**

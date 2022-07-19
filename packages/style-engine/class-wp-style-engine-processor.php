@@ -37,9 +37,11 @@ class WP_Style_Engine_Processor {
 	/**
 	 * Get the CSS rules as a string.
 	 *
+	 * @param bool $remove_printed_rules Whether to remove printed rules.
+	 *
 	 * @return string The computed CSS.
 	 */
-	public function get_css() {
+	public function get_css( $remove_printed_rules = false ) {
 		// Combine CSS selectors that have identical declarations.
 		$this->combine_rules_selectors();
 
@@ -49,8 +51,10 @@ class WP_Style_Engine_Processor {
 		foreach ( $rules as $rule ) {
 			// Add the CSS.
 			$css .= $rule->get_css();
-			// Remove the rule from the store to avoid double-rendering.
-			$this->store->remove_rule( $rule->get_selector() );
+			if ( $remove_printed_rules ) {
+				// Remove the rule from the store to avoid double-rendering.
+				$this->store->remove_rule( $rule->get_selector() );
+			}
 		}
 		return $css;
 	}
