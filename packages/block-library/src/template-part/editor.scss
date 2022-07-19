@@ -23,20 +23,4 @@
 	position: sticky;
 	top: 0;
 	padding: $grid-unit-20 0;
-
-	@include break-small() {
-		position: absolute;
-		top: $grid-unit-20;
-		// Gap + close button size + header padding.
-		right: $grid-unit-10 + $button-size + $grid-unit-40;
-		padding: 0;
-	}
-
-	.components-search-control {
-		input[type="search"].components-search-control__input {
-			@include break-small() {
-				height: $grid-unit * 5.5;
-			}
-		}
-	}
 }
