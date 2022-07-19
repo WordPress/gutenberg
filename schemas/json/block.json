@@ -504,8 +504,22 @@
 						"description": "A detailed variation description."
 					},
 					"category": {
-						"type": "string",
-						"description": "A category classification, used in search interfaces to arrange block types by category."
+						"description": "A category classification, used in search interfaces to arrange block types by category.",
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"enum": [
+									"text",
+									"media",
+									"design",
+									"widgets",
+									"theme",
+									"embed"
+								]
+							}
+						]
 					},
 					"icon": {
 						"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
