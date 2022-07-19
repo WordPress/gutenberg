@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classNames from 'classnames';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
@@ -59,7 +58,7 @@ function UnforwardedSelectControl(
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning.
-	if ( isEmpty( options ) && ! children ) return null;
+	if ( ! options?.length && ! children ) return null;
 
 	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
 		onBlur( event );
