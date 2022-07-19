@@ -66,7 +66,16 @@ export default function PostTemplate() {
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
-		return select( editPostStore ).getEditedPostTemplate()?.title;
+		const templateSlug =
+			select( editorStore ).getEditedPostAttribute( 'template' );
+
+		const settings = select( editorStore ).getEditorSettings();
+		if ( templateSlug && settings.availableTemplates[ templateSlug ] ) {
+			return settings.availableTemplates[ templateSlug ];
+		}
+
+		const template = select( editPostStore ).getEditedPostTemplate();
+		return template?.title ?? template?.slug;
 	}, [] );
 
 	return (
