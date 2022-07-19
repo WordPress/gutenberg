@@ -7,7 +7,9 @@ export default function useClickSelection() {
 	return useRefEffect( ( node ) => {
 		function onMouseDown( event ) {
 			if (
-				event.target.closest( '[contenteditable],[tabindex]' ) !== node
+				! event.target.classList.contains(
+					'block-editor-block-list__layout'
+				)
 			) {
 				return;
 			}
