@@ -373,6 +373,33 @@ export function setGroupingBlockName( name ) {
  *
  * @param {Object[]} categories Block categories.
  *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect, useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const blockCategories = useSelect( ( select ) =>
+ *         select( blocksStore ).getCategories()
+ *     );
+ *
+ *     const { setCategories } = useDispatch( blocksStore )
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 setCategories( [
+ *                     ...blockCategories,
+ *                     { title: 'Custom Category', slug: 'custom-category' },
+ *                 ] )
+ *             }
+ *         >
+ *             { __( 'Add a new custom block category' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function setCategories( categories ) {

@@ -163,9 +163,36 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
 }
 
 /**
- * Returns all the available categories.
+ * Returns all the available block categories.
  *
  * @param {Object} state Data state.
+ *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect, useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const blockCategories = useSelect( ( select ) =>
+ *         select( blocksStore ).getCategories()
+ *     );
+ *
+ *     const { setCategories } = useDispatch( blocksStore )
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 setCategories( [
+ *                     ...blockCategories,
+ *                     { title: 'Custom Category', slug: 'custom-category' },
+ *                 ] )
+ *             }
+ *         >
+ *             { __( 'Add a new custom block category' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {WPBlockCategory[]} Categories list.
  */
