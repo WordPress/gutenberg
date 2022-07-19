@@ -45,21 +45,23 @@
 	}
 
 	.editor-post-featured-image__preview-icon {
-		display: none;
+		background: $white;
+		border-radius: $radius-block-ui;
+		display: block;
+		height: $grid-unit-40;
+		padding: $grid-unit-05;
+		position: absolute;
+		right: $grid-unit-10;
+		top: $grid-unit-10;
+		visibility: hidden;
+		width: $grid-unit-40;
 	}
 
 	&:hover,
-	&:focus {
+	&:focus,
+	&.is-menu-open {
 		.editor-post-featured-image__preview-icon {
-			background: $white;
-			border-radius: $radius-block-ui;
-			display: block;
-			height: $grid-unit-40;
-			padding: $grid-unit-05;
-			position: absolute;
-			right: $grid-unit-10;
-			top: $grid-unit-10;
-			width: $grid-unit-40;
+			visibility: visible;
 		}
 	}
 }

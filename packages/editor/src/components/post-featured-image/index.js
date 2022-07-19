@@ -16,7 +16,7 @@ import {
 	Dropdown,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -101,10 +101,14 @@ function PostFeaturedImage( {
 	noticeUI,
 	noticeOperations,
 } ) {
+	const menuAnchorRef = useRef();
+
 	const [ isLoading, setIsLoading ] = useState( false );
+
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
+
 	const postLabel = get( postType, [ 'labels' ], {} );
 	const mediaDetails = getMediaDetails( media, currentPostId );
 
@@ -173,11 +177,18 @@ function PostFeaturedImage( {
 						<div className="editor-post-featured-image__container">
 							<Dropdown
 								className="editor-post-featured-image__dropdown"
-								position="center left"
+								position={
+									featuredImageId
+										? 'bottom left'
+										: 'bottom center'
+								}
+								popoverProps={ { anchorRef: menuAnchorRef } }
 								focusOnMount
 								renderToggle={ ( { isOpen, onToggle } ) =>
 									featuredImageId ? (
 										<PostFeaturedImagePreview
+											isMenuOpen={ isOpen }
+											menuAnchorRef={ menuAnchorRef }
 											mediaDetails={ mediaDetails }
 											isLoading={ isLoading }
 											aria-expanded={ isOpen }
@@ -186,6 +197,7 @@ function PostFeaturedImage( {
 										/>
 									) : (
 										<PostFeaturedImageToggle
+											menuAnchorRef={ menuAnchorRef }
 											aria-expanded={ isOpen }
 											onClick={ onToggle }
 										>

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -11,13 +16,17 @@ import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 
 export default function PostFeaturedImagePreview( {
+	isMenuOpen,
+	menuAnchorRef,
 	mediaDetails,
 	isLoading,
 	...props
 } ) {
 	return (
 		<Button
-			className="editor-post-featured-image__preview"
+			className={ classnames( 'editor-post-featured-image__preview', {
+				'is-menu-open': isMenuOpen,
+			} ) }
 			aria-label={ __( 'Edit or update the image' ) }
 			{ ...props }
 		>
@@ -31,10 +40,13 @@ export default function PostFeaturedImagePreview( {
 				</ResponsiveWrapper>
 			) }
 			{ isLoading && <Spinner /> }
-			<Icon
+			{ /* TODO: If Icon supported ref then could eliminate this wrapper. */ }
+			<span
+				ref={ menuAnchorRef }
 				className="editor-post-featured-image__preview-icon"
-				icon={ pencil }
-			/>
+			>
+				<Icon icon={ pencil } />
+			</span>
 		</Button>
 	);
 }
