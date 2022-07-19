@@ -101,7 +101,7 @@ export default function BlockTools( {
 				event.target.ownerDocument.defaultView
 					.getSelection()
 					.removeAllRanges();
-				event.target.focus();
+				__unstableContentRef?.current.focus();
 			}
 		}
 	}
