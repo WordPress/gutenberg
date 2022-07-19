@@ -53,7 +53,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$template_hierarchy = gutenberg_get_template__hierarchy( $request['slug'] );
+		$template_hierarchy = gutenberg_get_template_hierarchy( $request['slug'] );
 		$fallback_template  = resolve_block_template( $request['slug'], $template_hierarchy, '' );
 		return rest_ensure_response( $fallback_template->content );
 	}
