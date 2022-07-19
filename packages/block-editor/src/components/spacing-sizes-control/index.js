@@ -34,7 +34,7 @@ export default function SpacingSizesControl( {
 	label = __( 'Spacing Control' ),
 	values: valuesProp,
 	sides,
-	splitOnAxis = true,
+	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 	useSelect,
