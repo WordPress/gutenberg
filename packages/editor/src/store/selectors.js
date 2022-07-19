@@ -1071,10 +1071,10 @@ export function getActivePostLock( state ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return (
+	return Boolean(
 		getCurrentPost( state )._links?.hasOwnProperty(
 			'wp:action-unfiltered-html'
-		) ?? false
+		)
 	);
 }
 
