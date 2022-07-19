@@ -330,7 +330,7 @@ export function getLayoutStyles( {
 						if ( declarations.length ) {
 							const combinedSelector =
 								selector === ROOT_BLOCK_SELECTOR
-									? `${ selector } .${ className }${
+									? `.${ className }${
 											spacingStyle?.selector || ''
 									  }`
 									: `${ selector }.${ className }${
@@ -362,7 +362,7 @@ export function getLayoutStyles( {
 					displayMode &&
 					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
+					ruleset += `.${ className } { display:${ displayMode }; }`;
 				}
 
 				if ( baseStyles?.length ) {
@@ -380,7 +380,7 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `${ selector } .${ className }${
+							const combinedSelector = `.${ className }${
 								baseStyle?.selector || ''
 							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(

@@ -1324,13 +1324,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 									}
 								}
 
-								$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
-								$layout_selector = sprintf(
-									$format,
-									$selector,
-									$class_name,
-									$spacing_rule['selector']
-								);
+								$layout_selector =
+									static::ROOT_BLOCK_SELECTOR === $selector ?
+										sprintf(
+											'.%s%s',
+											$class_name,
+											$spacing_rule['selector']
+										) :
+										sprintf(
+											'%s.%s%s',
+											$selector,
+											$class_name,
+											$spacing_rule['selector']
+										);
 								$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
 							}
 						}
@@ -1358,13 +1364,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$layout_selector = sprintf(
-							'%s .%s',
-							$selector,
-							$class_name
-						);
-						$block_rules    .= static::to_ruleset(
-							$layout_selector,
+						$block_rules .= static::to_ruleset(
+							".$class_name",
 							array(
 								array(
 									'name'  => 'display',
@@ -1392,8 +1393,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 							}
 
 							$layout_selector = sprintf(
-								'%s .%s%s',
-								$selector,
+								'.%s%s',
 								$class_name,
 								$base_style_rule['selector']
 							);
