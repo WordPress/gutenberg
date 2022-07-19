@@ -26,7 +26,7 @@
 	z-index: z-index(".block-editor-template-part__selection-modal");
 
 	.components-search-control {
-		input[type=search].components-search-control__input {
+		input[type="search"].components-search-control__input {
 			height: $grid-unit * 5.5;
 		}
 	}
