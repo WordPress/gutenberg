@@ -101,3 +101,13 @@ Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
 };
+
+export const DropdownSelector: ComponentStory< typeof FormTokenField > =
+	DefaultTemplate.bind( {} );
+DropdownSelector.args = {
+	...Default.args,
+	__experimentalExpandOnFocus: true,
+	__experimentalAutoSelectFirstMatch: true,
+	__experimentalValidateInput: ( token: string ) =>
+		continents.includes( token ),
+};
