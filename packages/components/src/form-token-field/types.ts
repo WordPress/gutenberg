@@ -154,6 +154,15 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__next36pxDefaultSize?: boolean;
+	/**
+	 * If true, the select the first matching suggestion when the user presses
+	 * the Enter key (or space when tokenizeOnSpace is true).
+	 *
+	 * This has no effect if __experimentalValidateInput isn't defined.
+	 *
+	 * @default false
+	 */
+	__experimentalAutoSelectFirstMatch?: boolean;
 }
 
 export interface SuggestionsListProps< T = string | { value: string } > {

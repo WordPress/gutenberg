@@ -76,6 +76,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
 		__next36pxDefaultSize = false,
+		__experimentalAutoSelectFirstMatch = false,
 	} = props;
 
 	const instanceId = useInstanceId( FormTokenField );
@@ -495,8 +496,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function getSelectedSuggestion() {
+		const matchingSuggestions = getMatchingSuggestions();
+
 		if ( selectedSuggestionIndex !== -1 ) {
-			return getMatchingSuggestions()[ selectedSuggestionIndex ];
+			return matchingSuggestions[ selectedSuggestionIndex ];
+		}
+
+		if (
+			matchingSuggestions.length > 0 &&
+			incompleteTokenValue.length > 0 &&
+			typeof __experimentalValidateInput !== 'undefined' &&
+			__experimentalAutoSelectFirstMatch
+		) {
+			return matchingSuggestions[ 0 ];
 		}
 
 		return undefined;
