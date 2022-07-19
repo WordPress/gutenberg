@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -12,18 +12,18 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
 import { space } from '../../ui/utils/space';
 import * as styles from '../styles';
 import { useCx, rtl } from '../../utils';
+import type { FlexProps } from '../types';
 
-/**
- *
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
- * @return {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
- */
-function useDeprecatedProps( { isReversed, ...otherProps } ) {
+function useDeprecatedProps(
+	props: WordPressComponentProps< FlexProps, 'div' >
+): WordPressComponentProps< FlexProps, 'div' > {
+	const { isReversed, ...otherProps } = props;
+
 	if ( typeof isReversed !== 'undefined' ) {
 		deprecated( 'Flex isReversed', {
 			alternative: 'Flex direction="row-reverse" or "column-reverse"',
@@ -38,10 +38,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
 	return otherProps;
 }
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
- */
-export function useFlex( props ) {
+export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const {
 		align = 'center',
 		className,
@@ -67,7 +64,11 @@ export function useFlex( props ) {
 	const rtlWatchResult = rtl.watch();
 
 	const classes = useMemo( () => {
-		const sx = {};
+		const sx: {
+			Base?: SerializedStyles;
+			Items?: SerializedStyles;
+			WrapItems?: SerializedStyles;
+		} = {};
 
 		sx.Base = css( {
 			alignItems: isColumn ? 'normal' : align,

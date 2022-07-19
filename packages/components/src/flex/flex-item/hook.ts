@@ -1,27 +1,30 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { FlexItemProps } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
- */
-export function useFlexItem( props ) {
+export function useFlexItem(
+	props: WordPressComponentProps< FlexItemProps, 'div' >
+) {
 	const {
 		className,
 		display: displayProp,
 		isBlock = false,
 		...otherProps
 	} = useContextSystem( props, 'FlexItem' );
-	const sx = {};
+
+	const sx: {
+		Base?: SerializedStyles;
+	} = {};
 
 	const contextDisplay = useFlexContext().flexItemDisplay;
 
