@@ -8,14 +8,6 @@ exports[`Shortcut renders passed className 1`] = `
 </span>
 `;
 
-exports[`Shortcut renders the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties 1`] = `
-<span
-  aria-label="shortcut label"
->
-  shortcut text
-</span>
-`;
-
 exports[`Shortcut renders the shortcut display text when a string is passed as the shortcut 1`] = `
 <span>
   shortcut text

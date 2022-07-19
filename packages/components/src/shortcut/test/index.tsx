@@ -29,7 +29,9 @@ describe( 'Shortcut', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'shortcut text' ) ).toMatchSnapshot();
+		expect( screen.getByLabelText( 'shortcut label' ) ).toHaveTextContent(
+			'shortcut text'
+		);
 	} );
 
 	it( 'renders passed className', () => {
