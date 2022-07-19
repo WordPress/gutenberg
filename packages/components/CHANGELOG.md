@@ -2,10 +2,33 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+-   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+
+### Enhancements
+
+-   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+-   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+-   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+-   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+-   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+-   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+
 ### Internal
 
+-   `ColorPicker`: Clean up implementation of 40px size ([#42002](https://github.com/WordPress/gutenberg/pull/42002/)).
 -   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
+-   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
+-   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
+-   `ScrollLock`: Convert to TypeScript ([#42303](https://github.com/WordPress/gutenberg/pull/42303)).
 -   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
+-   `TreeSelect`: Refactor away from `_.compact()` ([#42438](https://github.com/WordPress/gutenberg/pull/42438)).
+-   `MediaEdit`: Refactor away from `_.compact()` for mobile ([#42438](https://github.com/WordPress/gutenberg/pull/42438)).
+-   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+-   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+-   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 
 ## 19.15.0 (2022-07-13)
 
@@ -16,6 +39,14 @@
 -   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
 -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076)).
 -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
+
+### Enhancement
+
+-   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
+
+### Enhancements
+
+-   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
 
 ### Internal
 

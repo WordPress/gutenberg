@@ -634,6 +634,7 @@ export default function NavigationSubmenuEdit( {
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
+							__unstableShift
 						>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"

@@ -316,6 +316,10 @@
 							"type": "boolean",
 							"default": true
 						},
+						"fluid": {
+							"description": "Opts into fluid typography.",
+							"type": "boolean"
+						},
 						"letterSpacing": {
 							"description": "Allow users to set custom letter spacing.",
 							"type": "boolean",
@@ -358,6 +362,20 @@
 									"size": {
 										"description": "CSS font-size value, including units.",
 										"type": "string"
+									},
+									"fluid": {
+										"type": "object",
+										"properties": {
+											"min": {
+												"description": "A min font size for fluid font size calculations in px, rem or em.",
+												"type": "string"
+											},
+											"max": {
+												"description": "A max font size for fluid font size calculations in px, rem or em.",
+												"type": "string"
+											}
+										},
+										"additionalProperties": false
 									}
 								},
 								"additionalProperties": false

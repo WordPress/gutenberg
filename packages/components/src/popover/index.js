@@ -210,15 +210,19 @@ const Popover = (
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
-	const onDialogClose = ( type, event ) => {
-		// Ideally the popover should have just a single onClose prop and
-		// not three props that potentially do the same thing.
-		if ( type === 'focus-outside' && onFocusOutside ) {
-			onFocusOutside( event );
-		} else if ( onClose ) {
-			onClose();
-		}
-	};
+	let onDialogClose;
+
+	if ( onClose || onFocusOutside ) {
+		onDialogClose = ( type, event ) => {
+			// Ideally the popover should have just a single onClose prop and
+			// not three props that potentially do the same thing.
+			if ( type === 'focus-outside' && onFocusOutside ) {
+				onFocusOutside( event );
+			} else if ( onClose ) {
+				onClose();
+			}
+		};
+	}
 
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount,

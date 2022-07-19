@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, omit, pick } from 'lodash';
+import { get, has, isEmpty, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import {
 	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -296,10 +297,14 @@ export function ImageEdit( {
 		/>
 	);
 
+	const borderProps = useBorderProps( attributes );
+
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		'has-custom-border':
+			!! borderProps.className || ! isEmpty( borderProps.style ),
 	} );
 
 	const blockProps = useBlockProps( {

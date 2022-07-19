@@ -10,13 +10,8 @@
 			"id": 13,
 			"width": 358,
 			"height": 164,
-			"linkDestination": "none",
 			"sizeSlug": "large",
-			"style": {
-				"border": {
-					"radius": "10px"
-				}
-			}
+			"linkDestination": "none"
 		},
 		"innerBlocks": []
 	}

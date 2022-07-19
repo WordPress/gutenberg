@@ -35,7 +35,10 @@ export type FlexProps = {
 	 */
 	expanded?: boolean;
 	/**
-	 * Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+	 * Spacing in between each child can be adjusted by using `gap`.
+	 *
+	 * Can either be a number (which will act as a multiplier to the library's grid system base of 4px),
+	 * or a literal CSS value string.
 	 *
 	 * @default 2
 	 */

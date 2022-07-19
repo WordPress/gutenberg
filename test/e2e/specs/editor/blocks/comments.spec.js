@@ -8,6 +8,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * @typedef {import('@wordpress/e2e-test-utils-playwright').RequestUtils} RequestUtils
  */
 
+test.use( {
+	commentsBlockUtils: async ( { page, admin }, use ) => {
+		await use( new CommentsBlockUtils( { page, admin } ) );
+	},
+} );
+
 test.describe( 'Comments', () => {
 	let previousPageComments,
 		previousCommentsPerPage,
@@ -17,17 +23,20 @@ test.describe( 'Comments', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { commentsBlockUtils } ) => {
 		// Ideally, we'd set options in beforeAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		previousPageComments = await admin.setOption( 'page_comments', '1' );
-		previousCommentsPerPage = await admin.setOption(
+		previousPageComments = await commentsBlockUtils.setOption(
+			'page_comments',
+			'1'
+		);
+		previousCommentsPerPage = await commentsBlockUtils.setOption(
 			'comments_per_page',
 			'1'
 		);
-		previousDefaultCommentsPage = await admin.setOption(
+		previousDefaultCommentsPage = await commentsBlockUtils.setOption(
 			'default_comments_page',
 			'newest'
 		);
@@ -43,8 +52,8 @@ test.describe( 'Comments', () => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		await expect(
-			await page.locator( 'text="No results found."' )
-		).toHaveCount( 1 );
+			page.locator( 'role=document[name="Block: Comment Template"i]' )
+		).toContainText( 'No results found.' );
 	} );
 
 	test( 'Pagination links are working as expected', async ( {
@@ -53,7 +62,6 @@ test.describe( 'Comments', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const author = requestUtils.getCurrentUser();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
@@ -61,7 +69,6 @@ test.describe( 'Comments', () => {
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
 			await requestUtils.createComment( {
-				author: author.id,
 				content: `This is an automated comment - ${ i }`,
 				post: postId,
 			} );
@@ -69,45 +76,45 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"i] >> "View Post"'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
 		);
 
 		// We check that there is a previous comments page link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Older Comments"i]' )
+		).toBeVisible();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Newer Comments"i]' )
+		).toBeHidden();
 
-		await page.click( 'text="Older Comments"' );
+		await page.click( 'role=link[name="Older Comments"i]' );
 
 		// We check that there are a previous and a next link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Older Comments"i]' )
+		).toBeVisible();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Newer Comments"i]' )
+		).toBeVisible();
 
-		await page.click( 'text="Older Comments"' );
+		await page.click( 'role=link[name="Older Comments"i]' );
 
 		// We check that there is only have a next link
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Older Comments"i]' )
+		).toBeHidden();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 1 );
+			page.locator( 'role=link[name="Newer Comments"i]' )
+		).toBeVisible();
 	} );
 	test( 'Pagination links are not appearing if break comments is not enabled', async ( {
 		admin,
 		editor,
 		page,
 		requestUtils,
+		commentsBlockUtils,
 	} ) => {
-		const author = requestUtils.getCurrentUser();
-		await admin.setOption( 'page_comments', '0' );
+		await commentsBlockUtils.setOption( 'page_comments', '0' );
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
@@ -115,7 +122,6 @@ test.describe( 'Comments', () => {
 		// Create three comments for that post.
 		for ( let i = 0; i < 3; i++ ) {
 			await requestUtils.createComment( {
-				author: author.id,
 				content: `This is an automated comment - ${ i }`,
 				post: postId,
 			} );
@@ -123,33 +129,68 @@ test.describe( 'Comments', () => {
 
 		// Visit the post that was just published.
 		await page.click(
-			'role=region[name="Editor publish"i] >> "View Post"'
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
 		);
 
 		// We check that there are no comments page link.
 		await expect(
-			await page.locator( 'text="Older Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Older Comments"i]' )
+		).toBeHidden();
 		await expect(
-			await page.locator( 'text="Newer Comments"' )
-		).toHaveCount( 0 );
+			page.locator( 'role=link[name="Newer Comments"i]' )
+		).toBeHidden();
 	} );
 
-	test.afterEach( async ( { admin } ) => {
+	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
 		// Ideally, we'd set options in afterAll. Unfortunately, these
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll.
-		await admin.setOption( 'page_comments', previousPageComments );
-		await admin.setOption( 'comments_per_page', previousCommentsPerPage );
-		await admin.setOption(
+		await commentsBlockUtils.setOption(
+			'page_comments',
+			previousPageComments
+		);
+		await commentsBlockUtils.setOption(
+			'comments_per_page',
+			previousCommentsPerPage
+		);
+		await commentsBlockUtils.setOption(
 			'default_comments_page',
 			previousDefaultCommentsPage
 		);
+		await requestUtils.deleteAllComments();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllComments();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 } );
+
+class CommentsBlockUtils {
+	constructor( { page, admin } ) {
+		this.page = page;
+		this.admin = admin;
+	}
+
+	/**
+	 * Sets a site option, from the options-general admin page.
+	 *
+	 * This is a temporary solution until we can handle options through the REST
+	 * API.
+	 *
+	 * @param {string} setting The option, used to get the option by id.
+	 * @param {string} value   The value to set the option to.
+	 *
+	 * @return {Promise<string>} A Promise that resolves to the option's
+	 * previous value.
+	 */
+	async setOption( setting, value ) {
+		await this.admin.visitAdminPage( 'options.php', '' );
+		const previousValue = await this.page.inputValue( `#${ setting }` );
+
+		await this.page.fill( `#${ setting }`, value );
+		await this.page.click( '#Update' );
+
+		return previousValue;
+	}
+}
