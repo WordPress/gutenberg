@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
+
 ## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
 -   [*] Image block copies the alt text from the media library when selecting an item [#41839]
