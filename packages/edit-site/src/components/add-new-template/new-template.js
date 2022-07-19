@@ -257,11 +257,7 @@ function useMissingTemplates(
 			// with the check if it has available specific item to create a
 			// template for.
 			if ( matchIndex > -1 ) {
-				enhancedMissingDefaultTemplateTypes.splice(
-					matchIndex,
-					1,
-					menuItem
-				);
+				enhancedMissingDefaultTemplateTypes[ matchIndex ] = menuItem;
 			} else {
 				enhancedMissingDefaultTemplateTypes.push( menuItem );
 			}
