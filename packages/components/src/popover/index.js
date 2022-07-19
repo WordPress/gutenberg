@@ -182,7 +182,6 @@ const Popover = (
 	}, [ ownerDocument ] );
 
 	const middlewares = [
-		frameOffset,
 		offset ? offsetMiddleware( offset ) : undefined,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
@@ -205,6 +204,7 @@ const Popover = (
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
+		frameOffset,
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
