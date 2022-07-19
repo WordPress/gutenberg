@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import { NavigableMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	media as mediaIcon,
@@ -25,41 +25,43 @@ export default function PostFeaturedImageMenu( {
 				title={ title }
 				onClose={ onClose }
 			/>
-			<MenuGroup>
-				<MenuItem
-					icon={ mediaIcon }
-					iconPosition="left"
-					onClick={ () => {
-						onOpenMediaLibrary();
-						onClose();
-					} }
-				>
-					{ __( 'Open Media Library' ) }
-				</MenuItem>
-				<MenuItem
-					icon={ uploadIcon }
-					iconPosition="left"
-					onClick={ () => {
-						onOpenFileDialog();
-						onClose();
-					} }
-				>
-					{ __( 'Upload file' ) }
-				</MenuItem>
-				{ onRemoveImage && (
+			<NavigableMenu>
+				<MenuGroup>
 					<MenuItem
-						icon={ trashIcon }
+						icon={ mediaIcon }
 						iconPosition="left"
-						isDestructive
 						onClick={ () => {
-							onRemoveImage();
+							onOpenMediaLibrary();
 							onClose();
 						} }
 					>
-						{ removeImageLabel }
+						{ __( 'Open Media Library' ) }
 					</MenuItem>
-				) }
-			</MenuGroup>
+					<MenuItem
+						icon={ uploadIcon }
+						iconPosition="left"
+						onClick={ () => {
+							onOpenFileDialog();
+							onClose();
+						} }
+					>
+						{ __( 'Upload file' ) }
+					</MenuItem>
+					{ onRemoveImage && (
+						<MenuItem
+							icon={ trashIcon }
+							iconPosition="left"
+							isDestructive
+							onClick={ () => {
+								onRemoveImage();
+								onClose();
+							} }
+						>
+							{ removeImageLabel }
+						</MenuItem>
+					) }
+				</MenuGroup>
+			</NavigableMenu>
 		</div>
 	);
 }
