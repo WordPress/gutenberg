@@ -33,7 +33,7 @@ npm ci
 ## Run
 
 ```sh
-npm run other:native start:reset
+npm run native start:reset
 ```
 
 Runs the packager (Metro) in development mode. The packager stays running to serve the app bundle to the clients that request it.
@@ -41,7 +41,7 @@ Runs the packager (Metro) in development mode. The packager stays running to ser
 With the packager running, open another terminal window and use the following command to compile and run the Android app:
 
 ```sh
-npm run other:native android
+npm run native android
 ```
 
 The app should now open in a connected device or a running emulator and fetch the JavaScript code from the running packager.
@@ -49,7 +49,7 @@ The app should now open in a connected device or a running emulator and fetch th
 To compile and run the iOS variant of the app using the _default_ simulator device, use:
 
 ```sh
-npm run other:native ios
+npm run native ios
 ```
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
@@ -59,13 +59,13 @@ which will attempt to open your app in the iOS Simulator if you're on a Mac and 
 To compile and run the app using a different device simulator, use the following, noting the double sets of `--` to pass the simulator option down to the `react-native` CLI.
 
 ```sh
-npm run other:native ios -- -- --simulator="DEVICE_NAME"
+npm run native ios -- -- --simulator="DEVICE_NAME"
 ```
 
 For example, if you'd like to run in an iPhone Xs Max, try:
 
 ```sh
-npm run other:native ios -- -- --simulator="iPhone Xs Max"
+npm run native ios -- -- --simulator="iPhone Xs Max"
 ```
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
@@ -74,7 +74,7 @@ To see a list of all of your available iOS devices, use `xcrun simctl list devic
 
 If the Android emulator doesn't start correctly, or compiling fails with `Could not initialize class org.codehaus.groovy.runtime.InvokerHelper` or similar, it may help to double check the set up of your development environment against the latest requirements in [React Native's documentation](https://reactnative.dev/docs/environment-setup). With Android Studio, for example, you will need to configure the `ANDROID_HOME` environment variable and ensure that your version of JDK matches the latest requirements.
 
-Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to stop the metro bunder process and restart it with `npm run other:native start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `npm run other:native clean:install` script can be handy.
+Some times, and especially when tweaking anything in the `package.json`, Babel configuration (`.babelrc`) or the Jest configuration (`jest.config.js`), your changes might seem to not take effect as expected. On those times, you might need to stop the metro bunder process and restart it with `npm run native start:reset`. Other times, you might want to reinstall the NPM packages from scratch and the `npm run native clean:install` script can be handy.
 
 ## Developing with Visual Studio Code
 
@@ -89,7 +89,7 @@ One of the extensions we are using is the [React Native Tools](https://marketpla
 Use the following command to run the test suite:
 
 ```sh
-npm run other:native test
+npm run native test
 ```
 
 It will run the [jest](https://github.com/facebook/jest) test runner on your tests. The tests are running on the desktop against Node.js.
@@ -97,7 +97,7 @@ It will run the [jest](https://github.com/facebook/jest) test runner on your tes
 To run the tests with debugger support, start it with the following CLI command:
 
 ```sh
-npm run other:native test:debug
+npm run native test:debug
 ```
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
@@ -110,26 +110,26 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 This repository uses Appium to run UI tests. The tests live in `__device-tests__` and are written using Appium to run tests against simulators and real devices. To run these you'll need to check off a few things:
 
--   When running the tests, you'll need to ensure the Metro bundler (`npm run other:native start`) is not running.
+-   When running the tests, you'll need to ensure the Metro bundler (`npm run native start`) is not running.
 -   [Appium CLI](https://github.com/appium/appium/blob/HEAD/docs/en/about-appium/getting-started.md) installed and available globally. We also recommend using [appium-doctor](https://github.com/appium/appium-doctor) to ensure all of Appium's dependencies are good to go. You don't have to worry about starting the server yourself, the tests handle starting the server on port 4723, just be sure that the port is free or feel free to change the port number in the test file.
 -   For iOS a simulator should automatically launch but for Android you'll need to have an emulator _with at least platform version 8.0_ fired up and running.
 
 Then, to run the UI tests on iOS:
 
 ```sh
-npm run other:native test:e2e:ios:local
+npm run native test:e2e:ios:local
 ```
 
 and for Android:
 
 ```sh
-npm run other:native test:e2e:android:local
+npm run native test:e2e:android:local
 ```
 
-To run a single test instead of the entire suite, use `npm run other:native device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test.js`:
+To run a single test instead of the entire suite, use `npm run native device-tests:local`. Here's an example that runs only `gutenberg-editor-paragraph.test.js`:
 
 ```sh
-npm run other:native test:e2e:android:local gutenberg-editor-paragraph.test.js
+npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 Note: You might experience problems that seem to be related to the tests starting the Appium server, e.g. errors that say `Connection Refused`, `Connection Reset` or `The requested environment is not available`. For now, you can manually start the Appium server via [appium desktop](https://github.com/appium/appium-desktop) or the CLI, then change the port number in the tests while (optionally) commenting out related code in the `beforeAll` and `afterAll` block.

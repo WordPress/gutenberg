@@ -93,13 +93,13 @@ See if `doctor` can fix both "common" and "iOS" issues. (Don't worry if "Android
 Once all common and iOS issues are resolved, try:
 
 ```
-npm run other:native start:reset #starts metro
+npm run native start:reset #starts metro
 ```
 
 In another terminal type:
 
 ```
-npm run other:native ios
+npm run native ios
 ```
 
 After waiting for everything to build, the demo app should be running from the iOS simulator:
@@ -196,13 +196,13 @@ There are some advanced settings we can toggle, but these are optional. Click fi
 Start metro:
 
 ```
-npm run other:native start:reset
+npm run native start:reset
 ```
 
 In another terminal run the following to launch the demo app in the Android emulator (if the emulator isn't already running, it'll also be launched as part of this command):
 
 ```
-npm run other:native android
+npm run native android
 ```
 
 After a bit of a wait, we’ll see something like this:
@@ -212,7 +212,7 @@ After a bit of a wait, we’ll see something like this:
 ## Unit Tests
 
 ```sh
-npm run other:native test
+npm run native test
 ```
 
 ## Integration Tests
@@ -229,18 +229,18 @@ Resolve any required dependencies.
 
 ### iOS Integration Tests
 
-If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run other:native start:reset`.
+If we know we can run the iOS local environment without issue, E2Es for iOS are straightforward. Stop any running metro processes. This was launched previously with `npm run native start:reset`.
 
 Then in terminal type:
 
 ```sh
-npm run other:native test:e2e:ios:local
+npm run native test:e2e:ios:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```sh
-npm run other:native test:e2e:ios:local gutenberg-editor-paragraph.test.js
+npm run native test:e2e:ios:local gutenberg-editor-paragraph.test.js
 ```
 
 If all things go well, it should look like:
@@ -255,18 +255,18 @@ Start the virtual device first. Go back to the AVD by clicking on the phone icon
 
 <img src="https://developer.wordpress.org/files/2021/10/adv-integration.png" width="700px" alt="A screenshot of how to start the Android Simulator.">
 
-Make sure no metro processes are running. This was launched previously with `npm run other:native start:reset`.
+Make sure no metro processes are running. This was launched previously with `npm run native start:reset`.
 
 Then in a terminal run:
 
 ```sh
-npm run other:native test:e2e:android:local
+npm run native test:e2e:android:local
 ```
 
 Passing a filename should also work to run a subset of tests:
 
 ```
-npm run other:native test:e2e:android:local gutenberg-editor-paragraph.test.js
+npm run native test:e2e:android:local gutenberg-editor-paragraph.test.js
 ```
 
 After a bit of a wait we should see:
