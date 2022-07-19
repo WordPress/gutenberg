@@ -28,6 +28,11 @@
 	.components-search-control {
 		input[type="search"].components-search-control__input {
 			height: $grid-unit * 5.5;
+			width: $grid-unit * 16;
+
+			@include break-small() {
+				width: auto;
+			}
 		}
 	}
 }
