@@ -16,11 +16,12 @@
 -   [Metadata](/docs/reference-guides/block-api/block-metadata.md)
 -   [Variations](/docs/reference-guides/block-api/block-variations.md)
 
-## [Filter Reference](/docs/reference-guides/filters/README.md)
+## [Hooks Reference](/docs/reference-guides/filters/README.md)
 
--   [Block Filters](/docs/reference-guides/filters/block-filters.md)
--   [Editor Filters (Experimental)](/docs/reference-guides/filters/editor-filters.md)
--   [Parser Filters](/docs/reference-guides/filters/parser-filters.md)
+-   [Block Hooks](/docs/reference-guides/filters/block-filters.md)
+-   [Editor Hooks](/docs/reference-guides/filters/editor-filters.md)
+-   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
+-   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)
 -   [Autocomplete](/docs/reference-guides/filters/autocomplete-filters.md)
 
 ## [SlotFills Reference](/docs/reference-guides/slotfills/README.md)

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter, compact } from 'lodash';
+import { set, map, find, get, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -296,7 +296,8 @@ interface GetEntityRecord {
  * @param  kind  Entity kind.
  * @param  name  Entity name.
  * @param  key   Record's key
- * @param  query Optional query.
+ * @param  query Optional query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Record.
  */
@@ -526,7 +527,8 @@ interface GetEntityRecords {
  * @param  state State tree
  * @param  kind  Entity kind.
  * @param  name  Entity name.
- * @param  query Optional terms query.
+ * @param  query Optional terms query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Records.
  */
@@ -1115,7 +1117,7 @@ export function canUser(
 	resource: string,
 	id?: GenericRecordKey
 ): boolean | undefined {
-	const key = compact( [ action, resource, id ] ).join( '/' );
+	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
 

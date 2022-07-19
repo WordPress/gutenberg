@@ -574,7 +574,7 @@ export class ImageEdit extends Component {
 					<>
 						{ __(
 							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
-						) }
+						) }{ ' ' }
 						<FooterMessageLink
 							href={
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
@@ -665,6 +665,7 @@ export class ImageEdit extends Component {
 			context,
 			featuredImageId,
 			wasBlockJustInserted,
+			shouldUseFastImage,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 		const hasImageContext = context
@@ -845,6 +846,9 @@ export class ImageEdit extends Component {
 											isUploadInProgress={
 												isUploadInProgress
 											}
+											shouldUseFastImage={
+												shouldUseFastImage
+											}
 											onSelectMediaUploadOption={
 												this.onSelectMediaUploadOption
 											}
@@ -904,7 +908,8 @@ export default compose( [
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes, imageDefaultSize } = getSettings();
+		const { imageSizes, imageDefaultSize, shouldUseFastImage } =
+			getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
@@ -921,6 +926,7 @@ export default compose( [
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,
+			shouldUseFastImage,
 			featuredImageId,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,

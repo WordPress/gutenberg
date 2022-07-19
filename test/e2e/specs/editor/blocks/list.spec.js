@@ -313,23 +313,6 @@ test.describe( 'List', () => {
 		);
 	} );
 
-	test( 'can be created by converting a quote', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await editor.transformBlockTo( 'core/list' );
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul><li>one</li><li>two</li></ul>
-<!-- /wp:list -->`
-		);
-	} );
-
 	test( 'can be converted to a quote', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'one' );
@@ -339,7 +322,9 @@ test.describe( 'List', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
-<blockquote class="wp-block-quote"><p>one</p><p>two</p></blockquote>
+<blockquote class="wp-block-quote"><!-- wp:list -->
+<ul><li>one</li><li>two</li></ul>
+<!-- /wp:list --></blockquote>
 <!-- /wp:quote -->`
 		);
 	} );

@@ -207,9 +207,9 @@ exports[`Writing Flow should navigate empty paragraphs 1`] = `
 `;
 
 exports[`Writing Flow should not create extra line breaks in multiline value 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote -->"
+"<!-- wp:list -->
+<ul><li></li></ul>
+<!-- /wp:list -->"
 `;
 
 exports[`Writing Flow should not delete surrounding space when deleting a selected word 1`] = `
