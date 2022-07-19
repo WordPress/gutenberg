@@ -255,7 +255,21 @@ const Popover = (
 		__unstableShift
 			? shift( {
 					crossAxis: true,
-					limiter: limitShift(),
+					limiter: limitShift( {
+						offset: ( { floating } ) => {
+							// iFrame-specific correction aimed at allowing the floating element
+							// to shift fully below the reference element.
+							if ( ownerDocument === document ) {
+								return 0;
+							}
+							// TODO: adapt code based on the placement
+							// (see https://floating-ui.com/docs/shift#limitshift-offset)
+							return {
+								mainAxis: 0,
+								crossAxis: -floating.height,
+							};
+						},
+					} ),
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
