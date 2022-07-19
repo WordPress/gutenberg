@@ -7,8 +7,8 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  * Internal dependencies
  */
 import InputControl from '..';
-import { InputControlPrefixWrapper } from '../input-prefix';
-import { InputControlSuffixWrapper } from '../input-suffix';
+import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
+import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 
 const meta: ComponentMeta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
