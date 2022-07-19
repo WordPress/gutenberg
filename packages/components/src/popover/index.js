@@ -181,8 +181,9 @@ const Popover = (
 						currentPlacement.includes( 'top' ) ||
 						currentPlacement.includes( 'bottom' );
 
-					// The axes here seem to be opposite to what the floating-ui docs
-					// state, but this seems to work. :confused-emoji:
+					// The main axis should represent the gap between the
+					// floating element and the reference element. The cross
+					// axis is always perpendicular to the main axis.
 					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
 					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
 
