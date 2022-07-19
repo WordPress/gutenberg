@@ -5,7 +5,6 @@ import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -26,7 +25,7 @@ export default function Actions( { template } ) {
 	const isRevertable = isTemplateRevertable( template );
 
 	if ( ! isRemovable && ! isRevertable ) {
-		return null;
+		return __( 'No actions' );
 	}
 
 	async function revertAndSaveTemplate() {
@@ -53,9 +52,12 @@ export default function Actions( { template } ) {
 
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
+			icon={ null }
 			className="edit-site-list-table__actions"
+			toggleProps={ {
+				children: __( 'Actions' ),
+				isSecondary: true,
+			} }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>

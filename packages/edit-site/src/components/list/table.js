@@ -4,10 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	VisuallyHidden,
-	__experimentalHeading as Heading,
-} from '@wordpress/components';
+import { __experimentalHeading as Heading } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -85,7 +82,7 @@ export default function Table( { templateType } ) {
 						className="edit-site-list-table-column"
 						role="columnheader"
 					>
-						<VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>
+						{ __( 'Manage' ) }
 					</th>
 				</tr>
 			</thead>
