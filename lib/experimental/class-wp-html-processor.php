@@ -1,4 +1,29 @@
 <?php
+/***
+ * Scans through an HTML document to find specific tags, then
+ * transforms those tags by adding, removing, or updating the
+ * values of the HTML attributes within that tag (opener).
+ *
+ * Does not fully parse HTML or _recurse_ into the HTML structure
+ * Instead this scans linearly through a document and only parses
+ * the HTML tag openers.
+ *
+ * @TODO:
+ *  - All the return values from `scan()` are written as if
+ *    they are simple string values but they need to be the
+ *    structure of the matches.
+ *      - [ start, end ] of tag opener structure in source
+ *      - [ start,  end ] offset of tag/attribute name in source
+ *      - comparable( $name ) of the tag/attribute name
+ *      - $value of the attribute value
+ *
+ *  - Write a comprehensive test suite for various unexpected
+ *    quirks and attribute names. Unfortunately we need to have
+ *    some fairly robust support because it's not difficult to
+ *    create misleading HTML through the block editor. For
+ *    example, as can happen with a number of plaintext inputs.
+ */
+
 
 /**
  * Processes an input HTML document by applying a specified set
@@ -17,11 +42,11 @@ class WP_HTML_Processor {
 
 
 	/**
-	 * Tracks parsing while scanning input document.
+	 * Scans the HTML document, keeping track of its own state.
 	 *
-	 * @var WP_HTML_Processor_Parse_State
+	 * @var WP_HTML_Scanner
 	 */
-	public $state;
+	public $scanner;
 
 
 	/**
@@ -34,14 +59,14 @@ class WP_HTML_Processor {
 
 
 	public function __construct( $input ) {
-		$this->state = new WP_HTML_Processor_Parse_State( $input );
+		$this->scanner = new WP_HTML_Scanner( $input );
+		$this->modifications = new WP_Tag_Modifications();
 	}
 
 
-	public function find( WP_Tag_Find_Descriptor $descriptor ) {
-		$this->state->reset();
-		$this->descriptor = $descriptor;
-		$this->modifications = new WP_Tag_Modifications();
+	public function find( $query ) {
+		$this->scanner->reset();
+		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
 	}
 
 
@@ -51,7 +76,7 @@ class WP_HTML_Processor {
 		// construct output
 
 		// @TODO: This is a stub; implement the real apply() behavior.
-		return $this->state->document;
+		return $this->scanner->document;
 	}
 
 
@@ -195,7 +220,7 @@ class WP_Tag_Find_Descriptor {
 }
 
 
-class WP_HTML_Processor_Parse_State {
+class WP_HTML_Scanner {
 	/**
 	 * Input HTML document we're processing.
 	 *
@@ -214,9 +239,17 @@ class WP_HTML_Processor_Parse_State {
 	/**
 	 * Whether we've already found the tag meeting our search constraints.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
 	public $did_match = false;
+
+
+	/**
+	 * Whether we've reached the end of the document and failed to find our match.
+	 *
+	 * @var bool
+	 */
+	public $did_fail_match = false;
 
 
 	/**
@@ -225,6 +258,15 @@ class WP_HTML_Processor_Parse_State {
 	 * @var int|null
 	 */
 	public $tag_start = null;
+
+
+	/**
+	 * Byte offset in the document where the current tag
+	 * being analyzed ends, including the trailing `>`.
+	 *
+	 * @var int|null
+	 */
+	public $tag_end = null;
 
 
 	/**
@@ -264,6 +306,123 @@ class WP_HTML_Processor_Parse_State {
 		$this->document = $input;
 	}
 
+
+	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0 ) {
+		if ( $found_already === $descriptor->match_offset ) {
+			return $found_already;
+		}
+
+		$tag = $this->find_next_tag();
+		if ( ! $tag ) {
+			return false;
+		}
+
+		// @TODO: Are we done matching?
+
+		while ( $attribute = $this->find_next_attribute() ) {
+			list( $name, $value ) = $attribute;
+
+			// HTML5 says duplicate values are ignored
+			if ( isset( $this->attributes[ $name ] ) ) {
+				continue;
+			}
+
+			$this->attributes[ $name ] = $value;
+
+			// @TODO: Are we done matching?
+		}
+
+		// @TODO: Remove this debugging call.
+		var_export( [
+			'tag' => $tag,
+			'attributes' => $this->attributes
+		] );
+	}
+
+	public function find_next_tag() {
+		if ( 1 !== preg_match(
+	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} \/>]*)~mui",
+			$this->document,
+			$tag_match,
+			PREG_OFFSET_CAPTURE,
+			$this->start_at
+		) ) {
+			$this->start_at = strlen( $this->document );
+			$this->did_fail_match = true;
+			return false;
+		}
+
+		list( '0' => $full_match ) = $tag_match;
+
+		// Keep scanning if we found a comment or CDATA section.
+		if ( ! isset( $tag_match['TAG'] ) ) {
+			$this->start_at += strlen( $full_match );
+			return $this->find_next_tag();
+		}
+
+		list( 'TAG' => $tag_name ) = $tag_match;
+		$this->start_at += strlen( $full_match );
+
+		return $tag_name;
+	}
+
+
+	public function find_next_attribute() {
+		// Find the attribute name
+		if ( 1 !== preg_match(
+			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^/>\t\x{0C} =]*)~miu',
+			$this->document,
+			$attribute_match,
+			PREG_OFFSET_CAPTURE,
+			$this->start_at
+		) ) {
+			$this->start_at = strlen( $this->document );
+			return false;
+		}
+
+		list( '0' => $full_match ) = $attribute_match;
+
+		list( 'NAME' => $attribute_name ) = $attribute_match;
+		$this->start_at += strlen( $full_match );
+
+		if ( '=' !== $this->document[ $this->start_at ] ) {
+			return [ $attribute_name, '' ];
+		}
+
+		// Find the attribute value
+		// Skip the equals sign.
+		$this->start_at += 1;
+		switch ( $this->document[ $this->start_at ] ) {
+			case '"':
+				$this->start_at += 1;
+				$pattern = '~(?P<VALUE>[^"]*)"~';
+				break;
+
+			case "'":
+				$this->start_at += 1;
+				$pattern = "~(?P<VALUE>[^']*)'~";
+				break;
+
+			default:
+				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} />]*)~';
+				break;
+		}
+
+		if ( 1 != preg_match(
+			$pattern,
+			$this->document,
+			$value_match,
+			PREG_OFFSET_CAPTURE,
+			$this->start_at
+		) ) {
+			return $attribute_name;
+		}
+
+		list( '0' => $full_match, 'VALUE' => $attribute_value ) = $value_match;
+		$this->start_at += strlen( $full_match );
+
+		return [ $attribute_name, $attribute_value ];
+	}
 
 	public function reset() {
 		$this->tag_name = null;
