@@ -794,6 +794,34 @@ _Returns_
 Returns true if a request is in progress for embed preview data, or false
 otherwise.
 
+_Usage_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { embedPreview, isRequestingEmbedPreview } = useSelect(
+		( select ) => {
+			return {
+				embedPreview: select( coreDataStore ).getEmbedPreview(
+					'https://twitter.com/wordpress'
+				),
+				isRequestingEmbedPreview: select(
+					coreDataStore
+				).isRequestingEmbedPreview( 'https://twitter.com/wordpress' ),
+			};
+		}
+	);
+
+	return ! isRequestingEmbedPreview && embedPreview ? (
+		<div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+	) : (
+		<div>{ __( 'Loading Tweets…' ) }</div>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `State`: Data state.

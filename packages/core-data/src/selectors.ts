@@ -113,6 +113,33 @@ const EMPTY_OBJECT = {};
  * @param  state Data state.
  * @param  url   URL the preview would be for.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { embedPreview, isRequestingEmbedPreview } = useSelect(
+ *         ( select ) => {
+ *             return {
+ *                 embedPreview: select( coreDataStore ).getEmbedPreview(
+ *                     'https://twitter.com/wordpress'
+ *                 ),
+ *                 isRequestingEmbedPreview: select(
+ *                     coreDataStore
+ *                 ).isRequestingEmbedPreview( 'https://twitter.com/wordpress' ),
+ *             };
+ *         }
+ *     );
+ *
+ *     return ! isRequestingEmbedPreview && embedPreview ? (
+ *         <div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+ *         ) : (
+ *         <div>{ __( 'Loading Tweets…' ) }</div>
+ *     );
+ * };
+ * ```
+ *
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
