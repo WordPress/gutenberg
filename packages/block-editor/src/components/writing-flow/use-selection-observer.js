@@ -112,6 +112,8 @@ export default function useSelectionObserver() {
 					if ( ! selectedNode ) return;
 					// Already focussed.
 					if ( selectedNode === activeElement ) return;
+					// Wrapper is focussed.
+					if ( node === activeElement ) return;
 					// Focus lies outside the editor.
 					if ( ! node.contains( activeElement ) ) return;
 
