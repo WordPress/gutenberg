@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -11,28 +11,24 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import * as styles from './styles';
 import { CONFIG, reduceMotion } from '../utils';
 import { useCx } from '../utils/hooks/use-cx';
 import { isValueDefined } from '../utils/values';
+import type { ElevationProps } from './types';
 
-/**
- * @param {number} value
- * @return {string} The box shadow value.
- */
-export function getBoxShadow( value ) {
-	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
+export function getBoxShadow( value: number ) {
+	const boxShadowColor = `rgba(0, 0, 0, ${ value / 20 })`;
 	const boxShadow = `0 ${ value }px ${ value * 2 }px 0
 	${ boxShadowColor }`;
 
 	return boxShadow;
 }
 
-/**
- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
- */
-export function useElevation( props ) {
+export function useElevation(
+	props: WordPressComponentProps< ElevationProps, 'div' >
+) {
 	const {
 		active,
 		borderRadius = 'inherit',
@@ -48,10 +44,12 @@ export function useElevation( props ) {
 	const cx = useCx();
 
 	const classes = useMemo( () => {
-		/** @type {number | undefined} */
-		let hoverValue = isValueDefined( hover ) ? hover : value * 2;
-		/** @type {number | undefined} */
-		let activeValue = isValueDefined( active ) ? active : value / 2;
+		let hoverValue: number | undefined = isValueDefined( hover )
+			? hover
+			: value * 2;
+		let activeValue: number | undefined = isValueDefined( active )
+			? active
+			: value / 2;
 
 		if ( ! isInteractive ) {
 			hoverValue = isValueDefined( hover ) ? hover : undefined;
@@ -60,7 +58,12 @@ export function useElevation( props ) {
 
 		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
 
-		const sx = {};
+		const sx: {
+			Base?: SerializedStyles;
+			hover?: SerializedStyles;
+			active?: SerializedStyles;
+			focus?: SerializedStyles;
+		} = {};
 
 		sx.Base = css(
 			{

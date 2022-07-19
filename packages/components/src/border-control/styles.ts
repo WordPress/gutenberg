@@ -31,6 +31,9 @@ const focusBoxShadow = css`
 
 export const borderControl = css`
 	position: relative;
+	border: 0;
+	padding: 0;
+	margin: 0;
 `;
 
 export const innerWrapper = () => css`
