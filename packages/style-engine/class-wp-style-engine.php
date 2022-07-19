@@ -646,6 +646,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		$defaults = array(
 			'selector'                   => null,
 			'convert_vars_to_classnames' => false,
+			'enqueue'                    => false,
 		);
 
 		$options       = wp_parse_args( $options, $defaults );
@@ -653,10 +654,18 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		$parsed_styles = $style_engine->parse_block_supports_styles( $block_styles, $options );
 
 		// Output.
-		$styles_output                 = array();
-		$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
-		$styles_output['declarations'] = $parsed_styles['css_declarations'];
-		$styles_output['classnames']   = $style_engine->compile_classnames( $parsed_styles['classnames'] );
+		$styles_output = array();
+		if ( ! empty( $parsed_styles['css_declarations'] ) ) {
+			$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
+			$styles_output['declarations'] = $parsed_styles['css_declarations'];
+			if ( true === $options['enqueue'] ) {
+				$style_engine->store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
+			}
+		}
+
+		if ( ! empty( $parsed_styles['classnames'] ) ) {
+			$styles_output['classnames'] = $style_engine->compile_classnames( $parsed_styles['classnames'] );
+		}
 
 		return array_filter( $styles_output );
 	}
@@ -669,22 +678,17 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *
  * @access public
  *
- * @param string $selector     A CSS selector.
- * @param array  $block_styles The value of a block's attributes.style.
+ * @param string $selector         A CSS selector.
+ * @param array  $css_declarations An array of CSS definitions, e.g., array( "$property" => "$value" ).
  *
  * @return boolean Whether the storage process was successful.
  */
-function wp_style_engine_enqueue_block_supports_styles( $selector, $block_styles ) {
-	if ( empty( $selector ) || empty( $block_styles ) ) {
+function wp_style_engine_enqueue_block_supports_styles( $selector, $css_declarations ) {
+	if ( empty( $selector ) || empty( $css_declarations ) ) {
 		return false;
 	}
 	if ( class_exists( 'WP_Style_Engine' ) ) {
-		$options       = array(
-			'selector' => $selector,
-		);
-		$style_engine  = WP_Style_Engine::get_instance();
-		$parsed_styles = $style_engine->parse_block_supports_styles( $block_styles, $options );
-		return $style_engine->store_css_rule( $selector, $parsed_styles['css_declarations'], 'block-supports' );
+		return WP_Style_Engine::get_instance()->store_css_rule( $selector, $css_declarations, 'block-supports' );
 	}
 	return false;
 }
