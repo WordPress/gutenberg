@@ -125,7 +125,13 @@ export default function DimensionsPanel( { name } ) {
 		name
 	);
 
-	const hasContentSizeValue = () => !! contentSizeValue;
+	const [ userSetContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name,
+		'user'
+	);
+
+	const hasUserSetContentSizeValue = () => !! userSetContentSizeValue;
 	const resetContentSizeValue = () => setContentSizeValue( '' );
 
 	const [ wideSizeValue, setWideSizeValue ] = useSetting(
@@ -133,7 +139,13 @@ export default function DimensionsPanel( { name } ) {
 		name
 	);
 
-	const hasWideSizeValue = () => !! wideSizeValue;
+	const [ userSetWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name,
+		'user'
+	);
+
+	const hasUserSetWideSizeValue = () => !! userSetWideSizeValue;
 	const resetWideSizeValue = () => setWideSizeValue( '' );
 
 	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
@@ -174,6 +186,8 @@ export default function DimensionsPanel( { name } ) {
 		resetPaddingValue();
 		resetMarginValue();
 		resetGapValue();
+		resetContentSizeValue();
+		resetWideSizeValue();
 	};
 
 	return (
@@ -184,7 +198,7 @@ export default function DimensionsPanel( { name } ) {
 						<FlexItem>
 							<ToolsPanelItem
 								label={ __( 'Content size' ) }
-								hasValue={ hasContentSizeValue }
+								hasValue={ hasUserSetContentSizeValue }
 								onDeselect={ resetContentSizeValue }
 								isShownByDefault={ true }
 							>
@@ -215,7 +229,7 @@ export default function DimensionsPanel( { name } ) {
 						<FlexItem>
 							<ToolsPanelItem
 								label={ __( 'Wide size' ) }
-								hasValue={ hasWideSizeValue }
+								hasValue={ hasUserSetWideSizeValue }
 								onDeselect={ resetWideSizeValue }
 								isShownByDefault={ true }
 							>
