@@ -2,39 +2,33 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG, flow } from '../utils';
-import { space } from '../ui/utils/space';
+import { COLORS, CONFIG } from '../utils';
+import { flow } from '../utils/flow';
+import { SliderColors } from './types';
 
-const boxShadow = flow(
-	[
-		'0 0 0',
-		CONFIG.controlPseudoBoxShadowFocusWidth,
-		CONFIG.surfaceBackgroundColor,
-	],
-	[
-		'0 0 0',
-		`calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px)`,
-		COLORS.admin.theme,
-	]
-);
-const errorBoxShadow = flow(
-	[
-		'0 0 0',
-		CONFIG.controlPseudoBoxShadowFocusWidth,
-		CONFIG.surfaceBackgroundColor,
-	],
-	[
-		'0 0 0',
-		`calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px)`,
-		COLORS.alert.red,
-	]
-);
+const getBoxShadowStyle = (
+	color: CSSProperties[ 'color' ] = COLORS.admin.theme
+) => {
+	return flow(
+		[
+			'0 0 0',
+			CONFIG.controlPseudoBoxShadowFocusWidth,
+			CONFIG.surfaceBackgroundColor,
+		],
+		[
+			'0 0 0',
+			`calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px)`,
+			color,
+		]
+	);
+};
 
-function getFocusBoxShadow( color = boxShadow ) {
+const getFocusBoxShadow = ( color: CSSProperties[ 'boxShadow' ] ) => {
 	return css`
 		&::-webkit-slider-thumb {
 			box-shadow: ${ color };
@@ -43,108 +37,119 @@ function getFocusBoxShadow( color = boxShadow ) {
 			box-shadow: ${ color };
 		}
 	`;
-}
+};
 
 export const focusedError = css`
-	${ getFocusBoxShadow( errorBoxShadow ) };
+	${ getFocusBoxShadow( getBoxShadowStyle( COLORS.alert.red ) ) };
 `;
 
-export const slider = css`
-	appearance: none;
-	background-color: transparent;
-	border: 0;
-	border-radius: ${ CONFIG.controlBorderRadius };
-	cursor: pointer;
-	display: block;
-	height: ${ CONFIG.controlHeight };
-	max-width: 100%;
-	min-width: 0;
-	padding: 0;
-	margin: 0;
-	width: 100%;
+const thumbStyles = ( colors: SliderColors ) => {
+	const { thumbColor = CONFIG.sliderThumbBackgroundColor } = colors;
+	return css`
+		appearance: none;
+		background-color: ${ thumbColor };
+		border: 1px solid ${ CONFIG.sliderThumbBorderColor };
+		border-radius: 50%;
+		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
+		cursor: pointer;
+		height: 12px;
+		margin-top: -5px;
+		opacity: 1;
+		width: 12px;
+		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
+	`;
+};
 
-	&:focus {
-		outline: none;
-	}
+const disabledThumbStyles = css`
+	background: ${ COLORS.ui.textDisabled };
+	border-color: ${ COLORS.ui.textDisabled };
+`;
 
-	&::-moz-focus-outer {
+const trackStyles = ( colors: SliderColors ) => {
+	const {
+		thumbColor = COLORS.admin.theme,
+		trackColor = COLORS.admin.theme,
+		trackBackgroundColor = CONFIG.controlBackgroundDimColor,
+	} = colors;
+
+	return css`
+		background: linear-gradient(
+			to right,
+			${ trackColor } calc( var( --progress ) ),
+			${ trackBackgroundColor } calc( var( --progress ) )
+		);
+		border-radius: 2px;
+		height: 2px;
+	`;
+};
+
+export const slider = ( colors ) => {
+	return css`
+		appearance: none;
+		background-color: transparent;
 		border: 0;
-	}
-
-	&::-webkit-slider-runnable-track {
-		background: linear-gradient(
-			to right,
-			${ COLORS.admin.theme } calc( var( --progress ) ),
-			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
-		);
-		border-radius: 2px;
-		height: 2px;
-
-		*:disabled& {
-			background: ${ CONFIG.controlBackgroundDimColor };
-		}
-	}
-	&::-moz-range-track {
-		background: linear-gradient(
-			to right,
-			${ COLORS.admin.theme } calc( var( --progress ) ),
-			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
-		);
-		border-radius: 2px;
-		height: 2px;
-		will-change: transform;
-
-		*:disabled& {
-			background: ${ CONFIG.controlBackgroundDimColor };
-		}
-	}
-
-	&::-webkit-slider-thumb {
-		appearance: none;
-		background-color: ${ CONFIG.sliderThumbBackgroundColor };
-		border: 1px solid ${ CONFIG.sliderThumbBorderColor };
-		border-radius: 50%;
-		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
+		border-radius: ${ CONFIG.controlBorderRadius };
 		cursor: pointer;
-		height: 12px;
-		margin-top: -5px;
-		opacity: 1;
-		width: 12px;
-		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
+		display: block;
+		height: ${ CONFIG.controlHeight };
+		max-width: 100%;
+		min-width: 0;
+		padding: 0;
+		margin: 0;
+		width: 100%;
 
-		*:disabled& {
-			background: ${ COLORS.ui.textDisabled };
-			border-color: ${ COLORS.ui.textDisabled };
+		&:focus {
+			outline: none;
 		}
-	}
-	&::-moz-range-thumb {
-		appearance: none;
-		background-color: ${ CONFIG.sliderThumbBackgroundColor };
-		border: 1px solid ${ CONFIG.sliderThumbBorderColor };
-		border-radius: 50%;
-		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
-		cursor: pointer;
-		height: 12px;
-		margin-top: -5px;
-		opacity: 1;
-		width: 12px;
-		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
-		will-change: transform;
 
-		*:disabled& {
-			background: ${ COLORS.ui.textDisabled };
-			border-color: ${ COLORS.ui.textDisabled };
+		&::-moz-focus-outer {
+			border: 0;
 		}
-	}
 
-	&:focus {
-		${ getFocusBoxShadow() }
-	}
-`;
+		&::-webkit-slider-runnable-track {
+			${ trackStyles( colors ) }
 
-export const focused = css`
-	${ getFocusBoxShadow() }
-`;
+			*:disabled& {
+				background: ${ CONFIG.controlBackgroundDimColor };
+			}
+		}
+		&::-moz-range-track {
+			${ trackStyles( colors ) }
+			will-change: transform;
+
+			*:disabled& {
+				background: ${ CONFIG.controlBackgroundDimColor };
+			}
+		}
+
+		/* Vendor prefixes don't work correctly when comma separated. */
+		&::-webkit-slider-thumb {
+			${ thumbStyles( colors ) }
+
+			*:disabled& {
+				${ disabledThumbStyles }
+			}
+		}
+		&::-moz-range-thumb {
+			${ thumbStyles( colors ) }
+			will-change: transform;
+
+			*:disabled& {
+				${ disabledThumbStyles }
+			}
+		}
+
+		&:focus {
+			${ getFocusBoxShadow( getBoxShadowStyle( colors?.thumbColor ) ) }
+		}
+	`;
+};
+
+export const focused = ( colors: SliderColors ) => {
+	return css`
+		${ getFocusBoxShadow( getBoxShadowStyle( colors?.thumbColor ) ) }
+	`;
+};
 
 export const error = css`
 	&::-webkit-slider-runnable-track {
@@ -172,7 +177,7 @@ export const error = css`
 	}
 
 	&:focus {
-		${ getFocusBoxShadow( errorBoxShadow ) };
+		${ getFocusBoxShadow( getBoxShadowStyle( COLORS.alert.red ) ) };
 	}
 `;
 

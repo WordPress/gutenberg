@@ -34,6 +34,9 @@ export function useSlider(
 		min = 0,
 		size = 'default',
 		style,
+		thumbColor,
+		trackColor,
+		trackBackgroundColor,
 		value: valueProp,
 		...otherProps
 	} = useContextSystem( props, 'Slider' );
@@ -92,15 +95,25 @@ export function useSlider(
 	// Generate dynamic class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
+		const colors = { thumbColor, trackColor, trackBackgroundColor };
 		return cx(
-			styles.slider,
+			styles.slider( colors ),
 			error && styles.error,
 			styles[ size ],
-			isFocused && styles.focused,
+			isFocused && styles.focused( colors ),
 			error && isFocused && styles.focusedError,
 			className
 		);
-	}, [ className, cx, error, isFocused, size ] );
+	}, [
+		className,
+		cx,
+		error,
+		isFocused,
+		size,
+		thumbColor,
+		trackColor,
+		trackBackgroundColor,
+	] );
 
 	return {
 		...otherProps,

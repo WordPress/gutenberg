@@ -22,6 +22,9 @@ const meta: ComponentMeta< typeof Slider > = {
 			control: 'select',
 			options: [ 'small', 'default', 'large' ],
 		},
+		thumbColor: { control: { type: 'color' } },
+		trackBackgroundColor: { control: { type: 'color' } },
+		trackColor: { control: { type: 'color' } },
 		value: { control: { type: null } },
 	},
 	parameters: {
