@@ -306,7 +306,8 @@
 		"pretest:unit:php:multisite": "wp-env start",
 		"test:unit:php:multisite": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose",
 		"test:unit:update": "npm run test:unit -- --updateSnapshot",
-		"test:unit:watch": "npm run test:unit -- --watch"
+		"test:unit:watch": "npm run test:unit -- --watch",
+		"wp-env": "wp-env"
 	},
 	"lint-staged": {
 		"*.{js,json,ts,tsx,yml,yaml}": [
