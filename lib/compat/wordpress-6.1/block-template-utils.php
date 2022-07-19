@@ -296,3 +296,43 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 	}
 	return $template;
 }
+
+/**
+ * Helper function to get the Template Hierarchy for a given slug.
+ * We need to Handle special cases here like `front-page`, `singular` and `archive` templates.
+ *
+ * Noting that we always add `index` as the last fallback template.
+ *
+ * @param string $slug The slug from which to extract the template hierarchy.
+ * @return array<string> The template hierarchy.
+ */
+function gutenberg_get_template__hierarchy( $slug ) {
+	if ( 'front-page' === $slug ) {
+		return array( 'front-page', 'home', 'index' );
+	}
+	$limit = 2;
+	if ( strpos( $slug, 'single-' ) === 0 || strpos( $slug, 'taxonomy-' ) === 0 ) {
+		// E.g. `single-post-hello` or `taxonomy-recipes-vegetarian`.
+		$limit = 3;
+	}
+	$parts = explode( '-', $slug, $limit );
+	$type  = array_shift( $parts );
+	$slugs = array( $type );
+	foreach ( $parts as $part ) {
+		array_unshift( $slugs, $slugs[0] . '-' . $part );
+	}
+	// Handle `archive` template.
+	if ( strpos( $slug, 'author' ) === 0 || strpos( $slug, 'category' ) === 0 || strpos( $slug, 'taxonomy' ) === 0 || strpos( $slug, 'tag' ) === 0 || 'date' === $slug ) {
+		$slugs[] = 'archive';
+	}
+	// Handle `single` template.
+	if ( 'attachment' === $slug ) {
+		$slugs[] = 'single';
+	}
+	// Handle `singular` template.
+	if ( strpos( $slug, 'single' ) === 0 || strpos( $slug, 'page' ) === 0 || 'attachment' === $slug ) {
+		$slugs[] = 'singular';
+	}
+	$slugs[] = 'index';
+	return $slugs;
+}

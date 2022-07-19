@@ -10,6 +10,54 @@
  * Base Templates REST API Controller.
  */
 class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
+
+	/**
+	 * Registers the controllers routes.
+	 *
+	 * @return void
+	 */
+	public function register_routes() {
+		// Get fallback template content.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/fallback_content',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_template_fallback_content' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => array(
+						'slug' => array(
+							'description' => __( 'The slug of the template to get the fallback content for', 'gutenberg' ),
+							'type'        => 'string',
+						),
+					),
+				),
+			)
+		);
+		parent::register_routes();
+	}
+
+	/**
+	 * Returns the fallback template content for a given slug.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_template_fallback_content( $request ) {
+		if ( empty( $request['slug'] ) ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				__( 'Invalid slug.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+		$template_hierarchy = gutenberg_get_template__hierarchy( $request['slug'] );
+		$fallback_template  = resolve_block_template( $request['slug'], $template_hierarchy, '' );
+		return rest_ensure_response( $fallback_template->content );
+	}
+
 	/**
 	 * Returns a list of templates.
 	 *
