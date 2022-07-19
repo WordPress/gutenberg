@@ -14,7 +14,6 @@ const noop = () => {};
 
 export default function AllInputControl( {
 	onChange = noop,
-	onFocus = noop,
 	values,
 	sides,
 	...props
@@ -23,10 +22,6 @@ export default function AllInputControl( {
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
-
-	const handleOnFocus = ( event ) => {
-		onFocus( event, { side: 'all' } );
-	};
 
 	// Applies a value to an object representing top, right, bottom and left
 	// sides while taking into account any custom side configuration.
@@ -63,7 +58,6 @@ export default function AllInputControl( {
 			{ ...props }
 			value={ allValue }
 			onChange={ handleOnChange }
-			onFocus={ handleOnFocus }
 			placeholder={ allPlaceholder }
 			withInputField={ false }
 		/>

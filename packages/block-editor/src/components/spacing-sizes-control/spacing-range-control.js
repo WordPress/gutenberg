@@ -10,6 +10,9 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	Flex,
 	FlexItem,
+	__experimentalBoxControlIcon as BoxControlIcon,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -21,14 +24,17 @@ import { settings } from '@wordpress/icons';
  *
  * @return {WPElement} Font size edit element.
  */
-export default function SpacingRangeControl( props ) {
+export default function SpacingRangeControl( {
+	spacingSizes,
+	value,
+	side,
+	label,
+	onChange,
+} ) {
 	const [ valueNow, setValueNow ] = useState( null );
 	const [ showCustomValueControl, setShowCustomValueControl ] =
 		useState( false );
-	const customTooltipContent = ( value ) => props.spacingSizes[ value ]?.name;
-	const createHandleOnFocus = ( side ) => () => {
-		props.onFocus( side );
-	};
+	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
 	const useSelect = false; //props.useSelect;
 	const getNewCustomValue = ( newSize ) => {
 		return newSize;
@@ -39,87 +45,91 @@ export default function SpacingRangeControl( props ) {
 		if ( size === 0 ) {
 			return '0';
 		}
-		return `var:preset|spacing|${ props.spacingSizes[ newSize ]?.slug }`;
+		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
 	};
 
-	const currentValueHint = customTooltipContent( props.value );
+	const currentValueHint = customTooltipContent( value );
 
-	const options = props.spacingSizes.map( ( size, index ) => ( {
+	const options = spacingSizes.map( ( size, index ) => ( {
 		key: index,
 		name: size.name,
 	} ) );
-	const marks = props.spacingSizes.map( ( value, index ) => ( {
+	const marks = spacingSizes.map( ( newValue, index ) => ( {
 		value: index,
 		lable: undefined,
 	} ) );
 
 	return (
 		<>
-			<Flex>
-				<FlexItem>
-					<div>
-						<span>{ props.label }</span>{ ' ' }
-						<span className="components-spacing-sizes-control__hint">
-							{ currentValueHint !== undefined
-								? currentValueHint
-								: __( 'Default' ) }
-						</span>
-					</div>
-				</FlexItem>
-				<FlexItem>
-					<Button
-						label={
-							showCustomValueControl
-								? __( 'Use size preset' )
-								: __( 'Set custom size' )
-						}
-						icon={ settings }
-						onClick={ () => {
-							setShowCustomValueControl(
-								! showCustomValueControl
-							);
-						} }
-						isPressed={ showCustomValueControl }
-						isSmall
-					/>
-				</FlexItem>
-			</Flex>
+			<HStack>
+				<BoxControlIcon
+					side={ side }
+					sides={ [
+						'top',
+						'right',
+						'bottom',
+						'left',
+						'vertical',
+						'horizontal',
+					] }
+				/>
+
+				<Text className="components-spacing-sizes-control__hint">
+					{ currentValueHint !== undefined
+						? currentValueHint
+						: __( 'Default' ) }
+				</Text>
+
+				<Button
+					label={
+						showCustomValueControl
+							? __( 'Use size preset' )
+							: __( 'Set custom size' )
+					}
+					icon={ settings }
+					onClick={ () => {
+						setShowCustomValueControl( ! showCustomValueControl );
+					} }
+					isPressed={ showCustomValueControl }
+					isSmall
+					className="components-spacing-sizes-control__custom-toggle"
+				/>
+			</HStack>
 			{ showCustomValueControl && (
 				<div>
 					<UnitControl
-						label={ props.label }
+						label={ label }
 						onChange={ ( newSize ) =>
-							props.onChange( getNewCustomValue( newSize ) )
+							onChange( getNewCustomValue( newSize ) )
 						}
 						value="28%"
 					/>
 
 					<RangeControl
-						value={ props.value }
+						value={ value }
 						label={ <></> }
 						min={ 0 }
 						max={ 50 }
 						// initialPosition={ 0 }
 						withInputField={ false }
-						onChange={ ( value ) => console.log( value ) }
+						onChange={ ( newValue ) => console.log( newValue ) }
 						// step={ step }
 					/>
 				</div>
 			) }
 			{ ! useSelect && ! showCustomValueControl && (
 				<RangeControl
-					value={ props.value }
+					value={ value }
 					label={ <></> }
 					onChange={ ( newSize ) =>
-						props.onChange( getNewRangeValue( newSize ) )
+						onChange( getNewRangeValue( newSize ) )
 					}
-					onFocus={ createHandleOnFocus( props.side ) }
 					withInputField={ false }
 					aria-valuenow={ valueNow }
-					aria-valuetext={ props.spacingSizes[ valueNow ]?.name }
+					aria-valuetext={ spacingSizes[ valueNow ]?.name }
 					renderTooltipContent={ customTooltipContent }
 					min={ 0 }
-					max={ props.spacingSizes.length - 1 }
+					max={ spacingSizes.length - 1 }
 					marks={ marks }
 				/>
 			) }
@@ -128,15 +138,15 @@ export default function SpacingRangeControl( props ) {
 					value={ options.find(
 						( option ) => option.key === valueNow
 					) }
-					label={ props.label }
+					label={ label }
 					onChange={ ( selectedItem ) => {
-						props.onChange( getNewRangeValue( selectedItem.key ) );
+						onChange( getNewRangeValue( selectedItem.key ) );
 					} }
-					onFocus={ createHandleOnFocus( props.side ) }
+					onFocus={ createHandleOnFocus( side ) }
 					options={ options }
 					onHighlightedIndexChange={ ( index ) => {
 						if ( index.type === '__item_mouse_move__' ) {
-							props.onChange(
+							onChange(
 								getNewRangeValue( index.highlightedIndex )
 							);
 						}

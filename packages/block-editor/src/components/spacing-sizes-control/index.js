@@ -19,12 +19,7 @@ import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import LinkedButton from './linked-button';
-import {
-	DEFAULT_VALUES,
-	getInitialSide,
-	isValuesMixed,
-	isValuesDefined,
-} from './utils';
+import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
 import useSetting from '../use-setting';
 
 const defaultInputProps = {
@@ -39,7 +34,7 @@ export default function SpacingSizesControl( {
 	label = __( 'Spacing Control' ),
 	values: valuesProp,
 	sides,
-	splitOnAxis = false,
+	splitOnAxis = true,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 	useSelect,
@@ -58,17 +53,8 @@ export default function SpacingSizesControl( {
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState(
-		getInitialSide( isLinked, splitOnAxis )
-	);
-
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
-	};
-
-	const handleOnFocus = ( nextSide ) => {
-		setSide( nextSide );
 	};
 
 	const handleOnChange = ( nextValue ) => {
@@ -87,7 +73,6 @@ export default function SpacingSizesControl( {
 	const inputControlProps = {
 		...inputProps,
 		onChange: handleOnChange,
-		onFocus: handleOnFocus,
 		isLinked,
 		sides,
 		values: inputValues,
@@ -114,9 +99,6 @@ export default function SpacingSizesControl( {
 				) }
 			</Flex>
 			<Flex className="component-box-control__header-control-wrapper">
-				<FlexItem>
-					<BoxControlIcon side={ side } sides={ sides } />
-				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
 						<AllInputControl

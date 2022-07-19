@@ -13,18 +13,10 @@ const groupedSides = [ 'vertical', 'horizontal' ];
 
 export default function AxialInputControls( {
 	onChange,
-	onFocus,
 	values,
 	sides,
 	...props
 } ) {
-	const createHandleOnFocus = ( side ) => () => {
-		if ( ! onFocus ) {
-			return;
-		}
-		onFocus( side );
-	};
-
 	const createHandleOnChange = ( side ) => ( next ) => {
 		if ( ! onChange ) {
 			return;
@@ -70,10 +62,10 @@ export default function AxialInputControls( {
 							{ ...props }
 							value={ value }
 							onChange={ createHandleOnChange( side ) }
-							onFocus={ createHandleOnFocus( side ) }
 							label={ LABELS[ side ] }
 							key={ `box-control-${ side }` }
 							withInputField={ false }
+							side={ side }
 						/>
 					);
 				} ) }
