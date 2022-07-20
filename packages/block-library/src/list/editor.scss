@@ -1,0 +1,9 @@
+.editor-styles-wrapper {
+	// Ideally we shouldn't set default margin as this will also revert theme
+	// styles.
+	.wp-block-list[data-block],
+	.wp-block-list-item[data-block] {
+		margin-top: revert;
+		margin-bottom: revert;
+	}
+}
