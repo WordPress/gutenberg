@@ -144,6 +144,7 @@ test.describe( 'Comments', () => {
 		).toBeHidden();
 	} );
 } );
+
 /*
  * The following test suite ensures that the legacy Post Comments block is still
  * supported and it is converted into the Comments block on the editor.
