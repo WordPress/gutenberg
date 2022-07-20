@@ -194,7 +194,7 @@ export default function DimensionsPanel( { name } ) {
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
-					Set the width of the main content area.
+					{ __( 'Set the width of the main content area.' ) }
 				</span>
 			) }
 			{ showContentSizeControl && (
