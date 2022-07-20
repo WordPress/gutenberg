@@ -5,6 +5,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -52,11 +53,12 @@ export default function Actions( { template } ) {
 
 	return (
 		<DropdownMenu
-			icon={ null }
+			icon={ chevronDown }
 			className="edit-site-list-table__actions"
+			text={ __( 'Actions' ) }
 			toggleProps={ {
-				children: __( 'Actions' ),
-				isSecondary: true,
+				variant: 'tertiary',
+				iconPosition: 'right',
 			} }
 		>
 			{ ( { onClose } ) => (
