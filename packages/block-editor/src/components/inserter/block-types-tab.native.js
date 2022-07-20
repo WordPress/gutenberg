@@ -32,31 +32,47 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		onSelect( ...args );
 	};
 
-	const collectionSections = useMemo( () => {
+	const collectionGroups = useMemo( () => {
 		const result = [];
 		Object.keys( collections ).forEach( ( namespace ) => {
 			const data = items.filter(
 				( item ) => getBlockNamespace( item ) === namespace
 			);
 			if ( data.length > 0 ) {
-				result.push(
-					createInserterSection( {
-						key: `collection-${ namespace }`,
-						metadata: {
-							icon: collections[ namespace ].icon,
-							title: collections[ namespace ].title,
-						},
-						items: data,
-					} )
-				);
+				result.push( {
+					namespace,
+					data,
+				} );
 			}
 		} );
 
 		return result;
 	}, [ items, collections ] );
 
+	const itemsFilteredByCollections = items.filter( ( { name } ) =>
+		collectionGroups.some( ( collection ) => {
+			return ! collection.data.some( ( { name: itemName } ) => {
+				return itemName === name;
+			} );
+		} )
+	);
+
+	const collectionSections = collectionGroups.map( ( { namespace, data } ) =>
+		createInserterSection( {
+			key: `collection-${ namespace }`,
+			metadata: {
+				icon: collections[ namespace ].icon,
+				title: collections[ namespace ].title,
+			},
+			items: data,
+		} )
+	);
+
 	const sections = [
-		createInserterSection( { key: 'default', items } ),
+		createInserterSection( {
+			key: 'default',
+			items: itemsFilteredByCollections,
+		} ),
 		...collectionSections,
 	];
 
