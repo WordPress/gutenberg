@@ -423,7 +423,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 
 ### Variations
 
-- Type: `array`
+- Type: `object[]`
 - Optional
 - Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 - Property: `variations`
@@ -445,7 +445,9 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 }
 ```
 
-_Note: JavaScript functions (isActive) and React elements (icon) can't be used in block.json_
+Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
+
+_Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
 See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
