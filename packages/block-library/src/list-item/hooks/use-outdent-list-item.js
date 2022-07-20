@@ -40,6 +40,7 @@ export default function useOutdentListItem( clientId ) {
 		getSelectionEnd,
 		hasMultiSelection,
 		getMultiSelectedBlockClientIds,
+		isBlockSelected,
 	} = useSelect( blockEditorStore );
 
 	return [
@@ -47,6 +48,7 @@ export default function useOutdentListItem( clientId ) {
 		useCallback(
 			( _clientId = clientId ) => {
 				const _hasMultiSelection = hasMultiSelection();
+				const isSelected = isBlockSelected( _clientId );
 				const clientIds = _hasMultiSelection
 					? getMultiSelectedBlockClientIds()
 					: [ _clientId ];
@@ -70,6 +72,7 @@ export default function useOutdentListItem( clientId ) {
 					listAttributes,
 					previousSiblings
 				);
+				newListItemParent.clientId = listItemParentId;
 
 				const lastBlock = getBlock( last( clientIds ) );
 				const childList = lastBlock.innerBlocks[ 0 ];
@@ -99,11 +102,17 @@ export default function useOutdentListItem( clientId ) {
 						newListItemParent,
 						...newBlocksExcludingLast,
 						newLastItem,
-					]
+					],
+					-1
 				);
 
 				// Restore the selection state.
-				if ( ! _hasMultiSelection ) {
+				if ( _hasMultiSelection ) {
+					multiSelect(
+						first( newBlocksExcludingLast ).clientId,
+						newLastItem.clientId
+					);
+				} else if ( isSelected ) {
 					const selectionStart = getSelectionStart();
 					const selectionEnd = getSelectionEnd();
 					selectionChange(
@@ -113,11 +122,6 @@ export default function useOutdentListItem( clientId ) {
 							? selectionStart.offset
 							: selectionEnd.offset,
 						selectionEnd.offset
-					);
-				} else {
-					multiSelect(
-						first( newBlocksExcludingLast ).clientId,
-						newLastItem.clientId
 					);
 				}
 			},

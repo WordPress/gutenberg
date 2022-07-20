@@ -1264,6 +1264,10 @@ function selectionHelper( state = {}, action ) {
 				return state;
 			}
 
+			if ( action.indexToSelect === -1 ) {
+				return state;
+			}
+
 			const blockToSelect =
 				action.blocks[ action.indexToSelect ] ||
 				action.blocks[ action.blocks.length - 1 ];
