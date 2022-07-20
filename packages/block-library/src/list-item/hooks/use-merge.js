@@ -12,7 +12,7 @@ export default function useMerge( clientId ) {
 		getBlockOrder,
 		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
+	const { mergeBlocks, moveBlocksToPosition } =
 		useDispatch( blockEditorStore );
 
 	function getTrailing( id ) {
@@ -33,27 +33,28 @@ export default function useMerge( clientId ) {
 
 	return ( forward ) => {
 		if ( forward ) {
-			const [ listClientId ] = getBlockOrder( clientId );
-			if ( listClientId ) {
-				const [ firstListItem ] = getBlockOrder( listClientId );
+			// Forward "merging" (forward delete) should be equal pressing
+			// Backspace from the next item. If the next item is not at the top
+			// level, the item should be outdented instead of merged.
+			if ( getBlockOrder( clientId ).length ) {
+				// Should be implemented in `./use-backspace`.
+				return;
+			}
+
+			const nextBlockClientId = getNext( clientId );
+			if ( nextBlockClientId ) {
 				registry.batch( () => {
-					mergeBlocks( clientId, firstListItem );
-					removeBlock( listClientId );
+					moveBlocksToPosition(
+						getBlockOrder( nextBlockClientId ),
+						nextBlockClientId,
+						getPreviousBlockClientId( nextBlockClientId )
+					);
+					mergeBlocks( clientId, nextBlockClientId );
 				} );
-			} else {
-				const nextBlockClientId = getNext( clientId );
-				if ( nextBlockClientId ) {
-					registry.batch( () => {
-						moveBlocksToPosition(
-							getBlockOrder( nextBlockClientId ),
-							nextBlockClientId,
-							getPreviousBlockClientId( nextBlockClientId )
-						);
-						mergeBlocks( clientId, nextBlockClientId );
-					} );
-				}
 			}
 		} else {
+			// Merging is only done from the top level. For lowel levels, the
+			// list item is outdented instead.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( previousBlockClientId ) {
 				const trailingClientId = getTrailing( previousBlockClientId );
