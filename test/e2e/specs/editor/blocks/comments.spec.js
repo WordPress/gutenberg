@@ -164,8 +164,9 @@ test.describe( 'Post Comments', () => {
 
 	test( 'is still supported', async ( { page, requestUtils } ) => {
 		// Create a post with the old "Post Comments" block.
-		const postId = await requestUtils.createPost( {
+		const { id: postId } = await requestUtils.createPost( {
 			content: '<!-- wp:post-comments /-->',
+			status: 'publish',
 		} );
 
 		// Publish a comment on that post.
@@ -192,8 +193,9 @@ test.describe( 'Post Comments', () => {
 		commentsBlockUtils,
 	} ) => {
 		// Create a post with the old "Post Comments" block.
-		const postId = await requestUtils.createPost( {
+		const { id: postId } = await requestUtils.createPost( {
 			content: '<!-- wp:post-comments /-->',
+			status: 'publish',
 		} );
 		await requestUtils.createComment( {
 			content: 'This is an automated comment',

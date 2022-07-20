@@ -1,12 +1,28 @@
 /**
+ * Internal dependencies
+ */
+import type { RequestUtils } from './index';
+
+export interface Post {
+	id: number;
+	content: string;
+	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+}
+
+export interface CreatePostPayload {
+	content: string;
+	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+}
+
+/**
  * Delete all posts using REST API.
  *
- * @this {import('./index').RequestUtils}
+ * @param {} this RequestUtils.
  */
-export async function deleteAllPosts() {
+export async function deleteAllPosts( this: RequestUtils ) {
 	// List all posts.
 	// https://developer.wordpress.org/rest-api/reference/posts/#list-posts
-	const posts = await this.rest( {
+	const posts = await this.rest< Post[] >( {
 		path: '/wp/v2/posts',
 		params: {
 			per_page: 100,
@@ -34,16 +50,18 @@ export async function deleteAllPosts() {
 /**
  * Creates a new post using the REST API.
  *
- * @param {string} content The content for the post.
- *
- * @return {Promise<number>} Post ID.
+ * @param {} this    RequestUtils.
+ * @param {} payload Post attributes.
  */
-export async function createPost( { content } ) {
-	const post = await this.rest( {
+export async function createPost(
+	this: RequestUtils,
+	payload: CreatePostPayload
+) {
+	const post = await this.rest< Post >( {
 		method: 'POST',
 		path: `/wp/v2/posts`,
-		params: { status: 'publish', content },
+		params: { ...payload },
 	} );
 
-	return post.id;
+	return post;
 }
