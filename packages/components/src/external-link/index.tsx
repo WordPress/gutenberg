@@ -35,7 +35,7 @@ function UnforwardedExternalLink(
 	/* Anchor links are percieved as external links.
 	This constant helps check for on page anchor links,
 	to prevent them from being opened in the editor. */
-	const shouldPreventDefault = href.startsWith( '#' );
+	const isInternalAnchor = !! href?.startsWith( '#' );
 
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
@@ -44,7 +44,7 @@ function UnforwardedExternalLink(
 			className={ classes }
 			href={ href }
 			onClick={
-				shouldPreventDefault
+				isInternalAnchor
 					? ( event ) => event.preventDefault()
 					: undefined
 			}
