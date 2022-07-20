@@ -19,6 +19,39 @@ In case of function type, the function should accept a block's attributes
 and the variation's attributes and determines if a variation is active.
 A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	// This example assumes that a core/embed block is the first block in the Block Editor.
+	const activeBlockVariation = useSelect( ( select ) => {
+		// Retrieve the list of blocks.
+		const [ firstBlock ] = select( blockEditorStore ).getBlocks();
+		// Retrieve the block attributes for the first block.
+		const firstBlockAttributes = select(
+			blockEditorStore
+		).getBlockAttributes( firstBlock.clientId );
+
+		// Return the active block variation for the first block.
+		return select( blocksStore ).getActiveBlockVariation(
+			'core/embed',
+			firstBlockAttributes
+		);
+	} );
+
+	return activeBlockVariation && activeBlockVariation.name === 'spotify' ? (
+		<p>{ __( 'Spotify variation' ) }</p>
+	) : (
+		<p>{ __( 'Other variation' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
