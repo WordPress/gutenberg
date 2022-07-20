@@ -656,6 +656,29 @@ _Returns_
 Returns true if the block type by the given name or object value matches a
 search term, or false otherwise.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockNameIsFound = useSelect( ( select ) =>
+		select( blocksStore ).isMatchingSearchTerm( 'core/navigation' )
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__( 'core/navigation is an existing search term: %s' ),
+				blockNameIsFound
+			) }
+		</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Blocks state.

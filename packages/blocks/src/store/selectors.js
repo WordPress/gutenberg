@@ -641,6 +641,28 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * @param {(string|Object)} nameOrType Block name or type object.
  * @param {string}          searchTerm Search term by which to filter.
  *
+ * @example
+ * ```js
+ * import { __, sprintf } from '@wordpress/i18n';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const blockNameIsFound = useSelect( ( select ) =>
+ *         select( blocksStore ).isMatchingSearchTerm( 'core/navigation' )
+ *     );
+ *
+ *     return (
+ *         <p>
+ *             { sprintf(
+ *             __( 'core/navigation is an existing search term: %s' ),
+ *                 blockNameIsFound
+ *             ) }
+ *         </p>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object[]} Whether block type matches search term.
  */
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
