@@ -523,14 +523,7 @@
 					},
 					"icon": {
 						"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
-						"oneOf": [
-							{
-								"type": "string"
-							},
-							{
-								"type": "object"
-							}
-						]
+						"type": "string"
 					},
 					"isDefault": {
 						"type": "boolean",
