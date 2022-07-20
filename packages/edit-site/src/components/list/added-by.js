@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Icon,
-	Tooltip,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -24,58 +20,34 @@ import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
-function CustomizedTooltip( { isCustomized, children } ) {
-	if ( ! isCustomized ) {
-		return children;
-	}
-
-	return (
-		<Tooltip text={ __( 'This template has been customized' ) }>
-			{ children }
-		</Tooltip>
-	);
-}
-
-function BaseAddedBy( { text, icon, imageUrl, isCustomized } ) {
+function BaseAddedBy( { text, icon, imageUrl } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
 	return (
 		<HStack alignment="left">
-			<CustomizedTooltip isCustomized={ isCustomized }>
-				{ imageUrl ? (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__avatar',
-							{
-								'is-loaded': isImageLoaded,
-							}
-						) }
-					>
-						<img
-							onLoad={ () => setIsImageLoaded( true ) }
-							alt=""
-							src={ imageUrl }
-						/>
-					</div>
-				) : (
-					<div
-						className={ classnames(
-							'edit-site-list-added-by__icon',
-							{
-								'is-customized': isCustomized,
-							}
-						) }
-					>
-						<Icon icon={ icon } />
-					</div>
-				) }
-			</CustomizedTooltip>
+			{ imageUrl ? (
+				<div
+					className={ classnames( 'edit-site-list-added-by__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
 			<span>{ text }</span>
 		</HStack>
 	);
 }
 
-function AddedByTheme( { slug, isCustomized } ) {
+function AddedByTheme( { slug } ) {
 	const theme = useSelect(
 		( select ) => select( coreStore ).getTheme( slug ),
 		[ slug ]
@@ -85,24 +57,17 @@ function AddedByTheme( { slug, isCustomized } ) {
 		<BaseAddedBy
 			icon={ themeIcon }
 			text={ theme?.name?.rendered || slug }
-			isCustomized={ isCustomized }
 		/>
 	);
 }
 
-function AddedByPlugin( { slug, isCustomized } ) {
+function AddedByPlugin( { slug } ) {
 	const plugin = useSelect(
 		( select ) => select( coreStore ).getPlugin( slug ),
 		[ slug ]
 	);
 
-	return (
-		<BaseAddedBy
-			icon={ pluginIcon }
-			text={ plugin?.name || slug }
-			isCustomized={ isCustomized }
-		/>
-	);
+	return <BaseAddedBy icon={ pluginIcon } text={ plugin?.name || slug } />;
 }
 
 function AddedByAuthor( { id } ) {
@@ -138,6 +103,29 @@ function AddedBySite() {
 	);
 }
 
+export function CustomizedTemplateInfo( { template } ) {
+	// Template originally provided by a theme, but customized by a user.
+	// Templates originally didn't have the 'origin' field so identify
+	// older customized templates by checking for no origin and a 'theme'
+	// or 'custom' source.
+	if (
+		template.author &&
+		template.has_theme_file &&
+		( template.origin === 'theme' ||
+			( ! template.origin &&
+				[ 'theme', 'custom' ].includes( template.source ) ) ||
+			template.origin === 'plugin' )
+	) {
+		return (
+			<p className="edit-site-list-template-customized-info">
+				{ __( 'This template has been customized.' ) }
+			</p>
+		);
+	}
+
+	return null;
+}
+
 export default function AddedBy( { templateType, template } ) {
 	if ( ! template ) {
 		return;
@@ -154,22 +142,12 @@ export default function AddedBy( { templateType, template } ) {
 				( ! template.origin &&
 					[ 'theme', 'custom' ].includes( template.source ) ) )
 		) {
-			return (
-				<AddedByTheme
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-				/>
-			);
+			return <AddedByTheme slug={ template.theme } />;
 		}
 
 		// Template originally provided by a plugin, but customized by a user.
 		if ( template.has_theme_file && template.origin === 'plugin' ) {
-			return (
-				<AddedByPlugin
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-				/>
-			);
+			return <AddedByPlugin slug={ template.theme } />;
 		}
 
 		// Template was created from scratch, but has no author. Author support

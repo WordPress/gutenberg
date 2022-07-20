@@ -15,7 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import Link from '../routes/link';
 import Actions from './actions';
-import AddedBy from './added-by';
+import AddedBy, { CustomizedTemplateInfo } from './added-by';
 
 export default function Table( { templateType } ) {
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
@@ -95,6 +95,7 @@ export default function Table( { templateType } ) {
 								</Link>
 							</Heading>
 							{ template.description }
+							<CustomizedTemplateInfo template={ template } />
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
