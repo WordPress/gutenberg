@@ -40,6 +40,15 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 			"message": "This is a notice!"
 		}
 	},
+	"variations": [
+		{
+			"name": "example",
+			"title": "Example",
+			"attributes": {
+				"message": "This is an example!"
+			},
+		}
+	]
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
 	"viewScript": "file:./build/view.js",
