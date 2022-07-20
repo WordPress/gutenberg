@@ -15,6 +15,7 @@ import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 const { error, warn } = window.console;
 
@@ -371,7 +372,7 @@ export function setGroupingBlockName( name ) {
 /**
  * Returns an action object used to set block categories.
  *
- * @param {Object[]} categories Block categories.
+ * @param {WPBlockCategory[]} categories Block categories.
  *
  * @example
  * ```js

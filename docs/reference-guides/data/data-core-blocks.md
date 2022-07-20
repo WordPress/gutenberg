@@ -105,26 +105,19 @@ _Usage_
 
 ```js
 import { store as blocksStore } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
 	const blockCategories = useSelect( ( select ) =>
 		select( blocksStore ).getCategories()
 	);
 
-	const { setCategories } = useDispatch( blocksStore );
-
 	return (
-		<Button
-			onClick={ () =>
-				setCategories( [
-					...blockCategories,
-					{ title: 'Custom Category', slug: 'custom-category' },
-				] )
-			}
-		>
-			{ __( 'Add a new custom block category' ) }
-		</Button>
+		<ul>
+			{ blockCategories.map( ( category ) => (
+				<li key={ category.slug }>{ category.title }</li>
+			) ) }
+		</ul>
 	);
 };
 ```
@@ -425,7 +418,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _categories_ `Object[]`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 _Returns_
 
