@@ -34,6 +34,28 @@ _Returns_
 
 Returns block styles by block name.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const buttonBlockStyles = useSelect( ( select ) =>
+		select( blocksStore ).getBlockStyles( 'core/button' )
+	);
+
+	return (
+		<ul>
+			{ buttonBlockStyles &&
+				buttonBlockStyles.map( ( style ) => (
+					<li key={ style.name }>{ style.label }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
