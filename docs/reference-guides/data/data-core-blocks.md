@@ -419,7 +419,32 @@ _Returns_
 
 ### getGroupingBlockName
 
-Returns the name of the block for handling unregistered blocks.
+Returns the name of the block for handling the grouping of blocks.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const groupingBlockName = useSelect( ( select ) =>
+		select( blocksStore ).getGroupingBlockName()
+	);
+
+	return (
+		groupingBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Default grouping block name: %s' ),
+					groupingBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
 
 _Parameters_
 
@@ -427,7 +452,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Name of the block for handling unregistered blocks.
+-   `string?`: Name of the block for handling the grouping of blocks.
 
 ### getUnregisteredFallbackBlockName
 
