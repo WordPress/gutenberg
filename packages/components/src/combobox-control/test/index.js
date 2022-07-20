@@ -148,4 +148,33 @@ describe( 'ComboboxControl', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.name );
 	} );
+
+	it( 'should select the correct option via keypress events', async () => {
+		const user = setupUser();
+		const targetIndex = 4;
+		const targetOption = timezones[ targetIndex ];
+		const onChangeSpy = jest.fn();
+		render(
+			<TestComboboxControl
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		// Pressing tab selects the input and shows the options
+		await user.tab();
+
+		// Navigate the options using the down arrow
+		for ( let i = 0; i < targetIndex; i++ ) {
+			await user.keyboard( '{ArrowDown}' );
+		}
+
+		// Pressing Enter/Return selects the currently focused option
+		await user.keyboard( '{Enter}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+		expect( input ).toHaveValue( targetOption.name );
+	} );
 } );
