@@ -421,6 +421,34 @@ It provides structured example data for the block. This data is used to construc
 
 See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
 
+### Variations
+
+- Type: `array`
+- Optional
+- Localized: Yes (`title`, `description`, and `keywords` of each variation only)
+- Property: `variations`
+
+```json
+{
+	"variations": [
+		{
+			"name": "example",
+			"title": "Example",
+			"attributes": {
+				"level": 2,
+				"message": "This is an example!"
+			},
+			"scope": [ "block" ],
+			"isActive": [ "level" ]
+		}
+	]
+}
+```
+
+_Note: JavaScript functions (isActive) and React elements (icon) can't be used in block.json_
+
+See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+
 ### Editor Script
 
 -   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
