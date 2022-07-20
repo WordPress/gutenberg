@@ -505,7 +505,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if (
 			matchingSuggestions.length > 0 &&
 			incompleteTokenValue.length > 0 &&
-			typeof __experimentalValidateInput !== 'undefined' &&
+			! __experimentalValidateInput( '' ) &&
 			__experimentalAutoSelectFirstMatch
 		) {
 			return matchingSuggestions[ 0 ];
