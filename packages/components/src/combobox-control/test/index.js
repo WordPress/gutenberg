@@ -122,7 +122,9 @@ describe( 'ComboboxControl', () => {
 		// Confirm the rendered options match the provided dataset.
 		expect( renderedOptions ).toHaveLength( timezones.length );
 		renderedOptions.forEach( ( option, optionIndex ) => {
-			expect( option ).toHaveTextContent( timezones[ optionIndex ].name );
+			expect( option ).toHaveTextContent(
+				timezones[ optionIndex ].label
+			);
 		} );
 	} );
 
