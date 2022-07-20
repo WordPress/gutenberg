@@ -261,6 +261,28 @@ _Returns_
 
 Returns an array with the child blocks of a given block.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const childBlockNames = useSelect( ( select ) =>
+		select( blocksStore ).getChildBlockNames( 'core/navigation' )
+	);
+
+	return (
+		<ul>
+			{ childBlockNames &&
+				childBlockNames.map( ( child ) => (
+					<li key={ child }>{ child }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
