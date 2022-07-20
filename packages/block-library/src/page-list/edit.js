@@ -103,6 +103,14 @@ export default function PageListEdit( { context, clientId } ) {
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
+		const canReadSettings = select( coreStore ).canUser(
+			'read',
+			'settings'
+		);
+		if ( ! canReadSettings ) {
+			return undefined;
+		}
+
 		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
 		return site?.show_on_front === 'page' && site?.page_on_front;
 	}, [] );
