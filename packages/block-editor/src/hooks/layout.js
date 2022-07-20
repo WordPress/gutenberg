@@ -84,6 +84,22 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 	return layoutClassnames;
 }
 
+/**
+ * Determines whether or not the theme has disabled all layout styles output.
+ *
+ * This feature only disables the output of layout styles,
+ * the controls for adjusting layout will still be available in the editor.
+ * Themes that use this feature commit to providing their own styling for layout features.
+ *
+ * @return {boolean} Whether or not the theme opts-in to disable all layout styles.
+ */
+function useThemeHasDisabledLayoutStyles() {
+	return useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
+}
+
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
 	const defaultThemeLayout = useSetting( 'layout' );
@@ -264,10 +280,12 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const shouldRenderLayoutStyles = hasBlockSupport(
+		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
+		const shouldRenderLayoutStyles =
+			hasLayoutBlockSupport && ! useThemeHasDisabledLayoutStyles();
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
@@ -277,7 +295,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const layoutClasses = shouldRenderLayoutStyles
+		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
 		const selector = `.${ getBlockDefaultClassName(

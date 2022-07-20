@@ -21,11 +21,13 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -536,7 +538,8 @@ export const toStyles = (
 	tree,
 	blockSelectors,
 	hasBlockGapSupport,
-	hasFallbackGapSupport
+	hasFallbackGapSupport,
+	skipLayoutStyles = false
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -612,7 +615,10 @@ export const toStyles = (
 			}
 
 			// Process blockGap and layout styles.
-			if ( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport ) {
+			if (
+				! skipLayoutStyles &&
+				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+			) {
 				ruleset += getLayoutStyles( {
 					tree,
 					style: styles,
@@ -761,6 +767,22 @@ export const getBlockSelectors = ( blockTypes ) => {
 	return result;
 };
 
+/**
+ * Determines whether or not the theme has disabled all layout styles output.
+ *
+ * This feature only disables the output of layout styles,
+ * the controls for adjusting layout will still be available in the editor.
+ * Themes that use this feature commit to providing their own styling for layout features.
+ *
+ * @return {boolean} Whether or not the theme opts-in to disable all layout styles.
+ */
+function useThemeHasDisabledLayoutStyles() {
+	return useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
+}
+
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
@@ -769,6 +791,7 @@ export function useGlobalStylesOutput() {
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
+	const skipLayoutStyles = useThemeHasDisabledLayoutStyles();
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -784,7 +807,8 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
-			hasFallbackGapSupport
+			hasFallbackGapSupport,
+			skipLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [

@@ -171,6 +171,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	}
 
 	$settings['localAutosaveInterval'] = 15;
+	$settings['disableLayoutStyles']   = current_theme_supports( 'disable-layout-styles' );
 
 	return $settings;
 }

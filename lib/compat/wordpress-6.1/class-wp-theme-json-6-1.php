@@ -1252,6 +1252,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$block_rules = '';
 		$block_type  = null;
 
+		// Skip outputting layout styles if explicitly disabled.
+		if ( current_theme_supports( 'disable-layout-styles' ) ) {
+			return $block_rules;
+		}
+
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
 			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
