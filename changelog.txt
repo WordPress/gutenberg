@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 13.7.0-rc.2 =
+
+
+
+## Changelog
+
+- [Site Editor]: Re-architect templates addition. ([42457](https://github.com/WordPress/gutenberg/pull/42457))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ntsekouras
+
+
 = 13.7.0-rc.1 =
 
 

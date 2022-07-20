@@ -578,7 +578,7 @@ export class ImageEdit extends Component {
 					<>
 						{ __(
 							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
-						) }
+						) }{ ' ' }
 						<FooterMessageLink
 							href={
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
