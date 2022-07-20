@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	Dropdown,
+	Button,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	PostURLCheck,
@@ -14,7 +18,12 @@ export default function PostURL() {
 	const anchorRef = useRef();
 	return (
 		<PostURLCheck>
-			<PanelRow className="edit-post-post-url" ref={ anchorRef }>
+			<ToolsPanelItem
+				ref={ anchorRef }
+				className="edit-post-post-url"
+				label={ __( 'URL' ) }
+				hasValue={ () => true }
+			>
 				<span>{ __( 'URL' ) }</span>
 				<Dropdown
 					popoverProps={ { anchorRef } }
@@ -28,7 +37,7 @@ export default function PostURL() {
 						<PostURLForm onClose={ onClose } />
 					) }
 				/>
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostURLCheck>
 	);
 }

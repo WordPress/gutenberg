@@ -1,15 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { PostTrash as PostTrashLink, PostTrashCheck } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 export default function PostTrash() {
 	return (
 		<PostTrashCheck>
-			<PanelRow>
+			<ToolsPanelItem
+				label={ __( 'Move to trash' ) }
+				hasValue={ () => true }
+			>
 				<PostTrashLink />
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostTrashCheck>
 	);
 }

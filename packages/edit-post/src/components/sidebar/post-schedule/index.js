@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	Dropdown,
+	Button,
+} from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
 	PostSchedule as PostScheduleForm,
@@ -14,7 +18,12 @@ export default function PostSchedule() {
 	const anchorRef = useRef();
 	return (
 		<PostScheduleCheck>
-			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
+			<ToolsPanelItem
+				ref={ anchorRef }
+				className="edit-post-post-schedule"
+				label={ __( 'Publish' ) }
+				hasValue={ () => true }
+			>
 				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					popoverProps={ { anchorRef } }
@@ -30,7 +39,7 @@ export default function PostSchedule() {
 						<PostScheduleForm onClose={ onClose } />
 					) }
 				/>
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostScheduleCheck>
 	);
 }

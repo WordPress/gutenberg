@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	Dropdown,
+	Button,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
@@ -41,7 +45,12 @@ export default function PostTemplate() {
 	}
 
 	return (
-		<PanelRow className="edit-post-post-template" ref={ anchorRef }>
+		<ToolsPanelItem
+			ref={ anchorRef }
+			className="edit-post-post-template"
+			label={ __( 'Template' ) }
+			hasValue={ () => true }
+		>
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
 				popoverProps={ { anchorRef } }
@@ -58,7 +67,7 @@ export default function PostTemplate() {
 					<PostTemplateForm onClose={ onClose } />
 				) }
 			/>
-		</PanelRow>
+		</ToolsPanelItem>
 	);
 }
 

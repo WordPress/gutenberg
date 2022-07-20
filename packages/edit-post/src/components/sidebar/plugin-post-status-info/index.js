@@ -5,7 +5,15 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelRow } from '@wordpress/components';
+import {
+	createSlotFill,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import PostStatusRow from '../post-status-row';
 
 export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
@@ -16,6 +24,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  *
  * @param {Object}    props             Component properties.
  * @param {string}    [props.className] An optional class name added to the row.
+ * @param {string}    [props.label]     Optional label text. If specified, the row
+ *                                      can be toggled by the user.
  * @param {WPElement} props.children    Children to be rendered.
  *
  * @example
@@ -52,9 +62,15 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  *
  * @return {WPComponent} The component to be rendered.
  */
-const PluginPostStatusInfo = ( { children, className } ) => (
+const PluginPostStatusInfo = ( { children, className, label } ) => (
 	<Fill>
-		<PanelRow className={ className }>{ children }</PanelRow>
+		{ label ? (
+			<ToolsPanelItem className={ className } label={ label }>
+				{ children }
+			</ToolsPanelItem>
+		) : (
+			<PostStatusRow className={ className }>{ children }</PostStatusRow>
+		) }
 	</Fill>
 );
 

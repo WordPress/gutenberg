@@ -1,7 +1,9 @@
 .edit-post-post-schedule {
-	width: 100%;
-	position: relative;
+	align-items: center;
+	display: flex;
 	justify-content: flex-start;
+	position: relative;
+	width: 100%;
 
 	span {
 		display: block;

@@ -1,7 +1,19 @@
-.edit-post-post-status {
-	// Counteract the 5px of bottom margin on .components-panel__body-title.
-	.edit-post-post-featured-image:first-of-type,
-	.edit-post-post-summary:first-of-type {
-		margin-top: -5px;
+[class].edit-post-post-status {
+	row-gap: $grid-unit-20;
+
+	> :nth-child(2):not(.edit-post-post-featured-image),
+	> .edit-post-post-title + :not(.edit-post-post-excerpt),
+	> .edit-post-post-excerpt + * {
+		margin-top: $grid-unit-20;
+		position: relative;
+
+		&::before {
+			border-top: 1px solid $gray-200;
+			content: "";
+			left: -$grid-unit-20;
+			position: absolute;
+			right: -$grid-unit-20;
+			top: -$grid-unit-20;
+		}
 	}
 }

@@ -1,18 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
+import { __experimentalToolsPanel as ToolsPanelItem } from '@wordpress/components';
 import {
 	PostPendingStatus as PostPendingStatusForm,
 	PostPendingStatusCheck,
 } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 export function PostPendingStatus() {
 	return (
 		<PostPendingStatusCheck>
-			<PanelRow>
+			<ToolsPanelItem
+				label={ __( 'Pending review' ) }
+				hasValue={ () => true }
+			>
 				<PostPendingStatusForm />
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostPendingStatusCheck>
 	);
 }

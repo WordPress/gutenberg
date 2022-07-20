@@ -1,18 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import {
 	PostAuthor as PostAuthorForm,
 	PostAuthorCheck,
 } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 export function PostAuthor() {
 	return (
 		<PostAuthorCheck>
-			<PanelRow className="edit-post-post-author">
+			<ToolsPanelItem
+				className="edit-post-post-author"
+				label={ __( 'Author' ) }
+				hasValue={ () => true }
+			>
 				<PostAuthorForm />
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostAuthorCheck>
 	);
 }

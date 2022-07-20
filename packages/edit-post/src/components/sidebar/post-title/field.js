@@ -7,7 +7,7 @@ import { PlainText } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
-export default function PostSummaryTitle() {
+export default function PostTitleField() {
 	const { title, titlePlaceholder } = useSelect(
 		( select ) => ( {
 			title: select( editorStore ).getEditedPostAttribute( 'title' ),
@@ -22,7 +22,7 @@ export default function PostSummaryTitle() {
 	return (
 		<PlainText
 			__experimentalVersion={ 2 }
-			className="edit-post-post-summary__title"
+			className="edit-post-post-title__field"
 			placeholder={
 				decodeEntities( titlePlaceholder ) || __( 'Add title' )
 			}

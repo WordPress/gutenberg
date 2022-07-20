@@ -306,6 +306,7 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.label_ `[string]`: Optional label text. If specified, the row can be toggled by the user.
 -   _props.children_ `WPElement`: Children to be rendered.
 
 _Returns_

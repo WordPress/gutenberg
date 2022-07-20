@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	Dropdown,
+	Button,
+} from '@wordpress/components';
 import {
 	PostVisibility as PostVisibilityForm,
 	PostVisibilityLabel,
@@ -12,11 +16,16 @@ import {
 import { useRef } from '@wordpress/element';
 
 export function PostVisibility() {
-	const rowRef = useRef();
+	const anchorRef = useRef();
 	return (
 		<PostVisibilityCheck
 			render={ ( { canEdit } ) => (
-				<PanelRow ref={ rowRef } className="edit-post-post-visibility">
+				<ToolsPanelItem
+					ref={ anchorRef }
+					className="edit-post-post-visibility"
+					label={ __( 'Visibility' ) }
+					hasValue={ () => true }
+				>
 					<span>{ __( 'Visibility' ) }</span>
 					{ ! canEdit && (
 						<span>
@@ -31,7 +40,7 @@ export function PostVisibility() {
 								// Anchor the popover to the middle of the
 								// entire row so that it doesn't move around
 								// when the label changes.
-								anchorRef: rowRef.current,
+								anchorRef,
 							} }
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<PostVisibilityToggle
@@ -44,7 +53,7 @@ export function PostVisibility() {
 							) }
 						/>
 					) }
-				</PanelRow>
+				</ToolsPanelItem>
 			) }
 		/>
 	);

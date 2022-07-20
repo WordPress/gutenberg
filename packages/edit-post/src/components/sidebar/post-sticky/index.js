@@ -1,18 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import {
 	PostSticky as PostStickyForm,
 	PostStickyCheck,
 } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 export function PostSticky() {
 	return (
 		<PostStickyCheck>
-			<PanelRow>
+			<ToolsPanelItem
+				label={ __( 'Stick to top' ) }
+				hasValue={ () => true }
+			>
 				<PostStickyForm />
-			</PanelRow>
+			</ToolsPanelItem>
 		</PostStickyCheck>
 	);
 }
