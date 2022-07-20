@@ -22,6 +22,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
+    val hostAppNamespace: String,
     val featuredImageId: Int,
     val editorTheme: Bundle?,
     val translations: Bundle,
@@ -34,6 +35,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_INITIAL_TITLE, "")
         putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
+        putString(PROP_HOST_APP_NAMESPACE, hostAppNamespace)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
@@ -97,6 +99,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
 
         const val PROP_LOCALE = "locale"
+        const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"

@@ -68,6 +68,8 @@ public class Gutenberg: UIResponder {
 
         initialProps["postType"] = dataSource.gutenbergPostType()
 
+        initialProps["hostAppNamespace"] = dataSource.gutenbergHostAppNamespace()
+
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
