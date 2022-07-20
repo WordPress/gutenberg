@@ -143,6 +143,38 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 	} );
+
+	test( 'A button allows the block to switch from legacy mode to editable mode', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/comments',
+			attributes: { legacy: true, textColor: 'vivid-purple' },
+		} );
+
+		const block = page.locator( 'role=document[name="Block: Comments"i]' );
+		const warning = block.locator( '.block-editor-warning' );
+		const placeholder = block.locator(
+			'.wp-block-post-comments__placeholder'
+		);
+
+		await expect( block ).toHaveClass( /has-vivid-purple-color/ );
+		await expect( warning ).toBeVisible();
+		await expect( placeholder ).toBeVisible();
+
+		await page.click( 'role=button[name="Switch to editable mode"i]' );
+
+		const commentTemplate = block.locator(
+			'role=document[name="Block: Comment Template"i]'
+		);
+		await expect( block ).toHaveClass( /has-vivid-purple-color/ );
+		await expect( commentTemplate ).toBeVisible();
+		await expect( warning ).toBeHidden();
+		await expect( placeholder ).toBeHidden();
+	} );
 } );
 
 /*
