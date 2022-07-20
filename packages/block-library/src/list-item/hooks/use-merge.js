@@ -6,9 +6,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function useMerge( clientId ) {
 	const registry = useRegistry();
-	const { getPreviousBlockClientId, getNextBlockClientId, getBlockOrder } =
-		useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition } =
+	const {
+		getPreviousBlockClientId,
+		getNextBlockClientId,
+		getBlockOrder,
+		getBlockRootClientId,
+	} = useSelect( blockEditorStore );
+	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
 		useDispatch( blockEditorStore );
 
 	function getTrailing( id ) {
@@ -21,11 +25,33 @@ export default function useMerge( clientId ) {
 		return getTrailing( order[ order.length - 1 ] );
 	}
 
+	function getNext( id ) {
+		return (
+			getNextBlockClientId( id ) || getNext( getBlockRootClientId( id ) )
+		);
+	}
+
 	return ( forward ) => {
 		if ( forward ) {
-			const nextBlockClientId = getNextBlockClientId( clientId );
-			if ( nextBlockClientId ) {
-				mergeBlocks( clientId, nextBlockClientId );
+			const [ listClientId ] = getBlockOrder( clientId );
+			if ( listClientId ) {
+				const [ firstListItem ] = getBlockOrder( listClientId );
+				registry.batch( () => {
+					mergeBlocks( clientId, firstListItem );
+					removeBlock( listClientId );
+				} );
+			} else {
+				const nextBlockClientId = getNext( clientId );
+				if ( nextBlockClientId ) {
+					registry.batch( () => {
+						moveBlocksToPosition(
+							getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							getPreviousBlockClientId( nextBlockClientId )
+						);
+						mergeBlocks( clientId, nextBlockClientId );
+					} );
+				}
 			}
 		} else {
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
