@@ -362,6 +362,31 @@ _Returns_
 
 Returns the name of the block for handling non-block content.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const freeformFallbackBlockName = useSelect( ( select ) =>
+		select( blocksStore ).getFreeformFallbackBlockName()
+	);
+
+	return (
+		freeformFallbackBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Freeform fallback block name: %s' ),
+					freeformFallbackBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -385,6 +410,31 @@ _Returns_
 ### getUnregisteredFallbackBlockName
 
 Returns the name of the block for handling unregistered blocks.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const unregisteredFallbackBlockName = useSelect( ( select ) =>
+		select( blocksStore ).getUnregisteredFallbackBlockName()
+	);
+
+	return (
+		unregisteredFallbackBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Unregistered fallback block name: %s' ),
+					unregisteredFallbackBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
 
 _Parameters_
 
