@@ -436,6 +436,7 @@ See the [the example documentation](/docs/reference-guides/block-api/block-regis
 - Optional
 - Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 - Property: `variations`
+- Since: `WordPress 5.9.0`
 
 ```json
 {
