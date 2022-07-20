@@ -4,8 +4,13 @@
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+} from '@wordpress/components';
+import { Icon, chevronDown, reset } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -26,7 +31,14 @@ export default function Actions( { template } ) {
 	const isRevertable = isTemplateRevertable( template );
 
 	if ( ! isRemovable && ! isRevertable ) {
-		return __( 'No actions' );
+		return (
+			<>
+				<Icon icon={ reset } />
+				<VisuallyHidden>
+					{ __( 'No actions available' ) }
+				</VisuallyHidden>
+			</>
+		);
 	}
 
 	async function revertAndSaveTemplate() {
