@@ -220,6 +220,83 @@ class WP_Tag_Find_Descriptor {
 }
 
 
+class WP_HTML_Scanner_Token {
+	/**
+	 * The starting byte offset in some document where the token was found.
+	 *
+	 * @var int
+	 */
+	public $start;
+
+	/**
+	 * The byte length of the token in the source document.
+	 *
+	 * @var int
+	 */
+	public $length;
+
+	/**
+	 * Comparable value of the token
+	 *
+	 * @var string|null
+	 */
+	public $comparable = null;
+
+	public function __construct( $start, $length, $comparable ) {
+		$this->start = $start;
+		$this->length = $length;
+		$this->comparable = $comparable;
+	}
+
+	/**
+	 * Converts a `preg_match()` result with PREG_OFFSET_CAPTURE
+	 * into a token pair of start-offset and length.
+	 *
+	 * This class exists to disambiguate alternative ways we could
+	 * be representing a pattern match, and it holds a lazy
+	 * reference to a comparable value to the parsed token.
+	 *
+	 * @param $preg_match
+	 * @return self
+	 */
+	public static function from_preg_match( $preg_match ) {
+		list( $source_value, $starts_at ) = $preg_match;
+
+		return new self( $starts_at, strlen( $source_value ), WP_Tag_Find_Descriptor::comparable( $source_value ) );
+	}
+}
+
+
+class WP_HTML_Attribute_Token {
+	/**
+	 * @var WP_HTML_Scanner_Token
+	 */
+	public $name;
+
+	/**
+	 * @var WP_HTML_Scanner_Token|null
+	 */
+	public $value;
+
+	/**
+	 * @var int
+	 */
+	public $attribute_start;
+
+	/**
+	 * @var int
+	 */
+	public $attribute_end;
+
+	public function __construct( $name, $value, $start, $end ) {
+		$this->name            = $name;
+		$this->value           = $value;
+		$this->attribute_start = $start;
+		$this->attribute_end   = $end;
+	}
+}
+
+
 class WP_HTML_Scanner {
 	/**
 	 * Input HTML document we're processing.
@@ -272,7 +349,7 @@ class WP_HTML_Scanner {
 	/**
 	 * Start and end of matched tag name, or `null` if not yet found.
 	 *
-	 * @var array<int|string>|null
+	 * @var WP_HTML_Scanner_Token|null
 	 */
 	public $tag_name = null;
 
@@ -297,7 +374,7 @@ class WP_HTML_Scanner {
 	 *     );
 	 * </code>
 	 *
-	 * @var array<int|string>
+	 * @var array<WP_HTML_Scanner_Token>
 	 */
 	public $attributes = array();
 
@@ -341,7 +418,7 @@ class WP_HTML_Scanner {
 
 	public function find_next_tag() {
 		if ( 1 !== preg_match(
-	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} \/>]*)~mui",
+	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} />]*)~mui",
 			$this->document,
 			$tag_match,
 			PREG_OFFSET_CAPTURE,
@@ -352,7 +429,7 @@ class WP_HTML_Scanner {
 			return false;
 		}
 
-		list( '0' => $full_match ) = $tag_match;
+		list( list( $full_match, $start_at ) ) = $tag_match;
 
 		// Keep scanning if we found a comment or CDATA section.
 		if ( ! isset( $tag_match['TAG'] ) ) {
@@ -360,10 +437,11 @@ class WP_HTML_Scanner {
 			return $this->find_next_tag();
 		}
 
-		list( 'TAG' => $tag_name ) = $tag_match;
+		$this->tag_start = $this->start_at;
+		$this->tag_name = WP_HTML_Scanner_Token::from_preg_match( $tag_match['TAG'] );
 		$this->start_at += strlen( $full_match );
 
-		return $tag_name;
+		return true;
 	}
 
 
@@ -376,21 +454,21 @@ class WP_HTML_Scanner {
 			PREG_OFFSET_CAPTURE,
 			$this->start_at
 		) ) {
-			$this->start_at = strlen( $this->document );
 			return false;
 		}
 
-		list( '0' => $full_match ) = $attribute_match;
-
-		list( 'NAME' => $attribute_name ) = $attribute_match;
-		$this->start_at += strlen( $full_match );
+		list( list( $full_match, $start_at ) ) = $attribute_match;
+		$name_token = WP_HTML_Scanner_Token::from_preg_match( $attribute_match['NAME'] );
 
 		if ( '=' !== $this->document[ $this->start_at ] ) {
-			return [ $attribute_name, '' ];
+			$this->start_at += strlen( $full_match );
+			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $start_at + strlen( $full_match ) );
 		}
 
+		$this->start_at += strlen( $full_match );
+
+		// Skip the equals sign (we already returned if it's not there).
 		// Find the attribute value
-		// Skip the equals sign.
 		$this->start_at += 1;
 		switch ( $this->document[ $this->start_at ] ) {
 			case '"':
@@ -415,13 +493,15 @@ class WP_HTML_Scanner {
 			PREG_OFFSET_CAPTURE,
 			$this->start_at
 		) ) {
-			return $attribute_name;
+			// The end of the token is one after the end of the name because we found an `=`, implying the value is empty.
+			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $name_token->start + $name_token->length + 1 );
 		}
 
-		list( '0' => $full_match, 'VALUE' => $attribute_value ) = $value_match;
+		list( list( $full_match, $value_start_at ) ) = $value_match;
+		$value_token = WP_HTML_Scanner_Token::from_preg_match( $value_match['VALUE'] );
 		$this->start_at += strlen( $full_match );
 
-		return [ $attribute_name, $attribute_value ];
+		return new WP_HTML_Attribute_Token( $name_token, $value_token, $start_at, $value_start_at + strlen( $full_match ) );
 	}
 
 	public function reset() {
