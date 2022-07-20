@@ -102,6 +102,29 @@ _Returns_
 
 Returns the block support value for a feature, if defined.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const paragraphBlockSupportValue = useSelect( ( select ) =>
+		select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' )
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__( 'core/paragraph supports.anchor value: %s' ),
+				paragraphBlockSupportValue
+			) }
+		</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -517,6 +540,29 @@ _Returns_
 
 Returns true if the block defines support for a feature, or false otherwise.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+    const paragraphBlockSupportClassName = useSelect( ( select ) =>
+        select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' )
+    );
+
+    return (
+        <p>
+            { sprintf(
+                __( 'core/paragraph supports custom class name?: %s' ),
+                paragraphBlockSupportClassName
+            ) }
+        /p>
+    );
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -532,6 +578,29 @@ _Returns_
 
 Returns a boolean indicating if a block has child blocks or not.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const navigationBlockHasChildBlocks = useSelect( ( select ) =>
+		select( blocksStore ).hasChildBlocks( 'core/navigation' )
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__( 'core/navigation has child blocks: %s' ),
+				navigationBlockHasChildBlocks
+			) }
+		</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -544,6 +613,34 @@ _Returns_
 ### hasChildBlocksWithInserterSupport
 
 Returns a boolean indicating if a block has at least one child block with inserter support.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const navigationBlockHasChildBlocksWithInserterSupport = useSelect(
+		( select ) =>
+			select( blocksStore ).hasChildBlocksWithInserterSupport(
+				'core/navigation'
+			)
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__(
+					'core/navigation has child blocks with inserter support: %s'
+				),
+				navigationBlockHasChildBlocksWithInserterSupport
+			) }
+		</p>
+	);
+};
+```
 
 _Parameters_
 
