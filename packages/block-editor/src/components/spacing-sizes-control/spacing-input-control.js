@@ -7,7 +7,6 @@ import {
 	RangeControl,
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
-	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalBoxControlIcon as BoxControlIcon,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
@@ -15,25 +14,17 @@ import {
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
-/**
- * Inspector control panel containing the spacing size related configuration
- *
- * @param {Object} props
- *
- * @return {WPElement} Font size edit element.
- */
-export default function SpacingRangeControl( {
+export default function SpacingInputControl( {
 	spacingSizes,
 	value,
 	side,
-	label,
 	onChange,
 } ) {
 	const [ valueNow, setValueNow ] = useState( null );
 	const [ showCustomValueControl, setShowCustomValueControl ] =
 		useState( false );
 	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
-	const useSelect = false; //props.useSelect;
+
 	const getNewCustomValue = ( newSize ) => {
 		return newSize;
 	};
@@ -72,7 +63,7 @@ export default function SpacingRangeControl( {
 					] }
 				/>
 
-				{ spacingSizes.length <= 8 && (
+				{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 					<Text className="components-spacing-sizes-control__hint">
 						{ currentValueHint !== undefined
 							? currentValueHint
@@ -80,6 +71,24 @@ export default function SpacingRangeControl( {
 					</Text>
 				) }
 
+				{ spacingSizes.length > 8 && ! showCustomValueControl && (
+					<CustomSelectControl
+						value={ options.find(
+							( option ) => option.key === valueNow
+						) }
+						onChange={ ( selectedItem ) => {
+							onChange( getNewRangeValue( selectedItem.key ) );
+						} }
+						options={ options }
+						onHighlightedIndexChange={ ( index ) => {
+							if ( index.type === '__item_mouse_move__' ) {
+								onChange(
+									getNewRangeValue( index.highlightedIndex )
+								);
+							}
+						} }
+					/>
+				) }
 				<Button
 					label={
 						showCustomValueControl
@@ -96,9 +105,8 @@ export default function SpacingRangeControl( {
 				/>
 			</HStack>
 			{ showCustomValueControl && (
-				<div>
+				<HStack className="components-spacing-sizes-control__custom-value-control">
 					<UnitControl
-						label={ label }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -107,20 +115,15 @@ export default function SpacingRangeControl( {
 
 					<RangeControl
 						value={ value }
-						label={ <></> }
 						min={ 0 }
 						max={ 50 }
-						// initialPosition={ 0 }
 						withInputField={ false }
-						onChange={ ( newValue ) => console.log( newValue ) }
-						// step={ step }
 					/>
-				</div>
+				</HStack>
 			) }
 			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 				<RangeControl
 					value={ value }
-					label={ <></> }
 					onChange={ ( newSize ) =>
 						onChange( getNewRangeValue( newSize ) )
 					}
@@ -131,25 +134,6 @@ export default function SpacingRangeControl( {
 					min={ 0 }
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
-				/>
-			) }
-			{ spacingSizes.length > 8 && ! showCustomValueControl && (
-				<CustomSelectControl
-					value={ options.find(
-						( option ) => option.key === valueNow
-					) }
-					label={ <></> }
-					onChange={ ( selectedItem ) => {
-						onChange( getNewRangeValue( selectedItem.key ) );
-					} }
-					options={ options }
-					onHighlightedIndexChange={ ( index ) => {
-						if ( index.type === '__item_mouse_move__' ) {
-							onChange(
-								getNewRangeValue( index.highlightedIndex )
-							);
-						}
-					} }
 				/>
 			) }
 		</>

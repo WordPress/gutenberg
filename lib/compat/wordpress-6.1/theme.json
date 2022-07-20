@@ -274,7 +274,7 @@
 			"spacingScale": {
 				"operator": "*",
 				"increment": 1.5,
-				"steps": 8,
+				"steps": 7,
 				"mediumStep": 1.5,
 				"unit": "rem"
 			}

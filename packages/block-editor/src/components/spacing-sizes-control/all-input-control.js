@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import SpacingRangeControl from './spacing-range-control';
+import SpacingInputControl from './spacing-input-control';
 import {
 	ALL_SIDES,
 	LABELS,
@@ -54,7 +54,7 @@ export default function AllInputControl( {
 	};
 
 	return (
-		<SpacingRangeControl
+		<SpacingInputControl
 			{ ...props }
 			value={ allValue }
 			onChange={ handleOnChange }

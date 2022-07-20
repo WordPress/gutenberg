@@ -1,12 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { Flex } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import SpacingRangeControl from './spacing-range-control';
+import SpacingInputControl from './spacing-input-control';
 import { LABELS, getSpacingPresetSlug, getSliderValueFromSlug } from './utils';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
@@ -53,7 +48,7 @@ export default function AxialInputControls( {
 					props.spacingSizes
 				);
 				return (
-					<SpacingRangeControl
+					<SpacingInputControl
 						{ ...props }
 						value={ value }
 						onChange={ createHandleOnChange( side ) }

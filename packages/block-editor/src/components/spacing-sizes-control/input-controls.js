@@ -1,12 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { Flex } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import SpacingRangeControl from './spacing-range-control';
+import SpacingInputControl from './spacing-input-control';
 import {
 	ALL_SIDES,
 	LABELS,
@@ -67,7 +62,7 @@ export default function BoxInputControls( {
 				);
 
 				return (
-					<SpacingRangeControl
+					<SpacingInputControl
 						{ ...props }
 						value={ value }
 						label={ LABELS[ side ] }

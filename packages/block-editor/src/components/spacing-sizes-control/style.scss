@@ -7,7 +7,7 @@
 	.components-range-control__mark {
 		height: 4px;
 		width: 3px;
-		background-color: #ffffff;
+		background-color: #fff;
 		z-index: 1;
 	}
 
@@ -24,46 +24,29 @@
 	}
 
 	.components-custom-select-control {
+		.components-custom-select-control__label {
+			margin-bottom: 0;
+		}
 		button {
 			width: 100%;
 		}
 	}
 
+	.components-spacing-sizes-control__custom-value-control {
+		.components-unit-control-wrapper {
+			width: 110px;
+			flex-shrink: 0;
+		}
+		.components-range-control {
+			flex: 1;
+		}
+	}
+
 	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
-		legend {
-			margin-bottom: 12px;
-		}
 	}
 
 	.components-spacing-sizes-control__hint {
 		color: $gray-700;
-	}
-
-	.component-spacing-sizes-control__wrapper {
-		min-height: 30px;
-		gap: 0;
-	}
-	.component-spacing-sizes-control__input-controls-wrapper {
-		justify-content: center;
-		padding-top: 8px;
-		.component-spacing-sizes-control__input-controls {
-			position: relative;
-			height: 100%;
-			width: 100%;
-			justify-content: flex-start;
-			flex-direction: column;
-		}
-	}
-
-	.component-spacing-sizes-control__linked-button.has-icon {
-		display: flex;
-		justify-content: center;
-		margin-left: 2px;
-		margin-top: 3px;
-
-		svg {
-			margin-right: 0;
-		}
 	}
 }
