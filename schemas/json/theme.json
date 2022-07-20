@@ -1102,7 +1102,7 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"link": {
 					"type": "object",
