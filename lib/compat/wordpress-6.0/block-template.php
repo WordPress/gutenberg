@@ -25,7 +25,7 @@ function gutenberg_resolve_home_template() {
 	}
 
 	$hierarchy = array( 'front-page', 'home', 'index' );
-	$template  = gutenberg_resolve_template( 'home', $hierarchy, '' );
+	$template  = resolve_block_template( 'home', $hierarchy, '' );
 
 	if ( ! $template ) {
 		return null;
