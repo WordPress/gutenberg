@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { compact } = require( 'lodash' );
 const postcss = require( 'postcss' );
 
 /**
@@ -41,13 +40,13 @@ const baseConfig = {
 	},
 	mode,
 	module: {
-		rules: compact( [
+		rules: [
 			{
 				test: /\.js$/,
 				use: require.resolve( 'source-map-loader' ),
 				enforce: 'pre',
 			},
-		] ),
+		],
 	},
 	watchOptions: {
 		ignored: [

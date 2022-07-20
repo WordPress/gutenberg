@@ -438,7 +438,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Templates",
+		"title": "Block Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/reference-guides/block-api/block-templates.md",
 		"parent": "block-api"
@@ -462,19 +462,19 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Filter Reference",
+		"title": "Hooks Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Filters",
+		"title": "Block Hooks",
 		"slug": "block-filters",
 		"markdown_source": "../docs/reference-guides/filters/block-filters.md",
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters",
+		"title": "Editor Hooks",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/reference-guides/filters/editor-filters.md",
 		"parent": "filters"

@@ -8,7 +8,6 @@ import {
 	some,
 	filter,
 	first,
-	flatMap,
 	has,
 	uniq,
 	isEmpty,
@@ -293,10 +292,9 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	} );
 
 	// Build a list of block names using the possible 'to' transforms.
-	const blockNames = flatMap(
-		possibleTransforms,
-		( transformation ) => transformation.blocks
-	);
+	const blockNames = possibleTransforms
+		.map( ( transformation ) => transformation.blocks )
+		.flat();
 
 	// Map block names to block types.
 	return blockNames.map( ( name ) =>
@@ -402,9 +400,9 @@ export function findTransform( transforms, predicate ) {
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
-		return flatMap( getBlockTypes(), ( { name } ) =>
-			getBlockTransforms( direction, name )
-		);
+		return getBlockTypes()
+			.map( ( { name } ) => getBlockTransforms( direction, name ) )
+			.flat();
 	}
 
 	// Validate that block type exists and has array of direction.

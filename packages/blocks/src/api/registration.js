@@ -3,15 +3,7 @@
 /**
  * External dependencies
  */
-import {
-	camelCase,
-	isEmpty,
-	isObject,
-	isString,
-	mapKeys,
-	pick,
-	pickBy,
-} from 'lodash';
+import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -138,6 +130,10 @@ import { store as blocksStore } from '../store';
  */
 
 export const serverSideBlockDefinitions = {};
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Sets the server side block definition of blocks.
@@ -302,7 +298,7 @@ function translateBlockSettingUsingI18nSchema(
 	settingValue,
 	textdomain
 ) {
-	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+	if ( typeof i18nSchema === 'string' && typeof settingValue === 'string' ) {
 		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
 		return _x( settingValue, i18nSchema, textdomain );
 	}

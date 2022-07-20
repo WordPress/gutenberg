@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, compact, every } from 'lodash';
+import { partial, first, castArray, last, every } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -202,7 +202,7 @@ const BlockActionsMenu = ( {
 		},
 	};
 
-	const options = compact( [
+	const options = [
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
@@ -215,7 +215,7 @@ const BlockActionsMenu = ( {
 		canDuplicate && allOptions.duplicateButton,
 		isReusableBlockType && allOptions.convertToRegularBlocks,
 		! isLocked && allOptions.delete,
-	] );
+	].filter( Boolean );
 
 	// End early if there are no options to show.
 	if ( ! options.length ) {

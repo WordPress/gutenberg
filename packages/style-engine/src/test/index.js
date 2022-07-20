@@ -8,6 +8,15 @@ describe( 'generate', () => {
 		expect( generate( {}, '.some-selector' ) ).toEqual( '' );
 	} );
 
+	it( 'should generate empty style with empty keys', () => {
+		expect(
+			generate( {
+				spacing: undefined,
+				color: undefined,
+			} )
+		).toEqual( '' );
+	} );
+
 	it( 'should generate inline styles where there is no selector', () => {
 		expect(
 			generate( {
@@ -72,14 +81,17 @@ describe( 'generate', () => {
 		);
 	} );
 
-	it( 'should parse preset values (use for elements.link.color.text)', () => {
+	it( 'should parse preset values', () => {
 		expect(
 			generate( {
 				color: {
 					text: 'var:preset|color|ham-sandwich',
 				},
+				spacing: { margin: '3px' },
 			} )
-		).toEqual( 'color: var(--wp--preset--color--ham-sandwich);' );
+		).toEqual(
+			'color: var(--wp--preset--color--ham-sandwich); margin: 3px;'
+		);
 	} );
 
 	it( 'should parse border rules', () => {
@@ -275,6 +287,33 @@ describe( 'getCSSRules', () => {
 				key: 'textTransform',
 				selector: '.some-selector',
 				value: 'uppercase',
+			},
+		] );
+	} );
+
+	it( 'should handle styles with CSS vars', () => {
+		expect(
+			getCSSRules(
+				{
+					color: {
+						text: 'var:preset|color|bomba-picante',
+					},
+					spacing: { padding: '11px' },
+				},
+				{
+					selector: '.some-selector a',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector a',
+				key: 'color',
+				value: 'var(--wp--preset--color--bomba-picante)',
+			},
+			{
+				selector: '.some-selector a',
+				key: 'padding',
+				value: '11px',
 			},
 		] );
 	} );

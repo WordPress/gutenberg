@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 import { useState } from '@wordpress/element';
-import { useInstanceId, useResizeObserver } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -28,7 +28,6 @@ const SetupContent = ( {
 	activeSlide,
 	patterns,
 	onBlockPatternSelect,
-	height,
 } ) => {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
@@ -39,10 +38,7 @@ const SetupContent = ( {
 			[ activeSlide + 1, 'next-slide' ],
 		] );
 		return (
-			<div
-				className="block-editor-block-pattern-setup__carousel"
-				style={ { height } }
-			>
+			<div className="block-editor-block-pattern-setup__carousel">
 				<div className={ containerClass }>
 					<ul className="carousel-container">
 						{ patterns.map( ( pattern, index ) => (
@@ -50,7 +46,6 @@ const SetupContent = ( {
 								className={ slideClass.get( index ) || '' }
 								key={ pattern.name }
 								pattern={ pattern }
-								minHeight={ height }
 							/>
 						) ) }
 					</ul>
@@ -59,10 +54,7 @@ const SetupContent = ( {
 		);
 	}
 	return (
-		<div
-			style={ { height } }
-			className="block-editor-block-pattern-setup__grid"
-		>
+		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
 				{ ...composite }
 				role="listbox"
@@ -151,8 +143,6 @@ const BlockPatternSetup = ( {
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
 
 	if ( ! patterns?.length ) {
 		return null;
@@ -166,7 +156,6 @@ const BlockPatternSetup = ( {
 		onBlockPatternSelect || onBlockPatternSelectDefault;
 	return (
 		<>
-			{ contentResizeListener }
 			<div
 				className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
 			>
@@ -175,7 +164,6 @@ const BlockPatternSetup = ( {
 					activeSlide={ activeSlide }
 					patterns={ patterns }
 					onBlockPatternSelect={ onPatternSelectCallback }
-					height={ contentHeight - 2 * 60 }
 				/>
 				<SetupToolbar
 					viewMode={ viewMode }

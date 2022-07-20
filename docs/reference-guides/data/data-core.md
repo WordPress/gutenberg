@@ -240,7 +240,7 @@ _Parameters_
 -   _kind_ `K`: Entity kind.
 -   _name_ `N`: Entity name.
 -   _key_ `KeyOf< R >`: Record's key
--   _query_ Optional query.
+-   _query_ Optional query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 
@@ -289,7 +289,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `K`: Entity kind.
 -   _name_ `N`: Entity name.
--   _query_ Optional terms query.
+-   _query_ Optional terms query. If requesting specific fields, fields must always include the ID.
 
 _Returns_
 

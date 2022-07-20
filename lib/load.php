@@ -70,7 +70,7 @@ require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.0/block-template.php';
+require __DIR__ . '/compat/wordpress-6.0/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
@@ -87,6 +87,7 @@ require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.1/edit-form-blocks.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
@@ -114,6 +115,15 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-gutenb
 }
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-declarations-gutenberg.php';
+}
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rule-gutenberg.php';
+}
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
+}
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
 }
 
 // Block supports overrides.
