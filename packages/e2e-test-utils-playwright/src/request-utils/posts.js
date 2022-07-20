@@ -30,3 +30,20 @@ export async function deleteAllPosts() {
 		)
 	);
 }
+
+/**
+ * Creates a new post using the REST API.
+ *
+ * @param {string} content The content for the post.
+ *
+ * @return {Promise<number>} Post ID.
+ */
+export async function createPost( { content } ) {
+	const post = await this.rest( {
+		method: 'POST',
+		path: `/wp/v2/posts`,
+		params: { status: 'publish', content },
+	} );
+
+	return post.id;
+}

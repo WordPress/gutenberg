@@ -161,13 +161,9 @@ test.describe( 'Post Comments', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'is still supported', async ( {
-		page,
-		requestUtils,
-		commentsBlockUtils,
-	} ) => {
+	test( 'is still supported', async ( { page, requestUtils } ) => {
 		// Create a post with the old "Post Comments" block.
-		const postId = await commentsBlockUtils.createNewPost( {
+		const postId = await requestUtils.createPost( {
 			content: '<!-- wp:post-comments /-->',
 		} );
 
@@ -195,7 +191,7 @@ test.describe( 'Post Comments', () => {
 		commentsBlockUtils,
 	} ) => {
 		// Create a post with the old "Post Comments" block.
-		const postId = await commentsBlockUtils.createNewPost( {
+		const postId = await requestUtils.createPost( {
 			content: '<!-- wp:post-comments /-->',
 		} );
 		await requestUtils.createComment( {
@@ -277,23 +273,6 @@ class CommentsBlockUtils {
 		await this.page.click( '#Update' );
 
 		return previousValue;
-	}
-
-	/**
-	 * Creates a post with the given content.
-	 *
-	 * @param {string} content The content for the post.
-	 *
-	 * @return {Promise<number>} Post ID.
-	 */
-	async createNewPost( { content } ) {
-		const post = await this.requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/posts`,
-			params: { status: 'publish', content },
-		} );
-
-		return post.id;
 	}
 
 	async hideWelcomeGuide() {
