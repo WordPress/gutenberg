@@ -117,6 +117,7 @@ function usePageData() {
 			order: 'asc',
 			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
 			per_page: -1,
+			context: 'view',
 		}
 	);
 
