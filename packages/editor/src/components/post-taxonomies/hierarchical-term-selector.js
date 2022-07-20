@@ -152,7 +152,7 @@ export function getFilterMatcher( filterValue ) {
  * @param {string} props.slug Taxonomy slug.
  * @return {WPElement}        Hierarchical term selector component.
  */
-function HierarchicalTermSelector( { slug } ) {
+export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	/**
@@ -173,12 +173,10 @@ function HierarchicalTermSelector( { slug } ) {
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const { getTaxonomy, getEntityRecords, isResolving } = select(
-				coreStore
-			);
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getTaxonomy, getEntityRecords, isResolving } =
+				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
 
 			return {

@@ -20,7 +20,6 @@ export function useBorderControlDropdown(
 		border,
 		className,
 		colors,
-		contentClassName,
 		onChange,
 		previousStyleSelection,
 		__next36pxDefaultSize,
@@ -68,8 +67,8 @@ export function useBorderControlDropdown(
 	}, [ border, cx, __next36pxDefaultSize ] );
 
 	const popoverClassName = useMemo( () => {
-		return cx( styles.borderControlPopover, contentClassName );
-	}, [ cx, contentClassName ] );
+		return cx( styles.borderControlPopover );
+	}, [ cx ] );
 
 	const popoverControlsClassName = useMemo( () => {
 		return cx( styles.borderControlPopoverControls );

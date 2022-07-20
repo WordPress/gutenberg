@@ -110,7 +110,7 @@
 		"html": false,
 		"units": [ "px", "em", "rem", "vh", "vw" ],
 		"spacing": {
-			"blockGap": true,
+			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true

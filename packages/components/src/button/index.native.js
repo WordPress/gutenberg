@@ -8,7 +8,6 @@ import {
 	View,
 	Platform,
 } from 'react-native';
-import { isArray } from 'lodash';
 import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
@@ -153,7 +152,7 @@ export function Button( props ) {
 			( !! label &&
 				// The children are empty and...
 				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+					( Array.isArray( children ) && ! children.length ) ) &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 

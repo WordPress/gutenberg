@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,6 +14,7 @@ import { fractionToPercentage } from './utils';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
+const noop = () => {};
 
 export default function FocalPointPickerControls( {
 	onChange = noop,

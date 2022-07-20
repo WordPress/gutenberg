@@ -10,12 +10,10 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	width: 100%;
 	height: $grid-unit-60;
 	margin-bottom: $grid-unit-20+$grid-unit-05;
-	/*rtl:ignore*/
-	padding-right: $components-custom-gradient-picker__padding;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
-		width: calc(100% - #{ $grid-unit-40 });
+		width: calc(100% - #{ $grid-unit-60 });
 		margin-left: auto;
 		margin-right: auto;
 	}

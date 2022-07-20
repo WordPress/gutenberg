@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { compact, get } from 'lodash';
-
 export function serializeGradientColor( { type, value } ) {
 	if ( type === 'literal' ) {
 		return value;
@@ -40,13 +35,12 @@ export function serializeGradient( { type, orientation, colorStops } ) {
 	const serializedColorStops = colorStops
 		.sort( ( colorStop1, colorStop2 ) => {
 			return (
-				get( colorStop1, [ 'length', 'value' ], 0 ) -
-				get( colorStop2, [ 'length', 'value' ], 0 )
+				( colorStop1?.length?.value ?? 0 ) -
+				( colorStop2?.length?.value ?? 0 )
 			);
 		} )
 		.map( serializeGradientColorStop );
-	return `${ type }(${ compact( [
-		serializedOrientation,
-		...serializedColorStops,
-	] ).join( ',' ) })`;
+	return `${ type }(${ [ serializedOrientation, ...serializedColorStops ]
+		.filter( Boolean )
+		.join( ',' ) })`;
 }

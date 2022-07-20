@@ -8,7 +8,6 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import {
 	formatOutdent,
@@ -27,7 +26,10 @@ import {
 	useSpace,
 	useIndentListItem,
 	useOutdentListItem,
+	useSplit,
+	useMerge,
 } from './hooks';
+import { convertToListItems } from './utils';
 
 function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
@@ -54,10 +56,8 @@ function IndentUI( { clientId } ) {
 }
 
 export default function ListItemEdit( {
-	name,
 	attributes,
 	setAttributes,
-	mergeBlocks,
 	onReplace,
 	clientId,
 } ) {
@@ -69,6 +69,8 @@ export default function ListItemEdit( {
 	const useEnterRef = useEnter( { content, clientId } );
 	const useBackspaceRef = useBackspace( { clientId } );
 	const useSpaceRef = useSpace( clientId );
+	const onSplit = useSplit( clientId );
+	const onMerge = useMerge( clientId );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
@@ -86,14 +88,11 @@ export default function ListItemEdit( {
 					value={ content }
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
-					onSplit={ ( value ) => {
-						return createBlock( name, {
-							...attributes,
-							content: value,
-						} );
+					onSplit={ onSplit }
+					onMerge={ onMerge }
+					onReplace={ ( blocks, ...args ) => {
+						onReplace( convertToListItems( blocks ), ...args );
 					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
 				/>
 				{ innerBlocksProps.children }
 			</li>

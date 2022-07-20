@@ -1,14 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { name as listItemName } from './block.json';
+import { name as listName } from '../list/block.json';
 
 export function createListItem( listItemAttributes, listAttributes, children ) {
 	return createBlock(
-		'core/list-item',
+		listItemName,
 		listItemAttributes,
-		! children || ! children.length
+		! children?.length
 			? []
-			: [ createBlock( 'core/list', listAttributes, children ) ]
+			: [ createBlock( listName, listAttributes, children ) ]
 	);
+}
+
+export function convertToListItems( blocks ) {
+	const listItems = [];
+
+	for ( let block of blocks ) {
+		if ( block.name === listItemName ) {
+			listItems.push( block );
+		} else if ( block.name === listName ) {
+			listItems.push( ...block.innerBlocks );
+		} else if ( ( block = switchToBlockType( block, listName ) ) ) {
+			for ( const { innerBlocks } of block ) {
+				listItems.push( ...innerBlocks );
+			}
+		}
+	}
+
+	return listItems;
 }

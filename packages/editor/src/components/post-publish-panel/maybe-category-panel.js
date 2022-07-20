@@ -21,15 +21,17 @@ import { store as editorStore } from '../../store';
 function MaybeCategoryPanel() {
 	const hasNoCategory = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
-		const categoriesTaxonomy = select( coreStore ).getTaxonomy(
-			'category'
-		);
-		const defaultCategorySlug = 'uncategorized';
+		const categoriesTaxonomy =
+			select( coreStore ).getTaxonomy( 'category' );
+		const defaultCategoryId = select( coreStore ).getEntityRecord(
+			'root',
+			'site'
+		)?.default_category;
 		const defaultCategory = select( coreStore ).getEntityRecords(
 			'taxonomy',
 			'category',
 			{
-				slug: defaultCategorySlug,
+				id: defaultCategoryId,
 			}
 		)?.[ 0 ];
 		const postTypeSupportsCategories =

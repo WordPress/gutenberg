@@ -188,6 +188,14 @@ wp-env start --debug
 	...
 ```
 
+## Using included WordPress PHPUnit test files
+
+Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
+
+### Customizing the `wp-tests-config.php` file
+
+While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
+
 ## Using Xdebug
 
 Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
@@ -300,20 +308,22 @@ Positionals:
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
 <div class="callout callout-alert">
-To run a WP-CLI command that includes optional arguments, enclose the WP-CLI command in quotation marks; otherwise, the optional arguments are ignored. This is because flags are normally passed to `wp-env` itself, meaning that the flags are not considered part of the argument that specifies the WP-CLI command. With quotation marks, `wp-env` considers everything inside quotation marks the WP-CLI command argument.
+In some cases, `wp-env` may consume options that you are attempting to pass to 
+the container. This happens with options that `wp-env` has already declared,
+such as `--debug`, `--help`, and `--version`. When this happens, you should fall
+back to using quotation marks; `wp-env` considers everything inside the
+quotation marks to be command argument.
 
-For example, to list cron schedules with optional arguments that specify the fields returned and the format of the output:
+For example, to ask `WP-CLI` for its help text:
 
 ```sh
-wp-env run cli "wp cron schedule list --fields=name --format=csv"
+wp-env run cli "wp --help"
 ```
 
-Without the quotation marks, WP-CLI lists the schedule in its default format, ignoring the `fields` and `format` arguments.
+Without the quotation marks, `wp-env` will print its own help text instead of
+passing it to the container. If you experience any problems where the command
+is not being passed correctly, fall back to using quotation marks.
 </div>
-
-Note that quotation marks are not required for a WP-CLI command that excludes optional arguments, although it does not hurt to include them. For example, the following command syntaxes return identical results: `wp-env run cli "wp cron schedule list"` or `wp-env run cli wp cron schedule list`.
-
-For more information about all the available commands, see [WP-CLI Commands](https://developer.wordpress.org/cli/commands/).
 
 ```sh
 wp-env run <container> [command..]
@@ -323,11 +333,7 @@ Runs an arbitrary command in one of the underlying Docker containers. The
 "development", "tests", or "cli". To run a wp-cli command, use the "cli" or
 "tests-cli" service. You can also use this command to open shell sessions like
 bash and the WordPress shell in the WordPress instance. For example, `wp-env run
-cli bash` will open bash in the development WordPress instance. When using long
-commands with arguments and quotation marks, you need to wrap the "command"
-param in quotation marks. For example: `wp-env run tests-cli "wp post create
---post_type=page --post_title='Test'"` will create a post on the tests WordPress
-instance.
+cli bash` will open bash in the development WordPress instance.
 
 Positionals:
   container  The container to run the command on.            [string] [required]
@@ -460,12 +466,13 @@ _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PO
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
-| Type              | Format                        | Example(s)                                               |
-| ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`   |
-| ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
+| Type              | Format                                       | Example(s)                                               |
+| ----------------- | -------------------------------------------- | -------------------------------------------------------- |
+| Relative path     | `.<path>\|~<path>`                           | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`                  | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| GitHub repository | `<owner>/<repo>[#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, if no branch is provided wp-env will fall back to the repos default branch |
+| SSH repository    | `ssh://user@host/<owner>/<repo>.git[#<ref>]` | `"ssh://git@github.com/WordPress/WordPress.git"`         |
+| ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
@@ -518,6 +525,8 @@ WP_HOME: 'http://localhost',
 ```
 
 On the test instance, all of the above are still defined, but `WP_DEBUG` and `SCRIPT_DEBUG` are set to false.
+
+These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
 
 Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 

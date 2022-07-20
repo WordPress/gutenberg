@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit, omitBy, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -15,7 +10,7 @@ import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';
 
-const availableIcons = omit( icons, 'Icon' );
+const { Icon: _Icon, ...availableIcons } = icons;
 
 export default { title: 'Icons/Icon', component: Icon };
 
@@ -42,9 +37,13 @@ export const _default = () => {
 
 const LibraryExample = () => {
 	const [ filter, setFilter ] = useState( '' );
-	const filteredIcons = omitBy( availableIcons, ( _icon, name ) => {
-		return name.indexOf( filter ) === -1;
-	} );
+	const filteredIcons = filter.length
+		? Object.fromEntries(
+				Object.entries( availableIcons ).filter( ( [ name ] ) =>
+					name.includes( filter )
+				)
+		  )
+		: availableIcons;
 	return (
 		<div style={ { padding: '20px' } }>
 			<label htmlFor="filter-icon" style={ { paddingRight: '10px' } }>
@@ -58,7 +57,7 @@ const LibraryExample = () => {
 				placeholder="Icon name"
 				onChange={ ( event ) => setFilter( event.target.value ) }
 			/>
-			{ map( filteredIcons, ( icon, name ) => {
+			{ Object.entries( filteredIcons ).map( ( [ name, icon ] ) => {
 				return (
 					<div
 						key={ name }

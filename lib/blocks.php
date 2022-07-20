@@ -71,7 +71,6 @@ function gutenberg_reregister_core_block_types() {
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
 				'navigation.php'                   => 'core/navigation',
-				'navigation-area.php'              => 'core/navigation-area',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
@@ -143,7 +142,7 @@ function gutenberg_reregister_core_block_types() {
 			// to replace paths with overrides defined by the plugin.
 			$metadata = json_decode( file_get_contents( $block_json_file ), true );
 			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				return false;
+				continue;
 			}
 
 			if ( $registry->is_registered( $metadata['name'] ) ) {
@@ -156,7 +155,7 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
-				return;
+				continue;
 			}
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
@@ -200,7 +199,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		wp_register_style(
 			"wp-block-{$block_name}",
 			gutenberg_url( $style_path ),
-			array(),
+			array( 'global-styles' ),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
@@ -208,7 +207,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
 	} else {
-		wp_register_style( "wp-block-{$block_name}", false );
+		wp_register_style( "wp-block-{$block_name}", false, array( 'global-styles' ) );
 	}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
@@ -247,7 +246,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 				wp_register_style(
 					"wp-block-{$block_name}",
 					gutenberg_url( $theme_style_path ),
-					array(),
+					array( 'global-styles' ),
 					$default_version
 				);
 				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );

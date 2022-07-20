@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+-   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for the `wp-phpunit/wp-phpunit` Composer package. To continue using the package, set the following two environment variables in your `phpunit.xml` file or similar: `WP_TESTS_DIR=""` and `WP_PHPUNIT__TESTS_CONFIG="/wordpress-phpunit/wp-tests-config.php"`.**
+-   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
+
+### Enhancement
+-   Read WordPress' version and include the corresponding PHPUnit test files in the environment.
+-   Set the `WP_TESTS_DIR` environment variable in all containers to point at the PHPUnit test files.
+
+## 4.8.0 (2022-06-01)
+### Enhancement
+-   Removed the need for quotation marks when passing options to `wp-env run`.
+-   Setting a `config` key to `null` will prevent adding the constant to `wp-config.php` even if a default value is defined by `wp-env`.
+
+## 4.7.0 (2022-05-18)
+
+### Enhancement
+-   Added SSH protocol support for git sources
+
 ## 4.2.0 (2022-01-27)
 
 ### Enhancement

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -113,7 +113,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
 				},
-				( value ) => ! isUndefined( value )
+				( value ) => typeof value !== 'undefined'
 			);
 
 			return {
@@ -432,11 +432,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
-					const titleTrimmed = invoke( post, [
-						'title',
-						'rendered',
-						'trim',
-					] );
+					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author
@@ -450,13 +446,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						excerptElement.innerText ||
 						'';
 
-					const {
-						url: imageSourceUrl,
-						alt: featuredImageAlt,
-					} = getFeaturedImageDetails( post, featuredImageSizeSlug );
+					const { url: imageSourceUrl, alt: featuredImageAlt } =
+						getFeaturedImageDetails( post, featuredImageSizeSlug );
 					const imageClasses = classnames( {
 						'wp-block-latest-posts__featured-image': true,
-						[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+						[ `align${ featuredImageAlign }` ]:
+							!! featuredImageAlign,
 					} );
 					const renderFeaturedImage =
 						displayFeaturedImage && imageSourceUrl;

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
-import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { DimensionControl } from '../';
 
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
+	const instanceId = 1;
 
 	afterEach( () => {
 		onChangeHandler.mockClear();
@@ -25,7 +25,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders with defaults', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 				/>
 			);
@@ -35,7 +35,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders with icon and default icon label', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Margin' }
 					icon={ plus }
 				/>
@@ -46,7 +46,7 @@ describe( 'DimensionControl', () => {
 		it( 'renders with icon and custom icon label', () => {
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Margin' }
 					icon={ plus }
 					iconLabel={ 'Tablet Devices' }
@@ -76,7 +76,7 @@ describe( 'DimensionControl', () => {
 
 			const wrapper = shallow(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Custom Dimension' }
 					sizes={ customSizes }
 				/>
@@ -89,7 +89,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with correct args on size change', () => {
 			const wrapper = mount(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>
@@ -121,7 +121,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
 			const wrapper = mount(
 				<DimensionControl
-					instanceId={ uniqueId() }
+					instanceId={ instanceId }
 					label={ 'Padding' }
 					onChange={ onChangeHandler }
 				/>

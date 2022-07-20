@@ -31,6 +31,9 @@ const focusBoxShadow = css`
 
 export const borderControl = css`
 	position: relative;
+	border: 0;
+	padding: 0;
+	margin: 0;
 `;
 
 export const innerWrapper = () => css`
@@ -172,8 +175,9 @@ export const colorIndicatorWrapper = (
 
 export const borderControlPopover = css`
 	/* Remove padding from content, this will be re-added via inner elements*/
-	&& > div > div {
+	&& .components-popover__content {
 		padding: 0;
+		width: 264px;
 	}
 `;
 

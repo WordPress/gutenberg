@@ -28,11 +28,13 @@ function BlockPopoverInbetween( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { orientation, rootClientId } = useSelect(
+	const { orientation, rootClientId, isVisible } = useSelect(
 		( select ) => {
-			const { getBlockListSettings, getBlockRootClientId } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockListSettings,
+				getBlockRootClientId,
+				isBlockVisible,
+			} = select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( previousClientId );
 			return {
@@ -40,6 +42,9 @@ function BlockPopoverInbetween( {
 					getBlockListSettings( _rootClientId )?.orientation ||
 					'vertical',
 				rootClientId: _rootClientId,
+				isVisible:
+					isBlockVisible( previousClientId ) &&
+					isBlockVisible( nextClientId ),
 			};
 		},
 		[ previousClientId ]
@@ -48,7 +53,7 @@ function BlockPopoverInbetween( {
 	const nextElement = useBlockElement( nextClientId );
 	const isVertical = orientation === 'vertical';
 	const style = useMemo( () => {
-		if ( ! previousElement && ! nextElement ) {
+		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
 			return {};
 		}
 
@@ -87,7 +92,7 @@ function BlockPopoverInbetween( {
 	}, [ previousElement, nextElement, isVertical ] );
 
 	const getAnchorRect = useCallback( () => {
-		if ( ! previousElement && ! nextElement ) {
+		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
 			return {};
 		}
 
@@ -107,6 +112,8 @@ function BlockPopoverInbetween( {
 					left: previousRect ? previousRect.right : nextRect.right,
 					right: previousRect ? previousRect.left : nextRect.left,
 					bottom: nextRect ? nextRect.top : previousRect.bottom,
+					height: 0,
+					width: 0,
 					ownerDocument,
 				};
 			}
@@ -116,6 +123,8 @@ function BlockPopoverInbetween( {
 				left: previousRect ? previousRect.left : nextRect.left,
 				right: previousRect ? previousRect.right : nextRect.right,
 				bottom: nextRect ? nextRect.top : previousRect.bottom,
+				height: 0,
+				width: 0,
 				ownerDocument,
 			};
 		}
@@ -126,6 +135,8 @@ function BlockPopoverInbetween( {
 				left: previousRect ? previousRect.left : nextRect.right,
 				right: nextRect ? nextRect.right : previousRect.left,
 				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+				height: 0,
+				width: 0,
 				ownerDocument,
 			};
 		}
@@ -135,13 +146,15 @@ function BlockPopoverInbetween( {
 			left: previousRect ? previousRect.right : nextRect.left,
 			right: nextRect ? nextRect.left : previousRect.right,
 			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
+			height: 0,
+			width: 0,
 			ownerDocument,
 		};
 	}, [ previousElement, nextElement ] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
-	if ( ! previousElement || ! nextElement ) {
+	if ( ! previousElement || ! nextElement || ! isVisible ) {
 		return null;
 	}
 
@@ -155,12 +168,11 @@ function BlockPopoverInbetween( {
 	return (
 		<Popover
 			ref={ popoverScrollRef }
-			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
-			// otherwise render in place (not in the the default popover slot).
+			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.

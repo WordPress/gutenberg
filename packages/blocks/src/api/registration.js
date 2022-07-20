@@ -3,17 +3,7 @@
 /**
  * External dependencies
  */
-import {
-	camelCase,
-	isArray,
-	isEmpty,
-	isNil,
-	isObject,
-	isString,
-	mapKeys,
-	pick,
-	pickBy,
-} from 'lodash';
+import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -141,6 +131,10 @@ import { store as blocksStore } from '../store';
 
 export const serverSideBlockDefinitions = {};
 
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
+
 /**
  * Sets the server side block definition of blocks.
  *
@@ -178,7 +172,10 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 			continue;
 		}
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
-			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			pickBy(
+				definitions[ blockName ],
+				( value ) => value !== null && value !== undefined
+			),
 			( value, key ) => camelCase( key )
 		);
 	}
@@ -301,14 +298,14 @@ function translateBlockSettingUsingI18nSchema(
 	settingValue,
 	textdomain
 ) {
-	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+	if ( typeof i18nSchema === 'string' && typeof settingValue === 'string' ) {
 		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
 		return _x( settingValue, i18nSchema, textdomain );
 	}
 	if (
-		isArray( i18nSchema ) &&
+		Array.isArray( i18nSchema ) &&
 		! isEmpty( i18nSchema ) &&
-		isArray( settingValue )
+		Array.isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
 			translateBlockSettingUsingI18nSchema(

@@ -71,7 +71,6 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
-export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -92,6 +91,8 @@ export {
 	Item as __experimentalItem,
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
+export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';

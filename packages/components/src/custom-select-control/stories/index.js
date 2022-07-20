@@ -7,8 +7,13 @@ export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
 	argTypes: {
-		__next36pxDefaultSize: {
-			control: { type: 'boolean' },
+		__next36pxDefaultSize: { control: { type: 'boolean' } },
+		__nextUnconstrainedWidth: { control: { type: 'boolean' } },
+		size: {
+			control: {
+				type: 'radio',
+				options: [ 'small', 'default', '__unstable-large' ],
+			},
 		},
 	},
 };
@@ -55,8 +60,7 @@ WithLongLabels.args = {
 		},
 		{
 			key: 'reallylonglabel3',
-			name:
-				'That really is ok though because you should stress test your UIs.',
+			name: 'That really is ok though because you should stress test your UIs.',
 		},
 	],
 };

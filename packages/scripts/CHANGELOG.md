@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix the incorrect exit error code when status missing in `webpack` call for `build` and `start` commands ([#42396](https://github.com/WordPress/gutenberg/pull/42396)).
+
+## 23.3.0 (2022-06-15)
+
+### Enhancements
+
+-   The bundled `wp-prettier` dependency has been upgraded from `2.2.1` to `2.6.2` ([#40542](https://github.com/WordPress/gutenberg/pull/40542)).
+
+## 23.2.0 (2022-06-01)
+
+### Bug Fix
+
+-   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
+
+## 23.1.0 (2022-05-18)
+
+### New Feature
+
+-   Enable by default code formatting for JSON files in the `format` command ([#40994](https://github.com/WordPress/gutenberg/pull/40994)). You can opt-out of this behavior by providing a custom file matcher, example: `wp-scripts format src/**/*.js`.
+-   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
+
+### Bug Fixes
+
+-   Fix: env unit test fails on Windows ([#41070](https://github.com/WordPress/gutenberg/pull/41070))
+
 ## 23.0.0 (2022-05-04)
 
 ### Breaking Changes
@@ -9,7 +36,7 @@
 -   Remove `lint-md-js` script that was broken for some time and it's extemely hard to make it work correctly with the recommended ESLint config in Markdown files ([#40511](https://github.com/WordPress/gutenberg/pull/40511)).
 -   Remove the previously deprecated and undocumented `format-js` command ([#40512](https://github.com/WordPress/gutenberg/pull/40512)). You should use the `format` command instead.
 
-### New Feature
+### New Features
 
 -   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
 

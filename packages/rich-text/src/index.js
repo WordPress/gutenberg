@@ -3,6 +3,7 @@ export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';
 export { getActiveFormat } from './get-active-format';
+export { getActiveFormats } from './get-active-formats';
 export { getActiveObject } from './get-active-object';
 export { getTextContent } from './get-text-content';
 export { isListRootSelected as __unstableIsListRootSelected } from './is-list-root-selected';

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -38,6 +33,8 @@ import { useControlledState } from '../utils/hooks';
 const defaultInputProps = {
 	min: 0,
 };
+
+const noop = () => {};
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
@@ -120,7 +117,7 @@ export default function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="region" aria-labelledby={ headingId }>
+		<Root id={ id } role="group" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
 				<FlexItem>
 					<Text

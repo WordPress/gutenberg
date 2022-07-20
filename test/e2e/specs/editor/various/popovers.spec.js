@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'popovers', () => {
-	test.beforeEach( async ( { pageUtils } ) => {
-		await pageUtils.createNewPost();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
 	test.describe( 'dropdown', () => {
