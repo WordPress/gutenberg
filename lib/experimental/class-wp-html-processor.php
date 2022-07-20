@@ -338,15 +338,6 @@ class WP_HTML_Scanner {
 
 
 	/**
-	 * Byte offset in the document where the current tag
-	 * being analyzed ends, including the trailing `>`.
-	 *
-	 * @var int|null
-	 */
-	public $tag_end = null;
-
-
-	/**
 	 * Start and end of matched tag name, or `null` if not yet found.
 	 *
 	 * @var WP_HTML_Scanner_Token|null
@@ -386,6 +377,7 @@ class WP_HTML_Scanner {
 
 	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0 ) {
 		if ( $found_already === $descriptor->match_offset ) {
+			return;
 			return $found_already;
 		}
 
@@ -395,25 +387,22 @@ class WP_HTML_Scanner {
 		}
 
 		// @TODO: Are we done matching?
-
 		while ( $attribute = $this->find_next_attribute() ) {
-			list( $name, $value ) = $attribute;
-
 			// HTML5 says duplicate values are ignored
-			if ( isset( $this->attributes[ $name ] ) ) {
+			if ( isset( $this->attributes[ $attribute->name->comparable ] ) ) {
 				continue;
 			}
 
-			$this->attributes[ $name ] = $value;
+			$this->attributes[ $attribute->name->comparable ] = $attribute;
 
 			// @TODO: Are we done matching?
 		}
 
 		// @TODO: Remove this debugging call.
-		var_export( [
-			'tag' => $tag,
-			'attributes' => $this->attributes
-		] );
+//		var_export( [
+//			'tag' => $tag,
+//			'attributes' => $this->attributes
+//		] );
 	}
 
 	public function find_next_tag() {
@@ -448,7 +437,7 @@ class WP_HTML_Scanner {
 	public function find_next_attribute() {
 		// Find the attribute name
 		if ( 1 !== preg_match(
-			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^/>\t\x{0C} =]*)~miu',
+			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^=/>\t\x{0C} ]*)~miu',
 			$this->document,
 			$attribute_match,
 			PREG_OFFSET_CAPTURE,
@@ -458,14 +447,17 @@ class WP_HTML_Scanner {
 		}
 
 		list( list( $full_match, $start_at ) ) = $attribute_match;
-		$name_token = WP_HTML_Scanner_Token::from_preg_match( $attribute_match['NAME'] );
 
-		if ( '=' !== $this->document[ $this->start_at ] ) {
-			$this->start_at += strlen( $full_match );
-			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $start_at + strlen( $full_match ) );
+		if ( empty( $full_match ) ) {
+			return false;
 		}
 
+		$name_token = WP_HTML_Scanner_Token::from_preg_match( $attribute_match['NAME'] );
+
 		$this->start_at += strlen( $full_match );
+		if ( '=' !== $this->document[ $this->start_at ] ) {
+			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $start_at + strlen( $full_match ) );
+		}
 
 		// Skip the equals sign (we already returned if it's not there).
 		// Find the attribute value
