@@ -7,12 +7,16 @@ import {
 	RangeControl,
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
-	__experimentalBoxControlIcon as BoxControlIcon,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { LABELS } from './utils';
 
 export default function SpacingInputControl( {
 	spacingSizes,
@@ -51,17 +55,7 @@ export default function SpacingInputControl( {
 	return (
 		<>
 			<HStack>
-				<BoxControlIcon
-					side={ side }
-					sides={ [
-						'top',
-						'right',
-						'bottom',
-						'left',
-						'vertical',
-						'horizontal',
-					] }
-				/>
+				<Text>{ LABELS[ side ] }</Text>
 
 				{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 					<Text className="components-spacing-sizes-control__hint">
