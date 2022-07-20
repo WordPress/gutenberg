@@ -43,33 +43,27 @@ export default function AxialInputControls( {
 		: groupedSides;
 
 	return (
-		<Flex className="component-spacing-sizes-control__input-controls-wrapper">
-			<Flex
-				gap={ 0 }
-				align="top"
-				className="component-spacing-sizes-control__input-controls"
-			>
-				{ filteredSides.map( ( side ) => {
-					const axisValue =
-						side === 'vertical' ? values.top : values.left;
-					const slug = getSpacingPresetSlug( axisValue );
-					const value = getSliderValueFromSlug(
-						slug,
-						props.spacingSizes
-					);
-					return (
-						<SpacingRangeControl
-							{ ...props }
-							value={ value }
-							onChange={ createHandleOnChange( side ) }
-							label={ LABELS[ side ] }
-							key={ `box-control-${ side }` }
-							withInputField={ false }
-							side={ side }
-						/>
-					);
-				} ) }
-			</Flex>
-		</Flex>
+		<>
+			{ filteredSides.map( ( side ) => {
+				const axisValue =
+					side === 'vertical' ? values.top : values.left;
+				const slug = getSpacingPresetSlug( axisValue );
+				const value = getSliderValueFromSlug(
+					slug,
+					props.spacingSizes
+				);
+				return (
+					<SpacingRangeControl
+						{ ...props }
+						value={ value }
+						onChange={ createHandleOnChange( side ) }
+						label={ LABELS[ side ] }
+						key={ `box-control-${ side }` }
+						withInputField={ false }
+						side={ side }
+					/>
+				);
+			} ) }
+		</>
 	);
 }

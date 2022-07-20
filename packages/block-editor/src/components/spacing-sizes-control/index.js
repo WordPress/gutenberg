@@ -4,11 +4,9 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	Flex,
-	FlexItem,
-	FlexBlock,
 	Button,
-	__experimentalBoxControlIcon as BoxControlIcon,
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 
 /**
@@ -82,44 +80,36 @@ export default function SpacingSizesControl( {
 
 	return (
 		<fieldset role="region" className="component-spacing-sizes-control">
-			<Flex className="component-spacing-sizes-control__header">
-				<FlexItem as="legend">{ label }</FlexItem>
+			<HStack className="component-spacing-sizes-control__header">
+				<Text as="legend">{ label }</Text>
 				{ allowReset && (
-					<FlexItem>
-						<Button
-							className="component-box-control__reset-button"
-							isSecondary
-							isSmall
-							onClick={ handleOnReset }
-							disabled={ ! isDirty }
-						>
-							{ __( 'Reset' ) }
-						</Button>
-					</FlexItem>
-				) }
-			</Flex>
-			<Flex className="component-box-control__header-control-wrapper">
-				{ isLinked && (
-					<FlexBlock>
-						<AllInputControl
-							aria-label={ label }
-							{ ...inputControlProps }
-						/>
-					</FlexBlock>
+					<Button
+						className="component-box-control__reset-button"
+						isSecondary
+						isSmall
+						onClick={ handleOnReset }
+						disabled={ ! isDirty }
+					>
+						{ __( 'Reset' ) }
+					</Button>
 				) }
 				{ ! hasOneSide && (
-					<FlexItem>
-						<LinkedButton
-							onClick={ toggleLinked }
-							isLinked={ isLinked }
-						/>
-					</FlexItem>
+					<LinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
 				) }
-			</Flex>
+			</HStack>
+
+			{ isLinked && (
+				<AllInputControl
+					aria-label={ label }
+					{ ...inputControlProps }
+				/>
+			) }
+
 			{ ! isLinked && splitOnAxis && (
-				<FlexBlock>
-					<AxialInputControls { ...inputControlProps } />
-				</FlexBlock>
+				<AxialInputControls { ...inputControlProps } />
 			) }
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />

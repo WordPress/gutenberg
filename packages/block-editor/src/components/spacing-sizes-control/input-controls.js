@@ -58,33 +58,26 @@ export default function BoxInputControls( {
 	};
 
 	return (
-		<Flex className="component-spacing-sizes-control__input-controls-wrapper">
-			<Flex
-				gap={ 0 }
-				align="top"
-				direction="column"
-				className="component-spacing-sizes-control__input-controls"
-			>
-				{ filteredSides.map( ( side ) => {
-					const slug = getSpacingPresetSlug( values[ side ] );
-					const value = getSliderValueFromSlug(
-						slug,
-						props.spacingSizes
-					);
+		<>
+			{ filteredSides.map( ( side ) => {
+				const slug = getSpacingPresetSlug( values[ side ] );
+				const value = getSliderValueFromSlug(
+					slug,
+					props.spacingSizes
+				);
 
-					return (
-						<SpacingRangeControl
-							{ ...props }
-							value={ value }
-							label={ LABELS[ side ] }
-							key={ `box-control-${ side }` }
-							withInputField={ false }
-							side={ side }
-							onChange={ createHandleOnChange( side ) }
-						/>
-					);
-				} ) }
-			</Flex>
-		</Flex>
+				return (
+					<SpacingRangeControl
+						{ ...props }
+						value={ value }
+						label={ LABELS[ side ] }
+						key={ `box-control-${ side }` }
+						withInputField={ false }
+						side={ side }
+						onChange={ createHandleOnChange( side ) }
+					/>
+				);
+			} ) }
+		</>
 	);
 }

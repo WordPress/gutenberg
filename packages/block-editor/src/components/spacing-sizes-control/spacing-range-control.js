@@ -8,8 +8,6 @@ import {
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	Flex,
-	FlexItem,
 	__experimentalBoxControlIcon as BoxControlIcon,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
@@ -74,11 +72,13 @@ export default function SpacingRangeControl( {
 					] }
 				/>
 
-				<Text className="components-spacing-sizes-control__hint">
-					{ currentValueHint !== undefined
-						? currentValueHint
-						: __( 'Default' ) }
-				</Text>
+				{ spacingSizes.length <= 8 && (
+					<Text className="components-spacing-sizes-control__hint">
+						{ currentValueHint !== undefined
+							? currentValueHint
+							: __( 'Default' ) }
+					</Text>
+				) }
 
 				<Button
 					label={
@@ -117,7 +117,7 @@ export default function SpacingRangeControl( {
 					/>
 				</div>
 			) }
-			{ ! useSelect && ! showCustomValueControl && (
+			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 				<RangeControl
 					value={ value }
 					label={ <></> }
@@ -133,16 +133,15 @@ export default function SpacingRangeControl( {
 					marks={ marks }
 				/>
 			) }
-			{ useSelect && ! showCustomValueControl && (
+			{ spacingSizes.length > 8 && ! showCustomValueControl && (
 				<CustomSelectControl
 					value={ options.find(
 						( option ) => option.key === valueNow
 					) }
-					label={ label }
+					label={ <></> }
 					onChange={ ( selectedItem ) => {
 						onChange( getNewRangeValue( selectedItem.key ) );
 					} }
-					onFocus={ createHandleOnFocus( side ) }
 					options={ options }
 					onHighlightedIndexChange={ ( index ) => {
 						if ( index.type === '__item_mouse_move__' ) {
