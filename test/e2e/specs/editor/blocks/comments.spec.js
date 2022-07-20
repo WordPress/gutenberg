@@ -18,31 +18,30 @@ test.use( {
 } );
 
 test.describe( 'Comments', () => {
-	let previousPageComments,
-		previousCommentsPerPage,
-		previousDefaultCommentsPage;
+	// Ideally, we'd set options in beforeAll or afterAll. Unfortunately, these
+	// aren't exposed via the REST API, so we have to set them through the
+	// relevant wp-admin screen, which involves page utils; but those are
+	// prohibited from beforeAll/afterAll.
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
 	test.beforeEach( async ( { commentsBlockUtils } ) => {
-		// Ideally, we'd set options in beforeAll. Unfortunately, these
-		// aren't exposed via the REST API, so we have to set them through the
-		// relevant wp-admin screen, which involves page utils; but those are
-		// prohibited from beforeAll.
-		previousPageComments = await commentsBlockUtils.setOption(
-			'page_comments',
-			'1'
-		);
-		previousCommentsPerPage = await commentsBlockUtils.setOption(
-			'comments_per_page',
-			'1'
-		);
-		previousDefaultCommentsPage = await commentsBlockUtils.setOption(
-			'default_comments_page',
-			'newest'
-		);
+		await commentsBlockUtils.setOptions( {
+			page_comments: '1',
+			comments_per_page: '1',
+			default_comments_page: 'newest',
+		} );
+	} );
+
+	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
+		await commentsBlockUtils.restorePreviousOptions();
+		await requestUtils.deleteAllComments();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'We show no results message if there are no comments', async ( {
@@ -216,30 +215,6 @@ test.describe( 'Comments', () => {
 			'This is an automated comment'
 		);
 	} );
-
-	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
-		// Ideally, we'd set options in afterAll. Unfortunately, these
-		// aren't exposed via the REST API, so we have to set them through the
-		// relevant wp-admin screen, which involves page utils; but those are
-		// prohibited from beforeAll.
-		await commentsBlockUtils.setOption(
-			'page_comments',
-			previousPageComments
-		);
-		await commentsBlockUtils.setOption(
-			'comments_per_page',
-			previousCommentsPerPage
-		);
-		await commentsBlockUtils.setOption(
-			'default_comments_page',
-			previousDefaultCommentsPage
-		);
-		await requestUtils.deleteAllComments();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
 } );
 
 class CommentsBlockUtils {
@@ -247,6 +222,22 @@ class CommentsBlockUtils {
 		this.page = page;
 		this.admin = admin;
 		this.requestUtils = requestUtils;
+		this.previousOptions = {};
+	}
+
+	async setOptions( options ) {
+		for ( const [ key, value ] of Object.entries( options ) ) {
+			const previousValue = await this.setOption( key, value );
+			if ( ! this.previousOptions[ key ] ) {
+				this.previousOptions[ key ] = previousValue;
+			}
+		}
+	}
+
+	async restorePreviousOptions() {
+		for ( const [ key, value ] of Object.entries( this.previousOptions ) ) {
+			await this.setOption( key, value );
+		}
 	}
 
 	/**
