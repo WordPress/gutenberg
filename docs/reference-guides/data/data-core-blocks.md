@@ -286,6 +286,28 @@ _Returns_
 
 Returns the name of the default block name.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const defaultBlockName = useSelect( ( select ) =>
+		select( blocksStore ).getDefaultBlockName()
+	);
+
+	return (
+		defaultBlockName && (
+			<p>
+				{ sprintf( __( 'Default block name: %s' ), defaultBlockName ) }
+			</p>
+		)
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
