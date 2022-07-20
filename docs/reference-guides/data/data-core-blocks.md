@@ -274,6 +274,28 @@ _Returns_
 
 Returns all the available collections.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockCollections = useSelect( ( select ) =>
+		select( blocksStore ).getCollections()
+	);
+
+	return (
+		<ul>
+			{ Object.values( blockCollections ).length > 0 &&
+				Object.values( blockCollections ).map( ( collection ) => (
+					<li key={ collection.title }>{ collection.title }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.

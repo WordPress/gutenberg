@@ -344,6 +344,27 @@ export function getCategories( state ) {
  *
  * @param {Object} state Data state.
  *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const blockCollections = useSelect( ( select ) =>
+ *         select( blocksStore ).getCollections()
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             { Object.values( blockCollections ).length > 0 &&
+ *                 Object.values( blockCollections ).map( ( collection ) => (
+ *                     <li key={ collection.title }>{ collection.title }</li>
+ *             ) ) }
+ *         </ul>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Collections list.
  */
 export function getCollections( state ) {
