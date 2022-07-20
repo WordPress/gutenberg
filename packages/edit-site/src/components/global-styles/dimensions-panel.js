@@ -6,10 +6,10 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
+	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	Flex,
-	FlexItem,
+	__experimentalView as View,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
@@ -193,65 +193,59 @@ export default function DimensionsPanel( { name } ) {
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
-				<Flex>
-					{ showContentSizeControl && (
-						<ToolsPanelItem
-							as={ FlexItem }
-							label={ __( 'Content size' ) }
-							hasValue={ hasUserSetContentSizeValue }
-							onDeselect={ resetContentSizeValue }
-							isShownByDefault={ true }
-						>
-							<Flex align="flex-end">
-								<FlexItem>
-									<UnitControl
-										label={ __( 'Content' ) }
-										labelPosition="top"
-										__unstableInputWidth="80px"
-										value={ contentSizeValue || '' }
-										onChange={ ( nextContentSize ) => {
-											setContentSizeValue(
-												nextContentSize
-											);
-										} }
-										units={ units }
-									/>
-								</FlexItem>
-								<FlexItem>
-									<Icon icon={ positionCenter } />
-								</FlexItem>
-							</Flex>
-						</ToolsPanelItem>
-					) }
-
-					{ showWideSizeControl && (
-						<ToolsPanelItem
-							as={ FlexItem }
-							label={ __( 'Wide size' ) }
-							hasValue={ hasUserSetWideSizeValue }
-							onDeselect={ resetWideSizeValue }
-							isShownByDefault={ true }
-						>
-							<Flex align="flex-end">
-								<FlexItem>
-									<UnitControl
-										label={ __( 'Wide' ) }
-										labelPosition="top"
-										__unstableInputWidth="80px"
-										value={ wideSizeValue || '' }
-										onChange={ ( nextWideSize ) => {
-											setWideSizeValue( nextWideSize );
-										} }
-										units={ units }
-									/>
-								</FlexItem>
-								<FlexItem>
-									<Icon icon={ stretchWide } />
-								</FlexItem>
-							</Flex>
-						</ToolsPanelItem>
-					) }
-				</Flex>
+				<span className="span-columns">
+					Set the width of the main content area.
+				</span>
+			) }
+			{ showContentSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Content size' ) }
+					hasValue={ hasUserSetContentSizeValue }
+					onDeselect={ resetContentSizeValue }
+					isShownByDefault={ true }
+				>
+					<HStack alignment="flex-end">
+						<UnitControl
+							label={ __( 'Content' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ contentSizeValue || '' }
+							onChange={ ( nextContentSize ) => {
+								setContentSizeValue( nextContentSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ positionCenter } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
+			) }
+			{ showWideSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Wide size' ) }
+					hasValue={ hasUserSetWideSizeValue }
+					onDeselect={ resetWideSizeValue }
+					isShownByDefault={ true }
+				>
+					<HStack alignment="flex-end">
+						<UnitControl
+							label={ __( 'Wide' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ wideSizeValue || '' }
+							onChange={ ( nextWideSize ) => {
+								setWideSizeValue( nextWideSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ stretchWide } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
