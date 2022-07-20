@@ -179,4 +179,31 @@ describe( 'ComboboxControl', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.name );
 	} );
+
+	it( 'should select the correct option from a search', async () => {
+		const user = setupUser();
+		const targetOption = timezones[ 13 ];
+		const searchString = targetOption.label.substring( 0, 11 );
+		const onChangeSpy = jest.fn();
+		render(
+			<TestComboboxControl
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		// Pressing tab selects the input and shows the options
+		await user.tab();
+
+		// Type enough characters to ensure a predictable search result
+		await user.keyboard( searchString );
+
+		// Pressing Enter/Return selects the currently focused option
+		await user.keyboard( '{Enter}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+		expect( input ).toHaveValue( targetOption.name );
+	} );
 } );
