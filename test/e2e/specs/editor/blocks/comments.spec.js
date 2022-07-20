@@ -143,8 +143,25 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 	} );
+} );
+/*
+ * The following test suite ensures that the legacy Post Comments block is still
+ * supported and it is converted into the Comments block on the editor.
+ */
+test.describe( 'Post Comments', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
 
-	test( 'The old Post Comments block is still supported', async ( {
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'is still supported', async ( {
 		page,
 		requestUtils,
 		commentsBlockUtils,
@@ -170,7 +187,7 @@ test.describe( 'Comments', () => {
 		);
 	} );
 
-	test( 'The old Post Comments is converted to Comments with legacy attribute', async ( {
+	test( 'is converted to Comments with legacy attribute', async ( {
 		page,
 		admin,
 		requestUtils,
