@@ -13,8 +13,10 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] Add React Native FastImage [#42009]
 -   [*] Block inserter displays block collections [#42405]
--   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
 -   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
+-   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
 
 ## 1.79.0
 -   [*] Add 'Insert from URL' option to Video block [#41493]
