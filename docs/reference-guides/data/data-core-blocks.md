@@ -301,6 +301,31 @@ When there are multiple variations annotated as the default one,
 the last added item is picked. This simplifies registering overrides.
 When there is no default variation set, it returns the first item.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const defaultEmbedBlockVariation = useSelect( ( select ) =>
+		select( blocksStore ).getDefaultBlockVariation( 'core/embed' )
+	);
+
+	return (
+		defaultEmbedBlockVariation && (
+			<p>
+				{ sprintf(
+					__( 'core/embed default variation: %s' ),
+					defaultEmbedBlockVariation.title
+				) }
+			</p>
+		)
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
