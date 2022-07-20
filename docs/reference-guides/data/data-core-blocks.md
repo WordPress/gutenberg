@@ -62,6 +62,35 @@ _Returns_
 
 Returns a block type by name.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const paragraphBlock = useSelect( ( select ) =>
+		select( blocksStore ).getBlockType( 'core/paragraph' )
+	);
+
+	return (
+		<ul>
+			{ paragraphBlock &&
+				Object.entries( paragraphBlock.supports ).map(
+					( blockSupportsEntry ) => {
+						const [ propertyName, value ] = blockSupportsEntry;
+						return (
+							<li
+								key={ propertyName }
+							>{ `${ propertyName } : ${ value }` }</li>
+						);
+					}
+				) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -74,6 +103,27 @@ _Returns_
 ### getBlockTypes
 
 Returns all the available block types.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockTypes = useSelect( ( select ) =>
+		select( blocksStore ).getBlockTypes()
+	);
+
+	return (
+		<ul>
+			{ blockTypes.map( ( block ) => (
+				<li key={ block.name }>{ block.title }</li>
+			) ) }
+		</ul>
+	);
+};
+```
 
 _Parameters_
 
