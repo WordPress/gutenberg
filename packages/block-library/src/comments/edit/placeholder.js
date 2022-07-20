@@ -26,7 +26,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 
 	return (
 		<div
-			className="wp-block-post-comments__placeholder"
+			className="wp-block-comments__legacy-placeholder"
 			ref={ disabledRef }
 		>
 			<h3>

@@ -158,7 +158,7 @@ test.describe( 'Comments', () => {
 		const block = page.locator( 'role=document[name="Block: Comments"i]' );
 		const warning = block.locator( '.block-editor-warning' );
 		const placeholder = block.locator(
-			'.wp-block-post-comments__placeholder'
+			'.wp-block-comments__legacy-placeholder'
 		);
 
 		await expect( block ).toHaveClass( /has-vivid-purple-color/ );
