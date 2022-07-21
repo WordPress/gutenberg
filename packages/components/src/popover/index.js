@@ -43,6 +43,11 @@ import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
 
 /**
+ * @typedef {import('../animate').AppearOrigin} AppearOrigin
+ * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
+ */
+
+/**
  * Name of slot in which popover should fill.
  *
  * @type {string}
@@ -93,33 +98,32 @@ const positionToPlacement = ( position ) => {
 	return y;
 };
 
-// Given the placement, compute the animation origin used for the entrance
-// animation. The origin should the the "opposite" of the placement.
+// Given the floating-ui `placement`, compute the origin used for the entrance
+// animation. The origin should be on the "opposite" side from the placement.
+
+/** @type {Object.<FloatingUIPlacement, AppearOrigin>} */
+const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
+	top: 'bottom',
+	'top-start': 'bottom right',
+	'top-end': 'bottom left',
+	right: 'middle left',
+	'right-start': 'bottom left',
+	'right-end': 'top left',
+	bottom: 'top',
+	'bottom-start': 'top right',
+	'bottom-end': 'top left',
+	left: 'middle right',
+	'left-start': 'bottom right',
+	'left-end': 'top right',
+};
+
+/**
+ *
+ * @param {FloatingUIPlacement} placement A placement string from floating ui
+ * @return {AppearOrigin} The Animation origin string
+ */
 const placementToAnimationOrigin = ( placement ) => {
-	const [ placementX, placementY ] = placement.split( '-' );
-
-	let animOriginX, animOriginY;
-	if ( placementX === 'top' || placementX === 'bottom' ) {
-		animOriginX = placementX === 'top' ? 'bottom' : 'top';
-		animOriginY = 'middle';
-		if ( placementY === 'start' ) {
-			animOriginY = 'left';
-		} else if ( placementY === 'end' ) {
-			animOriginY = 'right';
-		}
-	}
-
-	if ( placementX === 'left' || placementX === 'right' ) {
-		animOriginX = 'center';
-		animOriginY = placementX === 'left' ? 'right' : 'left';
-		if ( placementY === 'start' ) {
-			animOriginX = 'top';
-		} else if ( placementY === 'end' ) {
-			animOriginX = 'bottom';
-		}
-	}
-
-	return animOriginX + ' ' + animOriginY;
+	return PLACEMENT_TO_ANIMATION_ORIGIN_MAP[ placement ] ?? 'middle';
 };
 
 const Popover = (
