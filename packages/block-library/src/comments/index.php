@@ -24,7 +24,7 @@
 function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
 
-	$is_legacy = 'core/post-comments' === $block->name || isset( $attributes['legacy'] );
+	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
 	if ( ! $is_legacy ) {
 		return $block->render( array( 'dynamic' => false ) );
 	}
