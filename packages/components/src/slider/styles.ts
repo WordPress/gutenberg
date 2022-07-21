@@ -75,8 +75,8 @@ const trackStyles = ( colors: SliderColors ) => {
 	return css`
 		background: linear-gradient(
 			to right,
-			${ trackColor } calc( var( --progress ) ),
-			${ trackBackgroundColor } calc( var( --progress ) )
+			${ trackColor } calc( var( --slider--progress ) ),
+			${ trackBackgroundColor } calc( var( --slider--progress ) )
 		);
 		border-radius: 2px;
 		height: 2px;
@@ -155,15 +155,19 @@ export const error = css`
 	&::-webkit-slider-runnable-track {
 		background: linear-gradient(
 			to right,
-			${ CONFIG.controlDestructiveBorderColor } calc( var( --progress ) ),
-			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
+			${ CONFIG.controlDestructiveBorderColor }
+				calc( var( --slider--progress ) ),
+			${ CONFIG.controlBackgroundDimColor }
+				calc( var( --slider--progress ) )
 		);
 	}
 	&::-moz-range-track {
 		background: linear-gradient(
 			to right,
-			${ CONFIG.controlDestructiveBorderColor } calc( var( --progress ) ),
-			${ CONFIG.controlBackgroundDimColor } calc( var( --progress ) )
+			${ CONFIG.controlDestructiveBorderColor }
+				calc( var( --slider--progress ) ),
+			${ CONFIG.controlBackgroundDimColor }
+				calc( var( --slider--progress ) )
 		);
 	}
 

@@ -94,7 +94,10 @@ export function useSlider(
 		[ numericMin, numericMax ],
 		[ 0, 100 ]
 	);
-	const componentStyles = { ...style, '--progress': `${ currentValue }%` };
+	const componentStyles = {
+		...style,
+		'--slider--progress': `${ currentValue }%`,
+	};
 
 	// Generate dynamic class names.
 	const cx = useCx();

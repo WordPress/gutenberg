@@ -30,8 +30,8 @@ exports[`Slider should render correctly 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -44,8 +44,8 @@ exports[`Slider should render correctly 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -118,7 +118,7 @@ exports[`Slider should render correctly 1`] = `
   id="slider"
   max="100"
   min="0"
-  style="--progress: 50%;"
+  style="--slider--progress: 50%;"
   type="range"
   value="50"
 />
@@ -154,8 +154,8 @@ exports[`Slider should render max 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -168,8 +168,8 @@ exports[`Slider should render max 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -242,9 +242,9 @@ exports[`Slider should render max 1`] = `
   id="slider"
   max="50"
   min="0"
-  style="--progress: 100%;"
+  style="--slider--progress: 50%;"
   type="range"
-  value="50"
+  value="25"
 />
 `;
 
@@ -278,8 +278,8 @@ exports[`Slider should render min 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -292,8 +292,8 @@ exports[`Slider should render min 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -366,9 +366,9 @@ exports[`Slider should render min 1`] = `
   id="slider"
   max="100"
   min="5"
-  style="--progress: 47.368421052631575%;"
+  style="--slider--progress: 44.73684210526316%;"
   type="range"
-  value="50"
+  value="47.5"
 />
 `;
 
@@ -402,8 +402,8 @@ exports[`Slider should render size 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -416,8 +416,8 @@ exports[`Slider should render size 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -494,7 +494,7 @@ exports[`Slider should render size 1`] = `
   id="slider"
   max="100"
   min="0"
-  style="--progress: 50%;"
+  style="--slider--progress: 50%;"
   type="range"
   value="50"
 />
@@ -530,8 +530,8 @@ exports[`Slider should render unit value 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -544,8 +544,8 @@ exports[`Slider should render unit value 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -618,7 +618,7 @@ exports[`Slider should render unit value 1`] = `
   id="slider"
   max="100"
   min="0"
-  style="--progress: 40%;"
+  style="--slider--progress: 40%;"
   type="range"
   value="40"
 />
@@ -654,8 +654,8 @@ exports[`Slider should render value 1`] = `
 .emotion-0::-webkit-slider-runnable-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -668,8 +668,8 @@ exports[`Slider should render value 1`] = `
 .emotion-0::-moz-range-track {
   background: linear-gradient(
   			to right,
-  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
-  			#f3f4f5 calc( var( --progress ) )
+  			var( --wp-admin-theme-color, #00669b) calc( var( --slider--progress ) ),
+  			#f3f4f5 calc( var( --slider--progress ) )
   		);
   border-radius: 2px;
   height: 2px;
@@ -742,7 +742,7 @@ exports[`Slider should render value 1`] = `
   id="slider"
   max="100"
   min="0"
-  style="--progress: 40%;"
+  style="--slider--progress: 40%;"
   type="range"
   value="40"
 />
