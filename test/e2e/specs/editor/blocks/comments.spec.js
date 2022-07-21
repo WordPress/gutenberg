@@ -175,6 +175,68 @@ test.describe( 'Comments', () => {
 		await expect( warning ).toBeHidden();
 		await expect( placeholder ).toBeHidden();
 	} );
+
+	test( 'The block version is rendered if the legacy attribute is false', async ( {
+		page,
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/comments',
+			attributes: { legacy: false },
+		} );
+		const postId = await editor.publishPost();
+
+		// Create a comments for that post.
+		await requestUtils.createComment( {
+			content: `This is an automated comment`,
+			post: postId,
+		} );
+
+		// Visit the post that was just published.
+		await page.click(
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
+		);
+
+		// Check that the Comment Template block (an inner block) is rendered.
+		await expect(
+			page.locator( '.wp-block-comment-template' )
+		).toBeVisible();
+		await expect( page.locator( '.commentlist' ) ).toBeHidden();
+	} );
+
+	test( 'The PHP version is rendered if the legacy attribute is true', async ( {
+		page,
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/comments',
+			attributes: { legacy: true },
+		} );
+		const postId = await editor.publishPost();
+
+		// Create a comments for that post.
+		await requestUtils.createComment( {
+			content: `This is an automated comment`,
+			post: postId,
+		} );
+
+		// Visit the post that was just published.
+		await page.click(
+			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
+		);
+
+		// Check that the Comment Template block (an inner block) is NOT rendered.
+		await expect(
+			page.locator( '.wp-block-comment-template' )
+		).toBeHidden();
+		await expect( page.locator( '.commentlist' ) ).toBeVisible();
+	} );
 } );
 
 /*
