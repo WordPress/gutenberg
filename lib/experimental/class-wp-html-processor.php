@@ -173,15 +173,14 @@ class WP_Tag_Find_Descriptor {
 	public static function parse( $query ) {
 		$descriptor = new WP_Tag_Find_Descriptor();
 
-		$tag_name = $query['tag_name'];
-		$descriptor->tag_name = null !== $tag_name
-			? self::comparable( $tag_name )
+		$descriptor->tag_name = isset( $query['tag_name'] )
+			? self::comparable( $query['tag_name'] )
 			: null;
 
-		$match_offset = isset( $query['match_offset'] ) ? $query['match_offset'] : 0;
+		$match_offset = isset( $query['match_offset'] ) ? $query['match_offset'] : 1;
 		$descriptor->match_offset = is_integer( $match_offset )
 			? $match_offset
-			: 0;
+			: 1;
 
 		$containing_class = isset( $query['class_name'] ) ? $query['class_name'] : null;
 		$descriptor->class_name = is_string( $containing_class )
@@ -205,17 +204,36 @@ class WP_Tag_Find_Descriptor {
 		return strtolower( trim( $input ) );
 	}
 
+	/**
+	 * @param string $tag
+	 * @param array<WP_HTML_Attribute_Token> $attributes
+	 * @return 'matches'|'cannot-match'|'might-match'|'not-implemented'
+	 */
+	public function check( $tag, $attributes ) {
+		// @TODO Special-case h1..h6 here
+		if ( $this->tag_name !== null && $this->tag_name !== $tag ) {
+			return 'cannot-match';
+		}
 
-	public function needs_only_tag() {
-		return $this->class_name === null && $this->data_attribute === null;
-	}
+		if ( null === $this->class_name && null === $this->data_attribute ) {
+			return 'matches';
+		}
 
-	public function needs_class() {
-		return $this->class_name !== null;
-	}
+		if ( null === $this->data_attribute && isset( $attributes['class'] ) ) {
+			// @TODO: Avoid this nested if
+			if ( null === $attributes['class']->value ) {
+				return false;
+			}
 
-	public function needs_data_attribute() {
-		return $this->data_attribute !== null;
+			$pattern_class = preg_quote( $this->class_name, '~' );
+			return 1 === preg_match( "~(?:^|[\t ]){$pattern_class}(?:[\t ]|$)~", $attributes['class']->value->comparable );
+		}
+
+		if ( null === $this->class_name ) {
+			return 'not-implemented';
+		}
+
+		return 'might-match';
 	}
 }
 
@@ -314,22 +332,6 @@ class WP_HTML_Scanner {
 
 
 	/**
-	 * Whether we've already found the tag meeting our search constraints.
-	 *
-	 * @var bool
-	 */
-	public $did_match = false;
-
-
-	/**
-	 * Whether we've reached the end of the document and failed to find our match.
-	 *
-	 * @var bool
-	 */
-	public $did_fail_match = false;
-
-
-	/**
 	 * Byte offset in the current tag being inspected starts, includes leading `<`.
 	 *
 	 * @var int|null
@@ -375,15 +377,22 @@ class WP_HTML_Scanner {
 	}
 
 
-	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0 ) {
+	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0, $tag = null ) {
 		if ( $found_already === $descriptor->match_offset ) {
-			return;
-			return $found_already;
+			return $tag;
 		}
 
 		$tag = $this->find_next_tag();
 		if ( ! $tag ) {
 			return false;
+		}
+
+		switch ( $descriptor->check( $tag->comparable, array() ) ) {
+			case 'cannot-match':
+				return $this->scan( $descriptor, $found_already, $tag );
+
+			case 'matches':
+				return $this->scan( $descriptor, $found_already + 1, $tag );
 		}
 
 		// @TODO: Are we done matching?
@@ -395,42 +404,49 @@ class WP_HTML_Scanner {
 
 			$this->attributes[ $attribute->name->comparable ] = $attribute;
 
-			// @TODO: Are we done matching?
+			switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
+				case 'matches':
+					return $this->scan( $descriptor, $found_already + 1, $tag );
+			}
 		}
 
-		// @TODO: Remove this debugging call.
-//		var_export( [
-//			'tag' => $tag,
-//			'attributes' => $this->attributes
-//		] );
+		// try to find the next tag
+		return $this->scan( $descriptor, $found_already, $tag );
 	}
 
+	/**
+	 * @return WP_HTML_Scanner_Token|false
+	 */
 	public function find_next_tag() {
 		if ( 1 !== preg_match(
-	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} />]*)~mui",
+			/*
+			 * Unfortunately we can't try to search for only the tag name we want because that might
+			 * lead us to skip over other tags and lose track of our place. So we need to search for
+			 * _every_ tag and then check after we find one if it's the one we are looking for.
+			 */
+	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} /?>]*)~mui",
 			$this->document,
 			$tag_match,
 			PREG_OFFSET_CAPTURE,
 			$this->start_at
 		) ) {
-			$this->start_at = strlen( $this->document );
-			$this->did_fail_match = true;
 			return false;
 		}
 
-		list( list( $full_match, $start_at ) ) = $tag_match;
+		list( $full_match, $start_at ) = $tag_match[0];
 
 		// Keep scanning if we found a comment or CDATA section.
 		if ( ! isset( $tag_match['TAG'] ) ) {
-			$this->start_at += strlen( $full_match );
+			$this->start_at = $start_at + strlen( $full_match );
 			return $this->find_next_tag();
 		}
 
-		$this->tag_start = $this->start_at;
+		$this->start_at = $start_at + strlen( $full_match );
 		$this->tag_name = WP_HTML_Scanner_Token::from_preg_match( $tag_match['TAG'] );
-		$this->start_at += strlen( $full_match );
+		$this->tag_start = $this->tag_name->start - 1; // rewind past the leading `<`
+		$this->attributes = array();
 
-		return true;
+		return $this->tag_name;
 	}
 
 
@@ -446,7 +462,7 @@ class WP_HTML_Scanner {
 			return false;
 		}
 
-		list( list( $full_match, $start_at ) ) = $attribute_match;
+		list( $full_match, $start_at ) = $attribute_match[0];
 
 		if ( empty( $full_match ) ) {
 			return false;
@@ -454,7 +470,7 @@ class WP_HTML_Scanner {
 
 		$name_token = WP_HTML_Scanner_Token::from_preg_match( $attribute_match['NAME'] );
 
-		$this->start_at += strlen( $full_match );
+		$this->start_at = $start_at + strlen( $full_match );
 		if ( '=' !== $this->document[ $this->start_at ] ) {
 			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $start_at + strlen( $full_match ) );
 		}
@@ -465,16 +481,16 @@ class WP_HTML_Scanner {
 		switch ( $this->document[ $this->start_at ] ) {
 			case '"':
 				$this->start_at += 1;
-				$pattern = '~(?P<VALUE>[^"]*)"~';
+				$pattern = '~(?P<VALUE>[^"]*)"~miu';
 				break;
 
 			case "'":
 				$this->start_at += 1;
-				$pattern = "~(?P<VALUE>[^']*)'~";
+				$pattern = "~(?P<VALUE>[^']*)'~miu";
 				break;
 
 			default:
-				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} />]*)~';
+				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} >]*)~miu';
 				break;
 		}
 
@@ -489,9 +505,9 @@ class WP_HTML_Scanner {
 			return new WP_HTML_Attribute_Token( $name_token, null, $name_token->start, $name_token->start + $name_token->length + 1 );
 		}
 
-		list( list( $full_match, $value_start_at ) ) = $value_match;
+		list( $full_match, $value_start_at ) = $value_match[0];
 		$value_token = WP_HTML_Scanner_Token::from_preg_match( $value_match['VALUE'] );
-		$this->start_at += strlen( $full_match );
+		$this->start_at = $value_start_at + strlen( $full_match );
 
 		return new WP_HTML_Attribute_Token( $name_token, $value_token, $start_at, $value_start_at + strlen( $full_match ) );
 	}
@@ -499,7 +515,6 @@ class WP_HTML_Scanner {
 	public function reset() {
 		$this->tag_name = null;
 		$this->attributes = array();
-		$this->did_match = false;
 		$this->tag_start = null;
 	}
 }
