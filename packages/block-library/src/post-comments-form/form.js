@@ -76,16 +76,9 @@ const CommentsForm = ( { postId, postType } ) => {
 			: false
 	);
 
-	let warning = false;
-	let actions;
-
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
-			warning = __(
-				'Post Comments Form block: Comments are not enabled for this item.'
-			);
-
-			actions = [
+			const actions = [
 				<Button
 					key="enableComments"
 					onClick={ () => setCommentStatus( 'open' ) }
@@ -97,23 +90,34 @@ const CommentsForm = ( { postId, postType } ) => {
 					) }
 				</Button>,
 			];
+			return (
+				<Warning actions={ actions }>
+					{ __(
+						'Post Comments Form block: Comments are not enabled for this item.'
+					) }
+				</Warning>
+			);
 		} else if ( ! postTypeSupportsComments ) {
-			warning = sprintf(
-				/* translators: 1: Post type (i.e. "post", "page") */
-				__(
-					'Post Comments Form block: Comments are not enabled for this post type (%s).'
-				),
-				postType
+			return (
+				<Warning>
+					{ sprintf(
+						/* translators: 1: Post type (i.e. "post", "page") */
+						__(
+							'Post Comments Form block: Comments are not enabled for this post type (%s).'
+						),
+						postType
+					) }
+				</Warning>
 			);
 		} else if ( 'open' !== defaultCommentStatus ) {
-			warning = __(
-				'Post Comments Form block: Comments are not enabled.'
+			return (
+				<Warning>
+					{ __(
+						'Post Comments Form block: Comments are not enabled.'
+					) }
+				</Warning>
 			);
 		}
-	}
-
-	if ( warning ) {
-		return <Warning actions={ actions }>{ warning }</Warning>;
 	}
 
 	return <CommentsFormPlaceholder />;
