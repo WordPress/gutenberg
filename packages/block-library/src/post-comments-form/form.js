@@ -112,11 +112,11 @@ const CommentsForm = ( { postId, postType } ) => {
 		}
 	}
 
-	return warning ? (
-		<Warning actions={ actions }>{ warning }</Warning>
-	) : (
-		<CommentsFormPlaceholder />
-	);
+	if ( warning ) {
+		return <Warning actions={ actions }>{ warning }</Warning>;
+	}
+
+	return <CommentsFormPlaceholder />;
 };
 
 export default CommentsForm;
