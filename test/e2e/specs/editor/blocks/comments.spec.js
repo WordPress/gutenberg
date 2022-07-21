@@ -177,7 +177,7 @@ test.describe( 'Comments', () => {
 		await expect( placeholder ).toBeHidden();
 	} );
 
-	test( 'The block version is rendered if the legacy attribute is false', async ( {
+	test( 'The editable block version is rendered if the legacy attribute is false', async ( {
 		page,
 		admin,
 		editor,
