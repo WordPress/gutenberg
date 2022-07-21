@@ -33,6 +33,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -120,10 +121,21 @@ const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
 /**
  *
  * @param {FloatingUIPlacement} placement A placement string from floating ui
+ * @param {boolean}             rtl
  * @return {AppearOrigin} The Animation origin string
  */
-const placementToAnimationOrigin = ( placement ) => {
-	return PLACEMENT_TO_ANIMATION_ORIGIN_MAP[ placement ] ?? 'middle';
+const placementToAnimationOrigin = ( placement, rtl ) => {
+	/** @type {AppearOrigin} */
+	let animationOrigin =
+		PLACEMENT_TO_ANIMATION_ORIGIN_MAP[ placement ] ?? 'middle';
+
+	if ( rtl && /left/gi.test( animationOrigin ) ) {
+		animationOrigin = animationOrigin.replace( /left/gi, 'right' );
+	} else if ( rtl && /right/gi.test( animationOrigin ) ) {
+		animationOrigin = animationOrigin.replace( /right/gi, 'left' );
+	}
+
+	return animationOrigin;
 };
 
 const Popover = (
@@ -420,7 +432,7 @@ const Popover = (
 		!! animate &&
 		getAnimateClassName( {
 			type: 'appear',
-			origin: placementToAnimationOrigin( computedPlacement ),
+			origin: placementToAnimationOrigin( computedPlacement, isRTL() ),
 		} );
 
 	const mergedFloatingRef = useMergeRefs( [
