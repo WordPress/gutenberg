@@ -432,36 +432,17 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Creates new rulesets as classes for each preset value such as:
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given nodes.
 	 *
-	 *   .has-value-color {
-	 *     color: value;
-	 *   }
-	 *
-	 *   .has-value-background-color {
-	 *     background-color: value;
-	 *   }
-	 *
-	 *   .has-value-font-size {
-	 *     font-size: value;
-	 *   }
-	 *
-	 *   .has-value-gradient-background {
-	 *     background: value;
-	 *   }
-	 *
-	 *   p.has-value-gradient-background {
-	 *     background: value;
-	 *   }
-	 *
-	 * @since 5.9.0
+	 * @since 6.1.0
 	 *
 	 * @param array $setting_nodes Nodes with settings.
 	 * @param array $origins       List of origins to process presets from.
-	 * @return string The new stylesheet.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	protected function get_preset_classes_store( $setting_nodes, $origins ) {
-		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/css-variables' );
+		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/preset-classes' );
 
 		foreach ( $setting_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
@@ -505,31 +486,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_preset_classes( $setting_nodes, $origins ) {
-		$store     = $this->get_preset_classes_store( $setting_nodes, $origins );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_preset_classes_store( $setting_nodes, $origins ) ) )->get_css();
 	}
 
 	/**
-	 * Converts each styles section into a list of rulesets
-	 * to be appended to the stylesheet.
-	 * These rulesets contain all the css variables (custom variables and preset variables).
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given nodes.
 	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *     block-selector {
-	 *       --wp--preset--category--slug: value;
-	 *       --wp--custom--variable: value;
-	 *     }
-	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Added the `$origins` parameter.
+	 * @since 6.1.0
 	 *
 	 * @param array $nodes   Nodes with settings.
 	 * @param array $origins List of origins to process.
-	 * @return string The new stylesheet.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	protected function get_css_variables_store( $nodes, $origins ) {
 		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/css-variables' );
@@ -567,9 +535,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_css_variables( $nodes, $origins ) {
-		$store     = $this->get_css_variables_store( $nodes, $origins );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_css_variables_store( $nodes, $origins ) ) )->get_css();
 	}
 
 	/**
@@ -723,17 +689,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Returns the stylesheet that results of processing
-	 * the theme.json structure this object represents.
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given types and origins.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @param array $types    Types of styles to load. Will load all by default. It accepts:
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
-	 * @return string Stylesheet.
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	public function get_stylesheet_store( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
+		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles' );
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -754,7 +722,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
-		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles' );
 		if ( in_array( 'variables', $types, true ) ) {
 			$store = $this->combine_style_engine_stores( $store, $this->get_css_variables_store( $setting_nodes, $origins ) );
 		}
@@ -799,19 +766,18 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
-		$store     = $this->get_stylesheet_store( $types, $origins );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_stylesheet_store( $types, $origins ) ) )->get_css();
 	}
 
 	/**
-	 * Gets the CSS rules for a particular block from theme.json.
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given block metadata.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
-	 * @return string Styles for the block.
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	public function get_block_styles_store( $block_metadata ) {
+		$store            = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/blocks' );
 		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
@@ -879,8 +845,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
-
-		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/blocks' );
 
 		// 1. Separate the ones who use the general selector
 		// and the ones who use the duotone selector.
@@ -1001,25 +965,15 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$store     = $this->get_block_styles_store( $block_metadata );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_styles_store( $block_metadata ) ) )->get_css();
 	}
 
 	/**
-	 * Converts each style section into a list of rulesets
-	 * containing the block styles to be appended to the stylesheet.
-	 *
-	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
-	 *
-	 * For each section this creates a new ruleset such as:
-	 *
-	 *   block-selector {
-	 *     style-property-one: value;
-	 *   }
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given nodes.
 	 *
 	 * @param array $style_nodes Nodes with styles.
-	 * @return string The new stylesheet.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	protected function get_block_classes_store( $style_nodes ) {
 		$store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/block-classes' );
@@ -1049,9 +1003,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_block_classes( $style_nodes ) {
-		$store     = $this->get_block_classes_store( $style_nodes );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_classes_store( $style_nodes ) ) )->get_css();
 	}
 
 	/**
@@ -1471,11 +1423,13 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Get the CSS layout rules for a particular block from theme.json layout definitions.
+	 * Returns a WP_Style_Engine_CSS_Rules_Store_Gutenberg object for the given block metadata.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
-	 * @return string Layout styles for the block.
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
 	 */
 	protected function get_layout_styles_store( $block_metadata ) {
 		$store      = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'global-styles/layout' );
@@ -1629,9 +1583,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Layout styles for the block.
 	 */
 	protected function get_layout_styles( $block_metadata ) {
-		$store     = $this->get_layout_styles_store( $block_metadata );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_layout_styles_store( $block_metadata ) ) )->get_css();
 	}
 
 	/**
@@ -1712,8 +1664,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
-		$store     = static::compute_preset_classes_store( $settings, $selector, $origins );
-		$processor = new WP_Style_Engine_Processor_Gutenberg( $store );
-		return $processor->get_css();
+		return ( new WP_Style_Engine_Processor_Gutenberg( static::compute_preset_classes_store( $settings, $selector, $origins ) ) )->get_css();
 	}
 }
