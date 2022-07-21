@@ -823,7 +823,12 @@ export function useGlobalStylesOutput() {
 		] );
 		setSettings( mergedConfig.settings );
 		setSvgFilters( filters );
-	}, [ hasBlockGapSupport, hasFallbackGapSupport, mergedConfig ] );
+	}, [
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		mergedConfig,
+		skipLayoutStyles,
+	] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }
