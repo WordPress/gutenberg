@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -22,7 +24,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TYPES = [ 'archive' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign },
+	attributes: { type, level, textAlign, showPrefix },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
@@ -45,7 +47,20 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		titleElement = (
-			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show archive type in title' ) }
+							onChange={ () =>
+								setAttributes( { showPrefix: ! showPrefix } )
+							}
+							checked={ showPrefix }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+			</>
 		);
 	}
 	return (
