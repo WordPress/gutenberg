@@ -29,12 +29,8 @@ const caret = {
 		select,
 		{ blockClientId }
 	) {
-		// Just calling this, will make the text selection to be unreliable
-		// If you comment out this line, then everything works fine.
-		select( 'core/block-editor' ).getBlockName( blockClientId );
-
 		return {
-			carets: [],
+			carets: select( 'core/block-editor' ).getBlockName( blockClientId ),
 		};
 	},
 	__experimentalCreatePrepareEditableTree() {
