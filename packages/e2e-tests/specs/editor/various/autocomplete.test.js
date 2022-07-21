@@ -47,4 +47,19 @@ describe( 'autocomplete mentions', () => {
 		<!-- /wp:paragraph -->"
 	` );
 	} );
+
+	it( 'should insert elements from multiple completers in a single block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'I am @j' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '. I am eating an ~a' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.keyboard.press( 'Enter' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>I am @testuser. I am eating an 🍎</p>
+		<!-- /wp:paragraph -->"
+	` );
+	} );
 } );
