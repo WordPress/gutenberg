@@ -44,8 +44,9 @@ export function __experimentalGetUnprocessedBlockTypes( state ) {
  * import { useSelect } from '@wordpress/data';
  *
  * const ExampleComponent = () => {
- *     const blockTypes = useSelect( ( select ) =>
- *         select( blocksStore ).getBlockTypes()
+ *     const blockTypes = useSelect(
+ *         ( select ) => select( blocksStore ).getBlockTypes(),
+ *         []
  *     );
  *
  *     return (
@@ -78,7 +79,8 @@ export const getBlockTypes = createSelector(
  *
  * const ExampleComponent = () => {
  *     const paragraphBlock = useSelect( ( select ) =>
- *         select( blocksStore ).getBlockType( 'core/paragraph' )
+ *         ( select ) => select( blocksStore ).getBlockType( 'core/paragraph' ),
+ *         []
  *     );
  *
  *     return (
