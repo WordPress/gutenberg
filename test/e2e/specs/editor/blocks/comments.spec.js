@@ -184,10 +184,7 @@ test.describe( 'Comments', () => {
 		requestUtils,
 	} ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( {
-			name: 'core/comments',
-			attributes: { legacy: false },
-		} );
+		await editor.insertBlock( { name: 'core/comments' } );
 		const postId = await editor.publishPost();
 
 		// Create a comments for that post.
