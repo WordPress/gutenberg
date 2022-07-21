@@ -34,14 +34,12 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected, prefix ) {
-	if ( typeof selected !== 'object' ) {
-		return { [ prefix ]: selected };
-	}
-
+	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
 	return mapKeys( selected, ( value, key ) => `${ prefix }.${ key }` );
 }
 
 function getPrefixedKeys( selected, prefix ) {
+	if ( selected[ prefix ] ) return selected[ prefix ];
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
 		.reduce( ( accumulator, key ) => {
