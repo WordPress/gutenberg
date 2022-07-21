@@ -23,6 +23,7 @@ import {
 	LABELS,
 	getSliderValueFromPreset,
 	getCustomValueFromPreset,
+	isValueSpacingPreset,
 } from './utils';
 
 export default function SpacingInputControl( {
@@ -31,24 +32,25 @@ export default function SpacingInputControl( {
 	side,
 	onChange,
 } ) {
+	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
+		value !== undefined && ! isValueSpacingPreset( value )
+	);
+
+	const [ valueNow, setValueNow ] = useState( null );
+
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
-	const [ valueNow, setValueNow ] = useState( null );
-
-	const [ selectedUnit, setSelectedUnit ] = useState(
-		parseQuantityAndUnitFromRawValue( value )[ 1 ] || units[ 0 ]
-	);
-
-	const [ showCustomValueControl, setShowCustomValueControl ] =
-		useState( false );
-
-	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
-
 	const currentValue = ! showCustomValueControl
 		? getSliderValueFromPreset( value, spacingSizes )
 		: getCustomValueFromPreset( value, spacingSizes );
+
+	const [ selectedUnit, setSelectedUnit ] = useState(
+		parseQuantityAndUnitFromRawValue( currentValue )[ 1 ] || units[ 0 ]
+	);
+
+	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
 
 	const customRangeValue = parseInt( currentValue );
 
