@@ -105,17 +105,17 @@ const positionToPlacement = ( position ) => {
 /** @type {Object.<FloatingUIPlacement, AppearOrigin>} */
 const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
 	top: 'bottom',
-	'top-start': 'bottom right',
-	'top-end': 'bottom left',
+	'top-start': 'bottom left',
+	'top-end': 'bottom right',
 	right: 'middle left',
-	'right-start': 'bottom left',
-	'right-end': 'top left',
+	'right-start': 'top left',
+	'right-end': 'bottom left',
 	bottom: 'top',
-	'bottom-start': 'top right',
-	'bottom-end': 'top left',
+	'bottom-start': 'top left',
+	'bottom-end': 'top right',
 	left: 'middle right',
-	'left-start': 'bottom right',
-	'left-end': 'top right',
+	'left-start': 'top right',
+	'left-end': 'bottom right',
 };
 
 /**
