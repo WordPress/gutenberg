@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
+import { COLORS, CONFIG } from '../../utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useFormGroupContextId } from '../../ui/form-group';
 import { useControlledValue, useCx } from '../../utils/hooks';
@@ -25,6 +26,7 @@ export function useSlider(
 		className,
 		defaultValue,
 		error,
+		errorColor = CONFIG.controlDestructiveBorderColor,
 		onBlur = noop,
 		onChange: onChangeProp = noop,
 		onFocus = noop,
@@ -34,9 +36,9 @@ export function useSlider(
 		min = 0,
 		size = 'default',
 		style,
-		thumbColor,
-		trackColor,
-		trackBackgroundColor,
+		thumbColor = COLORS.admin.theme,
+		trackColor = COLORS.admin.theme,
+		trackBackgroundColor = CONFIG.controlBackgroundDimColor,
 		value: valueProp,
 		...otherProps
 	} = useContextSystem( props, 'Slider' );
@@ -104,19 +106,19 @@ export function useSlider(
 	// Generate dynamic class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const colors = { thumbColor, trackColor, trackBackgroundColor };
 		return cx(
-			styles.slider( colors ),
-			error && styles.error,
+			styles.slider( { thumbColor, trackColor, trackBackgroundColor } ),
+			error && styles.error( { errorColor, trackBackgroundColor } ),
 			styles[ size ],
-			isFocused && styles.focused( colors ),
-			error && isFocused && styles.focusedError,
+			isFocused && styles.focused( thumbColor ),
+			error && isFocused && styles.focusedError( errorColor ),
 			className
 		);
 	}, [
 		className,
 		cx,
 		error,
+		errorColor,
 		isFocused,
 		size,
 		thumbColor,

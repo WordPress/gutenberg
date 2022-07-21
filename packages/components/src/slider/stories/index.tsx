@@ -17,6 +17,7 @@ const meta: ComponentMeta< typeof Slider > = {
 	title: 'Components (Experimental)/Slider',
 	component: Slider,
 	argTypes: {
+		errorColor: { control: { type: 'color' } },
 		onChange: { action: 'onChange' },
 		size: {
 			control: 'select',

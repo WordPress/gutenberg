@@ -10,38 +10,32 @@ import type { CSSProperties } from 'react';
 import { COLORS, CONFIG } from '../utils';
 import { SliderColors } from './types';
 
-const getBoxShadowStyle = (
-	color: CSSProperties[ 'color' ] = COLORS.admin.theme
-) => {
+const getBoxShadowStyle = ( color: CSSProperties[ 'color' ] ) => {
 	return `
 		0 0 0 ${ CONFIG.controlPseudoBoxShadowFocusWidth } ${ CONFIG.surfaceBackgroundColor },
 		0 0 0 calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px) ${ color }
 	`;
 };
 
-const getFocusBoxShadow = ( color: CSSProperties[ 'boxShadow' ] ) => {
+const getFocusBoxShadow = ( color: CSSProperties[ 'color' ] ) => {
+	const boxShadow = getBoxShadowStyle( color );
 	return css`
 		&::-webkit-slider-thumb {
-			box-shadow: ${ color };
+			box-shadow: ${ boxShadow };
 		}
 		&::-moz-range-thumb {
-			box-shadow: ${ color };
+			box-shadow: ${ boxShadow };
 		}
 	`;
 };
 
-export const focusedError = css`
-	${ getFocusBoxShadow( getBoxShadowStyle( COLORS.alert.red ) ) };
-`;
-
-const thumbStyles = ( colors: SliderColors ) => {
-	const { thumbColor = CONFIG.sliderThumbBackgroundColor } = colors;
+const thumbStyles = ( thumbColor: CSSProperties[ 'color' ] ) => {
 	return css`
 		appearance: none;
 		background-color: ${ thumbColor };
-		border: 1px solid ${ CONFIG.sliderThumbBorderColor };
+		border: 1px solid transparent;
 		border-radius: 50%;
-		box-shadow: ${ CONFIG.sliderThumbBoxShadow };
+		box-shadow: none;
 		cursor: pointer;
 		height: 12px;
 		margin-top: -5px;
@@ -56,13 +50,7 @@ const disabledThumbStyles = css`
 	border-color: ${ COLORS.ui.textDisabled };
 `;
 
-const trackStyles = ( colors: SliderColors ) => {
-	const {
-		thumbColor = COLORS.admin.theme,
-		trackColor = COLORS.admin.theme,
-		trackBackgroundColor = CONFIG.controlBackgroundDimColor,
-	} = colors;
-
+const trackStyles = ( { trackColor, trackBackgroundColor }: SliderColors ) => {
 	return css`
 		background: linear-gradient(
 			to right,
@@ -74,7 +62,7 @@ const trackStyles = ( colors: SliderColors ) => {
 	`;
 };
 
-export const slider = ( colors ) => {
+export const slider = ( colors: SliderColors ) => {
 	return css`
 		appearance: none;
 		background-color: transparent;
@@ -115,14 +103,14 @@ export const slider = ( colors ) => {
 
 		/* Vendor prefixes don't work correctly when comma separated. */
 		&::-webkit-slider-thumb {
-			${ thumbStyles( colors ) }
+			${ thumbStyles( colors.thumbColor ) }
 
 			*:disabled& {
 				${ disabledThumbStyles }
 			}
 		}
 		&::-moz-range-thumb {
-			${ thumbStyles( colors ) }
+			${ thumbStyles( colors.thumbColor ) }
 			will-change: transform;
 
 			*:disabled& {
@@ -131,50 +119,48 @@ export const slider = ( colors ) => {
 		}
 
 		&:focus {
-			${ getFocusBoxShadow( getBoxShadowStyle( colors?.thumbColor ) ) }
+			${ getFocusBoxShadow( colors.thumbColor ) }
 		}
 	`;
 };
 
-export const focused = ( colors: SliderColors ) => {
+export const focused = ( thumbColor: CSSProperties[ 'color' ] ) =>
+	getFocusBoxShadow( thumbColor );
+
+export const focusedError = ( errorColor: CSSProperties[ 'color' ] ) =>
+	getFocusBoxShadow( errorColor );
+
+export const error = ( { errorColor, trackBackgroundColor }: SliderColors ) => {
 	return css`
-		${ getFocusBoxShadow( getBoxShadowStyle( colors?.thumbColor ) ) }
+		&::-webkit-slider-runnable-track {
+			background: linear-gradient(
+				to right,
+				${ errorColor } calc( var( --slider--progress ) ),
+				${ trackBackgroundColor } calc( var( --slider--progress ) )
+			);
+		}
+		&::-moz-range-track {
+			background: linear-gradient(
+				to right,
+				${ errorColor } calc( var( --slider--progress ) ),
+				${ trackBackgroundColor } calc( var( --slider--progress ) )
+			);
+		}
+
+		&::-webkit-slider-thumb {
+			background-color: ${ errorColor };
+			border: 1px solid ${ errorColor };
+		}
+		&::-moz-range-thumb {
+			background-color: ${ errorColor };
+			border: 1px solid ${ errorColor };
+		}
+
+		&:focus {
+			${ getFocusBoxShadow( errorColor ) };
+		}
 	`;
 };
-
-export const error = css`
-	&::-webkit-slider-runnable-track {
-		background: linear-gradient(
-			to right,
-			${ CONFIG.controlDestructiveBorderColor }
-				calc( var( --slider--progress ) ),
-			${ CONFIG.controlBackgroundDimColor }
-				calc( var( --slider--progress ) )
-		);
-	}
-	&::-moz-range-track {
-		background: linear-gradient(
-			to right,
-			${ CONFIG.controlDestructiveBorderColor }
-				calc( var( --slider--progress ) ),
-			${ CONFIG.controlBackgroundDimColor }
-				calc( var( --slider--progress ) )
-		);
-	}
-
-	&::-webkit-slider-thumb {
-		background-color: ${ CONFIG.controlDestructiveBorderColor };
-		border: 1px solid ${ CONFIG.controlDestructiveBorderColor };
-	}
-	&::-moz-range-thumb {
-		background-color: ${ CONFIG.controlDestructiveBorderColor };
-		border: 1px solid ${ CONFIG.controlDestructiveBorderColor };
-	}
-
-	&:focus {
-		${ getFocusBoxShadow( getBoxShadowStyle( COLORS.alert.red ) ) };
-	}
-`;
 
 export const large = css`
 	/*
