@@ -50,6 +50,8 @@ export default function SpacingInputControl( {
 		? getSliderValueFromPreset( value, spacingSizes )
 		: getCustomValueFromPreset( value, spacingSizes );
 
+	const customRangeValue = parseInt( currentValue );
+
 	const getNewCustomValue = ( newSize ) => {
 		const isNumeric = ! isNaN( parseFloat( newSize ) );
 		const nextValue = isNumeric ? newSize : undefined;
@@ -103,25 +105,6 @@ export default function SpacingInputControl( {
 							: __( 'Default' ) }
 					</Text>
 				) }
-
-				{ spacingSizes.length > 8 && ! showCustomValueControl && (
-					<CustomSelectControl
-						value={ options.find(
-							( option ) => option.key === valueNow
-						) }
-						onChange={ ( selectedItem ) => {
-							onChange( getNewPresetValue( selectedItem.key ) );
-						} }
-						options={ options }
-						onHighlightedIndexChange={ ( index ) => {
-							if ( index.type === '__item_mouse_move__' ) {
-								onChange(
-									getNewPresetValue( index.highlightedIndex )
-								);
-							}
-						} }
-					/>
-				) }
 				<Button
 					label={
 						showCustomValueControl
@@ -149,7 +132,7 @@ export default function SpacingInputControl( {
 					/>
 
 					<RangeControl
-						value={ value }
+						value={ customRangeValue }
 						min={ 0 }
 						max={ 50 }
 						withInputField={ false }
@@ -170,6 +153,24 @@ export default function SpacingInputControl( {
 					min={ 0 }
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
+				/>
+			) }
+			{ spacingSizes.length > 8 && ! showCustomValueControl && (
+				<CustomSelectControl
+					value={ options.find(
+						( option ) => option.key === valueNow
+					) }
+					onChange={ ( selectedItem ) => {
+						onChange( getNewPresetValue( selectedItem.key ) );
+					} }
+					options={ options }
+					onHighlightedIndexChange={ ( index ) => {
+						if ( index.type === '__item_mouse_move__' ) {
+							onChange(
+								getNewPresetValue( index.highlightedIndex )
+							);
+						}
+					} }
 				/>
 			) }
 		</>
