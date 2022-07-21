@@ -12,7 +12,6 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 ## 1.80.0
-
 -   [*] Add React Native FastImage [#42009]
 -   [*] Block inserter displays block collections [#42405]
 -   [*] Fix incorrect spacing within Image alt text footnote [#42504]
