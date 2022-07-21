@@ -9,11 +9,12 @@ const variations = [
 		name: 'group',
 		title: __( 'Group' ),
 		description: __( 'Gather blocks in a layout container.' ),
-		attributes: { layout: { type: 'default' } },
+		attributes: { layout: { inherit: true } },
 		scope: [ 'transform' ],
 		isActive: ( blockAttributes ) =>
 			! blockAttributes.layout ||
 			! blockAttributes.layout?.type ||
+			blockAttributes.layout?.inherit === true ||
 			blockAttributes.layout?.type === 'default',
 		icon: group,
 	},

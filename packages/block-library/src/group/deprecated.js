@@ -11,6 +11,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	useBlockProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 const migrateAttributes = ( attributes ) => {
@@ -38,6 +39,79 @@ const migrateAttributes = ( attributes ) => {
 };
 
 const deprecated = [
+	// Version with no default content width.
+	{
+		attributes: {
+			tagName: {
+				type: 'string',
+				default: 'div',
+			},
+			templateLock: {
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', false ],
+			},
+		},
+		supports: {
+			__experimentalOnEnter: true,
+			__experimentalSettings: true,
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			ariaLabel: true,
+			html: false,
+			color: {
+				gradients: true,
+				link: true,
+				__experimentalDefaultControls: {
+					background: true,
+					text: true,
+				},
+			},
+			spacing: {
+				margin: [ 'top', 'bottom' ],
+				padding: true,
+				blockGap: true,
+				__experimentalDefaultControls: {
+					padding: true,
+					blockGap: true,
+				},
+			},
+			__experimentalBorder: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+				__experimentalDefaultControls: {
+					color: true,
+					radius: true,
+					style: true,
+					width: true,
+				},
+			},
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalLetterSpacing: true,
+				__experimentalTextTransform: true,
+				__experimentalDefaultControls: {
+					fontSize: true,
+				},
+			},
+			__experimentalLayout: true,
+		},
+		isEligible: ( { layout } ) => ! layout,
+		migrate: ( attributes ) => {
+			if ( ! attributes.layout ) {
+				return attributes;
+			}
+		},
+		save( { attributes: { tagName: Tag } } ) {
+			return (
+				<Tag { ...useInnerBlocksProps.save( useBlockProps.save() ) } />
+			);
+		},
+	},
 	// Version of the block with the double div.
 	{
 		attributes: {
