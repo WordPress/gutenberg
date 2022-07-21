@@ -189,7 +189,7 @@ test.describe( 'Comments', () => {
 
 		// Create a comments for that post.
 		await requestUtils.createComment( {
-			content: `This is an automated comment`,
+			content: 'This is an automated comment',
 			post: postId,
 		} );
 
@@ -220,7 +220,7 @@ test.describe( 'Comments', () => {
 
 		// Create a comments for that post.
 		await requestUtils.createComment( {
-			content: `This is an automated comment`,
+			content: 'This is an automated comment',
 			post: postId,
 		} );
 
