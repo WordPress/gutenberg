@@ -124,10 +124,10 @@ class WP_Style_Engine_CSS_Declarations {
 		foreach ( $declarations_array as $property => $value ) {
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) ) {
-				$declarations_output .= esc_html( "{$property}: {$value};" ) . '; ';
+				$declarations_output .= "{$property}: {$value};";
 				continue;
 			}
-			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			$filtered_declaration = safecss_filter_attr( "{$property}: {$value}" );
 			if ( $filtered_declaration ) {
 				$declarations_output .= $filtered_declaration . '; ';
 			}
