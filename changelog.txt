@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 13.7.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Plugin: Compatibility fixes for WP 5.9 and Site Editor ([42549](https://github.com/WordPress/gutenberg/pull/42549))
+- Plugin: Fix PHP fatal error when using WP 5.9. ([42550](https://github.com/WordPress/gutenberg/pull/42550))
+
+
 = 13.7.0 =
 
 ## Changelog
