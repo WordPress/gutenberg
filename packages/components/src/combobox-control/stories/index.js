@@ -287,3 +287,69 @@ _default.args = {
 	__next36pxDefaultSize: false,
 	allowReset: false,
 };
+
+const authors = [
+	{
+		name: 'Hermann P. Schnitzel',
+		age: 45,
+		country: 'Germany',
+	},
+	{
+		name: 'Shequondolisa Bivouac',
+		age: 43,
+		country: 'France',
+	},
+	{
+		name: 'Bodrum Salvador',
+		age: 42,
+		country: 'Spain',
+	},
+	{
+		name: 'Parsley Montana',
+		age: 48,
+		country: 'Germany',
+	},
+	{
+		name: 'Cabbage New York',
+		age: 44,
+		country: 'France',
+	},
+	{
+		name: 'Jake Weary',
+		age: 41,
+		country: 'United Kingdom',
+	},
+];
+
+const authorOptions = authors.map( ( { name, ...details } ) => ( {
+	value: name,
+	label: name,
+	...details,
+} ) );
+
+export const WithRenderOption = ( args ) => {
+	const [ value, setValue ] = useState( '' );
+
+	return (
+		<>
+			<ComboboxControl
+				{ ...args }
+				value={ value }
+				onChange={ setValue }
+				label="Select an author"
+				options={ authorOptions }
+				renderOption={ ( { label, age, country } ) => (
+					<div>
+						<div style={ { marginBottom: '0.2rem' } }>
+							{ label }
+						</div>
+						<small>
+							Age: { age }, Country: { country }
+						</small>
+					</div>
+				) }
+			/>
+			<p>Selected author: { value }</p>
+		</>
+	);
+};
