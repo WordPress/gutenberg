@@ -2,12 +2,7 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import {
-	ALL_SIDES,
-	LABELS,
-	getSpacingPresetSlug,
-	getSliderValueFromSlug,
-} from './utils';
+import { ALL_SIDES, LABELS } from './utils';
 
 export default function BoxInputControls( {
 	values,
@@ -55,16 +50,10 @@ export default function BoxInputControls( {
 	return (
 		<>
 			{ filteredSides.map( ( side ) => {
-				const slug = getSpacingPresetSlug( values[ side ] );
-				const value = getSliderValueFromSlug(
-					slug,
-					props.spacingSizes
-				);
-
 				return (
 					<SpacingInputControl
 						{ ...props }
-						value={ value }
+						value={ values[ side ] }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
 						withInputField={ false }

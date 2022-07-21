@@ -2,26 +2,17 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import {
-	ALL_SIDES,
-	LABELS,
-	getAllValue,
-	isValuesMixed,
-	isValuesDefined,
-} from './utils';
-
-const noop = () => {};
+import { ALL_SIDES, getAllRawValue } from './utils';
 
 export default function AllInputControl( {
-	onChange = noop,
+	onChange,
 	values,
 	sides,
-	...props
+	spacingSizes,
 } ) {
-	const allValue = getAllValue( values, sides, props.spacingSizes );
-	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values, sides );
-	const allPlaceholder = isMixed ? LABELS.mixed : null;
+	const allValue = getAllRawValue( values );
+	// const hasValues = isValuesDefined( values );
+	// const isMixed = hasValues && isValuesMixed( values, sides );
 
 	// Applies a value to an object representing top, right, bottom and left
 	// sides while taking into account any custom side configuration.
@@ -55,11 +46,10 @@ export default function AllInputControl( {
 
 	return (
 		<SpacingInputControl
-			{ ...props }
 			value={ allValue }
 			onChange={ handleOnChange }
-			placeholder={ allPlaceholder }
-			withInputField={ false }
+			side={ 'all' }
+			spacingSizes={ spacingSizes }
 		/>
 	);
 }

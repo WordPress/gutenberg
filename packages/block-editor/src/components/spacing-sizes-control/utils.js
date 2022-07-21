@@ -8,6 +8,13 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 
+export function isValueSpacingPreset( value ) {
+	if ( ! value?.includes ) {
+		return false;
+	}
+	return value.includes( 'var:preset|spacing|' );
+}
+
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;
@@ -33,7 +40,8 @@ export function getSpacingPresetSlug( value ) {
 	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
 }
 
-export function getSliderValueFromSlug( slug, spacingSizes ) {
+export function getSliderValueFromPreset( presetValue, spacingSizes ) {
+	const slug = getSpacingPresetSlug( presetValue );
 	return spacingSizes.findIndex( ( spacingSize ) => {
 		return spacingSize.slug === slug;
 	} );
@@ -77,25 +85,14 @@ function mode( arr ) {
 }
 
 /**
- * Gets the 'all' input value and unit from values data.
+ * Gets the 'all' input value from values data.
  *
- * @param {Object} values         Box values.
- * @param {Array}  availableSides Available box sides to evaluate.
- * @param {Array}  spacingSizes   Spacing size preset values.
+ * @param {Object} values Box spacing values
  *
- * @return {string} A value + unit for the 'all' input.
+ * @return {string} The most common value from all sides of box.
  */
-export function getAllValue(
-	values = {},
-	availableSides = ALL_SIDES,
-	spacingSizes
-) {
-	const sides = normalizeSides( availableSides );
-	const parsedSlugs = sides.map( ( side ) =>
-		getSpacingPresetSlug( values[ side ] )
-	);
-
-	return getSliderValueFromSlug( mode( parsedSlugs ), spacingSizes );
+export function getAllRawValue( values = {} ) {
+	return mode( Object.values( values ) );
 }
 
 /**
@@ -108,7 +105,7 @@ export function getAllValue(
  * @return {boolean} Whether values are mixed.
  */
 export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
-	const allValue = getAllValue( values, selectedUnits, sides );
+	const allValue = getAllRawValue( values, selectedUnits, sides );
 	const isMixed = isNaN( parseFloat( allValue ) );
 
 	return isMixed;

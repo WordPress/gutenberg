@@ -50,5 +50,10 @@
 
 	.components-spacing-sizes-control__hint {
 		color: $gray-700;
+		margin-left: 0;
+	}
+
+	.components-spacing-sizes-control__side-label {
+		margin-right: 4px;
 	}
 }

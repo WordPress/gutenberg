@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { LABELS, getSpacingPresetSlug, getSliderValueFromSlug } from './utils';
+import { LABELS } from './utils';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
@@ -42,15 +42,10 @@ export default function AxialInputControls( {
 			{ filteredSides.map( ( side ) => {
 				const axisValue =
 					side === 'vertical' ? values.top : values.left;
-				const slug = getSpacingPresetSlug( axisValue );
-				const value = getSliderValueFromSlug(
-					slug,
-					props.spacingSizes
-				);
 				return (
 					<SpacingInputControl
 						{ ...props }
-						value={ value }
+						value={ axisValue }
 						onChange={ createHandleOnChange( side ) }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }

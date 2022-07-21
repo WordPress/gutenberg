@@ -9,6 +9,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -16,7 +17,8 @@ import { settings } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { LABELS } from './utils';
+import useSetting from '../use-setting';
+import { LABELS, getSliderValueFromPreset } from './utils';
 
 export default function SpacingInputControl( {
 	spacingSizes,
@@ -28,6 +30,14 @@ export default function SpacingInputControl( {
 	const [ showCustomValueControl, setShowCustomValueControl ] =
 		useState( false );
 	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+	} );
+
+	const currentValue = ! showCustomValueControl
+		? getSliderValueFromPreset( value, spacingSizes )
+		: '20px';
 
 	const getNewCustomValue = ( newSize ) => {
 		return newSize;
@@ -41,12 +51,13 @@ export default function SpacingInputControl( {
 		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
 	};
 
-	const currentValueHint = customTooltipContent( value );
+	const currentValueHint = customTooltipContent( currentValue );
 
 	const options = spacingSizes.map( ( size, index ) => ( {
 		key: index,
 		name: size.name,
 	} ) );
+
 	const marks = spacingSizes.map( ( newValue, index ) => ( {
 		value: index,
 		lable: undefined,
@@ -55,7 +66,11 @@ export default function SpacingInputControl( {
 	return (
 		<>
 			<HStack>
-				<Text>{ LABELS[ side ] }</Text>
+				{ side !== 'all' && (
+					<Text className="components-spacing-sizes-control__side-label">
+						{ LABELS[ side ] }
+					</Text>
+				) }
 
 				{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 					<Text className="components-spacing-sizes-control__hint">
@@ -104,7 +119,8 @@ export default function SpacingInputControl( {
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
-						value="28%"
+						value={ currentValue }
+						units={ units }
 					/>
 
 					<RangeControl
@@ -117,7 +133,7 @@ export default function SpacingInputControl( {
 			) }
 			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 				<RangeControl
-					value={ value }
+					value={ currentValue }
 					onChange={ ( newSize ) =>
 						onChange( getNewRangeValue( newSize ) )
 					}
