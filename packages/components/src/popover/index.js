@@ -82,7 +82,7 @@ const ArrowTriangle = ( props ) => (
 const slotNameContext = createContext();
 
 // Converts the `Popover`'s legacy "position" prop to the
-// new "placement" prop (used by `gloating-ui`).
+// new "placement" prop (used by `floating-ui`).
 const positionToPlacement = ( position ) => {
 	const [ x, y, z ] = position.split( ' ' );
 
@@ -137,6 +137,22 @@ const placementToAnimationOrigin = ( placement, rtl ) => {
 
 	return animationOrigin;
 };
+
+/**
+ * @param {FloatingUIPlacement} placement
+ * @return {'top' | 'right' | 'bottom' | 'left'} The side
+ */
+export function getSide( placement ) {
+	return placement.split( '-' )[ 0 ];
+}
+
+/**
+ * @param {FloatingUIPlacement} placement
+ * @return {'x' | 'y'} The axis
+ */
+export function getMainAxisFromPlacement( placement ) {
+	return [ 'top', 'bottom' ].includes( getSide( placement ) ) ? 'x' : 'y';
+}
 
 const Popover = (
 	{
@@ -272,17 +288,25 @@ const Popover = (
 			? shift( {
 					crossAxis: true,
 					limiter: limitShift( {
-						offset: ( { floating } ) => {
+						offset: ( { floating, placement } ) => {
 							// iFrame-specific correction aimed at allowing the floating element
 							// to shift fully below the reference element.
 							if ( ownerDocument === document ) {
 								return 0;
 							}
-							// TODO: adapt code based on the placement
-							// (see https://floating-ui.com/docs/shift#limitshift-offset)
+
+							const computedMainAxis =
+								getMainAxisFromPlacement( placement );
+
 							return {
-								mainAxis: 0,
-								crossAxis: -floating.height,
+								mainAxis:
+									computedMainAxis === 'x'
+										? 0
+										: -floating.height,
+								crossAxis:
+									computedMainAxis === 'x'
+										? -floating.height
+										: 0,
 							};
 						},
 					} ),
