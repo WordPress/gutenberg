@@ -27,12 +27,12 @@ export default function CommentsLegacy( {
 } ) {
 	const { textAlign } = attributes;
 
-	const removeLegacy = () => {
-		setAttributes( { legacy: false } );
-	};
-
 	const actions = [
-		<Button key="convert" onClick={ removeLegacy } variant="primary">
+		<Button
+			key="convert"
+			onClick={ () => void setAttributes( { legacy: false } ) }
+			variant="primary"
+		>
 			{ __( 'Switch to editable mode' ) }
 		</Button>,
 	];
