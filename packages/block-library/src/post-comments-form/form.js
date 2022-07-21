@@ -16,7 +16,6 @@ import { Button } from '@wordpress/components';
 import { useDisabled, useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
 
 const CommentsFormPlaceholder = () => {
 	const disabledFormRef = useDisabled();
@@ -79,7 +78,6 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	let warning = false;
 	let actions;
-	let showPlaceholder = true;
 
 	if ( ! isSiteEditor && 'open' !== commentStatus ) {
 		if ( 'closed' === commentStatus ) {
@@ -99,7 +97,6 @@ const CommentsForm = ( { postId, postType } ) => {
 					) }
 				</Button>,
 			];
-			showPlaceholder = false;
 		} else if ( ! postTypeSupportsComments ) {
 			warning = sprintf(
 				/* translators: 1: Post type (i.e. "post", "page") */
@@ -108,21 +105,17 @@ const CommentsForm = ( { postId, postType } ) => {
 				),
 				postType
 			);
-			showPlaceholder = false;
 		} else if ( 'open' !== defaultCommentStatus ) {
 			warning = __(
 				'Post Comments Form block: Comments are not enabled.'
 			);
-			showPlaceholder = false;
 		}
 	}
 
-	return (
-		<Fragment>
-			{ warning && <Warning actions={ actions }>{ warning }</Warning> }
-
-			{ showPlaceholder ? <CommentsFormPlaceholder /> : null }
-		</Fragment>
+	return warning ? (
+		<Warning actions={ actions }>{ warning }</Warning>
+	) : (
+		<CommentsFormPlaceholder />
 	);
 };
 
