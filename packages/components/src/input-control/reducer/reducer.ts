@@ -13,7 +13,6 @@ import { useReducer, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import {
 	InputState,
-	LeadStateReducer,
 	StateReducer,
 	initialInputControlState,
 	initialStateReducer,
@@ -51,21 +50,22 @@ function mergeInitialState(
  */
 function inputControlStateReducer(
 	composedStateReducers: StateReducer
-): LeadStateReducer {
+): StateReducer {
 	return ( state, action ) => {
-		if ( ! ( 'type' in action ) ) {
-			// Returns the new state without running other reducers. These are
-			// controlled updates from props and need no specialization.
-			return {
-				...state,
-				value: `${ action.value ?? '' }`,
-				isDirty: false,
-				_event: undefined,
-			};
-		}
 		const nextState = { ...state };
 
 		switch ( action.type ) {
+			/*
+			 * Controlled updates
+			 */
+			case actions.CONTROL:
+				nextState.value = `${ action.payload.value }`;
+				nextState.isDirty = false;
+				nextState._event = undefined;
+				// So far there is no need for specialization of this action so
+				// returning immediately avoids invoking additional reducers.
+				return nextState;
+
 			/**
 			 * Keyboard events
 			 */
@@ -151,7 +151,7 @@ export function useInputControlStateReducer(
 	initialState: Partial< InputState > = initialInputControlState,
 	onChangeHandler: InputChangeCallback
 ) {
-	const [ state, dispatch ] = useReducer< LeadStateReducer >(
+	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
@@ -221,7 +221,10 @@ export function useInputControlStateReducer(
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
-			dispatch( { value: initialState.value } );
+			dispatch( {
+				type: actions.CONTROL,
+				payload: { value: initialState.value ?? '' },
+			} );
 		}
 	}, [ initialState.value ] );
 
