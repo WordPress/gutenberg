@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useDisabled } from '@wordpress/compose';
@@ -30,7 +30,10 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 			ref={ disabledRef }
 		>
 			<h3>
-				{ __( 'One response to' ) } “{ postTitle }”
+				{
+					/* translators: %s: Post title. */
+					sprintf( __( 'One response to %s' ), postTitle )
+				}
 			</h3>
 
 			<div className="navigation">
