@@ -15,6 +15,17 @@ export function isValueSpacingPreset( value ) {
 	return value.includes( 'var:preset|spacing|' );
 }
 
+export function getCustomValueFromPreset( value, spacingSizes ) {
+	if ( ! isValueSpacingPreset( value ) ) {
+		return value;
+	}
+
+	const slug = getSpacingPresetSlug( value );
+	const spacingSize = spacingSizes.find( ( size ) => size.slug === slug );
+
+	return spacingSize?.size;
+}
+
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;

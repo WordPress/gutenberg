@@ -19,7 +19,11 @@ import { settings } from '@wordpress/icons';
  * Internal dependencies
  */
 import useSetting from '../use-setting';
-import { LABELS, getSliderValueFromPreset } from './utils';
+import {
+	LABELS,
+	getSliderValueFromPreset,
+	getCustomValueFromPreset,
+} from './utils';
 
 export default function SpacingInputControl( {
 	spacingSizes,
@@ -44,7 +48,7 @@ export default function SpacingInputControl( {
 
 	const currentValue = ! showCustomValueControl
 		? getSliderValueFromPreset( value, spacingSizes )
-		: value;
+		: getCustomValueFromPreset( value, spacingSizes );
 
 	const getNewCustomValue = ( newSize ) => {
 		const isNumeric = ! isNaN( parseFloat( newSize ) );
