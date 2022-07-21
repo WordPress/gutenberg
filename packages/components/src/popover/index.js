@@ -99,9 +99,6 @@ const positionToPlacement = ( position ) => {
 	return y;
 };
 
-// Given the floating-ui `placement`, compute the origin used for the entrance
-// animation. The origin should be on the "opposite" side from the placement.
-
 /** @type {Object.<FloatingUIPlacement, AppearOrigin>} */
 const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
 	top: 'bottom',
@@ -119,6 +116,8 @@ const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
 };
 
 /**
+ * Given the floating-ui `placement`, compute the origin used for the entrance
+ * animation. The origin should be on the "opposite" side from the placement.
  *
  * @param {FloatingUIPlacement} placement A placement string from floating ui
  * @param {boolean}             rtl
