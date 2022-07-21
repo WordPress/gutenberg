@@ -10,6 +10,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -26,29 +27,48 @@ export default function SpacingInputControl( {
 	side,
 	onChange,
 } ) {
-	const [ valueNow, setValueNow ] = useState( null );
-	const [ showCustomValueControl, setShowCustomValueControl ] =
-		useState( false );
-	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
-
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
+	const [ valueNow, setValueNow ] = useState( null );
+
+	const [ selectedUnit, setSelectedUnit ] = useState(
+		parseQuantityAndUnitFromRawValue( value )[ 1 ] || units[ 0 ]
+	);
+
+	const [ showCustomValueControl, setShowCustomValueControl ] =
+		useState( false );
+
+	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
+
 	const currentValue = ! showCustomValueControl
 		? getSliderValueFromPreset( value, spacingSizes )
-		: '20px';
+		: value;
 
 	const getNewCustomValue = ( newSize ) => {
-		return newSize;
+		const isNumeric = ! isNaN( parseFloat( newSize ) );
+		const nextValue = isNumeric ? newSize : undefined;
+		return nextValue;
 	};
-	const getNewRangeValue = ( newSize ) => {
+
+	const getNewPresetValue = ( newSize ) => {
 		setValueNow( newSize );
 		const size = parseInt( newSize, 10 );
 		if ( size === 0 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
+	};
+
+	const handleCustomValueSliderChange = ( next ) => {
+		onChange(
+			next !== undefined ? `${ next }${ selectedUnit }` : undefined
+		);
+	};
+
+	const handleOnUnitChange = ( unit ) => {
+		setSelectedUnit( unit );
 	};
 
 	const currentValueHint = customTooltipContent( currentValue );
@@ -86,13 +106,13 @@ export default function SpacingInputControl( {
 							( option ) => option.key === valueNow
 						) }
 						onChange={ ( selectedItem ) => {
-							onChange( getNewRangeValue( selectedItem.key ) );
+							onChange( getNewPresetValue( selectedItem.key ) );
 						} }
 						options={ options }
 						onHighlightedIndexChange={ ( index ) => {
 							if ( index.type === '__item_mouse_move__' ) {
 								onChange(
-									getNewRangeValue( index.highlightedIndex )
+									getNewPresetValue( index.highlightedIndex )
 								);
 							}
 						} }
@@ -121,6 +141,7 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
+						onUnitChange={ handleOnUnitChange }
 					/>
 
 					<RangeControl
@@ -128,6 +149,7 @@ export default function SpacingInputControl( {
 						min={ 0 }
 						max={ 50 }
 						withInputField={ false }
+						onChange={ handleCustomValueSliderChange }
 					/>
 				</HStack>
 			) }
@@ -135,7 +157,7 @@ export default function SpacingInputControl( {
 				<RangeControl
 					value={ currentValue }
 					onChange={ ( newSize ) =>
-						onChange( getNewRangeValue( newSize ) )
+						onChange( getNewPresetValue( newSize ) )
 					}
 					withInputField={ false }
 					aria-valuenow={ valueNow }
