@@ -18,16 +18,15 @@ test.use( {
 } );
 
 test.describe( 'Comments', () => {
-	// Ideally, we'd set options in beforeAll or afterAll. Unfortunately, these
-	// aren't exposed via the REST API, so we have to set them through the
-	// relevant wp-admin screen, which involves page utils; but those are
-	// prohibited from beforeAll/afterAll.
-
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
 	test.beforeEach( async ( { commentsBlockUtils } ) => {
+		// Ideally, we'd set options in beforeAll or afterAll. Unfortunately, these
+		// aren't exposed via the REST API, so we have to set them through the
+		// relevant wp-admin screen, which involves page utils; but those are
+		// prohibited from beforeAll/afterAll.
 		await commentsBlockUtils.setOptions( {
 			page_comments: '1',
 			comments_per_page: '1',
