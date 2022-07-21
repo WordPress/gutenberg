@@ -205,7 +205,7 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={ true }
 				>
-					<HStack alignment="flex-end">
+					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
 							label={ __( 'Content' ) }
 							labelPosition="top"
@@ -230,7 +230,7 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={ true }
 				>
-					<HStack alignment="flex-end">
+					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
 							label={ __( 'Wide' ) }
 							labelPosition="top"
