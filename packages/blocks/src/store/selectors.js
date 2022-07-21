@@ -658,16 +658,22 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * import { useSelect } from '@wordpress/data';
  *
  * const ExampleComponent = () => {
- *     const blockNameIsFound = useSelect( ( select ) =>
- *         select( blocksStore ).isMatchingSearchTerm( 'core/navigation' ),
- *         []
- *     );
+ *     const termFound = useSelect(
+ *         ( select ) =>
+ *             select( blocksStore ).isMatchingSearchTerm(
+ *                 'core/navigation',
+ *                 'theme'
+ *             ),
+ *             []
+ *         );
  *
  *     return (
  *         <p>
  *             { sprintf(
- *             __( 'core/navigation is an existing search term: %s' ),
- *                 blockNameIsFound
+ *                 __(
+ *                     'Search term was found in the title, keywords, category or description in block.json: %s'
+ *                 ),
+ *                 termFound
  *             ) }
  *         </p>
  *     );
