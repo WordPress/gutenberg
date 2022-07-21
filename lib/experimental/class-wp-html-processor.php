@@ -226,7 +226,7 @@ class WP_Tag_Find_Descriptor {
 			}
 
 			$pattern_class = preg_quote( $this->class_name, '~' );
-			return 1 === preg_match( "~(?:^|[\t ]){$pattern_class}(?:[\t ]|$)~", $attributes['class']->value->comparable );
+			return 1 === preg_match( "~(?:^|[\t ]){$pattern_class}(?:[\t ]|$)~Smui", $attributes['class']->value->comparable );
 		}
 
 		if ( null === $this->class_name ) {
@@ -424,7 +424,7 @@ class WP_HTML_Scanner {
 			 * lead us to skip over other tags and lose track of our place. So we need to search for
 			 * _every_ tag and then check after we find one if it's the one we are looking for.
 			 */
-	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} /?>]*)~mui",
+	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} /?>]*)~Smui",
 			$this->document,
 			$tag_match,
 			PREG_OFFSET_CAPTURE,
@@ -453,7 +453,7 @@ class WP_HTML_Scanner {
 	public function find_next_attribute() {
 		// Find the attribute name
 		if ( 1 !== preg_match(
-			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^=/>\t\x{0C} ]*)~miu',
+			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^=/>\t\x{0C} ]*)~Smiu',
 			$this->document,
 			$attribute_match,
 			PREG_OFFSET_CAPTURE,
@@ -481,20 +481,20 @@ class WP_HTML_Scanner {
 		switch ( $this->document[ $this->start_at ] ) {
 			case '"':
 				$this->start_at += 1;
-				$pattern = '~(?P<VALUE>[^"]*)"~miu';
+				$pattern = '~(?P<VALUE>[^"]*)"~Smiu';
 				break;
 
 			case "'":
 				$this->start_at += 1;
-				$pattern = "~(?P<VALUE>[^']*)'~miu";
+				$pattern = "~(?P<VALUE>[^']*)'~Smiu";
 				break;
 
 			default:
-				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} >]*)~miu';
+				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} >]*)~Smiu';
 				break;
 		}
 
-		if ( 1 != preg_match(
+		if ( 1 !== preg_match(
 			$pattern,
 			$this->document,
 			$value_match,
