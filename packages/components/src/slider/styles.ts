@@ -8,24 +8,15 @@ import type { CSSProperties } from 'react';
  * Internal dependencies
  */
 import { COLORS, CONFIG } from '../utils';
-import { flow } from '../utils/flow';
 import { SliderColors } from './types';
 
 const getBoxShadowStyle = (
 	color: CSSProperties[ 'color' ] = COLORS.admin.theme
 ) => {
-	return flow(
-		[
-			'0 0 0',
-			CONFIG.controlPseudoBoxShadowFocusWidth,
-			CONFIG.surfaceBackgroundColor,
-		],
-		[
-			'0 0 0',
-			`calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px)`,
-			color,
-		]
-	);
+	return `
+		0 0 0 ${ CONFIG.controlPseudoBoxShadowFocusWidth } ${ CONFIG.surfaceBackgroundColor },
+		0 0 0 calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px) ${ color }
+	`;
 };
 
 const getFocusBoxShadow = ( color: CSSProperties[ 'boxShadow' ] ) => {
