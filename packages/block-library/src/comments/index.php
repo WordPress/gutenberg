@@ -139,26 +139,6 @@ function enqueue_legacy_post_comments_block_styles( $block_name ) {
 }
 
 /**
- * Renders the legacy `core/post-comments` block on the server.
- * It triggers a developer warning and then calls the renamed
- * block's `render_callback` function output.
- *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
- *
- * @return string Returns the output of the block.
- */
-function render_legacy_post_comments_block( $attributes, $content, $block ) {
-	trigger_error(
-		/* translators: %1$s: Block type */
-		sprintf( __( 'Block %1$s has been renamed to Comments Query Loop. %1$s will be supported until WordPress version X.X.', 'gutenberg' ), $block->name ),
-		headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
-	);
-	return render_block_core_comments( $attributes, $content, $block );
-}
-
-/**
  * Ensures backwards compatibility for any users running the Gutenberg plugin
  * who have used Post Comments before it was merged into Comments Query Loop.
  *
@@ -222,7 +202,7 @@ function register_legacy_post_comments_block() {
 			'wp-block-button',
 		),
 		'editorStyle'       => 'wp-block-post-comments-editor',
-		'render_callback'   => 'render_legacy_post_comments_block',
+		'render_callback'   => 'render_block_core_comments',
 		'skip_inner_blocks' => true,
 	);
 
