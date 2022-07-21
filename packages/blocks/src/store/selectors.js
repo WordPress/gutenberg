@@ -217,18 +217,14 @@ export const getBlockVariations = createSelector(
  *     // This example assumes that a core/embed block is the first block in the Block Editor.
  *     const activeBlockVariation = useSelect( ( select ) => {
  *         // Retrieve the list of blocks.
- *         const [ firstBlock ] = select( blockEditorStore ).getBlocks();
- *         // Retrieve the block attributes for the first block.
- *         const firstBlockAttributes = select(
- *             blockEditorStore
- *         ).getBlockAttributes( firstBlock.clientId );
+ *         const [ firstBlock ] = select( blockEditorStore ).getBlocks()
  *
  *         // Return the active block variation for the first block.
  *         return select( blocksStore ).getActiveBlockVariation(
- *             'core/embed',
- *             firstBlockAttributes
+ *             firstBlock.name,
+ *             firstBlock.attributes
  *         );
- *     }, []);
+ *     }, [] );
  *
  *     return activeBlockVariation && activeBlockVariation.name === 'spotify' ? (
  *         <p>{ __( 'Spotify variation' ) }</p>

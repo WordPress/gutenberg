@@ -32,15 +32,11 @@ const ExampleComponent = () => {
 	const activeBlockVariation = useSelect( ( select ) => {
 		// Retrieve the list of blocks.
 		const [ firstBlock ] = select( blockEditorStore ).getBlocks();
-		// Retrieve the block attributes for the first block.
-		const firstBlockAttributes = select(
-			blockEditorStore
-		).getBlockAttributes( firstBlock.clientId );
 
 		// Return the active block variation for the first block.
 		return select( blocksStore ).getActiveBlockVariation(
-			'core/embed',
-			firstBlockAttributes
+			firstBlock.name,
+			firstBlock.attributes
 		);
 	}, [] );
 
