@@ -125,10 +125,38 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	children: ReactNode;
 	/**
 	 * Renders an element on the left side of the input.
+	 *
+	 * By default, the prefix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlPrefixWrapper>` component.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
+	 * />
 	 */
 	prefix?: ReactNode;
 	/**
 	 * Renders an element on the right side of the input.
+	 *
+	 * By default, the suffix is aligned with the edge of the input border, with no padding.
+	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
+	 * the provided `<InputControlSuffixWrapper>` component.
+	 *
+	 * @example
+	 * import {
+	 *   __experimentalInputControl as InputControl,
+	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+	 * } from '@wordpress/components';
+	 *
+	 * <InputControl
+	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
+	 * />
 	 */
 	suffix?: ReactNode;
 	/**
@@ -175,3 +203,17 @@ export interface InputControlLabelProps {
 	labelPosition?: BaseProps[ 'labelPosition' ];
 	size?: BaseProps[ 'size' ];
 }
+
+export type InputControlPrefixWrapperProps = {
+	/**
+	 * The prefix to be inserted.
+	 */
+	children: ReactNode;
+};
+
+export type InputControlSuffixWrapperProps = {
+	/**
+	 * The suffix to be inserted.
+	 */
+	children: ReactNode;
+};

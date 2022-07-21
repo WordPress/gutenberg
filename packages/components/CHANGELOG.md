@@ -6,11 +6,13 @@
 
 -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+-   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
 
 ### Enhancements
 
 -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
 -   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+-   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
 -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
 -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
 -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
@@ -29,6 +31,7 @@
 -   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+-   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
 
 ## 19.15.0 (2022-07-13)
 
