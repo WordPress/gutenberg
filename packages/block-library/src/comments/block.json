@@ -12,7 +12,8 @@
 			"default": "div"
 		},
 		"legacy": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
