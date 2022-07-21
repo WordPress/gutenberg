@@ -89,14 +89,16 @@ export function useSlider(
 		[ onFocus ]
 	);
 
-	const currentValue = interpolate(
+	// Interpolate the current value between 0 and 100, so that it can be used
+	// to position the slider's thumb correctly.
+	const progressPercentage = interpolate(
 		value,
 		[ numericMin, numericMax ],
 		[ 0, 100 ]
 	);
 	const componentStyles = {
 		...style,
-		'--slider--progress': `${ currentValue }%`,
+		'--slider--progress': `${ progressPercentage }%`,
 	};
 
 	// Generate dynamic class names.
