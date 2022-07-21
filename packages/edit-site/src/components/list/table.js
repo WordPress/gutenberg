@@ -15,7 +15,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import Link from '../routes/link';
 import Actions from './actions';
-import AddedBy, { CustomizedTemplateInfo } from './added-by';
+import AddedBy from './added-by';
+import CustomizedTemplateInfo from './customized-template-info';
 
 export default function Table( { templateType } ) {
 	const { records: templates, isResolving: isLoading } = useEntityRecords(

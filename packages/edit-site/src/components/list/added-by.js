@@ -16,7 +16,6 @@ import {
 	plugins as pluginIcon,
 	globe as globeIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 
 const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
 
@@ -101,29 +100,6 @@ function AddedBySite() {
 	return (
 		<BaseAddedBy icon={ globeIcon } imageUrl={ logoURL } text={ name } />
 	);
-}
-
-export function CustomizedTemplateInfo( { template } ) {
-	// Template originally provided by a theme, but customized by a user.
-	// Templates originally didn't have the 'origin' field so identify
-	// older customized templates by checking for no origin and a 'theme'
-	// or 'custom' source.
-	if (
-		template.author &&
-		template.has_theme_file &&
-		( template.origin === 'theme' ||
-			( ! template.origin &&
-				[ 'theme', 'custom' ].includes( template.source ) ) ||
-			template.origin === 'plugin' )
-	) {
-		return (
-			<p className="edit-site-list-template-customized-info">
-				{ __( 'This template has been customized.' ) }
-			</p>
-		);
-	}
-
-	return null;
 }
 
 export default function AddedBy( { templateType, template } ) {
