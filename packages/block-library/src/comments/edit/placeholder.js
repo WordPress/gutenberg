@@ -115,7 +115,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 				</div>
 			</div>
 
-			<CommentsForm />
+			<CommentsForm postId={ postId } postType={ postType } />
 		</div>
 	);
 }
