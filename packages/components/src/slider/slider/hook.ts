@@ -41,8 +41,12 @@ export function useSlider(
 		...otherProps
 	} = useContextSystem( props, 'Slider' );
 
+	const numericMax = parseFloat( `${ max }` );
+	const numericMin = parseFloat( `${ min }` );
+	const fallbackDefaultValue = `${ ( numericMax - numericMin ) / 2 }`;
+
 	const [ _value, onChange ] = useControlledValue( {
-		defaultValue: defaultValue || '50',
+		defaultValue: defaultValue || fallbackDefaultValue,
 		onChange: onChangeProp,
 		value: valueProp,
 	} );
@@ -87,7 +91,7 @@ export function useSlider(
 
 	const currentValue = interpolate(
 		value,
-		[ parseFloat( `${ min }` ), parseFloat( `${ max }` ) ],
+		[ numericMin, numericMax ],
 		[ 0, 100 ]
 	);
 	const componentStyles = { ...style, '--progress': `${ currentValue }%` };
