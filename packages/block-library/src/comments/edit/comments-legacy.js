@@ -27,10 +27,6 @@ export default function CommentsLegacy( {
 } ) {
 	const { textAlign } = attributes;
 
-	const warning = __(
-		"Comments block: You're currently using this block in legacy mode. The following is just a placeholder, not a real comment. The final styling may differ because it also depends on the current theme. For better compatibility with the Block Editor, please consider switching the block to its editable mode."
-	);
-
 	const removeLegacy = () => {
 		setAttributes( { legacy: false } );
 	};
@@ -59,7 +55,15 @@ export default function CommentsLegacy( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				<Warning actions={ actions }>{ warning }</Warning>
+				<Warning actions={ actions }>
+					{ __(
+						"Comments block: You're currently using this block in legacy mode. " +
+							'The following is just a placeholder, not a real comment. ' +
+							'The final styling may differ because it also depends on the current theme. ' +
+							'For better compatibility with the Block Editor, ' +
+							'please consider switching the block to its editable mode.'
+					) }
+				</Warning>
 				<Placeholder postId={ postId } postType={ postType } />
 			</div>
 		</>
