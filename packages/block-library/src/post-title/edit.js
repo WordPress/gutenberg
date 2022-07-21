@@ -20,7 +20,8 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+import LevelControl from '../site-title/edit/level-toolbar';
+import LevelIcon from '../site-title/edit/level-icon';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostTitleEdit( {
@@ -102,8 +103,9 @@ export default function PostTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
+				<LevelControl
+					icon={ <LevelIcon level={ level } /> }
+					level={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
