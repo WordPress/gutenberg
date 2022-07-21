@@ -42,7 +42,7 @@ const ExampleComponent = () => {
 			'core/embed',
 			firstBlockAttributes
 		);
-	} );
+	}, [] );
 
 	return activeBlockVariation && activeBlockVariation.name === 'spotify' ? (
 		<p>{ __( 'Spotify variation' ) }</p>
@@ -74,8 +74,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const buttonBlockStyles = useSelect( ( select ) =>
-		select( blocksStore ).getBlockStyles( 'core/button' )
+	const buttonBlockStyles = useSelect(
+		( select ) => select( blocksStore ).getBlockStyles( 'core/button' ),
+		[]
 	);
 
 	return (
@@ -110,8 +111,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const paragraphBlockSupportValue = useSelect( ( select ) =>
-		select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' )
+	const paragraphBlockSupportValue = useSelect(
+		( select ) =>
+			select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' ),
+		[]
 	);
 
 	return (
@@ -225,8 +228,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const socialLinkVariations = useSelect( ( select ) =>
-		select( blocksStore ).getBlockVariations( 'core/social-link' )
+	const socialLinkVariations = useSelect(
+		( select ) =>
+			select( blocksStore ).getBlockVariations( 'core/social-link' ),
+		[]
 	);
 
 	return (
@@ -261,8 +266,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const blockCategories = useSelect( ( select ) =>
-		select( blocksStore ).getCategories()
+	const blockCategories = useSelect(
+		( select ) => select( blocksStore ).getCategories(),
+		[]
 	);
 
 	return (
@@ -294,8 +300,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const childBlockNames = useSelect( ( select ) =>
-		select( blocksStore ).getChildBlockNames( 'core/navigation' )
+	const childBlockNames = useSelect(
+		( select ) =>
+			select( blocksStore ).getChildBlockNames( 'core/navigation' ),
+		[]
 	);
 
 	return (
@@ -329,8 +337,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const blockCollections = useSelect( ( select ) =>
-		select( blocksStore ).getCollections()
+	const blockCollections = useSelect(
+		( select ) => select( blocksStore ).getCollections(),
+		[]
 	);
 
 	return (
@@ -364,8 +373,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const defaultBlockName = useSelect( ( select ) =>
-		select( blocksStore ).getDefaultBlockName()
+	const defaultBlockName = useSelect(
+		( select ) => select( blocksStore ).getDefaultBlockName(),
+		[]
 	);
 
 	return (
@@ -401,8 +411,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const defaultEmbedBlockVariation = useSelect( ( select ) =>
-		select( blocksStore ).getDefaultBlockVariation( 'core/embed' )
+	const defaultEmbedBlockVariation = useSelect(
+		( select ) =>
+			select( blocksStore ).getDefaultBlockVariation( 'core/embed' ),
+		[]
 	);
 
 	return (
@@ -440,8 +452,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const freeformFallbackBlockName = useSelect( ( select ) =>
-		select( blocksStore ).getFreeformFallbackBlockName()
+	const freeformFallbackBlockName = useSelect(
+		( select ) => select( blocksStore ).getFreeformFallbackBlockName(),
+		[]
 	);
 
 	return (
@@ -477,8 +490,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const groupingBlockName = useSelect( ( select ) =>
-		select( blocksStore ).getGroupingBlockName()
+	const groupingBlockName = useSelect(
+		( select ) => select( blocksStore ).getGroupingBlockName(),
+		[]
 	);
 
 	return (
@@ -514,8 +528,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const unregisteredFallbackBlockName = useSelect( ( select ) =>
-		select( blocksStore ).getUnregisteredFallbackBlockName()
+	const unregisteredFallbackBlockName = useSelect(
+		( select ) => select( blocksStore ).getUnregisteredFallbackBlockName(),
+		[]
 	);
 
 	return (
@@ -552,7 +567,8 @@ import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
     const paragraphBlockSupportClassName = useSelect( ( select ) =>
-        select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' )
+        select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' ),
+        []
     );
 
     return (
@@ -589,8 +605,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const navigationBlockHasChildBlocks = useSelect( ( select ) =>
-		select( blocksStore ).hasChildBlocks( 'core/navigation' )
+	const navigationBlockHasChildBlocks = useSelect(
+		( select ) => select( blocksStore ).hasChildBlocks( 'core/navigation' ),
+		[]
 	);
 
 	return (
@@ -629,7 +646,8 @@ const ExampleComponent = () => {
 		( select ) =>
 			select( blocksStore ).hasChildBlocksWithInserterSupport(
 				'core/navigation'
-			)
+			),
+		[]
 	);
 
 	return (
@@ -667,8 +685,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-	const blockNameIsFound = useSelect( ( select ) =>
-		select( blocksStore ).isMatchingSearchTerm( 'core/navigation' )
+	const blockNameIsFound = useSelect(
+		( select ) =>
+			select( blocksStore ).isMatchingSearchTerm( 'core/navigation' ),
+		[]
 	);
 
 	return (

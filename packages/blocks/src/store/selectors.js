@@ -120,7 +120,8 @@ export function getBlockType( state, name ) {
  *
  * const ExampleComponent = () => {
  *     const buttonBlockStyles = useSelect( ( select ) =>
- *         select( blocksStore ).getBlockStyles( 'core/button' )
+ *         select( blocksStore ).getBlockStyles( 'core/button' ),
+ *         []
  *     );
  *
  *     return (
@@ -154,7 +155,8 @@ export function getBlockStyles( state, name ) {
  *
  * const ExampleComponent = () => {
  *     const socialLinkVariations = useSelect( ( select ) =>
- *         select( blocksStore ).getBlockVariations( 'core/social-link' )
+ *         select( blocksStore ).getBlockVariations( 'core/social-link' ),
+ *         []
  *     );
  *
  *     return (
@@ -226,7 +228,7 @@ export const getBlockVariations = createSelector(
  *             'core/embed',
  *             firstBlockAttributes
  *         );
- *     } );
+ *     }, []);
  *
  *     return activeBlockVariation && activeBlockVariation.name === 'spotify' ? (
  *         <p>{ __( 'Spotify variation' ) }</p>
@@ -282,7 +284,8 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
  *
  * const ExampleComponent = () => {
  *     const defaultEmbedBlockVariation = useSelect( ( select ) =>
- *         select( blocksStore ).getDefaultBlockVariation( 'core/embed' )
+ *         select( blocksStore ).getDefaultBlockVariation( 'core/embed' ),
+ *         []
  *     );
  *
  *     return (
@@ -322,7 +325,8 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  *
  * const ExampleComponent = () => {
  *     const blockCategories = useSelect( ( select ) =>
- *         select( blocksStore ).getCategories()
+ *         select( blocksStore ).getCategories(),
+ *         []
  *     );
  *
  *     return (
@@ -353,7 +357,8 @@ export function getCategories( state ) {
  *
  * const ExampleComponent = () => {
  *     const blockCollections = useSelect( ( select ) =>
- *         select( blocksStore ).getCollections()
+ *         select( blocksStore ).getCollections(),
+ *         []
  *     );
  *
  *     return (
@@ -386,7 +391,8 @@ export function getCollections( state ) {
  *
  * const ExampleComponent = () => {
  *     const defaultBlockName = useSelect( ( select ) =>
- *         select( blocksStore ).getDefaultBlockName()
+ *         select( blocksStore ).getDefaultBlockName(),
+ *         []
  *     );
  *
  *     return (
@@ -418,7 +424,8 @@ export function getDefaultBlockName( state ) {
  *
  * const ExampleComponent = () => {
  *     const freeformFallbackBlockName = useSelect( ( select ) =>
- *         select( blocksStore ).getFreeformFallbackBlockName()
+ *         select( blocksStore ).getFreeformFallbackBlockName(),
+ *         []
  *     );
  *
  *     return (
@@ -453,7 +460,8 @@ export function getFreeformFallbackBlockName( state ) {
  *
  * const ExampleComponent = () => {
  *     const unregisteredFallbackBlockName = useSelect( ( select ) =>
- *         select( blocksStore ).getUnregisteredFallbackBlockName()
+ *         select( blocksStore ).getUnregisteredFallbackBlockName(),
+ *         []
  *     );
  *
  *     return (
@@ -488,7 +496,8 @@ export function getUnregisteredFallbackBlockName( state ) {
  *
  * const ExampleComponent = () => {
  *     const groupingBlockName = useSelect( ( select ) =>
- *         select( blocksStore ).getGroupingBlockName()
+ *         select( blocksStore ).getGroupingBlockName(),
+ *         []
  *     );
  *
  *     return (
@@ -523,7 +532,8 @@ export function getGroupingBlockName( state ) {
  *
  * const ExampleComponent = () => {
  *     const childBlockNames = useSelect( ( select ) =>
- *         select( blocksStore ).getChildBlockNames( 'core/navigation' )
+ *         select( blocksStore ).getChildBlockNames( 'core/navigation' ),
+ *         []
  *     );
  *
  *     return (
@@ -568,7 +578,8 @@ export const getChildBlockNames = createSelector(
  *
  * const ExampleComponent = () => {
  *     const paragraphBlockSupportValue = useSelect( ( select ) =>
- *         select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' )
+ *         select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' ),
+ *         []
  *     );
  *
  *     return (
@@ -615,7 +626,8 @@ export const getBlockSupport = (
  *
  * const ExampleComponent = () => {
  *     const paragraphBlockSupportClassName = useSelect( ( select ) =>
- *         select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' )
+ *         select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' ),
+ *         []
  *     );
  *
  *     return (
@@ -651,7 +663,8 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  *
  * const ExampleComponent = () => {
  *     const blockNameIsFound = useSelect( ( select ) =>
- *         select( blocksStore ).isMatchingSearchTerm( 'core/navigation' )
+ *         select( blocksStore ).isMatchingSearchTerm( 'core/navigation' ),
+ *         []
  *     );
  *
  *     return (
@@ -714,7 +727,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
  *
  * const ExampleComponent = () => {
  *     const navigationBlockHasChildBlocks = useSelect( ( select ) =>
- *         select( blocksStore ).hasChildBlocks( 'core/navigation' )
+ *         select( blocksStore ).hasChildBlocks( 'core/navigation' ),
+ *         []
  *     );
  *
  *     return (
@@ -750,7 +764,8 @@ export const hasChildBlocks = ( state, blockName ) => {
  *     const navigationBlockHasChildBlocksWithInserterSupport = useSelect( ( select ) =>
  *         select( blocksStore ).hasChildBlocksWithInserterSupport(
  *             'core/navigation'
- *         )
+ *         ),
+ *         []
  *     );
  *
  *     return (
