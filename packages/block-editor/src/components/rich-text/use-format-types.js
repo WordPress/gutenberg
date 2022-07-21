@@ -145,10 +145,11 @@ export function useFormatTypes( {
 					);
 			}
 
+			const selected = getPrefixedKeys( keyedSelected, type.name );
 			changeHandlers.push(
 				type.__experimentalCreateOnChangeEditableValue(
 					{
-						...( keyedSelected[ type.name ] || {} ),
+						...( typeof selected === 'object' ? selected : {} ),
 						...dispatchers,
 					},
 					{
