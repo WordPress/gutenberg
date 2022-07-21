@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import type { ComponentPropsWithRef, MouseEventHandler } from 'react';
+import type {
+	ComponentPropsWithRef,
+	MouseEventHandler,
+	ReactNode,
+} from 'react';
 
 type Messages = {
 	/**
@@ -165,6 +169,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
+	renderSuggestion?: ( suggestion: T ) => ReactNode;
 }
 
 export interface TokenProps extends TokenItem {
