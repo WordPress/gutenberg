@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	Button,
 	RangeControl,
@@ -46,9 +46,11 @@ export default function SpacingInputControl( {
 		? getSliderValueFromPreset( value, spacingSizes )
 		: getCustomValueFromPreset( value, spacingSizes );
 
-	const [ selectedUnit, setSelectedUnit ] = useState(
-		parseQuantityAndUnitFromRawValue( currentValue )[ 1 ] || units[ 0 ]
-	);
+	const selectedUnit =
+		useMemo(
+			() => parseQuantityAndUnitFromRawValue( currentValue ),
+			[ currentValue ]
+		)[ 1 ] || units[ 0 ].value;
 
 	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
 
@@ -73,10 +75,6 @@ export default function SpacingInputControl( {
 		onChange(
 			next !== undefined ? `${ next }${ selectedUnit }` : undefined
 		);
-	};
-
-	const handleOnUnitChange = ( unit ) => {
-		setSelectedUnit( unit );
 	};
 
 	const currentValueHint = customTooltipContent( currentValue );
@@ -130,7 +128,6 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
-						onUnitChange={ handleOnUnitChange }
 					/>
 
 					<RangeControl
