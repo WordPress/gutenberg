@@ -110,6 +110,10 @@ class WP_Style_Engine_CSS_Rule {
 	 * @return string
 	 */
 	public function get_css() {
-		return $this->get_selector() . ' {' . $this->declarations->get_declarations_string() . '}';
+		$styles = $this->declarations->get_declarations_string();
+		if ( empty( $styles ) ) {
+			return '';
+		}
+		return $this->get_selector() . ' {' . $styles . '}';
 	}
 }
