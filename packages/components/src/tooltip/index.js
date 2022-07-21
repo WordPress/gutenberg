@@ -13,8 +13,9 @@ import {
 	concatChildren,
 	useEffect,
 	useState,
+	useRef,
 } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,29 +32,45 @@ export const TOOLTIP_DELAY = 700;
 
 const eventCatcher = <div className="event-catcher" />;
 
-const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
-	cloneElement(
+const getDisabledElement = ( {
+	eventHandlers,
+	child,
+	childrenWithPopover,
+	mergedRefs,
+} ) => {
+	return cloneElement(
 		<span className="disabled-element-wrapper">
 			{ cloneElement( eventCatcher, eventHandlers ) }
 			{ cloneElement( child, {
 				children: childrenWithPopover,
+				ref: mergedRefs,
 			} ) }
 		</span>,
-		eventHandlers
+		{ ...eventHandlers }
 	);
+};
 
-const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
-	cloneElement( child, {
+const getRegularElement = ( {
+	child,
+	eventHandlers,
+	childrenWithPopover,
+	mergedRefs,
+} ) => {
+	return cloneElement( child, {
 		...eventHandlers,
 		children: childrenWithPopover,
+		ref: mergedRefs,
 	} );
+};
 
 const addPopoverToGrandchildren = ( {
+	anchorRef,
 	grandchildren,
 	isOver,
+	offset,
 	position,
-	text,
 	shortcut,
+	text,
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -64,7 +81,8 @@ const addPopoverToGrandchildren = ( {
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
-				offset={ 12 }
+				offset={ offset }
+				anchorRef={ anchorRef }
 				__unstableShift
 			>
 				{ text }
@@ -110,6 +128,13 @@ function Tooltip( props ) {
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+
+	// Create a reference to the Tooltip's child, to be passed to the Popover
+	// so that the Tooltip can be correctly positioned. Also, merge with the
+	// existing ref for the first child, so that its ref is preserved.
+	const childRef = useRef( null );
+	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
+	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
 
 	const createMouseDown = ( event ) => {
 		// Preserve original child callback behavior.
@@ -214,10 +239,12 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
+		anchorRef: childRef,
 		isOver,
+		offset: 4,
 		position,
-		text,
 		shortcut,
+		text,
 	};
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
@@ -228,6 +255,7 @@ function Tooltip( props ) {
 		child,
 		eventHandlers,
 		childrenWithPopover,
+		mergedRefs: mergedChildRefs,
 	} );
 }
 

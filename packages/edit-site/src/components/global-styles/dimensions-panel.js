@@ -6,10 +6,13 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
+	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalView as View,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
+import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,11 +22,27 @@ import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
 export function useHasDimensionsPanel( name ) {
+	const hasContentSize = useHasContentSize( name );
+	const hasWideSize = useHasWideSize( name );
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
 
-	return hasPadding || hasMargin || hasGap;
+	return hasContentSize || hasWideSize || hasPadding || hasMargin || hasGap;
+}
+
+function useHasContentSize( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'layout.contentSize', name );
+
+	return settings && supports.includes( 'contentSize' );
+}
+
+function useHasWideSize( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'layout.wideSize', name );
+
+	return settings && supports.includes( 'wideSize' );
 }
 
 function useHasPadding( name ) {
@@ -86,6 +105,8 @@ function splitStyleValue( value ) {
 }
 
 export default function DimensionsPanel( { name } ) {
+	const showContentSizeControl = useHasContentSize( name );
+	const showWideSizeControl = useHasWideSize( name );
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
@@ -98,6 +119,34 @@ export default function DimensionsPanel( { name } ) {
 			'vw',
 		],
 	} );
+
+	const [ contentSizeValue, setContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name
+	);
+
+	const [ userSetContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name,
+		'user'
+	);
+
+	const hasUserSetContentSizeValue = () => !! userSetContentSizeValue;
+	const resetContentSizeValue = () => setContentSizeValue( '' );
+
+	const [ wideSizeValue, setWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name
+	);
+
+	const [ userSetWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name,
+		'user'
+	);
+
+	const hasUserSetWideSizeValue = () => !! userSetWideSizeValue;
+	const resetWideSizeValue = () => setWideSizeValue( '' );
 
 	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
 	const paddingValues = splitStyleValue( rawPadding );
@@ -137,10 +186,67 @@ export default function DimensionsPanel( { name } ) {
 		resetPaddingValue();
 		resetMarginValue();
 		resetGapValue();
+		resetContentSizeValue();
+		resetWideSizeValue();
 	};
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+			{ ( showContentSizeControl || showWideSizeControl ) && (
+				<span className="span-columns">
+					{ __( 'Set the width of the main content area.' ) }
+				</span>
+			) }
+			{ showContentSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Content size' ) }
+					hasValue={ hasUserSetContentSizeValue }
+					onDeselect={ resetContentSizeValue }
+					isShownByDefault={ true }
+				>
+					<HStack alignment="flex-end">
+						<UnitControl
+							label={ __( 'Content' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ contentSizeValue || '' }
+							onChange={ ( nextContentSize ) => {
+								setContentSizeValue( nextContentSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ positionCenter } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
+			) }
+			{ showWideSizeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Wide size' ) }
+					hasValue={ hasUserSetWideSizeValue }
+					onDeselect={ resetWideSizeValue }
+					isShownByDefault={ true }
+				>
+					<HStack alignment="flex-end">
+						<UnitControl
+							label={ __( 'Wide' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ wideSizeValue || '' }
+							onChange={ ( nextWideSize ) => {
+								setWideSizeValue( nextWideSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ stretchWide } />
+						</View>
+					</HStack>
+				</ToolsPanelItem>
+			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }

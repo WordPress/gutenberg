@@ -6,8 +6,8 @@
  */
 
 class Override_Script_Test extends WP_UnitTestCase {
-	function setUp() {
-		parent::setUp();
+	function set_up() {
+		parent::set_up();
 
 		wp_register_script(
 			'gutenberg-dummy-script',
@@ -18,8 +18,8 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function tearDown() {
-		parent::tearDown();
+	function tear_down() {
+		parent::tear_down();
 
 		wp_deregister_script( 'gutenberg-dummy-script' );
 	}

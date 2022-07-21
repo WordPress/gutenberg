@@ -57,7 +57,7 @@ function Editor( {
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords } =
+			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
 				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -78,6 +78,7 @@ function Editor( {
 			const supportsTemplateMode =
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
+			const canEditTemplate = canUser( 'create', 'templates' );
 
 			return {
 				hasFixedToolbar:
@@ -96,7 +97,7 @@ function Editor( {
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				isTemplateMode: isEditingTemplate(),
 				template:
-					supportsTemplateMode && isViewable
+					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
