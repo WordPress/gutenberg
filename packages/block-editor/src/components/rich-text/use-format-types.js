@@ -38,7 +38,7 @@ function prefixSelectKeys( selected, prefix ) {
 	return mapKeys( selected, ( value, key ) => `${ prefix }.${ key }` );
 }
 
-function getPrefixedKeys( selected, prefix ) {
+function getPrefixedSelectKeys( selected, prefix ) {
 	if ( selected[ prefix ] ) return selected[ prefix ];
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
@@ -117,7 +117,7 @@ export function useFormatTypes( {
 	formatTypes.forEach( ( type ) => {
 		if ( type.__experimentalCreatePrepareEditableTree ) {
 			const handler = type.__experimentalCreatePrepareEditableTree(
-				getPrefixedKeys( keyedSelected, type.name ),
+				getPrefixedSelectKeys( keyedSelected, type.name ),
 				{
 					richTextIdentifier: identifier,
 					blockClientId: clientId,
@@ -145,7 +145,7 @@ export function useFormatTypes( {
 					);
 			}
 
-			const selected = getPrefixedKeys( keyedSelected, type.name );
+			const selected = getPrefixedSelectKeys( keyedSelected, type.name );
 			changeHandlers.push(
 				type.__experimentalCreateOnChangeEditableValue(
 					{
