@@ -7,10 +7,6 @@ $swatch-gap: 12px;
 	.block-editor-color-gradient-control__color-indicator {
 		margin-bottom: $grid-unit-15;
 	}
-
-	> .components-base-control__field {
-		margin-bottom: 0;
-	}
 }
 
 .block-editor-color-gradient-control__fieldset {
@@ -45,7 +41,7 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $grid-unit-20 * 2 ); // Ensure the popover perfectly wraps the swatches. 
+	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $grid-unit-20 * 2 ); // Ensure the popover perfectly wraps the swatches.
 	padding: $grid-unit-20;
 }
 
