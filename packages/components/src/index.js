@@ -91,6 +91,8 @@ export {
 	Item as __experimentalItem,
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
+export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';

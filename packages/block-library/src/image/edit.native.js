@@ -268,11 +268,15 @@ export class ImageEdit extends Component {
 	componentDidUpdate( previousProps ) {
 		const { image, attributes, setAttributes, featuredImageId } =
 			this.props;
+		const { url } = attributes;
 		if ( ! previousProps.image && image ) {
-			const url =
-				getUrlForSlug( image, attributes?.sizeSlug ) ||
-				image.source_url;
-			setAttributes( { url } );
+			if ( ! hasQueryArg( url, 'w' ) && attributes?.sizeSlug ) {
+				const updatedUrl =
+					getUrlForSlug( image, attributes.sizeSlug ) ||
+					image.source_url;
+
+				setAttributes( { url: updatedUrl } );
+			}
 		}
 
 		const { id } = attributes;
@@ -921,9 +925,10 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+		const image = shouldGetMedia ? getMedia( id ) : null;
 
 		return {
-			image: shouldGetMedia ? getMedia( id ) : null,
+			image,
 			imageSizes,
 			imageDefaultSize,
 			shouldUseFastImage,

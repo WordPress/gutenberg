@@ -119,7 +119,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		icon?: string;
 		/**
-		 * If no value exists this prop contains the slider starting position.
+		 * The slider starting position, used when no `value` is passed.
+		 * The `initialPosition` will be clamped between the provided `min`
+		 * and `max` prop values.
 		 */
 		initialPosition?: number;
 		/**
