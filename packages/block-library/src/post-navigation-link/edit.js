@@ -148,6 +148,7 @@ export default function PostNavigationLinkEdit( {
 				{ isNext && displayArrow && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
+						aria-hidden={ true }
 					>
 						{ displayArrow }
 					</span>
