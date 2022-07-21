@@ -45,9 +45,6 @@ export default function TemplatePartEdit( {
 	const templatePartId = createTemplatePartId( theme, slug );
 	const [ hasAlreadyRendered, RecursionProvider ] =
 		useNoRecursiveRenders( templatePartId );
-	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
-		useState( false );
-
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
@@ -82,6 +79,10 @@ export default function TemplatePartEdit( {
 		},
 		[ templatePartId, clientId ]
 	);
+
+	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
+		useState( ! slug && [ 'header', 'footer' ].includes( area ) );
+
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
