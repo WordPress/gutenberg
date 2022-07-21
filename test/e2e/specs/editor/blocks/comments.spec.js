@@ -18,6 +18,8 @@ test.use( {
 } );
 
 test.describe( 'Comments', () => {
+	let previousOptions;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -27,7 +29,7 @@ test.describe( 'Comments', () => {
 		// aren't exposed via the REST API, so we have to set them through the
 		// relevant wp-admin screen, which involves page utils; but those are
 		// prohibited from beforeAll/afterAll.
-		await commentsBlockUtils.setOptions( {
+		previousOptions = await commentsBlockUtils.setOptions( {
 			page_comments: '1',
 			comments_per_page: '1',
 			default_comments_page: 'newest',
@@ -35,7 +37,7 @@ test.describe( 'Comments', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils, commentsBlockUtils } ) => {
-		await commentsBlockUtils.restorePreviousOptions();
+		await commentsBlockUtils.setOptions( previousOptions );
 		await requestUtils.deleteAllComments();
 	} );
 
@@ -331,22 +333,23 @@ class CommentsBlockUtils {
 		this.page = page;
 		this.admin = admin;
 		this.requestUtils = requestUtils;
-		this.previousOptions = {};
 	}
 
+	/**
+	 * Sets a group of site options, from the options-general admin page.
+	 *
+	 * This is a temporary solution until we can handle options through the REST
+	 * API.
+	 *
+	 * @param {Record<string, string>} options Options in key-value format.
+	 * @return {Record<string, string>} Previous options.
+	 */
 	async setOptions( options ) {
+		const previousValues = {};
 		for ( const [ key, value ] of Object.entries( options ) ) {
-			const previousValue = await this.setOption( key, value );
-			if ( ! this.previousOptions[ key ] ) {
-				this.previousOptions[ key ] = previousValue;
-			}
+			previousValues[ key ] = await this.setOption( key, value );
 		}
-	}
-
-	async restorePreviousOptions() {
-		for ( const [ key, value ] of Object.entries( this.previousOptions ) ) {
-			await this.setOption( key, value );
-		}
+		return previousValues;
 	}
 
 	/**
