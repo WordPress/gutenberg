@@ -58,6 +58,7 @@ function ComboboxControl( {
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
+	renderOption,
 } ) {
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
@@ -279,6 +280,7 @@ function ComboboxControl( {
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
+							renderSuggestion={ renderOption }
 						/>
 					) }
 				</div>
