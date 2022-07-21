@@ -21,7 +21,8 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
-const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+const getFileArgsFromCLI = () =>
+	minimist( getArgsFromCLI(), { boolean: true } )._;
 
 const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();
