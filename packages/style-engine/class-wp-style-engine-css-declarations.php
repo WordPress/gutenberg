@@ -121,18 +121,17 @@ class WP_Style_Engine_CSS_Declarations {
 	public function get_declarations_string() {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
-		$add_whitespace      = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 
 		foreach ( $declarations_array as $property => $value ) {
 			$value = $this->sanitize_value( $value );
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
-				$declarations_output .= $add_whitespace ? "{$property}: {$value}; " : "{$property}:{$value};";
+				$declarations_output .= "{$property}:{$value};";
 				continue;
 			}
-			$filtered_declaration = safecss_filter_attr( $add_whitespace ? "{$property}: {$value}" : "{$property}:{$value}" );
+			$filtered_declaration = safecss_filter_attr( "{$property}:{$value}" );
 			if ( $filtered_declaration ) {
-				$declarations_output .= $add_whitespace ? $filtered_declaration . '; ' : $filtered_declaration . ';';
+				$declarations_output .= $filtered_declaration . ';';
 			}
 		}
 		return rtrim( $declarations_output );
