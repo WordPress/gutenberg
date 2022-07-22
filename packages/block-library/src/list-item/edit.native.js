@@ -48,12 +48,6 @@ export default function ListItemEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 	} );
-	const { color, backgroundColor, placeholderColor } = style;
-	const contentStyles = {
-		...( color && { color } ),
-		...( backgroundColor && { backgroundColor } ),
-		...( placeholderColor && { placeholderColor } ),
-	};
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
@@ -73,7 +67,7 @@ export default function ListItemEdit( {
 				onReplace={ ( blocks, ...args ) => {
 					onReplace( convertToListItems( blocks ), ...args );
 				} }
-				style={ contentStyles }
+				style={ style }
 			/>
 			<View { ...innerBlocksProps }>{ innerBlocksProps.children }</View>
 			<BlockControls group="block">
