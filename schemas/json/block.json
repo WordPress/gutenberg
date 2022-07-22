@@ -17,7 +17,7 @@
 		},
 		"apiVersion": {
 			"type": "integer",
-			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. The most recent version is 2 and it was introduced in WordPress 5.6.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"default": 1,
 			"enum": [ 1, 2 ]
 		},
@@ -211,7 +211,7 @@
 		},
 		"supports": {
 			"type": "object",
-			"description": "It contains as set of options to control features used in the editor. See the the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
+			"description": "It contains as set of options to control features used in the editor. See the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
 			"properties": {
 				"anchor": {
 					"type": "boolean",
@@ -416,7 +416,7 @@
 		},
 		"example": {
 			"type": "object",
-			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
+			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
 			"properties": {
 				"viewportWidth": {
 					"type": "number",
