@@ -18,10 +18,17 @@ function UnconnectedDropdownContentWrapper(
 	props: WordPressComponentProps< DropdownContentWrapperProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const derivedProps = useContextSystem( props, 'DropdownContentWrapper' );
+	const { paddingSize = 'small', ...derivedProps } = useContextSystem(
+		props,
+		'DropdownContentWrapper'
+	);
 
 	return (
-		<DropdownContentWrapperDiv { ...derivedProps } ref={ forwardedRef } />
+		<DropdownContentWrapperDiv
+			{ ...derivedProps }
+			paddingSize={ paddingSize }
+			ref={ forwardedRef }
+		/>
 	);
 }
 
