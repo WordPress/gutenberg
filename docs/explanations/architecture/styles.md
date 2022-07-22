@@ -4,17 +4,15 @@ This document introduces the main concepts related to styles that affect the use
 
 1. HTML and CSS
 2. Block styles
-
 -   From UI controls to HTML markup
 -   Block Supports API
 -   Current limits of the Block Supports API
-
 3. Global styles
-
 -   Gather data
 -   Consolidate data
 -   From data to styles
 -   Current limits of the Global styles API
+4. Structural layout styles
 
 ### HTML and CSS
 
@@ -498,3 +496,51 @@ Similarly to block supports, there can be only one instance of any style in use 
 4. **Only blocks using block supports are shown in the Global Styles UI**
 
 The global styles UI in the site editor has a screen for per-block styles. The list of blocks is generated dynamically using the block supports from the `block.json` of blocks. If a block wants to be listed there, it needs to use the block supports mechanism.
+
+### Structural layout styles
+
+In addition to styles at the individual block level and in global styles, there is the concept of Layout styles that are output for both blocks-based and classic themes.
+
+The Layout block support is an experimental approach for outputting common structural layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
+
+There are two primary places where Layout styles are output:
+
+1. Base layout styles
+
+Base layout styles are those styles that are common to all blocks that opt-in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type, such as Buttons and Social Icons.
+
+Base layout styles are output from within the main class that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
+
+Common layout definitions are stored in the core `theme.json` file, but are not intended to be extended or overridden by themes.
+
+2. Individual layout styles
+
+When a block that opts-in to the experimental Layout support is rendered, two things are processed and added to the output:
+
+- Semantic classnames are added to the block markup to indicate which Layout settings are in use. Examples include `is-layout-flow` for blocks (such as Group) that use the default/flow layout.
+- Individual styles are generated for unique Layout values that are set on the individual block being rendered. These styles are attached to the block via a container classname using the form `wp-container-$id` where the `$id` is a random/unique number.
+
+#### Available layout types
+
+There are currently two layout types in use:
+
+* Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
+* Flow: Items are displayed using a Flexbox layout. Spacing between children is handled via the `gap` CSS property.
+
+#### Targeting layout or container blocks from themes
+
+The Layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
+
+For themes that wish to target container blocks in order to add or adjust particular styles, the block's classname is often the best classname to use. Classnames such as `wp-block-group` or `wp-block-columns` are usually reliable classnames for targeting a particular block.
+
+For targeting a block that uses a particular Layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
+
+##### Semantic classnames
+
+Work is currently underway to introduce stable semantic classnames in Layout block output. The task is being discussed in [this issue](https://github.com/WordPress/gutenberg/issues/38719).
+
+Until the semantic classname naming structure has stabilised, consider the following classnames as unstable / likely to change:
+
+* `is-layout-flow`: Blocks that use the Default/Flow layout type.
+* `is-layout-flex`: Blocks that use the Flex layout type.
+* `wp-container-$id`: A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
