@@ -47,6 +47,16 @@ class WP_Style_Engine_CSS_Rules_Store {
 		}
 		return static::$stores[ $store_name ];
 	}
+
+	/**
+	 * Get an array of all available stores.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store[]
+	 */
+	public static function get_stores() {
+		return static::$stores;
+	}
+
 	/**
 	 * Get an array of all rules.
 	 *
