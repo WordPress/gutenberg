@@ -12,7 +12,7 @@ import {
 	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'autocomplete mentions', () => {
+describe( 'autocomplete', () => {
 	beforeAll( async () => {
 		await createUser( 'testuser', { firstName: 'Jane', lastName: 'Doe' } );
 		await activatePlugin( 'gutenberg-test-autocompleter' );
@@ -60,6 +60,21 @@ describe( 'autocomplete mentions', () => {
 		"<!-- wp:paragraph -->
 		<p>I am @testuser. I am eating an 🍎</p>
 		<!-- /wp:paragraph -->"
-	` );
+		` );
+	} );
+
+	it( 'should not insert disabled options', async () => {
+		await clickBlockAppender();
+		// The 'Grapes' option is disabled in our test plugin, so it should insert the grapes emoji
+		await page.keyboard.type( 'Sorry, we are all out of ~g' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' grapes.' );
+		// The characters that triggered the completer should remain (i.e. `~g`)
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>Sorry, we are all out of ~g grapes.</p>
+		<!-- /wp:paragraph -->"
+		` );
 	} );
 } );
