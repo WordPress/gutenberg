@@ -74,6 +74,7 @@ require __DIR__ . '/compat/wordpress-6.0/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
+require __DIR__ . '/compat/wordpress-6.0/edit-site-routes-backwards-compat.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
