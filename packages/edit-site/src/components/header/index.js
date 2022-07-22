@@ -218,11 +218,11 @@ export default function Header( {
 									icon={ external }
 								>
 									{ __( 'View Site' ) }
-									<VisuallyHidden as="span"> 
-										{ 
-											/* translators: accessibility text */ 
-											__( '(opens in a new tab)' ) 
-										} 
+									<VisuallyHidden as="span">
+										{
+											/* translators: accessibility text */
+											__( '(opens in a new tab)' )
+										}
 									</VisuallyHidden>
 								</MenuItem>
 							</MenuGroup>
