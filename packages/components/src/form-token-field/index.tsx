@@ -496,18 +496,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function getSelectedSuggestion() {
-		const matchingSuggestions = getMatchingSuggestions();
-
 		if ( selectedSuggestionIndex !== -1 ) {
-			return matchingSuggestions[ selectedSuggestionIndex ];
-		}
-
-		if (
-			matchingSuggestions.length > 0 &&
-			incompleteTokenValue.length > 0 &&
-			__experimentalAutoSelectFirstMatch
-		) {
-			return matchingSuggestions[ 0 ];
+			return getMatchingSuggestions()[ selectedSuggestionIndex ];
 		}
 
 		return undefined;
@@ -543,8 +533,17 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		);
 
 		if ( resetSelectedSuggestion ) {
-			setSelectedSuggestionIndex( -1 );
-			setSelectedSuggestionScroll( false );
+			if (
+				__experimentalAutoSelectFirstMatch &&
+				inputHasMinimumChars &&
+				hasMatchingSuggestions
+			) {
+				setSelectedSuggestionIndex( 0 );
+				setSelectedSuggestionScroll( true );
+			} else {
+				setSelectedSuggestionIndex( -1 );
+				setSelectedSuggestionScroll( false );
+			}
 		}
 
 		if ( inputHasMinimumChars ) {
