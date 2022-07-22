@@ -18,7 +18,7 @@ function block_query_title_filter_archive_title( $title ) {
 	} elseif ( is_tag() ) {
 		$title = single_tag_title( '', false );
 	} elseif ( is_author() ) {
-		$title = '<span class="vcard">' . get_the_author() . '</span>';
+		$title = get_the_author();
 	} elseif ( is_post_type_archive() ) {
 		$title = post_type_archive_title( '', false );
 	} elseif ( is_tax() ) {
@@ -53,7 +53,6 @@ function render_block_core_query_title( $attributes ) {
 		} else {
 			$title = get_the_archive_title();
 		}
-		
 	}
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
