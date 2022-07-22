@@ -868,6 +868,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$store->add_rule( 'body' )->add_declarations( array( 'margin' => '0' ) );
 		}
 
+		// 2. Generate and append the rules that use the general selector.
 		$store->add_rule( $selector )->add_declarations( $this->get_plain_declarations_from_pairs( $declarations ) );
 
 		// 3. Generate and append the rules that use the duotone selector.
