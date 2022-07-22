@@ -79,15 +79,20 @@ export default function useMerge( clientId ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
-	function switchToDefaultBlockType() {
+	function switchToDefaultBlockType( forward ) {
 		const rootClientId = getBlockRootClientId( clientId );
 		const replacement = switchToBlockType(
 			getBlock( rootClientId ),
 			getDefaultBlockName()
 		);
+		const indexToSelect = forward ? replacement.length - 1 : 0;
+		const initialPosition = forward ? -1 : 0;
 		registry.batch( () => {
 			replaceBlock( rootClientId, replacement );
-			selectBlock( replacement[ 0 ].clientId );
+			selectBlock(
+				replacement[ indexToSelect ].clientId,
+				initialPosition
+			);
 		} );
 	}
 
@@ -96,7 +101,7 @@ export default function useMerge( clientId ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
-				switchToDefaultBlockType();
+				switchToDefaultBlockType( forward );
 				return;
 			}
 
@@ -129,7 +134,7 @@ export default function useMerge( clientId ) {
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {
-				switchToDefaultBlockType();
+				switchToDefaultBlockType( forward );
 			}
 		}
 	};
