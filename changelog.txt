@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 13.7.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- Layout: Add not .alignfull rule from root CSS PR. ([42614](https://github.com/WordPress/gutenberg/pull/42614))
+
+
 = 13.7.1 =
 
 ## Changelog
