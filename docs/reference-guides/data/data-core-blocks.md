@@ -775,7 +775,9 @@ const ExampleComponent = () => {
 				] )
 			}
 		>
-			{ __( 'Add my custom block type' ) }
+			{ __(
+				'Add my custom block type to the list of registered blocks'
+			) }
 		</Button>
 	);
 };
@@ -783,7 +785,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _blockTypes_ `WPBlockType[]`: Block types received.
+-   _blockTypes_ `WPBlockType|WPBlockType[]`: Object or array of objects representing blocks to added.
 
 _Returns_
 
@@ -831,9 +833,34 @@ _Returns_
 
 Returns an action object used to remove a registered block type.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { removeBlockTypes } = useDispatch( blocksStore );
+
+	return (
+		<Button
+			onClick={ () =>
+				removeBlockTypes( [ 'core/cover', 'core/heading' ] )
+			}
+		>
+			{ __(
+				'Remove Cover and Heading blocks from the list of registered blocks'
+			) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
--   _names_ `string|Array`: Block name.
+-   _names_ `string|string[]`: Block name or array of block names to be removed.
 
 _Returns_
 

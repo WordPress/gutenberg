@@ -144,7 +144,7 @@ const processBlockType = ( blockType, { select } ) => {
 /**
  * Returns an action object used in signalling that block types have been added.
  *
- * @param {WPBlockType[]} blockTypes Block types received.
+ * @param {WPBlockType|WPBlockType[]} blockTypes Object or array of objects representing blocks to added.
  *
  * @example
  * ```js
@@ -170,7 +170,7 @@ const processBlockType = ( blockType, { select } ) => {
  *                 ] )
  *             }
  *         >
- *             { __( 'Add my custom block type' ) }
+ *             { __( 'Add my custom block type to the list of registered blocks' ) }
  *     </Button>
  *     );
  * };
@@ -249,7 +249,31 @@ export const __experimentalReapplyBlockTypeFilters =
 /**
  * Returns an action object used to remove a registered block type.
  *
- * @param {string|Array} names Block name.
+ * @param {string|string[]} names Block name or array of block names to be removed.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { removeBlockTypes } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 removeBlockTypes( [ 'core/cover', 'core/heading' ] )
+ *             }
+ *         >
+ *             { __(
+ *                 'Remove Cover and Heading blocks from the list of registered blocks'
+ *             ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
