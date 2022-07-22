@@ -6,6 +6,7 @@ import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { isAppleOS } from '@wordpress/keycodes';
 
 function EditorKeyboardShortcutsRegister() {
 	// Registering the shortcuts.
@@ -39,6 +40,16 @@ function EditorKeyboardShortcutsRegister() {
 				modifier: 'primaryShift',
 				character: 'z',
 			},
+			// Disable on Apple OS because it conflict's with the browser
+			// history shortcut.
+			aliases: isAppleOS()
+				? []
+				: [
+						{
+							modifier: 'primary',
+							character: 'y',
+						},
+				  ],
 		} );
 	}, [ registerShortcut ] );
 
