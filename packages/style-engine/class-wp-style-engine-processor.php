@@ -56,7 +56,7 @@ class WP_Style_Engine_Processor {
 				$this->store->remove_rule( $rule->get_selector() );
 			}
 		}
-		return trim( $css );
+		return $css;
 	}
 
 	/**

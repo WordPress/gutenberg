@@ -58,7 +58,7 @@ class WP_Style_Engine_CSS_Declarations {
 		}
 
 		// Trim the value. If empty, bail early.
-		$value = trim( $value );
+		$value = $this->sanitize_value( $value );
 		if ( '' === $value ) {
 			return;
 		}
@@ -123,7 +123,6 @@ class WP_Style_Engine_CSS_Declarations {
 		$declarations_output = '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			$value = $this->sanitize_value( $value );
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
 				$declarations_output .= "{$property}:{$value};";
@@ -134,7 +133,7 @@ class WP_Style_Engine_CSS_Declarations {
 				$declarations_output .= $filtered_declaration . ';';
 			}
 		}
-		return rtrim( $declarations_output );
+		return $declarations_output;
 	}
 
 	/**
@@ -160,6 +159,6 @@ class WP_Style_Engine_CSS_Declarations {
 		$value = esc_html( $value );
 		// Fix quotes to account for URLs.
 		$value = str_replace( array( '&#039;', '&#39;', '&#034;', '&#34;', '&quot;', '&apos;' ), array( "'", "'", '"', '"', '"', "'" ), $value );
-		return $value;
+		return trim( $value );
 	}
 }
