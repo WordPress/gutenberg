@@ -122,6 +122,7 @@ class WP_Style_Engine_CSS_Declarations {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
 		foreach ( $declarations_array as $property => $value ) {
+			$value = $this->sanitize_value( $value );
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
 				$declarations_output .= "{$property}: {$value};";
@@ -144,5 +145,20 @@ class WP_Style_Engine_CSS_Declarations {
 	 */
 	protected function sanitize_property( $property ) {
 		return sanitize_key( $property );
+	}
+
+	/**
+	 * Sanitize values.
+	 *
+	 * @param string $value The CSS value.
+	 *
+	 * @return string The sanitized value.
+	 */
+	protected function sanitize_value( $value ) {
+		// Escape HTML.
+		$value = esc_html( $value );
+		// Decode HTML entities for quotes only to account for URLs.
+		$value = html_entity_decode( $value, ENT_QUOTES, 'UTF-8' );
+		return $value;
 	}
 }
