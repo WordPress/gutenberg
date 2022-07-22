@@ -123,7 +123,7 @@ class WP_Style_Engine_CSS_Declarations {
 		$declarations_output = '';
 		foreach ( $declarations_array as $property => $value ) {
 			// Account for CSS variables.
-			if ( 0 === strpos( $property, '--' ) ) {
+			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
 				$declarations_output .= "{$property}: {$value};";
 				continue;
 			}
