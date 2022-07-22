@@ -79,7 +79,7 @@ export default function useMerge( clientId ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
-	function deleteList() {
+	function switchToDefaultBlockType() {
 		const rootClientId = getBlockRootClientId( clientId );
 		const replacement = switchToBlockType(
 			getBlock( rootClientId ),
@@ -96,7 +96,7 @@ export default function useMerge( clientId ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
-				deleteList();
+				switchToDefaultBlockType();
 				return;
 			}
 
@@ -129,7 +129,7 @@ export default function useMerge( clientId ) {
 					mergeBlocks( trailingId, clientId );
 				} );
 			} else {
-				deleteList();
+				switchToDefaultBlockType();
 			}
 		}
 	};
