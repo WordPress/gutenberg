@@ -126,8 +126,8 @@ export const UnitSelect = styled.select< SelectProps >`
 
 		&:focus {
 			border: 1px solid ${ COLORS.ui.borderFocus };
-			box-shadow: inset 0 0 0 ${ CONFIG.borderWidth }
-				${ COLORS.ui.borderFocus };
+			box-shadow: inset 0 0 0
+				${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
 			outline-offset: 0;
 			outline: 2px solid transparent;
 			z-index: 1;
