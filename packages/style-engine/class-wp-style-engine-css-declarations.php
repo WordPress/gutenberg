@@ -158,7 +158,7 @@ class WP_Style_Engine_CSS_Declarations {
 		// Escape HTML.
 		$value = esc_html( $value );
 		// Fix quotes to account for URLs.
-		$value = str_replace( array( '&#039;', '&#39;', '&#034;', '&#34;' ), array( "'", "'", '"', '"' ), $value );
+		$value = str_replace( array( '&#039;', '&#39;', '&#034;', '&#34;', '&quot;', '&apos;' ), array( "'", "'", '"', '"', '"', "'" ), $value );
 		return $value;
 	}
 }
