@@ -15,6 +15,7 @@ import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 /** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 const { error, warn } = window.console;
@@ -143,7 +144,37 @@ const processBlockType = ( blockType, { select } ) => {
 /**
  * Returns an action object used in signalling that block types have been added.
  *
- * @param {Array|Object} blockTypes Block types received.
+ * @param {WPBlockType[]} blockTypes Block types received.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { addBlockTypes } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 addBlockTypes( [
+ *                     {
+ *                         name: 'custom/block',
+ *                         title: __( 'My Custom Block' ),
+ *                         edit: () => (
+ *                             <div>{ __( 'Hello from a custom block!' ) }</div>
+ *                         ),
+ *                     },
+ *                 ] )
+ *             }
+ *         >
+ *             { __( 'Add my custom block type' ) }
+ *     </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */

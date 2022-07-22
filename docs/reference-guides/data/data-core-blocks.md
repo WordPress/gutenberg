@@ -750,9 +750,40 @@ _Returns_
 
 Returns an action object used in signalling that block types have been added.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { addBlockTypes } = useDispatch( blocksStore );
+
+	return (
+		<Button
+			onClick={ () =>
+				addBlockTypes( [
+					{
+						name: 'custom/block',
+						title: __( 'My Custom Block' ),
+						edit: () => (
+							<div>{ __( 'Hello from a custom block!' ) }</div>
+						),
+					},
+				] )
+			}
+		>
+			{ __( 'Add my custom block type' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
--   _blockTypes_ `Array|Object`: Block types received.
+-   _blockTypes_ `WPBlockType[]`: Block types received.
 
 _Returns_
 
