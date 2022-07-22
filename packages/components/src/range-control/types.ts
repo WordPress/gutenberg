@@ -88,7 +88,7 @@ export type RangeControlProps< IconProps = unknown > = Pick<
 		 */
 		afterIcon?: IconType< IconProps >;
 		/**
-		 * If this property is true, a button to reset the the slider is
+		 * If this property is true, a button to reset the slider is
 		 * rendered.
 		 *
 		 * @default false

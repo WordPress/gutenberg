@@ -175,7 +175,7 @@ function Tooltip( props ) {
 			// Mouse events behave unreliably in React for disabled elements,
 			// firing on mouseenter but not mouseleave.  Further, the default
 			// behavior for disabled elements in some browsers is to ignore
-			// mouse events. Don't bother trying to to handle them.
+			// mouse events. Don't bother trying to handle them.
 			//
 			// See: https://github.com/facebook/react/issues/4251
 			if ( event.currentTarget.disabled ) {
