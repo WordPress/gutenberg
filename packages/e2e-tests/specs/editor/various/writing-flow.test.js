@@ -282,7 +282,7 @@ describe( 'Writing Flow', () => {
 	} );
 
 	it( 'should not create extra line breaks in multiline value', async () => {
-		await insertBlock( 'Quote' );
+		await insertBlock( 'List' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -752,5 +752,78 @@ describe( 'Writing Flow', () => {
 			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
 		);
 		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
+	} );
+
+	it( 'should move to the start of the first line on ArrowUp', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await page.evaluate(
+				() => document.activeElement.offsetHeight
+			);
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Move to the start of the second line.
+		await page.keyboard.press( 'ArrowLeft' );
+		// Move to the start of the first line.
+		await page.keyboard.press( 'ArrowUp' );
+		// Insert a "." for testing.
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the paragraph.
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			)
+		).toBe( 'core/paragraph' );
+		expect(
+			await page.evaluate( () => document.activeElement.textContent )
+		).toMatch( /^\.a+$/ );
+	} );
+
+	it( 'should vertically move the caret from corner to corner', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await page.evaluate(
+				() => document.activeElement.offsetHeight
+			);
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+		// Move to the start of the first line.
+		await page.keyboard.press( 'ArrowUp' );
+		// Insert a "." for testing.
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the second line.
+		// It should not be added to the first line!
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'data-type' )
+			)
+		).toBe( 'core/paragraph' );
+		expect(
+			await page.evaluate( () => document.activeElement.textContent )
+		).toMatch( /^a+\.a$/ );
 	} );
 } );

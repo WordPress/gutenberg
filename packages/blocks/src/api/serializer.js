@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, castArray, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -142,7 +142,8 @@ export function getSaveElement(
 	let element = save( { attributes, innerBlocks } );
 
 	if (
-		isObject( element ) &&
+		element !== null &&
+		typeof element === 'object' &&
 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
 		! ( blockType.apiVersion > 1 )
 	) {

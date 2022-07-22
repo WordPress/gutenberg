@@ -39,6 +39,11 @@ const labelStyles = css`
 
 export const StyledLabel = styled.label`
 	${ labelStyles }
+	/**
+	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
+	 * StyledLabel when it is rendered as a legend.
+	 */
+	padding: 0;
 `;
 
 const deprecatedMarginHelp = ( { __nextHasNoMarginBottom = false } ) => {

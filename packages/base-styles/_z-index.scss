@@ -18,6 +18,7 @@ $z-layers: (
 	".block-editor-inserter__tabs .components-tab-panel__tab-content": 0, // lower scrolling content
 	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
 	".block-editor-inserter__search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 1, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -139,6 +140,7 @@ $z-layers: (
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
+	".block-editor-template-part__selection-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.

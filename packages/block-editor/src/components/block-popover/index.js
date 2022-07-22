@@ -57,7 +57,7 @@ export default function BlockPopover( {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			// Render in the old slot if needed for backward compatibility,
-			// otherwise render in place (not in the the default popover slot).
+			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ selectedElement }
