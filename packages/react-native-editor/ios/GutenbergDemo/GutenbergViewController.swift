@@ -306,8 +306,8 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
-    func gutenbergHostAppNamespace() -> String? {
-        return nil
+    func gutenbergHostAppNamespace() -> String {
+        return "WordPress"
     }
 
     func gutenbergFeaturedImageId() -> NSNumber? {
