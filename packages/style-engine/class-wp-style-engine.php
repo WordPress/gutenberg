@@ -436,7 +436,7 @@ class WP_Style_Engine {
 			$styles_output['declarations'] = $css_declarations->get_declarations();
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
-				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
+				$styles_output['css'] = $css_selector . '{' . $css . '}';
 			}
 		}
 
