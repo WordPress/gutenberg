@@ -171,6 +171,8 @@ export const resetButton = css`
 	/* Override button component styling */
 	&& {
 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
 		height: 46px;
 	}
 `;
