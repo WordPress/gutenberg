@@ -125,7 +125,7 @@ class WP_Style_Engine_CSS_Declarations {
 			$value = $this->sanitize_value( $value );
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
-				$declarations_output .= "{$property}: {$value};";
+				$declarations_output .= "{$property}: {$value}; ";
 				continue;
 			}
 			$filtered_declaration = safecss_filter_attr( "{$property}: {$value}" );
