@@ -24,22 +24,22 @@ export default function useMerge( clientId ) {
 		useDispatch( blockEditorStore );
 	const [ , outdentListItem ] = useOutdentListItem( clientId );
 
-	function getTrailing( id ) {
+	function getTrailingId( id ) {
 		const order = getBlockOrder( id );
 
 		if ( ! order.length ) {
 			return id;
 		}
 
-		return getTrailing( order[ order.length - 1 ] );
+		return getTrailingId( order[ order.length - 1 ] );
 	}
 
-	function getParentListItem( id ) {
+	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
-		const parentListItem = getBlockRootClientId( listId );
-		if ( ! parentListItem ) return;
-		if ( getBlockName( parentListItem ) !== listItemName ) return;
-		return parentListItem;
+		const parentListItemId = getBlockRootClientId( listId );
+		if ( ! parentListItemId ) return;
+		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		return parentListItemId;
 	}
 
 	/**
@@ -49,12 +49,12 @@ export default function useMerge( clientId ) {
 	 * @param {string} id A list item client ID.
 	 * @return {string?} The client ID of the next list item.
 	 */
-	function _getNext( id ) {
+	function _getNextId( id ) {
 		const next = getNextBlockClientId( id );
 		if ( next ) return next;
-		const parentListItem = getParentListItem( id );
-		if ( ! parentListItem ) return;
-		return _getNext( parentListItem );
+		const parentListItemId = getParentListItemId( id );
+		if ( ! parentListItemId ) return;
+		return _getNextId( parentListItemId );
 	}
 
 	/**
@@ -64,13 +64,13 @@ export default function useMerge( clientId ) {
 	 * @param {string} id The client ID of the current list item.
 	 * @return {string?} The client ID of the next list item.
 	 */
-	function getNext( id ) {
+	function getNextId( id ) {
 		const order = getBlockOrder( id );
 
 		// If the list item does not have a nested list, return the next list
 		// item.
 		if ( ! order.length ) {
-			return _getNext( id );
+			return _getNextId( id );
 		}
 
 		// Get the first list item in the nested list.
@@ -79,9 +79,9 @@ export default function useMerge( clientId ) {
 
 	return ( forward ) => {
 		if ( forward ) {
-			const nextBlockClientId = getNext( clientId );
+			const nextBlockClientId = getNextId( clientId );
 			if ( ! nextBlockClientId ) return;
-			if ( getParentListItem( nextBlockClientId ) ) {
+			if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
 			} else {
 				registry.batch( () => {
@@ -97,17 +97,17 @@ export default function useMerge( clientId ) {
 			// Merging is only done from the top level. For lowel levels, the
 			// list item is outdented instead.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
-			if ( getParentListItem( clientId ) ) {
+			if ( getParentListItemId( clientId ) ) {
 				outdentListItem( clientId );
 			} else if ( previousBlockClientId ) {
-				const trailingClientId = getTrailing( previousBlockClientId );
+				const trailingId = getTrailingId( previousBlockClientId );
 				registry.batch( () => {
 					moveBlocksToPosition(
 						getBlockOrder( clientId ),
 						clientId,
 						previousBlockClientId
 					);
-					mergeBlocks( trailingClientId, clientId );
+					mergeBlocks( trailingId, clientId );
 				} );
 			}
 		}

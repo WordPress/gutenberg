@@ -46,12 +46,12 @@ export default function useOutdentListItem( clientId ) {
 		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 
-	function getParentListItem( id ) {
+	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
-		const parentListItem = getBlockRootClientId( listId );
-		if ( ! parentListItem ) return;
-		if ( getBlockName( parentListItem ) !== listItemName ) return;
-		return parentListItem;
+		const parentListItemId = getBlockRootClientId( listId );
+		if ( ! parentListItemId ) return;
+		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		return parentListItemId;
 	}
 
 	return [
@@ -66,52 +66,52 @@ export default function useOutdentListItem( clientId ) {
 			// Can't outdent if it's not a list item.
 			if ( getBlockName( firstClientId ) !== listItemName ) return;
 
-			const parentListItem = getParentListItem( firstClientId );
+			const parentListItemId = getParentListItemId( firstClientId );
 
 			// Can't outdent if it's at the top level.
-			if ( ! parentListItem ) return;
+			if ( ! parentListItemId ) return;
 
-			const parentList = getBlockRootClientId( firstClientId );
+			const parentListId = getBlockRootClientId( firstClientId );
 			const lastClientId = last( clientIds );
-			const order = getBlockOrder( parentList );
+			const order = getBlockOrder( parentListId );
 			const followingListItems = order.slice(
 				getBlockIndex( lastClientId ) + 1
 			);
 
 			registry.batch( () => {
 				if ( followingListItems.length ) {
-					let nestedList = first( getBlockOrder( firstClientId ) );
+					let nestedListId = first( getBlockOrder( firstClientId ) );
 
-					if ( ! nestedList ) {
+					if ( ! nestedListId ) {
 						const nestedListBlock = cloneBlock(
-							getBlock( parentList ),
+							getBlock( parentListId ),
 							{},
 							[]
 						);
-						nestedList = nestedListBlock.clientId;
+						nestedListId = nestedListBlock.clientId;
 						insertBlock( nestedListBlock, 0, firstClientId, false );
 						// Immediately update the block list settings, otherwise
 						// blocks can't be moved here due to canInsert checks.
 						updateBlockListSettings(
-							nestedList,
-							getBlockListSettings( parentList )
+							nestedListId,
+							getBlockListSettings( parentListId )
 						);
 					}
 
 					moveBlocksToPosition(
 						followingListItems,
-						parentList,
-						nestedList
+						parentListId,
+						nestedListId
 					);
 				}
 				moveBlocksToPosition(
 					clientIds,
-					parentList,
-					getBlockRootClientId( parentListItem ),
-					getBlockIndex( parentListItem ) + 1
+					parentListId,
+					getBlockRootClientId( parentListItemId ),
+					getBlockIndex( parentListItemId ) + 1
 				);
-				if ( ! getBlockOrder( parentList ).length ) {
-					removeBlock( parentList );
+				if ( ! getBlockOrder( parentListId ).length ) {
+					removeBlock( parentListId );
 				}
 			} );
 		}, [] ),
