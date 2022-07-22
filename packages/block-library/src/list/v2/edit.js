@@ -24,7 +24,8 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, Platform } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -132,10 +133,14 @@ function Edit( { attributes, setAttributes, clientId } ) {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
+		...( Platform.isNative && { marginVertical: 8, marginHorizontal: 8 } ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, reversed, start } = attributes;
-	const TagName = ordered ? 'ol' : 'ul';
+	const TagName = Platform.select( {
+		web: ordered ? 'ol' : 'ul',
+		native: View,
+	} );
 
 	const controls = (
 		<BlockControls group="block">
