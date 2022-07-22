@@ -19,6 +19,35 @@ In case of function type, the function should accept a block's attributes
 and the variation's attributes and determines if a variation is active.
 A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	// This example assumes that a core/embed block is the first block in the Block Editor.
+	const activeBlockVariation = useSelect( ( select ) => {
+		// Retrieve the list of blocks.
+		const [ firstBlock ] = select( blockEditorStore ).getBlocks();
+
+		// Return the active block variation for the first block.
+		return select( blocksStore ).getActiveBlockVariation(
+			firstBlock.name,
+			firstBlock.attributes
+		);
+	}, [] );
+
+	return activeBlockVariation && activeBlockVariation.name === 'spotify' ? (
+		<p>{ __( 'Spotify variation' ) }</p>
+	) : (
+		<p>{ __( 'Other variation' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -34,6 +63,29 @@ _Returns_
 
 Returns block styles by block name.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const buttonBlockStyles = useSelect(
+		( select ) => select( blocksStore ).getBlockStyles( 'core/button' ),
+		[]
+	);
+
+	return (
+		<ul>
+			{ buttonBlockStyles &&
+				buttonBlockStyles.map( ( style ) => (
+					<li key={ style.name }>{ style.label }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -46,6 +98,31 @@ _Returns_
 ### getBlockSupport
 
 Returns the block support value for a feature, if defined.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const paragraphBlockSupportValue = useSelect(
+		( select ) =>
+			select( blocksStore ).getBlockSupport( 'core/paragraph', 'anchor' ),
+		[]
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__( 'core/paragraph supports.anchor value: %s' ),
+				paragraphBlockSupportValue
+			) }
+		</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -62,6 +139,37 @@ _Returns_
 
 Returns a block type by name.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const paragraphBlock = useSelect(
+		( select ) => ( select ) =>
+			select( blocksStore ).getBlockType( 'core/paragraph' ),
+		[]
+	);
+
+	return (
+		<ul>
+			{ paragraphBlock &&
+				Object.entries( paragraphBlock.supports ).map(
+					( blockSupportsEntry ) => {
+						const [ propertyName, value ] = blockSupportsEntry;
+						return (
+							<li
+								key={ propertyName }
+							>{ `${ propertyName } : ${ value }` }</li>
+						);
+					}
+				) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -75,6 +183,28 @@ _Returns_
 
 Returns all the available block types.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+
+	return (
+		<ul>
+			{ blockTypes.map( ( block ) => (
+				<li key={ block.name }>{ block.title }</li>
+			) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -86,6 +216,30 @@ _Returns_
 ### getBlockVariations
 
 Returns block variations by block name.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const socialLinkVariations = useSelect(
+		( select ) =>
+			select( blocksStore ).getBlockVariations( 'core/social-link' ),
+		[]
+	);
+
+	return (
+		<ul>
+			{ socialLinkVariations &&
+				socialLinkVariations.map( ( variation ) => (
+					<li key={ variation.name }>{ variation.title }</li>
+				) ) }
+		</ul>
+	);
+};
+```
 
 _Parameters_
 
@@ -99,7 +253,29 @@ _Returns_
 
 ### getCategories
 
-Returns all the available categories.
+Returns all the available block categories.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockCategories = useSelect(
+		( select ) => select( blocksStore ).getCategories(),
+		[]
+	);
+
+	return (
+		<ul>
+			{ blockCategories.map( ( category ) => (
+				<li key={ category.slug }>{ category.title }</li>
+			) ) }
+		</ul>
+	);
+};
+```
 
 _Parameters_
 
@@ -112,6 +288,30 @@ _Returns_
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const childBlockNames = useSelect(
+		( select ) =>
+			select( blocksStore ).getChildBlockNames( 'core/navigation' ),
+		[]
+	);
+
+	return (
+		<ul>
+			{ childBlockNames &&
+				childBlockNames.map( ( child ) => (
+					<li key={ child }>{ child }</li>
+				) ) }
+		</ul>
+	);
+};
+```
 
 _Parameters_
 
@@ -126,6 +326,29 @@ _Returns_
 
 Returns all the available collections.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockCollections = useSelect(
+		( select ) => select( blocksStore ).getCollections(),
+		[]
+	);
+
+	return (
+		<ul>
+			{ Object.values( blockCollections ).length > 0 &&
+				Object.values( blockCollections ).map( ( collection ) => (
+					<li key={ collection.title }>{ collection.title }</li>
+				) ) }
+		</ul>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -137,6 +360,29 @@ _Returns_
 ### getDefaultBlockName
 
 Returns the name of the default block name.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const defaultBlockName = useSelect(
+		( select ) => select( blocksStore ).getDefaultBlockName(),
+		[]
+	);
+
+	return (
+		defaultBlockName && (
+			<p>
+				{ sprintf( __( 'Default block name: %s' ), defaultBlockName ) }
+			</p>
+		)
+	);
+};
+```
 
 _Parameters_
 
@@ -153,6 +399,33 @@ When there are multiple variations annotated as the default one,
 the last added item is picked. This simplifies registering overrides.
 When there is no default variation set, it returns the first item.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const defaultEmbedBlockVariation = useSelect(
+		( select ) =>
+			select( blocksStore ).getDefaultBlockVariation( 'core/embed' ),
+		[]
+	);
+
+	return (
+		defaultEmbedBlockVariation && (
+			<p>
+				{ sprintf(
+					__( 'core/embed default variation: %s' ),
+					defaultEmbedBlockVariation.title
+				) }
+			</p>
+		)
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -167,6 +440,32 @@ _Returns_
 
 Returns the name of the block for handling non-block content.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const freeformFallbackBlockName = useSelect(
+		( select ) => select( blocksStore ).getFreeformFallbackBlockName(),
+		[]
+	);
+
+	return (
+		freeformFallbackBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Freeform fallback block name: %s' ),
+					freeformFallbackBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -177,7 +476,33 @@ _Returns_
 
 ### getGroupingBlockName
 
-Returns the name of the block for handling unregistered blocks.
+Returns the name of the block for handling the grouping of blocks.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const groupingBlockName = useSelect(
+		( select ) => select( blocksStore ).getGroupingBlockName(),
+		[]
+	);
+
+	return (
+		groupingBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Default grouping block name: %s' ),
+					groupingBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
 
 _Parameters_
 
@@ -185,11 +510,37 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Name of the block for handling unregistered blocks.
+-   `string?`: Name of the block for handling the grouping of blocks.
 
 ### getUnregisteredFallbackBlockName
 
 Returns the name of the block for handling unregistered blocks.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const unregisteredFallbackBlockName = useSelect(
+		( select ) => select( blocksStore ).getUnregisteredFallbackBlockName(),
+		[]
+	);
+
+	return (
+		unregisteredFallbackBlockName && (
+			<p>
+				{ sprintf(
+					__( 'Unregistered fallback block name: %s' ),
+					unregisteredFallbackBlockName
+				) }
+			</p>
+		)
+	);
+};
+```
 
 _Parameters_
 
@@ -202,6 +553,30 @@ _Returns_
 ### hasBlockSupport
 
 Returns true if the block defines support for a feature, or false otherwise.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+    const paragraphBlockSupportClassName = useSelect( ( select ) =>
+        select( blocksStore ).hasBlockSupport( 'core/paragraph', 'className' ),
+        []
+    );
+
+    return (
+        <p>
+            { sprintf(
+                __( 'core/paragraph supports custom class name?: %s' ),
+                paragraphBlockSupportClassName
+            ) }
+        /p>
+    );
+};
+```
 
 _Parameters_
 
@@ -218,6 +593,30 @@ _Returns_
 
 Returns a boolean indicating if a block has child blocks or not.
 
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const navigationBlockHasChildBlocks = useSelect(
+		( select ) => select( blocksStore ).hasChildBlocks( 'core/navigation' ),
+		[]
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__( 'core/navigation has child blocks: %s' ),
+				navigationBlockHasChildBlocks
+			) }
+		</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Data state.
@@ -230,6 +629,35 @@ _Returns_
 ### hasChildBlocksWithInserterSupport
 
 Returns a boolean indicating if a block has at least one child block with inserter support.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const navigationBlockHasChildBlocksWithInserterSupport = useSelect(
+		( select ) =>
+			select( blocksStore ).hasChildBlocksWithInserterSupport(
+				'core/navigation'
+			),
+		[]
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__(
+					'core/navigation has child blocks with inserter support: %s'
+				),
+				navigationBlockHasChildBlocksWithInserterSupport
+			) }
+		</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -244,6 +672,36 @@ _Returns_
 
 Returns true if the block type by the given name or object value matches a
 search term, or false otherwise.
+
+_Usage_
+
+```js
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const termFound = useSelect(
+		( select ) =>
+			select( blocksStore ).isMatchingSearchTerm(
+				'core/navigation',
+				'theme'
+			),
+		[]
+	);
+
+	return (
+		<p>
+			{ sprintf(
+				__(
+					'Search term was found in the title, keywords, category or description in block.json: %s'
+				),
+				termFound
+			) }
+		</p>
+	);
+};
+```
 
 _Parameters_
 
@@ -367,9 +825,38 @@ _Returns_
 
 Returns an action object used to set block categories.
 
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const blockCategories = useSelect(
+		( select ) => select( blocksStore ).getCategories(),
+		[]
+	);
+
+	const { setCategories } = useDispatch( blocksStore );
+
+	return (
+		<Button
+			onClick={ () =>
+				setCategories( [
+					...blockCategories,
+					{ title: 'Custom Category', slug: 'custom-category' },
+				] )
+			}
+		>
+			{ __( 'Add a new custom block category' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
--   _categories_ `Object[]`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 _Returns_
 
@@ -378,6 +865,23 @@ _Returns_
 ### setDefaultBlockName
 
 Returns an action object used to set the default block name.
+
+_Usage_
+
+```js
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { setDefaultBlockName } = useDispatch( blocksStore );
+
+	return (
+		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

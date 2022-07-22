@@ -106,6 +106,13 @@ export default function Header( {
 
 	const isFocusMode = templateType === 'wp_template_part';
 
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Toggle block inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
+
 	return (
 		<div className="edit-site-header">
 			<NavigableToolbar
@@ -123,17 +130,9 @@ export default function Header( {
 						onClick={ openInserter }
 						disabled={ ! isVisualMode }
 						icon={ plus }
-						/* translators: button label text should, if possible, be under 16
-				characters. */
-						label={ _x(
-							'Toggle block inserter',
-							'Generic label for block inserter button'
-						) }
+						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
-					>
-						{ showIconLabels &&
-							( ! isInserterOpen ? __( 'Add' ) : __( 'Close' ) ) }
-					</ToolbarItem>
+					/>
 					{ isLargeViewport && (
 						<>
 							<ToolbarItem
