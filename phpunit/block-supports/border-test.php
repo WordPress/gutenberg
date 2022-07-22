@@ -117,7 +117,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$actual   = gutenberg_apply_border_support( $block_type, $block_atts );
 		$expected = array(
 			'class' => 'has-border-color has-red-border-color',
-			'style' => 'border-radius: 10px; border-style: dashed; border-width: 1px;',
+			'style' => 'border-radius:10px;border-style:dashed;border-width:1px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -179,7 +179,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 
 		$actual   = gutenberg_apply_border_support( $block_type, $block_atts );
 		$expected = array(
-			'style' => 'border-style: dotted; border-width: 1px;',
+			'style' => 'border-style:dotted;border-width:1px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -208,7 +208,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-left-radius: 1em; border-top-right-radius: 2rem; border-bottom-left-radius: 30px; border-bottom-right-radius: 4vh;',
+			'style' => 'border-top-left-radius:1em;border-top-right-radius:2rem;border-bottom-left-radius:30px;border-bottom-right-radius:4vh;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -237,7 +237,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
 			'class' => 'has-border-color',
-			'style' => 'border-color: #72aee6; border-style: dashed; border-width: 2px;',
+			'style' => 'border-color:#72aee6;border-style:dashed;border-width:2px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -282,7 +282,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: #007017; border-bottom-style: solid; border-left-width: 1px; border-left-color: #f6f7f7; border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:#72aee6;border-top-style:dashed;border-right-width:0.25rem;border-right-color:#e65054;border-right-style:dotted;border-bottom-width:0.5em;border-bottom-color:#007017;border-bottom-style:solid;border-left-width:1px;border-left-color:#f6f7f7;border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -372,7 +372,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-color: #72aee6; border-right-color: #e65054; border-bottom-color: #007017; border-left-color: #f6f7f7;',
+			'style' => 'border-top-color:#72aee6;border-right-color:#e65054;border-bottom-color:#007017;border-left-color:#f6f7f7;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -409,7 +409,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:#72aee6;border-top-style:dashed;border-right-width:0.25rem;border-right-color:#e65054;border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -454,7 +454,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: var(--wp--preset--color--red); border-top-style: dashed; border-right-width: 0.25rem; border-right-color: var(--wp--preset--color--green); border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: var(--wp--preset--color--blue); border-bottom-style: solid; border-left-width: 1px; border-left-color: var(--wp--preset--color--yellow); border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:var(--wp--preset--color--red);border-top-style:dashed;border-right-width:0.25rem;border-right-color:var(--wp--preset--color--green);border-right-style:dotted;border-bottom-width:0.5em;border-bottom-color:var(--wp--preset--color--blue);border-bottom-style:solid;border-left-width:1px;border-left-color:var(--wp--preset--color--yellow);border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
