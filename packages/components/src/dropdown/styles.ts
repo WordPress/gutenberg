@@ -25,7 +25,14 @@ const padding = ( { paddingSize = 'small' }: DropdownContentWrapperProps ) => {
 
 export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps >`
 	// Negative margin to reset (offset) the default padding on .components-popover__content
-	margin: ${ space( -2 ) };
+	margin-left: ${ space( -2 ) };
+	margin-right: ${ space( -2 ) };
+	&:first-child {
+		margin-top: ${ space( -2 ) };
+	}
+	&:last-child {
+		margin-bottom: ${ space( -2 ) };
+	}
 
 	${ padding };
 `;
