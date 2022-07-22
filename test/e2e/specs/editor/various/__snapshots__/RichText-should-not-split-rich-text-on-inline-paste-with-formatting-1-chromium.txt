@@ -1,0 +1,3 @@
+<!-- wp:paragraph -->
+<p>a1<strong>2</strong>3b</p>
+<!-- /wp:paragraph -->

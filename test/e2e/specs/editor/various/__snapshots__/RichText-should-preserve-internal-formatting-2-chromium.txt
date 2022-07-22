@@ -1,0 +1,7 @@
+<!-- wp:paragraph -->
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><mark>1</mark></p>
+<!-- /wp:paragraph -->
