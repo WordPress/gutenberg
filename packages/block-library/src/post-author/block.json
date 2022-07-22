@@ -23,6 +23,9 @@
 		},
 		"byline": {
 			"type": "string"
+		},
+		"linked": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],

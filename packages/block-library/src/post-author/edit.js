@@ -47,9 +47,9 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const { textAlign, showAvatar, showBio, byline } = attributes;
-
+	const { textAlign, showAvatar, showBio, byline, linked } = attributes;
 	const avatarSizes = [];
+	const authorName = authorDetails?.name || __( 'Post Author' );
 	if ( authorDetails ) {
 		forEach( authorDetails.avatar_urls, ( url, size ) => {
 			avatarSizes.push( {
@@ -119,6 +119,11 @@ function PostAuthorEdit( {
 							setAttributes( { showBio: ! showBio } )
 						}
 					/>
+					<ToggleControl
+						label={ __( 'Link author name to author page' ) }
+						checked={ linked }
+						onChange={ () => setAttributes( { linked: ! linked } ) }
+					/>
 				</PanelBody>
 			</InspectorControls>
 
@@ -159,7 +164,11 @@ function PostAuthorEdit( {
 						/>
 					) }
 					<p className="wp-block-post-author__name">
-						{ authorDetails?.name || __( 'Post Author' ) }
+						{ linked ? (
+							<a href={ authorDetails?.link }>{ authorName }</a>
+						) : (
+							authorName
+						) }
 					</p>
 					{ showBio && (
 						<p className="wp-block-post-author__bio">
