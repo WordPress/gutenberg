@@ -114,6 +114,9 @@ class WP_Style_Engine_CSS_Rule {
 		if ( empty( $styles ) ) {
 			return '';
 		}
-		return $this->get_selector() . ' {' . $styles . '}';
+
+		return defined( 'SCRIPT_DEBUG' ) && ! SCRIPT_DEBUG
+			? $this->get_selector() . ' { ' . $styles . ' } '
+			: $this->get_selector() . '{' . $styles . '}';
 	}
 }
