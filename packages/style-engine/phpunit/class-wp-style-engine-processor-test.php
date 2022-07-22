@@ -34,7 +34,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.a-nice-rule {color: var(--nice-color); background-color: purple;}.a-nicer-rule {font-family: Nice sans; font-size: 1em; background-color: purple;}', $a_nice_renderer->get_css() );
+		$this->assertEquals( '.a-nice-rule{color:var(--nice-color);background-color:purple;}.a-nicer-rule{font-family:Nice sans;font-size:1em;background-color:purple;}', $a_nice_renderer->get_css() );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.an-excellent-rule {color: var(--excellent-color); border-style: dotted; border-color: brown;}', $an_excellent_renderer->get_css() );
+		$this->assertEquals( '.an-excellent-rule{color:var(--excellent-color);border-style:dotted;border-color:brown;}', $an_excellent_renderer->get_css() );
 
 		$an_excellent_store->add_rule( '.an-excellent-rule' )->add_declarations(
 			array(
@@ -67,7 +67,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.an-excellent-rule {color: var(--excellent-color); border-style: dashed; border-color: brown; border-width: 2px;}', $an_excellent_renderer->get_css() );
+		$this->assertEquals( '.an-excellent-rule{color:var(--excellent-color);border-style:dashed;border-color:brown;border-width:2px;}', $an_excellent_renderer->get_css() );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.a-sweet-rule,#an-even-sweeter-rule > marquee {color: var(--sweet-color); background-color: purple;}', $a_sweet_renderer->get_css() );
+		$this->assertEquals( '.a-sweet-rule,#an-even-sweeter-rule > marquee{color:var(--sweet-color);background-color:purple;}', $a_sweet_renderer->get_css() );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule {border-color: purple;}', $a_lovely_renderer->get_css() );
+		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule{border-color:purple;}', $a_lovely_renderer->get_css() );
 
 		$a_lovely_store->add_rule( '.a-most-lovely-rule' )->add_declarations(
 			array(
@@ -122,6 +122,6 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule,.a-most-lovely-rule,.a-perfectly-lovely-rule {border-color: purple;}', $a_lovely_renderer->get_css() );
+		$this->assertEquals( '.a-lovely-rule,.a-lovelier-rule,.a-most-lovely-rule,.a-perfectly-lovely-rule{border-color:purple;}', $a_lovely_renderer->get_css() );
 	}
 }

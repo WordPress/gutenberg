@@ -55,7 +55,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$new_pie_store->add_rule( $selector )->add_declarations( $css_declarations );
 		$styles   = $css_declarations->get_declarations_string();
-		$expected = $selector . ' {' . $styles . '}';
+		$expected = $selector . '{' . $styles . '}';
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
 
