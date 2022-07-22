@@ -304,7 +304,9 @@ export class BlockList extends Component {
 					}
 					title={ title }
 					ListHeaderComponent={ header }
-					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
+					ListEmptyComponent={
+						isRootList && ! isReadOnly && this.renderEmptyList
+					}
 					ListFooterComponent={ this.renderBlockListFooter }
 					onScroll={ onScroll }
 				/>
