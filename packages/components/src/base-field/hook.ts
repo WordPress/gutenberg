@@ -6,26 +6,62 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../ui/context';
 import { useControlGroupContext } from '../ui/control-group';
 import { useFlex } from '../flex';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
+import type { UseBaseFieldProps } from './types';
 
 /**
- * @typedef OwnProps
- * @property {boolean} [hasError=false] Renders an error.
- * @property {boolean} [disabled]       Whether the field is disabled.
- * @property {boolean} [isInline=false] Renders as an inline element (layout).
- * @property {boolean} [isSubtle=false] Renders a subtle variant.
+ * `useBaseField` is an internal (i.e., not exported in the `index.js`) hook
+ * used for building more complex fields like `TextField`.
+ * It provides error handling and focus styles for field components.
+ * It does _not_ handle layout of the component aside from wrapping the field in a `Flex` wrapper.
+ *
+ * ```js
+ * function useExampleField( props ) {
+ * 	const {
+ * 		as = 'input',
+ * 		...baseProps,
+ * 	} = useBaseField( props );
+ *
+ * 	const inputProps = {
+ * 		as,
+ * 		// more cool stuff here
+ * 	}
+ *
+ * 	return { inputProps, ...baseProps };
+ * }
+ *
+ * function ExampleField( props, forwardRef ) {
+ * 	const {
+ * 		preFix,
+ * 		affix,
+ * 		disabled,
+ * 		inputProps,
+ * 		...baseProps
+ * 	} = useExampleField( props );
+ *
+ * 	return (
+ * 		<View { ...baseProps } disabled={ disabled }>
+ * 			{preFix}
+ * 			<View
+ * 				autocomplete="off"
+ * 				{ ...inputProps }
+ * 				disabled={ disabled }
+ * 			/>
+ * 			{affix}
+ * 		</View>
+ * 	);
+ * }
+ * ```
+ *
+ * @param {WordPressComponentProps< UseBaseFieldProps, 'div' >} props
  */
-
-/** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
-
-/**
- * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
- */
-export function useBaseField( props ) {
+export function useBaseField(
+	props: WordPressComponentProps< UseBaseFieldProps, 'div' >
+) {
 	const {
 		className,
 		hasError = false,
@@ -54,7 +90,7 @@ export function useBaseField( props ) {
 	);
 
 	return {
-		...useFlex( { ...flexProps, className: classes } ),
+		...useFlex( { children: null, ...flexProps, className: classes } ),
 		disabled,
 		defaultValue,
 	};
