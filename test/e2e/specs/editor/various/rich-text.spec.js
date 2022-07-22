@@ -31,7 +31,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
@@ -44,7 +44,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Some ' );
 		// All following characters should now be bold.
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
@@ -61,7 +61,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'i' );
 		await page.keyboard.type( '1' );
@@ -73,11 +73,10 @@ test.describe( 'RichText', () => {
 	} );
 
 	test( 'should not highlight more than one format', async ( {
-		editor,
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
@@ -98,7 +97,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Some ' );
 		await editor.showBlockToolbar();
 		await page.click( '[aria-label="Bold"]' );
@@ -115,7 +114,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'A `backtick`' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -129,7 +128,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -141,7 +140,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '`a`' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Backspace' );
@@ -155,7 +154,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '`a`' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		// Move inside format boundary.
@@ -172,7 +171,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'A `backtick` and more.' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -183,7 +182,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
@@ -272,7 +271,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
@@ -361,7 +360,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -380,7 +379,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
@@ -396,7 +395,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
@@ -416,7 +415,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
@@ -431,7 +430,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.type( '2' );
@@ -452,7 +451,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		// Add text and select to color.
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
@@ -501,7 +500,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 
 		// Create two lines of text in a paragraph.
 		await page.keyboard.type( '1' );
@@ -530,7 +529,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 
 		// Create an indented list of two lines.
 		await page.keyboard.type( '* 1' );
@@ -555,7 +554,7 @@ test.describe( 'RichText', () => {
 	} );
 
 	test( 'should navigate arround emoji', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '🍓' );
 		// Only one press on arrow left should be required to move in front of
 		// the emoji.
@@ -570,7 +569,7 @@ test.describe( 'RichText', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		// Puppeteer doesn't support composition, so emulate it by inserting
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
@@ -594,7 +593,7 @@ test.describe( 'RichText', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
