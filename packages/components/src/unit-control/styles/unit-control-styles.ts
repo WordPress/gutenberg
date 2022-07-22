@@ -10,6 +10,7 @@ import { COLORS, CONFIG, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 import { BackdropUI } from '../../input-control/styles/input-control-styles';
 import type { SelectSize } from '../types';
+import { space } from '../../ui/utils/space';
 
 // Using `selectSize` instead of `size` to avoid a type conflict with the
 // `size` HTML attribute of the `select` element.
@@ -59,24 +60,44 @@ export const ValueInput = styled( NumberControl )`
 	}
 `;
 
-const baseUnitLabelStyles = css`
-	appearance: none;
-	background: transparent;
-	border-radius: 2px;
-	border: none;
-	box-sizing: border-box;
-	color: ${ COLORS.darkGray[ 500 ] };
-	display: block;
-	font-size: 8px;
-	letter-spacing: -0.5px;
-	outline: none;
-	padding: 2px 1px;
-	text-align-last: center;
-	text-transform: uppercase;
-	width: 20px;
+const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+	const base = css`
+		appearance: none;
+		background: transparent;
+		border-radius: 2px;
+		border: none;
+		box-sizing: border-box;
+		display: block;
+		outline: none;
+		text-align-last: center;
 
-	${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
-`;
+		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+	`;
+	const defaultLabelSize = css`
+		padding: 2px 1px;
+		width: 20px;
+		color: ${ COLORS.darkGray[ 500 ] };
+		font-size: 8px;
+		letter-spacing: -0.5px;
+		text-transform: uppercase;
+	`;
+	const largeLabelSize = css`
+		padding-left: ${ space( 1 ) };
+		padding-right: ${ space( 4 ) };
+		color: ${ COLORS.ui.theme };
+		font-size: 13px;
+	`;
+	const labelSize = {
+		default: defaultLabelSize,
+		small: defaultLabelSize,
+		'__unstable-large': largeLabelSize,
+	};
+
+	return css`
+		${ base };
+		${ labelSize[ selectSize ] };
+	`;
+};
 
 export const UnitLabel = styled.div< SelectProps >`
 	&&& {
@@ -95,6 +116,7 @@ export const UnitSelect = styled.select< SelectProps >`
 		/* Removing margin ensures focus styles neatly overlay the wrapper. */
 		margin: 0;
 		transition: box-shadow 0.1s linear, border 0.1s linear;
+		font-family: inherit;
 
 		&:hover {
 			background-color: ${ COLORS.lightGray[ 300 ] };
