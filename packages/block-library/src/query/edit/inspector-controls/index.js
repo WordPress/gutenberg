@@ -13,6 +13,8 @@ import {
 	RangeControl,
 	ToggleControl,
 	Notice,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -41,6 +43,7 @@ function useIsPostTypeHierarchical( postType ) {
 }
 
 export default function QueryInspectorControls( {
+	clientId,
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
@@ -100,78 +103,138 @@ export default function QueryInspectorControls( {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 	return (
-		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					label={ __( 'Inherit query from template' ) }
-					help={ __(
-						'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-					) }
-					checked={ !! inherit }
-					onChange={ ( value ) => setQuery( { inherit: !! value } ) }
-				/>
-				{ ! inherit && (
-					<SelectControl
-						options={ postTypesSelectOptions }
-						value={ postType }
-						label={ __( 'Post type' ) }
-						onChange={ onPostTypeChange }
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						label={ __( 'Inherit query from template' ) }
 						help={ __(
-							'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+							'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
 						) }
+						checked={ !! inherit }
+						onChange={ ( value ) =>
+							setQuery( { inherit: !! value } )
+						}
 					/>
-				) }
-				{ displayLayout?.type === 'flex' && (
-					<>
-						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ displayLayout.columns }
-							onChange={ ( value ) =>
-								setDisplayLayout( { columns: value } )
-							}
-							min={ 2 }
-							max={ Math.max( 6, displayLayout.columns ) }
+					{ ! inherit && (
+						<SelectControl
+							options={ postTypesSelectOptions }
+							value={ postType }
+							label={ __( 'Post type' ) }
+							onChange={ onPostTypeChange }
+							help={ __(
+								'WordPress contains different types of content and they are divided into collections called "Post types". By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+							) }
 						/>
-						{ displayLayout.columns > 6 && (
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'This column count exceeds the recommended amount and may cause visual breakage.'
-								) }
-							</Notice>
-						) }
-					</>
-				) }
-				{ ! inherit && (
-					<OrderControl
-						{ ...{ order, orderBy } }
-						onChange={ setQuery }
-					/>
-				) }
-				{ ! inherit && showSticky && (
-					<StickyControl
-						value={ sticky }
-						onChange={ ( value ) => setQuery( { sticky: value } ) }
-					/>
-				) }
-			</PanelBody>
-			{ ! inherit && (
-				<PanelBody title={ __( 'Filters' ) }>
-					<TaxonomyControls onChange={ setQuery } query={ query } />
-					<AuthorControl value={ authorIds } onChange={ setQuery } />
-					<TextControl
-						label={ __( 'Keyword' ) }
-						value={ querySearch }
-						onChange={ setQuerySearch }
-					/>
-					{ isPostTypeHierarchical && (
-						<ParentControl
-							parents={ parents }
-							postType={ postType }
+					) }
+					{ displayLayout?.type === 'flex' && (
+						<>
+							<RangeControl
+								label={ __( 'Columns' ) }
+								value={ displayLayout.columns }
+								onChange={ ( value ) =>
+									setDisplayLayout( { columns: value } )
+								}
+								min={ 2 }
+								max={ Math.max( 6, displayLayout.columns ) }
+							/>
+							{ displayLayout.columns > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
+							) }
+						</>
+					) }
+					{ ! inherit && (
+						<OrderControl
+							{ ...{ order, orderBy } }
 							onChange={ setQuery }
 						/>
 					) }
+					{ ! inherit && showSticky && (
+						<StickyControl
+							value={ sticky }
+							onChange={ ( value ) =>
+								setQuery( { sticky: value } )
+							}
+						/>
+					) }
 				</PanelBody>
+			</InspectorControls>
+			{ ! inherit && (
+				<InspectorControls>
+					<ToolsPanel
+						className={ `block-support-panel` }
+						label={ __( 'Filters' ) }
+						resetAll={ () => {
+							setQuery( {
+								author: '',
+								parents: [],
+								search: '',
+								taxQuery: null,
+							} );
+						} }
+						// key={ panelId } // TODO: do I need this?
+						panelId={ clientId }
+					>
+						{ /* // TODO: probably have a hook for available taxonomies and add conditionally */ }
+						<ToolsPanelItem
+							label={ __( 'Taxonomies' ) }
+							hasValue={ () => true }
+							onDeselect={ () => setQuery( { taxQuery: null } ) }
+							panelId={ clientId }
+							isShownByDefault
+						>
+							<TaxonomyControls
+								onChange={ setQuery }
+								query={ query }
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							hasValue={ () => !! authorIds }
+							label={ __( 'Authors' ) }
+							onDeselect={ () => setQuery( { author: '' } ) }
+							panelId={ clientId }
+						>
+							<AuthorControl
+								value={ authorIds }
+								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							hasValue={ () => !! querySearch }
+							label={ __( 'Keyword' ) }
+							onDeselect={ () => setQuerySearch( '' ) }
+							panelId={ clientId }
+						>
+							<TextControl
+								label={ __( 'Keyword' ) }
+								value={ querySearch }
+								onChange={ setQuerySearch }
+							/>
+						</ToolsPanelItem>
+						{ isPostTypeHierarchical && (
+							<ToolsPanelItem
+								hasValue={ () => !! parents?.length }
+								label={ __( 'Parents' ) }
+								onDeselect={ () => setQuery( { parents: [] } ) }
+								panelId={ clientId }
+							>
+								<ParentControl
+									parents={ parents }
+									postType={ postType }
+									onChange={ setQuery }
+								/>
+							</ToolsPanelItem>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
 			) }
-		</InspectorControls>
+		</>
 	);
 }

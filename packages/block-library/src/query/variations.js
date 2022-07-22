@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postList } from '@wordpress/icons';
+import { postList, preformatted } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,6 +31,42 @@ const QUERY_DEFAULT_ATTRIBUTES = {
 };
 
 const variations = [
+	{
+		// This variation is just for testing purposes and will not be merged..
+		name: 'products-list',
+		title: __( 'Products List' ),
+		description: __( 'Display a list of your products.' ),
+		icon: preformatted,
+		attributes: {
+			query: {
+				perPage: null,
+				pages: 0,
+				offset: 0,
+				postType: 'product',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				exclude: [],
+				sticky: '',
+				inherit: false,
+				taxQuery: null,
+				parents: [],
+			},
+		},
+		innerBlocks: [
+			[
+				'core/post-template',
+				{},
+				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
+			],
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results' ],
+		],
+		isActive: ( blockAttributes ) =>
+			blockAttributes?.query?.postType === 'product',
+		scope: [ 'inserter' ],
+	},
 	{
 		name: 'posts-list',
 		title: __( 'Posts List' ),
