@@ -306,6 +306,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergHostAppNamespace() -> String? {
+        return nil
+    }
+
     func gutenbergFeaturedImageId() -> NSNumber? {
         return nil
     }
