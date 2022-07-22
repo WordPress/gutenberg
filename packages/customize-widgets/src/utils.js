@@ -107,7 +107,7 @@ export function widgetToBlock( { id, idBase, number, instance } ) {
 
 	if ( idBase === 'block' ) {
 		const parsedBlocks = parse( raw.content, {
-			__unstableFreeformAutoP: false,
+			__unstableAutoP: false,
 		} );
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
