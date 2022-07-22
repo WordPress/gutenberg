@@ -3,6 +3,7 @@
  */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getDefaultBlockName, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,8 +20,9 @@ export default function useMerge( clientId ) {
 		getBlockOrder,
 		getBlockRootClientId,
 		getBlockName,
+		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition } =
+	const { mergeBlocks, moveBlocksToPosition, replaceBlock, selectBlock } =
 		useDispatch( blockEditorStore );
 	const [ , outdentListItem ] = useOutdentListItem( clientId );
 
@@ -77,10 +79,27 @@ export default function useMerge( clientId ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
+	function deleteList() {
+		const rootClientId = getBlockRootClientId( clientId );
+		const replacement = switchToBlockType(
+			getBlock( rootClientId ),
+			getDefaultBlockName()
+		);
+		registry.batch( () => {
+			replaceBlock( rootClientId, replacement );
+			selectBlock( replacement[ 0 ].clientId );
+		} );
+	}
+
 	return ( forward ) => {
 		if ( forward ) {
 			const nextBlockClientId = getNextId( clientId );
-			if ( ! nextBlockClientId ) return;
+
+			if ( ! nextBlockClientId ) {
+				deleteList();
+				return;
+			}
+
 			if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
 			} else {
@@ -109,6 +128,8 @@ export default function useMerge( clientId ) {
 					);
 					mergeBlocks( trailingId, clientId );
 				} );
+			} else {
+				deleteList();
 			}
 		}
 	};
