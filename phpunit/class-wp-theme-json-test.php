@@ -8,11 +8,26 @@
 
 class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
+	 * Reset the Style-Engine stores for global-styles.
+	 */
+	public function reset_style_engine_stores() {
+		$stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
+		foreach ( $stores as $store ) {
+			$rules = $store->get_all_rules();
+			foreach ( array_keys( $rules ) as $selector ) {
+				$store->remove_rule( $selector );
+			}
+		}
+	}
+	/**
 	 * @dataProvider data_get_layout_definitions
 	 *
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
 	 */
 	public function test_get_stylesheet_generates_layout_styles( $layout_definitions ) {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -46,6 +61,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
 	 */
 	public function test_get_stylesheet_generates_fallback_gap_layout_styles( $layout_definitions ) {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -80,6 +98,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
 	 */
 	public function test_get_stylesheet_generates_base_fallback_gap_layout_styles( $layout_definitions ) {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -186,6 +207,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 	function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -229,6 +253,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_handles_only_pseudo_selector_rules_for_given_property() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -268,6 +295,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -307,6 +337,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -347,6 +380,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_handles_priority_of_elements_vs_block_elements_pseudo_selectors() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -394,6 +430,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_handles_whitelisted_block_level_element_pseudo_selectors() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -449,6 +488,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * remove that filter and instead use the core block for the following test.
 	 */
 	function test_get_stylesheet_with_block_support_feature_level_selectors() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -567,6 +609,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * array( 'ref' => 'styles.color.background' ) => "#ffffff".
 	 */
 	function test_get_property_value_valid() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -599,6 +644,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage get_property_value
 	 */
 	function test_get_property_value_loop() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -630,6 +678,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage get_property_value
 	 */
 	function test_get_property_value_recursion() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -661,6 +712,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage get_property_value
 	 */
 	function test_get_property_value_self() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
@@ -976,6 +1030,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_styles_for_block_with_padding_aware_alignments() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => 2,
@@ -1007,6 +1064,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_styles_for_block_without_padding_aware_alignments() {
+		// Reset the Style-Engine stores for global-styles.
+		$this->reset_style_engine_stores();
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => 2,
