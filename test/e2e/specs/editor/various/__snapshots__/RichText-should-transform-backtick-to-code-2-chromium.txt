@@ -1,0 +1,3 @@
+<!-- wp:paragraph -->
+<p>A `backtick`</p>
+<!-- /wp:paragraph -->
