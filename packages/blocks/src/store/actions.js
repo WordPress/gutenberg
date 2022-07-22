@@ -288,7 +288,32 @@ export function removeBlockTypes( names ) {
  * Returns an action object used in signalling that new block styles have been added.
  *
  * @param {string}       blockName Block name.
- * @param {Array|Object} styles    Block styles.
+ * @param {Array|Object} styles    Block style object or array of block style objects.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { addBlockStyles } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 addBlockStyles( 'core/quote', {
+ *                     name: 'fancy-quote',
+ *                     label: 'Fancy Quote',
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Add a Fancy Quote style to the core/quote block' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */

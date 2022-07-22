@@ -737,10 +737,36 @@ _Returns_
 
 Returns an action object used in signalling that new block styles have been added.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { addBlockStyles } = useDispatch( blocksStore );
+
+	return (
+		<Button
+			onClick={ () =>
+				addBlockStyles( 'core/quote', {
+					name: 'fancy-quote',
+					label: 'Fancy Quote',
+				} )
+			}
+		>
+			{ __( 'Add a Fancy Quote style to the core/quote block' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _styles_ `Array|Object`: Block styles.
+-   _styles_ `Array|Object`: Block style object or array of block style objects.
 
 _Returns_
 
