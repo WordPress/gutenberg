@@ -15,13 +15,13 @@ const meta: ComponentMeta< typeof Divider > = {
 	title: 'Components (Experimental)/Divider',
 	argTypes: {
 		margin: {
-			control: { type: 'number' },
+			control: { type: 'text' },
 		},
 		marginStart: {
-			control: { type: 'number' },
+			control: { type: 'text' },
 		},
 		marginEnd: {
-			control: { type: 'number' },
+			control: { type: 'text' },
 		},
 	},
 	parameters: {
@@ -41,7 +41,7 @@ const Template: ComponentStory< typeof Divider > = ( args ) => (
 
 export const Horizontal: ComponentStory< typeof Divider > = Template.bind( {} );
 Horizontal.args = {
-	margin: 2,
+	margin: '2',
 };
 
 export const Vertical: ComponentStory< typeof Divider > = Template.bind( {} );

@@ -2,24 +2,6 @@
  * External dependencies
  */
 import type { Moment } from 'moment';
-import type { ReactNode } from 'react';
-
-export type UpdateOnBlurAsIntegerFieldProps = {
-	/**
-	 * The value of the integer field.
-	 */
-	value: number | string;
-
-	/**
-	 * Called when the field is changed.
-	 */
-	onUpdate: ( value: number ) => void;
-
-	/**
-	 * Children to render inside the field.
-	 */
-	children?: ReactNode;
-};
 
 export type TimePickerProps = {
 	/**
@@ -94,6 +76,13 @@ export type DatePickerProps = {
 	 * dot on the day of the event.
 	 */
 	events?: DatePickerEvent[];
+
+	/**
+	 * The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+	 *
+	 * @default 0
+	 */
+	startOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
@@ -103,4 +92,20 @@ export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
 		 * passed the date and time as an argument.
 		 */
 		onChange?: ( date: string | null ) => void;
+
+		/**
+		 * Start opting in to not displaying a Help button which will become the
+		 * default in a future version.
+		 *
+		 * @default false
+		 */
+		__nextRemoveHelpButton?: boolean;
+
+		/**
+		 * Start opting in to not displaying a Reset button which will become
+		 * the default in a future version.
+		 *
+		 * @default false
+		 */
+		__nextRemoveResetButton?: boolean;
 	};

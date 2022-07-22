@@ -37,37 +37,27 @@ function PostTitle( _, forwardedRef ) {
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
-	const {
-		insertDefaultBlock,
-		clearSelectedBlock,
-		insertBlocks,
-	} = useDispatch( blockEditorStore );
-	const {
-		isCleanNewPost,
-		title,
-		placeholder,
-		isFocusMode,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			isCleanNewPost: _isCleanNewPost,
-		} = select( editorStore );
-		const { getSettings } = select( blockEditorStore );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } =
+		useDispatch( blockEditorStore );
+	const { isCleanNewPost, title, placeholder, isFocusMode, hasFixedToolbar } =
+		useSelect( ( select ) => {
+			const { getEditedPostAttribute, isCleanNewPost: _isCleanNewPost } =
+				select( editorStore );
+			const { getSettings } = select( blockEditorStore );
+			const {
+				titlePlaceholder,
+				focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			} = getSettings();
 
-		return {
-			isCleanNewPost: _isCleanNewPost(),
-			title: getEditedPostAttribute( 'title' ),
-			placeholder: titlePlaceholder,
-			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		};
-	}, [] );
+			return {
+				isCleanNewPost: _isCleanNewPost(),
+				title: getEditedPostAttribute( 'title' ),
+				placeholder: titlePlaceholder,
+				isFocusMode: focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			};
+		}, [] );
 
 	useImperativeHandle( forwardedRef, () => ( {
 		focus: () => {
@@ -159,9 +149,13 @@ function PostTitle( _, forwardedRef ) {
 			plainText,
 		} );
 
-		if ( typeof content !== 'string' && content.length ) {
-			event.preventDefault();
+		event.preventDefault();
 
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
 			const [ firstBlock ] = content;
 
 			if (
@@ -174,6 +168,8 @@ function PostTitle( _, forwardedRef ) {
 			} else {
 				onInsertBlockAfter( content );
 			}
+		} else {
+			onUpdate( content );
 		}
 	}
 

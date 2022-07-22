@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { __experimentalGetElementClassName } from '@wordpress/block-editor';
 import { useDisabled, useInstanceId } from '@wordpress/compose';
 
 const CommentsForm = () => {
@@ -27,7 +33,10 @@ const CommentsForm = () => {
 					<input
 						name="submit"
 						type="submit"
-						className="submit wp-block-button__link"
+						className={ classnames(
+							'wp-block-button__link',
+							__experimentalGetElementClassName( 'button' )
+						) }
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }
 					/>

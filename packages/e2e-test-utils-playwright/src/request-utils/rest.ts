@@ -4,13 +4,22 @@
 import * as fs from 'fs/promises';
 import { dirname } from 'path';
 import type { APIRequestContext } from '@playwright/test';
-import { chunk } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { WP_BASE_URL } from '../config';
 import type { RequestUtils, StorageState } from './index';
+
+function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
+	const arr = [ ...requests ];
+	const cache = [];
+	while ( arr.length ) {
+		cache.push( arr.splice( 0, chunkSize ) );
+	}
+
+	return cache;
+}
 
 async function getAPIRootURL( request: APIRequestContext ) {
 	// Discover the API root url using link header.
@@ -61,7 +70,7 @@ type RequestFetchOptions = Exclude<
 	Parameters< APIRequestContext[ 'fetch' ] >[ 1 ],
 	undefined
 >;
-interface RestOptions extends RequestFetchOptions {
+export interface RestOptions extends RequestFetchOptions {
 	path: string;
 }
 
@@ -143,7 +152,7 @@ async function getMaxBatchSize( this: RequestUtils, forceRefetch = false ) {
 	return this.maxBatchSize;
 }
 
-interface BatchRequest {
+export interface BatchRequest {
 	method?: string;
 	path: string;
 	headers?: Record< string, string | string[] >;
@@ -157,7 +166,7 @@ async function batchRest< BatchResponse >(
 	const maxBatchSize = await this.getMaxBatchSize();
 
 	if ( requests.length > maxBatchSize ) {
-		const chunks = chunk( requests, maxBatchSize );
+		const chunks = splitRequestsToChunks( requests, maxBatchSize );
 
 		const chunkResponses = await Promise.all(
 			chunks.map( ( chunkRequests ) =>

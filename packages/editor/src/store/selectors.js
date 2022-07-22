@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, has, isString, includes, some } from 'lodash';
+import { find, get, has, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -146,9 +146,8 @@ export const isEditedPostDirty = createRegistrySelector(
  */
 export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
-		const dirtyEntityRecords = select(
-			coreStore
-		).__experimentalGetDirtyEntityRecords();
+		const dirtyEntityRecords =
+			select( coreStore ).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
 		return some(
 			dirtyEntityRecords,
@@ -535,7 +534,7 @@ export function isEditedPostEmpty( state ) {
 
 	if ( blocks.length ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
-		// joined with with newlines such that even if every individual block
+		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
 		if ( blocks.length > 1 ) {
 			return false;
@@ -708,9 +707,8 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const isSavingNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
-		const entitiesBeingSaved = select(
-			coreStore
-		).__experimentalGetEntitiesBeingSaved();
+		const entitiesBeingSaved =
+			select( coreStore ).__experimentalGetEntitiesBeingSaved();
 		const { type, id } = getCurrentPost( state );
 		return some(
 			entitiesBeingSaved,
@@ -1244,9 +1242,8 @@ export const isBlockValid = getBlockEditorSelector( 'isBlockValid' );
 /**
  * @see getBlockAttributes in core/block-editor store.
  */
-export const getBlockAttributes = getBlockEditorSelector(
-	'getBlockAttributes'
-);
+export const getBlockAttributes =
+	getBlockEditorSelector( 'getBlockAttributes' );
 
 /**
  * @see getBlock in core/block-editor store.
@@ -1476,9 +1473,8 @@ export const isMultiSelecting = getBlockEditorSelector( 'isMultiSelecting' );
 /**
  * @see isSelectionEnabled in core/block-editor store.
  */
-export const isSelectionEnabled = getBlockEditorSelector(
-	'isSelectionEnabled'
-);
+export const isSelectionEnabled =
+	getBlockEditorSelector( 'isSelectionEnabled' );
 
 /**
  * @see getBlockMode in core/block-editor store.
@@ -1529,9 +1525,8 @@ export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
 /**
  * @see canInsertBlockType in core/block-editor store.
  */
-export const canInsertBlockType = getBlockEditorSelector(
-	'canInsertBlockType'
-);
+export const canInsertBlockType =
+	getBlockEditorSelector( 'canInsertBlockType' );
 
 /**
  * @see getInserterItems in core/block-editor store.
@@ -1606,14 +1601,13 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		return {};
 	}
 
-	const { excerpt, slug, title, area } = template;
-	const {
-		title: defaultTitle,
-		description: defaultDescription,
-	} = __experimentalGetDefaultTemplateType( state, slug );
+	const { description, slug, title, area } = template;
+	const { title: defaultTitle, description: defaultDescription } =
+		__experimentalGetDefaultTemplateType( state, slug );
 
-	const templateTitle = isString( title ) ? title : title?.rendered;
-	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+	const templateTitle = typeof title === 'string' ? title : title?.rendered;
+	const templateDescription =
+		typeof description === 'string' ? description : description?.raw;
 	const templateIcon =
 		__experimentalGetDefaultTemplatePartAreas( state ).find(
 			( item ) => area === item.area

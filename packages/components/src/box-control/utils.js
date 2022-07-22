@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, isNumber } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -82,16 +77,16 @@ export function getAllValue(
 		: '';
 
 	/**
-	 * The isNumber check is important. On reset actions, the incoming value
+	 * The typeof === 'number' check is important. On reset actions, the incoming value
 	 * may be null or an empty string.
 	 *
 	 * Also, the value may also be zero (0), which is considered a valid unit value.
 	 *
-	 * isNumber() is more specific for these cases, rather than relying on a
+	 * typeof === 'number' is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
 	let commonUnit;
-	if ( isNumber( commonQuantity ) ) {
+	if ( typeof commonQuantity === 'number' ) {
 		commonUnit = mode( allParsedUnits );
 	} else {
 		// Set meaningful unit selection if no commonQuantity and user has previously
@@ -145,14 +140,12 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
 export function isValuesDefined( values ) {
 	return (
 		values !== undefined &&
-		! isEmpty(
-			Object.values( values ).filter(
-				// Switching units when input is empty causes values only
-				// containing units. This gives false positive on mixed values
-				// unless filtered.
-				( value ) => !! value && /\d/.test( value )
-			)
-		)
+		Object.values( values ).filter(
+			// Switching units when input is empty causes values only
+			// containing units. This gives false positive on mixed values
+			// unless filtered.
+			( value ) => !! value && /\d/.test( value )
+		).length > 0
 	);
 }
 

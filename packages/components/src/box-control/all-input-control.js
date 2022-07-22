@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-/**
  * Internal dependencies
  */
 import UnitControl from './unit-control';
@@ -13,6 +9,8 @@ import {
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
+
+const noop = () => {};
 
 export default function AllInputControl( {
 	onChange = noop,

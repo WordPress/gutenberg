@@ -6,11 +6,10 @@ import { useState } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__experimentalConfirmDialog as ConfirmDialog,
-	Button,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { close as closeIcon } from '@wordpress/icons';
+import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -30,9 +29,8 @@ export default function PostVisibility( { onClose } ) {
 	const { editPost, savePost } = useDispatch( editorStore );
 
 	const [ hasPassword, setHasPassword ] = useState( !! password );
-	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] = useState(
-		false
-	);
+	const [ showPrivateConfirmDialog, setShowPrivateConfirmDialog ] =
+		useState( false );
 
 	const setPublic = () => {
 		editPost( {
@@ -70,20 +68,16 @@ export default function PostVisibility( { onClose } ) {
 	};
 
 	return (
-		<>
-			<Button
-				className="editor-post-visibility__close"
-				isSmall
-				icon={ closeIcon }
-				onClick={ onClose }
+		<div className="editor-post-visibility">
+			<InspectorPopoverHeader
+				title={ __( 'Visibility' ) }
+				help={ __( 'Control how this post is viewed.' ) }
+				onClose={ onClose }
 			/>
 			<fieldset className="editor-post-visibility__fieldset">
-				<legend className="editor-post-visibility__legend">
+				<VisuallyHidden as="legend">
 					{ __( 'Visibility' ) }
-				</legend>
-				<p className="editor-post-visibility__description">
-					{ __( 'Control how this post is viewed.' ) }
-				</p>
+				</VisuallyHidden>
 				<PostVisibilityChoice
 					instanceId={ instanceId }
 					value="public"
@@ -134,7 +128,7 @@ export default function PostVisibility( { onClose } ) {
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>
-		</>
+		</div>
 	);
 }
 

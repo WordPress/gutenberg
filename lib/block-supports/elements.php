@@ -87,16 +87,8 @@ function gutenberg_render_elements_support( $block_content, $block ) {
  * @return null
  */
 function gutenberg_render_elements_support_styles( $pre_render, $block ) {
-	$block_type                    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
-	if ( $skip_link_color_serialization ) {
-		return null;
-	}
-
-	$link_color = null;
-	if ( ! empty( $block['attrs'] ) ) {
-		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
-	}
+	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
 
 	/*
 	* For now we only care about link color.
@@ -104,23 +96,26 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
-	if ( null === $link_color ) {
+	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
+
+	if ( $skip_link_color_serialization ) {
 		return null;
 	}
+	$class_name        = gutenberg_get_elements_class_name( $block );
+	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	$class_name = gutenberg_get_elements_class_name( $block );
+	if ( $link_block_styles ) {
+		$styles = gutenberg_style_engine_get_block_supports_styles(
+			$link_block_styles,
+			array(
+				'selector' => ".$class_name a",
+			)
+		);
 
-	if ( strpos( $link_color, 'var:preset|color|' ) !== false ) {
-		// Get the name from the string and add proper styles.
-		$index_to_splice = strrpos( $link_color, '|' ) + 1;
-		$link_color_name = substr( $link_color, $index_to_splice );
-		$link_color      = "var(--wp--preset--color--$link_color_name)";
+		if ( ! empty( $styles['css'] ) ) {
+			gutenberg_enqueue_block_support_styles( $styles['css'] );
+		}
 	}
-	$link_color_declaration = esc_html( safecss_filter_attr( "color: $link_color" ) );
-
-	$style = ".$class_name a{" . $link_color_declaration . ';}';
-
-	gutenberg_enqueue_block_support_styles( $style );
 
 	return null;
 }

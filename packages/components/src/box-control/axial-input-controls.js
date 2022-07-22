@@ -106,7 +106,7 @@ export default function AxialInputControls( {
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last;
+	const only = first === last && first;
 
 	return (
 		<Layout
@@ -115,12 +115,10 @@ export default function AxialInputControls( {
 			className="component-box-control__vertical-horizontal-input-controls"
 		>
 			{ filteredSides.map( ( side ) => {
-				const [
-					parsedQuantity,
-					parsedUnit,
-				] = parseQuantityAndUnitFromRawValue(
-					side === 'vertical' ? values.top : values.left
-				);
+				const [ parsedQuantity, parsedUnit ] =
+					parseQuantityAndUnitFromRawValue(
+						side === 'vertical' ? values.top : values.left
+					);
 				const selectedUnit =
 					side === 'vertical'
 						? selectedUnits.top

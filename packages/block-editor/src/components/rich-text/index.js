@@ -76,6 +76,8 @@ function removeNativeProps( props ) {
 		'minWidth',
 		'maxWidth',
 		'setRef',
+		'disableSuggestions',
+		'disableAutocorrection',
 	] );
 }
 
@@ -120,9 +122,8 @@ function RichTextWrapper(
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
-		const { getSelectionStart, getSelectionEnd } = select(
-			blockEditorStore
-		);
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -239,7 +240,11 @@ function RichTextWrapper(
 		);
 	}
 
-	const { value, onChange, ref: richTextRef } = useRichText( {
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -338,7 +343,8 @@ function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					anchorRef={ anchorRef.current }
+					anchorRef={ anchorRef }
+					value={ value }
 				/>
 			) }
 			<TagName

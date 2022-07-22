@@ -22,7 +22,7 @@ const gitTests = [
 	{
 		sourceString: 'ssh://git@github.com/short.git',
 		url: 'ssh://git@github.com/short.git',
-		ref: 'master',
+		ref: undefined,
 		path: currentDirectory + '/short',
 		clonePath: currentDirectory + '/short',
 		basename: 'short',
@@ -30,7 +30,7 @@ const gitTests = [
 	{
 		sourceString: 'ssh://git@github.com/owner/long/path/repo.git',
 		url: 'ssh://git@github.com/owner/long/path/repo.git',
-		ref: 'master',
+		ref: undefined,
 		path: currentDirectory + '/owner/long/path/repo',
 		clonePath: currentDirectory + '/owner/long/path/repo',
 		basename: 'repo',

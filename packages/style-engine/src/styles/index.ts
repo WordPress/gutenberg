@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import padding from './padding';
-import margin from './margin';
+import border from './border';
+import color from './color';
+import spacing from './spacing';
+import typography from './typography';
 
-export const styleDefinitions = [ margin, padding ];
+export const styleDefinitions = [
+	...border,
+	...color,
+	...spacing,
+	...typography,
+];

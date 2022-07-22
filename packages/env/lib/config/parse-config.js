@@ -133,7 +133,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 			return {
 				type: 'git',
 				url: sshUrl.href.split( '#' )[ 0 ],
-				ref: sshUrl.hash.slice( 1 ) || 'master',
+				ref: sshUrl.hash.slice( 1 ) || undefined,
 				path: workingPath,
 				clonePath: workingPath,
 				basename,
@@ -144,11 +144,12 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
 	);
+
 	if ( gitHubFields ) {
 		return {
 			type: 'git',
 			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 5 ] || 'master',
+			ref: gitHubFields[ 5 ],
 			path: path.resolve(
 				workDirectoryPath,
 				gitHubFields[ 2 ],

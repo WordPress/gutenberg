@@ -147,6 +147,7 @@ const BorderControlDropdown = (
 		resetButtonClassName,
 		showDropdownHeader,
 		enableStyle = true,
+		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
 
@@ -175,6 +176,8 @@ const BorderControlDropdown = (
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
 			position={ dropdownPosition }
+			label={ __( 'Border color and style picker' ) }
+			showTooltip={ true }
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
@@ -240,7 +243,10 @@ const BorderControlDropdown = (
 		<Dropdown
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
-			contentClassName={ popoverClassName }
+			popoverProps={ {
+				...__unstablePopoverProps,
+				className: popoverClassName,
+			} }
 			{ ...otherProps }
 			ref={ forwardedRef }
 		/>

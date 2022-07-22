@@ -2,6 +2,7 @@ export { default as Icon } from './icon';
 
 export { default as addCard } from './library/add-card';
 export { default as addSubmenu } from './library/add-submenu';
+export { default as addTemplate } from './library/add-template';
 export { default as alignCenter } from './library/align-center';
 export { default as alignJustify } from './library/align-justify';
 export { default as alignLeft } from './library/align-left';
@@ -196,6 +197,7 @@ export { default as settings } from './library/settings';
 export { default as share } from './library/share';
 export { default as shield } from './library/shield';
 export { default as shortcode } from './library/shortcode';
+export { default as shuffle } from './library/shuffle';
 export { default as siteLogo } from './library/site-logo';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';

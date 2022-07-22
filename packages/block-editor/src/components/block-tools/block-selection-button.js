@@ -102,7 +102,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
-		isNavigationMode,
 	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
@@ -160,10 +159,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && isNavigationMode() ) {
-			clearSelectedBlock();
-			event.preventDefault();
-		}
 		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
 			event.preventDefault();
@@ -262,6 +257,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						onClick={ () => setNavigationMode( false ) }
 						onKeyDown={ onKeyDown }
 						label={ label }
+						showTooltip={ false }
 						className="block-selection-button_select-button"
 					>
 						<BlockTitle

@@ -108,7 +108,6 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2, 3 ] );
 
 		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
@@ -420,7 +419,6 @@ describe( 'Multi-block selection', () => {
 		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
 
-		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
 	} );
 
@@ -720,9 +718,8 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Escape' );
 
 		await pressKeyWithModifier( 'primary', 'a' );
 
@@ -900,30 +897,6 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Enter' );
-
-		// Ensure selection is in the correct place.
-		await page.keyboard.type( '&' );
-
-		// Expect two blocks with "&" in between.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should merge into quote with correct selection', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '> 1[' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( ']2' );
-		await page.keyboard.press( 'ArrowLeft' );
-		// Select everything between [].
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
-
-		// Test setup.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '&' );

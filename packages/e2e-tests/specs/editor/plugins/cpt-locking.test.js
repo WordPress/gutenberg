@@ -49,12 +49,12 @@ describe( 'cpt locking', () => {
 
 	const shouldAllowBlocksToBeMoved = async () => {
 		await page.click(
-			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
-			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+			'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -103,9 +103,8 @@ describe( 'cpt locking', () => {
 
 		it( 'should show invalid template notice if the blocks do not match the templte', async () => {
 			const content = await getEditedPostContent();
-			const [ , contentWithoutImage ] = content.split(
-				'<!-- /wp:image -->'
-			);
+			const [ , contentWithoutImage ] =
+				content.split( '<!-- /wp:image -->' );
 			await setPostContent( contentWithoutImage );
 			const noticeContent = await page.waitForSelector(
 				'.editor-template-validation-notice .components-notice__content'
@@ -194,7 +193,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be removed', async () => {
 			await page.type(
-				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+				'div > .block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
 			await clickBlockToolbarButton( 'Options' );

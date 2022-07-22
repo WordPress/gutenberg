@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { countBy, flatMap, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -50,7 +45,7 @@ const multipleH1Headings = [
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
-	return flatMap( blocks, ( block = {} ) => {
+	return blocks.flatMap( ( block = {} ) => {
 		if ( block.name === 'core/heading' ) {
 			return {
 				...block,
@@ -83,7 +78,13 @@ export const DocumentOutline = ( {
 	// Not great but it's the simplest way to locate the title right now.
 	const titleNode = document.querySelector( '.editor-post-title__input' );
 	const hasTitle = isTitleSupported && title && titleNode;
-	const countByLevel = countBy( headings, 'level' );
+	const countByLevel = headings.reduce(
+		( acc, heading ) => ( {
+			...acc,
+			[ heading.level ]: ( acc[ heading.level ] || 0 ) + 1,
+		} ),
+		{}
+	);
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (
@@ -155,7 +156,7 @@ export default compose(
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			blocks: getBlocks(),
-			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
+			isTitleSupported: postType?.supports?.title ?? false,
 		};
 	} )
 )( DocumentOutline );

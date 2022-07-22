@@ -73,12 +73,10 @@ function setContentEditableWrapper( node, value ) {
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
-	const { multiSelect, selectBlock, selectionChange } = useDispatch(
-		blockEditorStore
-	);
-	const { getBlockParents, getBlockSelectionStart } = useSelect(
-		blockEditorStore
-	);
+	const { multiSelect, selectBlock, selectionChange } =
+		useDispatch( blockEditorStore );
+	const { getBlockParents, getBlockSelectionStart } =
+		useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -86,12 +84,11 @@ export default function useSelectionObserver() {
 
 			function onSelectionChange( event ) {
 				const selection = defaultView.getSelection();
-				// If no selection is found, end multi selection and disable the
-				// contentEditable wrapper.
+
 				if ( ! selection.rangeCount ) {
-					setContentEditableWrapper( node, false );
 					return;
 				}
+
 				// If selection is collapsed and we haven't used `shift+click`,
 				// end multi selection and disable the contentEditable wrapper.
 				// We have to check about `shift+click` case because elements

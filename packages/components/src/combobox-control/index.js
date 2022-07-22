@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, deburr } from 'lodash';
+import removeAccents from 'remove-accents';
+
 /**
  * WordPress dependencies
  */
@@ -15,19 +16,21 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { Flex, FlexBlock, FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+
+const noop = () => {};
 
 const DetectOutside = withFocusOutside(
 	class extends Component {
@@ -42,6 +45,7 @@ const DetectOutside = withFocusOutside(
 );
 
 function ComboboxControl( {
+	__next36pxDefaultSize,
 	value,
 	label,
 	options,
@@ -57,7 +61,10 @@ function ComboboxControl( {
 } ) {
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
-	const instanceId = useInstanceId( ComboboxControl );
+	// Use a custom prefix when generating the `instanceId` to avoid having
+	// duplicate input IDs when rendering this component and `FormTokenField`
+	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
+	const instanceId = useInstanceId( ComboboxControl, 'combobox-control' );
 	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
 		currentOption || null
 	);
@@ -69,9 +76,9 @@ function ComboboxControl( {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
 		const containsMatch = [];
-		const match = deburr( inputValue.toLocaleLowerCase() );
+		const match = removeAccents( inputValue.toLocaleLowerCase() );
 		options.forEach( ( option ) => {
-			const index = deburr( option.label )
+			const index = removeAccents( option.label )
 				.toLocaleLowerCase()
 				.indexOf( match );
 			if ( index === 0 ) {
@@ -111,22 +118,22 @@ function ComboboxControl( {
 			return;
 		}
 
-		switch ( event.keyCode ) {
-			case ENTER:
+		switch ( event.code ) {
+			case 'Enter':
 				if ( selectedSuggestion ) {
 					onSuggestionSelected( selectedSuggestion );
 					preventDefault = true;
 				}
 				break;
-			case UP:
+			case 'ArrowUp':
 				handleArrowNavigation( -1 );
 				preventDefault = true;
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				handleArrowNavigation( 1 );
 				preventDefault = true;
 				break;
-			case ESCAPE:
+			case 'Escape':
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
@@ -166,7 +173,7 @@ function ComboboxControl( {
 
 	const handleOnReset = () => {
 		onChange( null );
-		inputContainer.current.input.focus();
+		inputContainer.current.focus();
 	};
 
 	// Update current selections when the filter input changes.
@@ -223,7 +230,9 @@ function ComboboxControl( {
 					tabIndex="-1"
 					onKeyDown={ onKeyDown }
 				>
-					<Flex>
+					<InputWrapperFlex
+						__next36pxDefaultSize={ __next36pxDefaultSize }
+					>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -255,7 +264,7 @@ function ComboboxControl( {
 								/>
 							</FlexItem>
 						) }
-					</Flex>
+					</InputWrapperFlex>
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }

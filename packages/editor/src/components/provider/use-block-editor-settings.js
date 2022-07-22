@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo } from 'lodash';
+import { pick, unionBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +41,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		const isWeb = Platform.OS === 'web';
 		const { canUser, getEntityRecord } = select( coreStore );
 
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -52,29 +54,41 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: -1 }
 				  )
 				: [], // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
+			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
 		};
 	}, [] );
 
-	const {
-		__experimentalBlockPatterns: settingsBlockPatterns,
-		__experimentalBlockPatternCategories: settingsBlockPatternCategories,
-	} = settings;
+	const settingsBlockPatterns =
+		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+		settings.__experimentalBlockPatterns; // WP 5.9
+	const settingsBlockPatternCategories =
+		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		settings.__experimentalBlockPatternCategories; // WP 5.9
 
-	const { blockPatterns, blockPatternCategories } = useSelect(
+	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
 		( select ) => ( {
-			blockPatterns:
-				settingsBlockPatterns ?? select( coreStore ).getBlockPatterns(),
-			blockPatternCategories:
-				settingsBlockPatternCategories ??
+			restBlockPatterns: select( coreStore ).getBlockPatterns(),
+			restBlockPatternCategories:
 				select( coreStore ).getBlockPatternCategories(),
 		} ),
-		[ settingsBlockPatterns, settingsBlockPatternCategories ]
+		[]
+	);
+
+	const blockPatterns = useMemo(
+		() => unionBy( settingsBlockPatterns, restBlockPatterns, 'name' ),
+		[ settingsBlockPatterns, restBlockPatterns ]
+	);
+
+	const blockPatternCategories = useMemo(
+		() =>
+			unionBy(
+				settingsBlockPatternCategories,
+				restBlockPatternCategories,
+				'name'
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
 	const { undo } = useDispatch( editorStore );
@@ -124,6 +138,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',
