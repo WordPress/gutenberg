@@ -846,10 +846,29 @@ _Returns_
 
 Returns an action object used in signalling that block styles have been removed.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { removeBlockStyles } = useDispatch( blocksStore );
+
+	return (
+		<Button onClick={ () => removeBlockStyles( 'core/button', 'outline' ) }>
+			{ __( 'Remove the Outline style from the core/button block' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _styleNames_ `Array|string`: Block style names.
+-   _styleNames_ `Array|string`: Block style names or array of block style names.
 
 _Returns_
 

@@ -329,7 +329,25 @@ export function addBlockStyles( blockName, styles ) {
  * Returns an action object used in signalling that block styles have been removed.
  *
  * @param {string}       blockName  Block name.
- * @param {Array|string} styleNames Block style names.
+ * @param {Array|string} styleNames Block style names or array of block style names.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { removeBlockStyles } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button onClick={ () => removeBlockStyles( 'core/button', 'outline' ) }>
+ *             { __( 'Remove the Outline style from the core/button block' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
