@@ -127,8 +127,10 @@ function IndentUI( { clientId } ) {
 	);
 }
 
-function Edit( { attributes, setAttributes, clientId } ) {
-	const blockProps = useBlockProps();
+function Edit( { attributes, setAttributes, clientId, style } ) {
+	const blockProps = useBlockProps( {
+		...( Platform.isNative && { style } ),
+	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
