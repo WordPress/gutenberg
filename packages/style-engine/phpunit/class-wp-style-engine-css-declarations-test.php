@@ -101,7 +101,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: &lt;red/&gt;; margin-right: 10em;',
+			'margin-right: 10em;',
 			$css_declarations->get_declarations_string()
 		);
 	}

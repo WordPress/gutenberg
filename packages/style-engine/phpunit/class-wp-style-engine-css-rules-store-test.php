@@ -43,20 +43,19 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_pie_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'meat-pie' );
 		$selector      = '.wp-block-sauce a:hover';
 		$store_rule    = $new_pie_store->add_rule( $selector );
-		$expected      = "$selector {}";
-		$this->assertEquals( $expected, $store_rule->get_css() );
+		$this->assertEquals( '', $store_rule->get_css() );
 
-		$pie_declarations = array(
-			'color'         => 'brown',
-			'border-color'  => 'yellow',
-			'border-radius' => '10rem',
+		$css_declarations = new WP_Style_Engine_CSS_Declarations(
+			array(
+				'color'         => 'brown',
+				'border-color'  => 'yellow',
+				'border-radius' => '10rem',
+			)
 		);
-		$css_declarations = new WP_Style_Engine_CSS_Declarations( $pie_declarations );
-		$store_rule->add_declarations( $css_declarations );
 
-		$store_rule = $new_pie_store->add_rule( $selector );
-		$styles     = $css_declarations->get_declarations_string();
-		$expected   = empty( $styles ) ? '' : $selector . ' {' . $styles . '}';
+		$new_pie_store->add_rule( $selector )->add_declarations( $css_declarations );
+		$styles   = $css_declarations->get_declarations_string();
+		$expected = $selector . ' {' . $styles . '}';
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
 
