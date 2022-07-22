@@ -108,6 +108,4 @@ DropdownSelector.args = {
 	...Default.args,
 	__experimentalExpandOnFocus: true,
 	__experimentalAutoSelectFirstMatch: true,
-	__experimentalValidateInput: ( token: string ) =>
-		continents.includes( token ),
 };
