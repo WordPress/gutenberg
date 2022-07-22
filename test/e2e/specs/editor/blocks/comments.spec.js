@@ -300,7 +300,7 @@ test.describe( 'Post Comments', () => {
 		// Hide welcome guide.
 		await commentsBlockUtils.hideWelcomeGuide();
 
-		// Check that the Post Comments block has been replaced by Comments (legacy)
+		// Check that the Post Comments block has been replaced with Comments.
 		await expect( page.locator( '.wp-block-post-comments' ) ).toBeHidden();
 		await expect( page.locator( '.wp-block-comments' ) ).toBeVisible();
 
@@ -311,7 +311,7 @@ test.describe( 'Post Comments', () => {
 		// Visit post
 		await page.goto( `/?p=${ postId }` );
 
-		// Rendered block should be the same as Post Comments
+		// Rendered block should be the same as Post Comments.
 		await expect( page.locator( '.wp-block-post-comments' ) ).toBeVisible();
 		await expect( page.locator( '.comment-content' ) ).toContainText(
 			'This is an automated comment'
