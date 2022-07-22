@@ -189,54 +189,58 @@ const BorderControlDropdown = (
 	);
 
 	const renderContent = ( { onClose }: PopoverProps ) => (
-		<DropdownContentWrapper paddingSize="medium">
-			<VStack className={ popoverControlsClassName } spacing={ 6 }>
-				{ showDropdownHeader ? (
-					<HStack>
-						<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
-						<Button
-							isSmall
-							label={ __( 'Close border color' ) }
-							icon={ closeSmall }
-							onClick={ onClose }
-						/>
-					</HStack>
-				) : undefined }
-				<ColorPalette
-					className={ popoverContentClassName }
-					value={ color }
-					onChange={ onColorChange }
-					{ ...{ colors, disableCustomColors } }
-					__experimentalHasMultipleOrigins={
-						__experimentalHasMultipleOrigins
-					}
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ false }
-					enableAlpha={ enableAlpha }
-				/>
-				{ enableStyle && (
-					<BorderControlStylePicker
-						label={ __( 'Style' ) }
-						value={ style }
-						onChange={ onStyleChange }
+		<>
+			<DropdownContentWrapper paddingSize="medium">
+				<VStack className={ popoverControlsClassName } spacing={ 6 }>
+					{ showDropdownHeader ? (
+						<HStack>
+							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
+							<Button
+								isSmall
+								label={ __( 'Close border color' ) }
+								icon={ closeSmall }
+								onClick={ onClose }
+							/>
+						</HStack>
+					) : undefined }
+					<ColorPalette
+						className={ popoverContentClassName }
+						value={ color }
+						onChange={ onColorChange }
+						{ ...{ colors, disableCustomColors } }
+						__experimentalHasMultipleOrigins={
+							__experimentalHasMultipleOrigins
+						}
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						clearable={ false }
+						enableAlpha={ enableAlpha }
 					/>
-				) }
-			</VStack>
+					{ enableStyle && (
+						<BorderControlStylePicker
+							label={ __( 'Style' ) }
+							value={ style }
+							onChange={ onStyleChange }
+						/>
+					) }
+				</VStack>
+			</DropdownContentWrapper>
 			{ showResetButton && (
-				<Button
-					className={ resetButtonClassName }
-					variant="tertiary"
-					onClick={ () => {
-						onReset();
-						onClose();
-					} }
-				>
-					{ __( 'Reset to default' ) }
-				</Button>
+				<DropdownContentWrapper paddingSize="none">
+					<Button
+						className={ resetButtonClassName }
+						variant="tertiary"
+						onClick={ () => {
+							onReset();
+							onClose();
+						} }
+					>
+						{ __( 'Reset to default' ) }
+					</Button>
+				</DropdownContentWrapper>
 			) }
-		</DropdownContentWrapper>
+		</>
 	);
 
 	return (
