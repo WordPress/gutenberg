@@ -88,6 +88,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
+        private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
@@ -99,7 +100,6 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
 
         const val PROP_LOCALE = "locale"
-        const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
