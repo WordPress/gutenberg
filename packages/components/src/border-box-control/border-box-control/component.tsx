@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,26 +18,20 @@ import { VisuallyHidden } from '../../visually-hidden';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderBoxControl } from './hook';
 
-import type {
-	BorderBoxControlProps,
-	BorderBoxControlLabelProps,
-} from '../types';
+import type { BorderBoxControlProps } from '../types';
+import type { LabelProps } from '../../border-control/types';
 
-const BorderLabel = ( props: BorderBoxControlLabelProps ) => {
-	const { label, hideLabelFromVision, ...otherProps } = props;
+const BorderLabel = ( props: LabelProps ) => {
+	const { label, hideLabelFromVision } = props;
 
 	if ( ! label ) {
 		return null;
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="div" { ...otherProps }>
-			{ label }
-		</VisuallyHidden>
+		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel as="div" { ...otherProps }>
-			{ label }
-		</StyledLabel>
+		<StyledLabel as="legend">{ label }</StyledLabel>
 	);
 };
 
@@ -70,10 +64,6 @@ const BorderBoxControl = (
 	} = useBorderBoxControl( props );
 	const containerRef = useRef();
 	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const labelId = useInstanceId(
-		BorderBoxControl,
-		'border-box-control-label'
-	) as string;
 	const popoverProps = popoverPlacement
 		? {
 				placement: popoverPlacement,
@@ -85,14 +75,12 @@ const BorderBoxControl = (
 
 	return (
 		<View
-			role="group"
+			as="fieldset"
 			className={ className }
 			{ ...otherProps }
 			ref={ mergedRef }
-			aria-labelledby={ label && labelId }
 		>
 			<BorderLabel
-				id={ labelId }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>

@@ -122,10 +122,3 @@ export type SplitControlsProps = ColorProps & {
 	 */
 	__next36pxDefaultSize?: boolean;
 };
-
-export type BorderBoxControlLabelProps = LabelProps & {
-	/**
-	 * Unique ID for the label.
-	 */
-	id?: string;
-};
