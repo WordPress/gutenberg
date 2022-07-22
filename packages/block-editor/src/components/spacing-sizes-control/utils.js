@@ -110,16 +110,11 @@ export function getAllRawValue( values = {} ) {
  * Checks to determine if values are mixed.
  *
  * @param {Object} values        Box values.
- * @param {Object} selectedUnits Box units.
- * @param {Array}  sides         Available box sides to evaluate.
  *
  * @return {boolean} Whether values are mixed.
  */
-export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
-	const allValue = getAllRawValue( values, selectedUnits, sides );
-	const isMixed = isNaN( parseFloat( allValue ) );
-
-	return isMixed;
+export function isValuesMixed( values = {} ) {
+	return new Set( Object.values( values ) ).size > 1;
 }
 
 /**
@@ -127,7 +122,7 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
  *
  * @param {Object} values Box values.
  *
- * @return {boolean} Whether values are mixed.
+ * @return {boolean} Whether values are defined.
  */
 export function isValuesDefined( values ) {
 	return (
