@@ -30,7 +30,7 @@ export default function SpacingSizesControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Spacing Control' ),
-	values: valuesProp,
+	values,
 	sides,
 	splitOnAxis = false,
 	allowReset = true,
@@ -41,9 +41,9 @@ export default function SpacingSizesControl( {
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
 	];
-	const [ values, setValues ] = useState( valuesProp );
+	//const [ values, setValues ] = useState( valuesProp );
 	const inputValues = values || DEFAULT_VALUES;
-	const hasInitialValue = isValuesDefined( valuesProp );
+	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
@@ -58,13 +58,11 @@ export default function SpacingSizesControl( {
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
 		onChange( newValues );
-		setValues( newValues );
 		setIsDirty( true );
 	};
 
 	const handleOnReset = () => {
 		onChange( resetValues );
-		setValues( resetValues );
 		setIsDirty( false );
 	};
 

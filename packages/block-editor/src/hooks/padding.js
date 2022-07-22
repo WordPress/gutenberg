@@ -26,7 +26,10 @@ import {
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
 import SpacingSizesControl from '../components/spacing-sizes-control';
-import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import {
+	getSpacingPresetCssVar,
+	isValueSpacingPreset,
+} from '../components/spacing-sizes-control/utils';
 /**
  * Determines if there is padding support.
  *
@@ -143,16 +146,6 @@ export function PaddingEdit( props ) {
 						allowReset={ false }
 						splitOnAxis={ splitOnAxis }
 					/>
-					{ /* <SpacingSizesControl
-						values={ style?.spacing?.padding }
-						onChange={ onChange }
-						label={ __( 'Padding' ) }
-						sides={ sides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ splitOnAxis }
-						useSelect={ true }
-					/> */ }
 				</>
 			</>
 		),
@@ -164,14 +157,18 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
-			borderTopWidth: getSpacingPresetCssVar( padding?.top ) ?? 0,
-			borderRightWidth: getSpacingPresetCssVar( padding?.right ) ?? 0,
-			borderBottomWidth: getSpacingPresetCssVar( padding?.bottom ) ?? 0,
-			borderLeftWidth: getSpacingPresetCssVar( padding?.left ) ?? 0,
-			// borderTopWidth: padding?.top ?? 0,
-			// borderRightWidth: padding?.right ?? 0,
-			// borderBottomWidth: padding?.bottom ?? 0,
-			// borderLeftWidth: padding?.left ?? 0,
+			borderTopWidth: isValueSpacingPreset( padding?.top )
+				? getSpacingPresetCssVar( padding?.top )
+				: padding?.top,
+			borderRightWidth: isValueSpacingPreset( padding?.right )
+				? getSpacingPresetCssVar( padding?.right )
+				: padding?.right,
+			borderBottomWidth: isValueSpacingPreset( padding?.bottom )
+				? getSpacingPresetCssVar( padding?.bottom )
+				: padding?.bottom,
+			borderLeftWidth: isValueSpacingPreset( padding?.left )
+				? getSpacingPresetCssVar( padding?.left )
+				: padding?.left,
 		};
 	}, [ padding ] );
 
