@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -14,8 +15,9 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import { Button } from '../button';
 import BaseControl from '../base-control';
+import type { SearchControlProps } from './types';
 
 function SearchControl(
 	{
@@ -28,8 +30,8 @@ function SearchControl(
 		hideLabelFromVision = true,
 		help,
 		onClose,
-	},
-	forwardedRef
+	}: SearchControlProps,
+	forwardedRef: ForwardedRef< any >
 ) {
 	const searchRef = useRef();
 	const instanceId = useInstanceId( SearchControl );
@@ -53,7 +55,9 @@ function SearchControl(
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
 						onChange( '' );
-						searchRef.current.focus();
+						if ( searchRef.current ) {
+							( searchRef.current as HTMLInputElement )?.focus();
+						}
 					} }
 				/>
 			);

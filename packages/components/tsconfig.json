@@ -78,6 +78,7 @@
 		"src/resizable-box/**/*",
 		"src/scroll-lock/**/*",
 		"src/scrollable/**/*",
+		"src/search-control/**/*",
 		"src/select-control/**/*",
 		"src/shortcut/**/*",
 		"src/slot-fill/**/*",
