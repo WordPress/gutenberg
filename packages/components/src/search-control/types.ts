@@ -16,6 +16,6 @@ export type SearchControlProps = {
 	label: string;
 	placeholder: string | undefined;
 	hideLabelFromVision: boolean | undefined;
-	help: String | WPElement | undefined;
+	help: string | WPElement | undefined;
 	onClose: Function;
 };
