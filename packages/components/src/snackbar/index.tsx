@@ -70,15 +70,13 @@ function Snackbar(
 		}
 
 		// Prevent focus loss by moving it to the list element.
-		if ( listRef?.current ) {
-			( listRef.current as HTMLDivElement )?.focus();
-		}
+		listRef?.current?.focus();
 
 		onDismiss();
 		onRemove();
 	}
 
-	function onActionClick( event: Event, onClick: ( event: Event ) => {} ) {
+	function onActionClick( event: Event, onClick?: ( event: Event ) => {} ) {
 		event.stopPropagation();
 
 		onRemove();
