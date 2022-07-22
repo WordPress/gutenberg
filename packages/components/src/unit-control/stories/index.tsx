@@ -24,9 +24,6 @@ const meta: ComponentMeta< typeof UnitControl > = {
 		__unstableStateReducer: {
 			control: { type: null },
 		},
-		size: {
-			control: { type: 'select' },
-		},
 		onChange: {
 			action: 'onChange',
 			control: { type: null },
