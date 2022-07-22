@@ -77,4 +77,20 @@ describe( 'autocomplete', () => {
 		<!-- /wp:paragraph -->"
 		` );
 	} );
+
+	it( 'should cancel selection via `Escape` keypress', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'My favorite fruit is ~app' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.type( " ...no I changed my mind. It's mango." );
+		// The characters before `Escape` should remain (i.e. `~app`)
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>My favorite fruit is ~app ...no I changed my mind. It's mango.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should allow option navigation via keypress', async () => {} );
 } );

@@ -8,6 +8,10 @@
 			{ visual: '🍎', name: 'Apple', id: 1 },
 			{ visual: '🍊', name: 'Orange', id: 2 },
 			{ visual: '🍇', name: 'Grapes', id: 3 },
+			{ visual: '🥭', name: 'Mango', id: 4 },
+			{ visual: '🍓', name: 'Strawberry', id: 5 },
+			{ visual: '🫐', name: 'Blueberry', id: 6 },
+			{ visual: '🍒', name: 'Cherry', id: 7 },
 		],
 		// Returns a label for an option like "🍊 Orange"
 		getOptionLabel: ( option ) => `
