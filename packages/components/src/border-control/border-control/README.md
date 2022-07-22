@@ -113,6 +113,14 @@ _Note: the value may be `undefined` if a user clears all border properties._
 
 - Required: Yes
 
+### `renderAsFieldset`: `boolean`
+
+Whether or not the `BorderControl` should render as a fieldset and use a legend
+for its label.
+
+- Required: No
+- Default: false
+
 ### `shouldSanitizeBorder`: `boolean`
 
 If opted into, sanitizing the border means that if no width or color have been

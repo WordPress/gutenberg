@@ -60,6 +60,13 @@ export type LabelProps = {
 	label?: string;
 };
 
+export type BorderLabelProps = LabelProps & {
+	/**
+	 * Allows rendering the label as a legend for use inside a fieldset.
+	 */
+	as?: 'legend';
+};
+
 export type BorderControlProps = ColorProps &
 	LabelProps & {
 		/**
@@ -84,6 +91,13 @@ export type BorderControlProps = ColorProps &
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
 		__unstablePopoverProps?: Record< string, unknown >;
+		/**
+		 * Whether or not the `BorderControl` should render as a fieldset and
+		 * use a legend for its label.
+		 *
+		 * @default false
+		 */
+		renderAsFieldset?: boolean;
 		/**
 		 * If opted into, sanitizing the border means that if no width or color
 		 * have been selected, the border style is also cleared and `undefined`

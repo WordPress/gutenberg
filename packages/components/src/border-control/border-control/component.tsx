@@ -16,19 +16,19 @@ import { VisuallyHidden } from '../../visually-hidden';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControl } from './hook';
 
-import type { BorderControlProps, LabelProps } from '../types';
+import type { BorderControlProps, BorderLabelProps } from '../types';
 
-const BorderLabel = ( props: LabelProps ) => {
-	const { label, hideLabelFromVision } = props;
+const BorderLabel = ( props: BorderLabelProps ) => {
+	const { label, hideLabelFromVision, ...labelProps } = props;
 
 	if ( ! label ) {
 		return null;
 	}
 
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+		<VisuallyHidden { ...labelProps }>{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel as="legend">{ label }</StyledLabel>
+		<StyledLabel { ...labelProps }>{ label }</StyledLabel>
 	);
 };
 
@@ -50,6 +50,7 @@ const UnconnectedBorderControl = (
 		placeholder,
 		__unstablePopoverProps,
 		previousStyleSelection,
+		renderAsFieldset = false,
 		showDropdownHeader,
 		sliderClassName,
 		value: border,
@@ -64,10 +65,15 @@ const UnconnectedBorderControl = (
 	} = useBorderControl( props );
 
 	return (
-		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
+		<View
+			as={ renderAsFieldset ? 'fieldset' : undefined }
+			{ ...otherProps }
+			ref={ forwardedRef }
+		>
 			<BorderLabel
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
+				as={ renderAsFieldset ? 'legend' : undefined }
 			/>
 			<HStack spacing={ 3 }>
 				<HStack className={ innerWrapperClassName } alignment="stretch">
