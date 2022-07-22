@@ -12,9 +12,6 @@ test.use( {
 	commentsBlockUtils: async ( { page, admin, requestUtils }, use ) => {
 		await use( new CommentsBlockUtils( { page, admin, requestUtils } ) );
 	},
-	codeEditorUtils: async ( { page }, use ) => {
-		await use( new CodeEditorUtils( { page } ) );
-	},
 } );
 
 test.describe( 'Comments', () => {
@@ -280,8 +277,8 @@ test.describe( 'Post Comments', () => {
 	test( 'is converted to Comments with legacy attribute', async ( {
 		page,
 		admin,
+		editor,
 		requestUtils,
-		codeEditorUtils,
 		commentsBlockUtils,
 	} ) => {
 		// Create a post with the old "Post Comments" block.
@@ -307,12 +304,9 @@ test.describe( 'Post Comments', () => {
 		await expect( page.locator( '.wp-block-post-comments' ) ).toBeHidden();
 		await expect( page.locator( '.wp-block-comments' ) ).toBeVisible();
 
-		// Open code editor and check its content.
-		await codeEditorUtils.open();
-		await expect( codeEditorUtils.textbox() ).toContainText(
-			'<!-- wp:comments {"legacy":true} /-->'
-		);
-		await codeEditorUtils.close();
+		// Check the block definition has changed.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toBe( '<!-- wp:comments {"legacy":true} /-->' );
 
 		// Visit post
 		await page.goto( `/?p=${ postId }` );
@@ -386,32 +380,5 @@ class CommentsBlockUtils {
 
 		await this.page.reload();
 		await this.page.waitForSelector( '.edit-post-layout' );
-	}
-}
-
-class CodeEditorUtils {
-	constructor( { page } ) {
-		this.page = page;
-	}
-
-	async open() {
-		await this.page
-			.locator(
-				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-			)
-			.click();
-		await this.page
-			.locator( 'role=menuitemradio[name*="Code editor"i]' )
-			.click();
-	}
-
-	textbox() {
-		return this.page.locator( 'role=textbox[name="Type text or HTML"i]' );
-	}
-
-	async close() {
-		await this.page
-			.locator( 'role=button[name="Exit code editor"i]' )
-			.click();
 	}
 }
