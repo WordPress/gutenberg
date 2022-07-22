@@ -50,8 +50,8 @@ _Related_
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
--   _dateValue_ `Moment | Date | string | undefined`: Date object or string, parsable by moment.js.
--   _timezone_ `string | boolean | undefined`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
+-   _dateValue_ `[Moment | Date | string | undefined]`: Date object or string, parsable by moment.js.
+-   _timezone_ `[string | boolean | undefined]`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
 
 _Returns_
 
