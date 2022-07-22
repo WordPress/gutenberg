@@ -22,9 +22,9 @@ test.describe( 'Using Hooks API', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
-		expect(
-			page.locator( '.edit-post-sidebar .e2e-reset-block-button' )
-		).not.toBeNull();
+		await expect(
+			page.locator( 'role=button[name="Reset Block"i]' )
+		).toBeVisible();
 	} );
 
 	test( 'Pressing reset block button resets the block', async ( {
@@ -34,11 +34,11 @@ test.describe( 'Using Hooks API', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'First paragraph' );
 
-		const content = page.locator( 'p[data-type="core/paragraph"]' );
-		expect( await content.evaluate( ( node ) => node.innerText ) ).toEqual(
-			'First paragraph'
+		const paragraphBlock = page.locator(
+			'role=document[name="Paragraph block"i]'
 		);
+		await expect( paragraphBlock ).toHaveText( 'First paragraph' );
 		await page.click( 'role=button[name="Reset Block"i]' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toEqual( '' );
 	} );
 } );
