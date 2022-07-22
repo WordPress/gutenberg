@@ -2,8 +2,6 @@
  * External dependencies
  */
 const path = require( 'path' ); // import fs from 'fs';
-// import os from 'os';
-// import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
