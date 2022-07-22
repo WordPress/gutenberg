@@ -35,6 +35,7 @@
 -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
+-   `useBaseField`: Convert to TypeScript ([#42622](https://github.com/WordPress/gutenberg/pull/42622)).
 
 ## 19.15.0 (2022-07-13)
 
