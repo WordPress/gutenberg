@@ -22,6 +22,7 @@ import { VStack } from '../../v-stack';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
+import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 import type {
 	Color,
@@ -141,7 +142,6 @@ const BorderControlDropdown = (
 		onReset,
 		onColorChange,
 		onStyleChange,
-		popoverClassName,
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
@@ -189,7 +189,7 @@ const BorderControlDropdown = (
 	);
 
 	const renderContent = ( { onClose }: PopoverProps ) => (
-		<>
+		<DropdownContentWrapper paddingSize="medium">
 			<VStack className={ popoverControlsClassName } spacing={ 6 }>
 				{ showDropdownHeader ? (
 					<HStack>
@@ -236,7 +236,7 @@ const BorderControlDropdown = (
 					{ __( 'Reset to default' ) }
 				</Button>
 			) }
-		</>
+		</DropdownContentWrapper>
 	);
 
 	return (
@@ -245,7 +245,6 @@ const BorderControlDropdown = (
 			renderContent={ renderContent }
 			popoverProps={ {
 				...__unstablePopoverProps,
-				className: popoverClassName,
 			} }
 			{ ...otherProps }
 			ref={ forwardedRef }
