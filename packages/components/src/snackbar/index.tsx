@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef, MouseEvent, KeyboardEvent } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -8,27 +9,27 @@ import classnames from 'classnames';
  */
 import { speak } from '@wordpress/a11y';
 import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+import type { WPElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import { Button } from '../button';
+import type { SnackbarProps } from './types';
 
 const noop = () => {};
 const NOTICE_TIMEOUT = 10000;
 
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
-
 /**
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
- *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(
+	message: string | WPElement,
+	politeness: 'polite' | 'assertive'
+) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
 
@@ -54,24 +55,30 @@ function Snackbar(
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss = noop,
 		listRef,
-	},
-	ref
+	}: SnackbarProps,
+	ref: ForwardedRef< any >
 ) {
 	onDismiss = onDismiss || noop;
 
-	function dismissMe( event ) {
+	function dismissMe(
+		event:
+			| KeyboardEvent< HTMLDivElement | HTMLSpanElement >
+			| MouseEvent< HTMLDivElement | HTMLSpanElement >
+	) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
 
 		// Prevent focus loss by moving it to the list element.
-		listRef.current.focus();
+		if ( listRef?.current ) {
+			( listRef.current as HTMLDivElement )?.focus();
+		}
 
 		onDismiss();
 		onRemove();
 	}
 
-	function onActionClick( event, onClick ) {
+	function onActionClick( event: Event, onClick: ( event: Event ) => {} ) {
 		event.stopPropagation();
 
 		onRemove();
@@ -119,7 +126,7 @@ function Snackbar(
 			ref={ ref }
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : noop }
-			tabIndex="0"
+			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : '' }
 			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
 			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
@@ -135,7 +142,7 @@ function Snackbar(
 							key={ index }
 							href={ url }
 							variant="tertiary"
-							onClick={ ( event ) =>
+							onClick={ ( event: Event ) =>
 								onActionClick( event, onClick )
 							}
 							className="components-snackbar__action"
@@ -148,7 +155,7 @@ function Snackbar(
 					<span
 						role="button"
 						aria-label="Dismiss this notice"
-						tabIndex="0"
+						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }
 						onKeyPress={ dismissMe }

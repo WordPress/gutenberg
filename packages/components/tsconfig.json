@@ -33,6 +33,7 @@
 	"include": [
 		"src/__next/**/*",
 		"src/animate/**/*",
+		"src/animation/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
 		"src/border-box-control/**/*",
@@ -81,6 +82,7 @@
 		"src/select-control/**/*",
 		"src/shortcut/**/*",
 		"src/slot-fill/**/*",
+		"src/snackbar/**/*",
 		"src/style-provider/**/*",
 		"src/spacer/**/*",
 		"src/spinner/**/*",
