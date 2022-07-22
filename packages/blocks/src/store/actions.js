@@ -381,7 +381,8 @@ export function setGroupingBlockName( name ) {
  *
  * const ExampleComponent = () => {
  *     const blockCategories = useSelect( ( select ) =>
- *         select( blocksStore ).getCategories()
+ *         select( blocksStore ).getCategories(),
+ *         []
  *     );
  *
  *     const { setCategories } = useDispatch( blocksStore )
