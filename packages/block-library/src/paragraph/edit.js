@@ -146,7 +146,7 @@ function ParagraphBlock( {
 				}
 				data-empty={ content ? false : true }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
-				data-has-custom-placeholder={ placeholder ? true : undefined }
+				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

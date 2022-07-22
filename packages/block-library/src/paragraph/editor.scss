@@ -11,7 +11,7 @@
 }
 
 .block-editor-block-list__block[data-empty="true"] + .block-editor-block-list__block[data-empty="true"] {
-	&:not([data-has-custom-placeholder="true"]) {
+	&:not([data-custom-placeholder="true"]) {
 		[data-rich-text-placeholder] {
 			opacity: 0;
 		}
