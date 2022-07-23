@@ -60,6 +60,10 @@
 	grid-column: span 1;
 }
 
+.edit-site-global-styles-sidebar .components-tools-panel .span-columns {
+	grid-column: 1 / -1;
+}
+
 .edit-site-global-styles-sidebar__blocks-group {
 	padding-top: $grid-unit-30;
 	border-top: $border-width solid $gray-200;
