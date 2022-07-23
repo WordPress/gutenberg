@@ -64,7 +64,7 @@ function useConstrainedTabbing() {
 			node[ domAction ]( trap );
 			trap.focus();
 			// Remove after the browser moves focus to the next element.
-			timeoutId = setTimeout( () => node.removeChild( trap ) );
+			timeoutId = setTimeout( () => node.removeChild( trap ), 10 );
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
