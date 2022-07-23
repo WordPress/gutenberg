@@ -137,6 +137,15 @@ function Tooltip( props ) {
 	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
 
 	const createMouseDown = ( event ) => {
+		// In firefox, the mouse down event is also fired when the select
+		// list is chosen.
+		// Cancel further processing because re-rendering of child components
+		// causes onChange to be triggered with the old value.
+		// See https://github.com/WordPress/gutenberg/pull/42483
+		if ( event.target.tagName === 'OPTION' ) {
+			return;
+		}
+
 		// Preserve original child callback behavior.
 		emitToChild( children, 'onMouseDown', event );
 
@@ -149,6 +158,15 @@ function Tooltip( props ) {
 	};
 
 	const createMouseUp = ( event ) => {
+		// In firefox, the mouse up event is also fired when the select
+		// list is chosen.
+		// Cancel further processing because re-rendering of child components
+		// causes onChange to be triggered with the old value.
+		// See https://github.com/WordPress/gutenberg/pull/42483
+		if ( event.target.tagName === 'OPTION' ) {
+			return;
+		}
+
 		emitToChild( children, 'onMouseUp', event );
 		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 		setIsMouseDown( false );
