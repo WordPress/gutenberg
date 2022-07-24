@@ -373,17 +373,8 @@ class WP_Style_Engine {
 				continue;
 			}
 
-			$css_rules = $store_instance->get_all_rules();
-
-			if ( empty( $css_rules ) ) {
-				continue;
-			}
-
-			$styles_output = '';
-
-			foreach ( $css_rules as $css_rule ) {
-				$styles_output .= $css_rule->get_css();
-			}
+			$processor     = new WP_Style_Engine_Processor( $store_instance );
+			$styles_output = $processor->get_css();
 
 			if ( ! empty( $styles_output ) ) {
 				wp_register_style( $store_key, false, array(), true, true );
