@@ -159,7 +159,7 @@ export interface FormTokenFieldProps
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
-	 * Custom renderer for the token suggestions.
+	 * Custom renderer for suggestions.
 	 */
 	renderSuggestion?: ( args: { suggestion: string } ) => ReactNode;
 }

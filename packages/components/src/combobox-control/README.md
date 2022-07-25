@@ -116,6 +116,13 @@ The current value of the input.
 -   Type: `mixed`
 -   Required: Yes
 
+#### renderOption
+
+Custom renderer for options in suggestion list.
+
+-   Type: `Function` - `( args: { option: object } ) => ReactNode`
+-   Required: No
+
 ## Related components
 
 -   Like this component, but without a search input, the `CustomSelectControl` component.
