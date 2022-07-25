@@ -82,7 +82,6 @@ class WP_HTML_Processor {
 
 	public function find( $query ) {
 		$this->commit_class_changes();
-//		$this->scanner->reset();
 		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
 		if ( false === $this->scanner->scan( $this->descriptor ) ) {
 			return false;
@@ -481,13 +480,6 @@ class WP_HTML_Scanner {
 
 
 	/**
-	 * Whether we found the tag we searched for.
-	 *
-	 * @var bool
-	 */
-	public $did_match = false;
-
-	/**
 	 * Byte offset in the input document we will start or continue parsing.
 	 *
 	 * @var int
@@ -543,13 +535,11 @@ class WP_HTML_Scanner {
 
 	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0, $tag = null ) {
 		if ( $found_already === $descriptor->match_offset ) {
-			$this->did_match = true;
 			return $tag;
 		}
 
 		$tag = $this->find_next_tag();
 		if ( ! $tag ) {
-			$this->did_match = false;
 			return false;
 		}
 
@@ -571,6 +561,7 @@ class WP_HTML_Scanner {
 	 * @return WP_HTML_Scanner_Token|false
 	 */
 	public function find_next_tag() {
+		// @TODO: Handle <DOCTYPE>
 		if ( 1 !== preg_match(
 			/*
 			 * Unfortunately we can't try to search for only the tag name we want because that might
@@ -594,7 +585,6 @@ class WP_HTML_Scanner {
 			return $this->find_next_tag();
 		}
 
-		$this->did_match = false;
 		$this->start_at = $start_at + strlen( $full_match );
 		$this->tag_name = WP_HTML_Scanner_Token::from_preg_match( $tag_match['TAG'] );
 		$this->tag_start = $this->tag_name->start - 1; // rewind past the leading `<`
@@ -667,7 +657,6 @@ class WP_HTML_Scanner {
 	}
 
 	public function reset() {
-		$this->did_match = false;
 		$this->tag_name = null;
 		$this->attributes = array();
 		$this->tag_start = null;
