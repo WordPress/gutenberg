@@ -87,7 +87,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
-		'link'    => 'a:not(.wp-element-button)',
+		'link'    => 'a:where(:not(.wp-element-button))', // The where is needed to lower the specificity.
 		'heading' => 'h1, h2, h3, h4, h5, h6',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
