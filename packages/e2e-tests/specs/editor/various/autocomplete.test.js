@@ -92,5 +92,17 @@ describe( 'autocomplete', () => {
 		` );
 	} );
 
-	it( 'should allow option navigation via keypress', async () => {} );
+	it( 'should allow option selection via keypress event', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '~' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await pressKeyTimes( 'ArrowDown', 5 );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>🫐</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
 } );
