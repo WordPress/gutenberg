@@ -9,19 +9,35 @@
  * the HTML tag openers.
  *
  * @TODO:
- *  - All the return values from `scan()` are written as if
- *    they are simple string values but they need to be the
- *    structure of the matches.
- *      - [ start, end ] of tag opener structure in source
- *      - [ start,  end ] offset of tag/attribute name in source
- *      - comparable( $name ) of the tag/attribute name
- *      - $value of the attribute value
- *
  *  - Write a comprehensive test suite for various unexpected
  *    quirks and attribute names. Unfortunately we need to have
  *    some fairly robust support because it's not difficult to
  *    create misleading HTML through the block editor. For
  *    example, as can happen with a number of plaintext inputs.
+ *
+ * Performance ideas:
+ *
+ * It may be possible that we're thrashing the garbage collector by
+ * allocating new classes for each tag and attribute token as we
+ * scan through the input document. If this is the case we could
+ * try pre-allocating a certain number of token class instances and
+ * reuse those upon scanning each new tag. This would incur a fixed
+ * memory cost but in addition to lowering the pressure on the
+ * garbage collector we might end up having more efficient use of
+ * localized data within the processor cache.
+ *
+ * If we can pick up scanning where we leave off, we can stop parsing
+ * within a tag opener as soon as we meet all the query constraints.
+ * If we need to set an attribute we haven't yet seen then we would
+ * need to continue scanning to the end of that tag opener until we
+ * find the existing attribute or know it's not there. This could
+ * avoid parsing large attributes, such as one with a long data-URI.
+ *
+ * Defer creating comparable values until we need them so we don't
+ * eagerly allocate and convert string values we don't ever read.
+ *
+ * Classes are passed by reference by default, but are we missing
+ * opportunities to pass by reference when we are copying by value?
  */
 
 
@@ -66,9 +82,11 @@ class WP_HTML_Processor {
 
 	public function find( $query ) {
 		$this->commit_class_changes();
-		$this->scanner->reset();
+//		$this->scanner->reset();
 		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
-		$this->scanner->scan( $this->descriptor );
+		if ( false === $this->scanner->scan( $this->descriptor ) ) {
+			return false;
+		}
 
 		return $this;
 	}
@@ -184,13 +202,15 @@ class WP_HTML_Processor {
 	public function apply() {
 		$document = $this->scanner->document;
 
-		if ( ! $this->scanner->did_match ) {
-			return $document;
-		}
-
 		$this->commit_class_changes();
 
-		usort( $this->modifications->replacements, function ( $a, $b ) {
+		/*
+		 * Since we could be asking to modify attributes in a different
+		 * order than where they appear in the HTMl stream we need to
+		 * sort the modification replacements so we can progress
+		 * linearly and in a single pass.
+		 */
+		usort( $this->modifications->replacements, static function ( $a, $b ) {
 			if ( $a[0] === $b[0] ) {
 				return 0;
 			}
@@ -536,20 +556,15 @@ class WP_HTML_Scanner {
 		// @TODO: Are we done matching?
 		while ( $attribute = $this->find_next_attribute() ) {
 			// HTML5 says duplicate values are ignored
-			if ( array_key_exists( $attribute->name->comparable, $this->attributes ) ) {
-				continue;
+			if ( ! array_key_exists( $attribute->name->comparable, $this->attributes ) ) {
+				$this->attributes[ $attribute->name->comparable ] = $attribute;
 			}
-
-			$this->attributes[ $attribute->name->comparable ] = $attribute;
 		}
 
-		switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
-			case 'matches':
-				return $this->scan($descriptor, $found_already + 1, $tag);
-		}
+		$does_match = 'matches' === $descriptor->check( $tag->comparable, $this->attributes );
+		$found_this_time = $does_match ? 1 : 0;
 
-		// try to find the next tag
-		return $this->scan( $descriptor, $found_already, $tag );
+		return $this->scan( $descriptor, $found_already + $found_this_time, $tag );
 	}
 
 	/**
