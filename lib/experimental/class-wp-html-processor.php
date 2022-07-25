@@ -67,16 +67,143 @@ class WP_HTML_Processor {
 	public function find( $query ) {
 		$this->scanner->reset();
 		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
+		$this->scanner->scan( $this->descriptor );
+
+		return $this;
+	}
+
+
+	public function add_attribute( $name, $value ) {
+		$tag_name = $this->scanner->tag_name;
+		$insert_at = $tag_name->start + $tag_name->length;
+
+		$this->modifications->replacements[] = array(
+			$insert_at,
+			$insert_at,
+			' ' . self::serialize_attribute( $name, $value )
+		);
+
+		return $this;
+	}
+
+
+	public function add_class( $class_name ) {
+		$this->modifications->class_changes[ $class_name ] = true;
+	}
+
+
+	public function set_attribute( $name, $value ) {
+		if ( ! array_key_exists( WP_Tag_Find_Descriptor::comparable( $name ), $this->scanner->attributes ) ) {
+			return $this->add_attribute( $name, $value );
+		}
+
+		/** @var WP_HTML_Attribute_Token $existing */
+		$existing = $this->scanner->attributes[ $name ];
+
+		$this->modifications->replacements[] = array(
+			$existing->attribute_start,
+			$existing->attribute_end,
+			self::serialize_attribute( $name, $value )
+		);
+	}
+
+
+	public function remove_class( $class_name ) {
+		$this->modifications->class_changes[ $class_name ] = false;
+	}
+
+
+	public function remove_attribute( $name ) {
+		if ( ! array_key_exists( $name, $this->scanner->attributes ) ) {
+			return $this;
+		}
+
+		/** @var WP_HTML_Attribute_Token $existing */
+		$existing = $this->scanner->attributes[ $name ];
+
+		$this->modifications->replacements[] = array(
+			$existing->attribute_start,
+			$existing->attribute_end,
+			''
+		);
+	}
+
+
+	public static function serialize_attribute( $name, $value ) {
+		$value = str_replace( '"', "&quot;", $value );
+
+		return "{$name}=\"{$value}\"";
 	}
 
 
 	public function apply() {
-		// find tag
-		// apply modifications
-		// construct output
+		$document = $this->scanner->document;
 
-		// @TODO: This is a stub; implement the real apply() behavior.
-		return $this->scanner->document;
+		if ( ! $this->scanner->did_match ) {
+			return $document;
+		}
+
+		if ( ! empty( $this->modifications->class_changes ) ) {
+			$existing_class = array_key_exists( 'class', $this->scanner->attributes )
+				? substr(
+					$document,
+					$this->scanner->attributes['class']->value->start,
+					$this->scanner->attributes['class']->value->length
+				  )
+				: '';
+
+			// Remove unwanted classes.
+			$new_class = preg_replace_callback(
+				'~(?:^|[ \t])([^ \t]+)~miu',
+				function ( $matches ) {
+					 list( $full_match, $class_name ) = $matches;
+
+					 $comparable_name = WP_Tag_Find_Descriptor::comparable( $class_name );
+					 if (
+						  array_key_exists( $comparable_name, $this->modifications->class_changes ) &&
+						  false === $this->modifications->class_changes[ $comparable_name ]
+					 ) {
+						  return '';
+					 }
+
+					 return $full_match;
+				},
+				$existing_class
+			);
+
+			// Add new classes.
+			foreach ( $this->modifications->class_changes as $class => $should_include ) {
+				if ( $should_include ) {
+					$new_class .= " {$class}";
+				}
+			}
+
+			$this->set_attribute( 'class', trim( $new_class ) );
+		}
+
+		usort( $this->modifications->replacements, function ( $a, $b ) {
+			if ( $a[0] === $b[0] ) {
+				return 0;
+			}
+
+			return $a[0] < $b[0] ? -1 : 1;
+		} );
+
+		$output = '';
+		$at = 0;
+		foreach ( $this->modifications->replacements as $replacement ) {
+			list( $start, $end, $text ) = $replacement;
+
+			if ( $start > $at ) {
+				$output .= substr( $document, $at, $start - $at );
+			}
+
+			$output .= $text;
+			$at = $end;
+		}
+
+		$output .= substr( $document, $at );
+		return $output;
 	}
 
 
@@ -323,6 +450,14 @@ class WP_HTML_Scanner {
 	 */
 	public $document;
 
+
+	/**
+	 * Whether we found the tag we searched for.
+	 *
+	 * @var bool
+	 */
+	public $did_match = false;
+
 	/**
 	 * Byte offset in the input document we will start or continue parsing.
 	 *
@@ -367,7 +502,7 @@ class WP_HTML_Scanner {
 	 *     );
 	 * </code>
 	 *
-	 * @var array<WP_HTML_Scanner_Token>
+	 * @var array<WP_HTML_Attribute_Token>
 	 */
 	public $attributes = array();
 
@@ -379,35 +514,42 @@ class WP_HTML_Scanner {
 
 	public function scan( WP_Tag_Find_Descriptor $descriptor, $found_already = 0, $tag = null ) {
 		if ( $found_already === $descriptor->match_offset ) {
+			$this->did_match = true;
 			return $tag;
 		}
 
 		$tag = $this->find_next_tag();
 		if ( ! $tag ) {
+			$this->did_match = false;
 			return false;
 		}
 
-		switch ( $descriptor->check( $tag->comparable, array() ) ) {
-			case 'cannot-match':
-				return $this->scan( $descriptor, $found_already, $tag );
-
-			case 'matches':
-				return $this->scan( $descriptor, $found_already + 1, $tag );
-		}
+//		switch ( $descriptor->check( $tag->comparable, array() ) ) {
+//			case 'cannot-match':
+//				return $this->scan( $descriptor, $found_already, $tag );
+//
+//			case 'matches':
+//				return $this->scan( $descriptor, $found_already + 1, $tag );
+//		}
 
 		// @TODO: Are we done matching?
 		while ( $attribute = $this->find_next_attribute() ) {
 			// HTML5 says duplicate values are ignored
-			if ( isset( $this->attributes[ $attribute->name->comparable ] ) ) {
+			if ( array_key_exists( $attribute->name->comparable, $this->attributes ) ) {
 				continue;
 			}
 
 			$this->attributes[ $attribute->name->comparable ] = $attribute;
 
-			switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
-				case 'matches':
-					return $this->scan( $descriptor, $found_already + 1, $tag );
-			}
+//			switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
+//				case 'matches':
+//					return $this->scan( $descriptor, $found_already + 1, $tag );
+//			}
+		}
+
+		switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
+			case 'matches':
+				return $this->scan( $descriptor, $found_already + 1, $tag );
 		}
 
 		// try to find the next tag
@@ -441,6 +583,7 @@ class WP_HTML_Scanner {
 			return $this->find_next_tag();
 		}
 
+		$this->did_match = false;
 		$this->start_at = $start_at + strlen( $full_match );
 		$this->tag_name = WP_HTML_Scanner_Token::from_preg_match( $tag_match['TAG'] );
 		$this->tag_start = $this->tag_name->start - 1; // rewind past the leading `<`
@@ -509,10 +652,11 @@ class WP_HTML_Scanner {
 		$value_token = WP_HTML_Scanner_Token::from_preg_match( $value_match['VALUE'] );
 		$this->start_at = $value_start_at + strlen( $full_match );
 
-		return new WP_HTML_Attribute_Token( $name_token, $value_token, $start_at, $value_start_at + strlen( $full_match ) );
+		return new WP_HTML_Attribute_Token( $name_token, $value_token, $name_token->start, $value_start_at + strlen( $full_match ) );
 	}
 
 	public function reset() {
+		$this->did_match = false;
 		$this->tag_name = null;
 		$this->attributes = array();
 		$this->tag_start = null;
