@@ -738,9 +738,33 @@
 		"parent": "components"
 	},
 	{
+		"title": "CustomSelectControlArrow",
+		"slug": "custom-select-control-arrow",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-arrow/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControlGroupLabel",
+		"slug": "custom-select-control-group-label",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-group-label/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControlGroup",
+		"slug": "custom-select-control-group",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-group/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CustomSelectControlItem",
 		"slug": "custom-select-control-item",
 		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControlSeparator",
+		"slug": "custom-select-control-separator",
+		"markdown_source": "../packages/components/src/custom-select-control-new/custom-select-control-separator/README.md",
 		"parent": "components"
 	},
 	{
