@@ -36,7 +36,8 @@ class WP_Style_Engine {
 	 * @var array<string, WP_Style_Engine_CSS_Rules_Store|null>
 	 */
 	private static $stores = array(
-		'block-supports' => null,
+		'layout-block-supports' => null,
+		'block-supports'        => null,
 	);
 
 	/**
@@ -320,16 +321,29 @@ class WP_Style_Engine {
 	 * @param array  $css_declarations An array of parsed CSS property => CSS value pairs.
 	 * @param string $store_key        A valid key corresponding to an existing store in static::$stores.
 	 *
-	 * @return string A compiled CSS string.
+	 * @return void.
 	 */
-	public function store_css_rule( $css_selector, $css_declarations, $store_key ) {
+	public static function store_css_rule( $css_selector, $css_declarations, $store_key ) {
 		if ( ! $css_selector || ! isset( static::$stores[ $store_key ] ) ) {
-			return false;
+			return;
 		}
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 		$stored_css_rule  = static::$stores[ $store_key ]->add_rule( $css_selector );
 		$stored_css_rule->add_declarations( $css_declarations );
-		return true;
+	}
+
+	/**
+	 * Returns a store by store key.
+	 *
+	 * @param string $store_key A valid key corresponding to an existing store in static::$stores.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store|null The store, if found, otherwise `null`.
+	 */
+	public static function get_store( $store_key ) {
+		if ( ! isset( static::$stores[ $store_key ] ) ) {
+			return null;
+		}
+		return static::$stores[ $store_key ];
 	}
 
 	/**
@@ -368,19 +382,14 @@ class WP_Style_Engine {
 	 * Fetches, processes and compiles stored styles, then renders them to the page.
 	 */
 	public static function process_and_enqueue_stored_styles() {
-		foreach ( static::$stores as $store_key => $store_instance ) {
-			if ( ! $store_instance ) {
-				continue;
-			}
+		// 1. Block supports
+		// @TODO we could loop through static::$stores to enqueue and get the key.
+		$styles_output = static::compile_stylesheet_from_store( 'block-supports' ) . static::compile_stylesheet_from_store( 'layout-block-supports' );
 
-			$processor     = new WP_Style_Engine_Processor( $store_instance );
-			$styles_output = $processor->get_css();
-
-			if ( ! empty( $styles_output ) ) {
-				wp_register_style( $store_key, false, array(), true, true );
-				wp_add_inline_style( $store_key, $styles_output );
-				wp_enqueue_style( $store_key );
-			}
+		if ( ! empty( $styles_output ) ) {
+			wp_register_style( 'block-supports', false, array(), true, true );
+			wp_add_inline_style( 'block-supports', $styles_output );
+			wp_enqueue_style( 'block-supports' );
 		}
 	}
 
@@ -523,42 +532,6 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns compiled CSS from parsed css_declarations.
-	 *
-	 * @param array  $css_declarations An array of parsed CSS property => CSS value pairs.
-	 * @param string $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *
-	 * @return string A compiled CSS string.
-	 */
-	public function compile_css( $css_declarations, $css_selector ) {
-		if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
-			return '';
-		}
-
-		// Return an entire rule if there is a selector.
-		if ( $css_selector ) {
-			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
-			return $css_rule->get_css();
-		} else {
-			$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
-			return $css_declarations->get_declarations_string();
-		}
-	}
-	/**
-	 * Returns a string of classnames,
-	 *
-	 * @param string $classnames A flat array of classnames.
-	 *
-	 * @return string A string of classnames separate by a space.
-	 */
-	public function compile_classnames( $classnames ) {
-		if ( empty( $classnames ) || ! is_array( $classnames ) ) {
-			return null;
-		}
-		return implode( ' ', array_unique( $classnames ) );
-	}
-
-	/**
 	 * Style value parser that returns a CSS definition array comprising style properties
 	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
 	 * e.g., "$style_property-$individual_feature: $value;", which could represent the following:
@@ -603,6 +576,59 @@ class WP_Style_Engine {
 			}
 		}
 		return $css_declarations;
+	}
+
+	/**
+	 * Returns compiled CSS from parsed css_declarations.
+	 *
+	 * @param array  $css_declarations An array of parsed CSS property => CSS value pairs.
+	 * @param string $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+	 *
+	 * @return string A compiled CSS string.
+	 */
+	public function compile_css( $css_declarations, $css_selector ) {
+		if ( empty( $css_declarations ) || ! is_array( $css_declarations ) ) {
+			return '';
+		}
+
+		// Return an entire rule if there is a selector.
+		if ( $css_selector ) {
+			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
+			return $css_rule->get_css();
+		} else {
+			$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+			return $css_declarations->get_declarations_string();
+		}
+	}
+
+	/**
+	 * Returns a string of classnames,
+	 *
+	 * @param string $classnames A flat array of classnames.
+	 *
+	 * @return string A string of classnames separate by a space.
+	 */
+	public function compile_classnames( $classnames ) {
+		if ( empty( $classnames ) || ! is_array( $classnames ) ) {
+			return null;
+		}
+		return implode( ' ', array_unique( $classnames ) );
+	}
+
+	/**
+	 * Returns a compiled stylesheet from stored CSS rules.
+	 *
+	 * @param string $store_key A valid key corresponding to an existing store in static::$stores.
+	 *
+	 * @return string A compiled stylesheet from stored CSS rules.
+	 */
+	public static function compile_stylesheet_from_store( $store_key ) {
+		$store = static::get_store( $store_key );
+		if ( $store ) {
+			$processor = new WP_Style_Engine_Processor( $store );
+			return $processor->get_css();
+		}
+		return '';
 	}
 }
 
@@ -650,7 +676,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 			$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
 			$styles_output['declarations'] = $parsed_styles['css_declarations'];
 			if ( true === $options['enqueue'] ) {
-				$style_engine->store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
+				$style_engine::store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
 			}
 		}
 
@@ -664,22 +690,47 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 }
 
 /**
- * Global public interface method to parse block styles from a single block style object
- * and then, via the `enqueue` flag, will enqueue them for rendering on the frontend in a block-supports inline style tag.
+ * Global public interface method to register styles to be enqueued and rendered.
  *
  * @access public
  *
- * @param string $selector         A CSS selector.
- * @param array  $css_declarations An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ * @param string $store_key A valid store key.
+ * @param array  $css_rules array(
+ *     'selector'         => (string) A CSS selector.
+ *     'css_declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ * );.
  *
- * @return boolean Whether the storage process was successful.
+ * @return WP_Style_Engine_CSS_Rules_Store|null The store, if found, otherwise `null`.
  */
-function wp_style_engine_enqueue_block_supports_styles( $selector, $css_declarations ) {
-	if ( empty( $selector ) || empty( $css_declarations ) ) {
-		return false;
+function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
+	if ( empty( $store_key ) || empty( $css_rules ) ) {
+		return null;
 	}
 	if ( class_exists( 'WP_Style_Engine' ) ) {
-		return WP_Style_Engine::get_instance()->store_css_rule( $selector, $css_declarations, 'block-supports' );
+		$style_engine = WP_Style_Engine::get_instance();
+		foreach ( $css_rules as $selector => $css_declarations ) {
+			$style_engine::store_css_rule( $selector, $css_declarations, $store_key );
+		}
+		return $style_engine::get_store( $store_key );
 	}
-	return false;
 }
+
+/**
+ * Returns a compiled stylesheet from stored CSS rules.
+ *
+ * @access public
+ *
+ * @param string $store_key        A valid store key.
+ *
+ * @return string A compiled stylesheet from stored CSS rules.
+ */
+function wp_style_engine_get_stylesheet( $store_key ) {
+	if ( empty( $store_key ) ) {
+		return null;
+	}
+	if ( class_exists( 'WP_Style_Engine' ) ) {
+		return WP_Style_Engine::get_instance()::compile_stylesheet_from_store( $store_key );
+	}
+	return null;
+}
+
