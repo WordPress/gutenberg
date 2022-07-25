@@ -148,15 +148,18 @@ describe( 'children', () => {
 			</View>
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const NormalComponent = ( props ) => <div { ...props }>Inherent</div>;
 
 		render(
 			<ContextSystemProvider>
 				<ConnectedComponent />
 				<ConnectedComponent>Explicit children</ConnectedComponent>
+				<NormalComponent />
+				<NormalComponent>Explicit children</NormalComponent>
 			</ContextSystemProvider>
 		);
 
-		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 2 );
+		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 4 );
 	} );
 
 	describe( 'when connected component does a `cloneElement()`', () => {
