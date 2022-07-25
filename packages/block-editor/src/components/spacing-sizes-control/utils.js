@@ -8,6 +8,13 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Checks is given value is a spacing preset.
+ *
+ * @param {string} value Value to check
+ *
+ * @return {boolean} Return true if value is string in format var:preset|spacing|.
+ */
 export function isValueSpacingPreset( value ) {
 	if ( ! value?.includes ) {
 		return false;
@@ -15,6 +22,14 @@ export function isValueSpacingPreset( value ) {
 	return value.includes( 'var:preset|spacing|' );
 }
 
+/**
+ * Converts a spacing preset into a custom value.
+ *
+ * @param {string} value Value to convert
+ * @param {Array}  spacingSizes Array of the current spacing preset objects
+ *
+ * @return {string} Mapping of the spacing preset to its equivalent custom value.
+ */
 export function getCustomValueFromPreset( value, spacingSizes ) {
 	if ( ! isValueSpacingPreset( value ) ) {
 		return value;
@@ -26,6 +41,13 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
 	return spacingSize?.size;
 }
 
+/**
+ * Converts a spacing preset into a custom value.
+ *
+ * @param {string} value Value to convert.
+ *
+ * @return {string} CSS var string for given spacing preset value.
+ */
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;
@@ -37,6 +59,13 @@ export function getSpacingPresetCssVar( value ) {
 	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
 }
 
+/**
+ * Returns the slug section of the given spacing preset string.
+ *
+ * @param {string} value Value to extract slug from.
+ *
+ * @return {number} The int value of the slug from given spacing preset.
+ */
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
 		return;
@@ -51,6 +80,14 @@ export function getSpacingPresetSlug( value ) {
 	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
 }
 
+/**
+ * Converts spacing preset value into a Range component value .
+ *
+ * @param {string} presetValue Value to convert to Range value.
+ * @param {Array}  spacingSizes Array of current spacing preset vaue objects.
+ *
+ * @return {number} The int value for use in Range control.
+ */
 export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const slug = getSpacingPresetSlug( presetValue );
 	return spacingSizes.findIndex( ( spacingSize ) => {
@@ -109,7 +146,7 @@ export function getAllRawValue( values = {} ) {
 /**
  * Checks to determine if values are mixed.
  *
- * @param {Object} values        Box values.
+ * @param {Object} values Box values.
  *
  * @return {boolean} Whether values are mixed.
  */
@@ -136,50 +173,4 @@ export function isValuesDefined( values ) {
 			)
 		)
 	);
-}
-
-/**
- * Get initial selected side, factoring in whether the sides are linked,
- * and whether the vertical / horizontal directions are grouped via splitOnAxis.
- *
- * @param {boolean} isLinked    Whether the box control's fields are linked.
- * @param {boolean} splitOnAxis Whether splitting by horizontal or vertical axis.
- * @return {string} The initial side.
- */
-export function getInitialSide( isLinked, splitOnAxis ) {
-	let initialSide = 'all';
-
-	if ( ! isLinked ) {
-		initialSide = splitOnAxis ? 'vertical' : 'top';
-	}
-
-	return initialSide;
-}
-
-/**
- * Normalizes provided sides configuration to an array containing only top,
- * right, bottom and left. This essentially just maps `horizontal` or `vertical`
- * to their appropriate sides to facilitate correctly determining value for
- * all input control.
- *
- * @param {Array} sides Available sides for box control.
- * @return {Array} Normalized sides configuration.
- */
-export function normalizeSides( sides ) {
-	const filteredSides = [];
-
-	if ( ! sides?.length ) {
-		return ALL_SIDES;
-	}
-
-	if ( sides.includes( 'vertical' ) ) {
-		filteredSides.push( ...[ 'top', 'bottom' ] );
-	} else if ( sides.includes( 'horizontal' ) ) {
-		filteredSides.push( ...[ 'left', 'right' ] );
-	} else {
-		const newSides = ALL_SIDES.filter( ( side ) => sides.includes( side ) );
-		filteredSides.push( ...newSides );
-	}
-
-	return filteredSides;
 }
