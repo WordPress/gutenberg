@@ -78,7 +78,7 @@ describe( 'autocomplete', () => {
 		` );
 	} );
 
-	it( 'should cancel selection via `Escape` keypress', async () => {
+	it( 'should cancel selection via `Escape` keypress event', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'My favorite fruit is ~app' );
 		await page.waitForSelector( '.components-autocomplete__result' );
@@ -88,6 +88,22 @@ describe( 'autocomplete', () => {
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
 		<p>My favorite fruit is ~app ...no I changed my mind. It's mango.</p>
+		<!-- /wp:paragraph -->"
+		` );
+	} );
+
+	it( 'should allow option selection via click event', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '~' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		const strawberry = await page.waitForXPath(
+			'//button[@role="option"][text()="🍓 Strawberry"]'
+		);
+		await strawberry.click();
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>🍓</p>
 		<!-- /wp:paragraph -->"
 		` );
 	} );
