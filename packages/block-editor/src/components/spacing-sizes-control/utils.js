@@ -103,8 +103,8 @@ export const LABELS = {
 	left: __( 'Left' ),
 	right: __( 'Right' ),
 	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical sides' ),
-	horizontal: __( 'Horizontal sides' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
 };
 
 export const DEFAULT_VALUES = {

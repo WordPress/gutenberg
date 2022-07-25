@@ -102,11 +102,12 @@ export default function SpacingInputControl( {
 	} ) );
 
 	const ariaLabel = sprintf(
-		// translators: 1: Type of spacing being modified (Padding, margin, etc), 2: The side of the block being modified (top, bottom, left, etc.).
-		__( '%1$s value for %2$s' ),
-		type,
-		LABELS[ side ]?.toLowerCase()
+		// translators: 1: The side of the block being modified (top, bottom, left, etc.). 2. Type of spacing being modified (Padding, margin, etc)
+		__( '%1$s %2$s' ),
+		LABELS[ side ],
+		type?.toLowerCase()
 	);
+
 	return (
 		<>
 			<HStack>
