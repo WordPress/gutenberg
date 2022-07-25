@@ -53,7 +53,7 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 /**
  * @typedef  {Object}  ParseOptions
  * @property {boolean} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
- * @property {boolean} __unstableAutoP             Whether to run autoP in freeform content.
+ * @property {boolean} __unstableSkipAutop         Whether to skip autop in freeform content.
  */
 
 /**
@@ -101,7 +101,7 @@ export function normalizeRawBlock( rawBlock, options ) {
 	// meaning there are no negative consequences to repeated autop calls.
 	if (
 		rawBlockName === fallbackBlockName &&
-		options?.__unstableAutoP !== false
+		! options?.__unstableSkipAutop
 	) {
 		rawInnerHTML = autop( rawInnerHTML ).trim();
 	}
