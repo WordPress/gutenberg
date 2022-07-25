@@ -40,6 +40,15 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 			"message": "This is a notice!"
 		}
 	},
+	"variations": [
+		{
+			"name": "example",
+			"title": "Example",
+			"attributes": {
+				"message": "This is an example!"
+			},
+		}
+	]
 	"editorScript": "file:./build/index.js",
 	"script": "file:./build/script.js",
 	"viewScript": "file:./build/view.js",
@@ -420,6 +429,37 @@ Plugins and Themes can also register [custom block style](/docs/reference-guides
 It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
 
 See the [the example documentation](/docs/reference-guides/block-api/block-registration.md#example-optional) for more details.
+
+### Variations
+
+- Type: `object[]`
+- Optional
+- Localized: Yes (`title`, `description`, and `keywords` of each variation only)
+- Property: `variations`
+- Since: `WordPress 5.9.0`
+
+```json
+{
+	"variations": [
+		{
+			"name": "example",
+			"title": "Example",
+			"attributes": {
+				"level": 2,
+				"message": "This is an example!"
+			},
+			"scope": [ "block" ],
+			"isActive": [ "level" ]
+		}
+	]
+}
+```
+
+Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
+
+_Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
+
+See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
 ### Editor Script
 
