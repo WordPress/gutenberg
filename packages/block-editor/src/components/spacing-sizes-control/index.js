@@ -40,6 +40,7 @@ export default function SpacingSizesControl( {
 		...useSetting( 'spacing.spacingSizes' ),
 	];
 
+	const type = label;
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;
@@ -72,6 +73,7 @@ export default function SpacingSizesControl( {
 		values: inputValues,
 		spacingSizes,
 		useSelect,
+		type,
 	};
 
 	return (

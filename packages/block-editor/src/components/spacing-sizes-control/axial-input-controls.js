@@ -11,6 +11,7 @@ export default function AxialInputControls( {
 	values,
 	sides,
 	spacingSizes,
+	type,
 } ) {
 	const createHandleOnChange = ( side ) => ( next ) => {
 		if ( ! onChange ) {
@@ -51,6 +52,7 @@ export default function AxialInputControls( {
 						withInputField={ false }
 						side={ side }
 						spacingSizes={ spacingSizes }
+						type={ type }
 					/>
 				);
 			} ) }

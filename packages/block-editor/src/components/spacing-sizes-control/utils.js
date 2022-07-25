@@ -25,8 +25,8 @@ export function isValueSpacingPreset( value ) {
 /**
  * Converts a spacing preset into a custom value.
  *
- * @param {string} value Value to convert
- * @param {Array}  spacingSizes Array of the current spacing preset objects
+ * @param {string}  value Value to convert
+ * @param {Array}   spacingSizes Array of the current spacing preset objects
  *
  * @return {string} Mapping of the spacing preset to its equivalent custom value.
  */
@@ -83,8 +83,8 @@ export function getSpacingPresetSlug( value ) {
 /**
  * Converts spacing preset value into a Range component value .
  *
- * @param {string} presetValue Value to convert to Range value.
- * @param {Array}  spacingSizes Array of current spacing preset vaue objects.
+ * @param {string}  presetValue Value to convert to Range value.
+ * @param {Array}   spacingSizes Array of current spacing preset vaue objects.
  *
  * @return {number} The int value for use in Range control.
  */
@@ -97,14 +97,14 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 }
 
 export const LABELS = {
-	all: __( 'All' ),
+	all: __( 'All sides' ),
 	top: __( 'Top' ),
 	bottom: __( 'Bottom' ),
 	left: __( 'Left' ),
 	right: __( 'Right' ),
 	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
+	vertical: __( 'Vertical sides' ),
+	horizontal: __( 'Horizontal sides' ),
 };
 
 export const DEFAULT_VALUES = {

@@ -12,7 +12,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 
 /**
@@ -32,6 +32,7 @@ export default function SpacingInputControl( {
 	side,
 	onChange,
 	isMixed = false,
+	type,
 } ) {
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
@@ -100,6 +101,12 @@ export default function SpacingInputControl( {
 		lable: undefined,
 	} ) );
 
+	const ariaLabel = sprintf(
+		// translators: 1: Type of spacing being modified (Padding, margin, etc), 2: The side of the block being modified (top, bottom, left, etc.).
+		__( '%1$s value for %2$s' ),
+		type,
+		LABELS[ side ]?.toLowerCase()
+	);
 	return (
 		<>
 			<HStack>
@@ -141,6 +148,8 @@ export default function SpacingInputControl( {
 						units={ units }
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
+						label={ ariaLabel }
+						hideLabelFromVision={ true }
 					/>
 
 					<RangeControl
@@ -165,6 +174,8 @@ export default function SpacingInputControl( {
 					min={ 0 }
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
+					label={ ariaLabel }
+					hideLabelFromVision={ true }
 				/>
 			) }
 			{ spacingSizes.length > 8 && ! showCustomValueControl && (
@@ -183,6 +194,8 @@ export default function SpacingInputControl( {
 							);
 						}
 					} }
+					label={ ariaLabel }
+					hideLabelFromVision={ true }
 				/>
 			) }
 		</>
