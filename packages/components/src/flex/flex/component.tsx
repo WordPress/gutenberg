@@ -34,7 +34,7 @@ function UnconnectedFlex(
  * horizontally or vertically. `Flex` powers components like `HStack` and
  * `VStack`.
  *
- * `Flex` is used with any of it's two sub-components, `FlexItem` and
+ * `Flex` is used with any of its two sub-components, `FlexItem` and
  * `FlexBlock`.
  *
  * ```jsx
