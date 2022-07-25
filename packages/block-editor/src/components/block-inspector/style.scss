@@ -34,3 +34,17 @@
 	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }
+
+
+.block-editor-block-inspector__block-buttons-container {
+	border-top: $border-width solid $gray-200;
+	padding: $grid-unit-20;
+}
+
+.block-editor-block-inspector__block-type-type {
+	font-weight: 500;
+	&.block-editor-block-inspector__block-type-type {
+		line-height: $button-size-small;
+		margin: 0 0 $grid-unit-05;
+	}
+}
