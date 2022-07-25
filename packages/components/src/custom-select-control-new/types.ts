@@ -40,3 +40,7 @@ export type SelectControlGroupLabelProps = {
 };
 
 export type SelectControlSeparatorProps = {};
+
+export type SelectControlRowProps = {
+	children: ReactNode;
+};

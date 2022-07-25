@@ -6,9 +6,6 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
@@ -113,6 +110,11 @@ export const groupLabel = css`
 	line-height: 1.25rem;
 	font-weight: 500;
 	opacity: 0.6;
+`;
+
+//  TODO: convert to Flex or HStack
+export const row = css`
+	display: 'flex';
 `;
 
 export const separator = css`

@@ -4,3 +4,4 @@ export { default as CustomSelectControlGroup } from './custom-select-control-gro
 export { default as CustomSelectControlGroupLabel } from './custom-select-control-group-label';
 export { default as CustomSelectControlArrow } from './custom-select-control-arrow';
 export { default as CustomSelectControlSeparator } from './custom-select-control-separator';
+export { default as CustomSelectControlRow } from './custom-select-control-row';
