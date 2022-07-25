@@ -110,8 +110,6 @@ describe( 'ComboboxControl', () => {
 
 		const renderedOptions = getAllOptions();
 
-		expect( renderedOptions.length ).toEqual( timezones.length );
-
 		// Confirm the rendered options match the provided dataset.
 		expect( renderedOptions ).toHaveLength( timezones.length );
 		renderedOptions.forEach( ( option, optionIndex ) => {
