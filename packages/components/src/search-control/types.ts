@@ -9,13 +9,13 @@ import type { KeyboardEventHandler } from 'react';
 import type { WPElement } from '@wordpress/element';
 
 export type SearchControlProps = {
-	className: string | undefined;
+	className?: string;
 	onChange: ( arg0: string ) => {};
 	onKeyDown: KeyboardEventHandler< HTMLInputElement >;
 	value: string | number;
 	label: string;
-	placeholder: string | undefined;
-	hideLabelFromVision: boolean | undefined;
-	help: string | WPElement | undefined;
+	placeholder?: string;
+	hideLabelFromVision?: boolean;
+	help?: string | WPElement;
 	onClose: VoidFunction;
 };
