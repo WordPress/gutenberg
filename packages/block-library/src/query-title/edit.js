@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TYPES = [ 'archive' ];
+const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
 	attributes: { type, level, textAlign },
@@ -29,11 +29,10 @@ export default function QueryTitleEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-query-title__placeholder': type === 'archive',
+			'wp-block-query-title__placeholder': true,
 		} ),
 	} );
-	// The plan is to augment this block with more
-	// block variations like `Search Title`.
+
 	if ( ! SUPPORTED_TYPES.includes( type ) ) {
 		return (
 			<div { ...blockProps }>
@@ -46,6 +45,10 @@ export default function QueryTitleEdit( {
 	if ( type === 'archive' ) {
 		titleElement = (
 			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+		);
+	} else if ( type === 'search' ) {
+		titleElement = (
+			<TagName { ...blockProps }>{ __( 'Search results:' ) }</TagName>
 		);
 	}
 	return (

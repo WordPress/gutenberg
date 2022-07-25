@@ -17,13 +17,20 @@
 function render_block_core_query_title( $attributes ) {
 	$type       = isset( $attributes['type'] ) ? $attributes['type'] : null;
 	$is_archive = is_archive();
-	if ( ! $type || ( 'archive' === $type && ! $is_archive ) ) {
+	$is_search  = is_search();
+	if ( ! $type ||
+		( 'archive' === $type && ! $is_archive ) ||
+		( 'search' === $type && ! $is_search ) 
+		) {
 		return '';
 	}
 	$title = '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
+	} else if ( $is_search ) {
+		$title = __( 'Search results:' );
 	}
+
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
