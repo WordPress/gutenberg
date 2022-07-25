@@ -16,8 +16,11 @@ export type SelectControlOption = SelectControlOptionBase & {
 
 // React component props
 export type SelectControlItemProps = SelectControlOptionBase & {
+	// Is classname necessary, with WordPressComponentProps?
 	className?: string;
 	children?: ReactNode;
+	// Do we want to expose this prop?
+	checked?: boolean;
 };
 
 export type SelectControlProps = {
@@ -26,21 +29,34 @@ export type SelectControlProps = {
 	// TODO: explain that they are ignored if `children` is specified
 	options?: SelectControlOption[];
 	children?: ReactNode;
+	// Is classname necessary, with WordPressComponentProps?
 	className?: string;
 };
 
-export type SelectControlArrowProps = {};
+export type SelectControlArrowProps = {
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
+};
 
 export type SelectControlGroupProps = {
 	children: ReactNode;
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
 };
 
 export type SelectControlGroupLabelProps = {
 	children: ReactNode;
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
 };
 
-export type SelectControlSeparatorProps = {};
+export type SelectControlSeparatorProps = {
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
+};
 
 export type SelectControlRowProps = {
 	children: ReactNode;
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
 };
