@@ -52,8 +52,8 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 
 /**
  * @typedef  {Object}  ParseOptions
- * @property {boolean} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
- * @property {boolean} __unstableSkipAutop         Whether to skip autop in freeform content.
+ * @property {boolean?} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
+ * @property {boolean?} __unstableSkipAutop         Whether to skip autop in freeform content.
  */
 
 /**
@@ -82,8 +82,8 @@ function convertLegacyBlocks( rawBlock ) {
  * Normalize the raw block by applying the fallback block name if none given,
  * sanitize the parsed HTML...
  *
- * @param {WPRawBlock}   rawBlock The raw block object.
- * @param {ParseOptions} options  Extra options for handling block parsing.
+ * @param {WPRawBlock}    rawBlock The raw block object.
+ * @param {ParseOptions?} options  Extra options for handling block parsing.
  *
  * @return {WPRawBlock} The normalized block object.
  */
