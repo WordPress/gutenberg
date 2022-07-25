@@ -74,9 +74,9 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 		`,
 		large: css`
 			box-sizing: border-box;
-			width: 36px;
-			height: 36px;
-			margin-inline-end: 2px;
+			width: 24px;
+			height: 24px;
+			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
 			display: flex;
 			justify-content: center;
