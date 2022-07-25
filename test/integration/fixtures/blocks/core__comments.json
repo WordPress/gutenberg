@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
+			"legacy": false,
 			"className": "comments-post-extra"
 		},
 		"innerBlocks": [
