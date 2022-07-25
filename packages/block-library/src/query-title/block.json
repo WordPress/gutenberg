@@ -16,6 +16,10 @@
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"showSearchTerm": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

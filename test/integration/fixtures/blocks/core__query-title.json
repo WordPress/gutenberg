@@ -3,7 +3,8 @@
 		"name": "core/query-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1
+			"level": 1,
+			"showSearchTerm": true
 		},
 		"innerBlocks": []
 	}

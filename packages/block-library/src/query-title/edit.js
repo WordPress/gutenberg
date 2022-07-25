@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -22,7 +24,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign },
+	attributes: { type, level, textAlign, showSearchTerm },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
@@ -48,7 +50,30 @@ export default function QueryTitleEdit( {
 		);
 	} else if ( type === 'search' ) {
 		titleElement = (
-			<TagName { ...blockProps }>{ __( 'Search results:' ) }</TagName>
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show search term in title' ) }
+							onChange={ () =>
+								setAttributes( {
+									showSearchTerm: ! showSearchTerm,
+								} )
+							}
+							checked={ showSearchTerm }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				{ showSearchTerm ? (
+					<TagName { ...blockProps }>
+						{ __( 'Search results for: "search term"' ) }
+					</TagName>
+				) : (
+					<TagName { ...blockProps }>
+						{ __( 'Search results:' ) }
+					</TagName>
+				) }
+			</>
 		);
 	}
 	return (

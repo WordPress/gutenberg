@@ -20,15 +20,23 @@ function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	if ( ! $type ||
 		( 'archive' === $type && ! $is_archive ) ||
-		( 'search' === $type && ! $is_search ) 
+		( 'search' === $type && ! $is_search )
 		) {
 		return '';
 	}
 	$title = '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
-	} else if ( $is_search ) {
-		$title = __( 'Search results:' );
+	} elseif ( $is_search ) {
+		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] !== false ) {
+			/* translators: %s is the search term. */
+			$title = sprintf(
+				__( 'Search results for: "%s"' ),
+				get_search_query()
+			);
+		} else {
+			$title = __( 'Search results:' );
+		}
 	}
 
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
