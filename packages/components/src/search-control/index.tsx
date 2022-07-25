@@ -33,7 +33,7 @@ function SearchControl(
 	}: SearchControlProps,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const searchRef = useRef();
+	const searchRef = useRef< HTMLInputElement >();
 	const instanceId = useInstanceId( SearchControl );
 	const id = `components-search-control-${ instanceId }`;
 
