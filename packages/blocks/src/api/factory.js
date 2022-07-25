@@ -210,6 +210,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	// a Grouping block.
 	if (
 		! isMultiBlock &&
+		direction === 'from' &&
 		isContainerGroupBlock( sourceBlock.name ) &&
 		isContainerGroupBlock( transform.blockName )
 	) {
@@ -555,9 +556,14 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const hasSwitchedBlock =
-		name === '*' ||
-		some( transformationResults, ( result ) => result.name === name );
+	if ( name === '*' ) {
+		return transformationResults;
+	}
+
+	const hasSwitchedBlock = some(
+		transformationResults,
+		( result ) => result.name === name
+	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
