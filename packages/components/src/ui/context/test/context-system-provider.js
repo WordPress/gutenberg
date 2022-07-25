@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import styled from '@emotion/styled';
+
+/**
+ * WordPress dependencies
+ */
+import { cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -99,5 +104,141 @@ describe( 'props', () => {
 
 		expect( el.innerHTML ).toContain( 'Code is Poetry' );
 		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
+	} );
+
+	test( 'should not override children via context system', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+
+		render(
+			<ContextSystemProvider
+				context={ { Component: { children: 'Override' } } }
+			>
+				<ConnectedComponent />
+			</ContextSystemProvider>
+		);
+
+		expect( screen.queryByText( 'Override' ) ).not.toBeInTheDocument();
+	} );
+
+	// This matches the behavior for normal, non-context-connected components.
+	test( 'should not override inherent children', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
+				Inherent
+			</View>
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+
+		render(
+			<ContextSystemProvider>
+				<ConnectedComponent />
+				<ConnectedComponent>Explicit children</ConnectedComponent>
+			</ContextSystemProvider>
+		);
+
+		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 2 );
+	} );
+} );
+
+describe( 'Context System with polymorphic components', () => {
+	test( 'should pass through children to the `as` component', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+
+		render(
+			<ContextSystemProvider>
+				<ConnectedComponent as="span">Pass through</ConnectedComponent>
+			</ContextSystemProvider>
+		);
+
+		expect( screen.getByText( 'Pass through' ) ).toBeInTheDocument();
+	} );
+
+	test( 'should not override inherent children', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const AnotherComponent = ( props ) => (
+			<span { ...props }>Inherent</span>
+		);
+
+		render(
+			<ContextSystemProvider>
+				<ConnectedComponent as={ AnotherComponent } />
+				<ConnectedComponent as={ AnotherComponent }>
+					Explicit children
+				</ConnectedComponent>
+			</ContextSystemProvider>
+		);
+
+		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 2 );
+	} );
+
+	describe( 'should handle implicit `undefined` children when an `as` component does a `cloneElement()`', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+
+		const ComponentThatClones = ( { content, ...props } ) =>
+			cloneElement( content, props );
+		const ComponentThatClonesWithoutChildren = ( {
+			content,
+			children,
+			...props
+		} ) => cloneElement( content, props );
+
+		const ElementToClone = <span>Inherent</span>;
+
+		test.each( [
+			[
+				'should not override cloned inherent children with implicit `undefined` children',
+				() => (
+					<ConnectedComponent
+						as={ ComponentThatClones }
+						content={ ElementToClone }
+					/>
+				),
+				'Inherent',
+			],
+			[
+				'should override cloned inherent children with explicit children',
+				() => (
+					<ConnectedComponent
+						as={ ComponentThatClones }
+						content={ ElementToClone }
+					>
+						Override
+					</ConnectedComponent>
+				),
+				'Override',
+			],
+			[
+				'should not override cloned inherent children with explicit children if cloning code omitted the children',
+				() => (
+					<ConnectedComponent
+						as={ ComponentThatClonesWithoutChildren }
+						content={ ElementToClone }
+					>
+						Override
+					</ConnectedComponent>
+				),
+				'Inherent',
+			],
+		] )( '%s', ( _description, ComponentToTest, expectedText ) => {
+			render(
+				<ContextSystemProvider>
+					<ComponentToTest />
+				</ContextSystemProvider>
+			);
+
+			expect( screen.getByText( expectedText ) ).toBeInTheDocument();
+		} );
 	} );
 } );
