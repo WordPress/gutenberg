@@ -221,7 +221,6 @@ const Popover = (
 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
-
 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
 	].filter( ( m ) => !! m );
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
