@@ -10,6 +10,10 @@
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
+### New features
+
+-   Added Autocomplete Component e2e test suite. [#42674](https://github.com/WordPress/gutenberg/pull/42674).
+
 ## 4.0.0 (2022-04-08)
 
 ### Breaking Changes
