@@ -1102,7 +1102,7 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"link": {
 					"type": "object",
@@ -1130,6 +1130,9 @@
 						}
 					]
 				},
+				"heading": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
 				"h1": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
@@ -1146,6 +1149,9 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"h6": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"caption": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
