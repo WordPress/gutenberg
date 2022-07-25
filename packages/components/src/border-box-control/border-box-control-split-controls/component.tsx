@@ -9,6 +9,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
+import Tooltip from '../../tooltip';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
 import { contextConnect, WordPressComponentProps } from '../../ui/context';
@@ -64,41 +65,62 @@ const BorderBoxControlSplitControls = (
 				value={ value }
 				__next36pxDefaultSize={ __next36pxDefaultSize }
 			/>
-			<BorderControl
-				className={ centeredClassName }
-				hideLabelFromVision={ true }
-				label={ __( 'Top border' ) }
-				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
-				__unstablePopoverProps={ popoverProps }
-				value={ value?.top }
-				{ ...sharedBorderControlProps }
-			/>
-			<BorderControl
-				hideLabelFromVision={ true }
-				label={ __( 'Left border' ) }
-				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
-				__unstablePopoverProps={ popoverProps }
-				value={ value?.left }
-				{ ...sharedBorderControlProps }
-			/>
-			<BorderControl
-				className={ rightAlignedClassName }
-				hideLabelFromVision={ true }
-				label={ __( 'Right border' ) }
-				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
-				__unstablePopoverProps={ popoverProps }
-				value={ value?.right }
-				{ ...sharedBorderControlProps }
-			/>
-			<BorderControl
-				className={ centeredClassName }
-				hideLabelFromVision={ true }
-				label={ __( 'Bottom border' ) }
-				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
-				__unstablePopoverProps={ popoverProps }
-				value={ value?.bottom }
-				{ ...sharedBorderControlProps }
-			/>
+			<Tooltip text={ __( 'Top border' ) } position="top">
+				<div className={ centeredClassName }>
+					<BorderControl
+						hideLabelFromVision={ true }
+						label={ __( 'Top border' ) }
+						onChange={ ( newBorder ) =>
+							onChange( newBorder, 'top' )
+						}
+						__unstablePopoverProps={ popoverProps }
+						value={ value?.top }
+						{ ...sharedBorderControlProps }
+					/>
+				</div>
+			</Tooltip>
+			<Tooltip text={ __( 'Left border' ) } position="top">
+				<div>
+					<BorderControl
+						hideLabelFromVision={ true }
+						label={ __( 'Left border' ) }
+						onChange={ ( newBorder ) =>
+							onChange( newBorder, 'left' )
+						}
+						__unstablePopoverProps={ popoverProps }
+						value={ value?.left }
+						{ ...sharedBorderControlProps }
+					/>
+				</div>
+			</Tooltip>
+			<Tooltip text={ __( 'Right border' ) } position="top">
+				<div className={ rightAlignedClassName }>
+					<BorderControl
+						hideLabelFromVision={ true }
+						label={ __( 'Right border' ) }
+						onChange={ ( newBorder ) =>
+							onChange( newBorder, 'right' )
+						}
+						__unstablePopoverProps={ popoverProps }
+						value={ value?.right }
+						{ ...sharedBorderControlProps }
+					/>
+				</div>
+			</Tooltip>
+			<Tooltip text={ __( 'Bottom border' ) } position="top">
+				<div className={ centeredClassName }>
+					<BorderControl
+						hideLabelFromVision={ true }
+						label={ __( 'Bottom border' ) }
+						onChange={ ( newBorder ) =>
+							onChange( newBorder, 'bottom' )
+						}
+						__unstablePopoverProps={ popoverProps }
+						value={ value?.bottom }
+						{ ...sharedBorderControlProps }
+					/>
+				</div>
+			</Tooltip>
 		</Grid>
 	);
 };
