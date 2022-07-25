@@ -10,7 +10,7 @@ export default function AxialInputControls( {
 	onChange,
 	values,
 	sides,
-	...props
+	spacingSizes,
 } ) {
 	const createHandleOnChange = ( side ) => ( next ) => {
 		if ( ! onChange ) {
@@ -44,13 +44,13 @@ export default function AxialInputControls( {
 					side === 'vertical' ? values.top : values.left;
 				return (
 					<SpacingInputControl
-						{ ...props }
 						value={ axisValue }
 						onChange={ createHandleOnChange( side ) }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
 						withInputField={ false }
 						side={ side }
+						spacingSizes={ spacingSizes }
 					/>
 				);
 			} ) }

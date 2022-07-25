@@ -9,20 +9,20 @@ import { Button, Tooltip } from '@wordpress/components';
  * Internal dependencies
  */
 
-export default function LinkedButton( { isLinked, ...props } ) {
+export default function LinkedButton( { isLinked, onClick } ) {
 	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
 
 	return (
 		<Tooltip text={ label }>
 			<span>
 				<Button
-					{ ...props }
 					className="component-box-control__linked-button"
 					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall
 					icon={ isLinked ? link : linkOff }
 					iconSize={ 16 }
 					aria-label={ label }
+					onClick={ onClick }
 				/>
 			</span>
 		</Tooltip>

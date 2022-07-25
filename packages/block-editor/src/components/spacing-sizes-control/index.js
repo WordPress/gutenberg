@@ -24,11 +24,9 @@ const defaultInputProps = {
 	min: 0,
 };
 
-const noop = () => {};
-
 export default function SpacingSizesControl( {
 	inputProps = defaultInputProps,
-	onChange = noop,
+	onChange,
 	label = __( 'Spacing Control' ),
 	values,
 	sides,
@@ -41,7 +39,7 @@ export default function SpacingSizesControl( {
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
 	];
-	//const [ values, setValues ] = useState( valuesProp );
+
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;

@@ -6,11 +6,9 @@ import { ALL_SIDES, LABELS } from './utils';
 
 export default function BoxInputControls( {
 	values,
-	selectedUnits,
-	setSelectedUnits,
 	sides,
 	onChange,
-	...props
+	spacingSizes,
 } ) {
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
@@ -20,7 +18,7 @@ export default function BoxInputControls( {
 	const createHandleOnChange = ( side ) => ( next ) => {
 		// const { altKey } = event;
 		const altKey = null;
-		const nextValues = { ...props.values };
+		const nextValues = { ...values };
 		nextValues[ side ] = next;
 
 		/**
@@ -52,13 +50,13 @@ export default function BoxInputControls( {
 			{ filteredSides.map( ( side ) => {
 				return (
 					<SpacingInputControl
-						{ ...props }
 						value={ values[ side ] }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
 						withInputField={ false }
 						side={ side }
 						onChange={ createHandleOnChange( side ) }
+						spacingSizes={ spacingSizes }
 					/>
 				);
 			} ) }

@@ -31,6 +31,7 @@ export default function SpacingInputControl( {
 	value,
 	side,
 	onChange,
+	isMixed = false,
 } ) {
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
@@ -42,9 +43,15 @@ export default function SpacingInputControl( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
-	const currentValue = ! showCustomValueControl
-		? getSliderValueFromPreset( value, spacingSizes )
-		: getCustomValueFromPreset( value, spacingSizes );
+	let currentValue;
+
+	if ( isMixed ) {
+		currentValue = null;
+	} else {
+		currentValue = ! showCustomValueControl
+			? getSliderValueFromPreset( value, spacingSizes )
+			: getCustomValueFromPreset( value, spacingSizes );
+	}
 
 	const selectedUnit =
 		useMemo(
@@ -77,7 +84,11 @@ export default function SpacingInputControl( {
 		);
 	};
 
-	const currentValueHint = customTooltipContent( currentValue );
+	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
+
+	const currentValueHint = ! isMixed
+		? customTooltipContent( currentValue )
+		: __( 'Mixed' );
 
 	const options = spacingSizes.map( ( size, index ) => ( {
 		key: index,
@@ -128,6 +139,8 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
+						placeholder={ allPlaceholder }
+						disableUnits={ isMixed }
 					/>
 
 					<RangeControl

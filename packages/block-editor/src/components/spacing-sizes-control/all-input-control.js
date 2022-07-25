@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { ALL_SIDES, getAllRawValue } from './utils';
+import {
+	ALL_SIDES,
+	getAllRawValue,
+	isValuesMixed,
+	isValuesDefined,
+} from './utils';
 
 export default function AllInputControl( {
 	onChange,
@@ -11,8 +16,8 @@ export default function AllInputControl( {
 	spacingSizes,
 } ) {
 	const allValue = getAllRawValue( values );
-	// const hasValues = isValuesDefined( values );
-	// const isMixed = hasValues && isValuesMixed( values, sides );
+	const hasValues = isValuesDefined( values );
+	const isMixed = hasValues && isValuesMixed( values );
 
 	// Applies a value to an object representing top, right, bottom and left
 	// sides while taking into account any custom side configuration.
@@ -50,6 +55,7 @@ export default function AllInputControl( {
 			onChange={ handleOnChange }
 			side={ 'all' }
 			spacingSizes={ spacingSizes }
+			isMixed={ isMixed }
 		/>
 	);
 }
