@@ -28,9 +28,9 @@ function render_block_core_query_title( $attributes ) {
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	} elseif ( $is_search ) {
-		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] !== false ) {
-			/* translators: %s is the search term. */
+		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] ) {
 			$title = sprintf(
+				/* translators: %s is the search term. */
 				__( 'Search results for: "%s"' ),
 				get_search_query()
 			);
