@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { useSelectControlSeparator } from './hook';
-import { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
 import type { SelectControlSeparatorProps } from '../types';
 
 const UnforwardedSelectControlSeparator = (

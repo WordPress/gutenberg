@@ -46,6 +46,7 @@
 		"src/color-palette/**/*",
 		"src/color-picker/**/*",
 		"src/confirm-dialog/**/*",
+		"src/custom-select-control-new/**/*",
 		"src/dashicon/**/*",
 		"src/date-time/**/*",
 		"src/disabled/**/*",

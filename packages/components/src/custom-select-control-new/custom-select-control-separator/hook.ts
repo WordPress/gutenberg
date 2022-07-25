@@ -9,7 +9,7 @@ import { useMemo } from '@wordpress/element';
 import * as styles from '../styles';
 import type { WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
-import { SelectControlSeparatorProps } from '../types';
+import type { SelectControlSeparatorProps } from '../types';
 
 export const useSelectControlSeparator = ( {
 	className,

@@ -9,7 +9,7 @@ import { useMemo } from '@wordpress/element';
 import * as styles from '../styles';
 import type { WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
-import { SelectControlArrowProps } from '../types';
+import type { SelectControlArrowProps } from '../types';
 
 // TODO:
 // - should we allow polymorphism ?

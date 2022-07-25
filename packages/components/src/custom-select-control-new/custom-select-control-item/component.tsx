@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { useSelectControlItem } from './hook';
-import { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
 import type { SelectControlItemProps } from '../types';
 
 const UnforwardedSelectControlItem = (

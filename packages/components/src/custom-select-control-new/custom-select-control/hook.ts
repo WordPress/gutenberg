@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
 import * as styles from '../styles';
 import type { WordPressComponentProps } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
-import { SelectControlProps } from '../types';
+import type { SelectControlProps } from '../types';
 
 // TODO:
 // - should we use 'select' instead of `div` for props inheritance?

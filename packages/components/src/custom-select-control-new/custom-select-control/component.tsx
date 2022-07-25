@@ -12,9 +12,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-
 import { useSelectControl } from './hook';
-import { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
 import { CustomSelectControlItem, CustomSelectControlArrow } from '../';
 import type { SelectControlOption, SelectControlProps } from '../types';
 
