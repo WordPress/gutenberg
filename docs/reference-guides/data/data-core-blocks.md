@@ -821,6 +821,40 @@ _Returns_
 
 Returns an action object used in signalling that new block variations have been added.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { addBlockVariations } = useDispatch( blocksStore );
+
+	return (
+		<Button
+			onClick={ () =>
+				addBlockVariations( 'core/quote', {
+					name: 'blue',
+					title: __( 'Blue Quote' ),
+					isDefault: true,
+					attributes: {
+						color: 'blue',
+						className: 'is-style-blue-quote',
+					},
+					icon: 'format-quote',
+					isActive: ( blockAttributes, variationAttributes ) =>
+						blockAttributes.color === variationAttributes.color,
+				} )
+			}
+		>
+			{ __( 'Add a Blue Quote variation to the core/quote block.' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Block name.
@@ -914,6 +948,27 @@ _Returns_
 ### removeBlockVariations
 
 Returns an action object used in signalling that block variations have been removed.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { removeBlockVariations } = useDispatch( blocksStore );
+
+	return (
+		<Button onClick={ () => removeBlockVariations( 'core/quote', 'blue' ) }>
+			{ __(
+				'Remove the Blue Quote variation from the core/quote block.'
+			) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

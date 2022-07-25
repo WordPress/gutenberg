@@ -365,6 +365,39 @@ export function removeBlockStyles( blockName, styleNames ) {
  * @param {string}                              blockName  Block name.
  * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { addBlockVariations } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 addBlockVariations( 'core/quote', {
+ *                     name: 'blue',
+ *                     title: __( 'Blue Quote' ),
+ *                     isDefault: true,
+ *                     attributes: {
+ *                         color: 'blue',
+ *                         className: 'is-style-blue-quote',
+ *                     },
+ *                     icon: 'format-quote',
+ *                     isActive: ( blockAttributes, variationAttributes ) =>
+ *                         blockAttributes.color === variationAttributes.color,
+ *                     } )
+ *             }
+ *         >
+ *             { __( 'Add a Blue Quote variation to the core/quote block.' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function addBlockVariations( blockName, variations ) {
@@ -380,6 +413,26 @@ export function addBlockVariations( blockName, variations ) {
  *
  * @param {string}          blockName      Block name.
  * @param {string|string[]} variationNames Block variation names.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { Button } from '@wordpress/components';
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { removeBlockVariations } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button onClick={ () => removeBlockVariations( 'core/quote', 'blue' ) }>
+ *             { __(
+ *                 'Remove the Blue Quote variation from the core/quote block.'
+ *             ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
