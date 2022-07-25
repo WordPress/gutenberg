@@ -114,6 +114,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 		$incoming_rules = $store->get_all_rules();
 		foreach ( $incoming_rules as $rule ) {
 			$this->add_rule( $rule->get_selector() )->add_declarations( $rule->get_declarations() );
+			$store->remove_rule( $rule->get_selector() );
 		}
 		return $this;
 	}
