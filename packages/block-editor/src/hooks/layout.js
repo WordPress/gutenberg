@@ -62,6 +62,10 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 			layoutDefinitions?.[ layout?.type || 'default' ]?.className
 		);
 	}
+	if ( layout?.inherit ) {
+		layoutClassnames.push( 'has-global-content-size' );
+		layoutClassnames.push( 'has-global-wide-size' );
+	}
 
 	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
 		layoutClassnames.push( 'has-global-padding' );
@@ -275,7 +279,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
 		const usedLayout = layout?.inherit
-			? defaultThemeLayout
+			? { ...defaultThemeLayout, ...layout }
 			: layout || defaultBlockLayout || {};
 		const layoutClasses = shouldRenderLayoutStyles
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )

@@ -215,6 +215,20 @@
 								"margin-left": "auto !important",
 								"margin-right": "auto !important"
 							}
+						},
+						{
+							"selector": ":where(.has-global-content-size) > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+							"rules": {
+								"max-width": "var(--wp--style--global--content-size)",
+								"margin-left": "auto !important",
+								"margin-right": "auto !important"
+							}
+						},
+						{
+							"selector": ":where(.has-global-wide-size) > .alignwide",
+							"rules": {
+								"max-width": "var(--wp--style--global--wide-size)"
+							}
 						}
 					],
 					"spacingStyles": [

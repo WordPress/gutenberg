@@ -45,6 +45,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
+		$inherit      = isset( $layout['inherit'] ) ? $layout['inherit'] : '';
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -62,25 +63,24 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+		}
 
-			if ( isset( $block_spacing ) ) {
-				$block_spacing_values = gutenberg_style_engine_get_block_supports_styles(
-					array(
-						'spacing' => $block_spacing,
-					)
-				);
+		if ( ( $content_size || $wide_size || $inherit ) && isset( $block_spacing ) ) {
+			$block_spacing_values = gutenberg_style_engine_get_block_supports_styles(
+				array(
+					'spacing' => $block_spacing,
+				)
+			);
 
-				// Handle negative margins for alignfull children of blocks with custom padding set.
-				// They're added separately because padding might only be set on one side.
-				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-					$padding_right = $block_spacing_values['declarations']['padding-right'];
-					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
-				}
-				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-					$padding_left = $block_spacing_values['declarations']['padding-left'];
-					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
-				}
+			// Handle negative margins for alignfull children of blocks with custom padding set.
+			// They're added separately because padding might only be set on one side.
+			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
+				$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
+			}
+			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
+				$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
 			}
 		}
 
@@ -181,19 +181,26 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$class_names            = array();
+	$layout_definitions     = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
+	$block_classname        = wp_get_block_default_classname( $block['blockName'] );
+	$container_class        = wp_unique_id( 'wp-container-' );
+	$layout_classname       = '';
+	$use_global_padding     = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
-		$used_layout = $global_layout_settings;
-	}
 
-	$class_names        = array();
-	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
-	$container_class    = wp_unique_id( 'wp-container-' );
-	$layout_classname   = '';
-	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+		if ( isset( $global_layout_settings['contentSize'] ) && $global_layout_settings['contentSize'] ) {
+			$class_names[] = 'has-global-content-size';
+		}
+
+		if ( isset( $global_layout_settings['wideSize'] ) && $global_layout_settings['wideSize'] ) {
+			$class_names[] = 'has-global-wide-size';
+		}
+	}
 
 	if ( $use_global_padding ) {
 		$class_names[] = 'has-global-padding';

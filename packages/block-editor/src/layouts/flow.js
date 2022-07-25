@@ -116,7 +116,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions,
 	} ) {
-		const { contentSize, wideSize } = layout;
+		const { contentSize, wideSize, inherit = false } = layout;
 		const blockGapStyleValue = getGapBoxControlValueFromStyle(
 			style?.spacing?.blockGap
 		);
@@ -129,7 +129,7 @@ export default {
 				: '';
 
 		let output =
-			!! contentSize || !! wideSize
+			( !! contentSize || !! wideSize ) && ! inherit
 				? `
 					${ appendSelectors(
 						selector,
@@ -141,9 +141,6 @@ export default {
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
-					}
-					${ appendSelectors( selector, '> .alignfull' ) } {
-						max-width: none;
 					}
 				`
 				: '';
