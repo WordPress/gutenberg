@@ -281,7 +281,7 @@ function ComboboxControl( {
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
 							renderSuggestion={ ( { suggestion } ) =>
-								renderOption( { option: suggestion } )
+								renderOption?.( { option: suggestion } )
 							}
 						/>
 					) }
