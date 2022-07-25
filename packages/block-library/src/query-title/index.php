@@ -14,17 +14,16 @@
  */
 function block_query_title_filter_archive_title( $title ) {
 	if ( is_category() ) {
-		$title = single_cat_title( '', false );
+		return single_cat_title( '', false );
 	} elseif ( is_tag() ) {
-		$title = single_tag_title( '', false );
+		return single_tag_title( '', false );
 	} elseif ( is_author() ) {
-		$title = get_the_author();
+		return get_the_author();
 	} elseif ( is_post_type_archive() ) {
-		$title = post_type_archive_title( '', false );
+		return post_type_archive_title( '', false );
 	} elseif ( is_tax() ) {
-		$title = single_term_title( '', false );
+		return single_term_title( '', false );
 	}
-
 	return $title;
 }
 
@@ -49,7 +48,7 @@ function render_block_core_query_title( $attributes ) {
 		if ( ! $show_prefix ) {
 			add_filter( 'get_the_archive_title', 'block_query_title_filter_archive_title' );
 			$title = get_the_archive_title();
-			add_filter( 'get_the_archive_title', 'block_query_title_filter_archive_title' );
+			remove_filter( 'get_the_archive_title', 'block_query_title_filter_archive_title' );
 		} else {
 			$title = get_the_archive_title();
 		}
