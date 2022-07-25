@@ -78,13 +78,6 @@ describe( 'ComboboxControl', () => {
 		);
 	};
 
-	it( 'should render', () => {
-		render( <TestComboboxControl label={ defaultLabelText } /> );
-
-		const input = getInput( defaultLabelText );
-		expect( input ).toBeVisible();
-	} );
-
 	it( 'should render with visible label', () => {
 		render( <TestComboboxControl label={ defaultLabelText } /> );
 		const label = getLabel( defaultLabelText );
