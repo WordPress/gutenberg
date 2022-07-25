@@ -169,7 +169,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
-	renderSuggestion?: ( suggestion: T ) => ReactNode;
+	renderSuggestion?: ( props: { suggestion: T } ) => ReactNode;
 }
 
 export interface TokenProps extends TokenItem {

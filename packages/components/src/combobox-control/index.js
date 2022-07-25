@@ -280,7 +280,9 @@ function ComboboxControl( {
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
-							renderSuggestion={ renderOption }
+							renderSuggestion={ ( { suggestion } ) =>
+								renderOption( { option: suggestion } )
+							}
 						/>
 					) }
 				</div>

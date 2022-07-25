@@ -126,7 +126,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 				let output: ReactNode;
 
 				if ( typeof renderSuggestion === 'function' ) {
-					output = renderSuggestion( suggestion );
+					output = renderSuggestion( { suggestion } );
 				} else if ( matchText ) {
 					output = (
 						<span aria-label={ displayTransform( suggestion ) }>

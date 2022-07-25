@@ -338,16 +338,19 @@ export const WithRenderOption = ( args ) => {
 				onChange={ setValue }
 				label="Select an author"
 				options={ authorOptions }
-				renderOption={ ( { label, age, country } ) => (
-					<div>
-						<div style={ { marginBottom: '0.2rem' } }>
-							{ label }
+				renderOption={ ( { option } ) => {
+					const { label, age, country } = option;
+					return (
+						<div>
+							<div style={ { marginBottom: '0.2rem' } }>
+								{ label }
+							</div>
+							<small>
+								Age: { age }, Country: { country }
+							</small>
 						</div>
-						<small>
-							Age: { age }, Country: { country }
-						</small>
-					</div>
-				) }
+					);
+				} }
 			/>
 			<p>Selected author: { value }</p>
 		</>
