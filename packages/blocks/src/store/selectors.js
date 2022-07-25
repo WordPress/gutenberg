@@ -790,3 +790,13 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 		return hasBlockSupport( state, childBlockName, 'inserter', true );
 	} );
 };
+
+export const __unstableIsContentBlock = createSelector(
+	( state, blockTypeName ) => {
+		const blockType = getBlockType( state, blockTypeName );
+		return Object.entries( blockType.attributes ).some(
+			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
+		);
+	},
+	( state, blockTypeName ) => [ state.blockTypes[ blockTypeName ].attributes ]
+);

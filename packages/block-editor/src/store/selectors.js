@@ -1434,6 +1434,10 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock;
 	}
 
+	if ( getBlockAttributes( state, rootClientId ).lock?.content === true ) {
+		return 'all';
+	}
+
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
 		return null;
@@ -1593,6 +1597,7 @@ const canInsertBlockTypeUnmemoized = (
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
+		state.blocks.attributes[ rootClientId ],
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
@@ -2678,4 +2683,17 @@ export const __unstableGetVisibleBlocks = createSelector(
 		);
 	},
 	( state ) => [ state.blocks.visibility ]
+);
+
+export const __unstableGetContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		while ( !! state.blocks.parents[ current ] ) {
+			current = state.blocks.parents[ current ];
+			if ( getBlockAttributes( state, current )?.lock?.content ) {
+				return current;
+			}
+		}
+	},
+	( state ) => [ state.blocks.parents, state.blocks.attributes ]
 );

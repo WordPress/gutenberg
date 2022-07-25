@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
-import { AsyncModeProvider } from '@wordpress/data';
+import { memo, useMemo } from '@wordpress/element';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +10,7 @@ import { AsyncModeProvider } from '@wordpress/data';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -74,8 +75,19 @@ const countReducer =
 		return count + 1;
 	};
 
+function getIdsTreeFlat( blocks ) {
+	return blocks.reduce( ( result, { clientId, innerBlocks } ) => {
+		return [
+			...result,
+			{ clientId, innerBlocks: [] },
+			...getIdsTreeFlat( innerBlocks ),
+		];
+	}, [] );
+}
+
 function ListViewBranch( props ) {
 	const {
+		parentId,
 		blocks,
 		selectBlock,
 		showBlockMovers,
@@ -88,20 +100,35 @@ function ListViewBranch( props ) {
 		isExpanded,
 	} = props;
 
+	const isContentLocked = useSelect(
+		( select ) => {
+			return !! (
+				parentId &&
+				select( blockEditorStore ).getBlockAttributes( parentId )?.lock
+					?.content
+			);
+		},
+		[ parentId ]
+	);
+	const processedBlocks = useMemo( () => {
+		if ( isContentLocked ) {
+			return getIdsTreeFlat( blocks ).filter( Boolean );
+		}
+		return blocks.filter( Boolean );
+	}, [ isContentLocked, blocks ] );
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	const filteredBlocks = blocks.filter( Boolean );
-	const blockCount = filteredBlocks.length;
+	const blockCount = processedBlocks.length;
 	let nextPosition = listPosition;
 
 	return (
 		<>
-			{ filteredBlocks.map( ( block, index ) => {
+			{ processedBlocks.map( ( block, index ) => {
 				const { clientId, innerBlocks } = block;
 
 				if ( index > 0 ) {
 					nextPosition += countBlocks(
-						filteredBlocks[ index - 1 ],
+						processedBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
 						isExpanded
@@ -138,6 +165,7 @@ function ListViewBranch( props ) {
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
 							<ListViewBlock
+								renderOnlyContentBlocks={ isContentLocked }
 								block={ block }
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
@@ -161,6 +189,7 @@ function ListViewBranch( props ) {
 						) }
 						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
+								parentId={ clientId }
 								blocks={ innerBlocks }
 								selectBlock={ selectBlock }
 								showBlockMovers={ showBlockMovers }

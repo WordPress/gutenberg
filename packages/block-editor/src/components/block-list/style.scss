@@ -123,6 +123,14 @@
 	padding: 0;
 }
 
+.is-content-locked {
+	pointer-events: none;
+}
+
+.is-content-block {
+	pointer-events: initial;
+}
+
 .block-editor-block-list__layout .block-editor-block-list__block {
 	position: relative;
 

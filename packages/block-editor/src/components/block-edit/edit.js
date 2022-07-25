@@ -31,7 +31,7 @@ import BlockContext from '../block-context';
 const DEFAULT_BLOCK_CONTEXT = {};
 
 export const Edit = ( props ) => {
-	const { attributes = {}, name } = props;
+	const { attributes = {}, name, } = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 
@@ -59,7 +59,7 @@ export const Edit = ( props ) => {
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames( generatedClassName, attributes.className );
+	const className = classnames( generatedClassName, attributes.className, props.className );
 
 	return (
 		<Component { ...props } context={ context } className={ className } />
