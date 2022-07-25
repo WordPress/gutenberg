@@ -99,6 +99,10 @@ export const item = css`
 	}
 `;
 
+export const itemCheck = css`
+	/* TODO: styles (decide after prepping a storybook example) */
+`;
+
 export const arrow = css``;
 
 export const group = css``;

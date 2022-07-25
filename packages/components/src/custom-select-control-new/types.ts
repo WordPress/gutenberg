@@ -23,6 +23,12 @@ export type SelectControlItemProps = SelectControlOptionBase & {
 	checked?: boolean;
 };
 
+export type SelectControlItemCheckProps = SelectControlOptionBase & {
+	// Is classname necessary, with WordPressComponentProps?
+	className?: string;
+	children?: ReactNode;
+};
+
 export type SelectControlProps = {
 	value?: string;
 	label?: string;
