@@ -65,6 +65,7 @@ class WP_HTML_Processor {
 
 
 	public function find( $query ) {
+		$this->commit_class_changes();
 		$this->scanner->reset();
 		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
 		$this->scanner->scan( $this->descriptor );
@@ -136,6 +137,50 @@ class WP_HTML_Processor {
 	}
 
 
+	public function commit_class_changes() {
+		if ( empty( $this->modifications->class_changes ) ) {
+			return;
+		}
+
+		$existing_class = array_key_exists( 'class', $this->scanner->attributes )
+			? substr(
+				$this->scanner->document,
+				$this->scanner->attributes['class']->value->start,
+				$this->scanner->attributes['class']->value->length
+			)
+			: '';
+
+		// Remove unwanted classes.
+		$new_class = preg_replace_callback(
+			'~(?:^|[ \t])([^ \t]+)~miu',
+			function ( $matches ) {
+				list( $full_match, $class_name ) = $matches;
+
+				$comparable_name = WP_Tag_Find_Descriptor::comparable( $class_name );
+				if (
+					 array_key_exists( $comparable_name, $this->modifications->class_changes ) &&
+					 false === $this->modifications->class_changes[ $comparable_name ]
+				) {
+					 return '';
+				}
+
+				return $full_match;
+			},
+			$existing_class
+		);
+
+		// Add new classes.
+		foreach ( $this->modifications->class_changes as $class => $should_include ) {
+			if ( $should_include ) {
+				$new_class .= " {$class}";
+			}
+		}
+
+		$this->set_attribute( 'class', trim( $new_class ) );
+		$this->modifications->class_changes = array();
+	}
+
+
 	public function apply() {
 		$document = $this->scanner->document;
 
@@ -143,43 +188,7 @@ class WP_HTML_Processor {
 			return $document;
 		}
 
-		if ( ! empty( $this->modifications->class_changes ) ) {
-			$existing_class = array_key_exists( 'class', $this->scanner->attributes )
-				? substr(
-					$document,
-					$this->scanner->attributes['class']->value->start,
-					$this->scanner->attributes['class']->value->length
-				  )
-				: '';
-
-			// Remove unwanted classes.
-			$new_class = preg_replace_callback(
-				'~(?:^|[ \t])([^ \t]+)~miu',
-				function ( $matches ) {
-					 list( $full_match, $class_name ) = $matches;
-
-					 $comparable_name = WP_Tag_Find_Descriptor::comparable( $class_name );
-					 if (
-						  array_key_exists( $comparable_name, $this->modifications->class_changes ) &&
-						  false === $this->modifications->class_changes[ $comparable_name ]
-					 ) {
-						  return '';
-					 }
-
-					 return $full_match;
-				},
-				$existing_class
-			);
-
-			// Add new classes.
-			foreach ( $this->modifications->class_changes as $class => $should_include ) {
-				if ( $should_include ) {
-					$new_class .= " {$class}";
-				}
-			}
-
-			$this->set_attribute( 'class', trim( $new_class ) );
-		}
+		$this->commit_class_changes();
 
 		usort( $this->modifications->replacements, function ( $a, $b ) {
 			if ( $a[0] === $b[0] ) {
@@ -524,14 +533,6 @@ class WP_HTML_Scanner {
 			return false;
 		}
 
-//		switch ( $descriptor->check( $tag->comparable, array() ) ) {
-//			case 'cannot-match':
-//				return $this->scan( $descriptor, $found_already, $tag );
-//
-//			case 'matches':
-//				return $this->scan( $descriptor, $found_already + 1, $tag );
-//		}
-
 		// @TODO: Are we done matching?
 		while ( $attribute = $this->find_next_attribute() ) {
 			// HTML5 says duplicate values are ignored
@@ -540,16 +541,11 @@ class WP_HTML_Scanner {
 			}
 
 			$this->attributes[ $attribute->name->comparable ] = $attribute;
-
-//			switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
-//				case 'matches':
-//					return $this->scan( $descriptor, $found_already + 1, $tag );
-//			}
 		}
 
 		switch ( $descriptor->check( $tag->comparable, $this->attributes ) ) {
 			case 'matches':
-				return $this->scan( $descriptor, $found_already + 1, $tag );
+				return $this->scan($descriptor, $found_already + 1, $tag);
 		}
 
 		// try to find the next tag
