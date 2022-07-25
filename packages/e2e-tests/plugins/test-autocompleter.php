@@ -7,7 +7,7 @@
  * @package gutenberg-test-autocompleter
  */
 
- /**
+/**
  * Registers a custom script for the plugin.
  */
 function enqueue_test_autocompleter_plugin_script() {
