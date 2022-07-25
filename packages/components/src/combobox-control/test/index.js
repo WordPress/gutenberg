@@ -197,4 +197,70 @@ describe( 'ComboboxControl', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.name );
 	} );
+
+	it( 'should process multiple entries in a single session', async () => {
+		const user = setupUser();
+		const unmatchedString = 'Mordor';
+		const targetOption = timezones[ 6 ];
+		const searchString = targetOption.label.substring( 0, 11 );
+		const onChangeSpy = jest.fn();
+		render(
+			<TestComboboxControl
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		// Pressing tab selects the input and shows the options
+		await user.tab();
+
+		const initialRenderedOptions = getAllOptions();
+
+		// Rendered options match the provided dataset.
+		expect( initialRenderedOptions ).toHaveLength( timezones.length );
+		initialRenderedOptions.forEach( ( option, optionIndex ) => {
+			expect( option ).toHaveTextContent(
+				timezones[ optionIndex ].label
+			);
+		} );
+
+		// No options are rendered if no match is found
+		await user.keyboard( unmatchedString );
+		expect( screen.queryByRole( 'option' ) ).toBeNull();
+
+		// Clearing the input renders all options again
+		await user.clear( input );
+
+		const postClearRenderedOptions = getAllOptions();
+
+		expect( postClearRenderedOptions ).toHaveLength( timezones.length );
+		postClearRenderedOptions.forEach( ( option, optionIndex ) => {
+			expect( option ).toHaveTextContent(
+				timezones[ optionIndex ].label
+			);
+		} );
+
+		// Run a second search with a valid string.
+		await user.keyboard( searchString );
+		const validSearchRenderedOptions = getAllOptions();
+
+		// Find option that match the search string.
+		const matches = timezones.filter( ( option ) =>
+			option.label.includes( searchString )
+		);
+
+		// Confirm the rendered options match the provided dataset based on the current string.
+		expect( validSearchRenderedOptions ).toHaveLength( matches.length );
+		validSearchRenderedOptions.forEach( ( option, optionIndex ) => {
+			expect( option ).toHaveTextContent( matches[ optionIndex ].label );
+		} );
+
+		// Confirm that the corrent option is selected
+		await user.keyboard( '{Enter}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+		expect( input ).toHaveValue( targetOption.name );
+	} );
 } );
