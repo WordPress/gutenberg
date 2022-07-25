@@ -158,6 +158,10 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__next36pxDefaultSize?: boolean;
+	/**
+	 * Custom renderer for the token suggestions.
+	 */
+	renderSuggestion?: ( args: { suggestion: string } ) => ReactNode;
 }
 
 export interface SuggestionsListProps< T = string | { value: string } > {
@@ -169,7 +173,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
-	renderSuggestion?: ( props: { suggestion: T } ) => ReactNode;
+	renderSuggestion?: ( args: { suggestion: T } ) => ReactNode;
 }
 
 export interface TokenProps extends TokenItem {
