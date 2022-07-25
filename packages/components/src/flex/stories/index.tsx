@@ -12,6 +12,7 @@ import { View } from '../../view';
 const meta: ComponentMeta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
+	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },

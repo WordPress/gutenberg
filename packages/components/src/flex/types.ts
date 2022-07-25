@@ -83,7 +83,7 @@ export type FlexItemProps = {
 	/**
 	 * The children elements.
 	 */
-	children: ReactNode;
+	children?: ReactNode;
 };
 
 export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;
