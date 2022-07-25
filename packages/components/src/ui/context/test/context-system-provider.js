@@ -105,8 +105,25 @@ describe( 'props', () => {
 		expect( el.innerHTML ).toContain( 'Code is Poetry' );
 		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
 	} );
+} );
 
-	test( 'should not override children via context system', () => {
+describe( 'children', () => {
+	test( 'should pass through children', () => {
+		const Component = ( props, ref ) => (
+			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
+		);
+		const ConnectedComponent = contextConnect( Component, 'Component' );
+
+		render(
+			<ContextSystemProvider>
+				<ConnectedComponent>Pass through</ConnectedComponent>
+			</ContextSystemProvider>
+		);
+
+		expect( screen.getByText( 'Pass through' ) ).toBeInTheDocument();
+	} );
+
+	test( 'should not accept children via `context`', () => {
 		const Component = ( props, ref ) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
 		);
@@ -141,104 +158,43 @@ describe( 'props', () => {
 
 		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 2 );
 	} );
-} );
 
-describe( 'Context System with polymorphic components', () => {
-	test( 'should pass through children to the `as` component', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
-
-		render(
-			<ContextSystemProvider>
-				<ConnectedComponent as="span">Pass through</ConnectedComponent>
-			</ContextSystemProvider>
+	describe( 'when connected component does a `cloneElement()`', () => {
+		// eslint-disable-next-line no-unused-vars
+		const ComponentThatClones = ( { content, ...props }, _ref ) =>
+			cloneElement(
+				content,
+				useContextSystem( props, 'ComponentThatClones' )
+			);
+		const ConnectedComponentThatClones = contextConnect(
+			ComponentThatClones,
+			'ComponentThatClones'
 		);
 
-		expect( screen.getByText( 'Pass through' ) ).toBeInTheDocument();
-	} );
-
-	test( 'should not override inherent children', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
-		const AnotherComponent = ( props ) => (
-			<span { ...props }>Inherent</span>
-		);
-
-		render(
-			<ContextSystemProvider>
-				<ConnectedComponent as={ AnotherComponent } />
-				<ConnectedComponent as={ AnotherComponent }>
-					Explicit children
-				</ConnectedComponent>
-			</ContextSystemProvider>
-		);
-
-		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 2 );
-	} );
-
-	describe( 'should handle implicit `undefined` children when an `as` component does a `cloneElement()`', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
-
-		const ComponentThatClones = ( { content, ...props } ) =>
-			cloneElement( content, props );
-		const ComponentThatClonesWithoutChildren = ( {
-			content,
-			children,
-			...props
-		} ) => cloneElement( content, props );
-
-		const ElementToClone = <span>Inherent</span>;
-
-		test.each( [
-			[
-				'should not override cloned inherent children with implicit `undefined` children',
-				() => (
-					<ConnectedComponent
-						as={ ComponentThatClones }
-						content={ ElementToClone }
-					/>
-				),
-				'Inherent',
-			],
-			[
-				'should override cloned inherent children with explicit children',
-				() => (
-					<ConnectedComponent
-						as={ ComponentThatClones }
-						content={ ElementToClone }
-					>
-						Override
-					</ConnectedComponent>
-				),
-				'Override',
-			],
-			[
-				'should not override cloned inherent children with explicit children if cloning code omitted the children',
-				() => (
-					<ConnectedComponent
-						as={ ComponentThatClonesWithoutChildren }
-						content={ ElementToClone }
-					>
-						Override
-					</ConnectedComponent>
-				),
-				'Inherent',
-			],
-		] )( '%s', ( _description, ComponentToTest, expectedText ) => {
+		test( 'should not override cloned inherent children with implicit `undefined` children', () => {
 			render(
 				<ContextSystemProvider>
-					<ComponentToTest />
+					<ConnectedComponentThatClones
+						content={ <span>Inherent</span> }
+					/>
 				</ContextSystemProvider>
 			);
+			expect( screen.getByText( 'Inherent' ) ).toBeInTheDocument();
+		} );
 
-			expect( screen.getByText( expectedText ) ).toBeInTheDocument();
+		test( 'should override cloned inherent children with explicit children', () => {
+			render(
+				<ContextSystemProvider>
+					<ConnectedComponentThatClones
+						content={ <span>Inherent</span> }
+					>
+						Explicit children
+					</ConnectedComponentThatClones>
+				</ContextSystemProvider>
+			);
+			expect(
+				screen.getByText( 'Explicit children' )
+			).toBeInTheDocument();
 		} );
 	} );
 } );
