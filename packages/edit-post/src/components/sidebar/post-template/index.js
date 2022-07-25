@@ -69,9 +69,10 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 		const templateSlug =
 			select( editorStore ).getEditedPostAttribute( 'template' );
 
-		const settings = select( editorStore ).getEditorSettings();
-		if ( templateSlug && settings.availableTemplates[ templateSlug ] ) {
-			return settings.availableTemplates[ templateSlug ];
+		const { supportsTemplateMode, availableTemplates } =
+			select( editorStore ).getEditorSettings();
+		if ( ! supportsTemplateMode && availableTemplates[ templateSlug ] ) {
+			return availableTemplates[ templateSlug ];
 		}
 
 		const template = select( editPostStore ).getEditedPostTemplate();
