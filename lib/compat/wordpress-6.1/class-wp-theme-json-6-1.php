@@ -451,7 +451,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 			$selector = $metadata['selector'];
 			$node     = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$store    = $this->combine_style_engine_stores( $store, static::compute_preset_classes_store( $node, $selector, $origins ) );
+			$store->add_store( static::compute_preset_classes_store( $node, $selector, $origins ) );
 		}
 		return $store;
 	}
@@ -723,10 +723,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
 		if ( in_array( 'variables', $types, true ) ) {
-			$store = $this->combine_style_engine_stores( $store, $this->get_css_variables_store( $setting_nodes, $origins ) );
+			$store->add_store( $this->get_css_variables_store( $setting_nodes, $origins ) );
 		}
 		if ( in_array( 'styles', $types, true ) ) {
-			$store = $this->combine_style_engine_stores( $store, $this->get_block_classes_store( $style_nodes ) );
+			$store->add_store( $this->get_block_classes_store( $style_nodes ) );
 		} elseif ( in_array( 'base-layout-styles', $types, true ) ) {
 			// Base layout styles are provided as part of `styles`, so only output separately if explicitly requested.
 			// For backwards compatibility, the Columns block is explicitly included, to support a different default gap value.
@@ -743,12 +743,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			);
 
 			foreach ( $base_styles_nodes as $base_style_node ) {
-				$store = $this->combine_style_engine_stores( $store, $this->get_layout_styles_store( $base_style_node ) );
+				$store->add_store( $this->get_layout_styles_store( $base_style_node ) );
 			}
 		}
 
 		if ( in_array( 'presets', $types, true ) ) {
-			$store = $this->combine_style_engine_stores( $store, $this->get_preset_classes_store( $setting_nodes, $origins ) );
+			$store->add_store( $this->get_preset_classes_store( $setting_nodes, $origins ) );
 		}
 
 		return $store;
@@ -882,7 +882,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			static::ROOT_BLOCK_SELECTOR !== $selector &&
 			! empty( $block_metadata['name'] )
 		) {
-			$store = $this->combine_style_engine_stores( $store, $this->get_layout_styles_store( $block_metadata ) );
+			$store->add_store( $this->get_layout_styles_store( $block_metadata ) );
 		}
 
 		// 5. Generate and append the feature level rulesets.
@@ -952,7 +952,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 				$store->add_rule( $selector )->add_declarations( array( '--wp--style--block-gap' => $block_gap_value ) );
 			}
-			$store = $this->combine_style_engine_stores( $store, $this->get_layout_styles_store( $block_metadata ) );
+			$store->add_store( $this->get_layout_styles_store( $block_metadata ) );
 		}
 
 		return $store;
@@ -982,7 +982,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
-			$store = $this->combine_style_engine_stores( $store, $this->get_block_styles_store( $metadata ) );
+			$store->add_store( $this->get_block_styles_store( $metadata ) );
 		}
 
 		return $store;
@@ -1585,23 +1585,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	protected function get_layout_styles( $block_metadata ) {
 		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_layout_styles_store( $block_metadata ) ) )->get_css( true );
-	}
-
-	/**
-	 * Combine style-engine stores.
-	 * Accepts 2 store-engine stores and returns the 1st, with the rules of the 2nd one added to it.
-	 *
-	 * @param WP_Style_Engine_CSS_Rules_Store_Gutenberg $store_1 The first store.
-	 * @param WP_Style_Engine_CSS_Rules_Store_Gutenberg $store_2 The second store.
-	 *
-	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg The combined store.
-	 */
-	public static function combine_style_engine_stores( $store_1, $store_2 ) {
-		$store_2_rules = $store_2->get_all_rules();
-		foreach ( $store_2_rules as $store_2_rule ) {
-			$store_1->add_rule( $store_2_rule->get_selector() )->add_declarations( $store_2_rule->get_declarations() );
-		}
-		return $store_1;
 	}
 
 	/**
