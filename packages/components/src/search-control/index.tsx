@@ -55,9 +55,7 @@ function SearchControl(
 					label={ __( 'Reset search' ) }
 					onClick={ () => {
 						onChange( '' );
-						if ( searchRef.current ) {
-							( searchRef.current as HTMLInputElement )?.focus();
-						}
+						searchRef.current?.focus();
 					} }
 				/>
 			);
