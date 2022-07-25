@@ -27,13 +27,11 @@ function MaybeCategoryPanel() {
 			'root',
 			'site'
 		)?.default_category;
-		const defaultCategory = select( coreStore ).getEntityRecords(
+		const defaultCategory = select( coreStore ).getEntityRecord(
 			'taxonomy',
 			'category',
-			{
-				id: defaultCategoryId,
-			}
-		)?.[ 0 ];
+			defaultCategoryId
+		);
 		const postTypeSupportsCategories =
 			categoriesTaxonomy &&
 			some( categoriesTaxonomy.types, ( type ) => type === postType );
