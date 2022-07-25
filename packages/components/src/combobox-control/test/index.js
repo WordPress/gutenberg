@@ -53,6 +53,10 @@ const getLabel = ( labelText ) => screen.getByText( labelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
+const setTargetOption = ( index ) => {
+	const searchString = timezones[ index ].label.substring( 0, 11 );
+	return { searchString, ...timezones[ index ] };
+};
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,
@@ -121,7 +125,7 @@ describe( 'ComboboxControl', () => {
 
 	it( 'should select the correct option via click events', async () => {
 		const user = setupUser();
-		const targetOption = timezones[ 2 ];
+		const targetOption = setTargetOption( 2 );
 		const onChangeSpy = jest.fn();
 		render(
 			<TestComboboxControl
@@ -145,7 +149,7 @@ describe( 'ComboboxControl', () => {
 	it( 'should select the correct option via keypress events', async () => {
 		const user = setupUser();
 		const targetIndex = 4;
-		const targetOption = timezones[ targetIndex ];
+		const targetOption = setTargetOption( targetIndex );
 		const onChangeSpy = jest.fn();
 		render(
 			<TestComboboxControl
@@ -173,8 +177,7 @@ describe( 'ComboboxControl', () => {
 
 	it( 'should select the correct option from a search', async () => {
 		const user = setupUser();
-		const targetOption = timezones[ 13 ];
-		const searchString = targetOption.label.substring( 0, 11 );
+		const targetOption = setTargetOption( 13 );
 		const onChangeSpy = jest.fn();
 		render(
 			<TestComboboxControl
@@ -188,7 +191,7 @@ describe( 'ComboboxControl', () => {
 		await user.tab();
 
 		// Type enough characters to ensure a predictable search result
-		await user.keyboard( searchString );
+		await user.keyboard( targetOption.searchString );
 
 		// Pressing Enter/Return selects the currently focused option
 		await user.keyboard( '{Enter}' );
@@ -201,8 +204,7 @@ describe( 'ComboboxControl', () => {
 	it( 'should process multiple entries in a single session', async () => {
 		const user = setupUser();
 		const unmatchedString = 'Mordor';
-		const targetOption = timezones[ 6 ];
-		const searchString = targetOption.label.substring( 0, 11 );
+		const targetOption = setTargetOption( 6 );
 		const onChangeSpy = jest.fn();
 		render(
 			<TestComboboxControl
@@ -242,12 +244,12 @@ describe( 'ComboboxControl', () => {
 		} );
 
 		// Run a second search with a valid string.
-		await user.keyboard( searchString );
+		await user.keyboard( targetOption.searchString );
 		const validSearchRenderedOptions = getAllOptions();
 
 		// Find option that match the search string.
 		const matches = timezones.filter( ( option ) =>
-			option.label.includes( searchString )
+			option.label.includes( targetOption.searchString )
 		);
 
 		// Confirm the rendered options match the provided dataset based on the current string.
