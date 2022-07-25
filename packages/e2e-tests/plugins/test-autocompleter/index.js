@@ -14,12 +14,7 @@
 			{ visual: '🍒', name: 'Cherry', id: 7 },
 		],
 		// Returns a label for an option like "🍊 Orange"
-		getOptionLabel: ( option ) => `
-			<span>
-				<span className="icon">${ option.visual }</span>
-				${ option.name }
-			</span>
-		`,
+		getOptionLabel: ( option ) => `${ option.visual } ${ option.name }`,
 		// Declares that options should be matched by their name
 		getOptionKeywords: ( option ) => [ option.name ],
 		// Declares that the Grapes option is disabled
