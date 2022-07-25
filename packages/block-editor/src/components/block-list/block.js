@@ -18,6 +18,7 @@ import {
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -292,19 +293,48 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId } =
-				select( blockEditorStore );
+			const {
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getBlockRootClientId,
+				getBlockIndex,
+				getBlockOrder,
+				getBlock,
+			} = select( blockEditorStore );
+			const { moveBlocksToPosition } = dispatch( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
 				if ( nextBlockClientId ) {
 					mergeBlocks( clientId, nextBlockClientId );
+				} else {
+					moveBlocksToPosition(
+						[ clientId ],
+						rootClientId,
+						getBlockRootClientId( rootClientId ),
+						getBlockIndex( rootClientId ) + 1
+					);
 				}
 			} else {
 				const previousBlockClientId =
 					getPreviousBlockClientId( clientId );
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
+				} else {
+					moveBlocksToPosition(
+						[ clientId ],
+						rootClientId,
+						getBlockRootClientId( rootClientId ),
+						getBlockIndex( rootClientId )
+					);
+
+					if ( ! getBlockOrder( rootClientId ).length ) {
+						const replacement = switchToBlockType(
+							getBlock( rootClientId ),
+							'*'
+						);
+					}
 				}
 			}
 		},
