@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -8,6 +13,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,6 +41,9 @@ export default function SpacingSizesControl( {
 	resetValues = DEFAULT_VALUES,
 	useSelect,
 } ) {
+	const [ showCustomValueControl, setShowCustomValueControl ] =
+		useState( false );
+
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
@@ -78,7 +87,15 @@ export default function SpacingSizesControl( {
 
 	return (
 		<fieldset role="region" className="component-spacing-sizes-control">
-			<HStack className="component-spacing-sizes-control__header">
+			<HStack
+				className={ classnames(
+					'component-spacing-sizes-control__header',
+					{
+						'component-spacing-sizes-control__header-is-linked':
+							isLinked,
+					}
+				) }
+			>
 				<Text as="legend">{ label }</Text>
 				{ allowReset && (
 					<Button
@@ -90,6 +107,24 @@ export default function SpacingSizesControl( {
 					>
 						{ __( 'Reset' ) }
 					</Button>
+				) }
+				{ isLinked && (
+					<Button
+						label={
+							showCustomValueControl
+								? __( 'Use size preset' )
+								: __( 'Set custom size' )
+						}
+						icon={ settings }
+						onClick={ () => {
+							setShowCustomValueControl(
+								! showCustomValueControl
+							);
+						} }
+						isPressed={ showCustomValueControl }
+						isSmall
+						className="components-spacing-sizes-control__custom-toggle"
+					/>
 				) }
 				{ ! hasOneSide && (
 					<LinkedButton
@@ -103,6 +138,7 @@ export default function SpacingSizesControl( {
 				<AllInputControl
 					aria-label={ label }
 					{ ...inputControlProps }
+					showCustomValueControl={ showCustomValueControl }
 				/>
 			) }
 

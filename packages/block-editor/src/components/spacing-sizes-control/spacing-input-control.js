@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
@@ -8,6 +13,7 @@ import {
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -33,6 +39,7 @@ export default function SpacingInputControl( {
 	onChange,
 	isMixed = false,
 	type,
+	showAllSidesCustomValueControl = false,
 } ) {
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
@@ -111,36 +118,54 @@ export default function SpacingInputControl( {
 	return (
 		<>
 			<HStack>
-				{ side !== 'all' && (
-					<Text className="components-spacing-sizes-control__side-label">
-						{ LABELS[ side ] }
-					</Text>
-				) }
+				<VStack className="components-spacing-sizes-control__side-label-wrapper">
+					{ side !== 'all' && (
+						<Text className="components-spacing-sizes-control__side-label">
+							{ LABELS[ side ] }
+						</Text>
+					) }
 
-				{ spacingSizes.length <= 8 && ! showCustomValueControl && (
-					<Text className="components-spacing-sizes-control__hint">
-						{ currentValueHint !== undefined
-							? currentValueHint
-							: __( 'Default' ) }
-					</Text>
+					{ spacingSizes.length <= 8 &&
+						! showCustomValueControl &&
+						! showAllSidesCustomValueControl && (
+							<Text className="components-spacing-sizes-control__hint">
+								{ currentValueHint !== undefined
+									? currentValueHint
+									: __( 'Default' ) }
+							</Text>
+						) }
+				</VStack>
+				{ side !== 'all' && (
+					<Button
+						label={
+							showCustomValueControl
+								? __( 'Use size preset' )
+								: __( 'Set custom size' )
+						}
+						icon={ settings }
+						onClick={ () => {
+							setShowCustomValueControl(
+								! showCustomValueControl
+							);
+						} }
+						isPressed={ showCustomValueControl }
+						isSmall
+						className="components-spacing-sizes-control__custom-toggle"
+					/>
 				) }
-				<Button
-					label={
-						showCustomValueControl
-							? __( 'Use size preset' )
-							: __( 'Set custom size' )
-					}
-					icon={ settings }
-					onClick={ () => {
-						setShowCustomValueControl( ! showCustomValueControl );
-					} }
-					isPressed={ showCustomValueControl }
-					isSmall
-					className="components-spacing-sizes-control__custom-toggle"
-				/>
 			</HStack>
-			{ showCustomValueControl && (
-				<HStack className="components-spacing-sizes-control__custom-value-control">
+			{ ( showCustomValueControl || showAllSidesCustomValueControl ) && (
+				<HStack
+					className={ classnames(
+						'components-spacing-sizes-control__custom-value-control',
+						{
+							'components-spacing-sizes-control__custom-value-control-all':
+								side === 'all',
+							'components-spacing-sizes-control__custom-value-control-single':
+								side !== 'all',
+						}
+					) }
+				>
 					<UnitControl
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
@@ -162,23 +187,25 @@ export default function SpacingInputControl( {
 					/>
 				</HStack>
 			) }
-			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
-				<RangeControl
-					value={ currentValue }
-					onChange={ ( newSize ) =>
-						onChange( getNewPresetValue( newSize ) )
-					}
-					withInputField={ false }
-					aria-valuenow={ valueNow }
-					aria-valuetext={ spacingSizes[ valueNow ]?.name }
-					renderTooltipContent={ customTooltipContent }
-					min={ 0 }
-					max={ spacingSizes.length - 1 }
-					marks={ marks }
-					label={ ariaLabel }
-					hideLabelFromVision={ true }
-				/>
-			) }
+			{ spacingSizes.length <= 8 &&
+				! showCustomValueControl &&
+				! showAllSidesCustomValueControl && (
+					<RangeControl
+						value={ currentValue }
+						onChange={ ( newSize ) =>
+							onChange( getNewPresetValue( newSize ) )
+						}
+						withInputField={ false }
+						aria-valuenow={ valueNow }
+						aria-valuetext={ spacingSizes[ valueNow ]?.name }
+						renderTooltipContent={ customTooltipContent }
+						min={ 0 }
+						max={ spacingSizes.length - 1 }
+						marks={ marks }
+						label={ ariaLabel }
+						hideLabelFromVision={ true }
+					/>
+				) }
 			{ spacingSizes.length > 8 && ! showCustomValueControl && (
 				<CustomSelectControl
 					value={ options.find(
