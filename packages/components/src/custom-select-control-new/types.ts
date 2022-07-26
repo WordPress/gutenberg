@@ -21,6 +21,8 @@ export type SelectControlItemProps = SelectControlOptionBase & {
 	children?: ReactNode;
 	// Do we want to expose this prop?
 	checked?: boolean;
+	// Should we expose this?
+	preventScrollOnKeyDown?: boolean;
 };
 
 export type SelectControlItemCheckProps = SelectControlOptionBase & {

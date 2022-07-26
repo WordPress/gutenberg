@@ -81,6 +81,9 @@ const UnforwardedSelectControl = (
 								key={ key }
 								value={ option.value }
 								disabled={ option.disabled }
+								preventScrollOnKeyDown={
+									index === 0 ? true : false
+								}
 							>
 								{ option.label }
 							</CustomSelectControlItem>
