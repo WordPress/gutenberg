@@ -74,16 +74,17 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 		`,
 		large: css`
 			box-sizing: border-box;
-			width: 24px;
+			min-width: 24px;
+			max-width: 48px;
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			display: flex;
-			justify-content: center;
-			align-items: center;
 			color: ${ COLORS.ui.theme };
 			font-size: 13px;
 			text-align-last: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		`,
 	};
 
@@ -125,6 +126,10 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			}
 		`,
 		large: css`
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
 			&:hover {
 				color: ${ COLORS.ui.borderFocus };
 				box-shadow: inset 0 0 0
