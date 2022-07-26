@@ -28,7 +28,7 @@
  */
 function gutenberg_site_editor_menu() {
 	if ( wp_is_block_theme() ) {
-		add_submenu_page( 'themes.php', null, null, 'edit_theme_options', 'gutenberg-edit-site', 'gutenberg_edit_site_page' );
+		add_submenu_page( null, null, null, 'edit_theme_options', 'gutenberg-edit-site', 'gutenberg_edit_site_page' );
 	}
 }
 add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
@@ -41,3 +41,4 @@ function gutenberg_redirect_deprecated_to_new_site_editor_page() {
 		exit;
 }
 add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_redirect_deprecated_to_new_site_editor_page' );
+add_action( 'load-admin_page_gutenberg-edit-site', 'gutenberg_redirect_deprecated_to_new_site_editor_page' );
