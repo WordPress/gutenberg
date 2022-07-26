@@ -19,7 +19,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 	test( 'Should save the changes', async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
 		// Add title to enable valid non-empty post save.
-		await page.type( '.editor-post-title__input', 'Hello Meta' );
+		await page.type( 'role=textbox[name="Add title"i]', 'Hello Meta' );
 
 		// Type something.
 		await page.click( 'role=button[name="Text"i]' );
@@ -49,8 +49,6 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		 * For more context, see https://github.com/WordPress/gutenberg/pull/33228/files#r666897885
 		 */
 		const content = page.locator( '#test_tinymce_id' );
-		expect( await content.evaluate( ( node ) => node.value ) ).toBe(
-			'Typing in a metabox'
-		);
+		await expect( content ).toHaveValue( 'Typing in a metabox' );
 	} );
 } );
