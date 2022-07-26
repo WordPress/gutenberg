@@ -192,6 +192,7 @@ export default function TypographyPanel( { name, element } ) {
 					fontFamilies={ fontFamilies }
 					value={ fontFamily }
 					onChange={ setFontFamily }
+					size="__unstable-large"
 				/>
 			) }
 			{ hasFontSizeEnabled && (
@@ -200,14 +201,17 @@ export default function TypographyPanel( { name, element } ) {
 					onChange={ setFontSize }
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
+					size="__unstable-large"
 				/>
 			) }
 			{ hasLineHeightEnabled && (
 				<Spacer marginBottom={ 6 }>
 					<LineHeightControl
 						__nextHasNoMarginBottom={ true }
+						__unstableInputWidth={ '50%' }
 						value={ lineHeight }
 						onChange={ setLineHeight }
+						size="__unstable-large"
 					/>
 				</Spacer>
 			) }
@@ -226,12 +230,16 @@ export default function TypographyPanel( { name, element } ) {
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
+					size="__unstable-large"
+					__nextUnconstrainedWidth
 				/>
 			) }
 			{ hasLetterSpacingControl && (
 				<LetterSpacingControl
 					value={ letterSpacing }
 					onChange={ setLetterSpacing }
+					size="__unstable-large"
+					__unstableInputWidth={ '50%' }
 				/>
 			) }
 		</PanelBody>
