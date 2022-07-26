@@ -27,9 +27,16 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 					'callback'            => array( $this, 'get_template_fallback' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(
-						'slug' => array(
-							'description' => __( 'The slug of the template to get the fallback content for', 'gutenberg' ),
+						'slug'      => array(
+							'description' => __( 'The slug of the template to get the fallback for', 'gutenberg' ),
 							'type'        => 'string',
+						),
+						'hierarchy' => array(
+							'description' => __( 'The template hierarchy to use to resolve the fallback template', 'gutenberg' ),
+							'type'        => 'array',
+							'items'       => array(
+								'type' => 'string',
+							),
 						),
 					),
 				),
@@ -53,8 +60,14 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		$template_hierarchy = gutenberg_get_template_hierarchy( $request['slug'] );
-		$fallback_template  = resolve_block_template( $request['slug'], $template_hierarchy, '' );
+		if ( empty( $request['hierarchy'] ) || ! is_array( $request['hierarchy'] ) ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				__( 'Invalid hierarchy.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+		$fallback_template = resolve_block_template( $request['slug'], $request['hierarchy'], '' );
 		return rest_ensure_response( $fallback_template );
 	}
 
