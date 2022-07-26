@@ -85,4 +85,21 @@
 	.components-spacing-sizes-control__side-label {
 		margin-right: 4px;
 	}
+
+	.components-spacing-sizes-control__custom-select-control-all,
+	.components-spacing-sizes-control__custom-select-control-single {
+		.components-input-control__container {
+			width: 100%;
+		}
+	}
+
+	.components-spacing-sizes-control__custom-select-control-all {
+		margin-top: 18px;
+		margin-bottom: 2px;
+	}
+
+	.components-spacing-sizes-control__custom-select-control-single {
+		margin-top: 4px;
+		margin-bottom: 8px;
+	}
 }

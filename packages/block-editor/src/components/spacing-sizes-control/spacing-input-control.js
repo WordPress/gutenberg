@@ -207,26 +207,34 @@ export default function SpacingInputControl( {
 						hideLabelFromVision={ true }
 					/>
 				) }
-			{ spacingSizes.length > 8 && ! showCustomValueControl && (
-				<CustomSelectControl
-					value={ options.find(
-						( option ) => option.key === valueNow
-					) }
-					onChange={ ( selectedItem ) => {
-						onChange( getNewPresetValue( selectedItem.key ) );
-					} }
-					options={ options }
-					onHighlightedIndexChange={ ( index ) => {
-						if ( index.type === '__item_mouse_move__' ) {
-							onChange(
-								getNewPresetValue( index.highlightedIndex )
-							);
-						}
-					} }
-					label={ ariaLabel }
-					hideLabelFromVision={ true }
-				/>
-			) }
+			{ spacingSizes.length > 8 &&
+				! showCustomValueControl &&
+				! showAllSidesCustomValueControl && (
+					<CustomSelectControl
+						className={ classnames( {
+							'components-spacing-sizes-control__custom-select-control-all':
+								side === 'all',
+							'components-spacing-sizes-control__custom-select-control-single':
+								side !== 'all',
+						} ) }
+						value={ options.find(
+							( option ) => option.key === valueNow
+						) }
+						onChange={ ( selectedItem ) => {
+							onChange( getNewPresetValue( selectedItem.key ) );
+						} }
+						options={ options }
+						onHighlightedIndexChange={ ( index ) => {
+							if ( index.type === '__item_mouse_move__' ) {
+								onChange(
+									getNewPresetValue( index.highlightedIndex )
+								);
+							}
+						} }
+						label={ ariaLabel }
+						hideLabelFromVision={ true }
+					/>
+				) }
 		</>
 	);
 }
