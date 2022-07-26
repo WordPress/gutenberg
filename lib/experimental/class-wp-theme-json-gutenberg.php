@@ -16,4 +16,13 @@
  */
 class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
 
+	/**
+	 * Cleans cached data across class instances.
+	 *
+	 * @since 6.1.0
+	 */
+	public static function clean_cached_data() {
+		static::$blocks_metadata = null;
+	}
+
 }
