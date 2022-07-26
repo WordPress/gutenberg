@@ -16,7 +16,6 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 
@@ -119,22 +118,22 @@ function ComboboxControl( {
 			return;
 		}
 
-		switch ( event.keyCode ) {
-			case ENTER:
+		switch ( event.code ) {
+			case 'Enter':
 				if ( selectedSuggestion ) {
 					onSuggestionSelected( selectedSuggestion );
 					preventDefault = true;
 				}
 				break;
-			case UP:
+			case 'ArrowUp':
 				handleArrowNavigation( -1 );
 				preventDefault = true;
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				handleArrowNavigation( 1 );
 				preventDefault = true;
 				break;
-			case ESCAPE:
+			case 'Escape':
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;

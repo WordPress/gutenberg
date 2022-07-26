@@ -10,6 +10,10 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"legacy": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -25,5 +29,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-comments-editor"
+	"editorStyle": "wp-block-comments-editor",
+	"usesContext": [ "postId", "postType" ]
 }

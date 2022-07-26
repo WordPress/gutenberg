@@ -28,9 +28,8 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Quote',
 				'Heading',
-				'Pullquote',
+				'Quote',
 				'Columns',
 				'Table of Contents',
 			] )
@@ -56,7 +55,6 @@ describe( 'Block Switcher', () => {
 			expect.arrayContaining( [
 				'Group',
 				'Paragraph',
-				'Pullquote',
 				'Heading',
 				'Table of Contents',
 			] )

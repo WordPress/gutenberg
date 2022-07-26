@@ -370,7 +370,7 @@ class WP_Style_Engine {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
 				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
-				if ( static::is_valid_style_value( $style_value ) ) {
+				if ( $individual_property && static::is_valid_style_value( $value ) ) {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
@@ -511,9 +511,9 @@ class WP_Style_Engine {
  * @param array<string> $options      An array of options to determine the output.
  *
  * @return array<string>|null array(
- *     'styles'        => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
- *     'declarations'  => (array) An array of property/value pairs representing parsed CSS declarations.
- *     'classnames'    => (string) Classnames separated by a space.
+ *     'css'          => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+ *     'declarations' => (array) An array of property/value pairs representing parsed CSS declarations.
+ *     'classnames'   => (string) Classnames separated by a space.
  * );
  */
 function wp_style_engine_get_block_supports_styles( $block_styles, $options = array() ) {

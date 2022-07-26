@@ -162,7 +162,7 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show suggestions when when input is empty if expandOnFocus is set to true', () => {
+		it( 'should show suggestions when input is empty if expandOnFocus is set to true', () => {
 			setUp( { __experimentalExpandOnFocus: true } );
 			wrapper.setState( {
 				isExpanded: true,
