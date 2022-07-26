@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+-   Context System: Stop explicitly setting `undefined` to the `children` prop. This fixes a bug where `Icon` could not be correctly rendered via the `as` prop of a context-connected component ([#42686](https://github.com/WordPress/gutenberg/pull/42686)).
 -   `Popover`, `Dropdown`: Fix width when `expandOnMobile` is enabled ([#42635](https://github.com/WordPress/gutenberg/pull/42635/)).
 -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
