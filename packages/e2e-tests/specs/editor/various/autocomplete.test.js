@@ -19,6 +19,7 @@ describe( 'autocomplete', () => {
 	} );
 
 	afterAll( async () => {
+		await deleteUser( 'testuser' );
 		await deactivatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
@@ -26,14 +27,10 @@ describe( 'autocomplete', () => {
 		await createNewPost();
 	} );
 
-	afterAll( async () => {
-		await deleteUser( 'testuser' );
-	} );
-
 	it( 'should allow option selection via click event', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '~' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		const strawberry = await page.waitForXPath(
 			'//button[@role="option"][text()="🍓 Strawberry"]'
 		);
@@ -49,7 +46,7 @@ describe( 'autocomplete', () => {
 	it( 'should allow option selection via keypress event', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '~' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await pressKeyTimes( 'ArrowDown', 5 );
 		await page.keyboard.press( 'Enter' );
 
@@ -63,7 +60,7 @@ describe( 'autocomplete', () => {
 	it( 'should cancel selection via `Escape` keypress event', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'My favorite fruit is ~app' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await page.keyboard.press( 'Escape' );
 		await page.keyboard.type( " ...no I changed my mind. It's mango." );
 		// The characters before `Escape` should remain (i.e. `~app`)
@@ -78,7 +75,7 @@ describe( 'autocomplete', () => {
 		await clickBlockAppender();
 		// The 'Grapes' option is disabled in our test plugin, so it should insert the grapes emoji
 		await page.keyboard.type( 'Sorry, we are all out of ~g' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' grapes.' );
 		// The characters that triggered the completer should remain (i.e. `~g`)
@@ -92,7 +89,7 @@ describe( 'autocomplete', () => {
 	it( 'should allow newlines after a completion', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'I would like an ~o' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await pressKeyTimes( 'Enter', 2 );
 		await page.keyboard.type( '...and this is a new paragraph block.' );
 
@@ -110,10 +107,10 @@ describe( 'autocomplete', () => {
 	it( 'should insert elements from multiple completers in a single block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'I am @j' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '. I am eating an ~a' );
-		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.waitForXPath( '//button[@role="option"]' );
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
