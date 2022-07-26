@@ -351,98 +351,143 @@ test.describe( 'Navigation block', () => {
 			await requestUtils.deleteUser( userId );
 		} );
 
+		// TODO
 		// shows a warning if user does not have permission to create navigation menus
-		test.only( 'shows a warning if user does not have permission to create navigation menus', async ( {
-			admin,
-			editor,
-			page,
-		} ) => {
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/navigation' } );
+		test.fixme(
+			'shows a warning if user does not have permission to create navigation menus',
+			async ( { admin, editor, page } ) => {
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/navigation' } );
 
-			// Make sure the snackbar error shows up.
-			const noticeText =
-				'You do not have permission to create Navigation Menus.';
-			const snackbar = await page.locator(
-				`.components-snackbar__content >> text=${ noticeText }`
-			);
+				// Make sure the snackbar error shows up.
+				const noticeText =
+					'You do not have permission to create Navigation Menus.';
+				const snackbar = await page.locator(
+					`.components-snackbar__content >> text=${ noticeText }`
+				);
 
-			await expect( snackbar ).toBeVisible();
+				await expect( snackbar ).toBeVisible();
 
-			// Expect a console 403 for requests to:
-			// * /wp/v2/settings?_locale=user
-			// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
-			expect( console ).toHaveErrored();
-		} );
+				// Expect a console 403 for requests to:
+				// * /wp/v2/settings?_locale=user
+				// * /wp/v2/templates?context=edit&post_type=post&per_page=100&_locale=user
+				expect( console ).toHaveErrored();
+			}
+		);
 
 		// shows a warning if user does not have permission to edit or update navigation menus
-		test( 'shows a warning if user does not have permission to edit or update navigation menus', async () => {} );
+		test.fixme(
+			'shows a warning if user does not have permission to edit or update navigation menus',
+			async () => {}
+		);
 	} );
 
 	test.describe( 'loading states', async () => {
 		// shows a loading indicator whilst empty Navigation menu is being created
-		test( 'shows a loading indicator when a new empty navigation menu is being created', async () => {} );
+		test.fixme(
+			'shows a loading indicator when a new empty navigation menu is being created',
+			async () => {}
+		);
 
 		// shows a loading indicator whilst ref resolves to Navigation post items
-		test( 'shows a loading indicator when the selected navigation menu is loading', async () => {} );
+		test.fixme(
+			'shows a loading indicator when the selected navigation menu is loading',
+			async () => {}
+		);
 
 		// does not show a loading indicator if there is no ref to a Navigation post and Nav Menus have loaded
-		test( 'does not show a loading indicator if all navigation menus have loaded and there is no selected menu', async () => {} );
+		test.fixme(
+			'does not show a loading indicator if all navigation menus have loaded and there is no selected menu',
+			async () => {}
+		);
 	} );
 
 	test.describe( 'editing', () => {
 		// Shows the quick inserter when the block contains non-navigation specific blocks
-		test( 'shows the quick inserter when blocks other than a link or submenu are present', async () => {} );
+		test.fixme(
+			'shows the quick inserter when blocks other than a link or submenu are present',
+			async () => {}
+		);
 
 		// respects the nesting level
-		test( 'does not allow creating submenus beyond the max nesting level', async () => {} );
+		test.fixme(
+			'does not allow creating submenus beyond the max nesting level',
+			async () => {}
+		);
 
 		// retains initial uncontrolled inner blocks whilst there are no modifications to those blocks
-		test( 'retains initial uncontrolled inner blocks whilst there are no modifications', async () => {} );
+		test.fixme(
+			'retains initial uncontrolled inner blocks whilst there are no modifications',
+			async () => {}
+		);
 
 		// converts uncontrolled inner blocks to an entity when modifications are made to the blocks
-		test( 'converts uncontrolled inner blocks to a new navigation menu when modifications are made', async () => {} );
+		test.fixme(
+			'converts uncontrolled inner blocks to a new navigation menu when modifications are made',
+			async () => {}
+		);
 
 		// only updates a single entity currently linked with the block
-		test( 'only updates the currently selected navigation menu when editing inner blocks', async () => {} );
+		test.fixme(
+			'only updates the currently selected navigation menu when editing inner blocks',
+			async () => {}
+		);
 
 		// should always focus select menu button after item selection
-		test( 'focuses the select menu toolbar item after choosing a menu in the dropdown', async () => {} );
+		test.fixme(
+			'focuses the select menu toolbar item after choosing a menu in the dropdown',
+			async () => {}
+		);
 	} );
 
 	test.describe( 'navigation link block', async () => {
 		// allows an empty navigation block to be created and manually populated using a mixture of internal and external links
-		test( 'allows internal and external links', async () => {} );
+		test.fixme( 'allows internal and external links', async () => {} );
 
 		// allows pages to be created from the navigation block and their links added to menu
-		test( 'allows creation of new pages', async () => {} );
+		test.fixme( 'allows creation of new pages', async () => {} );
 
 		// encodes URL when create block if needed
-		test( 'encodes URLs', async () => {} );
+		test.fixme( 'encodes URLs', async () => {} );
 
 		// correctly decodes special characters in the created Page title for display
-		test( 'decodes special characters in a page title', async () => {} );
+		test.fixme(
+			'decodes special characters in a page title',
+			async () => {}
+		);
 	} );
 
 	test.describe( 'submenu block', async () => {
 		// renders buttons for the submenu opener elements when the block is set to open on click instead of hover'
-		test( 'uses buttons for submenus when the open on click option is enabled', async () => {} );
+		test.fixme(
+			'uses buttons for submenus when the open on click option is enabled',
+			async () => {}
+		);
 
 		// shows button which converts submenu to link when submenu is not-populated (empty)
 		// shows button to convert submenu to link in disabled state when submenu is populated
 		// shows button to convert submenu to link when submenu is populated with a single incomplete link item
-		test( 'has a toolbar button that converts an empty submenu to a link', async () => {} );
+		test.fixme(
+			'has a toolbar button that converts an empty submenu to a link',
+			async () => {}
+		);
 	} );
 
 	test.describe( 'frontend', async () => {
 		// applies accessible label to block element
-		test( 'has an accessible label', async () => {} );
+		test.fixme( 'has an accessible label', async () => {} );
 
 		// does not load the frontend script if no navigation blocks are present
-		test( 'does not load the frontend script if no navigation blocks are present', async () => {} );
+		test.fixme(
+			'does not load the frontend script if no navigation blocks are present',
+			async () => {}
+		);
 
 		// loads the frontend script only once even when multiple navigation blocks are present
-		test( 'loads the frontend script only once even when multiple navigation blocks are present', async () => {} );
+		test.fixme(
+			'loads the frontend script only once even when multiple navigation blocks are present',
+			async () => {}
+		);
 	} );
 } );
 
