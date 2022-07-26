@@ -14,7 +14,7 @@ import TextareaControl from '../../textarea-control/';
 /**
  * External dependencies
  */
-import type { ComponentMeta } from '@storybook/react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 const meta: ComponentMeta< typeof Disabled > = {
 	title: 'Components/Disabled',
@@ -29,28 +29,36 @@ const meta: ComponentMeta< typeof Disabled > = {
 
 export default meta;
 
-const Form = () => (
-	<div>
-		<TextControl label="Text Control" value="" onChange={ () => {} } />
-		<TextareaControl
-			label="TextArea Control"
-			value=""
-			onChange={ () => {} }
-		/>
-		<SelectControl
-			label="Select Control"
-			onChange={ () => {} }
-			options={ [
-				{ value: '', label: 'Select an option', disabled: true },
-				{ value: 'a', label: 'Option A' },
-				{ value: 'b', label: 'Option B' },
-				{ value: 'c', label: 'Option C' },
-			] }
-		/>
-	</div>
-);
+const Form = () => {
+	const [ textControlValue, setTextControlValue ] = useState( '' );
+	const [ textAreaValue, setTextAreaValue ] = useState( '' );
+	return (
+		<div>
+			<TextControl
+				label="Text Control"
+				value={ textControlValue }
+				onChange={ setTextControlValue }
+			/>
+			<TextareaControl
+				label="TextArea Control"
+				value={ textAreaValue }
+				onChange={ setTextAreaValue }
+			/>
+			<SelectControl
+				label="Select Control"
+				onChange={ () => {} }
+				options={ [
+					{ value: '', label: 'Select an option', disabled: true },
+					{ value: 'a', label: 'Option A' },
+					{ value: 'b', label: 'Option B' },
+					{ value: 'c', label: 'Option C' },
+				] }
+			/>
+		</div>
+	);
+};
 
-export const Default = () => {
+export const Default: ComponentStory< typeof Disabled > = () => {
 	return (
 		<Disabled>
 			<Form />
@@ -58,20 +66,20 @@ export const Default = () => {
 	);
 };
 
-export const DisabledWithProp = () => {
+export const DisabledWithProp: ComponentStory< typeof Disabled > = () => {
 	const [ isDisabled, setState ] = useState( true );
 	const toggleDisabled = () => {
 		setState( () => ! isDisabled );
 	};
 
 	return (
-		<div>
+		<>
 			<Disabled isDisabled={ isDisabled }>
 				<Form />
 			</Disabled>
 			<Button variant="primary" onClick={ toggleDisabled }>
 				Set isDisabled to { isDisabled ? 'false' : 'true' }
 			</Button>
-		</div>
+		</>
 	);
 };

@@ -13,24 +13,19 @@ import { createContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { StyledWrapper } from './styles/disabled-styles';
+import type { DisabledProps } from './types';
+import type { RefCallback } from 'react';
 
-const Context = createContext( false );
+const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
 
-/**
- * @typedef OwnProps
- * @property {string}                    [className]       Classname for the disabled element.
- * @property {import('react').ReactNode} children          Children to disable.
- * @property {boolean}                   [isDisabled=true] Whether to disable the children.
- */
-
-/**
- * @param {OwnProps & import('react').HTMLAttributes<HTMLDivElement>} props
- * @return {JSX.Element} Element wrapping the children to disable them when isDisabled is true.
- */
-function Disabled( { className, children, isDisabled = true, ...props } ) {
-	/** @type {import('react').RefCallback<HTMLDivElement>} */
-	const ref = useDisabled();
+function Disabled( {
+	className,
+	children,
+	isDisabled = true,
+	...props
+}: DisabledProps ) {
+	const ref: RefCallback< HTMLDivElement > = useDisabled();
 
 	if ( ! isDisabled ) {
 		return <Provider value={ false }>{ children }</Provider>;
