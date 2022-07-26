@@ -74,7 +74,9 @@ describe( 'autocomplete', () => {
 		await clickBlockAppender();
 		// The 'Grapes' option is disabled in our test plugin, so it should insert the grapes emoji
 		await page.keyboard.type( 'Sorry, we are all out of ~g' );
-		await page.waitForXPath( '//button[@role="option"]' );
+		await page.waitForXPath(
+			'//button[@role="option"][text()="🍇 Grapes"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' grapes.' );
 		// The characters that triggered the completer should remain (i.e. `~g`)
@@ -88,7 +90,9 @@ describe( 'autocomplete', () => {
 	it( 'should allow newlines after a completion', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'I would like an ~o' );
-		await page.waitForXPath( '//button[@role="option"]' );
+		await page.waitForXPath(
+			'//button[@role="option"][text()="🍊 Orange"]'
+		);
 		await pressKeyTimes( 'Enter', 2 );
 		await page.keyboard.type( '...and this is a new paragraph block.' );
 
@@ -106,10 +110,14 @@ describe( 'autocomplete', () => {
 	it( 'should insert elements from multiple completers in a single block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'I am @j' );
-		await page.waitForXPath( '//button[@role="option"]' );
+		await page.waitForXPath(
+			'//button[@role="option"]//*[contains(text(),"Jane Doe")]'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '. I am eating an ~a' );
-		await page.waitForXPath( '//button[@role="option"]' );
+		await page.waitForXPath(
+			'//button[@role="option"][text()="🍎 Apple"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
