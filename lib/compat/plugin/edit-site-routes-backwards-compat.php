@@ -1,5 +1,10 @@
 <?php
 /**
+ * Backwards compatibility handling for routes used by the plugin consumers.
+ * This doesn't need to be back ported to core and will be removed after WP 6.1,
+ * to ensure that the plugin consumers have enough time to migrate to the core's
+ * route (`site-editor.php`).
+ *
  * Whitelists the `theme.php` route and redirects the following routes:
  * - `themes.php?page=gutenberg-edit-site`
  * - `admin.php?page=gutenberg-edit-site`
@@ -8,15 +13,19 @@
  *
  * The old routes have been deprecated and removed in Gutenberg 13.7.0, but third-party
  * consumer code might still be referencing them. In order to not break the Site Editor
- * flows, we don't fully remove the old routes, but redirect them to the new one.
+ * flows, we don't fully remove the old routes, but redirect them to the core's one.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/41306
+ *
+ * @package gutenberg
  */
 
- /**
-	* "Whitelists" the old routes. Without this, trying to access the old Site Editor
-	* routes result in a HTTP 403 error.
-  *
-	* The whitelist is done by adding an wp-admin submenu page that won't be rendered.
-  */
+/**
+ * "Whitelists" the old routes. Without this, trying to access the old Site Editor
+ * routes result in a HTTP 403 error.
+ *
+ * The whitelist is done by adding an wp-admin submenu page that won't be rendered.
+ */
 function gutenberg_site_editor_menu() {
 	if ( wp_is_block_theme() ) {
 		add_submenu_page( 'themes.php', null, null, 'edit_theme_options', 'gutenberg-edit-site', 'gutenberg_edit_site_page' );
