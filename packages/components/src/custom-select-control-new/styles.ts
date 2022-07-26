@@ -6,8 +6,6 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../utils';
-import { space } from '../ui/utils/space';
 
 const focused = css`
 	outline: 2px solid hsl( 204, 100%, 40% );
