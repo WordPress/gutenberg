@@ -59,7 +59,11 @@ export default function QueryTitleEdit( {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+				<TagName { ...blockProps }>
+					{ showPrefix
+						? __( 'Archive type: Name' )
+						: __( 'Archive title' ) }
+				</TagName>
 			</>
 		);
 	}
