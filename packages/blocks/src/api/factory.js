@@ -555,6 +555,8 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
+	// When unwrapping blocks (`switchToBlockType( wrapperblocks, '*' )`), do
+	// not run filters on the unwrapped blocks. They shoud remain as they are.
 	if ( name === '*' ) {
 		return transformationResults;
 	}
