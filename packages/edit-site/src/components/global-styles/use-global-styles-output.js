@@ -334,7 +334,7 @@ export function getLayoutStyles( {
 								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(${ selector } .${ className }${
+										? `:where(.${ className }${
 												spacingStyle?.selector || ''
 										  })`
 										: `:where(${ selector }.${ className }${
