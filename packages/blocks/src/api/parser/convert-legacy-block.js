@@ -82,6 +82,15 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
+	/**
+	 * Filter the name and/or attributes of the block while the parsing process.
+	 *
+	 * @since 13.7.2
+	 *
+	 * @param {array} $data      Two dimmensional array containing the block name and attributes.
+	 * @param {string} $data.[0] The block name.
+	 * @param {Object} $data.[1] The block attributes.
+	 */
 	return applyFilters( 'blocks.convertLegacyBlockNameAndAttributes', [
 		name,
 		newAttributes,
