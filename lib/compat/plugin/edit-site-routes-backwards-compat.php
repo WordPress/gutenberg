@@ -5,7 +5,7 @@
  * to ensure that the plugin consumers have enough time to migrate to the core's
  * route (`site-editor.php`).
  *
- * Whitelists the `theme.php` route and redirects the following routes:
+ * Allows the `theme.php` route and redirects the following routes:
  * - `themes.php?page=gutenberg-edit-site`
  * - `admin.php?page=gutenberg-edit-site`
  *
@@ -21,10 +21,10 @@
  */
 
 /**
- * "Whitelists" the old routes. Without this, trying to access the old Site Editor
- * routes result in a HTTP 403 error.
+ * Allows the old routes. Without this, trying to access the old Site Editor
+ * routes results in a HTTP 403 error.
  *
- * The whitelist is done by adding an wp-admin submenu page that won't be rendered.
+ * Allowing the route is done by adding an wp-admin submenu page that won't be rendered.
  */
 function gutenberg_site_editor_menu() {
 	if ( wp_is_block_theme() ) {
