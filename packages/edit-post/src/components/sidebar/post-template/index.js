@@ -27,7 +27,11 @@ export default function PostTemplate() {
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;
-		if ( ! hasTemplates && ! settings.supportsTemplateMode ) {
+		if ( hasTemplates ) {
+			return true;
+		}
+
+		if ( ! settings.supportsTemplateMode ) {
 			return false;
 		}
 
