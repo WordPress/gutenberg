@@ -38,10 +38,9 @@ export default meta;
 // - with HTML `<options />` (and related vanilla elements)?
 // - example with custom author dropdown
 
-export const Default: ComponentStory< typeof CustomSelectControl > = ( {
-	onChange,
-	...args
-} ) => (
+export const Default: ComponentStory< typeof CustomSelectControl > = (
+	args
+) => (
 	<CustomSelectControl { ...args }>
 		<CustomSelectControlItem value="Venus" />
 		<CustomSelectControlItem value="Earth">
@@ -59,7 +58,7 @@ Default.args = {
 
 export const WithGroupsAndSeparators: ComponentStory<
 	typeof CustomSelectControl
-> = ( { onChange, ...args } ) => {
+> = ( args ) => {
 	return (
 		<CustomSelectControl { ...args }>
 			{ [

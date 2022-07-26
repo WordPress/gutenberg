@@ -71,6 +71,7 @@ const UnforwardedSelectControl = (
 				) }
 			</Select>
 			<SelectPopover state={ selectState } className={ popoverClassName }>
+				{ /* Popover arrow? */ }
 				{ children ??
 					options?.map( ( option, index ) => {
 						const key =
