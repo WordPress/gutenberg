@@ -1087,6 +1087,10 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"shadow": {
+					"description": "Sets the `box-shadow` CSS property.",
+					"type": "string"
 				}
 			}
 		},
@@ -1101,7 +1105,9 @@
 						"border": {},
 						"color": {},
 						"spacing": {},
-						"typography": {}
+						"typography": {},
+						"filter": {},
+						"shadow": {}
 					},
 					"additionalProperties": false
 				}
