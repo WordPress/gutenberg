@@ -6,6 +6,8 @@ import {
 	searchForBlock,
 	getEditedPostContent,
 	createNewPost,
+	pressKeyWithModifier,
+	transformBlockTo,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Group', () => {
@@ -39,5 +41,38 @@ describe( 'Group', () => {
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can wrap in group and unwrap group', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		await transformBlockTo( 'Group' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:group -->
+			<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+			<p>1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>2</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group -->"
+		` );
+
+		await transformBlockTo( 'Unwrap' );
+
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>1</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>2</p>
+			<!-- /wp:paragraph -->"
+		` );
 	} );
 } );
