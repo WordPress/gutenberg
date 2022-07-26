@@ -334,12 +334,12 @@ export function getLayoutStyles( {
 								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `${ selector } :where(.${ className }${
+										? `:where(${ selector } .${ className }${
 												spacingStyle?.selector || ''
 										  })`
-										: `${ selector }:where(.${ className })${
+										: `:where(${ selector }.${ className }${
 												spacingStyle?.selector || ''
-										  }`;
+										  })`;
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
