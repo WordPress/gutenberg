@@ -11,21 +11,37 @@ import Button from '../../button/';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
+/**
+ * External dependencies
+ */
+import type { ComponentMeta } from '@storybook/react';
 
-export default {
+const meta: ComponentMeta< typeof Disabled > = {
 	title: 'Components/Disabled',
 	component: Disabled,
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
+	},
 };
+
+export default meta;
 
 const Form = () => (
 	<div>
-		<TextControl label="Text Control" />
-		<TextareaControl label="TextArea Control" />
+		<TextControl label="Text Control" value="" onChange={ () => {} } />
+		<TextareaControl
+			label="TextArea Control"
+			value=""
+			onChange={ () => {} }
+		/>
 		<SelectControl
 			label="Select Control"
 			onChange={ () => {} }
 			options={ [
-				{ value: null, label: 'Select an option', disabled: true },
+				{ value: '', label: 'Select an option', disabled: true },
 				{ value: 'a', label: 'Option A' },
 				{ value: 'b', label: 'Option B' },
 				{ value: 'c', label: 'Option C' },
@@ -34,7 +50,7 @@ const Form = () => (
 	</div>
 );
 
-export const _default = () => {
+export const Default = () => {
 	return (
 		<Disabled>
 			<Form />
