@@ -6,28 +6,6 @@
  */
 
 /**
- * Filters the prefix from the `core/query-title` block archive variation.
- *
- * @param array $title Archive title to be displayed.
- *
- * @return string Returns the query title based on the queried object but without prefix.
- */
-function block_query_title_filter_archive_title( $title ) {
-	if ( is_category() ) {
-		return single_cat_title( '', false );
-	} elseif ( is_tag() ) {
-		return single_tag_title( '', false );
-	} elseif ( is_author() ) {
-		return get_the_author();
-	} elseif ( is_post_type_archive() ) {
-		return post_type_archive_title( '', false );
-	} elseif ( is_tax() ) {
-		return single_term_title( '', false );
-	}
-	return $title;
-}
-
-/**
  * Renders the `core/query-title` block on the server.
  * For now it only supports Archive title,
  * using queried object information
@@ -46,9 +24,12 @@ function render_block_core_query_title( $attributes ) {
 	if ( $is_archive ) {
 		$show_prefix = isset( $attributes['showPrefix'] ) ? $attributes['showPrefix'] : true;
 		if ( ! $show_prefix ) {
-			add_filter( 'get_the_archive_title', 'block_query_title_filter_archive_title' );
+			$filter_title = function( $title, $original_title ) {
+				return $original_title;
+			};
+			add_filter( 'get_the_archive_title', $filter_title , 10, 2 );
 			$title = get_the_archive_title();
-			remove_filter( 'get_the_archive_title', 'block_query_title_filter_archive_title' );
+			remove_filter( 'get_the_archive_title', $filter_title , 10, 2 );
 		} else {
 			$title = get_the_archive_title();
 		}
