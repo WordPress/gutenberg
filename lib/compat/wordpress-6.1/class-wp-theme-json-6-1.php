@@ -751,11 +751,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			* If there are content and wide widths in theme.json, output them
 			* as custom properties on the body element so all blocks can use them.
 			*/
-			if ( isset( $settings['layout']['contentSize'] ) && $settings['layout']['contentSize'] ) {
-				$block_rules .= '--wp--style--global--content-size: ' . $settings['layout']['contentSize'] . ';';
-			}
-			if ( isset( $settings['layout']['wideSize'] ) && $settings['layout']['wideSize'] ) {
-				$block_rules .= '--wp--style--global--wide-size: ' . $settings['layout']['wideSize'] . ';';
+			if ( isset( $settings['layout']['contentSize'] ) && $settings['layout']['contentSize'] || isset( $settings['layout']['wideSize'] ) && $settings['layout']['wideSize'] ) {
+				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+				$block_rules .= '--wp--style--global--content-size: ' . $content_size . ';';
+				$block_rules .= '--wp--style--global--wide-size: ' . $wide_size . ';';
 			}
 
 			$block_rules .= '}';
