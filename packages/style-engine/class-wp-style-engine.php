@@ -662,19 +662,21 @@ function wp_style_engine_get_block_supports_styles( $block_styles, $options = ar
  *     'css_declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
  * );.
  *
- * @return WP_Style_Engine_CSS_Rules_Store|null The store, if found, otherwise `null`.
+ * @return WP_Style_Engine_CSS_Rules_Store.
  */
 function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
-	if ( empty( $store_key ) || empty( $css_rules ) ) {
-		return null;
-	}
-	if ( class_exists( 'WP_Style_Engine' ) ) {
-		$style_engine = WP_Style_Engine::get_instance();
-		foreach ( $css_rules as $selector => $css_declarations ) {
-			$style_engine::store_css_rule( $selector, $css_declarations, $store_key );
-		}
+	$style_engine = WP_Style_Engine::get_instance();
+	if ( empty( $css_rules ) ) {
 		return $style_engine::get_store( $store_key );
 	}
+
+	foreach ( $css_rules as $selector => $css_declarations ) {
+		if ( empty( $selector ) || empty( $css_declarations ) ) {
+			continue;
+		}
+		$style_engine::store_css_rule( $selector, $css_declarations, $store_key );
+	}
+	return $style_engine::get_store( $store_key );
 }
 
 /**
