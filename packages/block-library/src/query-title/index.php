@@ -27,15 +27,16 @@ function render_block_core_query_title( $attributes ) {
 	$title = '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
-	} elseif ( $is_search ) {
+	}
+	if ( $is_search ) {
+		$title = __( 'Search results' );
+
 		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] ) {
 			$title = sprintf(
 				/* translators: %s is the search term. */
 				__( 'Search results for: "%s"' ),
 				get_search_query()
 			);
-		} else {
-			$title = __( 'Search results:' );
 		}
 	}
 

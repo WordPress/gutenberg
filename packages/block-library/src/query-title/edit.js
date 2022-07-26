@@ -29,9 +29,8 @@ export default function QueryTitleEdit( {
 } ) {
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: classnames( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-query-title__placeholder': true,
 		} ),
 	} );
 
@@ -48,7 +47,9 @@ export default function QueryTitleEdit( {
 		titleElement = (
 			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
 		);
-	} else if ( type === 'search' ) {
+	}
+
+	if ( type === 'search' ) {
 		titleElement = (
 			<>
 				<InspectorControls>
@@ -64,18 +65,16 @@ export default function QueryTitleEdit( {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				{ showSearchTerm ? (
-					<TagName { ...blockProps }>
-						{ __( 'Search results for: "search term"' ) }
-					</TagName>
-				) : (
-					<TagName { ...blockProps }>
-						{ __( 'Search results:' ) }
-					</TagName>
-				) }
+
+				<TagName { ...blockProps }>
+					{ showSearchTerm
+						? __( 'Search results for: "search term"' )
+						: __( 'Search results' ) }
+				</TagName>
 			</>
 		);
 	}
+
 	return (
 		<>
 			<BlockControls group="block">
