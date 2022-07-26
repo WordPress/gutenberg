@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 13.7.3 =
+
+
+
+## Changelog
+
+### Various
+
+- Redirect old `theme_page` Site Editor routes to the new `site-editor.php` page. ([42643](https://github.com/WordPress/gutenberg/pull/42643))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine
+
+
 = 13.7.2 =
 
 ## Changelog
