@@ -19,6 +19,7 @@
 -   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
 -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
 -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+-   `ColorPalette`: Display checkered preview background when `value` is transparent ([#42232](https://github.com/WordPress/gutenberg/pull/42232)).
 -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `Dropdown`: Implement wrapper subcomponent for adding different padding to the dropdown content ([#42595](https://github.com/WordPress/gutenberg/pull/42595/)).
