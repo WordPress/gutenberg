@@ -71,23 +71,70 @@ class WP_HTML_Processor {
 
 
 	/**
-	 * Set of modifications to perform on input HTML document, built
-	 * via calls to the fluid API exposed by WP_HTML_Processor.
+	 * Which class names to add or remove from a tag.
+	 * If `true` then add and if `false` then remove.
 	 *
-	 * @var WP_Tag_Modifications
+	 * These are tracked separately from attribute updates
+	 * because they are semantically distinct, whereas this
+	 * interface exists for the common case of adding and
+	 * removing class names while other attributes are
+	 * generally modified as with DOM `setAttribute` calls.
+	 *
+	 * When modifying an HTML document these will eventually
+	 * be collapsed into a single lexical update to replace
+	 * the `class` attribute.
+	 *
+	 * Example:
+	 * <code>
+	 *     // Add the `wp-block-group` class, remove the `wp-group` class.
+	 *     $class_changes = array( 'wp-block-group' => true, 'wp-group' => false );
+	 * </code>
+	 *
+	 * @var array<boolean>
 	 */
-	public $modifications;
+	public $class_changes = array();
+
+
+	/**
+	 * Lexical replacements to apply to input HTML document.
+	 *
+	 * HTML modifications collapse into lexical replacements in order to
+	 * provide an efficient mechanism to update documents lazily and in
+	 * order to support a variety of semantic modifications without
+	 * building a complicated parsing machinery. That is, it's up to
+	 * the calling class to generate the lexical modification from the
+	 * semantic change requested.
+	 *
+	 * Example:
+	 * <code>
+	 *     // Replace an attribute stored with a new value, indices
+	 *     // sourced from the lazily-parsed HTML recognizer.
+	 *     list( $start, $end, $old_value ) = $attributes['src'];
+	 *     $modifications[] = array( $start, $end, get_the_post_thumbnail_url() );
+	 *
+	 *     // Correspondingly, something like this
+	 *     // will appear in the replacements array.
+	 *     $replacements = array(
+	 *         array( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
+	 *     );
+	 * </code>
+	 *
+	 * @var array<int|string>
+	 */
+	public $replacements = array();
 
 
 	public function __construct( $input ) {
 		$this->scanner = new WP_HTML_Scanner( $input );
-		$this->modifications = new WP_Tag_Modifications();
 	}
 
 
 	public function find( $query ) {
 		$this->commit_class_changes();
-		$this->descriptor = WP_Tag_Find_Descriptor::parse( $query );
+		$this->descriptor = $query instanceof WP_Tag_Find_Descriptor
+			? $query
+			: WP_Tag_Find_Descriptor::parse( $query );
+
 		if ( false === $this->scanner->scan( $this->descriptor ) ) {
 			return false;
 		}
@@ -100,7 +147,7 @@ class WP_HTML_Processor {
 		$tag_name = $this->scanner->tag_name;
 		$insert_at = $tag_name->start + $tag_name->length;
 
-		$this->modifications->replacements[] = array(
+		$this->replacements[] = array(
 			$insert_at,
 			$insert_at,
 			' ' . self::serialize_attribute( $name, $value )
@@ -111,7 +158,7 @@ class WP_HTML_Processor {
 
 
 	public function add_class( $class_name ) {
-		$this->modifications->class_changes[ $class_name ] = true;
+		$this->class_changes[ $class_name ] = true;
 	}
 
 
@@ -123,7 +170,7 @@ class WP_HTML_Processor {
 		/** @var WP_HTML_Attribute_Token $existing */
 		$existing = $this->scanner->attributes[ $name ];
 
-		$this->modifications->replacements[] = array(
+		$this->replacements[] = array(
 			$existing->attribute_start,
 			$existing->attribute_end,
 			self::serialize_attribute( $name, $value )
@@ -132,7 +179,7 @@ class WP_HTML_Processor {
 
 
 	public function remove_class( $class_name ) {
-		$this->modifications->class_changes[ $class_name ] = false;
+		$this->class_changes[ $class_name ] = false;
 	}
 
 
@@ -144,7 +191,7 @@ class WP_HTML_Processor {
 		/** @var WP_HTML_Attribute_Token $existing */
 		$existing = $this->scanner->attributes[ $name ];
 
-		$this->modifications->replacements[] = array(
+		$this->replacements[] = array(
 			$existing->attribute_start,
 			$existing->attribute_end,
 			''
@@ -160,7 +207,7 @@ class WP_HTML_Processor {
 
 
 	public function commit_class_changes() {
-		if ( empty( $this->modifications->class_changes ) ) {
+		if ( empty( $this->class_changes ) ) {
 			return;
 		}
 
@@ -180,8 +227,8 @@ class WP_HTML_Processor {
 
 				$comparable_name = WP_Tag_Find_Descriptor::comparable( $class_name );
 				if (
-					 array_key_exists( $comparable_name, $this->modifications->class_changes ) &&
-					 false === $this->modifications->class_changes[ $comparable_name ]
+					 array_key_exists( $comparable_name, $this->class_changes ) &&
+					 false === $this->class_changes[ $comparable_name ]
 				) {
 					 return '';
 				}
@@ -192,14 +239,14 @@ class WP_HTML_Processor {
 		);
 
 		// Add new classes.
-		foreach ( $this->modifications->class_changes as $class => $should_include ) {
+		foreach ( $this->class_changes as $class => $should_include ) {
 			if ( $should_include ) {
 				$new_class .= " {$class}";
 			}
 		}
 
 		$this->set_attribute( 'class', trim( $new_class ) );
-		$this->modifications->class_changes = array();
+		$this->class_changes = array();
 	}
 
 
@@ -208,7 +255,7 @@ class WP_HTML_Processor {
 
 		$this->commit_class_changes();
 
-		if ( empty( $this->modifications->replacements ) ) {
+		if ( empty( $this->replacements ) ) {
 			return $document;
 		}
 
@@ -218,17 +265,13 @@ class WP_HTML_Processor {
 		 * sort the modification replacements so we can progress
 		 * linearly and in a single pass.
 		 */
-		usort( $this->modifications->replacements, static function ( $a, $b ) {
-			if ( $a[0] === $b[0] ) {
-				return 0;
-			}
-
-			return $a[0] < $b[0] ? -1 : 1;
+		usort( $this->replacements, static function ( $a, $b ) {
+			return $a[0] - $b[0];
 		} );
 
 		$output = '';
 		$at = 0;
-		foreach ( $this->modifications->replacements as $replacement ) {
+		foreach ( $this->replacements as $replacement ) {
 			list( $start, $end, $text ) = $replacement;
 
 			if ( $start > $at ) {
@@ -670,60 +713,4 @@ class WP_HTML_Scanner {
 		$this->attributes = array();
 		$this->tag_start = null;
 	}
-}
-
-
-class WP_Tag_Modifications {
-	/**
-	 * Which class names to add or remove from a tag.
-	 * If `true` then add and if `false` then remove.
-	 *
-	 * These are tracked separately from attribute updates
-	 * because they are semantically distinct, whereas this
-	 * interface exists for the common case of adding and
-	 * removing class names while other attributes are
-	 * generally modified as with DOM `setAttribute` calls.
-	 *
-	 * When modifying an HTML document these will eventually
-	 * be collapsed into a single lexical update to replace
-	 * the `class` attribute.
-	 *
-	 * Example:
-	 * <code>
-	 *     // Add the `wp-block-group` class, remove the `wp-group` class.
-	 *     $class_changes = array( 'wp-block-group' => true, 'wp-group' => false );
-	 * </code>
-	 *
-	 * @var array<boolean>
-	 */
-	public $class_changes = array();
-
-
-	/**
-	 * Lexical replacements to apply to input HTML document.
-	 *
-	 * HTML modifications collapse into lexical replacements in order to
-	 * provide an efficient mechanism to update documents lazily and in
-	 * order to support a variety of semantic modifications without
-	 * building a complicated parsing machinery. That is, it's up to
-	 * the calling class to generate the lexical modification from the
-	 * semantic change requested.
-	 *
-	 * Example:
-	 * <code>
-	 *     // Replace an attribute stored with a new value, indices
-	 *     // sourced from the lazily-parsed HTML recognizer.
-	 *     list( $start, $end, $old_value ) = $attributes['src'];
-	 *     $modifications[] = array( $start, $end, get_the_post_thumbnail_url() );
-	 *
-	 *     // Correspondingly, something like this
-	 *     // will appear in the replacements array.
-	 *     $replacements = array(
-	 *         array( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
-	 *     );
-	 * </code>
-	 *
-	 * @var array<int|string>
-	 */
-	public $replacements = array();
 }
