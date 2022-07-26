@@ -14,6 +14,11 @@
  *    some fairly robust support because it's not difficult to
  *    create misleading HTML through the block editor. For
  *    example, as can happen with a number of plaintext inputs.
+ *  - Cleanup comparable copies so strings people add, such as
+ *    with add_class(), get pasted verbatim into the output
+ *    even though we use the comparable to d-duplicate entries.
+ *    Same goes for the attribute names - we don't want to
+ *    modify what we don't need to.
  *
  * Performance ideas:
  *
@@ -202,6 +207,10 @@ class WP_HTML_Processor {
 		$document = $this->scanner->document;
 
 		$this->commit_class_changes();
+
+		if ( empty( $this->modifications->replacements ) ) {
+			return $document;
+		}
 
 		/*
 		 * Since we could be asking to modify attributes in a different
@@ -687,7 +696,7 @@ class WP_Tag_Modifications {
 	 *
 	 * @var array<boolean>
 	 */
-	public $class_changes;
+	public $class_changes = array();
 
 
 	/**
@@ -716,5 +725,5 @@ class WP_Tag_Modifications {
 	 *
 	 * @var array<int|string>
 	 */
-	public $replacements;
+	public $replacements = array();
 }
