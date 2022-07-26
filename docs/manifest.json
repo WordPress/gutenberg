@@ -1896,12 +1896,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "Edit navigation",
-		"slug": "data-core-edit-navigation",
-		"markdown_source": "../docs/reference-guides/data/data-core-edit-navigation.md",
-		"parent": "data"
-	},
-	{
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "../docs/reference-guides/data/data-core-edit-post.md",
