@@ -30,7 +30,6 @@ describe( 'autocomplete', () => {
 	it( 'should allow option selection via click event', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '~' );
-		await page.waitForXPath( '//button[@role="option"]' );
 		const strawberry = await page.waitForXPath(
 			'//button[@role="option"][text()="🍓 Strawberry"]'
 		);
