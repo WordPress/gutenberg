@@ -174,9 +174,12 @@ const Popover = (
 	}, [ ownerDocument ] );
 
 	const middlewares = [
-		offset ? offsetMiddleware( offset ) : undefined,
-		frameOffset
+		frameOffset || offset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+					if ( ! frameOffset ) {
+						return offset;
+					}
+
 					const isTopBottomPlacement =
 						currentPlacement.includes( 'top' ) ||
 						currentPlacement.includes( 'bottom' );
@@ -193,9 +196,12 @@ const Popover = (
 						currentPlacement.includes( 'top' ) ||
 						currentPlacement.includes( 'left' );
 					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
+					const normalizedOffset = offset ? offset : 0;
 
 					return {
-						mainAxis: frameOffset[ mainAxis ] * mainAxisModifier,
+						mainAxis:
+							normalizedOffset +
+							frameOffset[ mainAxis ] * mainAxisModifier,
 						crossAxis: frameOffset[ crossAxis ],
 					};
 			  } )
