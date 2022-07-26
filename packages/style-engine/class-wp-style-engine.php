@@ -690,11 +690,8 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
  */
 function wp_style_engine_get_stylesheet( $store_key ) {
 	if ( empty( $store_key ) ) {
-		return null;
+		return '';
 	}
-	if ( class_exists( 'WP_Style_Engine' ) ) {
-		return WP_Style_Engine::get_instance()::compile_stylesheet_from_store( $store_key );
-	}
-	return null;
+	return WP_Style_Engine::get_instance()::compile_stylesheet_from_store( $store_key );
 }
 
