@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"settings": {
+		"appearanceTools": true,
+		"border": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"color": {
+			"custom": true,
+			"customGradient": true,
+			"link": true,
+			"palette": [
+				{
+					"color": "#e44064",
+					"name": "Pink Red",
+					"slug": "pink-red"
+				}
+			]
+		}
+	},
+	"styles": {
+		"blocks": {
+			"core/button": {
+				"border": {
+					"radius": "10px"
+				},
+				"color": {
+					"background": "var(--wp--preset--color--pink-red)"
+				}
+			},
+			"mycustom/block": {
+				"color": {
+					"background": "var(--wp--preset--color--pink-red)"
+				}
+			}
+		}
+	},
+	"version": 2
+}

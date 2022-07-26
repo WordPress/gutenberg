@@ -293,4 +293,199 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type' );
 		remove_filter( 'query', array( $this, 'filter_db_query' ) );
 	}
+
+	function test_get_plugin_theme_json() {
+		WP_Theme_JSON_Gutenberg::clean_cached_data();
+		activate_plugin( 'test-plugin-theme-json/test-plugin-theme-json.php' );
+		register_block_type( 'mycustom/block', array( 'render_callback' => null ) );
+		switch_theme( 'block-theme' );
+		$actual   = WP_Theme_JSON_Resolver_Gutenberg::get_plugin_theme_data()->get_raw_data();
+		$expected = array(
+			'settings' => array(
+				'border'     => array(
+					'color'  => true,
+					'radius' => true,
+					'style'  => true,
+					'width'  => true,
+				),
+				'color'      => array(
+					'custom'         => true,
+					'customGradient' => true,
+					'link'           => true,
+					'palette'        => array(
+						'theme' => array(
+							array(
+								'color' => '#e44064',
+								'name'  => 'Pink Red',
+								'slug'  => 'pink-red',
+							),
+						),
+					),
+				),
+				'spacing'    => array(
+					'blockGap' => true,
+					'margin'   => true,
+					'padding'  => true,
+				),
+				'typography' => array(
+					'lineHeight' => true,
+				),
+			),
+			'styles'   => array(
+				'blocks' => array(
+					'core/button'    => array(
+						'border' => array(
+							'radius' => '10px',
+						),
+						'color'  => array(
+							'background' => 'var(--wp--preset--color--pink-red)',
+						),
+					),
+					'mycustom/block' => array(
+						'color' => array(
+							'background' => 'var(--wp--preset--color--pink-red)',
+						),
+					),
+				),
+			),
+			'version'  => 2,
+		);
+		self::recursive_ksort( $actual );
+		self::recursive_ksort( $expected );
+
+		$this->assertSame(
+			$actual,
+			$expected
+		);
+		unregister_block_type( 'mycustom/block' );
+		deactivate_plugins( 'test-plugin-theme-json/test-plugin-theme-json.php' );
+	}
+
+	function test_merge_plugin_theme_json() {
+		WP_Theme_JSON_Gutenberg::clean_cached_data();
+		activate_plugin( 'test-plugin-theme-json/test-plugin-theme-json.php' );
+		register_block_type( 'mycustom/block', array( 'render_callback' => null ) );
+		switch_theme( 'block-theme' );
+		$raw_data          = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		$actual_settings   = $raw_data['settings'];
+		$expected_settings = array(
+			'border'     => array(
+				'color'  => true,
+				'radius' => true,
+				'style'  => true,
+				'width'  => true,
+			),
+			'color'      => array(
+				'custom'         => false,
+				'customGradient' => true,
+				'palette'        => array(
+					'theme' => array(
+						array(
+							'slug'  => 'light',
+							'name'  => 'Light',
+							'color' => '#f3f4f6',
+						),
+						array(
+							'slug'  => 'primary',
+							'name'  => 'Primary',
+							'color' => '#3858e9',
+						),
+						array(
+							'slug'  => 'dark',
+							'name'  => 'Dark',
+							'color' => '#111827',
+						),
+						array(
+							'color' => '#e44064',
+							'name'  => 'Pink Red',
+							'slug'  => 'pink-red',
+						),
+					),
+				),
+				'link'           => true,
+			),
+			'typography' => array(
+				'customFontSize' => true,
+				'lineHeight'     => false,
+			),
+			'spacing'    => array(
+				'units'   => false,
+				'padding' => false,
+			),
+			'blocks'     => array(
+				'core/button'    => array(
+					'border' => array(
+						'radius' => true,
+					),
+				),
+				'core/paragraph' => array(
+					'color' => array(
+						'palette' => array(
+							'theme' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Light',
+									'color' => '#f5f7f9',
+								),
+							),
+						),
+					),
+				),
+				'core/pullquote' => array(
+					'border' => array(
+						'color'  => true,
+						'radius' => true,
+						'style'  => true,
+						'width'  => true,
+					),
+				),
+			),
+		);
+
+		$raw_data        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		$actual_styles   = $raw_data['styles'];
+		$expected_styles = array(
+			'blocks' => array(
+				'core/button'    => array(
+					'border' => array(
+						'radius' => '10px',
+					),
+					'color'  => array(
+						'background' => 'var(--wp--preset--color--pink-red)',
+					),
+				),
+				'mycustom/block' => array(
+					'color' => array(
+						'background' => 'var(--wp--preset--color--pink-red)',
+					),
+				),
+			),
+		);
+
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+		self::recursive_ksort( $actual_styles );
+		self::recursive_ksort( $expected_styles );
+
+		$this->assertSame(
+			$actual_settings['blocks'],
+			$expected_settings['blocks'],
+			'The blocks index in the settings array does not match as expected'
+		);
+
+		$this->assertArrayHasKey( 'mycustom/block', $actual_styles['blocks'] );
+		$this->assertArrayHasKey( 'core/button', $actual_styles['blocks'] );
+		$this->assertSame(
+			$actual_styles['blocks']['mycustom/block'],
+			$expected_styles['blocks']['mycustom/block'],
+			'The styles for mycustom/block should be the same'
+		);
+		$this->assertSame(
+			$actual_styles['blocks']['core/button'],
+			$expected_styles['blocks']['core/button'],
+			'The plugin theme.json should have its definitions for core/button overridden by the theme.'
+		);
+		unregister_block_type( 'mycustom/block' );
+		deactivate_plugins( 'test-plugin-theme-json/test-plugin-theme-json.php' );
+	}
 }
