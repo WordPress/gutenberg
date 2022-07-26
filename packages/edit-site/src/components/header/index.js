@@ -217,7 +217,7 @@ export default function Header( {
 									target="_blank"
 									icon={ external }
 								>
-									{ __( 'View Site' ) }
+									{ __( 'View site' ) }
 									<VisuallyHidden as="span">
 										{
 											/* translators: accessibility text */
