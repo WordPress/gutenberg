@@ -163,6 +163,9 @@ export const extractColorNameFromCurrentValue = (
 };
 
 export const showTransparentBackground = ( currentValue ) => {
+	if ( typeof currentValue === 'undefined' ) {
+		return true;
+	}
 	return colord( currentValue ).alpha() === 0;
 };
 

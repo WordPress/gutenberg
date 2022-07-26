@@ -25,8 +25,8 @@ describe( 'ColorPalette: Utils', () => {
 		} );
 	} );
 	describe( 'showTransparentBackground', () => {
-		test( 'should return undefined for transparent colors', () => {
-			expect( undefined ).toBe( undefined );
+		test( 'should return true for undefined color values', () => {
+			expect( showTransparentBackground( undefined ) ).toBe( true );
 		} );
 		test( 'should return true for transparent colors', () => {
 			expect( showTransparentBackground( 'transparent' ) ).toBe( true );
