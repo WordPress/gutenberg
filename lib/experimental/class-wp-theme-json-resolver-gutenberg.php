@@ -16,6 +16,15 @@
  * @access private
  */
 class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
+
+	/**
+	 * Container for data coming from plugins
+	 *
+	 * @since 6.1.0
+	 * @var WP_Theme_JSON
+	 */
+	protected static $plugins = null;
+
 	/**
 	 * Returns the theme's data.
 	 *
@@ -128,6 +137,44 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 	}
 
 	/**
+	 * Returns any plugin provided theme data from all plugins merged together.
+	 *
+	 * Note: The current merge strategy merges in order of plugins returned by
+	 * `wp_get_active_and_valid_plugins()`. This means the data from the last
+	 * plugin in the list will override any equivalent properties from those
+	 * earlier in the list.
+	 *
+	 * @return WP_Theme_JSON
+	 */
+	public static function get_plugin_theme_data() {
+		if ( null === static::$plugins ) {
+			$plugins_data        = array();
+			$active_plugin_paths = wp_get_active_and_valid_plugins();
+			foreach ( $active_plugin_paths as $path ) {
+				$config = static::read_json_file( dirname( $path ) . '/theme.json' );
+				if ( ! empty( $config ) ) {
+					$plugins_data[ $path ] = $config;
+				}
+			}
+			// have configs from plugins, now let's register and merge.
+			$plugin_json = new WP_Theme_JSON_Gutenberg();
+			foreach ( $plugins_data as $plugin_path => $plugin_config ) {
+				$plugin_meta_data = get_plugin_data( $plugin_path, false, false );
+				if ( isset( $plugin_meta_data['TextDomain'] ) ) {
+					$plugin_config = static::translate( $plugin_config, $plugin_meta_data['TextDomain'] );
+				}
+				// TODO, this is where we could potentially introduce different merge
+				// strategies for plugin provided data.
+				$plugin_json->merge(
+					new WP_Theme_JSON_Gutenberg( $plugin_config )
+				);
+			}
+			static::$plugins = $plugin_json;
+		}
+		return static::$plugins;
+	}
+
+	/**
 	 * When given an array, this will remove any keys with the name `//`.
 	 *
 	 * @param array $array The array to filter.
@@ -148,14 +195,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 	 * Returns the data merged from multiple origins.
 	 *
 	 * There are three sources of data (origins) for a site:
-	 * default, theme, and custom. The custom's has higher priority
-	 * than the theme's, and the theme's higher than default's.
+	 * default, theme, plugin, and custom. The custom's has higher priority
+	 * than the theme's, the theme's has higher priority than plugin's,
+	 * and the plugin's has higher priority than the default's.
 	 *
 	 * Unlike the getters {@link get_core_data},
-	 * {@link get_theme_data}, and {@link get_user_data},
+	 * {@link get_theme_data}, {@link get_plugin_data}, and {@link get_user_data},
 	 * this method returns data after it has been merged
 	 * with the previous origins. This means that if the same piece of data
-	 * is declared in different origins (user, theme, and core),
+	 * is declared in different origins (user, theme, plugin, and core),
 	 * the last origin overrides the previous.
 	 *
 	 * For example, if the user has set a background color
@@ -178,7 +226,11 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
 		$result->merge( static::get_block_data() );
+		// TODO: This is where we could potentially introduce new strategies for
+		// merging plugin provided data.
+		$result->merge( static::get_plugin_theme_data() );
 		$result->merge( static::get_theme_data() );
+
 		if ( 'custom' === $origin ) {
 			$result->merge( static::get_user_data() );
 		}
@@ -186,5 +238,23 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		$result->set_spacing_sizes();
 
 		return $result;
+	}
+
+	/**
+	 * Cleans the cached data so it can be recalculated.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Added the `$user`, `$user_custom_post_type_id`,
+	 *              and `$i18n_schema` variables to reset.
+	 * @since 6.1.0 Added the `$plugins` variables to reset.
+	 */
+	public static function clean_cached_data() {
+		static::$core                     = null;
+		static::$theme                    = null;
+		static::$user                     = null;
+		static::$user_custom_post_type_id = null;
+		static::$theme_has_support        = null;
+		static::$i18n_schema              = null;
+		static::$plugins                  = null;
 	}
 }
