@@ -93,7 +93,7 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return spacingSize.slug === slug;
 	} );
-	return sliderValue !== -1 ? sliderValue : undefined;
+	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
 export const LABELS = {

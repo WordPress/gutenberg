@@ -4,6 +4,10 @@
 	padding-bottom: 12px;
 	width: 100%;
 
+	.components-range-control__wrapper {
+		margin-bottom: 0;
+	}
+
 	.components-range-control__mark {
 		height: 4px;
 		width: 3px;
