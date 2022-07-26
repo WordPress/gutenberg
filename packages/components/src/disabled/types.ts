@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentProps } from 'react';
 
-export interface DisabledProps extends ComponentPropsWithRef< 'div' > {
+export interface DisabledProps extends ComponentProps< 'div' > {
 	/**
 	 * Whether to disable all the descendant fields.
 	 *
