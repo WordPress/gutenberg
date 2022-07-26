@@ -9,13 +9,8 @@ import { flatMap } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
-import {
-	__UNSTABLE_LINE_SEPARATOR,
-	create,
-	split,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { createBlock } from '@wordpress/blocks';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -83,26 +78,6 @@ const transforms = {
 				);
 			},
 		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock(
-					'core/list',
-					{
-						anchor,
-					},
-					split(
-						create( { html: value, multilineTag: 'p' } ),
-						__UNSTABLE_LINE_SEPARATOR
-					).map( ( result ) => {
-						return createBlock( 'core/list-item', {
-							content: toHTMLString( { value: result } ),
-						} );
-					} )
-				);
-			},
-		},
 		...[ '*', '-' ].map( ( prefix ) => ( {
 			type: 'prefix',
 			prefix,
@@ -144,19 +119,6 @@ const transforms = {
 					createBlock( block, {
 						content,
 					} )
-				);
-			},
-		} ) ),
-		...[ 'core/quote', 'core/pullquote' ].map( ( block ) => ( {
-			type: 'block',
-			blocks: [ block ],
-			transform: ( attributes, innerBlocks ) => {
-				return switchToBlockType(
-					switchToBlockType(
-						createBlock( 'core/list', attributes, innerBlocks ),
-						'core/paragraph'
-					),
-					block
 				);
 			},
 		} ) ),
