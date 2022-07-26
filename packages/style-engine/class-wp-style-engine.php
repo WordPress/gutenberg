@@ -586,20 +586,6 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns a string of classnames,
-	 *
-	 * @param string $classnames A flat array of classnames.
-	 *
-	 * @return string A string of classnames separate by a space.
-	 */
-	public function compile_classnames( $classnames ) {
-		if ( empty( $classnames ) || ! is_array( $classnames ) ) {
-			return null;
-		}
-		return implode( ' ', array_unique( $classnames ) );
-	}
-
-	/**
 	 * Returns a compiled stylesheet from stored CSS rules.
 	 *
 	 * @param string $store_key A valid key.
@@ -659,7 +645,7 @@ function wp_style_engine_get_block_supports_styles( $block_styles, $options = ar
 		}
 
 		if ( ! empty( $parsed_styles['classnames'] ) ) {
-			$styles_output['classnames'] = $style_engine->compile_classnames( $parsed_styles['classnames'] );
+			$styles_output['classnames'] = implode( ' ', array_unique( $parsed_styles['classnames'] ) );
 		}
 
 		return array_filter( $styles_output );
