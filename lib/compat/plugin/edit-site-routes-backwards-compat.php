@@ -38,5 +38,6 @@ add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
  */
 function gutenberg_redirect_deprecated_to_new_site_editor_page() {
 		wp_safe_redirect( 'site-editor.php' );
+		exit;
 }
 add_action( 'load-appearance_page_gutenberg-edit-site', 'gutenberg_redirect_deprecated_to_new_site_editor_page' );
