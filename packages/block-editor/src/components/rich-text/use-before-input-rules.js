@@ -19,19 +19,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @type {string[]} Array of character pairs.
  */
-const wrapSelectionSettings = [
-	'`',
-	'()',
-	'[]',
-	'{}',
-	'"',
-	"'",
-	'“”',
-	'‘’',
-	'*',
-	'_',
-	'|',
-];
+const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
 
 export function useBeforeInputRules( props ) {
 	const {
@@ -57,7 +45,10 @@ export function useBeforeInputRules( props ) {
 			const pair = applyFilters(
 				'blockEditor.wrapSelectionSettings',
 				wrapSelectionSettings
-			).find( ( [ $1, $2 ] ) => $1 === data || $2 === data );
+			).find(
+				( [ startChar, endChar ] ) =>
+					startChar === data || endChar === data
+			);
 
 			if ( ! pair ) {
 				return;
