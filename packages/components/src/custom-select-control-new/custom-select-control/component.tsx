@@ -17,7 +17,7 @@ import type { WordPressComponentProps } from '../../ui/context';
 import { CustomSelectControlItem, CustomSelectControlArrow } from '../';
 import type { SelectControlOption, SelectControlProps } from '../types';
 
-const SelectControlCustomSelectLabel = ( {
+const CustomDisplayedValue = ( {
 	options,
 	value,
 }: {
@@ -58,7 +58,7 @@ const UnforwardedSelectControl = (
 				ref={ forwardedRef }
 			>
 				{ options?.length ? (
-					<SelectControlCustomSelectLabel
+					<CustomDisplayedValue
 						options={ options }
 						value={ selectState.value }
 					/>

@@ -59,39 +59,49 @@ Default.args = {
 
 export const WithGroupsAndSeparators: ComponentStory<
 	typeof CustomSelectControl
-> = ( { onChange, ...args } ) => (
-	<CustomSelectControl { ...args }>
-		<CustomSelectControlGroup>
-			<CustomSelectControlGroupLabel>
-				Primary
-			</CustomSelectControlGroupLabel>
-			<CustomSelectControlItem value="Red" />
-			<CustomSelectControlItem value="Yellow" />
-			<CustomSelectControlItem value="Blue" />
-		</CustomSelectControlGroup>
-		<CustomSelectControlSeparator />
-		<CustomSelectControlGroup>
-			<CustomSelectControlGroupLabel>
-				Secondary
-			</CustomSelectControlGroupLabel>
-			<CustomSelectControlItem value="Orange" />
-			<CustomSelectControlItem value="Green" />
-			<CustomSelectControlItem value="Purple" />
-		</CustomSelectControlGroup>
-		<CustomSelectControlSeparator />
-		<CustomSelectControlGroup>
-			<CustomSelectControlGroupLabel>
-				Tertiary
-			</CustomSelectControlGroupLabel>
-			<CustomSelectControlItem value="Amber" />
-			<CustomSelectControlItem value="Vermilion" />
-			<CustomSelectControlItem value="Magenta" />
-			<CustomSelectControlItem value="Violet" />
-			<CustomSelectControlItem value="Teal" />
-			<CustomSelectControlItem value="Chartreuse" />
-		</CustomSelectControlGroup>
-	</CustomSelectControl>
-);
+> = ( { onChange, ...args } ) => {
+	return (
+		<CustomSelectControl { ...args }>
+			{ [
+				{ label: 'Primary', values: [ 'Red', 'Yellow', 'Blue' ] },
+				{ label: 'Secondary', values: [ 'Orange', 'Green', 'Purple' ] },
+				{
+					label: 'Tertiary',
+					values: [
+						'Amber',
+						'Vermilion',
+						'Magenta',
+						'Violet',
+						'Teal',
+						'Chartreuse',
+					],
+				},
+			].map( ( { label, values }, groupIndex, groupArray ) => (
+				<>
+					<CustomSelectControlGroup>
+						<CustomSelectControlGroupLabel>
+							{ label }
+						</CustomSelectControlGroupLabel>
+						{ values.map( ( value, valueIndex ) => (
+							<CustomSelectControlItem
+								key={ value }
+								value={ value }
+								// Enables scroll on key down so pressing ArrowUp will scroll up and
+								// reveals the group label.
+								preventScrollOnKeyDown={
+									groupIndex === 0 && valueIndex === 0
+								}
+							/>
+						) ) }
+					</CustomSelectControlGroup>
+					{ groupIndex < groupArray.length - 1 ? (
+						<CustomSelectControlSeparator />
+					) : null }
+				</>
+			) ) }
+		</CustomSelectControl>
+	);
+};
 WithGroupsAndSeparators.args = {
 	label: 'Pick a color',
 };
