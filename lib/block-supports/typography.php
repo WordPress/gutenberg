@@ -233,7 +233,7 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
  *      'root_size_value'  => (number) Value of root font size for rem|em <-> px conversion. Default `16`.
  *      'acceptable_units' => (array)  An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  *  );.
- * @return array An array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ]
+ * @return array An array consisting of `'value'` and `'unit'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( empty( $raw_value ) ) {
@@ -343,6 +343,8 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 
 	// Build CSS rule.
 	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	var_dump($minimum_viewport_width['value']);
+	var_dump(round( $minimum_viewport_width['value'] / 100, 3 ));
 	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
 	$linear_factor          = round( $linear_factor, 3 ) * $scale_factor;
