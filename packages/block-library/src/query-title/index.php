@@ -27,9 +27,9 @@ function render_block_core_query_title( $attributes ) {
 			$filter_title = function( $title, $original_title ) {
 				return $original_title;
 			};
-			add_filter( 'get_the_archive_title', $filter_title , 10, 2 );
+			add_filter( 'get_the_archive_title', $filter_title, 10, 2 );
 			$title = get_the_archive_title();
-			remove_filter( 'get_the_archive_title', $filter_title , 10, 2 );
+			remove_filter( 'get_the_archive_title', $filter_title, 10, 2 );
 		} else {
 			$title = get_the_archive_title();
 		}
