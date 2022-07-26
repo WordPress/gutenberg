@@ -3,7 +3,6 @@
 class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
-	 * @group something
 	 */
 	protected static $admin_id;
 
@@ -28,32 +27,32 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
-			'/wp/v2/templates/fallback_content',
+			'/wp/v2/templates/lookup',
 			$routes,
 			'Get template fallback content route does not exist'
 		);
 	}
 
-	public function test_get_template_fallback_content() {
+	public function test_get_template_fallback() {
 		$base_path = gutenberg_dir_path() . 'test/emptytheme/block-templates/';
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/fallback_content' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/templates/lookup' );
 		// Should match `category.html`.
 		$request->set_param( 'slug', 'category-fruits' );
 		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		$data     = $response->get_data()->content;
 		$expected = file_get_contents( $base_path . 'category.html' );
 		$this->assertEquals( $expected, $data );
 		// Should fallback to `index.html` .
 		$request->set_param( 'slug', 'tag-status' );
 		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		$data     = $response->get_data()->content;
 		$expected = file_get_contents( $base_path . 'index.html' );
 		$this->assertEquals( $expected, $data );
 		// Should fallback to `singular.html` .
 		$request->set_param( 'slug', 'page-hello' );
 		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		$data     = $response->get_data()->content;
 		$expected = file_get_contents( $base_path . 'singular.html' );
 		$this->assertEquals( $expected, $data );
 	}

@@ -97,11 +97,12 @@ export default function NewTemplate( { postType } ) {
 			let templateContent = template.content;
 			// Try to find fallback content from existing templates.
 			if ( ! templateContent ) {
-				templateContent = await apiFetch( {
-					path: addQueryArgs( '/wp/v2/templates/fallback_content', {
+				const fallbackTemplate = await apiFetch( {
+					path: addQueryArgs( '/wp/v2/templates/lookup', {
 						slug,
 					} ),
 				} );
+				templateContent = fallbackTemplate.content;
 			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
