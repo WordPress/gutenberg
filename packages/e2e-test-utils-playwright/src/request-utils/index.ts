@@ -19,7 +19,7 @@ import { deleteAllTemplates } from './templates';
 import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
-import { deleteAllPosts } from './posts';
+import { createPost, deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 
@@ -121,6 +121,7 @@ class RequestUtils {
 	deactivatePlugin = deactivatePlugin.bind( this );
 	activateTheme = activateTheme.bind( this );
 	deleteAllBlocks = deleteAllBlocks;
+	createPost = createPost.bind( this );
 	deleteAllPosts = deleteAllPosts.bind( this );
 	createComment = createComment.bind( this );
 	deleteAllComments = deleteAllComments.bind( this );

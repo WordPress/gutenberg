@@ -31,7 +31,7 @@
 		position: static;
 		height: calc(100% - #{ $panel-header-height });
 		overflow-y: visible;
-		min-width: auto;
+		width: auto;
 		border: none;
 		outline: none;
 		border-top: $border-width solid $gray-900;
