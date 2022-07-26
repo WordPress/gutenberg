@@ -314,9 +314,7 @@ class WP_Style_Engine {
 		if ( empty( $css_selector ) || empty( $css_declarations ) ) {
 			return;
 		}
-		WP_Style_Engine_CSS_Rules_Store::get_store( $store_key )
-			->add_rule( $css_selector )
-			->add_declarations( $css_declarations );
+		static::get_store( $store_key )->add_rule( $css_selector )->add_declarations( $css_declarations );
 	}
 
 	/**
