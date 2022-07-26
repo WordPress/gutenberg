@@ -64,7 +64,6 @@ function useLayoutClasses( layout, layoutDefinitions ) {
 	}
 	if ( layout?.inherit ) {
 		layoutClassnames.push( 'has-global-content-size' );
-		layoutClassnames.push( 'has-global-wide-size' );
 	}
 
 	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {

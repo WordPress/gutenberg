@@ -225,7 +225,7 @@
 							}
 						},
 						{
-							"selector": ":where(.has-global-wide-size) > .alignwide",
+							"selector": ":where(.has-global-content-size) > .alignwide",
 							"rules": {
 								"max-width": "var(--wp--style--global--wide-size)"
 							}

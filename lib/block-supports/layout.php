@@ -193,12 +193,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			return $block_content;
 		}
 
-		if ( isset( $global_layout_settings['contentSize'] ) && $global_layout_settings['contentSize'] ) {
+		if ( isset( $global_layout_settings['contentSize'] ) && $global_layout_settings['contentSize'] || isset( $global_layout_settings['wideSize'] ) && $global_layout_settings['wideSize'] ) {
 			$class_names[] = 'has-global-content-size';
-		}
-
-		if ( isset( $global_layout_settings['wideSize'] ) && $global_layout_settings['wideSize'] ) {
-			$class_names[] = 'has-global-wide-size';
 		}
 	}
 
