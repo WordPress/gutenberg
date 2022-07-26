@@ -577,7 +577,7 @@ class WP_HTML_Scanner {
 			 * lead us to skip over other tags and lose track of our place. So we need to search for
 			 * _every_ tag and then check after we find one if it's the one we are looking for.
 			 */
-	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} /?>]*)~Smui",
+	"~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?\]\]>)|<\?(?>.*?)>|<(?P<TAG>[a-z][^\t\x{0A}\x{0C} /?>]*)~Smui",
 			$this->document,
 			$tag_match,
 			PREG_OFFSET_CAPTURE,
@@ -606,7 +606,7 @@ class WP_HTML_Scanner {
 	public function find_next_attribute() {
 		// Find the attribute name
 		if ( 1 !== preg_match(
-			'~[\t\x{0a}\x{0c}\x{0d} ]*(?P<NAME>=?[^=/>\t\x{0C} ]*)~Smiu',
+			'~[\t\x{0a}\x{0c} ]*(?P<NAME>=?[^=/>\t\x{0A}\x{0C} ]*)~Smiu',
 			$this->document,
 			$attribute_match,
 			PREG_OFFSET_CAPTURE,
@@ -643,7 +643,7 @@ class WP_HTML_Scanner {
 				break;
 
 			default:
-				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c}\x{0d} >]*)~Smiu';
+				$pattern = '~(?P<VALUE>[^\t\x{0a}\x{0c} >]*)~Smiu';
 				break;
 		}
 
