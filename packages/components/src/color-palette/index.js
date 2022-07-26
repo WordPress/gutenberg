@@ -162,6 +162,13 @@ export const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
+export const showTransparentBackground = ( currentValue ) => {
+	if ( typeof currentValue === 'undefined' ) {
+		return true;
+	}
+	return colord( currentValue ).alpha() === 0;
+};
+
 export default function ColorPalette( {
 	clearable = true,
 	className,
@@ -228,14 +235,18 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ customColorAccessibleLabel }
-							style={ {
-								background: value,
-								color:
-									colordColor.contrast() >
-									colordColor.contrast( '#000' )
-										? '#fff'
-										: '#000',
-							} }
+							style={
+								showTransparentBackground( value )
+									? { color: '#000' }
+									: {
+											background: value,
+											color:
+												colordColor.contrast() >
+												colordColor.contrast( '#000' )
+													? '#fff'
+													: '#000',
+									  }
+							}
 						>
 							<FlexItem
 								isBlock
