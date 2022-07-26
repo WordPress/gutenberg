@@ -491,8 +491,7 @@ export function switchToBlockType( blocks, name ) {
 			transformationsTo,
 			( t ) =>
 				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( name ) !== -1 ) &&
+				t.blocks.indexOf( name ) !== -1 &&
 				( ! isMultiBlock || t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
