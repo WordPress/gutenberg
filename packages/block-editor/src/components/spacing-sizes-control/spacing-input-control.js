@@ -56,9 +56,10 @@ export default function SpacingInputControl( {
 	if ( isMixed ) {
 		currentValue = null;
 	} else {
-		currentValue = ! showCustomValueControl
-			? getSliderValueFromPreset( value, spacingSizes )
-			: getCustomValueFromPreset( value, spacingSizes );
+		currentValue =
+			! showCustomValueControl && ! showAllSidesCustomValueControl
+				? getSliderValueFromPreset( value, spacingSizes )
+				: getCustomValueFromPreset( value, spacingSizes );
 	}
 
 	const selectedUnit =
