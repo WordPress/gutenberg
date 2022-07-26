@@ -37,8 +37,6 @@ export default function SpacingSizesControl( {
 	values,
 	sides,
 	splitOnAxis = false,
-	allowReset = true,
-	resetValues = DEFAULT_VALUES,
 	useSelect,
 } ) {
 	const [ showCustomValueControl, setShowCustomValueControl ] =
@@ -54,7 +52,6 @@ export default function SpacingSizesControl( {
 	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;
 
-	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
@@ -66,12 +63,6 @@ export default function SpacingSizesControl( {
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
 		onChange( newValues );
-		setIsDirty( true );
-	};
-
-	const handleOnReset = () => {
-		onChange( resetValues );
-		setIsDirty( false );
 	};
 
 	const inputControlProps = {
@@ -97,17 +88,6 @@ export default function SpacingSizesControl( {
 				) }
 			>
 				<Text as="legend">{ label }</Text>
-				{ allowReset && (
-					<Button
-						className="component-box-control__reset-button"
-						isSecondary
-						isSmall
-						onClick={ handleOnReset }
-						disabled={ ! isDirty }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				) }
 				{ isLinked && (
 					<Button
 						label={
