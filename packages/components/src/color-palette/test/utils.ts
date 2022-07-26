@@ -33,7 +33,7 @@ describe( 'ColorPalette: Utils', () => {
 			expect( showTransparentBackground( '#75757500' ) ).toBe( true );
 		} );
 
-		test( 'should return true for transparent colors', () => {
+		test( 'should return false for non-transparent colors', () => {
 			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
 			expect( showTransparentBackground( '#757575' ) ).toBe( false );
 			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
