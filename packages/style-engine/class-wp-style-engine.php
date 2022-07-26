@@ -580,10 +580,9 @@ class WP_Style_Engine {
 		if ( $css_selector ) {
 			$css_rule = new WP_Style_Engine_CSS_Rule( $css_selector, $css_declarations );
 			return $css_rule->get_css();
-		} else {
-			$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
-			return $css_declarations->get_declarations_string();
 		}
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		return $css_declarations->get_declarations_string();
 	}
 
 	/**
