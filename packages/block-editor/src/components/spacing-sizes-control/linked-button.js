@@ -16,7 +16,6 @@ export default function LinkedButton( { isLinked, onClick } ) {
 		<Tooltip text={ label }>
 			<span>
 				<Button
-					className="component-box-control__linked-button"
 					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall
 					icon={ isLinked ? link : linkOff }

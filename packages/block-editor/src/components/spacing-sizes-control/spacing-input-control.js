@@ -106,7 +106,7 @@ export default function SpacingInputControl( {
 
 	const marks = spacingSizes.map( ( newValue, index ) => ( {
 		value: index,
-		lable: undefined,
+		label: undefined,
 	} ) );
 
 	const ariaLabel = sprintf(

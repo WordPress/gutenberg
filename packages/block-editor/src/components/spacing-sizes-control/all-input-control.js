@@ -21,6 +21,8 @@ export default function AllInputControl( {
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values );
 
+	// TODO: This is a duplicate of https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/box-control/all-input-control.js#L37
+	// so ideally this should be exported from the components package and imported here.
 	// Applies a value to an object representing top, right, bottom and left
 	// sides while taking into account any custom side configuration.
 	const applyValueToSides = ( currentValues, newValue ) => {

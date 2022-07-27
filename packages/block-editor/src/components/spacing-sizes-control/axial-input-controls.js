@@ -18,16 +18,15 @@ export default function AxialInputControls( {
 			return;
 		}
 		const nextValues = { ...values };
-		const nextValue = next;
 
 		if ( side === 'vertical' ) {
-			nextValues.top = nextValue;
-			nextValues.bottom = nextValue;
+			nextValues.top = next;
+			nextValues.bottom = next;
 		}
 
 		if ( side === 'horizontal' ) {
-			nextValues.left = nextValue;
-			nextValues.right = nextValue;
+			nextValues.left = next;
+			nextValues.right = next;
 		}
 
 		onChange( nextValues );
@@ -48,7 +47,7 @@ export default function AxialInputControls( {
 						value={ axisValue }
 						onChange={ createHandleOnChange( side ) }
 						label={ LABELS[ side ] }
-						key={ `box-control-${ side }` }
+						key={ `spacing-sizes-control-${ side }` }
 						withInputField={ false }
 						side={ side }
 						spacingSizes={ spacingSizes }

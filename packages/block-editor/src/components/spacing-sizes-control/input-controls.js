@@ -53,7 +53,7 @@ export default function BoxInputControls( {
 					<SpacingInputControl
 						value={ values[ side ] }
 						label={ LABELS[ side ] }
-						key={ `box-control-${ side }` }
+						key={ `spacing-sizes-control-${ side }` }
 						withInputField={ false }
 						side={ side }
 						onChange={ createHandleOnChange( side ) }
