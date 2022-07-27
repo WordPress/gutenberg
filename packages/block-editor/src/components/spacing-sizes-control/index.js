@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { settings } from '@wordpress/icons';
@@ -23,7 +24,13 @@ import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import LinkedButton from './linked-button';
-import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
+import {
+	DEFAULT_VALUES,
+	isValuesMixed,
+	isValuesDefined,
+	getAllRawValue,
+	getSliderValueFromPreset,
+} from './utils';
 import useSetting from '../use-setting';
 
 const defaultInputProps = {
@@ -56,6 +63,15 @@ export default function SpacingSizesControl( {
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
+	const currentValueHint = isLinked
+		? spacingSizes[
+				getSliderValueFromPreset(
+					getAllRawValue( values ),
+					spacingSizes
+				)
+		  ]?.name
+		: undefined;
+
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
 	};
@@ -87,7 +103,18 @@ export default function SpacingSizesControl( {
 					}
 				) }
 			>
-				<Text as="legend">{ label }</Text>
+				<VStack>
+					<Text as="legend">{ label }</Text>
+					{ spacingSizes.length <= 8 &&
+						! showCustomValueControl &&
+						isLinked && (
+							<Text className="components-spacing-sizes-control__hint-all-sides">
+								{ currentValueHint !== undefined
+									? currentValueHint
+									: __( 'Default' ) }
+							</Text>
+						) }
+				</VStack>
 				{ isLinked && (
 					<Button
 						label={

@@ -128,7 +128,7 @@ export default function SpacingInputControl( {
 
 					{ spacingSizes.length <= 8 &&
 						! showCustomValueControl &&
-						! showAllSidesCustomValueControl && (
+						side !== 'all' && (
 							<Text className="components-spacing-sizes-control__hint">
 								{ currentValueHint !== undefined
 									? currentValueHint
