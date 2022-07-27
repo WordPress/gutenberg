@@ -59,7 +59,7 @@ function inputControlStateReducer(
 			 * Controlled updates
 			 */
 			case actions.CONTROL:
-				nextState.value = `${ action.payload.value }`;
+				nextState.value = action.payload.value;
 				nextState.isDirty = false;
 				nextState._event = undefined;
 				// Returns immediately to avoid invoking additional reducers.
