@@ -40,8 +40,10 @@ function EditorKeyboardShortcutsRegister() {
 				modifier: 'primaryShift',
 				character: 'z',
 			},
-			// Disable on Apple OS because it conflict's with the browser
-			// history shortcut.
+			// Disable on Apple OS because it conflicts with the browser's
+			// history shortcut. It's a fine alias for both Windows and Linux.
+			// Since there's no conflict for Ctrl+Shift+Z on both Windows and
+			// Linux, we keep it as the default for consistency.
 			aliases: isAppleOS()
 				? []
 				: [
