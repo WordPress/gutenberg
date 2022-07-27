@@ -23,7 +23,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * @param string $expected_output The expected output.
 	 */
 	public function test_generate_block_supports_styles( $block_styles, $options, $expected_output ) {
-		$generated_styles = wp_style_engine_get_block_supports_styles( $block_styles, $options );
+		$generated_styles = wp_style_engine_get_styles( $block_styles, $options );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
