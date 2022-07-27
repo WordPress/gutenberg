@@ -11,7 +11,6 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER } from '@wordpress/keycodes';
 
 /**
@@ -136,9 +135,7 @@ function InserterListItem( {
 							<BlockIcon icon={ item.icon } showColors />
 						</span>
 						<span className="block-editor-block-types-list__item-title">
-							<Truncate numberOfLines={ 3 }>
-								{ item.title }
-							</Truncate>
+							{ item.title }
 						</span>
 					</InserterListboxItem>
 				</div>
