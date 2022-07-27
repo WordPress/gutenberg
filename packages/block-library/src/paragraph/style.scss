@@ -19,6 +19,7 @@
 // cannot be set around it, caret position calculation fails in Chrome, and
 // typing at the end of the paragraph doesn't work.
 .has-drop-cap:not(:focus)::first-letter {
+	float: left;
 	font-size: 8.4em;
 	line-height: 0.68;
 	font-weight: 100;
@@ -28,6 +29,7 @@
 }
 
 body.rtl .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
 	margin-left: 0.1em;
 }
 

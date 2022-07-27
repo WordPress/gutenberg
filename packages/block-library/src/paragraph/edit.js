@@ -51,6 +51,10 @@ function ParagraphRTLControl( { direction, setDirection } ) {
 	);
 }
 
+function hasDropCapDisabled( align ) {
+	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
+}
+
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
@@ -64,17 +68,14 @@ function ParagraphBlock( {
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
-			'has-drop-cap':
-				align === ( isRTL() ? 'left' : 'right' ) || align === 'center'
-					? false
-					: dropCap,
+			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
 		style: { direction },
 	} );
 
 	let helpText;
-	if ( align === ( isRTL() ? 'left' : 'right' ) || align === 'center' ) {
+	if ( hasDropCapDisabled( align ) ) {
 		helpText = __( 'Aligned text can not have a drop cap.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
@@ -88,7 +89,12 @@ function ParagraphBlock( {
 				<AlignmentControl
 					value={ align }
 					onChange={ ( newAlign ) =>
-						setAttributes( { align: newAlign } )
+						setAttributes( {
+							align: newAlign,
+							dropCap: hasDropCapDisabled( newAlign )
+								? false
+								: dropCap,
+						} )
 					}
 				/>
 				<ParagraphRTLControl
@@ -111,21 +117,13 @@ function ParagraphBlock( {
 					>
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
-							checked={
-								align === ( isRTL() ? 'left' : 'right' ) ||
-								align === 'center'
-									? false
-									: dropCap
-							}
+							checked={ !! dropCap }
 							onChange={ () =>
 								setAttributes( { dropCap: ! dropCap } )
 							}
 							help={ helpText }
 							disabled={
-								align === ( isRTL() ? 'left' : 'right' ) ||
-								align === 'center'
-									? true
-									: false
+								hasDropCapDisabled( align ) ? true : false
 							}
 						/>
 					</ToolsPanelItem>
