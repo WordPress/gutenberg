@@ -425,13 +425,14 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		'root',
 		useAuthorMenuItem.AUTHOR_TEMPLATE_ENTITY_OBJECT
 	);
-	const authorMenuItem = defaultTemplateTypes?.find(
+	let authorMenuItem = defaultTemplateTypes?.find(
 		( { slug } ) => slug === 'author'
 	);
 	const hasGeneralTemplate = existingTemplates?.find(
 		( { slug } ) => slug === 'author'
 	);
 	if ( authorMenuItem && authorInfo.user?.hasEntities ) {
+		authorMenuItem = { ...authorMenuItem };
 		authorMenuItem.onClick = ( template ) => {
 			onClickMenuItem( {
 				type: 'root',
