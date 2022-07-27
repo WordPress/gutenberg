@@ -148,11 +148,11 @@ class WP_HTML_Processor {
 		$tag_name = $this->scanner->tag_name;
 		$insert_at = $tag_name->start + $tag_name->length;
 
-		$this->replacements[] = new WP_Text_Replacement(
+		$this->insert_replacement( new WP_Text_Replacement(
 			$insert_at,
 			$insert_at,
 			' ' . self::serialize_attribute( $name, $value )
-		);
+		) );
 
 		return $this;
 	}
@@ -170,11 +170,11 @@ class WP_HTML_Processor {
 
 		$existing = $this->scanner->attributes[ $name ];
 
-		$this->replacements[] = new WP_Text_Replacement(
+		$this->insert_replacement( new WP_Text_Replacement(
 			$existing->attribute_start,
 			$existing->attribute_end,
 			self::serialize_attribute( $name, $value )
-		);
+		) );
 	}
 
 
@@ -190,11 +190,11 @@ class WP_HTML_Processor {
 
 		$existing = $this->scanner->attributes[ $name ];
 
-		$this->replacements[] = array(
+		$this->insert_replacement( new WP_Text_Replacement(
 			$existing->attribute_start,
 			$existing->attribute_end,
 			''
-		);
+		) );
 	}
 
 
@@ -249,6 +249,44 @@ class WP_HTML_Processor {
 	}
 
 
+	/**
+	 * Registers a new lexical replacement for the input document,
+	 * maintains proper ordering of replacements for later substitution.
+	 *
+	 * Replacements need to be applied in the order in which their start
+	 * byte offset first appears in the input document. This insertion
+	 * function maintains that order on insertion. We can note that for
+	 * most of our expected replacements they will appear already in the
+	 * correct order or they will should be inserted within the last few
+	 * items of the replacements array. This is because for each tag we
+	 * scan, all of the replacements for that tag will follow all of the
+	 * replacements for the previous tag, and only those replacements for
+	 * a given tag which are listed in a different order than the HTML
+	 * attributes appear in the source document will need to be sorted.
+	 *
+	 * Doing this here removes the need to sort the entire array of
+	 * replacements at the end, which for operations with many
+	 * replacements can take up a substantial portion of the runtime.
+	 *
+	 * @see $this->apply()
+	 *
+	 * @param WP_Text_Replacement $replacement The new lexical replacement to register on the input document.
+	 */
+	private function insert_replacement( WP_Text_Replacement $replacement ) {
+		$this->replacements[] = $replacement;
+
+		$i = $c = count( $this->replacements ) - 1;
+		while ( $i > 0 && $this->replacements[ $i ]->start < $this->replacements[ $i - 1 ]->start ) {
+			$this->replacements[ $i ] = $this->replacements[ $i - 1 ];
+			$i--;
+		}
+
+		if ( $i < $c ) {
+			$this->replacements[ $i ] = $replacement;
+		}
+	}
+
+
 	private function apply() {
 		$document = $this->scanner->document;
 
@@ -257,16 +295,6 @@ class WP_HTML_Processor {
 		if ( empty( $this->replacements ) ) {
 			return $document;
 		}
-
-		/*
-		 * Since we could be asking to modify attributes in a different
-		 * order than where they appear in the HTMl stream we need to
-		 * sort the modification replacements so we can progress
-		 * linearly and in a single pass.
-		 */
-		usort( $this->replacements, static function ( $a, $b ) {
-			return $a->start - $b->start;
-		} );
 
 		$output = '';
 		$at = 0;
