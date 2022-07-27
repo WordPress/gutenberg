@@ -143,7 +143,7 @@ const processBlockType = ( blockType, { select } ) => {
 
 /**
  * Returns an action object used in signalling that block types have been added.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through registerBlockType from @wordpress/blocks.
  *
  * @ignore
  *
@@ -222,7 +222,7 @@ export const __experimentalReapplyBlockTypeFilters =
 
 /**
  * Returns an action object used to remove a registered block type.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockType from @wordpress/blocks.
  *
  * @ignore
  *
@@ -240,7 +240,7 @@ export function removeBlockTypes( names ) {
 
 /**
  * Returns an action object used in signalling that new block styles have been added.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
  *
  * @param {string}       blockName Block name.
  * @param {Array|Object} styles    Block style object or array of block style objects.
@@ -259,7 +259,7 @@ export function addBlockStyles( blockName, styles ) {
 
 /**
  * Returns an action object used in signalling that block styles have been removed.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockStyle from @wordpress/blocks.
  *
  * @ignore
  *
@@ -278,7 +278,7 @@ export function removeBlockStyles( blockName, styleNames ) {
 
 /**
  * Returns an action object used in signalling that new block variations have been added.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through registerBlockVariation from @wordpress/blocks.
  *
  * @ignore
  *
@@ -297,7 +297,7 @@ export function addBlockVariations( blockName, variations ) {
 
 /**
  * Returns an action object used in signalling that block variations have been removed.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockVariation from @wordpress/blocks.
  *
  * @ignore
  *
@@ -316,7 +316,7 @@ export function removeBlockVariations( blockName, variationNames ) {
 
 /**
  * Returns an action object used to set the default block name.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through setDefaultBlockName from @wordpress/blocks.
  *
  * @ignore
  *
@@ -334,7 +334,7 @@ export function setDefaultBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for non-block content.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through setFreeformContentHandlerName from @wordpress/blocks.
  *
  * @ignore
  *
@@ -352,7 +352,7 @@ export function setFreeformFallbackBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for unregistered blocks.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through setUnregisteredTypeHandlerName from @wordpress/blocks.
  *
  * @ignore
  *
@@ -371,7 +371,7 @@ export function setUnregisteredFallbackBlockName( name ) {
  * Returns an action object used to set the name of the block used
  * when grouping other blocks
  * eg: in "Group/Ungroup" interactions
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
  *
  * @ignore
  *
@@ -388,7 +388,7 @@ export function setGroupingBlockName( name ) {
 
 /**
  * Returns an action object used to set block categories.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through setCategories from @wordpress/blocks.
  *
  * @ignore
  *
@@ -405,7 +405,7 @@ export function setCategories( categories ) {
 
 /**
  * Returns an action object used to update a category.
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through updateCategory from @wordpress/blocks.
  *
  * @ignore
  *
@@ -424,7 +424,7 @@ export function updateCategory( slug, category ) {
 
 /**
  * Returns an action object used to add block collections
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through registerBlockCollection from @wordpress/blocks.
  *
  * @ignore
  *
@@ -445,7 +445,7 @@ export function addBlockCollection( namespace, title, icon ) {
 
 /**
  * Returns an action object used to remove block collections
- * Ignored from documentation as it's internal to the data store.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockCollection from @wordpress/blocks.
  *
  * @ignore
  *
