@@ -198,10 +198,15 @@ export function useInputControlStateReducer(
 
 	const currentState = useRef( state );
 	const refProps = useRef( { value: initialState.value, onChangeHandler } );
+
+	// Freshens refs to props and state so that subsequent effects have access
+	// to their latest values without their changes causing effect runs.
 	useLayoutEffect( () => {
 		currentState.current = state;
 		refProps.current = { value: initialState.value, onChangeHandler };
 	} );
+
+	// Propagates the latest state through onChange.
 	useLayoutEffect( () => {
 		if (
 			currentState.current._event !== undefined &&
@@ -215,6 +220,8 @@ export function useInputControlStateReducer(
 			} );
 		}
 	}, [ state.value, state.isDirty ] );
+
+	// Updates the state from props.
 	useLayoutEffect( () => {
 		if (
 			initialState.value !== currentState.current.value &&
