@@ -483,7 +483,7 @@ useAuthorMenuItem.AUTHOR_TEMPLATE_ENTITY_OBJECT = [
 	{
 		entitySlug: 'user',
 		templatePrefix: 'author',
-		additionalQueryParameters: { who: 'author' },
+		additionalQueryParameters: { who: 'authors' },
 	},
 ];
 
