@@ -20,7 +20,7 @@ export async function openPreviewPage( this: Editor ): Promise< Page > {
 		'role=region[name="Editor top bar"i]'
 	);
 	const previewButton = editorTopBar.locator(
-		'role=button[name="Preview"i]'
+		'role=button[name="View"i]'
 	);
 	await previewButton.click();
 
