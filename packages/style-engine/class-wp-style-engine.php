@@ -659,34 +659,34 @@ class WP_Style_Engine {
  * );
  */
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
-	if ( class_exists( 'WP_Style_Engine' ) ) {
-		$defaults = array(
-			'selector'                   => null,
-			'convert_vars_to_classnames' => false,
-			'enqueue'                    => false,
-		);
-
-		$options       = wp_parse_args( $options, $defaults );
-		$style_engine  = WP_Style_Engine::get_instance();
-		$parsed_styles = $style_engine->parse_block_supports_styles( $block_styles, $options );
-
-		// Output.
-		$styles_output = array();
-		if ( ! empty( $parsed_styles['css_declarations'] ) ) {
-			$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
-			$styles_output['declarations'] = $parsed_styles['css_declarations'];
-			if ( true === $options['enqueue'] ) {
-				$style_engine::store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
-			}
-		}
-
-		if ( ! empty( $parsed_styles['classnames'] ) ) {
-			$styles_output['classnames'] = $style_engine->compile_classnames( $parsed_styles['classnames'] );
-		}
-
-		return array_filter( $styles_output );
+	if ( ! class_exists( 'WP_Style_Engine' ) ) {
+		return array();
 	}
-	return array();
+	$defaults = array(
+		'selector'                   => null,
+		'convert_vars_to_classnames' => false,
+		'enqueue'                    => false,
+	);
+
+	$options       = wp_parse_args( $options, $defaults );
+	$style_engine  = WP_Style_Engine::get_instance();
+	$parsed_styles = $style_engine->parse_block_supports_styles( $block_styles, $options );
+
+	// Output.
+	$styles_output = array();
+	if ( ! empty( $parsed_styles['css_declarations'] ) ) {
+		$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
+		$styles_output['declarations'] = $parsed_styles['css_declarations'];
+		if ( true === $options['enqueue'] ) {
+			$style_engine::store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
+		}
+	}
+
+	if ( ! empty( $parsed_styles['classnames'] ) ) {
+		$styles_output['classnames'] = $style_engine->compile_classnames( $parsed_styles['classnames'] );
+	}
+
+	return array_filter( $styles_output );
 }
 
 /**
