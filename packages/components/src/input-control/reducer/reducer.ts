@@ -39,13 +39,13 @@ function mergeInitialState(
 }
 
 /**
- * Creates a reducer that opens the channel for external state subscription
- * and modification.
+ * Creates the base reducer which may be coupled to a specializing reducer.
+ * As its final step, for all actions other than CONTROL, the base reducer
+ * passes the state and action on through the specializing reducer. The
+ * exception for CONTROL actions is because they represent controlled updates
+ * from props and no case has yet presented for their specialization.
  *
- * This technique uses the "stateReducer" design pattern:
- * https://kentcdodds.com/blog/the-state-reducer-pattern/
- *
- * @param  composedStateReducers A custom reducer that can subscribe and modify state.
+ * @param  composedStateReducers A reducer to specialize state changes.
  * @return The reducer.
  */
 function inputControlStateReducer(
@@ -62,8 +62,7 @@ function inputControlStateReducer(
 				nextState.value = `${ action.payload.value }`;
 				nextState.isDirty = false;
 				nextState._event = undefined;
-				// So far there is no need for specialization of this action so
-				// returning immediately avoids invoking additional reducers.
+				// Returns immediately to avoid invoking additional reducers.
 				return nextState;
 
 			/**
