@@ -114,9 +114,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_class_when_there_is_a_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->remove( 'main' );
+		$w->next_tag()->remove_class( 'main' );
 		$this->assertSame(
-			'<div class="with-border foo-class bar-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			'<div class="with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
 		);
 	}
