@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { getPxFromCssUnit } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
@@ -94,8 +96,24 @@ export default function ListStyleType( {
 	start,
 	style,
 } ) {
-	const defaultFontSize =
+	const { height, width } = useWindowDimensions();
+	let defaultFontSize =
 		styles[ 'wp-block-list-item__list-item--default' ].fontSize;
+	const cssUnitOptions = {
+		height,
+		width,
+		fontSize: defaultFontSize,
+	};
+
+	if ( style?.baseColors?.typography?.fontSize ) {
+		defaultFontSize = parseFloat(
+			getPxFromCssUnit(
+				style.baseColors.typography.fontSize,
+				cssUnitOptions
+			)
+		);
+	}
+
 	const fontSize = parseInt(
 		style?.fontSize ? style.fontSize : defaultFontSize,
 		10

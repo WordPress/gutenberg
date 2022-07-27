@@ -117,7 +117,7 @@ export default function ListItemEdit( {
 				>
 					<RichText
 						identifier="content"
-						tagName="div"
+						tagName="p"
 						onChange={ ( nextContent ) =>
 							setAttributes( { content: nextContent } )
 						}
