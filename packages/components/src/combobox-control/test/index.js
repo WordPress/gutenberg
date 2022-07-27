@@ -94,6 +94,7 @@ describe.each( [
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
 		const label = getLabel( defaultLabelText );
+		expect( label ).toBeInTheDocument();
 		expect( label ).toBeVisible();
 	} );
 
