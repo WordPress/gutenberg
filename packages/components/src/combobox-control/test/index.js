@@ -62,35 +62,45 @@ const setupUser = () =>
 		advanceTimers: jest.advanceTimersByTime,
 	} );
 
-describe( 'ComboboxControl', () => {
-	const TestComboboxControl = ( { label, onChange, ...props } ) => {
-		const [ value, setValue ] = useState( null );
-		const handleOnChange = ( newValue ) => {
-			setValue( newValue );
-			onChange?.( newValue );
-		};
-		return (
-			<>
-				<ComboboxControl
-					{ ...props }
-					value={ value }
-					label={ label }
-					options={ timezones }
-					onChange={ handleOnChange }
-				/>
-			</>
-		);
+const ControlledComboboxControl = ( {
+	value: valueProp,
+	onChange,
+	...props
+} ) => {
+	const [ value, setValue ] = useState( valueProp );
+	const handleOnChange = ( newValue ) => {
+		setValue( newValue );
+		onChange?.( newValue );
 	};
+	return (
+		<>
+			<ComboboxControl
+				{ ...props }
+				value={ value }
+				onChange={ handleOnChange }
+			/>
+		</>
+	);
+};
+
+describe.each( [
+	[ 'uncontrolled', ComboboxControl ],
+	[ 'controlled', ControlledComboboxControl ],
+] )( 'ComboboxControl %s', ( ...modeAndComponent ) => {
+	const [ , Component ] = modeAndComponent;
 
 	it( 'should render with visible label', () => {
-		render( <TestComboboxControl label={ defaultLabelText } /> );
+		render(
+			<Component options={ timezones } label={ defaultLabelText } />
+		);
 		const label = getLabel( defaultLabelText );
 		expect( label ).toBeVisible();
 	} );
 
 	it( 'should render with hidden label', () => {
 		render(
-			<TestComboboxControl
+			<Component
+				options={ timezones }
 				label={ defaultLabelText }
 				hideLabelFromVision={ true }
 			/>
@@ -106,7 +116,9 @@ describe( 'ComboboxControl', () => {
 
 	it( 'should render with the correct options', async () => {
 		const user = setupUser();
-		render( <TestComboboxControl label={ defaultLabelText } /> );
+		render(
+			<Component options={ timezones } label={ defaultLabelText } />
+		);
 		const input = getInput( defaultLabelText );
 
 		// Clicking on the input shows the options
@@ -128,7 +140,8 @@ describe( 'ComboboxControl', () => {
 		const targetOption = setTargetOption( 2 );
 		const onChangeSpy = jest.fn();
 		render(
-			<TestComboboxControl
+			<Component
+				options={ timezones }
 				label={ defaultLabelText }
 				onChange={ onChangeSpy }
 			/>
@@ -152,7 +165,8 @@ describe( 'ComboboxControl', () => {
 		const targetOption = setTargetOption( targetIndex );
 		const onChangeSpy = jest.fn();
 		render(
-			<TestComboboxControl
+			<Component
+				options={ timezones }
 				label={ defaultLabelText }
 				onChange={ onChangeSpy }
 			/>
@@ -180,7 +194,8 @@ describe( 'ComboboxControl', () => {
 		const targetOption = setTargetOption( 13 );
 		const onChangeSpy = jest.fn();
 		render(
-			<TestComboboxControl
+			<Component
+				options={ timezones }
 				label={ defaultLabelText }
 				onChange={ onChangeSpy }
 			/>
@@ -207,7 +222,8 @@ describe( 'ComboboxControl', () => {
 		const targetOption = setTargetOption( 6 );
 		const onChangeSpy = jest.fn();
 		render(
-			<TestComboboxControl
+			<Component
+				options={ timezones }
 				label={ defaultLabelText }
 				onChange={ onChangeSpy }
 			/>
