@@ -106,8 +106,6 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	/**
 	 * We don't need home template resolution when block template parts are supported.
 	 * Set the value to true to satisfy the editor initialization guard clause.
-	 *
-	 * @todo replace with actual check.
 	 */
 	if ( $custom_settings['supportsTemplatePartsMode'] ) {
 		$custom_settings['__unstableHomeTemplate'] = true;
@@ -122,7 +120,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	if ( isset( $_GET['postType'] ) && ! isset( $_GET['postId'] ) ) {
 		$post_type = get_post_type_object( $_GET['postType'] );
 		if ( ! $post_type ) {
-			wp_die( __( 'Invalid post type.' ) );
+			wp_die( __( 'Invalid post type.', 'gutenberg' ) );
 		}
 	}
 
