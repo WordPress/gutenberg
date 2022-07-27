@@ -645,7 +645,7 @@ function wp_style_engine_get_block_supports_styles( $block_styles, $options = ar
 	}
 
 	if ( ! empty( $parsed_styles['classnames'] ) ) {
-		$styles_output['classnames'] = $style_engine->compile_classnames( $parsed_styles['classnames'] );
+		$styles_output['classnames'] = implode( ' ', array_unique( $parsed_styles['classnames'] ) );
 	}
 
 	return array_filter( $styles_output );
