@@ -143,7 +143,7 @@ describe( 'ComboboxControl', () => {
 
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
-		expect( input ).toHaveValue( targetOption.name );
+		expect( input ).toHaveValue( targetOption.label );
 	} );
 
 	it( 'should select the correct option via keypress events', async () => {
@@ -172,7 +172,7 @@ describe( 'ComboboxControl', () => {
 
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
-		expect( input ).toHaveValue( targetOption.name );
+		expect( input ).toHaveValue( targetOption.label );
 	} );
 
 	it( 'should select the correct option from a search', async () => {
@@ -198,7 +198,7 @@ describe( 'ComboboxControl', () => {
 
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
-		expect( input ).toHaveValue( targetOption.name );
+		expect( input ).toHaveValue( targetOption.label );
 	} );
 
 	it( 'should process multiple entries in a single session', async () => {
@@ -263,6 +263,6 @@ describe( 'ComboboxControl', () => {
 
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
-		expect( input ).toHaveValue( targetOption.name );
+		expect( input ).toHaveValue( targetOption.label );
 	} );
 } );
