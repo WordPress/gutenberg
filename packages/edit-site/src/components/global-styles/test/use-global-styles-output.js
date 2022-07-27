@@ -10,6 +10,7 @@ import {
 	getLayoutStyles,
 	getNodesWithSettings,
 	getNodesWithStyles,
+	getBlockSelectors,
 	toCustomProperties,
 	toStyles,
 } from '../use-global-styles-output';
@@ -57,6 +58,11 @@ describe( 'global styles renderer', () => {
 								},
 							},
 						},
+						'core/image': {
+							border: {
+								radius: '9999px',
+							},
+						},
 					},
 					elements: {
 						link: {
@@ -83,6 +89,10 @@ describe( 'global styles renderer', () => {
 			const blockSelectors = {
 				'core/heading': {
 					selector: '.my-heading1, .my-heading2',
+				},
+				'core/image': {
+					selector: '.my-image',
+					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			};
 
@@ -158,6 +168,15 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1 a, .my-heading2 a',
+				},
+				{
+					styles: {
+						border: {
+							radius: '9999px',
+						},
+					},
+					selector: '.my-image',
+					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			] );
 		} );
@@ -430,6 +449,14 @@ describe( 'global styles renderer', () => {
 								},
 							},
 						},
+						'core/image': {
+							color: {
+								text: 'red',
+							},
+							border: {
+								radius: '9999px',
+							},
+						},
 					},
 				},
 			};
@@ -441,12 +468,18 @@ describe( 'global styles renderer', () => {
 				'core/heading': {
 					selector: 'h1,h2,h3,h4,h5,h6',
 				},
+				'core/image': {
+					selector: '.wp-block-image',
+					featureSelectors: {
+						border: '.wp-block-image img, .wp-block-image .wp-crop-area',
+					},
+				},
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
 				'body {margin: 0;}' +
 					'body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
-					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
+					'.wp-block-image img, .wp-block-image .wp-crop-area{border-radius: 9999px }.wp-block-image{color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
@@ -616,6 +649,36 @@ describe( 'global styles renderer', () => {
 			expect( layoutStyles ).toEqual(
 				'.wp-block-group.is-layout-flex { gap: 2em; }'
 			);
+		} );
+	} );
+
+	describe( 'getBlockSelectors', () => {
+		it( 'should return block selectors data', () => {
+			const imageSupports = {
+				__experimentalBorder: {
+					radius: true,
+					__experimentalSelector: 'img, .crop-area',
+				},
+				color: {
+					__experimentalDuotone: 'img',
+				},
+				__experimentalSelector: '.my-image',
+			};
+			const imageBlock = { name: 'core/image', supports: imageSupports };
+			const blockTypes = [ imageBlock ];
+
+			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+				'core/image': {
+					name: imageBlock.name,
+					selector: imageSupports.__experimentalSelector,
+					duotoneSelector: imageSupports.color.__experimentalDuotone,
+					fallbackGapValue: undefined,
+					featureSelectors: {
+						border: '.my-image img, .my-image .crop-area',
+					},
+					hasLayoutSupport: false,
+				},
+			} );
 		} );
 	} );
 } );

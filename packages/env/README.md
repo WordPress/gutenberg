@@ -188,6 +188,14 @@ wp-env start --debug
 	...
 ```
 
+## Using included WordPress PHPUnit test files
+
+Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
+
+### Customizing the `wp-tests-config.php` file
+
+While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
+
 ## Using Xdebug
 
 Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
@@ -511,7 +519,7 @@ SCRIPT_DEBUG: true,
 WP_PHP_BINARY: 'php',
 WP_TESTS_EMAIL: 'admin@example.org',
 WP_TESTS_TITLE: 'Test Blog',
-WP_TESTS_DOMAIN: 'http://localhost',
+WP_TESTS_DOMAIN: 'localhost',
 WP_SITEURL: 'http://localhost',
 WP_HOME: 'http://localhost',
 ```

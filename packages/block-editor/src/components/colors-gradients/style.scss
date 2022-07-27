@@ -1,3 +1,8 @@
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
+
 .block-editor-color-gradient-control {
 	.block-editor-color-gradient-control__color-indicator {
 		margin-bottom: $grid-unit-15;
@@ -18,11 +23,6 @@
 }
 
 .block-editor-panel-color-gradient-settings {
-
-	// Must equal $color-palette-circle-size from:
-	// @wordpress/components/src/circular-option-picker/style.scss
-	$swatch-size: 28px;
-
 	@media screen and (min-width: $break-medium) {
 		.components-circular-option-picker__swatches {
 			display: grid;
@@ -40,10 +40,9 @@
 
 }
 
-.block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
-	width: $sidebar-width;
+.block-editor-panel-color-gradient-settings__dropdown-content {
+	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ); // Ensure the popover perfectly wraps the swatches.
 }
-
 
 .block-editor-panel-color-gradient-settings__color-indicator {
 	// Show a diagonal line (crossed out) for empty swatches.

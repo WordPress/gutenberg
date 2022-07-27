@@ -9,7 +9,7 @@ import { shallow, mount } from 'enzyme';
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
-	it( 'provides the the wrapped component with color values and setter functions as props', () => {
+	it( 'provides the wrapped component with color values and setter functions as props', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );

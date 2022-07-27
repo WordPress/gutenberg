@@ -69,7 +69,3 @@ export const ButtonContentView = styled.div`
 export const separatorActive = css`
 	background: transparent;
 `;
-
-export const medium = css`
-	min-height: ${ CONFIG.controlHeight };
-`;

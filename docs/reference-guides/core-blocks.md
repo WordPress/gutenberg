@@ -177,7 +177,7 @@ An advanced block that allows displaying post comments using different visual co
 -	**Name:** core/comments
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
+-	**Attributes:** legacy, tagName
 
 ## Comments Pagination
 
@@ -484,15 +484,6 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
-
-## Post Comments (deprecated)
-
-This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
-
--	**Name:** core/post-comments
--	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
--	**Attributes:** textAlign
 
 ## Post Comments Count
 

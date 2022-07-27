@@ -344,6 +344,7 @@ function RichTextWrapper(
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
 					anchorRef={ anchorRef }
+					value={ value }
 				/>
 			) }
 			<TagName

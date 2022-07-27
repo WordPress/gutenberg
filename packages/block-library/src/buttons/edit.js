@@ -53,11 +53,7 @@ function ButtonsEdit( { attributes: { layout = {} } } ) {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-		</>
-	);
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

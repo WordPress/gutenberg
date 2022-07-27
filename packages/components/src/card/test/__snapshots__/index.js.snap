@@ -373,7 +373,7 @@ Object {
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -629,7 +629,7 @@ Object {
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -786,15 +786,15 @@ Snapshot Diff:
     </div>
     <div
       aria-hidden="true"
--     class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
-+     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-     class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName em57xhy0"
++     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-o8otup-View-Elevation-sx-Base-elevationClassName em57xhy0"
-+     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-     class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName em57xhy0"
++     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
@@ -829,7 +829,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   opacity: 1;
   left: 0;
   right: 0;
@@ -854,7 +854,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 2px 4px 0 rgba(0 ,0, 0, 0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   opacity: 1;
   left: 0;
   right: 0;

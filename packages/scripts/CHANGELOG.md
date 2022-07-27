@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix the incorrect exit error code when status missing in `webpack` call for `build` and `start` commands ([#42396](https://github.com/WordPress/gutenberg/pull/42396)).
+
 ## 23.3.0 (2022-06-15)
 
 ### Enhancements

@@ -6,8 +6,9 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, rtl } from '../../utils';
+import { COLORS, CONFIG, rtl } from '../../utils';
 import NumberControl from '../../number-control';
+import { BackdropUI } from '../../input-control/styles/input-control-styles';
 import type { SelectSize } from '../types';
 
 // Using `selectSize` instead of `size` to avoid a type conflict with the
@@ -18,21 +19,17 @@ type SelectProps = {
 
 type InputProps = {
 	disableUnits?: boolean;
-	size: SelectSize;
 };
 
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
+
+	/* Target the InputControl's backdrop and make focus styles smoother. */
+	&&& ${ BackdropUI } {
+		transition: box-shadow 0.1s linear;
+	}
 `;
-
-const paddingStyles = ( { disableUnits }: InputProps ) => {
-	if ( disableUnits ) return '';
-
-	return css`
-		${ rtl( { paddingRight: 8 } )() };
-	`;
-};
 
 const arrowStyles = ( { disableUnits }: InputProps ) => {
 	if ( disableUnits ) return '';
@@ -58,7 +55,6 @@ export const ValueInput = styled( NumberControl )`
 			width: 100%;
 
 			${ arrowStyles };
-			${ paddingStyles };
 		}
 	}
 `;
@@ -96,15 +92,21 @@ export const UnitSelect = styled.select< SelectProps >`
 		cursor: pointer;
 		border: 1px solid transparent;
 		height: 100%;
+		/* Removing margin ensures focus styles neatly overlay the wrapper. */
+		margin: 0;
+		transition: box-shadow 0.1s linear, border 0.1s linear;
 
 		&:hover {
 			background-color: ${ COLORS.lightGray[ 300 ] };
 		}
 
 		&:focus {
-			border-color: ${ COLORS.ui.borderFocus };
-			outline: 2px solid transparent;
+			border: 1px solid ${ COLORS.ui.borderFocus };
+			box-shadow: inset 0 0 0 ${ CONFIG.borderWidth }
+				${ COLORS.ui.borderFocus };
 			outline-offset: 0;
+			outline: 2px solid transparent;
+			z-index: 1;
 		}
 
 		&:disabled {

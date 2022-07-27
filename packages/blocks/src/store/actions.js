@@ -15,6 +15,7 @@ import { isValidIcon, normalizeIconObject } from '../api/utils';
 import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 const { error, warn } = window.console;
 
@@ -297,6 +298,22 @@ export function removeBlockVariations( blockName, variationNames ) {
  *
  * @param {string} name Block name.
  *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { setDefaultBlockName } = useDispatch( blocksStore );
+ *
+ *     return (
+ *         <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+ *             { __( 'Set the default block to Heading' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function setDefaultBlockName( name ) {
@@ -355,7 +372,35 @@ export function setGroupingBlockName( name ) {
 /**
  * Returns an action object used to set block categories.
  *
- * @param {Object[]} categories Block categories.
+ * @param {WPBlockCategory[]} categories Block categories.
+ *
+ * @example
+ * ```js
+ * import { store as blocksStore } from '@wordpress/blocks';
+ * import { useSelect, useDispatch } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const blockCategories = useSelect( ( select ) =>
+ *         select( blocksStore ).getCategories(),
+ *         []
+ *     );
+ *
+ *     const { setCategories } = useDispatch( blocksStore )
+ *
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 setCategories( [
+ *                     ...blockCategories,
+ *                     { title: 'Custom Category', slug: 'custom-category' },
+ *                 ] )
+ *             }
+ *         >
+ *             { __( 'Add a new custom block category' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */

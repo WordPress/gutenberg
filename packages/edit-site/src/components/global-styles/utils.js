@@ -255,3 +255,34 @@ export function getValueFromVariable( features, blockName, variable ) {
 	}
 	return variable;
 }
+
+/**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+export function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
+}
