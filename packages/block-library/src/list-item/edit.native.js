@@ -37,6 +37,7 @@ export default function ListItemEdit( {
 		blockIndex,
 		hasInnerBlocks,
 		indentationLevel,
+		isParentList,
 		numberOfListItems,
 		ordered,
 		reversed,
@@ -50,6 +51,9 @@ export default function ListItemEdit( {
 				getBlockParentsByBlockName,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
+			const isFirstParentList =
+				getBlockParentsByBlockName( clientId, 'core/list', true )
+					.length === 1;
 			const currentIdentationLevel = getBlockParentsByBlockName(
 				clientId,
 				'core/list-item',
@@ -70,10 +74,11 @@ export default function ListItemEdit( {
 				blockIndex: currentBlockIndex,
 				hasInnerBlocks: blockWithInnerBlocks,
 				indentationLevel: currentIdentationLevel,
+				isParentList: isFirstParentList,
+				numberOfListItems: totalListItems,
 				ordered: isOrdered,
 				reversed: isReversed,
 				start: startValue,
-				numberOfListItems: totalListItems,
 			};
 		},
 		[ clientId ]
@@ -86,11 +91,15 @@ export default function ListItemEdit( {
 		allowedBlocks: [ 'core/list' ],
 	} );
 
+	const stylesParentList = [
+		isParentList && styles[ 'wp-block-list-item__list-item-parent' ],
+	];
+
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
 
 	return (
-		<>
+		<View style={ stylesParentList }>
 			<View style={ styles[ 'wp-block-list-item__list-item' ] }>
 				<View style={ styles[ 'wp-block-list-item__list-item-icon' ] }>
 					<ListStyleType
@@ -130,6 +139,6 @@ export default function ListItemEdit( {
 			<BlockControls group="block">
 				<IndentUI clientId={ clientId } />
 			</BlockControls>
-		</>
+		</View>
 	);
 }
