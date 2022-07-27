@@ -17,31 +17,8 @@ export default function BoxInputControls( {
 		: ALL_SIDES;
 
 	const createHandleOnChange = ( side ) => ( next ) => {
-		// const { altKey } = event;
-		const altKey = null;
 		const nextValues = { ...values };
 		nextValues[ side ] = next;
-
-		/**
-		 * Supports changing pair sides. For example, holding the ALT key
-		 * when changing the TOP will also update BOTTOM.
-		 */
-		if ( altKey ) {
-			switch ( side ) {
-				case 'top':
-					nextValues.bottom = next;
-					break;
-				case 'bottom':
-					nextValues.top = next;
-					break;
-				case 'left':
-					nextValues.right = next;
-					break;
-				case 'right':
-					nextValues.left = next;
-					break;
-			}
-		}
 
 		onChange( nextValues );
 	};
