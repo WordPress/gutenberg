@@ -24,7 +24,7 @@ interface EventPayload {
 	event?: SyntheticEvent;
 }
 
-interface Action< Type, ExtraPayload = {} > {
+export interface Action< Type = string, ExtraPayload = {} > {
 	type: Type;
 	payload: EventPayload & ExtraPayload;
 }

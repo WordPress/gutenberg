@@ -50,7 +50,7 @@ function mergeInitialState(
  */
 function inputControlStateReducer(
 	composedStateReducers: StateReducer
-): StateReducer {
+): StateReducer< actions.ControlAction > {
 	return ( state, action ) => {
 		const nextState = { ...state };
 
@@ -151,7 +151,7 @@ export function useInputControlStateReducer(
 	initialState: Partial< InputState > = initialInputControlState,
 	onChangeHandler: InputChangeCallback
 ) {
-	const [ state, dispatch ] = useReducer< StateReducer >(
+	const [ state, dispatch ] = useReducer(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
