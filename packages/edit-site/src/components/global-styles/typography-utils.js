@@ -160,7 +160,7 @@ export function getComputedFluidTypographyValue( {
  * @param {string}           rawValue Raw size value from theme.json.
  * @param {Object|undefined} options  Calculation options.
  *
- * @return {{ unit: string, value: number }|null} An an object consisting of `'value'` and `'unit'` properties.
+ * @return {{ unit: string, value: number }|null} An object consisting of `'value'` and `'unit'` properties.
  */
 export function getTypographyValueAndUnit( rawValue, options = {} ) {
 	if ( ! rawValue ) {
