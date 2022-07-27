@@ -105,6 +105,10 @@ export const Container = styled.div< ContainerProps >`
 	${ containerWidthStyles }
 `;
 
+export const TooltipWrapper = styled.div`
+	width: 100%;
+`;
+
 type InputProps = {
 	__next36pxDefaultSize?: boolean;
 	disabled?: boolean;

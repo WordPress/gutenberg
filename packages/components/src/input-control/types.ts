@@ -67,6 +67,23 @@ export type InputChangeCallback<
 	P = {}
 > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
 
+export type WithTooltipProps = {
+	/**
+	 * React children.
+	 */
+	children: ReactNode;
+	/**
+	 * Whether or not to wrap children in a Tooltip component.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
+	/**
+	 * Text to display within the Tooltip component.
+	 */
+	text?: string;
+};
+
 export interface InputFieldProps extends BaseProps {
 	/**
 	 * Determines the drag axis.
@@ -105,6 +122,12 @@ export interface InputFieldProps extends BaseProps {
 	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 	setIsFocused: ( isFocused: boolean ) => void;
+	/**
+	 * Whether to wrap input field in a Tooltip component.
+	 *
+	 * @default false
+	 */
+	showTooltip?: boolean;
 	stateReducer?: StateReducer;
 	/**
 	 * The current value of the input.

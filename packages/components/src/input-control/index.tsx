@@ -15,7 +15,9 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import InputBase from './input-base';
 import InputField from './input-field';
-import type { InputControlProps } from './types';
+import Tooltip from '../tooltip';
+import { TooltipWrapper } from './styles/input-control-styles';
+import type { InputControlProps, WithTooltipProps } from './types';
 import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
 
@@ -27,6 +29,18 @@ function useUniqueId( idProp?: string ) {
 
 	return idProp || id;
 }
+
+const WithTooltip = ( { showTooltip, text, children }: WithTooltipProps ) => {
+	if ( showTooltip && text ) {
+		return (
+			<Tooltip text={ text } position="top center">
+				<TooltipWrapper>{ children }</TooltipWrapper>
+			</Tooltip>
+		);
+	}
+
+	return <>{ children }</>;
+};
 
 export function UnforwardedInputControl(
 	{
@@ -44,6 +58,7 @@ export function UnforwardedInputControl(
 		onValidate = noop,
 		onKeyDown = noop,
 		prefix,
+		showTooltip = false,
 		size = 'default',
 		suffix,
 		value,
@@ -62,6 +77,8 @@ export function UnforwardedInputControl(
 		onChange,
 	} );
 
+	const tooltipText = typeof label === 'string' ? label : undefined;
+
 	return (
 		<InputBase
 			__next36pxDefaultSize={ __next36pxDefaultSize }
@@ -79,24 +96,26 @@ export function UnforwardedInputControl(
 			size={ size }
 			suffix={ suffix }
 		>
-			<InputField
-				{ ...props }
-				__next36pxDefaultSize={ __next36pxDefaultSize }
-				className="components-input-control__input"
-				disabled={ disabled }
-				id={ id }
-				isFocused={ isFocused }
-				isPressEnterToChange={ isPressEnterToChange }
-				onKeyDown={ onKeyDown }
-				onValidate={ onValidate }
-				paddingInlineStart={ prefix ? space( 2 ) : undefined }
-				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
-				ref={ ref }
-				setIsFocused={ setIsFocused }
-				size={ size }
-				stateReducer={ stateReducer }
-				{ ...draftHookProps }
-			/>
+			<WithTooltip showTooltip={ showTooltip } text={ tooltipText }>
+				<InputField
+					{ ...props }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					className="components-input-control__input"
+					disabled={ disabled }
+					id={ id }
+					isFocused={ isFocused }
+					isPressEnterToChange={ isPressEnterToChange }
+					onKeyDown={ onKeyDown }
+					onValidate={ onValidate }
+					paddingInlineStart={ prefix ? space( 2 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					ref={ ref }
+					setIsFocused={ setIsFocused }
+					size={ size }
+					stateReducer={ stateReducer }
+					{ ...draftHookProps }
+				/>
+			</WithTooltip>
 		</InputBase>
 	);
 }
