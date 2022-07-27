@@ -62,6 +62,10 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	$output = ob_get_clean();
 	$post   = $post_before;
 
+	if ( empty( $output ) ) {
+		return '';
+	}
+
 	$classnames = array();
 	// Adds the old class name for styles' backwards compatibility.
 	if ( isset( $attributes['legacy'] ) ) {
