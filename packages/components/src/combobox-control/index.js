@@ -283,7 +283,7 @@ function ComboboxControl( {
 							renderSuggestion={
 								typeof renderOption === 'function'
 									? ( { suggestion } ) => {
-											renderOption( {
+											return renderOption( {
 												option: suggestion,
 											} );
 									  }
