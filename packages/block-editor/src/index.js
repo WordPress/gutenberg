@@ -17,3 +17,4 @@ export * from './elements';
 export * from './utils';
 export { storeConfig, store } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';
+export { parse as __internalCssParser } from './utils/transform-styles/ast'
