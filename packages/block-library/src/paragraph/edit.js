@@ -76,8 +76,6 @@ function ParagraphBlock( {
 	let helpText;
 	if ( align === ( isRTL() ? 'left' : 'right' ) || align === 'center' ) {
 		helpText = __( 'Aligned text can not have a drop cap.' );
-		// This attribute change also makes sure that the option is toggled off, not only disabled.
-		setAttributes( { dropCap: undefined } );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
 	} else {
@@ -113,7 +111,12 @@ function ParagraphBlock( {
 					>
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
-							checked={ !! dropCap }
+							checked={
+								align === ( isRTL() ? 'left' : 'right' ) ||
+								align === 'center'
+									? false
+									: dropCap
+							}
 							onChange={ () =>
 								setAttributes( { dropCap: ! dropCap } )
 							}
