@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.16.0 (2022-07-27)
+
 ### Bug Fix
 
 -   Context System: Stop explicitly setting `undefined` to the `children` prop. This fixes a bug where `Icon` could not be correctly rendered via the `as` prop of a context-connected component ([#42686](https://github.com/WordPress/gutenberg/pull/42686)).

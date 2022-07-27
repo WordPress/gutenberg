@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.0.0 (2022-07-27)
+
 ### Breaking Changes
 -   Removed the `WP_PHPUNIT__TESTS_CONFIG` environment variable from the `phpunit` container. **This removes automatic support for the `wp-phpunit/wp-phpunit` Composer package. To continue using the package, set the following two environment variables in your `phpunit.xml` file or similar: `WP_TESTS_DIR=""` and `WP_PHPUNIT__TESTS_CONFIG="/wordpress-phpunit/wp-tests-config.php"`.**
 -   Removed the generated `/var/www/html/phpunit-wp-config.php` file from the environment.
