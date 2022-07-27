@@ -74,7 +74,7 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
-						if ( valueKey ) {
+						if ( valueKey && ! valueFunc ) {
 							declarations.push(
 								`--wp--preset--${ cssVarInfix }--${ kebabCase(
 									value.slug
