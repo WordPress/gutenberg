@@ -216,6 +216,32 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
+	it( 'should render aria-live announcement upon selection', async () => {
+		const user = setupUser();
+		const targetOption = setTargetOption( 9 );
+		const onChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options
+		await user.tab();
+
+		// Type enough characters to ensure a predictable search result
+		await user.keyboard( targetOption.searchString );
+
+		// Pressing Enter/Return selects the currently focused option
+		await user.keyboard( '{Enter}' );
+
+		const itemSelectedAnnouncement = screen.getByText( 'Item selected.' );
+
+		expect( itemSelectedAnnouncement ).toBeInTheDocument();
+	} );
+
 	it( 'should process multiple entries in a single session', async () => {
 		const user = setupUser();
 		const unmatchedString = 'Mordor';
