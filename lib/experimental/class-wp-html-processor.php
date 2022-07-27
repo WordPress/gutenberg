@@ -143,7 +143,7 @@ class WP_HTML_Processor {
 	}
 
 
-	public function add_attribute( $name, $value ) {
+	private function add_attribute( $name, $value ) {
 		$tag_name = $this->scanner->tag_name;
 		$insert_at = $tag_name->start + $tag_name->length;
 
@@ -199,14 +199,14 @@ class WP_HTML_Processor {
 	}
 
 
-	public static function serialize_attribute( $name, $value ) {
+	private static function serialize_attribute( $name, $value ) {
 		$value = str_replace( '"', "&quot;", $value );
 
 		return "{$name}=\"{$value}\"";
 	}
 
 
-	public function commit_class_changes() {
+	private function commit_class_changes() {
 		if ( empty( $this->class_changes ) ) {
 			return;
 		}
@@ -250,7 +250,7 @@ class WP_HTML_Processor {
 	}
 
 
-	public function apply() {
+	private function apply() {
 		$document = $this->scanner->document;
 
 		$this->commit_class_changes();
@@ -612,7 +612,7 @@ class WP_HTML_Scanner {
 	/**
 	 * @return WP_HTML_Scanner_Token|false
 	 */
-	public function find_next_tag() {
+	private function find_next_tag() {
 		// @TODO: Handle <DOCTYPE>
 		if ( 1 !== preg_match(
 			/*
@@ -646,7 +646,7 @@ class WP_HTML_Scanner {
 	}
 
 
-	public function find_next_attribute() {
+	private function find_next_attribute() {
 		// Find the attribute name
 		if ( 1 !== preg_match(
 			'~[\t\x{0a}\x{0c} ]*(?P<NAME>=?[^=/>\t\x{0A}\x{0C} ]*)~Smiu',
@@ -706,11 +706,5 @@ class WP_HTML_Scanner {
 		$this->start_at = $value_start_at + strlen( $full_match );
 
 		return new WP_HTML_Attribute_Token( $name_token, $value_token, $name_token->start, $value_start_at + strlen( $full_match ) );
-	}
-
-	public function reset() {
-		$this->tag_name = null;
-		$this->attributes = array();
-		$this->tag_start = null;
 	}
 }
