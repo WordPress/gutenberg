@@ -1,4 +1,6 @@
+/* Styles for backwards compatibility with the legacy `post-comments` block */
 .wp-block-post-comments {
+
 	/* utility classes */
 	.alignleft {
 		float: left;
@@ -7,6 +9,7 @@
 	.alignright {
 		float: right;
 	}
+
 	/* end utility classes */
 
 	.navigation {
@@ -62,9 +65,11 @@
 	.comment-meta {
 		font-size: 0.875em;
 		line-height: 1.5;
+
 		b {
 			font-weight: normal;
 		}
+
 		.comment-awaiting-moderation {
 			margin-top: 1em;
 			margin-bottom: 1em;
@@ -87,6 +92,7 @@
 	}
 
 	.comment-form {
+
 		textarea,
 		input:not([type="submit"]):not([type="checkbox"]) {
 			display: block;
@@ -106,6 +112,7 @@
 
 	.comment-reply-title {
 		margin-bottom: 0;
+
 		:where(small) {
 			font-size: var(--wp--preset--font-size--medium, smaller);
 			margin-left: 0.5em;

@@ -68,6 +68,8 @@ public class Gutenberg: UIResponder {
 
         initialProps["postType"] = dataSource.gutenbergPostType()
 
+        initialProps["hostAppNamespace"] = dataSource.gutenbergHostAppNamespace()
+
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
@@ -206,6 +208,10 @@ public class Gutenberg: UIResponder {
 
         if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
             settingsUpdates["quoteBlockV2"] = quoteBlockV2
+        }
+
+        if let listBlockV2 = editorSettings?.listBlockV2 {
+            settingsUpdates["listBlockV2"] = listBlockV2
         }
 
         if let rawStyles = editorSettings?.rawStyles {

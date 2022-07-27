@@ -36,7 +36,7 @@ This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version,
 
 #### View the release draft
 
-As soon as the workflow has finished, you'll find the release draft under https://github.com/WordPress/gutenberg/releases. The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).
+As soon as the workflow has finished, you'll find the release draft under [https://github.com/WordPress/gutenberg/releases](https://github.com/WordPress/gutenberg/releases). The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).
 
 The changelog draft will be at least partially pre-organized (based on GitHub label) into sections and within those into "features". Take some time to read the generated notes and then edit them to ensure legibility and accuracy.
 
