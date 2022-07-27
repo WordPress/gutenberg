@@ -203,23 +203,19 @@ class WP_HTML_Walker {
 			'~
 			# Preceeding whitespace:
 			[\x{09}\x{0a}\x{0c}\x{20} ]*
-			(?>
-				# Either a tag end, or an attribute:
-				(?P<CLOSER>\/?>)
+			# The next attribute:
+			(?P<NAME>(?>
+				# Attribute names starting with an equals sign (yes, this is valid)
+				=?[^=\/>\x{09}\x{0a}\x{0c}\x{20}]*
 				|
-				(?P<NAME>(?:
-					# Attribute names starting with an equals sign (yes, this is valid)
-					=?[^=\/>\x{09}\x{0a}\x{0c}\x{20}]*
-					|
-					# Attribute names starting with anything other than an equals sign:
-					[^=\/>\x{09}\x{0a}\x{0c}\x{20}]+
-				))
-			)
+				# Attribute names starting with anything other than an equals sign:
+				[^=\/>\x{09}\x{0a}\x{0c}\x{20}]+
+			))
 			~miux'
 		);
 
 		// No attribute, just tag closer.
-		if ( ! $name_match || ! empty( $name_match['CLOSER'][0] ) || empty( $name_match['NAME'][0] ) ) {
+		if ( empty( $name_match['NAME'][0] ) ) {
 			return false;
 		}
 
