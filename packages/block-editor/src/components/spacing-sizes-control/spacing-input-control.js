@@ -192,6 +192,10 @@ export default function SpacingInputControl( {
 				! showCustomValueControl &&
 				! showAllSidesCustomValueControl && (
 					<RangeControl
+						className={ classnames( {
+							'components-spacing-sizes-control__range-control-all':
+								side === 'all',
+						} ) }
 						value={ currentValue }
 						onChange={ ( newSize ) =>
 							onChange( getNewPresetValue( newSize ) )

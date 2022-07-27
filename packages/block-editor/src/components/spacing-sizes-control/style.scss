@@ -20,6 +20,9 @@
 			margin-top: 2px;
 		}
 	}
+	.components-spacing-sizes-control__range-control-all {
+		margin-top: 2px;
+	}
 
 	.components-range-control__wrapper {
 		margin-bottom: 0;
@@ -55,7 +58,10 @@
 
 	.components-spacing-sizes-control__custom-value-control {
 		&.components-spacing-sizes-control__custom-value-control-all {
-			margin-top: 16px;
+			margin-top: 8px;
+			.components-range-control {
+				margin-top: 0;
+			}
 		}
 		&.components-spacing-sizes-control__custom-value-control-single {
 			margin-bottom: $grid-unit-10;
@@ -102,7 +108,7 @@
 	}
 
 	.components-spacing-sizes-control__custom-select-control-all {
-		margin-top: 18px;
+		margin-top: 12px;
 		margin-bottom: 2px;
 	}
 
