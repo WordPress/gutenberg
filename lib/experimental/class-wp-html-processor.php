@@ -122,11 +122,13 @@ class WP_HTML_Processor {
 	 *
 	 * @var array<WP_Text_Replacement>
 	 */
-	public $replacements = array();
+	private $replacements;
+	private $r_index = 0;
 
 
 	public function __construct( $input ) {
 		$this->scanner = new WP_HTML_Scanner( $input );
+		$this->replacements = new SplFixedArray(20);
 	}
 
 
@@ -273,9 +275,16 @@ class WP_HTML_Processor {
 	 * @param WP_Text_Replacement $replacement The new lexical replacement to register on the input document.
 	 */
 	private function insert_replacement( WP_Text_Replacement $replacement ) {
-		$this->replacements[] = $replacement;
+		$replacements = $this->replacements;
 
-		$i = $c = count( $this->replacements ) - 1;
+		$old_size = $replacements->getSize();
+		if ( $this->r_index === $old_size ) {
+			$new_size = floor( $old_size * 1.4 );
+			$replacements->setSize( $new_size );
+		}
+
+		$this->replacements[ $this->r_index++ ] = $replacement;
+		$i = $c = $this->r_index - 1;
 		while ( $i > 0 && $this->replacements[ $i ]->start < $this->replacements[ $i - 1 ]->start ) {
 			$this->replacements[ $i ] = $this->replacements[ $i - 1 ];
 			$i--;
@@ -298,7 +307,9 @@ class WP_HTML_Processor {
 
 		$output = '';
 		$at = 0;
-		foreach ( $this->replacements as $replacement ) {
+		for ( $i = 0; $i < $this->r_index; $i++ ) {
+			$replacement = $this->replacements[ $i ];
+
 			if ( $replacement->start > $at ) {
 				$output .= substr( $document, $at, $replacement->start - $at );
 			}
