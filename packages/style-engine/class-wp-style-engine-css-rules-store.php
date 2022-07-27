@@ -58,6 +58,15 @@ class WP_Style_Engine_CSS_Rules_Store {
 	}
 
 	/**
+	 * Clears all stores from static::$stores.
+	 *
+	 * @return void
+	 */
+	public static function remove_all_stores() {
+		static::$stores = array();
+	}
+
+	/**
 	 * Get an array of all rules.
 	 *
 	 * @return WP_Style_Engine_CSS_Rule[]
