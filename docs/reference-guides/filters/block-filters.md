@@ -95,13 +95,13 @@ _Example:_
 wp.hooks.addFilter(
 	'blocks.migrateBlockType',
 	'my-plugin/book-update-block-name',
-	function ( [ blockType, blockAttributes ] ) {
+	function ( [ name, attributes ] ) {
 		// Convert 'my-plugin/book-obsolete-block-name' block in existing content to 'my-plugin/book'.
-		if ( 'my-plugin/book-obsolete-block-name' === blockType ) {
-			blockType = 'my-plugin/book';		
+		if ( 'my-plugin/book-obsolete-block-name' === name ) {
+			name = 'my-plugin/book';		
 		}
 
-		return [ blockType, blockAttributes ];
+		return [ name, attributes ];
 	}
 );
 ```
