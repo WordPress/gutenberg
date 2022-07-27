@@ -109,17 +109,18 @@ class WP_HTML_Processor {
 	 * <code>
 	 *     // Replace an attribute stored with a new value, indices
 	 *     // sourced from the lazily-parsed HTML recognizer.
-	 *     list( $start, $end, $old_value ) = $attributes['src'];
-	 *     $modifications[] = array( $start, $end, get_the_post_thumbnail_url() );
+	 *     $start = $attributes['src']->start;
+	 *     $end   = $attributes['src']->end;
+	 *     $modifications[] = new WP_Text_Replacement( $start, $end, get_the_post_thumbnail_url() );
 	 *
 	 *     // Correspondingly, something like this
 	 *     // will appear in the replacements array.
 	 *     $replacements = array(
-	 *         array( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
+	 *         WP_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
 	 *     );
 	 * </code>
 	 *
-	 * @var array<int|string>
+	 * @var array<WP_Text_Replacement>
 	 */
 	public $replacements = array();
 
@@ -147,7 +148,7 @@ class WP_HTML_Processor {
 		$tag_name = $this->scanner->tag_name;
 		$insert_at = $tag_name->start + $tag_name->length;
 
-		$this->replacements[] = array(
+		$this->replacements[] = new WP_Text_Replacement(
 			$insert_at,
 			$insert_at,
 			' ' . self::serialize_attribute( $name, $value )
@@ -167,10 +168,9 @@ class WP_HTML_Processor {
 			return $this->add_attribute( $name, $value );
 		}
 
-		/** @var WP_HTML_Attribute_Token $existing */
 		$existing = $this->scanner->attributes[ $name ];
 
-		$this->replacements[] = array(
+		$this->replacements[] = new WP_Text_Replacement(
 			$existing->attribute_start,
 			$existing->attribute_end,
 			self::serialize_attribute( $name, $value )
@@ -188,7 +188,6 @@ class WP_HTML_Processor {
 			return $this;
 		}
 
-		/** @var WP_HTML_Attribute_Token $existing */
 		$existing = $this->scanner->attributes[ $name ];
 
 		$this->replacements[] = array(
@@ -266,20 +265,18 @@ class WP_HTML_Processor {
 		 * linearly and in a single pass.
 		 */
 		usort( $this->replacements, static function ( $a, $b ) {
-			return $a[0] - $b[0];
+			return $a->start - $b->start;
 		} );
 
 		$output = '';
 		$at = 0;
 		foreach ( $this->replacements as $replacement ) {
-			list( $start, $end, $text ) = $replacement;
-
-			if ( $start > $at ) {
-				$output .= substr( $document, $at, $start - $at );
+			if ( $replacement->start > $at ) {
+				$output .= substr( $document, $at, $replacement->start - $at );
 			}
 
-			$output .= $text;
-			$at = $end;
+			$output .= $replacement->text;
+			$at = $replacement->end;
 		}
 
 		$output .= substr( $document, $at );
@@ -289,6 +286,24 @@ class WP_HTML_Processor {
 
 	public function __toString() {
 		return $this->apply();
+	}
+}
+
+
+class WP_Text_Replacement {
+	/** @var int Byte offset into document where replacement span begins. */
+	public $start;
+
+	/** @var int Byte offset into document where replacement span ends. */
+	public $end;
+
+	/** @var string Span of text to insert in document to replace existing content from start to end. */
+	public $text;
+
+	public function __construct( $start, $end, $text ) {
+		$this->start = $start;
+		$this->end   = $end;
+		$this->text  = $text;
 	}
 }
 
