@@ -162,6 +162,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'mobile' ),
 				),
 
+				'__experimentalEnableListBlockV2'        => array(
+					'description' => __( 'Whether the V2 of the list block that uses inner blocks should be enabled.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'mobile' ),
+				),
+
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
