@@ -87,10 +87,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 	 *
 	 * @since 13.7.2
 	 *
-	 * @param {Array} $data      Two dimmensional array containing the block name and attributes.
+	 * @param {Array} $data Two dimmensional array containing the block name and attributes.
 	 */
-	return applyFilters( 'blocks.migrateBlockType', [
-		name,
-		newAttributes,
-	] );
+	return applyFilters( 'blocks.migrateBlockType', [ name, newAttributes ] );
 }
