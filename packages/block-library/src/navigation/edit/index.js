@@ -389,10 +389,10 @@ function Navigation( {
 		name: 'block-library/core/navigation/classic-menu-conversion/error',
 	} );
 
-	function handleUpdateMenu( menuId ) {
+	const handleUpdateMenu = ( menuId ) => {
 		setRef( menuId );
 		selectBlock( clientId );
-	}
+	};
 
 	useEffect( () => {
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
