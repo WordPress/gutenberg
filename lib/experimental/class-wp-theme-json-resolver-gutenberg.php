@@ -17,6 +17,18 @@
  */
 class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 	/**
+	 * Container for data coming from the theme.
+	 *
+	 * This needs to be defined on the Gutenberg version of this file
+	 * otherwise calls to the core version of this file end up caching
+	 * an old version of the theme.json.
+	 *
+	 * @since 5.8.0
+	 * @var WP_Theme_JSON
+	 */
+	protected static $theme = null;
+
+	/**
 	 * Returns the theme's data.
 	 *
 	 * Data from theme.json will be backfilled from existing
