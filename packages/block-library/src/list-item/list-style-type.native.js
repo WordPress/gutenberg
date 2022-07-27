@@ -102,7 +102,7 @@ export default function ListStyleType( {
 	);
 	const defaultColor = style?.baseColors?.color?.text
 		? style.baseColors.color.text
-		: styles[ 'wp-block-list-item__list-item' ].color;
+		: styles[ 'wp-block-list-item__list-item--default' ].color;
 	const color = style?.color ? style.color : defaultColor;
 
 	if ( ordered ) {
