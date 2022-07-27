@@ -157,7 +157,10 @@ export function DropZoneComponent( {
 				exit={ disableMotion ? 'show' : 'exit' }
 				className="components-drop-zone__content"
 			>
-				<motion.div variants={ foreground }>
+				<motion.div
+					variants={ foreground }
+					className="components-drop-zone__content-foreground"
+				>
 					<Icon
 						icon={ upload }
 						className="components-drop-zone__content-icon"

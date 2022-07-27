@@ -17,3 +17,11 @@
 		}
 	}
 }
+
+.components-popover.wp-block-paragraph__drop_zone {
+	.components-popover__content {
+		border: none;
+		outline: none;
+		box-shadow: none;
+	}
+}

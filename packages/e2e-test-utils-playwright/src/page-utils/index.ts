@@ -6,6 +6,7 @@ import type { Browser, Page, BrowserContext } from '@playwright/test';
 /**
  * Internal dependencies
  */
+import { dragFiles } from './drag-files';
 import { isCurrentURL } from './is-current-url';
 import {
 	setClipboardData,
@@ -29,6 +30,7 @@ class PageUtils {
 		this.browser = this.context.browser()!;
 	}
 
+	dragFiles = dragFiles.bind( this );
 	isCurrentURL = isCurrentURL.bind( this );
 	pressKeyTimes = pressKeyTimes.bind( this );
 	pressKeyWithModifier = pressKeyWithModifier.bind( this );
