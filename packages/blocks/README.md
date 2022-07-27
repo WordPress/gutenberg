@@ -808,6 +808,20 @@ _Parameters_
 
 Assigns the default block name.
 
+_Usage_
+
+```js
+import { setDefaultBlockName } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _name_ `string`: Block name.
@@ -823,6 +837,20 @@ _Parameters_
 ### setGroupingBlockName
 
 Assigns name of block for handling block grouping interactions.
+
+_Usage_
+
+```js
+import { setGroupingBlockName } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+			{ __( 'Set the default block to Heading' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

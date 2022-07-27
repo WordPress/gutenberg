@@ -477,6 +477,20 @@ export function getUnregisteredTypeHandlerName() {
  * Assigns the default block name.
  *
  * @param {string} name Block name.
+ *
+ * @example
+ * ```js
+ * import { setDefaultBlockName } from '@wordpress/blocks';
+ *
+ * const ExampleComponent = () => {
+ *
+ *     return (
+ *         <Button onClick={ () => setDefaultBlockName( 'core/heading' ) }>
+ *             { __( 'Set the default block to Heading' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export function setDefaultBlockName( name ) {
 	dispatch( blocksStore ).setDefaultBlockName( name );
@@ -486,6 +500,20 @@ export function setDefaultBlockName( name ) {
  * Assigns name of block for handling block grouping interactions.
  *
  * @param {string} name Block name.
+ *
+ * @example
+ * ```js
+ * import { setGroupingBlockName } from '@wordpress/blocks';
+ *
+ * const ExampleComponent = () => {
+ *
+ *     return (
+ *         <Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
+ *             { __( 'Set the default block to Heading' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export function setGroupingBlockName( name ) {
 	dispatch( blocksStore ).setGroupingBlockName( name );
