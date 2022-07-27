@@ -173,3 +173,5 @@ export default function BoxControl( {
 		</Root>
 	);
 }
+
+export { applyValueToSides } from './utils';
