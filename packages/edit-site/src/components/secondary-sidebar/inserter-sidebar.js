@@ -10,7 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,11 +30,7 @@ export default function InserterSidebar() {
 		onClose: () => setIsInserterOpened( false ),
 		focusOnMount: null,
 	} );
-
-	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
+	const libraryRef = useCallback( ( node ) => node?.focusSearch(), [] );
 
 	return (
 		<div
