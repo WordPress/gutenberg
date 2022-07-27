@@ -41,7 +41,7 @@ function BlockTypesList( {
 							) }
 							onSelect={ onSelect }
 							onHover={ onHover }
-							isDraggable={ isDraggable && !item.isDisabled }
+							isDraggable={ isDraggable && ! item.isDisabled }
 							isFirst={ i === 0 && j === 0 }
 						/>
 					) ) }
