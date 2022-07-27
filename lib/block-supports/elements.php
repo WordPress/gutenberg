@@ -104,7 +104,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$class_name        = gutenberg_get_elements_class_name( $block );
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	gutenberg_style_engine_get_block_supports_styles(
+	gutenberg_style_engine_get_styles(
 		$link_block_styles,
 		array(
 			'selector' => ".$class_name a",
