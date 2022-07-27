@@ -753,7 +753,9 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			*/
 			if ( isset( $settings['layout']['contentSize'] ) && $settings['layout']['contentSize'] || isset( $settings['layout']['wideSize'] ) && $settings['layout']['wideSize'] ) {
 				$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+				$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 				$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+				$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
 				$block_rules .= '--wp--style--global--content-size: ' . $content_size . ';';
 				$block_rules .= '--wp--style--global--wide-size: ' . $wide_size . ';';
 			}
