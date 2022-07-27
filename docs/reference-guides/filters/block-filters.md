@@ -81,7 +81,7 @@ wp.hooks.addFilter(
 
 The following filters are available to change the behavior of blocks while editing in the block editor.
 
-### `blocks.convertLegacyBlockNameAndAttributes`
+### `blocks.migrateBlockType`
 
 Filter the name and/or attributes of the block while the parsing process.
 Use this hook as an opportunity to change the name and/or attributes of the block.
@@ -93,7 +93,7 @@ _Example:_
 
 ```js
 wp.hooks.addFilter(
-	'blocks.convertLegacyBlockNameAndAttributes',
+	'blocks.migrateBlockType',
 	'my-plugin/book-update-block-name',
 	function ( [ blockType, blockAttributes ] ) {
 		// Convert 'my-plugin/book-obsolete-block-name' block in existing content to 'my-plugin/book'.
