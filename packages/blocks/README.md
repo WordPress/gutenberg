@@ -685,6 +685,25 @@ _Returns_
 
 Registers a new block collection to group blocks in the same namespace in the inserter.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockCollection, registerBlockType } from '@wordpress/blocks';
+
+// Register the collection.
+registerBlockCollection( 'my-collection', {
+	title: __( 'Custom Collection' ),
+} );
+
+// Register a block in the same namespace to add it to the collection.
+registerBlockType( 'my-collection/block-name', {
+	title: __( 'My First Block' ),
+	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+	save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+} );
+```
+
 _Parameters_
 
 -   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
@@ -872,6 +891,23 @@ _Parameters_
 ### unregisterBlockType
 
 Unregisters a block.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockType } from '@wordpress/blocks';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => unregisterBlockType( 'my-collection/block-name' ) }
+		>
+			{ __( 'Unregister my custom block.' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
