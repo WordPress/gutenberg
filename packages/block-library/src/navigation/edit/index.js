@@ -189,8 +189,12 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
-		hasSubmenus,
+		innerBlocks,
 	} = useInnerBlocks( clientId );
+
+	const hasSubmenus = !! innerBlocks.find(
+		( block ) => block.name === 'core/navigation-submenu'
+	);
 
 	const {
 		replaceInnerBlocks,

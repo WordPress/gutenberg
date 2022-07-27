@@ -17,19 +17,17 @@ export function useInnerBlocks( clientId ) {
 			// introduce a selector like `getUncontrolledInnerBlocks`, just in
 			// case `getBlock` is fixed.
 			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
+
 			const _hasUncontrolledInnerBlocks =
 				!! _uncontrolledInnerBlocks?.length;
 			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
 				? EMPTY_ARRAY
 				: getBlocks( clientId );
-			const innerBlocks = _hasUncontrolledInnerBlocks
-				? _uncontrolledInnerBlocks
-				: _controlledInnerBlocks;
 
 			return {
-				hasSubmenus: !! innerBlocks.find(
-					( block ) => block.name === 'core/navigation-submenu'
-				),
+				innerBlocks: _hasUncontrolledInnerBlocks
+					? _uncontrolledInnerBlocks
+					: _controlledInnerBlocks,
 				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
 				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
 				controlledInnerBlocks: _controlledInnerBlocks,
