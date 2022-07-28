@@ -1,5 +1,6 @@
 .wp-block-list-item__list-item-parent {
-	margin-left: $block-edge-to-content;
+	margin-left: $solid-border-space;
+	margin-right: $solid-border-space;
 }
 
 .wp-block-list-item__nested-blocks {
