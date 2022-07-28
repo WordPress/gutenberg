@@ -155,11 +155,22 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * @param array $query Query.
+	 * Finds the next tag matching the $query.
 	 *
-	 * @TODO: How to document the query here without copying and pasting the docstring from WP_Tag_Find_Descriptor?
-	 * @return WP_HTML_Walker|false
-	 * @see WP_Tag_Find_Descriptor::parse.
+	 * @param array|string $query {
+	 *     Which tag name to find, having which class, etc.
+	 *
+	 * @type string|null $tag_name Which tag to find, or `null` for "any tag."
+	 * @type int|null $match_offset Find the Nth tag matching all search criteria.
+	 *                                   0 for "first" tag, 2 for "third," etc.
+	 *                                   Defaults to first tag.
+	 * @type string|null $class_name Tag must contain this whole class name to match.
+	 * @type array<string|callable>  Tag must contain data-attribute of given name and optionally a given
+	 *                                   value, or a given predicate function which returns whether the
+	 *                                   attribute's value constitutes a match.
+	 * }
+	 * @return WP_HTML_Walker
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function next_tag( $query = null ) {
 		$this->assert_not_closed();
@@ -284,7 +295,7 @@ class WP_HTML_Walker {
 	 * Applies attribute updates and cleans up once a tag is fully parsed.
 	 *
 	 * @return void
-	 * @throws WP_HTML_Walker_Exception
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	private function after_tag() {
 		$this->class_name_updates_to_attributes_updates();
@@ -302,7 +313,7 @@ class WP_HTML_Walker {
 	 * The behavior in all other cases is undefined.
 	 *
 	 * @return void
-	 * @throws WP_HTML_Walker_Exception When no tag was matched.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 * @see $classnames_updates
 	 * @see $attributes_updates
 	 */
@@ -387,7 +398,7 @@ class WP_HTML_Walker {
 	 * @param string $value The new attribute value.
 	 *
 	 * @return WP_HTML_Walker This object.
-	 * @throws WP_HTML_Walker_Exception When no tag was matched.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function set_attribute( $name, $value ) {
 		$this->assert_not_closed();
@@ -443,7 +454,7 @@ class WP_HTML_Walker {
 	 * @param string $name The attribute name to remove.
 	 *
 	 * @return WP_HTML_Walker This object.
-	 * @throws WP_HTML_Walker_Exception When no tag was matched.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_attribute( $name ) {
 		$this->assert_not_closed();
@@ -492,7 +503,7 @@ class WP_HTML_Walker {
 	 * @param string $class_name The class name to add.
 	 *
 	 * @return WP_HTML_Walker This object.
-	 * @throws WP_HTML_Walker_Exception When no tag was matched.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
@@ -509,7 +520,7 @@ class WP_HTML_Walker {
 	 * @param string $class_name The class name to remove.
 	 *
 	 * @return WP_HTML_Walker This object.
-	 * @throws WP_HTML_Walker_Exception When no tag was matched.
+	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
