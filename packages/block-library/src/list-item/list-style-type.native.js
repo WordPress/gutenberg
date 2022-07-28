@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
-import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -66,7 +65,10 @@ function OrderedList( {
 }
 
 function IconList( { fontSize, color, defaultFontSize, indentationLevel } ) {
-	const iconSize = ( fontSize * DEFAULT_ICON_SIZE ) / defaultFontSize;
+	const iconSize = parseInt(
+		( fontSize * DEFAULT_ICON_SIZE ) / defaultFontSize,
+		10
+	);
 
 	let listIcon = circle( iconSize, color );
 	if ( indentationLevel === 1 ) {
@@ -96,24 +98,8 @@ export default function ListStyleType( {
 	start,
 	style,
 } ) {
-	const { height, width } = useWindowDimensions();
-	let defaultFontSize =
+	const defaultFontSize =
 		styles[ 'wp-block-list-item__list-item--default' ].fontSize;
-	const cssUnitOptions = {
-		height,
-		width,
-		fontSize: defaultFontSize,
-	};
-
-	if ( style?.baseColors?.typography?.fontSize ) {
-		defaultFontSize = parseFloat(
-			getPxFromCssUnit(
-				style.baseColors.typography.fontSize,
-				cssUnitOptions
-			)
-		);
-	}
-
 	const fontSize = parseInt(
 		style?.fontSize ? style.fontSize : defaultFontSize,
 		10
