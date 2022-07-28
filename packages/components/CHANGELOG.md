@@ -42,6 +42,7 @@
 -   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+-   `StyleProvider`: Convert to TypeScript ([#42541](https://github.com/WordPress/gutenberg/pull/42541)).
 -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
 -   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
 
