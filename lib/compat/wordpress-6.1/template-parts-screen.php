@@ -175,7 +175,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	) {
 		wp_enqueue_style( 'wp-block-library-theme' );
 	}
-	
+
 	/** This action is documented in wp-admin/edit-form-blocks.php */
 	do_action( 'enqueue_block_editor_assets' );
 }
