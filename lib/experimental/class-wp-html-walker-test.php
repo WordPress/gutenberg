@@ -66,6 +66,22 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
+	 * Removing an attribute that's listed many times, e.g. `<div id="a" id="b" />` should remove
+	 * all its instances and output just `<div />`.
+	 *
+	 * Today, however, WP_HTML_Walker only removes the first such attribute. It seems like a corner case
+	 * and introducing additional complexity to correctly handle this scenario doesn't seem to be worth it.
+	 * Let's revisit if and when this becomes a problem.
+	 *
+	 * This test is in place to confirm this behavior, while incorrect, is well-defined.
+	 */
+	public function test_remove_duplicated_attribute() {
+		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
+		$w->next_tag()->remove_attribute( 'id' );
+		$this->assertSame( '<div  id="ignored-id"><span id="second">Text</span></div>', (string) $w );
+	}
+
+	/**
 	 *
 	 */
 	public function test_set_existing_attribute() {
