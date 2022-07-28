@@ -19,9 +19,11 @@ export interface InputState {
 	value?: string;
 }
 
-export type StateReducer< SpecializedAction = Action > = Reducer<
+export type StateReducer< SpecializedAction = {} > = Reducer<
 	InputState,
-	InputAction | SpecializedAction
+	SpecializedAction extends Action
+		? InputAction | SpecializedAction
+		: InputAction
 >;
 
 export const initialStateReducer: StateReducer = ( state: InputState ) => state;
