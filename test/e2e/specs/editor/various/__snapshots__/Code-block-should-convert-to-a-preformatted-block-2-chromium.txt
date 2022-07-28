@@ -1,3 +1,0 @@
-<!-- wp:preformatted -->
-<pre class="wp-block-preformatted">print "Hello Dolly!"</pre>
-<!-- /wp:preformatted -->
