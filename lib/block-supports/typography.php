@@ -378,6 +378,10 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
 
+	if ( false === $fluid_font_size_settings ) {
+		return $preset['size'];
+	}
+
 	// Try to grab explicit min and max fluid font sizes.
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;
 	$maximum_font_size_raw = isset( $fluid_font_size_settings['max'] ) ? $fluid_font_size_settings['max'] : null;
