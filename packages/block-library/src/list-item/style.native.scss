@@ -5,7 +5,6 @@
 
 .wp-block-list-item__nested-blocks {
 	margin-top: 14;
-	margin-left: $block-edge-to-content;
 }
 
 .wp-block-list-item__list-item {
@@ -40,8 +39,4 @@
 
 .wp-block-list-item__list-item-container {
 	margin-right: 8;
-}
-
-.wp-block-list-item__list-item-inner-blocks {
-	margin-left: 50;
 }
