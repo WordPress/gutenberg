@@ -91,16 +91,16 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	// `page`is a special case in template hierarchy.
-	const templateEntityObject = useMemo(
+	const templatePrefixes = useMemo(
 		() =>
-			publicPostTypes?.map( ( { slug } ) => {
-				return {
-					entitySlug: slug,
-					// `page`is a special case in template hierarchy.
-					templatePrefix:
-						slug !== 'page' ? `single-${ slug }` : 'page',
-				};
-			} ),
+			publicPostTypes?.reduce( ( accumulator, { slug } ) => {
+				let suffix = slug;
+				if ( slug !== 'page' ) {
+					suffix = `single-${ suffix }`;
+				}
+				accumulator[ slug ] = suffix;
+				return accumulator;
+			}, {} ),
 		[ publicPostTypes ]
 	);
 	// We need to keep track of naming conflicts. If a conflict
@@ -118,19 +118,17 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 		const singularName = labels.singular_name.toLowerCase();
 		return postTypeLabels[ singularName ] > 1 && singularName !== slug;
 	};
-	const postTypesInfo = useEntitiesInfo( 'postType', templateEntityObject );
+	const postTypesInfo = useEntitiesInfo( 'postType', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
 	const menuItems = ( publicPostTypes || [] ).reduce(
-		( accumulator, postType, index ) => {
+		( accumulator, postType ) => {
 			const { slug, labels, icon } = postType;
-
-			const generalTemplateSlug =
-				templateEntityObject[ index ].templatePrefix;
 			// We need to check if the general template is part of the
 			// defaultTemplateTypes. If it is, just use that info and
 			// augment it with the specific template functionality.
+			const generalTemplateSlug = templatePrefixes[ slug ];
 			const defaultTemplateType = defaultTemplateTypes?.find(
 				( { slug: _slug } ) => _slug === generalTemplateSlug
 			);
@@ -211,7 +209,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								return {
 									title,
 									description,
-									slug: `${ generalTemplateSlug }-${ suggestion.slug }`,
+									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
 								};
 							},
 						},
@@ -255,27 +253,20 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	const publicTaxonomies = usePublicTaxonomies();
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-
-	const templateEntityObject = useMemo(
+	// `category` and `post_tag` are special cases in template hierarchy.
+	const templatePrefixes = useMemo(
 		() =>
-			publicTaxonomies?.map( ( { slug } ) => {
-				let templatePrefix;
-				// `category` and `post_tag` are special cases in template hierarchy.
-				switch ( slug ) {
-					case 'category':
-						templatePrefix = 'category';
-						break;
-					case 'post_tag':
-						templatePrefix = 'tag';
-						break;
-					default:
-						templatePrefix = `taxonomy-${ slug }`;
+			publicTaxonomies?.reduce( ( accumulator, { slug } ) => {
+				let suffix = slug;
+				if ( ! [ 'category', 'post_tag' ].includes( slug ) ) {
+					suffix = `taxonomy-${ suffix }`;
 				}
-				return {
-					templatePrefix,
-					entitySlug: slug,
-				};
-			} ),
+				if ( slug === 'post_tag' ) {
+					suffix = `tag`;
+				}
+				accumulator[ slug ] = suffix;
+				return accumulator;
+			}, {} ),
 		[ publicTaxonomies ]
 	);
 	// We need to keep track of naming conflicts. If a conflict
@@ -296,18 +287,17 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 		const singularName = labels.singular_name.toLowerCase();
 		return taxonomyLabels[ singularName ] > 1 && singularName !== slug;
 	};
-	const taxonomiesInfo = useEntitiesInfo( 'taxonomy', templateEntityObject );
+	const taxonomiesInfo = useEntitiesInfo( 'taxonomy', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
 	const menuItems = ( publicTaxonomies || [] ).reduce(
-		( accumulator, taxonomy, index ) => {
+		( accumulator, taxonomy ) => {
 			const { slug, labels } = taxonomy;
-			const generalTemplateSlug =
-				templateEntityObject[ index ].templatePrefix;
 			// We need to check if the general template is part of the
 			// defaultTemplateTypes. If it is, just use that info and
 			// augment it with the specific template functionality.
+			const generalTemplateSlug = templatePrefixes[ slug ];
 			const defaultTemplateType = defaultTemplateTypes?.find(
 				( { slug: _slug } ) => _slug === generalTemplateSlug
 			);
@@ -378,7 +368,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 								return {
 									title,
 									description,
-									slug: `${ generalTemplateSlug }-${ suggestion.slug }`,
+									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
 								};
 							},
 						},
@@ -418,20 +408,26 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	return taxonomiesMenuItems;
 };
 
+const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
+const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
 export function useAuthorMenuItem( onClickMenuItem ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const authorInfo = useEntitiesInfo(
 		'root',
-		useAuthorMenuItem.AUTHOR_TEMPLATE_ENTITY_OBJECT
+		USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX,
+		USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS
 	);
 	let authorMenuItem = defaultTemplateTypes?.find(
 		( { slug } ) => slug === 'author'
 	);
-	const hasGeneralTemplate = existingTemplates?.find(
+	if ( ! authorMenuItem ) {
+		return;
+	}
+	const hasGeneralTemplate = !! existingTemplates?.find(
 		( { slug } ) => slug === 'author'
 	);
-	if ( authorMenuItem && authorInfo.user?.hasEntities ) {
+	if ( authorInfo.user?.hasEntities ) {
 		authorMenuItem = { ...authorMenuItem };
 		authorMenuItem.onClick = ( template ) => {
 			onClickMenuItem( {
@@ -479,13 +475,6 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		return authorMenuItem;
 	}
 }
-useAuthorMenuItem.AUTHOR_TEMPLATE_ENTITY_OBJECT = [
-	{
-		entitySlug: 'user',
-		templatePrefix: 'author',
-		additionalQueryParameters: { who: 'authors' },
-	},
-];
 
 /**
  * Helper hook that filters all the existing templates by the given
@@ -493,22 +482,22 @@ useAuthorMenuItem.AUTHOR_TEMPLATE_ENTITY_OBJECT = [
  *
  * Example:
  * `existingTemplates` is: [ { slug: 'tag-apple' }, { slug: 'page-about' }, { slug: 'tag' } ]
- * `templateEntityObject` is: [ { entitySlug: post_tag, templatePrefix: 'tag' } ]
+ * `templatePrefixes` is: { post_tag: 'tag' }
  * It will return: { post_tag: ['apple'] }
  *
  * Note: We append the `-` to the given template prefix in this function for our checks.
  *
- * @param {Array<Object?>} templateEntityObject An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
  * @return {Record<string,string[]>} An object with the entity's slug as key and an array with the existing template slugs as value.
  */
-const useExistingTemplateSlugs = ( templateEntityObject ) => {
+const useExistingTemplateSlugs = ( templatePrefixes ) => {
 	const existingTemplates = useExistingTemplates();
 	const existingSlugs = useMemo( () => {
-		return ( templateEntityObject || [] ).reduce(
-			( accumulator, { entitySlug, templatePrefix } ) => {
+		return Object.entries( templatePrefixes || {} ).reduce(
+			( accumulator, [ slug, prefix ] ) => {
 				const slugsWithTemplates = ( existingTemplates || [] ).reduce(
 					( _accumulator, existingTemplate ) => {
-						const _prefix = `${ templatePrefix }-`;
+						const _prefix = `${ prefix }-`;
 						if ( existingTemplate.slug.startsWith( _prefix ) ) {
 							_accumulator.push(
 								existingTemplate.slug.substring(
@@ -521,13 +510,13 @@ const useExistingTemplateSlugs = ( templateEntityObject ) => {
 					[]
 				);
 				if ( slugsWithTemplates.length ) {
-					accumulator[ entitySlug ] = slugsWithTemplates;
+					accumulator[ slug ] = slugsWithTemplates;
 				}
 				return accumulator;
 			},
 			{}
 		);
-	}, [ templateEntityObject, existingTemplates ] );
+	}, [ templatePrefixes, existingTemplates ] );
 	return existingSlugs;
 };
 
@@ -535,13 +524,18 @@ const useExistingTemplateSlugs = ( templateEntityObject ) => {
  * Helper hook that finds the existing records with an associated template,
  * as they need to be excluded from the template suggestions.
  *
- * @param {string}         entityName           The entity's name.
- * @param {Array<Object?>} templateEntityObject An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the existing records as value.
  */
-const useTemplatesToExclude = ( entityName, templateEntityObject ) => {
+const useTemplatesToExclude = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters = {}
+) => {
 	const slugsToExcludePerEntity =
-		useExistingTemplateSlugs( templateEntityObject );
+		useExistingTemplateSlugs( templatePrefixes );
 	const recordsToExcludePerEntity = useSelect(
 		( select ) => {
 			return Object.entries( slugsToExcludePerEntity || {} ).reduce(
@@ -552,6 +546,7 @@ const useTemplatesToExclude = ( entityName, templateEntityObject ) => {
 						_fields: 'id',
 						context: 'view',
 						slug: slugsWithTemplates,
+						...additionalQueryParameters[ slug ],
 					} );
 					if ( entitiesWithTemplates?.length ) {
 						accumulator[ slug ] = entitiesWithTemplates;
@@ -576,33 +571,39 @@ const useTemplatesToExclude = ( entityName, templateEntityObject ) => {
  * First we need to find the existing records with an associated template,
  * to query afterwards for any remaining record, by excluding them.
  *
- * @param {string}         entityName           The entity's name.
- * @param {Array<Object?>} templateEntityObject An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the EntitiesInfo as value.
  */
-const useEntitiesInfo = ( entityName, templateEntityObject ) => {
+const useEntitiesInfo = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters
+) => {
 	const recordsToExcludePerEntity = useTemplatesToExclude(
 		entityName,
-		templateEntityObject
+		templatePrefixes,
+		( additionalQueryParameters = {} )
 	);
 	const entitiesInfo = useSelect(
 		( select ) => {
-			return ( templateEntityObject || [] ).reduce(
-				( accumulator, { entitySlug, additionalQueryParameters } ) => {
+			return Object.keys( templatePrefixes || {} ).reduce(
+				( accumulator, slug ) => {
 					const existingEntitiesIds =
-						recordsToExcludePerEntity?.[ entitySlug ]?.map(
+						recordsToExcludePerEntity?.[ slug ]?.map(
 							( { id } ) => id
 						) || [];
-					accumulator[ entitySlug ] = {
+					accumulator[ slug ] = {
 						hasEntities: !! select( coreStore ).getEntityRecords(
 							entityName,
-							entitySlug,
+							slug,
 							{
 								per_page: 1,
 								_fields: 'id',
 								context: 'view',
 								exclude: existingEntitiesIds,
-								...( additionalQueryParameters || {} ),
+								...additionalQueryParameters[ slug ],
 							}
 						)?.length,
 						existingEntitiesIds,
@@ -612,7 +613,7 @@ const useEntitiesInfo = ( entityName, templateEntityObject ) => {
 				{}
 			);
 		},
-		[ templateEntityObject, recordsToExcludePerEntity ]
+		[ templatePrefixes, recordsToExcludePerEntity ]
 	);
 	return entitiesInfo;
 };
