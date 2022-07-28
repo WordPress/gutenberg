@@ -9,6 +9,7 @@ import {
 	deleteUser,
 	clickBlockAppender,
 	getEditedPostContent,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 const userList = [
@@ -78,6 +79,42 @@ describe( 'Autocomplete', () => {
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
 
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
+
+		it( `should insert ${ type } between two other words`, async () => {
+			const testData = {};
+			if ( type === 'mention' ) {
+				testData.triggerString = '@j';
+				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>Stuck in the middle with @testuser you.</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.triggerString = 'a ~m';
+				testData.optionPath = '[text()="🥭 Mango"]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>Stuck in the middle with a 🥭 you.</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else {
+				[ testData.triggerString, testData.snapshot ] = undefined;
+			}
+
+			await clickBlockAppender();
+			await page.keyboard.type( 'Stuck in the middle with you.' );
+			await pressKeyTimes( 'ArrowLeft', 'you.'.length );
+			await page.keyboard.type( testData.triggerString );
+			await page.waitForXPath(
+				`//button[@role="option"]${ testData.optionPath }`
+			);
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( ' ' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
 				testData.snapshot
 			);
