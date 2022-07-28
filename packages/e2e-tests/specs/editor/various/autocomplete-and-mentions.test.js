@@ -159,5 +159,40 @@ describe( 'Autocomplete', () => {
 				testData.snapshot
 			);
 		} );
+
+		it( `should allow ${ type } selection via click event`, async () => {
+			const testData = {};
+			if ( type === 'mention' ) {
+				testData.triggerString = '@';
+				testData.optionPath =
+					'//*[contains(text(),"Katniss Everdeen")]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>@mockingjay</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.triggerString = '~';
+				testData.optionPath = '[text()="🍓 Strawberry"]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>🍓</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else {
+				[ testData.triggerString, testData.snapshot ] = undefined;
+			}
+
+			await clickBlockAppender();
+			await page.keyboard.type( testData.triggerString );
+			const strawberry = await page.waitForXPath(
+				`//button[@role="option"]${ testData.optionPath }`
+			);
+			await strawberry.click();
+
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
 	} );
 } );
