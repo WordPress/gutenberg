@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
-import { times, map, compact, delay } from 'lodash';
+import { times, map, delay } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -474,7 +474,7 @@ const ColumnsEdit = ( props ) => {
 
 			return {
 				columnCount: getBlockCount( clientId ),
-				isDefaultColumns: ! compact( isContentEmpty ).length,
+				isDefaultColumns: ! isContentEmpty.filter( Boolean ).length,
 				innerWidths: innerColumnsWidths,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,

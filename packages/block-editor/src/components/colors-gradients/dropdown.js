@@ -11,6 +11,7 @@ import {
 	ColorIndicator,
 	Dropdown,
 	FlexItem,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -160,10 +161,15 @@ export default function ColorGradientSettingsDropdown( {
 							<Dropdown
 								popoverProps={ popoverProps }
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
-								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
-									<ColorGradientControl { ...controlProps } />
+									<DropdownContentWrapper paddingSize="medium">
+										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+											<ColorGradientControl
+												{ ...controlProps }
+											/>
+										</div>
+									</DropdownContentWrapper>
 								) }
 							/>
 						</WithToolsPanelItem>

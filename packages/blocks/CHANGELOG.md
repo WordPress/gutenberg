@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 11.13.0 (2022-07-27)
+
+## 11.12.0 (2022-07-13)
+
 ### Deprecations
 
 -   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).

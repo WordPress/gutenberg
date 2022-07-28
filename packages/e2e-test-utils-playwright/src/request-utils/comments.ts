@@ -7,20 +7,42 @@ export interface Comment {
 	id: number;
 	author: number;
 	content: string;
+	post: number;
+}
+
+export interface CreateCommentPayload {
+	content: string;
+	post: number;
+}
+
+export interface User {
+	id: number;
 }
 
 /**
  * Create new comment using the REST API.
  *
  * @param {} this    RequestUtils.
- * @param {} comment Comment.
+ * @param {} payload CreateCommentPayload.
  */
-export async function createComment( this: RequestUtils, comment: Comment ) {
-	this.rest( {
+export async function createComment(
+	this: RequestUtils,
+	payload: CreateCommentPayload
+) {
+	const currentUser = await this.rest< User >( {
+		path: '/wp/v2/users/me',
+		method: 'GET',
+	} );
+
+	const author = currentUser.id;
+
+	const comment = await this.rest< Comment >( {
 		method: 'POST',
 		path: '/wp/v2/comments',
-		data: comment,
+		data: { ...payload, author },
 	} );
+
+	return comment;
 }
 
 /**

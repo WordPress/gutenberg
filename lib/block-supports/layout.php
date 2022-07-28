@@ -34,10 +34,11 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param string  $gap_value                     The block gap value to apply.
  * @param boolean $should_skip_gap_serialization Whether to skip applying the user-defined value set in the editor.
  * @param string  $fallback_gap_value            The block gap value to apply.
+ * @param array   $block_spacing                 Custom spacing set on the block.
  *
  * @return string                                CSS style.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em' ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
@@ -54,7 +55,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright)) {";
+			$style  = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {";
 			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 			$style .= 'margin-left: auto !important;';
 			$style .= 'margin-right: auto !important;';
@@ -62,6 +63,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 			$style .= "$selector .alignfull { max-width: none; }";
+
+			if ( isset( $block_spacing ) ) {
+				$block_spacing_values = gutenberg_style_engine_get_styles(
+					array(
+						'spacing' => $block_spacing,
+					)
+				);
+
+				// Handle negative margins for alignfull children of blocks with custom padding set.
+				// They're added separately because padding might only be set on one side.
+				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+					$padding_right = $block_spacing_values['declarations']['padding-right'];
+					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
+				}
+				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+					$padding_left = $block_spacing_values['declarations']['padding-left'];
+					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
+				}
+			}
 		}
 
 		if ( $has_block_gap_support ) {
@@ -173,6 +193,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
+	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+
+	if ( $use_global_padding ) {
+		$class_names[] = 'has-global-padding';
+	}
 
 	// The following section was added to reintroduce a small set of layout classnames that were
 	// removed in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719). It is
@@ -214,11 +239,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
+	$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
 
 	// If a block's block.json skips serialization for spacing or spacing.blockGap,
 	// don't apply the user-defined value to the styles.
 	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value );
+	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
 
 	// Only add container class and enqueue block support styles if unique styles were generated.
 	if ( ! empty( $style ) ) {

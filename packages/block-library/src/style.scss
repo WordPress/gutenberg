@@ -7,6 +7,7 @@
 @import "./categories/style.scss";
 @import "./code/style.scss";
 @import "./columns/style.scss";
+@import "./comments/style.scss";
 @import "./comments-pagination/style.scss";
 @import "./comment-template/style.scss";
 @import "./cover/style.scss";
@@ -25,7 +26,6 @@
 @import "./page-list/style.scss";
 @import "./paragraph/style.scss";
 @import "./post-author/style.scss";
-@import "./post-comments/style.scss";
 @import "./post-comments-form/style.scss";
 @import "./post-excerpt/style.scss";
 @import "./post-featured-image/style.scss";
@@ -50,4 +50,3 @@
 @import "./video/style.scss";
 
 @import "common.scss";
-@import "./elements.scss";

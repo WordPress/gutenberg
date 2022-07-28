@@ -13,6 +13,7 @@ import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { COLORS, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
+import { space } from '../../ui/utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -110,6 +111,8 @@ type InputProps = {
 	inputSize?: Size;
 	isDragging?: boolean;
 	dragCursor?: CSSProperties[ 'cursor' ];
+	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
@@ -141,31 +144,32 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	`;
 };
 
-const sizeStyles = ( {
+export const getSizeConfig = ( {
 	inputSize: size,
 	__next36pxDefaultSize,
 }: InputProps ) => {
+	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
 			height: 36,
 			lineHeight: 1,
 			minHeight: 36,
-			paddingLeft: 16,
-			paddingRight: 16,
+			paddingLeft: space( 4 ),
+			paddingRight: space( 4 ),
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
-			paddingLeft: 8,
-			paddingRight: 8,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
 		},
 		'__unstable-large': {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: 16,
-			paddingRight: 16,
+			paddingLeft: space( 4 ),
+			paddingRight: space( 4 ),
 		},
 	};
 
@@ -174,14 +178,23 @@ const sizeStyles = ( {
 			height: 30,
 			lineHeight: 1,
 			minHeight: 30,
-			paddingLeft: 8,
-			paddingRight: 8,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
 		};
 	}
 
-	const style = sizes[ size as Size ] || sizes.default;
+	return sizes[ size as Size ] || sizes.default;
+};
 
-	return css( style );
+const sizeStyles = ( props: InputProps ) => {
+	return css( getSizeConfig( props ) );
+};
+
+const customPaddings = ( {
+	paddingInlineStart,
+	paddingInlineEnd,
+}: InputProps ) => {
+	return css( { paddingInlineStart, paddingInlineEnd } );
 };
 
 const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
@@ -235,6 +248,7 @@ export const Input = styled.input< InputProps >`
 		${ disabledStyles }
 		${ fontSizeStyles }
 		${ sizeStyles }
+		${ customPaddings }
 
 		&::-webkit-input-placeholder {
 			line-height: normal;

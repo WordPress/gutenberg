@@ -83,7 +83,7 @@ module.exports = async function readConfig( configPath ) {
 			WP_PHP_BINARY: 'php',
 			WP_TESTS_EMAIL: 'admin@example.org',
 			WP_TESTS_TITLE: 'Test Blog',
-			WP_TESTS_DOMAIN: 'http://localhost',
+			WP_TESTS_DOMAIN: 'localhost',
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
@@ -297,7 +297,6 @@ function withOverrides( config ) {
 	};
 
 	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_TESTS_DOMAIN' );
 	updateEnvUrl( 'WP_SITEURL' );
 	updateEnvUrl( 'WP_HOME' );
 

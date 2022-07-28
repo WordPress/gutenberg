@@ -104,6 +104,12 @@ export type ToggleGroupControlProps = Omit<
 	 * using help property as the content.
 	 */
 	help?: ReactNode;
+	/**
+	 * The size variant of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | '__unstable-large';
 };
 
 export type ToggleGroupControlContextProps = RadioStateReturn & {

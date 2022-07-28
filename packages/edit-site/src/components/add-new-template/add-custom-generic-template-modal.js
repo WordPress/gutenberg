@@ -57,7 +57,7 @@ function AddCustomGenericTemplateModal( { onClose, createTemplate } ) {
 							placeholder={ defaultTitle }
 							disabled={ isBusy }
 							help={ __(
-								'Describe the purpose of the template, e.g. "Full Width".'
+								'Describe the template, e.g. "Post with sidebar".'
 							) }
 						/>
 					</FlexItem>

@@ -12,15 +12,15 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 	 */
 	private $test_block_name;
 
-	function setUp() {
-		parent::setUp();
+	function set_up() {
+		parent::set_up();
 		$this->test_block_name = null;
 	}
 
-	function tearDown() {
+	function tear_down() {
 		unregister_block_type( $this->test_block_name );
 		$this->test_block_name = null;
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	function test_color_slugs_with_numbers_are_kebab_cased_properly() {

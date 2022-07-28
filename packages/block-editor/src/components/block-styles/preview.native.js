@@ -8,8 +8,8 @@ import {
 	Dimensions,
 	Animated,
 	Easing,
+	Image,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
 
 /**
  * WordPress dependencies
@@ -91,7 +91,7 @@ function StylePreview( { onPress, isActive, style, url } ) {
 				<View style={ styles.imageWrapper }>
 					{ isActive &&
 						getOutline( [ styles.outline, innerOutlineStyle ] ) }
-					<FastImage
+					<Image
 						style={ [ styles.image, styles[ name ] ] }
 						source={ { uri: url } }
 					/>

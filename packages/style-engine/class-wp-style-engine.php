@@ -229,11 +229,11 @@ class WP_Style_Engine {
 	 * @return WP_Style_Engine The main instance.
 	 */
 	public static function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
+		if ( null === static::$instance ) {
+			static::$instance = new static();
 		}
 
-		return self::$instance;
+		return static::$instance;
 	}
 
 	/**
@@ -370,7 +370,7 @@ class WP_Style_Engine {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
 				}
 				$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
-				if ( static::is_valid_style_value( $style_value ) ) {
+				if ( $individual_property && static::is_valid_style_value( $value ) ) {
 					$css_declarations[ $individual_property ] = $value;
 				}
 			}
@@ -382,10 +382,10 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Returns classnames and CSS based on the values in a block attributes.styles object.
+	 * Returns classnames and CSS based on the values in a styles object.
 	 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
-	 * @param array $block_styles Styles from a block's attributes object.
+	 * @param array $block_styles The style object.
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
@@ -396,7 +396,7 @@ class WP_Style_Engine {
 	 *     'classnames' => (string) Classnames separated by a space.
 	 * );
 	 */
-	public function get_block_supports_styles( $block_styles, $options ) {
+	public function get_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return null;
 		}
@@ -423,17 +423,17 @@ class WP_Style_Engine {
 		}
 
 		// Build CSS rules output.
-		$css_selector = isset( $options['selector'] ) ? $options['selector'] : null;
-		$style_rules  = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+		$css_selector     = isset( $options['selector'] ) ? $options['selector'] : null;
+		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
 
 		// The return object.
 		$styles_output = array();
-		$css           = $style_rules->get_declarations_string();
+		$css           = $css_declarations->get_declarations_string();
 
 		// Return css, if any.
 		if ( ! empty( $css ) ) {
 			$styles_output['css']          = $css;
-			$styles_output['declarations'] = $style_rules->get_declarations();
+			$styles_output['declarations'] = $css_declarations->get_declarations();
 			// Return an entire rule if there is a selector.
 			if ( $css_selector ) {
 				$styles_output['css'] = $css_selector . ' { ' . $css . ' }';
@@ -497,28 +497,35 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->get_block_supports_styles to generate block styles from a single block style object.
- * See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
+ * Global public interface method to WP_Style_Engine->get_styles to generate styles from a single style object, e.g.,
+ * the value of a block's attributes.style object or the top level styles in theme.json.
+ * See: https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles and
+ * https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
  *
  * Example usage:
  *
- * $styles = wp_style_engine_get_block_supports_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
- * // Returns `array( 'css' => 'color: #cccccc', 'classnames' => 'has-color' )`.
+ * $styles = wp_style_engine_get_styles( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * // Returns `array( 'css' => 'color: #cccccc', 'declarations' => array( 'color' => '#cccccc' ), 'classnames' => 'has-color' )`.
  *
  * @access public
  *
- * @param array         $block_styles The value of a block's attributes.style.
- * @param array<string> $options      An array of options to determine the output.
+ * @param array         $block_styles The style object.
+ * @param array<string> $options      array(
+ *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+ *     'context'                    => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+ * );.
  *
  * @return array<string>|null array(
- *     'styles'     => (string) A CSS ruleset formatted to be placed in an HTML `style` attribute or tag.
- *     'classnames' => (string) Classnames separated by a space.
+ *     'css'          => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+ *     'declarations' => (array) An array of property/value pairs representing parsed CSS declarations.
+ *     'classnames'   => (string) Classnames separated by a space.
  * );
  */
-function wp_style_engine_get_block_supports_styles( $block_styles, $options = array() ) {
+function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	if ( class_exists( 'WP_Style_Engine' ) ) {
 		$style_engine = WP_Style_Engine::get_instance();
-		return $style_engine->get_block_supports_styles( $block_styles, $options );
+		return $style_engine->get_styles( $block_styles, $options );
 	}
 	return null;
 }

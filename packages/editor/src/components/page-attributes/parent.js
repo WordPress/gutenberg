@@ -1,13 +1,8 @@
 /**
  * External dependencies
  */
-import {
-	get,
-	unescape as unescapeString,
-	debounce,
-	find,
-	deburr,
-} from 'lodash';
+import { get, unescape as unescapeString, debounce, find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -32,8 +27,8 @@ function getTitle( post ) {
 }
 
 export const getItemPriority = ( name, searchValue ) => {
-	const normalizedName = deburr( name ).toLowerCase();
-	const normalizedSearch = deburr( searchValue ).toLowerCase();
+	const normalizedName = removeAccents( name || '' ).toLowerCase();
+	const normalizedSearch = removeAccents( searchValue || '' ).toLowerCase();
 	if ( normalizedName === normalizedSearch ) {
 		return 0;
 	}

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.6.0 (2022-07-13)
+
 ### Enhancement
 
 -   Added prompt to continue when minimum system requirements not met ([#42151](https://github.com/WordPress/gutenberg/pull/42151)).
