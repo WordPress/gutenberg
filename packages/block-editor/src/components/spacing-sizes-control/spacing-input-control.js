@@ -214,9 +214,11 @@ export default function SpacingInputControl( {
 						'components-spacing-sizes-control__custom-select-control-single':
 							side !== 'all',
 					} ) }
-					value={ options.find(
-						( option ) => option.key === valueNow
-					) }
+					value={
+						options.find(
+							( option ) => option.key === currentValue
+						) || '' // passing undefined here causes a downshift controlled/uncontrolled warning
+					}
 					onChange={ ( selection ) => {
 						onChange(
 							getNewPresetValue( selection.selectedItem.key )
