@@ -392,6 +392,7 @@ function Navigation( {
 	};
 
 	useEffect( () => {
+		hideClassicMenuConversionNotice();
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
 			speak( __( 'Classic menu importing.' ) );
 		}
@@ -401,12 +402,16 @@ function Navigation( {
 			classicMenuConversionResult
 		) {
 			handleUpdateMenu( classicMenuConversionResult?.id );
-			hideClassicMenuConversionNotice();
+			showClassicMenuConversionNotice(
+				__( 'Classic menu imported successfully.' )
+			);
 			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
-			showClassicMenuConversionNotice( classicMenuConversionError );
+			showClassicMenuConversionNotice(
+				__( 'Classic menu import failed.' )
+			);
 			speak( __( 'Classic menu import failed.' ) );
 		}
 	}, [
