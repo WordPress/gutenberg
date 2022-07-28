@@ -21,7 +21,7 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 		parent::register_routes();
 
-		// Lists/updates a single nav item based on the given id.
+		// Lists a single nav item based on the given id.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
@@ -32,7 +32,7 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'The id of a navigation', 'gutenberg' ),
+							'description' => __( 'The slug identifier for a avigation', 'gutenberg' ),
 							'type'        => 'string',
 						),
 					),
