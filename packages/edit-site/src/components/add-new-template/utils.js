@@ -201,9 +201,9 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								if ( _needsUniqueIdentifier ) {
 									title = sprintf(
 										// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the post type, e.g. "Project: Hello (project_type)"
-										__( '%1$s %2$s' ),
+										__( '%1$s (%2$s)' ),
 										title,
-										`(${ slug })`
+										slug
 									);
 								}
 								return {
@@ -360,9 +360,9 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 								if ( _needsUniqueIdentifier ) {
 									title = sprintf(
 										// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the taxonomy, e.g. "Category: shoes (product_tag)"
-										__( '%1$s %2$s' ),
+										__( '%1$s (%2$s)' ),
 										title,
-										`(${ slug })`
+										slug
 									);
 								}
 								return {
@@ -413,9 +413,9 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
  * object with the entity's slug as key and the template prefix as value.
  *
  * Example:
- * `existingTemplates` is: [ { slug: tag-apple }, { slug: page-about }, { slug: tag } ]
+ * `existingTemplates` is: [ { slug: 'tag-apple' }, { slug: 'page-about' }, { slug: 'tag' } ]
  * `templatePrefixes` is: { post_tag: 'tag' }
- * It will return: { post_tag: [apple] }
+ * It will return: { post_tag: ['apple'] }
  *
  * Note: We append the `-` to the given template prefix in this function for our checks.
  *
