@@ -14,7 +14,15 @@
  * @return string Returns the wrapper for the Query pagination.
  */
 function render_block_core_query_pagination( $attributes, $content ) {
-	if ( empty( trim( $content ) ) ) {
+	$content = trim( $content );
+	if ( empty( $content ) ) {
+		return '';
+	}
+	// TODO: This is a rough quick implementation to see if we can use this or something similar for our use case.
+	preg_match_all( '/visibility:hidden;/', $content, $hiddens );
+	preg_match_all( '/wp-block-query-pagination-next/', $content, $nexts );
+	preg_match_all( '/wp-block-query-pagination-previous/', $content, $prevs );
+	if ( count( $hiddens[0] ) === count( $nexts[0] ) + count( $prevs[0] ) ) {
 		return '';
 	}
 
