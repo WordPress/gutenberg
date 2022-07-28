@@ -98,8 +98,13 @@ export default function ListStyleType( {
 	start,
 	style,
 } ) {
-	const defaultFontSize =
+	let defaultFontSize =
 		styles[ 'wp-block-list-item__list-item--default' ].fontSize;
+
+	if ( style?.baseColors?.typography?.fontSize ) {
+		defaultFontSize = parseInt( style.baseColors.typography.fontSize, 10 );
+	}
+
 	const fontSize = parseInt(
 		style?.fontSize ? style.fontSize : defaultFontSize,
 		10
