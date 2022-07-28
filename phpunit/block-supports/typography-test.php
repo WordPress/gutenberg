@@ -242,7 +242,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
 			),
 
-			'return_default_fluid_values_with_empty_fluidSize' => array(
+			'return_default_fluid_values_with_empty_fluid_array' => array(
 				'font_size_preset'            => array(
 					'size'  => '28px',
 					'fluid' => array(),

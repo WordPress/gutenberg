@@ -24,6 +24,11 @@ public protocol GutenbergBridgeDataSource: class {
     /// - Returns: The post type or nil.
     func gutenbergPostType() -> String
 
+    /// Asks the data source for the host app's namespace.
+    ///
+    /// - Returns: The host app's namespace e.g. WordPress.
+    func gutenbergHostAppNamespace() -> String
+
     /// Asks the data source for an object conforming to `TextViewAttachmentDelegate`
     /// to handle media loading.
     ///
