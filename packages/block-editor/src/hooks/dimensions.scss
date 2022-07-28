@@ -2,4 +2,9 @@
 	.single-column {
 		grid-column: span 1;
 	}
+
+	.tools-panel-item-padding {
+		display: grid;
+		grid-template-columns: 1fr 1fr 36px;
+	}
 }

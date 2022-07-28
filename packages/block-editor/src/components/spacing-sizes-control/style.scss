@@ -9,6 +9,17 @@
 	box-sizing: border-box;
 	padding-bottom: 12px;
 	width: 100%;
+	display: contents;
+
+	legend {
+		/* Quick vertical alignment and spacing tweaks. There's likely a better approach */
+		display: flex;
+		align-items: center;
+		padding-left: 0;
+		margin-bottom: 12px;
+		grid-column: 1 / 1;
+		grid-row: 1 /1;
+	}
 
 	.components-spacing-sizes-control__side-label-wrapper {
 		flex-direction: column;
@@ -20,8 +31,53 @@
 			margin-top: 2px;
 		}
 	}
+	.components-spacing-sizes-control__range-control-single,
 	.components-spacing-sizes-control__range-control-all {
-		margin-top: 2px;
+		grid-column: span 3;
+	}
+
+	.components-spacing-sizes-control__hint-single {
+		margin-top: 0;
+	}
+	.components-spacing-sizes-control__side-labels {
+		grid-column: 1 / 1;
+	}
+	.components-spacing-sizes-control__hint-single,
+	.components-spacing-sizes-control__hint-all {
+		color: $gray-700;
+		font-size: 12px;
+	}
+
+	.components-spacing-sizes-control__hint-all {
+		grid-column: 1 / 1;
+		justify-self: left;
+		grid-row: 1 /1;
+		position: relative;
+		top: 1rem;
+		left: 0;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-all {
+		grid-column: 2 / 2;
+		grid-row: 1 /1;
+		justify-self: end;
+		margin-right: 4px;
+	}
+
+	.components-spacing-sizes-control__custom-toggle-single {
+		grid-column: 3 / 3;
+		justify-self: end;
+	}
+
+	.component-spacing-sizes-control__linked-button {
+		grid-column: 3 / 3;
+		grid-row: 1 /1;
+		justify-self: end;
+	}
+
+	.components-spacing-sizes-control__custom-value-range {
+		grid-column: span 2;
+		margin-left: 8px;
 	}
 
 	.components-range-control__wrapper {
@@ -55,21 +111,21 @@
 			width: 100%;
 		}
 	}
+	.components-unit-control-wrapper {
+		margin-bottom: 8px;
 
+		.components-range-control {
+			margin-top: 0;
+		}
+	}
 	.components-spacing-sizes-control__custom-value-control {
 		&.components-spacing-sizes-control__custom-value-control-all {
 			margin-top: 8px;
-			.components-range-control {
-				margin-top: 0;
-			}
 		}
 		&.components-spacing-sizes-control__custom-value-control-single {
 			margin-bottom: $grid-unit-10;
 		}
-		.components-unit-control-wrapper {
-			width: 110px;
-			flex-shrink: 0;
-		}
+
 		.components-range-control {
 			flex: 1;
 		}
@@ -83,25 +139,16 @@
 		margin-bottom: -4px;
 	}
 
-	.components-spacing-sizes-control__hint {
-		color: $gray-700;
-		margin-left: 0;
-	}
-
-	.components-spacing-sizes-control__hint-all-sides {
-		color: $gray-700;
-		margin-left: 0;
-		margin-top: 0;
-		padding-left: 2px;
-		font-size: 12px;
-	}
-
 	.components-spacing-sizes-control__side-label {
 		margin-right: 4px;
+		grid-column: 1/1;
+		justify-self: left;
+		font-size: 12px;
 	}
 
 	.components-spacing-sizes-control__custom-select-control-all,
 	.components-spacing-sizes-control__custom-select-control-single {
+		grid-column: span 3;
 		.components-input-control__container {
 			width: 100%;
 		}

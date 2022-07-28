@@ -14,7 +14,7 @@ export default function LinkedButton( { isLinked, onClick } ) {
 
 	return (
 		<Tooltip text={ label }>
-			<span>
+			<span className="component-spacing-sizes-control__linked-button">
 				<Button
 					variant={ isLinked ? 'primary' : 'secondary' }
 					isSmall

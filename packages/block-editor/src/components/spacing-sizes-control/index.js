@@ -1,20 +1,9 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
-import { settings } from '@wordpress/icons';
+import { __experimentalText as Text } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,13 +13,7 @@ import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import LinkedButton from './linked-button';
-import {
-	DEFAULT_VALUES,
-	isValuesMixed,
-	isValuesDefined,
-	getAllRawValue,
-	getSliderValueFromPreset,
-} from './utils';
+import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
 import useSetting from '../use-setting';
 
 const defaultInputProps = {
@@ -46,9 +29,6 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	useSelect,
 } ) {
-	const [ showCustomValueControl, setShowCustomValueControl ] =
-		useState( false );
-
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
@@ -62,15 +42,6 @@ export default function SpacingSizesControl( {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
-
-	const currentValueHint = isLinked
-		? spacingSizes[
-				getSliderValueFromPreset(
-					getAllRawValue( values ),
-					spacingSizes
-				)
-		  ]?.name
-		: undefined;
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
@@ -94,58 +65,14 @@ export default function SpacingSizesControl( {
 
 	return (
 		<fieldset role="region" className="component-spacing-sizes-control">
-			<HStack
-				className={ classnames(
-					'component-spacing-sizes-control__header',
-					{
-						'component-spacing-sizes-control__header-is-linked':
-							isLinked,
-					}
-				) }
-			>
-				<VStack>
-					<Text as="legend">{ label }</Text>
-					{ spacingSizes.length <= 8 &&
-						! showCustomValueControl &&
-						isLinked && (
-							<Text className="components-spacing-sizes-control__hint-all-sides">
-								{ currentValueHint !== undefined
-									? currentValueHint
-									: __( 'Default' ) }
-							</Text>
-						) }
-				</VStack>
-				{ isLinked && (
-					<Button
-						label={
-							showCustomValueControl
-								? __( 'Use size preset' )
-								: __( 'Set custom size' )
-						}
-						icon={ settings }
-						onClick={ () => {
-							setShowCustomValueControl(
-								! showCustomValueControl
-							);
-						} }
-						isPressed={ showCustomValueControl }
-						isSmall
-						className="components-spacing-sizes-control__custom-toggle"
-					/>
-				) }
-				{ ! hasOneSide && (
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				) }
-			</HStack>
-
+			<Text as="legend">{ label }</Text>
+			{ ! hasOneSide && (
+				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
+			) }
 			{ isLinked && (
 				<AllInputControl
 					aria-label={ label }
 					{ ...inputControlProps }
-					showCustomValueControl={ showCustomValueControl }
 				/>
 			) }
 
