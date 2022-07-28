@@ -328,14 +328,28 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector =
-								selector === ROOT_BLOCK_SELECTOR
-									? `${ selector } .${ className }${
-											spacingStyle?.selector || ''
-									  }`
-									: `${ selector }.${ className }${
-											spacingStyle?.selector || ''
-									  }`;
+							let combinedSelector = '';
+
+							if ( ! hasBlockGapSupport ) {
+								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+								combinedSelector =
+									selector === ROOT_BLOCK_SELECTOR
+										? `:where(.${ className }${
+												spacingStyle?.selector || ''
+										  })`
+										: `:where(${ selector }.${ className }${
+												spacingStyle?.selector || ''
+										  })`;
+							} else {
+								combinedSelector =
+									selector === ROOT_BLOCK_SELECTOR
+										? `${ selector } .${ className }${
+												spacingStyle?.selector || ''
+										  }`
+										: `${ selector }.${ className }${
+												spacingStyle?.selector || ''
+										  }`;
+							}
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
 							) }; }`;
