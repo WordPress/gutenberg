@@ -159,7 +159,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $block_editor_context ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $block_editor_context ) ) )
 	);
 
 	wp_enqueue_script( 'wp-edit-site' );
