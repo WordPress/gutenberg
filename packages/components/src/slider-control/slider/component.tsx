@@ -14,19 +14,5 @@ const UnconnectedSlider = (
 	return <input { ...inputProps } ref={ forwardedRef } />;
 };
 
-/**
- * `Slider` is a form component that lets users choose a value within a range.
- *
- * @example
- * ```jsx
- * import { Slider } from `@wordpress/components`
- *
- * function Example() {
- *   return (
- *     <Slider />
- *   );
- * }
- * ```
- */
 export const Slider = contextConnect( UnconnectedSlider, 'Slider' );
 export default Slider;

@@ -9,10 +9,9 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import * as styles from '../styles';
 import { COLORS, CONFIG } from '../../utils';
 import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useFormGroupContextId } from '../../ui/form-group';
 import { useControlledValue, useCx } from '../../utils/hooks';
+import { useDebouncedHoverInteraction } from '../utils';
 import { interpolate } from '../../utils/interpolate';
-import { parseCSSUnitValue, createCSSUnitValue } from '../../utils/unit-values';
 import { isValueNumeric } from '../../utils/values';
 
 import type { SliderProps } from '../types';
@@ -30,7 +29,10 @@ export function useSlider(
 		onBlur = noop,
 		onChange: onChangeProp = noop,
 		onFocus = noop,
-		id: idProp,
+		onHideTooltip = noop,
+		onMouseLeave = noop,
+		onMouseMove = noop,
+		onShowTooltip = noop,
 		isFocused: isFocusedProp = false,
 		max = 100,
 		min = 0,
@@ -45,16 +47,14 @@ export function useSlider(
 
 	const numericMax = parseFloat( `${ max }` );
 	const numericMin = parseFloat( `${ min }` );
-	const fallbackDefaultValue = `${ ( numericMax - numericMin ) / 2 }`;
+	const fallbackDefaultValue = ( numericMax - numericMin ) / 2 + numericMin;
 
-	const [ _value, onChange ] = useControlledValue( {
+	const [ value, onChange ] = useControlledValue( {
 		defaultValue: defaultValue || fallbackDefaultValue,
 		onChange: onChangeProp,
 		value: valueProp,
 	} );
-	const [ value, initialUnit ] = parseCSSUnitValue( `${ _value }` );
 
-	const id = useFormGroupContextId( idProp );
 	const [ isFocused, setIsFocused ] = useState( isFocusedProp );
 
 	const handleOnBlur = useCallback(
@@ -72,15 +72,9 @@ export function useSlider(
 				return;
 			}
 
-			let next = `${ nextValue }`;
-
-			if ( initialUnit ) {
-				next = createCSSUnitValue( nextValue, initialUnit );
-			}
-
-			onChange( next );
+			onChange( nextValue );
 		},
-		[ onChange, initialUnit ]
+		[ onChange ]
 	);
 
 	const handleOnFocus = useCallback(
@@ -90,6 +84,13 @@ export function useSlider(
 		},
 		[ onFocus ]
 	);
+
+	const hoverInteractions = useDebouncedHoverInteraction( {
+		onHide: onHideTooltip,
+		onMouseLeave,
+		onMouseMove,
+		onShow: onShowTooltip,
+	} );
 
 	// Interpolate the current value between 0 and 100, so that it can be used
 	// to position the slider's thumb correctly.
@@ -107,9 +108,11 @@ export function useSlider(
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx(
-			styles.slider( { thumbColor, trackColor, trackBackgroundColor } ),
+			styles.slider(
+				{ thumbColor, trackColor, trackBackgroundColor },
+				size
+			),
 			error && styles.error( { errorColor, trackBackgroundColor } ),
-			styles[ size ],
 			isFocused && styles.focused( thumbColor ),
 			error && isFocused && styles.focusedError( errorColor ),
 			className
@@ -128,8 +131,8 @@ export function useSlider(
 
 	return {
 		...otherProps,
+		...hoverInteractions,
 		className: classes,
-		id: id ? `${ id }` : undefined,
 		max,
 		min,
 		onBlur: handleOnBlur,

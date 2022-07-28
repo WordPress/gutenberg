@@ -65,7 +65,7 @@ function baseInterpolate(
 
 /**
  * Gets a value based on an input range and an output range.
- * Can be used for a set of numbers or a set of colors.
+ * Can be used for a set of numbers.
  *
  * @param {number}           [input=0]
  * @param {[number, number]} [inputRange=[0,1]]

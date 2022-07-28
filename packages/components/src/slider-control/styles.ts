@@ -7,8 +7,14 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../utils';
-import { SliderColors } from './types';
+import { COLORS, CONFIG, reduceMotion, rtl } from '../utils';
+
+import type {
+	MarkProps,
+	SliderColors,
+	SliderSizes,
+	TooltipProps,
+} from './types';
 
 const getBoxShadowStyle = ( color: CSSProperties[ 'color' ] ) => {
 	return `
@@ -33,15 +39,26 @@ const thumbStyles = ( thumbColor: CSSProperties[ 'color' ] ) => {
 	return css`
 		appearance: none;
 		background-color: ${ thumbColor };
-		border: 1px solid transparent;
 		border-radius: 50%;
+		border: 1px solid transparent;
 		box-shadow: none;
 		cursor: pointer;
 		height: 12px;
 		margin-top: -5px;
 		opacity: 1;
-		width: 12px;
+		position: absolute;
 		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
+		width: 12px;
+		${ rtl(
+			{
+				transform: 'translateX(-50%)',
+				left: `var( --slider--progress )`,
+			},
+			{
+				transform: 'translate(50%)',
+				right: `var( --slider--progress )`,
+			}
+		)() }
 	`;
 };
 
@@ -54,15 +71,20 @@ const trackStyles = ( { trackColor, trackBackgroundColor }: SliderColors ) => {
 	return css`
 		background: linear-gradient(
 			to right,
-			${ trackColor } calc( var( --slider--progress ) ),
-			${ trackBackgroundColor } calc( var( --slider--progress ) )
+			${ trackColor } var( --slider--progress ),
+			${ trackBackgroundColor } var( --slider--progress )
 		);
 		border-radius: 2px;
 		height: 2px;
 	`;
 };
 
-export const slider = ( colors: SliderColors ) => {
+const sliderSizes = {
+	default: '36px',
+	'__unstable-large': '40px',
+};
+
+export const slider = ( colors: SliderColors, size: SliderSizes ) => {
 	return css`
 		appearance: none;
 		background-color: transparent;
@@ -70,12 +92,13 @@ export const slider = ( colors: SliderColors ) => {
 		border-radius: ${ CONFIG.controlBorderRadius };
 		cursor: pointer;
 		display: block;
-		height: ${ CONFIG.controlHeight };
+		height: ${ sliderSizes[ size ] };
 		max-width: 100%;
 		min-width: 0;
 		padding: 0;
 		margin: 0;
 		width: 100%;
+		z-index: 1; /* Ensures marks are beneath the thumb */
 
 		&:focus {
 			outline: none;
@@ -162,14 +185,121 @@ export const error = ( { errorColor, trackBackgroundColor }: SliderColors ) => {
 	`;
 };
 
-export const large = css`
-	/*
-	 * Uses hardcoded 40px height to match design goal instead of
-	 * CONFIG.controlHeightLarge which is only 36px.
-	 */
-	height: 40px;
+export const sliderControl = css``;
+export const sliderWrapper = css`
+	position: relative;
 `;
 
-export const small = css`
-	height: ${ CONFIG.controlHeightSmall };
+export const marks = css`
+	box-sizing: border-box;
+	display: block;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	user-select: none;
 `;
+
+const markFill = ( { disabled, isFilled }: MarkProps ) => {
+	let backgroundColor = isFilled
+		? COLORS.admin.theme
+		: COLORS.lightGray[ 600 ];
+
+	if ( disabled ) {
+		backgroundColor = COLORS.lightGray[ 800 ];
+	}
+
+	return css( { backgroundColor } );
+};
+
+export const mark = ( markProps: MarkProps ) => {
+	return css`
+		box-sizing: border-box;
+		height: 12px;
+		left: 0;
+		position: absolute;
+		top: -4px;
+		width: 1px;
+		${ markFill( markProps ) }
+	`;
+};
+
+const markLabelFill = ( { isFilled }: MarkProps ) => {
+	return css( {
+		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+	} );
+};
+
+export const markLabel = ( markProps: MarkProps ) => {
+	return css`
+		box-sizing: border-box;
+		color: ${ COLORS.lightGray[ 600 ] };
+		left: 0;
+		font-size: 11px;
+		position: absolute;
+		top: 12px;
+		transform: translateX( -50% );
+		white-space: nowrap;
+		${ markLabelFill( markProps ) };
+	`;
+};
+
+const tooltipPosition = ( props: TooltipProps ) => {
+	const { position, fillPercentage } = props;
+
+	if ( position === 'bottom' ) {
+		return css`
+			bottom: -60%;
+			${ rtl(
+				{
+					transform: 'translateX(-50%)',
+					left: `${ fillPercentage }%`,
+				},
+				{
+					transform: 'translateX(50%)',
+					right: `${ fillPercentage }%`,
+				}
+			)() }
+		`;
+	}
+
+	return css`
+		top: -50%;
+		${ rtl(
+			{
+				transform: 'translate(-50%, -60%)',
+				left: `${ fillPercentage }%`,
+			},
+			{
+				transform: 'translate(50%, -60%)',
+				right: `${ fillPercentage }%`,
+			}
+		)() }
+	`;
+};
+
+export const tooltip = ( props: TooltipProps ) => {
+	const { show, zIndex } = props;
+
+	return css`
+		background: rgba( 0, 0, 0, 0.8 );
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: white;
+		display: inline-block;
+		font-size: 12px;
+		min-width: 32px;
+		opacity: 0;
+		padding: 4px 8px;
+		pointer-events: none;
+		position: absolute;
+		text-align: center;
+		transition: opacity 120ms ease;
+		user-select: none;
+		line-height: 1.4;
+		opacity: ${ show ? 1 : 0 };
+		z-index: ${ zIndex };
+
+		${ tooltipPosition( props ) };
+		${ reduceMotion( 'transition' ) };
+	`;
+};
