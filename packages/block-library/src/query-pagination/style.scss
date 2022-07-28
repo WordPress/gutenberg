@@ -13,6 +13,10 @@ $pagination-margin: 0.5em;
 			margin-right: 0;
 		}
 	}
+
+	// This moves the next link to the right side of the container,
+	// which is important when it's the only block displayed
+	// and the block has a "space-between" justification.
 	&.is-content-justification-space-between > .wp-block-query-pagination-next {
 		margin-left: auto;
 	}
