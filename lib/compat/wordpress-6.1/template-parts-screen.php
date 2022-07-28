@@ -206,4 +206,4 @@ function gutenberg_register_template_parts_theme_feature() {
 		)
 	);
 }
-add_action( 'setup_theme', 'getunberg_register_template_parts_theme_feature', 5 );
+add_action( 'setup_theme', 'gutenberg_register_template_parts_theme_feature', 5 );
