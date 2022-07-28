@@ -30,8 +30,11 @@ export async function publishPost( this: Editor ) {
 		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
 	);
 
-	const urlString = await this.page.inputValue( 'text="Post address"' );
+	const urlString = await this.page.inputValue(
+		'role=textbox[name="Post address"i]'
+	);
 	const url = new URL( urlString );
 	const postId = url.searchParams.get( 'p' );
-	return postId;
+
+	return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
 }

@@ -58,8 +58,15 @@ const clickButton = ( name ) => {
 	fireEvent.click( getButton( name ) );
 };
 
+const getSliderInput = () => {
+	return screen.getByRole( 'slider', { name: 'Border width' } );
+};
+
+const getWidthInput = () => {
+	return screen.getByRole( 'spinbutton', { name: 'Border width' } );
+};
 const setWidthInput = ( value ) => {
-	const widthInput = screen.getByRole( 'spinbutton' );
+	const widthInput = getWidthInput();
 	widthInput.focus();
 	fireEvent.change( widthInput, { target: { value } } );
 };
@@ -73,9 +80,13 @@ describe( 'BorderControl', () => {
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
-			const widthInput = screen.getByRole( 'spinbutton' );
-			const unitSelect = screen.getByRole( 'combobox' );
-			const slider = screen.queryByRole( 'slider' );
+			const widthInput = getWidthInput();
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			const slider = screen.queryByRole( 'slider', {
+				name: 'Border width',
+			} );
 
 			expect( label ).toBeInTheDocument();
 			expect( colorButton ).toBeInTheDocument();
@@ -100,13 +111,13 @@ describe( 'BorderControl', () => {
 		it( 'should render with slider', () => {
 			renderBorderControl( { withSlider: true } );
 
-			const slider = screen.getByRole( 'slider' );
+			const slider = getSliderInput();
 			expect( slider ).toBeInTheDocument();
 		} );
 
 		it( 'should render placeholder in UnitControl', () => {
 			renderBorderControl( { placeholder: 'Mixed' } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = getWidthInput();
 
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
@@ -262,7 +273,7 @@ describe( 'BorderControl', () => {
 		it( 'should update width with slider value', () => {
 			const { rerender } = renderBorderControl( { withSlider: true } );
 
-			const slider = screen.getByRole( 'slider' );
+			const slider = getSliderInput();
 			fireEvent.change( slider, { target: { value: '5' } } );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
@@ -271,7 +282,7 @@ describe( 'BorderControl', () => {
 			} );
 
 			rerenderBorderControl( rerender, { withSlider: true } );
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = getWidthInput();
 
 			expect( widthInput.value ).toEqual( '5' );
 		} );

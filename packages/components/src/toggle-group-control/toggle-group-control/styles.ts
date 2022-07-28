@@ -8,19 +8,26 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import type { ToggleGroupControlProps } from '../types';
 
-export const ToggleGroupControl = css`
+export const ToggleGroupControl = ( {
+	size,
+}: {
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+} ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid;
 	border-color: ${ COLORS.ui.border };
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
-	min-height: ${ CONFIG.controlHeight };
 	min-width: 0;
 	padding: 2px;
 	position: relative;
 	transition: transform ${ CONFIG.transitionDurationFastest } linear;
 	${ reduceMotion( 'transition' ) }
+
+	${ toggleGroupControlSize( size ) }
+
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
@@ -32,6 +39,19 @@ export const ToggleGroupControl = css`
 		z-index: 1;
 	}
 `;
+
+export const toggleGroupControlSize = (
+	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
+) => {
+	const heights = {
+		default: '36px',
+		'__unstable-large': '40px',
+	};
+
+	return css`
+		min-height: ${ heights[ size ] };
+	`;
+};
 
 export const block = css`
 	display: flex;

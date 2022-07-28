@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { unescape as unescapeString, flatMap, compact } from 'lodash';
+import { unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,10 +11,10 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, SelectOptions } from './types';
+import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
 
 function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
-	return flatMap( tree, ( treeNode ) => [
+	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
 			label:
@@ -72,6 +72,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
  * }
  * ```
  */
+
 export function TreeSelect( {
 	label,
 	noOptionLabel,
@@ -81,10 +82,10 @@ export function TreeSelect( {
 	...props
 }: TreeSelectProps ) {
 	const options = useMemo( () => {
-		return compact( [
+		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
 			...getSelectOptions( tree ),
-		] );
+		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
 	}, [ noOptionLabel, tree ] );
 
 	return (

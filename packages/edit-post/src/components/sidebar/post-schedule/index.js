@@ -20,6 +20,7 @@ export default function PostSchedule() {
 					popoverProps={ { anchorRef } }
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
+					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<PostScheduleToggle
 							isOpen={ isOpen }

@@ -81,7 +81,7 @@ export default function ListViewDropIndicator( {
 			left: rect.left + indent,
 			right: rect.right,
 			width: 0,
-			height: rect.height,
+			height: 0,
 			ownerDocument,
 		};
 

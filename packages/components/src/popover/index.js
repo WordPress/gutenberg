@@ -148,7 +148,7 @@ const Popover = (
 			return anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			return anchorRect.ownerDocument;
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			return (
 				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
 				document
@@ -210,15 +210,19 @@ const Popover = (
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
-	const onDialogClose = ( type, event ) => {
-		// Ideally the popover should have just a single onClose prop and
-		// not three props that potentially do the same thing.
-		if ( type === 'focus-outside' && onFocusOutside ) {
-			onFocusOutside( event );
-		} else if ( onClose ) {
-			onClose();
-		}
-	};
+	let onDialogClose;
+
+	if ( onClose || onFocusOutside ) {
+		onDialogClose = ( type, event ) => {
+			// Ideally the popover should have just a single onClose prop and
+			// not three props that potentially do the same thing.
+			if ( type === 'focus-outside' && onFocusOutside ) {
+				onFocusOutside( event );
+			} else if ( onClose ) {
+				onClose();
+			}
+		};
+	}
 
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount,
@@ -275,7 +279,7 @@ const Popover = (
 					return anchorRect;
 				},
 			};
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			usedRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );

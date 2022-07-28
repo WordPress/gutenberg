@@ -197,6 +197,7 @@ export { default as settings } from './library/settings';
 export { default as share } from './library/share';
 export { default as shield } from './library/shield';
 export { default as shortcode } from './library/shortcode';
+export { default as shuffle } from './library/shuffle';
 export { default as siteLogo } from './library/site-logo';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';

@@ -11,14 +11,12 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
-import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { appendSelectors } from './utils';
+import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
-import useSetting from '../components/use-setting';
 import {
 	BlockControls,
 	JustifyContentControl,
@@ -107,59 +105,67 @@ export default {
 			</BlockControls>
 		);
 	},
-	save: function FlexLayoutStyle( { selector, layout, style, blockName } ) {
+	getLayoutStyle: function getLayoutStyle( {
+		selector,
+		layout,
+		style,
+		blockName,
+		hasBlockGapSupport,
+		layoutDefinitions,
+	} ) {
 		const { orientation = 'horizontal' } = layout;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const fallbackValue =
-			getBlockSupport( blockName, [
-				'spacing',
-				'blockGap',
-				'__experimentalDefault',
-			] ) || '0.5em';
 
-		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, fallbackValue )
-				: `var( --wp--style--block-gap, ${ fallbackValue } )`;
-		const justifyContent =
-			justifyContentMap[ layout.justifyContent ] ||
-			justifyContentMap.left;
+				? getGapCSSValue( style?.spacing?.blockGap )
+				: undefined;
+		const justifyContent = justifyContentMap[ layout.justifyContent ];
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
 			? layout.flexWrap
 			: 'wrap';
 		const verticalAlignment =
-			verticalAlignmentMap[ layout.verticalAlignment ] ||
-			verticalAlignmentMap.center;
-		const rowOrientation = `
-		flex-direction: row;
-		align-items: ${ verticalAlignment };
-		justify-content: ${ justifyContent };
-		`;
+			verticalAlignmentMap[ layout.verticalAlignment ];
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
-		const columnOrientation = `
-		flex-direction: column;
-		align-items: ${ alignItems };
-		`;
 
-		return (
-			<style>{ `
-				${ appendSelectors( selector ) } {
-					display: flex;
-					flex-wrap: ${ flexWrap };
-					gap: ${ hasBlockGapStylesSupport ? blockGapValue : fallbackValue };
-					${ orientation === 'horizontal' ? rowOrientation : columnOrientation }
-				}
+		let output = '';
+		const rules = [];
 
-				${ appendSelectors( selector, '> *' ) } {
-					margin: 0;
-				}
-			` }</style>
-		);
+		if ( flexWrap && flexWrap !== 'wrap' ) {
+			rules.push( `flex-wrap: ${ flexWrap }` );
+		}
+
+		if ( orientation === 'horizontal' ) {
+			if ( verticalAlignment ) {
+				rules.push( `align-items: ${ verticalAlignment }` );
+			}
+			if ( justifyContent ) {
+				rules.push( `justify-content: ${ justifyContent }` );
+			}
+		} else {
+			rules.push( 'flex-direction: column' );
+			rules.push( `align-items: ${ alignItems }` );
+		}
+
+		if ( rules.length ) {
+			output = `${ appendSelectors( selector ) } {
+				${ rules.join( '; ' ) };
+			}`;
+		}
+
+		// Output blockGap styles based on rules contained in layout definitions in theme.json.
+		if ( hasBlockGapSupport && blockGapValue ) {
+			output += getBlockGapCSS(
+				selector,
+				layoutDefinitions,
+				'flex',
+				blockGapValue
+			);
+		}
+		return output;
 	},
 	getOrientation( layout ) {
 		const { orientation = 'horizontal' } = layout;

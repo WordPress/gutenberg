@@ -11,7 +11,8 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
-import { ENTER } from '@wordpress/keycodes';
+import { __experimentalTruncate as Truncate } from '@wordpress/components';
+import { ENTER, isAppleOS } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -19,22 +20,6 @@ import { ENTER } from '@wordpress/keycodes';
 import BlockIcon from '../block-icon';
 import { InserterListboxItem } from '../inserter-listbox';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-
-/**
- * Return true if platform is MacOS.
- *
- * @param {Object} _window window object by default; used for DI testing.
- *
- * @return {boolean} True if MacOS; false otherwise.
- */
-function isAppleOS( _window = window ) {
-	const { platform } = _window.navigator;
-
-	return (
-		platform.indexOf( 'Mac' ) !== -1 ||
-		[ 'iPad', 'iPhone' ].includes( platform )
-	);
-}
 
 function InserterListItem( {
 	className,
@@ -135,7 +120,9 @@ function InserterListItem( {
 							<BlockIcon icon={ item.icon } showColors />
 						</span>
 						<span className="block-editor-block-types-list__item-title">
-							{ item.title }
+							<Truncate numberOfLines={ 3 }>
+								{ item.title }
+							</Truncate>
 						</span>
 					</InserterListboxItem>
 				</div>

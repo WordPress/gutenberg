@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	MenuGroup,
@@ -17,10 +16,6 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import {
-	MENU_TEMPLATES,
-	TEMPLATE_PARTS_SUB_MENUS,
-} from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
@@ -33,16 +28,6 @@ export default function TemplateDetails( { template, onClose } ) {
 		[]
 	);
 	const { revertTemplate } = useDispatch( editSiteStore );
-
-	const templateSubMenu = useMemo( () => {
-		if ( template?.type === 'wp_template' ) {
-			return { title: __( 'templates' ), menu: MENU_TEMPLATES };
-		}
-
-		return TEMPLATE_PARTS_SUB_MENUS.find(
-			( { area } ) => area === template?.area
-		);
-	}, [ template ] );
 
 	const browseAllLinkProps = useLink( {
 		// TODO: We should update this to filter by template part's areas as well.
@@ -106,11 +91,9 @@ export default function TemplateDetails( { template, onClose } ) {
 				className="edit-site-template-details__show-all-button"
 				{ ...browseAllLinkProps }
 			>
-				{ sprintf(
-					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */
-					__( 'Browse all %s' ),
-					templateSubMenu.title
-				) }
+				{ template?.type === 'wp_template'
+					? __( 'Browse all templates' )
+					: __( 'Browse all template parts' ) }
 			</Button>
 		</div>
 	);

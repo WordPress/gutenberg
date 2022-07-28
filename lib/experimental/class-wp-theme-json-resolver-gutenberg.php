@@ -33,7 +33,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
 
-		if ( null === static::$theme ) {
+		// When backporting to core, remove the instanceof Gutenberg class check, as it is only required for the Gutenberg plugin.
+		if ( null === static::$theme || ! static::$theme instanceof WP_Theme_JSON_Gutenberg ) {
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
@@ -110,6 +111,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $block_type->supports['__experimentalStyle'] );
+			}
+
+			if (
+				isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) &&
+				null === _wp_array_get( $config, array( 'styles', 'blocks', $block_name, 'spacing', 'blockGap' ), null )
+			) {
+				// Ensure an empty placeholder value exists for the block, if it provides a default blockGap value.
+				// The real blockGap value to be used will be determined when the styles are rendered for output.
+				$config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] = null;
 			}
 		}
 

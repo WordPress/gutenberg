@@ -8,12 +8,13 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { appendSelectors } from './utils';
+import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -107,15 +108,15 @@ export default {
 	toolBarControls: function DefaultLayoutToolbarControls() {
 		return null;
 	},
-	save: function DefaultLayoutStyle( {
+	getLayoutStyle: function getLayoutStyle( {
 		selector,
 		layout = {},
 		style,
 		blockName,
+		hasBlockGapSupport,
+		layoutDefinitions,
 	} ) {
 		const { contentSize, wideSize } = layout;
-		const blockGapSupport = useSetting( 'spacing.blockGap' );
-		const hasBlockGapStylesSupport = blockGapSupport !== null;
 		const blockGapStyleValue = getGapBoxControlValueFromStyle(
 			style?.spacing?.blockGap
 		);
@@ -125,14 +126,14 @@ export default {
 			blockGapStyleValue?.top &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? blockGapStyleValue?.top
-				: 'var( --wp--style--block-gap )';
+				: '';
 
 		let output =
 			!! contentSize || !! wideSize
 				? `
 					${ appendSelectors(
 						selector,
-						'> :where(:not(.alignleft):not(.alignright))'
+						'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
 					) } {
 						max-width: ${ contentSize ?? wideSize };
 						margin-left: auto !important;
@@ -147,37 +148,37 @@ export default {
 				`
 				: '';
 
-		output += `
-			${ appendSelectors( selector, '> .alignleft' ) } {
-				float: left;
-				margin-inline-start: 0;
-				margin-inline-end: 2em;
-			}
-			${ appendSelectors( selector, '> .alignright' ) } {
-				float: right;
-				margin-inline-start: 2em;
-				margin-inline-end: 0;
-			}
-
-			${ appendSelectors( selector, '> .aligncenter' ) } {
-				margin-left: auto !important;
-				margin-right: auto !important;
-			}
-		`;
-
-		if ( hasBlockGapStylesSupport ) {
-			output += `
-				${ appendSelectors( selector, '> *' ) } {
-					margin-block-start: 0;
-					margin-block-end: 0;
+		// If there is custom padding, add negative margins for alignfull blocks.
+		if ( style?.spacing?.padding ) {
+			// The style object might be storing a preset so we need to make sure we get a usable value.
+			const paddingValues = getCSSRules( style );
+			paddingValues.forEach( ( rule ) => {
+				if ( rule.key === 'paddingRight' ) {
+					output += `
+					${ appendSelectors( selector, '> .alignfull' ) } {
+						margin-right: calc(${ rule.value } * -1);
+					}
+					`;
+				} else if ( rule.key === 'paddingLeft' ) {
+					output += `
+					${ appendSelectors( selector, '> .alignfull' ) } {
+						margin-left: calc(${ rule.value } * -1);
+					}
+					`;
 				}
-				${ appendSelectors( selector, '> * + *' ) } {
-					margin-block-start: ${ blockGapValue };
-				}
-			`;
+			} );
 		}
 
-		return <style>{ output }</style>;
+		// Output blockGap styles based on rules contained in layout definitions in theme.json.
+		if ( hasBlockGapSupport && blockGapValue ) {
+			output += getBlockGapCSS(
+				selector,
+				layoutDefinitions,
+				'default',
+				blockGapValue
+			);
+		}
+		return output;
 	},
 	getOrientation() {
 		return 'vertical';

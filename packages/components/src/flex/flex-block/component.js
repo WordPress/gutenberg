@@ -20,9 +20,15 @@ function FlexBlock( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * <Flex>
- * 	<FlexBlock>...</FlexBlock>
- * </Flex>
+ * import { Flex, FlexBlock } from '@wordpress/components';
+ *
+ * function Example() {
+ *   return (
+ *     <Flex>
+ *       <FlexBlock>...</FlexBlock>
+ *     </Flex>
+ *   );
+ * }
  * ```
  */
 const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );

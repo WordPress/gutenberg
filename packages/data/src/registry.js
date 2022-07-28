@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapValues, isObject, forEach } from 'lodash';
+import { mapValues, forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,6 +42,10 @@ import { createEmitter } from './utils/emitter';
  *
  * @property {Function} registerStore registers store.
  */
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Creates a new store registry, given an optional object of initial store
