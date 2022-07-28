@@ -1002,7 +1002,7 @@ export const __unstableExpandSelection =
  */
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
-	( { select, dispatch } ) => {
+	( { registry, select, dispatch } ) => {
 		const blocks = [ firstBlockClientId, secondBlockClientId ];
 		dispatch( { type: 'MERGE_BLOCKS', blocks } );
 
@@ -1010,13 +1010,33 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		// Only focus the previous block if it's not mergeable.
+		if ( ! blockAType ) return;
+
+		const blockB = select.getBlock( clientIdB );
+
 		if ( blockAType && ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			// If there's no merge function defined, attempt merging inner
+			// blocks.
+			const blocksWithTheSameType = switchToBlockType(
+				blockB,
+				blockAType.name
+			);
+			if ( blocksWithTheSameType?.length !== 1 ) return;
+			const [ blockWithSameType ] = blocksWithTheSameType;
+			registry.batch( () => {
+				dispatch.insertBlocks(
+					blockWithSameType.innerBlocks,
+					undefined,
+					clientIdA
+				);
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
+			} );
 			return;
 		}
 
-		const blockB = select.getBlock( clientIdB );
 		const blockBType = getBlockType( blockB.name );
 		const { clientId, attributeKey, offset } = select.getSelectionStart();
 		const selectedBlockType =
@@ -1075,8 +1095,15 @@ export const mergeBlocks =
 				? [ cloneB ]
 				: switchToBlockType( cloneB, blockA.name );
 
-		// If the block types can not match, do nothing.
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+			// Fall back to moving the block inside the previous
+			// block.
+			dispatch.moveBlocksToPosition(
+				[ clientIdA ],
+				select.getBlockRootClientId( clientIdA ),
+				clientIdB,
+				0
+			);
 			return;
 		}
 
