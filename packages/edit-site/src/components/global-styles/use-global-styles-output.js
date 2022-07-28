@@ -539,7 +539,7 @@ export const toStyles = (
 	blockSelectors,
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
-	skipLayoutStyles = false
+	disableLayoutStyles = false
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -616,7 +616,7 @@ export const toStyles = (
 
 			// Process blockGap and layout styles.
 			if (
-				! skipLayoutStyles &&
+				! disableLayoutStyles &&
 				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
 			) {
 				ruleset += getLayoutStyles( {
@@ -767,22 +767,6 @@ export const getBlockSelectors = ( blockTypes ) => {
 	return result;
 };
 
-/**
- * Determines whether or not the theme has disabled all layout styles output.
- *
- * This feature only disables the output of layout styles,
- * the controls for adjusting layout will still be available in the editor.
- * Themes that use this feature commit to providing their own styling for layout features.
- *
- * @return {boolean} Whether or not the theme opts-in to disable all layout styles.
- */
-function useThemeHasDisabledLayoutStyles() {
-	return useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().disableLayoutStyles;
-	} );
-}
-
 export function useGlobalStylesOutput() {
 	const [ stylesheets, setStylesheets ] = useState( [] );
 	const [ settings, setSettings ] = useState( {} );
@@ -791,7 +775,10 @@ export function useGlobalStylesOutput() {
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
-	const skipLayoutStyles = useThemeHasDisabledLayoutStyles();
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -808,7 +795,7 @@ export function useGlobalStylesOutput() {
 			blockSelectors,
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
-			skipLayoutStyles
+			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
@@ -827,7 +814,7 @@ export function useGlobalStylesOutput() {
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
-		skipLayoutStyles,
+		disableLayoutStyles,
 	] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
