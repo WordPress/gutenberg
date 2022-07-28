@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 require_once './class-wp-html-walker.php';
 
 final class WP_HTML_Walker_Tests extends TestCase {
-	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
+	const HTML_SIMPLE = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 
 	/**
@@ -19,19 +19,31 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	/**
 	 *
 	 */
-	public function test_finding_existing_tag_returns_the_walker_object() {
+	public function test_finding_existing_tag() {
 		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$result = $w->next_tag();
-		$this->assertSame( $w, $result, 'Finding an existing tag returns the Walker object' );
+		$this->assertSame( $w, $result, 'Querying an existing tag returns the Walker object' );
+		$this->assertTrue( $w->has_match(), 'Querying an non-existing tag leads to has_match() === true' );
 	}
 
 	/**
 	 *
 	 */
-	public function test_finding_non_existing_tag_returns_false() {
+	public function test_finding_non_existing_tag() {
 		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$result = $w->next_tag( 'p' );
-		$this->assertFalse( $result );
+		$this->assertSame( $w, $result, 'Querying a non-existing tag returns the Walker object' );
+		$this->assertFalse( $w->has_match(), 'Querying a non-existing tag leads to has_match() === false' );
+	}
+
+	/**
+	 *
+	 */
+	public function test_chaining_after_a_non_existing_tag() {
+		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
+		$result = $w->next_tag( 'p' )->next_tag( 'div' )->set_attribute( 'id', 'primary' );
+		$this->assertSame( $w, $result, 'Chaining after a non-existing tag still returns the Walker object' );
+		$this->assertFalse( $w->has_match(), 'Chaining after a non-existing tag leads to has_match() === false' );
 	}
 
 	/**
@@ -50,6 +62,18 @@ final class WP_HTML_Walker_Tests extends TestCase {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag()->set_attribute( 'id', 'new-id' );
 		$this->assertSame( '<div id="new-id"><span id="second">Text</span></div>', (string) $w );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_all_tags_using_a_loop() {
+		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
+		do {
+			$w->next_tag()->set_attribute( 'data-foo', 'bar' );
+		} while ( $w->has_match() );
+
+		$this->assertSame( '<div data-foo="bar" id="first"><span data-foo="bar" id="second">Text</span></div>', (string) $w );
 	}
 
 	/**
@@ -179,26 +203,34 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	/**
 	 *
 	 */
-	public function test_throws_an_exception_when_updating_an_attribute_without_matching_a_tag() {
-		$this->expectException( WP_HTML_Walker_Exception::class );
-		$this->expectExceptionMessage( 'Cannot update a tag: No tag was matched' );
-
+	public function test_throws_no_exception_when_updating_an_attribute_without_matching_a_tag() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->set_attribute( 'id', 'first' );
+		$this->assertSame( self::HTML_WITH_CLASSES, (string) $w );
 	}
 
 	/**
-	 *
+	 * @dataProvider parser_methods
 	 */
-	public function test_throws_an_exception_when_updating_a_closed_walker() {
+	public function test_interactions_with_a_closed_walker_throw_an_exception( $method, $args ) {
 		$this->expectException( WP_HTML_Walker_Exception::class );
-		$this->expectExceptionMessage( 'Cannot update a tag: WP_HTML_Walker can only move forward through the HTML document and it has already reached an end.' );
+		$this->expectExceptionMessage( 'WP_HTML_Walker was already cast to a string' );
 
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
 		$w->__toString(); // Force the walker to get to the end of the document.
 
-		$w->set_attribute( 'id', 'first' );
+		$w->$method( ...$args );
+	}
+
+	public function parser_methods() {
+		return array(
+			array( 'next_tag', array( 'div' ) ),
+			array( 'set_attribute', array( 'id', 'test' ) ),
+			array( 'remove_attribute', array( 'id' ) ),
+			array( 'add_class', array( 'main' ) ),
+			array( 'remove_class', array( 'main' ) ),
+		);
 	}
 
 	/**
@@ -281,7 +313,9 @@ HTML;
 					'match_offset' => 2,
 				)
 			)
-			->remove_attribute( 'class' );
+			->remove_attribute( 'class' )
+			->next_tag( 'non-existent' )
+			->set_attribute( 'class', 'test' );
 		$this->assertSame( $expected_output, (string) $w );
 	}
 }

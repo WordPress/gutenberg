@@ -44,6 +44,12 @@ class WP_HTML_Walker {
 	 */
 	private $updated_bytes = 0;
 	/**
+	 * Whether the parsing is already finished.
+	 *
+	 * @var bool
+	 */
+	private $closed = false;
+	/**
 	 * The name of the currently matched tag.
 	 *
 	 * @var string|null
@@ -156,6 +162,7 @@ class WP_HTML_Walker {
 	 * @see WP_Tag_Find_Descriptor::parse.
 	 */
 	public function next_tag( $query = null ) {
+		$this->assert_not_closed();
 		$descriptor           = WP_Tag_Find_Descriptor::parse( $query );
 		$current_match_offset = - 1;
 		do {
@@ -165,9 +172,9 @@ class WP_HTML_Walker {
 			 * _every_ tag and then check after we find one if it's the one we are looking for.
 			 */
 			if ( false === $this->parse_next_tag() ) {
-				$this->close();
+				$this->parsed_bytes = strlen( $this->html );
 
-				return false;
+				return $this;
 			}
 
 			// Parse all the attributes of the current tag.
@@ -260,6 +267,17 @@ class WP_HTML_Walker {
 		return $this->attributes[ $attribute_name ];
 	}
 
+	private function assert_not_closed() {
+		if ( $this->closed ) {
+			throw new WP_HTML_Walker_Exception(
+				'This WP_HTML_Walker was already cast to a string and ' .
+				'no further lookups or updates are possible. This is because ' .
+				'the HTML parsing algorithm only moves forward and the ' .
+				'cursor is already at the end of the HTML document.'
+			);
+		}
+	}
+
 	/**
 	 * Applies attribute updates and cleans up once a tag is fully parsed.
 	 *
@@ -269,9 +287,9 @@ class WP_HTML_Walker {
 	private function after_tag() {
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
-		$this->tag_name           = null;
-		$this->tag_name_ends_at   = null;
-		$this->attributes         = array();
+		$this->tag_name         = null;
+		$this->tag_name_ends_at = null;
+		$this->attributes       = array();
 	}
 
 	/**
@@ -287,7 +305,7 @@ class WP_HTML_Walker {
 	 * @see $attributes_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		$classname_updates = $this->classnames_updates;
+		$classname_updates        = $this->classnames_updates;
 		$this->classnames_updates = array();
 		if ( empty( $classname_updates ) || array_key_exists( 'class', $this->attributes_updates ) ) {
 			return;
@@ -353,8 +371,8 @@ class WP_HTML_Walker {
 		);
 
 		foreach ( $updates as $diff ) {
-			$this->updated_html  .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
-			$this->updated_html  .= $diff->text;
+			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
+			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
 		}
 		$this->attributes_updates = array();
@@ -370,8 +388,10 @@ class WP_HTML_Walker {
 	 * @throws WP_HTML_Walker_Exception When no tag was matched.
 	 */
 	public function set_attribute( $name, $value ) {
-		$this->assert_tag_matched();
-
+		$this->assert_not_closed();
+		if ( ! $this->has_match() ) {
+			return $this;
+		}
 		$escaped_new_value = esc_attr( $value );
 		$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 
@@ -424,8 +444,7 @@ class WP_HTML_Walker {
 	 * @throws WP_HTML_Walker_Exception When no tag was matched.
 	 */
 	public function remove_attribute( $name ) {
-		$this->assert_tag_matched();
-
+		$this->assert_not_closed();
 		$attr = $this->get_current_tag_attribute( $name );
 		if ( $attr ) {
 			/*
@@ -449,16 +468,6 @@ class WP_HTML_Walker {
 		return $this;
 	}
 
-	private function assert_tag_matched() {
-		// More specific error message when we've finished parsing the original HTML document.
-		if ( $this->is_closed() ) {
-			throw new WP_HTML_Walker_Exception( 'Cannot update a tag: WP_HTML_Walker can only move forward through the HTML document and it has already reached an end.' );
-		}
-		if ( ! $this->tag_name ) {
-			throw new WP_HTML_Walker_Exception( 'Cannot update a tag: No tag was matched' );
-		}
-	}
-
 	private function get_current_tag_attribute( $name ) {
 		if ( array_key_exists( $name, $this->attributes ) ) {
 			return $this->attributes[ $name ];
@@ -467,12 +476,12 @@ class WP_HTML_Walker {
 		return false;
 	}
 
-	public function is_closed() {
-		return strlen( $this->html ) === $this->parsed_bytes;
+	public function has_match() {
+		return ! ! $this->tag_name;
 	}
 
-	private function close() {
-		$this->parsed_bytes = strlen( $this->html );
+	public function is_closed() {
+		return $this->closed;
 	}
 
 	/**
@@ -484,8 +493,10 @@ class WP_HTML_Walker {
 	 * @throws WP_HTML_Walker_Exception When no tag was matched.
 	 */
 	public function add_class( $class_name ) {
-		$this->assert_tag_matched();
-		$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, true );
+		$this->assert_not_closed();
+		if ( $this->has_match() ) {
+			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, true );
+		}
 
 		return $this;
 	}
@@ -499,8 +510,10 @@ class WP_HTML_Walker {
 	 * @throws WP_HTML_Walker_Exception When no tag was matched.
 	 */
 	public function remove_class( $class_name ) {
-		$this->assert_tag_matched();
-		$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, false );
+		$this->assert_not_closed();
+		if ( $this->has_match() ) {
+			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, false );
+		}
 
 		return $this;
 	}
@@ -538,7 +551,8 @@ class WP_HTML_Walker {
 		if ( ! $this->is_closed() ) {
 			$this->after_tag();
 			$this->updated_html .= substr( $this->html, $this->updated_bytes );
-			$this->close();
+			$this->parsed_bytes  = strlen( $this->html );
+			$this->closed        = true;
 		}
 
 		return $this->updated_html;
@@ -560,7 +574,7 @@ class WP_HTML_Walker {
  */
 class WP_Class_Name_Update {
 	const REMOVE = false;
-	const ADD = true;
+	const ADD    = true;
 	/** @var string */
 	public $class_name;
 	/** @var boolean */
@@ -568,7 +582,7 @@ class WP_Class_Name_Update {
 
 	/**
 	 * @param string $class_name
-	 * @param bool $operation
+	 * @param bool   $operation
 	 */
 	public function __construct( $class_name, $operation ) {
 		$this->class_name = $class_name;
@@ -724,7 +738,7 @@ class WP_Tag_Find_Descriptor {
 	}
 
 	/**
-	 * @param string $tag
+	 * @param string                         $tag
 	 * @param array<WP_HTML_Attribute_Token> $attributes
 	 *
 	 * @return boolean
