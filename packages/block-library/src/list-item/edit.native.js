@@ -129,6 +129,7 @@ export default function ListItemEdit( {
 							onReplace( convertToListItems( blocks ), ...args );
 						} }
 						style={ style }
+						deleteEnter={ true }
 					/>
 				</View>
 			</View>
