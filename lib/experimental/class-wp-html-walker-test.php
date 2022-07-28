@@ -56,6 +56,16 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
+	 * According to HTML spec, only the first instance of an attribute counts.
+	 * The other ones are ignored.
+	 */
+	public function test_update_duplicated_attribute() {
+		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
+		$w->next_tag()->set_attribute( 'id', 'updated-id' );
+		$this->assertSame( '<div id="updated-id" id="ignored-id"><span id="second">Text</span></div>', (string) $w );
+	}
+
+	/**
 	 *
 	 */
 	public function test_set_existing_attribute() {

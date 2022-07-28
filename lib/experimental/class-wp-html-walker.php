@@ -254,15 +254,17 @@ class WP_HTML_Walker {
 			$attribute_end   = $this->offset_after_match( $name_match['NAME'] );
 		}
 
-		$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
-			$attribute_name,
-			// Avoid storing large, base64-encoded images. This class only ever uses the "class"
-			// attribute value, so let's store just that. If we need to do attribute-based matching
-			// in the future, this function could start accepting a list of relevant attributes.
-			'class' === $attribute_name ? $attribute_value : null,
-			$attribute_start,
-			$attribute_end
-		);
+		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
+			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
+				$attribute_name,
+				// Avoid storing large, base64-encoded images. This class only ever uses the "class"
+				// attribute value, so let's store just that. If we need to do attribute-based matching
+				// in the future, this function could start accepting a list of relevant attributes.
+				'class' === $attribute_name ? $attribute_value : null,
+				$attribute_start,
+				$attribute_end
+			);
+		}
 
 		return $this->attributes[ $attribute_name ];
 	}
