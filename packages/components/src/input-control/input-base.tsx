@@ -101,7 +101,6 @@ export function InputBase(
 					hideLabelFromVision={ hideLabelFromVision }
 					labelPosition={ labelPosition }
 					htmlFor={ id }
-					size={ size }
 				>
 					{ label }
 				</Label>
