@@ -1,0 +1,3 @@
+<!-- wp:code -->
+<pre class="wp-block-code"><code>print "Hello Dolly!"</code></pre>
+<!-- /wp:code -->
