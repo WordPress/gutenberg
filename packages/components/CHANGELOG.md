@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+
 ## 19.16.0 (2022-07-27)
 
 ### Bug Fix
@@ -35,7 +39,6 @@
 -   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
 -   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
 -   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
--   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
 -   `ScrollLock`: Convert to TypeScript ([#42303](https://github.com/WordPress/gutenberg/pull/42303)).
 -   `Shortcut`: Convert to TypeScript ([#42272](https://github.com/WordPress/gutenberg/pull/42272)).
 -   `TreeSelect`: Refactor away from `_.compact()` ([#42438](https://github.com/WordPress/gutenberg/pull/42438)).
