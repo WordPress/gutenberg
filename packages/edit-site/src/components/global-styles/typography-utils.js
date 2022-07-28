@@ -35,6 +35,11 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	const DEFAULT_SCALE_FACTOR = 1;
 
 	// Font sizes.
+	// A font size has explicitly bypassed fluid calculations.
+	if ( false === preset?.fluid ) {
+		return defaultSize;
+	}
+
 	const fluidFontSizeSettings = preset?.fluid || {};
 
 	// Try to grab explicit min and max fluid font sizes.

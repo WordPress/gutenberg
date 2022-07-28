@@ -378,6 +378,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
 
+	// A font size has explicitly bypassed fluid calculations.
 	if ( false === $fluid_font_size_settings ) {
 		return $preset['size'];
 	}
