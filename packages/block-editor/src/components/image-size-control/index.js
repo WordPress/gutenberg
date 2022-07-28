@@ -22,8 +22,7 @@ import useDimensionHandler from './use-dimension-handler';
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 
 export default function ImageSizeControl( {
-	label,
-	help,
+	imageSizeHelp,
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -45,11 +44,11 @@ export default function ImageSizeControl( {
 		<>
 			{ ! isEmpty( imageSizeOptions ) && (
 				<SelectControl
-					label={ label === undefined ? __( 'Image size' ) : label }
+					label={ __( 'Image size' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
-					help={ help }
+					help={ imageSizeHelp }
 				/>
 			) }
 			{ isResizable && (
