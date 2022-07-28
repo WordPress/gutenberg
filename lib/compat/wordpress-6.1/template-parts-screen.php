@@ -197,7 +197,7 @@ function gutenberg_template_parts_screen_render() {
  *
  * @return void
  */
-function getunberg_register_template_parts_theme_feature() {
+function gutenberg_register_template_parts_theme_feature() {
 	register_theme_feature(
 		'block-template-parts',
 		array(
