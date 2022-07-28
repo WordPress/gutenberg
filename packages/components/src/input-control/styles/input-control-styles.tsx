@@ -11,7 +11,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { WordPressComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { COLORS, rtl } from '../../utils';
+import { baseLabelTypography, COLORS, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
 import { space } from '../../ui/utils/space';
 
@@ -272,6 +272,8 @@ const labelMargin = ( {
 
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
+		${ baseLabelTypography };
+
 		box-sizing: border-box;
 		display: block;
 		padding-top: 0;
