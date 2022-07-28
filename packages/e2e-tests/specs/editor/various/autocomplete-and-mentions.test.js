@@ -67,8 +67,6 @@ describe( 'Autocomplete', () => {
 					<p>I like 🍓.</p>
 					<!-- /wp:paragraph -->"
 					`;
-			} else {
-				[ testData.triggerString, testData.snapshot ] = undefined;
 			}
 
 			await clickBlockAppender();
@@ -102,8 +100,6 @@ describe( 'Autocomplete', () => {
 					<p>Stuck in the middle with a 🥭 you.</p>
 					<!-- /wp:paragraph -->"
 					`;
-			} else {
-				[ testData.triggerString, testData.snapshot ] = undefined;
 			}
 
 			await clickBlockAppender();
@@ -115,6 +111,50 @@ describe( 'Autocomplete', () => {
 			);
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
+
+		it( `should insert two subsequent ${ type }s`, async () => {
+			const testData = {};
+			if ( type === 'mention' ) {
+				testData.firstTriggerString =
+					'The two greatest hobbits, in order: @bi';
+				testData.secondTriggerString = ' @fr';
+				testData.firstOptionPath =
+					'//*[contains(text(),"Bilbo Baggins")]';
+				testData.secondOptionPath =
+					'//*[contains(text(),"Frodo Baggins")]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>The two greatest hobbits, in order: @thebetterhobbit @ringbearer.</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.firstTriggerString = 'An awesome combination: ~m';
+				testData.secondTriggerString = ' ~b';
+				testData.firstOptionPath = '[text()="🥭 Mango"]';
+				testData.secondOptionPath = '[text()="🫐 Blueberry"]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>An awesome combination: 🥭 🫐.</p>
+					<!-- /wp:paragraph -->"
+					`;
+			}
+
+			await clickBlockAppender();
+			await page.keyboard.type( testData.firstTriggerString );
+			await page.waitForXPath(
+				`//button[@role="option"]${ testData.firstOptionPath }`
+			);
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( testData.secondTriggerString );
+			await page.waitForXPath(
+				`//button[@role="option"]${ testData.secondOptionPath }`
+			);
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( '.' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
 				testData.snapshot
 			);
