@@ -16,7 +16,6 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 
@@ -30,6 +29,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+import { useControlledValue } from '../utils/hooks';
 
 const noop = () => {};
 
@@ -47,10 +47,10 @@ const DetectOutside = withFocusOutside(
 
 function ComboboxControl( {
 	__next36pxDefaultSize,
-	value,
+	value: valueProp,
 	label,
 	options,
-	onChange,
+	onChange: onChangeProp,
 	onFilterValueChange = noop,
 	hideLabelFromVision,
 	help,
@@ -60,6 +60,11 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 } ) {
+	const [ value, setValue ] = useControlledValue( {
+		value: valueProp,
+		onChange: onChangeProp,
+	} );
+
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
 	// Use a custom prefix when generating the `instanceId` to avoid having
@@ -93,7 +98,7 @@ function ComboboxControl( {
 	}, [ inputValue, options, value ] );
 
 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
-		onChange( newSelectedSuggestion.value );
+		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
 		setInputValue( '' );
@@ -119,22 +124,22 @@ function ComboboxControl( {
 			return;
 		}
 
-		switch ( event.keyCode ) {
-			case ENTER:
+		switch ( event.code ) {
+			case 'Enter':
 				if ( selectedSuggestion ) {
 					onSuggestionSelected( selectedSuggestion );
 					preventDefault = true;
 				}
 				break;
-			case UP:
+			case 'ArrowUp':
 				handleArrowNavigation( -1 );
 				preventDefault = true;
 				break;
-			case DOWN:
+			case 'ArrowDown':
 				handleArrowNavigation( 1 );
 				preventDefault = true;
 				break;
-			case ESCAPE:
+			case 'Escape':
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
@@ -173,7 +178,7 @@ function ComboboxControl( {
 	};
 
 	const handleOnReset = () => {
-		onChange( null );
+		setValue( null );
 		inputContainer.current.focus();
 	};
 

@@ -76,7 +76,7 @@ export type UnitSelectControlProps = {
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 	Pick<
 		InputControlProps,
-		'hideLabelFromVision' | '__next36pxDefaultSize'
+		'hideLabelFromVision' | 'prefix' | '__next36pxDefaultSize'
 	> & {
 		__unstableStateReducer?: StateReducer;
 		__unstableInputWidth?: CSSProperties[ 'width' ];

@@ -16,3 +16,11 @@
 		}
 	}
 }
+
+.block-library-template-part__selection-search {
+	background: $white;
+	position: sticky;
+	top: 0;
+	padding: $grid-unit-20 0;
+	z-index: z-index(".block-library-template-part__selection-search");
+}

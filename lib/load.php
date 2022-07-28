@@ -58,6 +58,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 require __DIR__ . '/experimental/editor-settings.php';
 
+// Gutenberg plugin compat.
+require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
+
 // WordPress 6.0 compat.
 require __DIR__ . '/compat/wordpress-6.0/block-gallery.php';
 require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
@@ -70,7 +73,7 @@ require __DIR__ . '/compat/wordpress-6.0/functions.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.0/block-template.php';
+require __DIR__ . '/compat/wordpress-6.0/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
 require __DIR__ . '/compat/wordpress-6.0/client-assets.php';

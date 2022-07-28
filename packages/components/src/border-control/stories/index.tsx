@@ -39,6 +39,9 @@ const colors = [
 	{ name: 'Blue', color: '#72aee6' },
 	{ name: 'Red', color: '#e65054' },
 	{ name: 'Yellow', color: '#f2d675' },
+	{ name: 'Blue', color: '#72aee6' },
+	{ name: 'Red', color: '#e65054' },
+	{ name: 'Yellow', color: '#f2d675' },
 ];
 
 // Multiple origin colors.
