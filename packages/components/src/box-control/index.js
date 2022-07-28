@@ -8,13 +8,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { BaseControl } from '../base-control';
 import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
-import { Text } from '../text';
 import LinkedButton from './linked-button';
 import {
 	Root,
@@ -120,12 +120,9 @@ export default function BoxControl( {
 		<Root id={ id } role="group" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
 				<FlexItem>
-					<Text
-						id={ headingId }
-						className="component-box-control__label"
-					>
+					<BaseControl.VisualLabel id={ headingId }>
 						{ label }
-					</Text>
+					</BaseControl.VisualLabel>
 				</FlexItem>
 				{ allowReset && (
 					<FlexItem>
