@@ -42,6 +42,16 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
 	$layout_styles = array();
 	if ( 'default' === $layout_type ) {
+		if ( $has_block_gap_support ) {
+			if ( is_array( $gap_value ) ) {
+				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
+			}
+			if ( $gap_value && ! $should_skip_gap_serialization ) {
+				$style .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
+				$style .= "$selector > * + * { margin-block-start: $gap_value; margin-block-end: 0; }";
+			}
+		}
+	} elseif ( 'column' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
 
@@ -254,19 +264,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$class_names            = array();
+	$layout_definitions     = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
+	$block_classname        = wp_get_block_default_classname( $block['blockName'] );
+	$container_class        = wp_unique_id( 'wp-container-' );
+	$layout_classname       = '';
+	$use_global_padding     = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
+
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		if ( ! $global_layout_settings ) {
 			return $block_content;
 		}
-		$used_layout = $global_layout_settings;
 	}
-
-	$class_names        = array();
-	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
-	$container_class    = wp_unique_id( 'wp-container-' );
-	$layout_classname   = '';
-	$use_global_padding = gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) && ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] );
 
 	if ( $use_global_padding ) {
 		$class_names[] = 'has-global-padding';

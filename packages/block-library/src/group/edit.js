@@ -48,7 +48,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	);
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout =
+		! layout?.type || layout?.type === 'column'
+			? { ...defaultLayout, ...layout, type: 'column' }
+			: layout;
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
 

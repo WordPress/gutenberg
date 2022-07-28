@@ -110,11 +110,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	// Only show the inherit toggle if it's supported,
 	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
-	// and that the default / flow layout type is in use, as this is the only one that supports inheritance.
+	// and either the default / flow or the column layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
 		!! defaultThemeLayout &&
-		( ! layout?.type || layout?.type === 'default' || layout?.inherit )
+		( ! layout?.type ||
+			layout?.type === 'default' ||
+			layout?.type === 'column' ||
+			layout?.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
@@ -141,12 +144,17 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								label={ __( 'Inner blocks use full width' ) }
-								checked={ ! inherit }
+								label={ __(
+									'Inner blocks respect content width'
+								) }
+								checked={ layoutType?.name === 'column' }
 								onChange={ () =>
 									setAttributes( {
 										layout: {
-											inherit: ! inherit,
+											type:
+												layoutType?.name === 'column'
+													? 'default'
+													: 'column',
 										},
 									} )
 								}
@@ -170,7 +178,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						/>
 					) }
 
-					{ ! inherit && layoutType && (
+					{ layoutType && layoutType.name !== 'default' && (
 						<layoutType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
