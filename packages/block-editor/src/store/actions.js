@@ -1023,6 +1023,7 @@ export const mergeBlocks =
 			);
 			if ( blocksWithTheSameType?.length !== 1 ) return;
 			const [ blockWithSameType ] = blocksWithTheSameType;
+			if ( blockWithSameType.innerBlocks.length < 1 ) return;
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1096,14 +1097,6 @@ export const mergeBlocks =
 				: switchToBlockType( cloneB, blockA.name );
 
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			// Fall back to moving the block inside the previous
-			// block.
-			dispatch.moveBlocksToPosition(
-				[ clientIdA ],
-				select.getBlockRootClientId( clientIdA ),
-				clientIdB,
-				0
-			);
 			return;
 		}
 
