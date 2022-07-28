@@ -8,7 +8,6 @@ import { __experimentalText as Text } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
@@ -34,7 +33,6 @@ export default function SpacingSizesControl( {
 		...useSetting( 'spacing.spacingSizes' ),
 	];
 
-	const type = label;
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( values );
 	const hasOneSide = sides?.length === 1;
@@ -60,7 +58,7 @@ export default function SpacingSizesControl( {
 		values: inputValues,
 		spacingSizes,
 		useSelect,
-		type,
+		type: label,
 	};
 
 	return (

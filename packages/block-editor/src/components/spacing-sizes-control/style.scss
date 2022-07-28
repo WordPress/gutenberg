@@ -1,5 +1,5 @@
 // The following is needed to prevent horizontal scrollbar when range
-// control is slid to far right. Component styles overrride with 100%
+// control is slid too far right. Component styles overrride with 100%
 // max width if extra specificity not added.
 .components-tools-panel-item > fieldset.component-spacing-sizes-control {
 	max-width: 235px;
