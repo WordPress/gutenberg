@@ -14,6 +14,9 @@ require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
  * Tests for registering, storing and retrieving CSS Rules.
  */
 class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
+	/**
+	 * Tear down after each test.
+	 */
 	public function tear_down() {
 		parent::tear_down();
 		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();

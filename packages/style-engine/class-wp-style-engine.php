@@ -384,7 +384,6 @@ class WP_Style_Engine {
 	 * @param array $block_styles The style object.
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-	 *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
 	 * );.
 	 *
@@ -393,7 +392,7 @@ class WP_Style_Engine {
 	 *     'classnames'       => (array) A flat array of classnames.
 	 * );
 	 */
-	public function parse_block_supports_styles( $block_styles, $options ) {
+	public function parse_block_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return array();
 		}
@@ -612,9 +611,10 @@ class WP_Style_Engine {
  *
  * @param array         $block_styles The style object.
  * @param array<string> $options      array(
- *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
  *     'context'                    => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
  *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+ *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
  * );.
  *
  * @return array<string>|null array(
@@ -629,21 +629,32 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	}
 	$defaults = array(
 		'selector'                   => null,
+		'context'                    => 'block-supports',
 		'convert_vars_to_classnames' => false,
 		'enqueue'                    => false,
 	);
 
 	$options       = wp_parse_args( $options, $defaults );
 	$style_engine  = WP_Style_Engine::get_instance();
-	$parsed_styles = $style_engine->parse_block_supports_styles( $block_styles, $options );
+	$parsed_styles = null;
+
+	// Block supports styles.
+	if ( 'block-supports' === $options['context'] ) {
+		$parsed_styles = $style_engine->parse_block_styles( $block_styles, $options );
+	}
 
 	// Output.
 	$styles_output = array();
+
+	if ( ! $parsed_styles ) {
+		return $styles_output;
+	}
+
 	if ( ! empty( $parsed_styles['css_declarations'] ) ) {
 		$styles_output['css']          = $style_engine->compile_css( $parsed_styles['css_declarations'], $options['selector'] );
 		$styles_output['declarations'] = $parsed_styles['css_declarations'];
 		if ( true === $options['enqueue'] ) {
-			$style_engine::store_css_rule( $options['selector'], $parsed_styles['css_declarations'], 'block-supports' );
+			$style_engine::store_css_rule( $options['selector'], $parsed_styles['css_declarations'], $options['context'] );
 		}
 	}
 
