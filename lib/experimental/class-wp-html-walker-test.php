@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 require_once './class-wp-html-walker.php';
 
 final class WP_HTML_Walker_Tests extends TestCase {
-	const HTML_SIMPLE = '<div id="first"><span id="second">Text</span></div>';
+	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 
 	/**
@@ -20,30 +20,26 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 *
 	 */
 	public function test_finding_existing_tag() {
-		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$result = $w->next_tag();
-		$this->assertSame( $w, $result, 'Querying an existing tag returns the Walker object' );
-		$this->assertTrue( $w->has_match(), 'Querying an non-existing tag leads to has_match() === true' );
+		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
+		$this->assertTrue( $w->next_tag(), 'Querying an existing tag returns true' );
 	}
 
 	/**
 	 *
 	 */
 	public function test_finding_non_existing_tag() {
-		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$result = $w->next_tag( 'p' );
-		$this->assertSame( $w, $result, 'Querying a non-existing tag returns the Walker object' );
-		$this->assertFalse( $w->has_match(), 'Querying a non-existing tag leads to has_match() === false' );
+		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
+		$this->assertFalse( $w->next_tag( 'p' ), 'Querying a non-existing tag returns false' );
 	}
 
 	/**
 	 *
 	 */
-	public function test_chaining_after_a_non_existing_tag() {
-		$w      = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$result = $w->next_tag( 'p' )->next_tag( 'div' )->set_attribute( 'id', 'primary' );
-		$this->assertSame( $w, $result, 'Chaining after a non-existing tag still returns the Walker object' );
-		$this->assertFalse( $w->has_match(), 'Chaining after a non-existing tag leads to has_match() === false' );
+	public function test_updates_after_a_non_existing_tag() {
+		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
+		$this->assertFalse( $w->next_tag( 'p' ) );
+		$this->assertFalse( $w->next_tag( 'div' ) );
+		$w->set_attribute( 'id', 'primary' );
 	}
 
 	/**
@@ -51,7 +47,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_set_new_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->set_attribute( 'test-attribute', 'test-value' );
+		$w->next_tag();
+		$w->set_attribute( 'test-attribute', 'test-value' );
 		$this->assertSame( '<div test-attribute="test-value" id="first"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -61,7 +58,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_update_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
-		$w->next_tag()->set_attribute( 'id', 'updated-id' );
+		$w->next_tag();
+		$w->set_attribute( 'id', 'updated-id' );
 		$this->assertSame( '<div id="updated-id" id="ignored-id"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -77,7 +75,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
-		$w->next_tag()->remove_attribute( 'id' );
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
 		$this->assertSame( '<div  id="ignored-id"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -86,7 +85,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_set_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->set_attribute( 'id', 'new-id' );
+		$w->next_tag();
+		$w->set_attribute( 'id', 'new-id' );
 		$this->assertSame( '<div id="new-id"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -95,9 +95,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_update_all_tags_using_a_loop() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		do {
-			$w->next_tag()->set_attribute( 'data-foo', 'bar' );
-		} while ( $w->has_match() );
+		while ( $w->next_tag() ) {
+			$w->set_attribute( 'data-foo', 'bar' );
+		}
 
 		$this->assertSame( '<div data-foo="bar" id="first"><span data-foo="bar" id="second">Text</span></div>', (string) $w );
 	}
@@ -107,7 +107,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->remove_attribute( 'id' );
+		$w->next_tag();
+		$w->remove_attribute( 'id' );
 		$this->assertSame( '<div ><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -116,7 +117,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_non_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->remove_attribute( 'no-such-attribute' );
+		$w->next_tag();
+		$w->remove_attribute( 'no-such-attribute' );
 		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
 
@@ -125,7 +127,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_add_class_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->add_class( 'foo-class' );
+		$w->next_tag();
+		$w->add_class( 'foo-class' );
 		$this->assertSame( '<div class="foo-class" id="first"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -134,7 +137,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_add_two_classes_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->add_class( 'foo-class' )->add_class( 'bar-class' );
+		$w->next_tag();
+		$w->add_class( 'foo-class' );
+		$w->add_class( 'bar-class' );
 		$this->assertSame( '<div class="foo-class bar-class" id="first"><span id="second">Text</span></div>', (string) $w );
 	}
 
@@ -143,7 +148,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_class_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
-		$w->next_tag()->remove_class( 'foo-class' );
+		$w->next_tag();
+		$w->remove_class( 'foo-class' );
 		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
 
@@ -152,7 +158,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_add_class_when_there_is_a_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->add_class( 'foo-class' )->add_class( 'bar-class' );
+		$w->next_tag();
+		$w->add_class( 'foo-class' );
+		$w->add_class( 'bar-class' );
 		$this->assertSame(
 			'<div class="main with-border foo-class bar-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -164,7 +172,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_remove_class_when_there_is_a_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->remove_class( 'main' );
+		$w->next_tag();
+		$w->remove_class( 'main' );
 		$this->assertSame(
 			'<div class="with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -176,7 +185,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_removing_all_classes_removes_the_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->remove_class( 'main' )->remove_class( 'with-border' );
+		$w->next_tag();
+		$w->remove_class( 'main' );
+		$w->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -188,7 +199,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_does_not_add_duplicate_class_names() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->add_class( 'with-border' );
+		$w->next_tag();
+		$w->add_class( 'with-border' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -200,7 +212,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->add_class( 'main' );
+		$w->next_tag();
+		$w->add_class( 'main' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -212,14 +225,18 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 */
 	public function test_set_attribute_takes_priority_over_add_class() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->add_class( 'add_class' )->set_attribute( 'class', 'set_attribute' );
+		$w->next_tag();
+		$w->add_class( 'add_class' );
+		$w->set_attribute( 'class', 'set_attribute' );
 		$this->assertSame(
 			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
 		);
 
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
-		$w->next_tag()->set_attribute( 'class', 'set_attribute' )->add_class( 'add_class' );
+		$w->next_tag();
+		$w->set_attribute( 'class', 'set_attribute' );
+		$w->add_class( 'add_class' );
 		$this->assertSame(
 			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
@@ -310,38 +327,37 @@ HTML;
 HTML;
 
 		$w = new WP_HTML_Walker( $input );
-		$w
-			->next_tag( 'div' )
-			->set_attribute( 'data-details', '{ "key": "value" }' )
-			->add_class( 'is-processed' )
-			->next_tag(
-				array(
-					'tag_name'   => 'div',
-					'class_name' => 'BtnGroup',
-				)
+		$w->next_tag( 'div' );
+		$w->set_attribute( 'data-details', '{ "key": "value" }' );
+		$w->add_class( 'is-processed' );
+		$w->next_tag(
+			array(
+				'tag_name'   => 'div',
+				'class_name' => 'BtnGroup',
 			)
-			->remove_class( 'BtnGroup' )
-			->add_class( 'button-group' )
-			->add_class( 'Another-Mixed-Case' )
-			->next_tag(
-				array(
-					'tag_name'   => 'div',
-					'class_name' => 'BtnGroup',
-				)
+		);
+		$w->remove_class( 'BtnGroup' );
+		$w->add_class( 'button-group' );
+		$w->add_class( 'Another-Mixed-Case' );
+		$w->next_tag(
+			array(
+				'tag_name'   => 'div',
+				'class_name' => 'BtnGroup',
 			)
-			->remove_class( 'BtnGroup' )
-			->add_class( 'button-group' )
-			->add_class( 'Another-Mixed-Case' )
-			->next_tag(
-				array(
-					'tag_name'     => 'button',
-					'class_name'   => 'btn',
-					'match_offset' => 2,
-				)
+		);
+		$w->remove_class( 'BtnGroup' );
+		$w->add_class( 'button-group' );
+		$w->add_class( 'Another-Mixed-Case' );
+		$w->next_tag(
+			array(
+				'tag_name'     => 'button',
+				'class_name'   => 'btn',
+				'match_offset' => 2,
 			)
-			->remove_attribute( 'class' )
-			->next_tag( 'non-existent' )
-			->set_attribute( 'class', 'test' );
+		);
+		$w->remove_attribute( 'class' );
+		$w->next_tag( 'non-existent' );
+		$w->set_attribute( 'class', 'test' );
 		$this->assertSame( $expected_output, (string) $w );
 	}
 }

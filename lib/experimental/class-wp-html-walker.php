@@ -169,7 +169,7 @@ class WP_HTML_Walker {
 	 *                                   value, or a given predicate function which returns whether the
 	 *                                   attribute's value constitutes a match.
 	 * }
-	 * @return WP_HTML_Walker
+	 * @return boolean Whether a tag was matched.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function next_tag( $query = null ) {
@@ -185,7 +185,7 @@ class WP_HTML_Walker {
 			if ( false === $this->parse_next_tag() ) {
 				$this->parsed_bytes = strlen( $this->html );
 
-				return $this;
+				return false;
 			}
 
 			// Parse all the attributes of the current tag.
@@ -198,7 +198,7 @@ class WP_HTML_Walker {
 			}
 		} while ( $current_match_offset !== $descriptor->match_offset );
 
-		return $this;
+		return true;
 	}
 
 	private function parse_next_tag() {
@@ -397,13 +397,12 @@ class WP_HTML_Walker {
 	 * @param string $name The attribute name to target.
 	 * @param string $value The new attribute value.
 	 *
-	 * @return WP_HTML_Walker This object.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function set_attribute( $name, $value ) {
 		$this->assert_not_closed();
-		if ( ! $this->has_match() ) {
-			return $this;
+		if ( ! $this->tag_name ) {
+			return;
 		}
 		$escaped_new_value = esc_attr( $value );
 		$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
@@ -444,8 +443,6 @@ class WP_HTML_Walker {
 				' ' . $updated_attribute
 			);
 		}
-
-		return $this;
 	}
 
 	/**
@@ -453,7 +450,6 @@ class WP_HTML_Walker {
 	 *
 	 * @param string $name The attribute name to remove.
 	 *
-	 * @return WP_HTML_Walker This object.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_attribute( $name ) {
@@ -477,8 +473,6 @@ class WP_HTML_Walker {
 				''
 			);
 		}
-
-		return $this;
 	}
 
 	private function get_current_tag_attribute( $name ) {
@@ -487,10 +481,6 @@ class WP_HTML_Walker {
 		}
 
 		return false;
-	}
-
-	public function has_match() {
-		return ! ! $this->tag_name;
 	}
 
 	public function is_closed() {
@@ -502,16 +492,13 @@ class WP_HTML_Walker {
 	 *
 	 * @param string $class_name The class name to add.
 	 *
-	 * @return WP_HTML_Walker This object.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->has_match() ) {
+		if ( $this->tag_name ) {
 			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, true );
 		}
-
-		return $this;
 	}
 
 	/**
@@ -519,16 +506,13 @@ class WP_HTML_Walker {
 	 *
 	 * @param string $class_name The class name to remove.
 	 *
-	 * @return WP_HTML_Walker This object.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->has_match() ) {
+		if ( $this->tag_name ) {
 			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, false );
 		}
-
-		return $this;
 	}
 
 	private function consume_regexp( $regexp ) {
