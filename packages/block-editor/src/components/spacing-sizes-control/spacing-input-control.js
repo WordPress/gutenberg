@@ -217,17 +217,12 @@ export default function SpacingInputControl( {
 					value={ options.find(
 						( option ) => option.key === valueNow
 					) }
-					onChange={ ( selectedItem ) => {
-						onChange( getNewPresetValue( selectedItem.key ) );
+					onChange={ ( selection ) => {
+						onChange(
+							getNewPresetValue( selection.selectedItem.key )
+						);
 					} }
 					options={ options }
-					onHighlightedIndexChange={ ( index ) => {
-						if ( index.type === '__item_mouse_move__' ) {
-							onChange(
-								getNewPresetValue( index.highlightedIndex )
-							);
-						}
-					} }
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
 				/>
