@@ -54,7 +54,7 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 				siteTitle: siteData.name,
 				homeTemplate: __unstableHomeTemplate,
 				isNavigationOpen: isNavigationOpened(),
-				isTemplatePartsMode: supportsTemplatePartsMode,
+				isTemplatePartsMode: !! supportsTemplatePartsMode,
 			};
 		}, [] );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
