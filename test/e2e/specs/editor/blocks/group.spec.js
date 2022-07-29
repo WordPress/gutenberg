@@ -55,7 +55,7 @@ test.describe( 'Group', () => {
 
 		await page.locator( '.editor-block-list-item-group' ).click();
 		await page.click( 'role=button[name="Add block"i]' );
-		await page.locator( '.editor-block-list-item-paragraph' ).click();
+		await page.click( 'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]' );
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
