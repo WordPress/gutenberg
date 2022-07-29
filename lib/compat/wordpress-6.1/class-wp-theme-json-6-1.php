@@ -87,7 +87,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
-		'link'    => 'a:not(.wp-element-button)',
+		'link'    => 'a:where(:not(.wp-element-button))', // The where is needed to lower the specificity.
 		'heading' => 'h1, h2, h3, h4, h5, h6',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
@@ -1394,14 +1394,25 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 									}
 								}
 
-								$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
-								$layout_selector = sprintf(
-									$format,
-									$selector,
-									$class_name,
-									$spacing_rule['selector']
-								);
-								$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
+								if ( ! $has_block_gap_support ) {
+									// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s%3$s)' : ':where(%1$s.%2$s%3$s)';
+									$layout_selector = sprintf(
+										$format,
+										$selector,
+										$class_name,
+										$spacing_rule['selector']
+									);
+								} else {
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '%s .%s%s' : '%s.%s%s';
+									$layout_selector = sprintf(
+										$format,
+										$selector,
+										$class_name,
+										$spacing_rule['selector']
+									);
+								}
+								$block_rules .= static::to_ruleset( $layout_selector, $declarations );
 							}
 						}
 					}
