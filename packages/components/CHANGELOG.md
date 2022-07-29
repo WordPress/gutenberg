@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+
+### Enhancements
+
+-   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+
 ## 19.16.0 (2022-07-27)
 
 ### Bug Fix
