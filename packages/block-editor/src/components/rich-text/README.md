@@ -53,7 +53,7 @@ _Optional._ By default, all registered formats are allowed. This setting can be 
 	value={ attributes.content }
 	allowedFormats={ [ 'core/bold', 'core/italic' ] } // Allow the content to be made bold or italic, but do not allow othe formatting options
 	onChange={ ( content ) => setAttributes( { content } ) }
-	placeholder={ __( 'Heading...' ) } // Display this text before any content has been added by the user
+	placeholder={ __( 'Heading...' ) }
 />
 ```
 
