@@ -213,6 +213,7 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
+				__nextUnconstrainedWidth
 			/>
 		)
 	);
