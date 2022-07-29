@@ -144,6 +144,9 @@ const transforms = {
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
+						// Gallery images can't currently be resized so make sure height and width are undefined.
+						image.width = undefined;
+						image.height = undefined;
 						return createBlock( 'core/image', image );
 					} );
 
