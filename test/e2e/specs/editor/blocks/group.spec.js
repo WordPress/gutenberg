@@ -54,7 +54,7 @@ test.describe( 'Group', () => {
 		await searchField.type( 'Group' );
 
 		await page.locator( '.editor-block-list-item-group' ).click();
-		await page.locator( '.block-editor-button-block-appender' ).click();
+		await page.click( 'role=button[name="Add block"i]' );
 		await page.locator( '.editor-block-list-item-paragraph' ).click();
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
