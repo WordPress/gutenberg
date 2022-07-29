@@ -79,6 +79,9 @@ export default function SpacingInputControl( {
 		setValueNow( newSize );
 		const size = parseInt( newSize, 10 );
 		if ( size === 0 ) {
+			return undefined;
+		}
+		if ( size === 1 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
@@ -121,7 +124,7 @@ export default function SpacingInputControl( {
 						{ LABELS[ side ] }
 					</Text>
 
-					{ spacingSizes.length <= 8 && ! showCustomValueControl && (
+					{ spacingSizes.length <= 9 && ! showCustomValueControl && (
 						<Text className="components-spacing-sizes-control__hint-single">
 							{ currentValueHint !== undefined
 								? currentValueHint
@@ -131,7 +134,7 @@ export default function SpacingInputControl( {
 				</VStack>
 			) }
 			{ side === 'all' &&
-				spacingSizes.length <= 8 &&
+				spacingSizes.length <= 9 &&
 				! showCustomValueControl && (
 					<Text className="components-spacing-sizes-control__hint-all">
 						{ currentValueHint !== undefined
@@ -183,7 +186,7 @@ export default function SpacingInputControl( {
 					/>
 				</>
 			) }
-			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
+			{ spacingSizes.length <= 9 && ! showCustomValueControl && (
 				<RangeControl
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
@@ -201,7 +204,7 @@ export default function SpacingInputControl( {
 					hideLabelFromVision={ true }
 				/>
 			) }
-			{ spacingSizes.length > 8 && ! showCustomValueControl && (
+			{ spacingSizes.length > 9 && ! showCustomValueControl && (
 				<CustomSelectControl
 					className="components-spacing-sizes-control__custom-select-control"
 					value={

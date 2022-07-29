@@ -89,13 +89,16 @@ export function getSpacingPresetSlug( value ) {
  * @return {number} The int value for use in Range control.
  */
 export function getSliderValueFromPreset( presetValue, spacingSizes ) {
+	if ( presetValue === undefined ) {
+		return 0;
+	}
+
 	const slug = getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return spacingSize.slug === slug;
 	} );
-	// If no matching value return NaN as this makes slider display at start
-	// undefined or null make it display midpoint.
-	return sliderValue !== -1 ? sliderValue : NaN;
+
+	return sliderValue !== -1 ? sliderValue : 0;
 }
 
 export const LABELS = {

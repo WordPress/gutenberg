@@ -7,7 +7,7 @@
 	legend {
 		padding-left: 0;
 		grid-column: 1 / 1;
-		grid-row: 1 /1;
+		grid-row: 1 / 1;
 	}
 
 	.components-spacing-sizes-control__side-labels {
@@ -28,7 +28,7 @@
 	.components-spacing-sizes-control__hint-all {
 		grid-column: 1 / 1;
 		justify-self: left;
-		grid-row: 1 /1;
+		grid-row: 1 / 1;
 		position: relative;
 		top: 1rem;
 		left: 0;
@@ -36,7 +36,7 @@
 
 	.components-spacing-sizes-control__custom-toggle-all {
 		grid-column: 2 / 2;
-		grid-row: 1 /1;
+		grid-row: 1 / 1;
 		justify-self: end;
 		margin-right: $grid-unit-05;
 	}
@@ -48,7 +48,7 @@
 
 	.component-spacing-sizes-control__linked-button {
 		grid-column: 3 / 3;
-		grid-row: 1 /1;
+		grid-row: 1 / 1;
 		justify-self: end;
 	}
 
@@ -107,7 +107,7 @@
 
 	.components-spacing-sizes-control__side-label {
 		margin-right: $grid-unit-05;
-		grid-column: 1/1;
+		grid-column: 1 / 1;
 		justify-self: left;
 		font-size: 12px;
 	}

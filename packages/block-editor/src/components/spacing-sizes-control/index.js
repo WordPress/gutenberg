@@ -29,6 +29,7 @@ export default function SpacingSizesControl( {
 	useSelect,
 } ) {
 	const spacingSizes = [
+		{ name: 'Default', slug: 'default', size: undefined },
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
 	];
