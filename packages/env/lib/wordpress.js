@@ -5,6 +5,7 @@ const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
+const https = require( 'https' );
 
 /**
  * Promisified dependencies
@@ -246,11 +247,6 @@ async function copyCoreFiles( fromPath, toPath ) {
  * @return {string} The version of WordPress the source is for.
  */
 async function readWordPressVersion( coreSource, spinner, debug ) {
-	// No source means they're using the bleeding edge.
-	if ( coreSource === null ) {
-		return null;
-	}
-
 	const versionFilePath = path.join(
 		coreSource.path,
 		'wp-includes',
@@ -275,6 +271,37 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
 	return versionMatch[ 1 ];
 }
 
+/**
+ * Returns the latest stable version of WordPress by requesting the stable-check
+ * endpoint on WordPress.org.
+ *
+ * @return {string} The latest stable version of WordPress, like "6.0.1"
+ */
+async function getLatestWordPressVersion() {
+	return new Promise( ( resolve, reject ) => {
+		https
+			.get(
+				'https://api.wordpress.org/core/stable-check/1.0/',
+				( response ) => {
+					response.setEncoding( 'utf8' );
+					let res = '';
+					response.on( 'data', ( data ) => ( res += data ) );
+					response.on( 'end', () => {
+						const versions = JSON.parse( res );
+						for ( const [ version, status ] of Object.entries(
+							versions
+						) ) {
+							if ( status === 'latest' ) {
+								resolve( version );
+							}
+						}
+					} );
+				}
+			)
+			.on( 'error', reject );
+	} );
+}
+
 module.exports = {
 	hasSameCoreSource,
 	checkDatabaseConnection,
@@ -282,4 +309,5 @@ module.exports = {
 	resetDatabase,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	getLatestWordPressVersion,
 };
