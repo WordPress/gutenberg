@@ -17,7 +17,7 @@ import List from '../list';
 import NavigationSidebar from '../navigation-sidebar';
 import getIsListPage from '../../utils/get-is-list-page';
 
-export default function EditSiteApp( { reboot } ) {
+export default function EditSiteApp( { reboot, homeTemplate } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -39,6 +39,10 @@ export default function EditSiteApp( { reboot } ) {
 			<Routes>
 				{ ( { params } ) => {
 					const isListPage = getIsListPage( params );
+					const homeTemplateType =
+						params.postId === homeTemplate?.postId
+							? 'site-editor'
+							: undefined;
 
 					return (
 						<>
@@ -54,7 +58,9 @@ export default function EditSiteApp( { reboot } ) {
 								// Open the navigation sidebar by default when in the list page.
 								isDefaultOpen={ !! isListPage }
 								activeTemplateType={
-									isListPage ? params.postType : undefined
+									isListPage
+										? params.postType
+										: homeTemplateType
 								}
 							/>
 						</>
