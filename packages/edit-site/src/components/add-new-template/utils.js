@@ -422,7 +422,13 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		( { slug } ) => slug === 'author'
 	);
 	if ( ! authorMenuItem ) {
-		return;
+		authorMenuItem = {
+			description: __(
+				'Displays latest posts written by a single author.'
+			),
+			slug: 'author',
+			title: 'Author',
+		};
 	}
 	const hasGeneralTemplate = !! existingTemplates?.find(
 		( { slug } ) => slug === 'author'
