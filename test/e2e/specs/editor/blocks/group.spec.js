@@ -22,7 +22,7 @@ test.describe( 'Group', () => {
 		const searchField = page.locator( '.components-search-control__input' );
 		await page.type( 'role=searchbox[name="Search for blocks and patterns"i]', 'Group' );
 
-		await page.locator( '.editor-block-list-item-group' ).click();
+		await page.click( 'role=listbox[name="Blocks"i] >> role=option[name="Group"i]' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
