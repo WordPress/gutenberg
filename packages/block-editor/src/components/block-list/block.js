@@ -292,29 +292,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
-			const { clientId } = ownProps;
-			const {
-				getPreviousBlockClientId,
-				getNextBlockClientId,
-				getBlockRootClientId,
-				getBlockIndex,
-				getBlockOrder,
-				getBlock,
-			} = select( blockEditorStore );
-			const { moveBlocksToPosition } = dispatch( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
+			const { clientId, rootClientId } = ownProps;
+			const { getPreviousBlockClientId, getNextBlockClientId, getBlock } =
+				select( blockEditorStore );
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
 				if ( nextBlockClientId ) {
 					mergeBlocks( clientId, nextBlockClientId );
-				} else {
-					moveBlocksToPosition(
-						[ clientId ],
-						rootClientId,
-						getBlockRootClientId( rootClientId ),
-						getBlockIndex( rootClientId ) + 1
-					);
 				}
 			} else {
 				const previousBlockClientId =
@@ -322,18 +307,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				} else {
-					moveBlocksToPosition(
-						[ clientId ],
-						rootClientId,
-						getBlockRootClientId( rootClientId ),
-						getBlockIndex( rootClientId )
+					const replacement = switchToBlockType(
+						getBlock( rootClientId ),
+						'*'
 					);
-
-					if ( ! getBlockOrder( rootClientId ).length ) {
-						const replacement = switchToBlockType(
-							getBlock( rootClientId ),
-							'*'
-						);
+					if ( replacement ) {
+						replaceBlocks( rootClientId, replacement, 0 );
 					}
 				}
 			}
