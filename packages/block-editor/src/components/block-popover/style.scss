@@ -32,11 +32,20 @@
 	// Disable pointer events for dragging and dropping.
 	// Without this the insertion point interferes with the
 	// drop zone.
-	// Pointer events are enabled for the inserter button
-	// elsewhere in the codebase (see BlockTools.)
 	pointer-events: none;
 
 	* {
 		pointer-events: none;
+	}
+
+	// Re-enable pointer events when the inbetween inserter has a '+' button.
+	//
+	// Needs specificity, do not simplify.
+	.is-with-inserter {
+		pointer-events: all;
+
+		* {
+			pointer-events: all;
+		}
 	}
 }
