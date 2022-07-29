@@ -306,12 +306,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 					getPreviousBlockClientId( clientId );
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
-				} else {
+				} else if ( rootClientId ) {
+					// Attempt to "unwrap" the block contents when there's no
+					// preceding block to merge with.
 					const replacement = switchToBlockType(
 						getBlock( rootClientId ),
 						'*'
 					);
-					if ( replacement ) {
+					if ( replacement && replacement.length ) {
 						replaceBlocks( rootClientId, replacement, 0 );
 					}
 				}
