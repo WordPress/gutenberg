@@ -758,6 +758,28 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
+		// 2. Generate and append the rules that use the general selector.
+		$block_rules .= static::to_ruleset( $selector, $declarations );
+
+		// 3. Generate and append the rules that use the duotone selector.
+		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
+			$selector_duotone = static::scope_selector( $block_metadata['selector'], $block_metadata['duotone'] );
+			$block_rules     .= static::to_ruleset( $selector_duotone, $declarations_duotone );
+		}
+
+		// 4. Generate Layout block gap styles.
+		if (
+			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! empty( $block_metadata['name'] )
+		) {
+			$block_rules .= $this->get_layout_styles( $block_metadata );
+		}
+
+		// 5. Generate and append the feature level rulesets.
+		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
+			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+		}
+
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
 			/*
 			* Reset default browser margin on the root body element.
@@ -808,6 +830,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		}
 
 		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+
 			if ( $use_root_padding ) {
 				$block_rules .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 				$block_rules .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
@@ -819,6 +842,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			$block_rules .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 			$block_rules .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
+			$block_gap_value       = _wp_array_get( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ), '0.5em' );
 			$has_block_gap_support = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
 			if ( $has_block_gap_support ) {
 				$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
