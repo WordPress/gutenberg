@@ -15,6 +15,17 @@ describe( 'typography utils', () => {
 					typographySettings: undefined,
 					expected: '28px',
 				},
+				// Should return non-fluid value when fluid is `false`.
+				{
+					preset: {
+						size: '28px',
+						fluid: false,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected: '28px',
+				},
 				// Should return fluid value.
 				{
 					preset: {
@@ -38,6 +49,20 @@ describe( 'typography utils', () => {
 					expected:
 						'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
 				},
+
+				// Should return default fluid values with null values.
+				{
+					preset: {
+						size: '28px',
+						fluid: null,
+					},
+					typographySettings: {
+						fluid: true,
+					},
+					expected:
+						'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+				},
+
 				// Should return size with invalid fluid units.
 				{
 					preset: {
