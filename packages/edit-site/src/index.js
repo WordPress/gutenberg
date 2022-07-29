@@ -139,3 +139,7 @@ export { default as __experimentalNavigationToggle } from './components/navigati
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export {
+	useGlobalStylesReset,
+	GlobalStylesProvider,
+} from './components/global-styles';
