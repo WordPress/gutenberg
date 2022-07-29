@@ -172,7 +172,7 @@ function Edit( { attributes, setAttributes, clientId, style } ) {
 		<>
 			<TagName
 				reversed={ reversed }
-				start={ start }
+				start={ Platform.isWeb ? start : undefined }
 				{ ...innerBlocksProps }
 			/>
 			{ controls }

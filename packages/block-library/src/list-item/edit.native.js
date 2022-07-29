@@ -23,6 +23,7 @@ import { useSplit, useMerge } from './hooks';
 import { convertToListItems } from './utils';
 import { IndentUI } from './edit.js';
 import styles from './style.scss';
+import ListStyleType from './list-style-type';
 
 export default function ListItemEdit( {
 	attributes,
@@ -32,11 +33,47 @@ export default function ListItemEdit( {
 	style,
 } ) {
 	const { placeholder, content } = attributes;
-	const { hasInnerBlocks } = useSelect(
+	const {
+		blockIndex,
+		hasInnerBlocks,
+		indentationLevel,
+		numberOfListItems,
+		ordered,
+		reversed,
+		start,
+	} = useSelect(
 		( select ) => {
-			const { getBlockCount } = select( blockEditorStore );
+			const {
+				getBlockAttributes,
+				getBlockCount,
+				getBlockIndex,
+				getBlockParentsByBlockName,
+				getBlockRootClientId,
+			} = select( blockEditorStore );
+			const currentIdentationLevel = getBlockParentsByBlockName(
+				clientId,
+				'core/list-item',
+				true
+			).length;
+			const currentBlockIndex = getBlockIndex( clientId );
+			const blockWithInnerBlocks = getBlockCount( clientId ) > 0;
+			const rootClientId = getBlockRootClientId( clientId );
+			const blockAttributes = getBlockAttributes( rootClientId );
+			const totalListItems = getBlockCount( rootClientId );
+			const {
+				ordered: isOrdered,
+				reversed: isReversed,
+				start: startValue,
+			} = blockAttributes || {};
+
 			return {
-				hasInnerBlocks: getBlockCount( clientId ) > 0,
+				blockIndex: currentBlockIndex,
+				hasInnerBlocks: blockWithInnerBlocks,
+				indentationLevel: currentIdentationLevel,
+				numberOfListItems: totalListItems,
+				ordered: isOrdered,
+				reversed: isReversed,
+				start: startValue,
 			};
 		},
 		[ clientId ]
@@ -49,30 +86,52 @@ export default function ListItemEdit( {
 		allowedBlocks: [ 'core/list' ],
 	} );
 
+	const stylesParentList = [
+		styles[ 'wp-block-list-item__list-item-parent' ],
+	];
+
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
 
 	return (
-		<>
-			<RichText
-				identifier="content"
-				tagName="div"
-				onChange={ ( nextContent ) =>
-					setAttributes( { content: nextContent } )
-				}
-				value={ content }
-				placeholder={ placeholder || __( 'List' ) }
-				onSplit={ onSplit }
-				onMerge={ onMerge }
-				onReplace={ ( blocks, ...args ) => {
-					onReplace( convertToListItems( blocks ), ...args );
-				} }
-				style={ style }
-			/>
-			<View { ...innerBlocksProps }>{ innerBlocksProps.children }</View>
+		<View style={ stylesParentList }>
+			<View style={ styles[ 'wp-block-list-item__list-item' ] }>
+				<View style={ styles[ 'wp-block-list-item__list-item-icon' ] }>
+					<ListStyleType
+						blockIndex={ blockIndex }
+						indentationLevel={ indentationLevel }
+						numberOfListItems={ numberOfListItems }
+						ordered={ ordered }
+						reversed={ reversed }
+						start={ start }
+						style={ style }
+					/>
+				</View>
+				<View
+					style={ styles[ 'wp-block-list-item__list-item-content' ] }
+				>
+					<RichText
+						identifier="content"
+						tagName="p"
+						onChange={ ( nextContent ) =>
+							setAttributes( { content: nextContent } )
+						}
+						value={ content }
+						placeholder={ placeholder || __( 'List' ) }
+						onSplit={ onSplit }
+						onMerge={ onMerge }
+						onReplace={ ( blocks, ...args ) => {
+							onReplace( convertToListItems( blocks ), ...args );
+						} }
+						style={ style }
+						deleteEnter={ true }
+					/>
+				</View>
+			</View>
+			<View { ...innerBlocksProps }></View>
 			<BlockControls group="block">
 				<IndentUI clientId={ clientId } />
 			</BlockControls>
-		</>
+		</View>
 	);
 }

@@ -1,4 +1,42 @@
+.wp-block-list-item__list-item-parent {
+	margin-left: $solid-border-space;
+	margin-right: $solid-border-space;
+}
+
 .wp-block-list-item__nested-blocks {
 	margin-top: 14;
-	margin-left: 20;
+}
+
+.wp-block-list-item__list-item {
+	flex: 1;
+	flex-direction: row;
+}
+
+.wp-block-list-item__list-item-icon {
+	align-items: center;
+}
+
+.wp-block-list-item__list-item-content {
+	flex-grow: 1;
+}
+
+.wp-block-list-item__list-item--default {
+	color: $black;
+	font-size: $editor-font-size;
+}
+
+.wp-block-list-item__list-item-ordered--default {
+	margin-top: 2;
+}
+
+.wp-block-list-item__list-item-ordered--custom {
+	margin-top: 3;
+}
+
+.wp-block-list-item__list-item-container--ordered {
+	margin-right: 3;
+}
+
+.wp-block-list-item__list-item-container {
+	margin-right: 8;
 }
