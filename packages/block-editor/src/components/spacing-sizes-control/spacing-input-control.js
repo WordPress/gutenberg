@@ -185,12 +185,7 @@ export default function SpacingInputControl( {
 			) }
 			{ spacingSizes.length <= 8 && ! showCustomValueControl && (
 				<RangeControl
-					className={ classnames( {
-						'components-spacing-sizes-control__range-control-all':
-							side === 'all',
-						'components-spacing-sizes-control__range-control-single':
-							side !== 'all',
-					} ) }
+					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
@@ -208,12 +203,7 @@ export default function SpacingInputControl( {
 			) }
 			{ spacingSizes.length > 8 && ! showCustomValueControl && (
 				<CustomSelectControl
-					className={ classnames( {
-						'components-spacing-sizes-control__custom-select-control-all':
-							side === 'all',
-						'components-spacing-sizes-control__custom-select-control-single':
-							side !== 'all',
-					} ) }
+					className="components-spacing-sizes-control__custom-select-control"
 					value={
 						options.find(
 							( option ) => option.key === currentValue

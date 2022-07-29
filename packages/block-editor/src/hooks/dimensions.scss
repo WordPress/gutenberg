@@ -6,5 +6,6 @@
 	.tools-panel-item-padding {
 		display: grid;
 		grid-template-columns: 1fr 1fr 36px;
+		grid-row-gap: $grid-unit-10;
 	}
 }
