@@ -277,6 +277,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	// Set the correct layout type for blocks using legacy content width.
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
+		$used_layout['type'] = 'column';
+	}
+
 	if ( $use_global_padding ) {
 		$class_names[] = 'has-global-padding';
 	}
