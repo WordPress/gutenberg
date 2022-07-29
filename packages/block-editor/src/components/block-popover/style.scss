@@ -18,11 +18,22 @@
 
 		// Allow clicking through the toolbar holder.
 		pointer-events: none;
+	}
 
-		// Position the block toolbar.
-		> * {
+	&:not(.block-editor-block-popover__inbetween) .components-popover__content {
+		* {
 			pointer-events: all;
 		}
 	}
 }
 
+.components-popover.block-editor-block-popover__inbetween {
+	// Disable pointer events when dragging and dropping.
+	// Without this the insertion point interferes with the
+	// drop zone.
+	pointer-events: none;
+
+	* {
+		pointer-events: none;
+	}
+}
