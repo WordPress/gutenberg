@@ -204,7 +204,8 @@ function useMarginProps( name ) {
 function useBlockGapProps( name ) {
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
 	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
+	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
+	const hasGapValue = () => !! userSetGapValue;
 	return {
 		gapValue,
 		setGapValue,
