@@ -84,12 +84,9 @@ test.describe( 'RichText', () => {
 		await pageUtils.pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate(
-			() =>
-				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
-					.length
-		);
-
+		const count = await page
+			.locator( '*[data-rich-text-format-boundary]' )
+			.count();
 		expect( count ).toBe( 1 );
 	} );
 
