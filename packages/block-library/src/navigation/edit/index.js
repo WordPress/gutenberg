@@ -60,11 +60,7 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_PENDING,
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
-import useCreateNavigationMenu, {
-	CREATE_NAVIGATION_MENU_ERROR,
-	CREATE_NAVIGATION_MENU_PENDING,
-	CREATE_NAVIGATION_MENU_SUCCESS,
-} from './use-create-navigation-menu';
+import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const EMPTY_ARRAY = [];
 
@@ -157,19 +153,19 @@ function Navigation( {
 		status: createNavigationMenuStatus,
 		error: createNavigationMenuError,
 		value: createNavigationMenuPost,
+		isPending: isCreatingNavigationMenu,
+		isSuccess: createNavigationMenuIsSuccess,
+		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
-
-	const isCreatingNavigationMenu =
-		createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING;
 
 	useEffect( () => {
 		hideNavigationMenuCreateNotice();
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_PENDING ) {
+		if ( isCreatingNavigationMenu ) {
 			speak( __( `Creating Navigation Menu.` ) );
 		}
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_SUCCESS ) {
+		if ( createNavigationMenuIsSuccess ) {
 			setRef( createNavigationMenuPost.id );
 			selectBlock( clientId );
 
@@ -178,7 +174,7 @@ function Navigation( {
 			);
 		}
 
-		if ( createNavigationMenuStatus === CREATE_NAVIGATION_MENU_ERROR ) {
+		if ( createNavigationMenuIsError ) {
 			showNavigationMenuCreateNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
@@ -389,10 +385,10 @@ function Navigation( {
 		name: 'block-library/core/navigation/classic-menu-conversion/error',
 	} );
 
-	function handleUpdateMenu( menuId ) {
+	const handleUpdateMenu = ( menuId ) => {
 		setRef( menuId );
 		selectBlock( clientId );
-	}
+	};
 
 	useEffect( () => {
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {

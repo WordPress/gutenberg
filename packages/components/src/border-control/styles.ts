@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG, rtl } from '../utils';
+import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 import {
 	StyledField,
@@ -31,6 +31,7 @@ export const borderControl = css`
 	border: 0;
 	padding: 0;
 	margin: 0;
+	${ boxSizingReset }
 `;
 
 export const innerWrapper = () => css`
