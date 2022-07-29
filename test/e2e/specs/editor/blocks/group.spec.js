@@ -17,11 +17,7 @@ test.describe( 'Group', () => {
 			'role=button[name="Toggle block inserter"i]'
 		);
 
-		if (
-			( await inserterButton.getAttribute( 'aria-pressed' ) ) === 'false'
-		) {
-			await inserterButton.click();
-		}
+		await inserterButton.click();
 
 		const searchField = page.locator( '.components-search-control__input' );
 		await searchField.type( 'Group' );
@@ -54,11 +50,7 @@ test.describe( 'Group', () => {
 			'role=button[name="Toggle block inserter"i]'
 		);
 
-		if (
-			( await inserterButton.getAttribute( 'aria-pressed' ) ) === 'false'
-		) {
-			await inserterButton.click();
-		}
+		await inserterButton.click();
 
 		const searchField = page.locator( '.components-search-control__input' );
 		await searchField.type( 'Group' );
