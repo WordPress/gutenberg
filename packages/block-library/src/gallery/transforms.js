@@ -305,26 +305,36 @@ const transforms = {
 						return innerBlocks.map(
 							( {
 								attributes: {
-									id,
 									url,
 									alt,
 									caption,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
 									sizeSlug: imageSizeSlug,
 									linkDestination,
-									href,
 									linkTarget,
+									anchor,
+									className,
 								},
 							} ) =>
 								createBlock( 'core/image', {
-									id,
+									align,
 									url,
 									alt,
 									caption,
-									sizeSlug: imageSizeSlug,
-									align,
-									linkDestination,
+									title,
 									href,
+									rel,
+									linkClass,
+									id,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
 									linkTarget,
+									anchor,
+									className,
 								} )
 						);
 					}
