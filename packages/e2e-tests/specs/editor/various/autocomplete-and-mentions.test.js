@@ -16,10 +16,10 @@ const userList = [
 	{ userName: 'testuser', firstName: 'Jane', lastName: 'Doe' },
 	{ userName: 'yourfather', firstName: 'Darth', lastName: 'Vader' },
 	{ userName: 'mockingjay', firstName: 'Katniss', lastName: 'Everdeen' },
-	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 	{ userName: 'ringbearer', firstName: 'Frodo', lastName: 'Baggins' },
 	{ userName: 'thebetterhobbit', firstName: 'Bilbo', lastName: 'Baggins' },
 	{ userName: 'makeitso', firstName: 'Jean-Luc', lastName: 'Picard' },
+	{ userName: 'buddytheelf', firstName: 'Buddy', lastName: 'Elf' },
 ];
 describe( 'Autocomplete', () => {
 	beforeAll( async () => {
@@ -185,10 +185,47 @@ describe( 'Autocomplete', () => {
 
 			await clickBlockAppender();
 			await page.keyboard.type( testData.triggerString );
-			const strawberry = await page.waitForXPath(
+			const targetOption = await page.waitForXPath(
 				`//button[@role="option"]${ testData.optionPath }`
 			);
-			await strawberry.click();
+			await targetOption.click();
+
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
+
+		it( `should allow ${ type } selection via keypress event`, async () => {
+			const testData = {};
+			// Jean-Luc is the target because user mentions will be listed alphabetically by first + last name
+			// 🍒 is the target because options are listed in the order they appear in the custom completer
+			if ( type === 'mention' ) {
+				testData.triggerString = '@';
+				testData.optionPath = '//*[contains(text(),"Jean-Luc Picard")]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>@makeitso</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.triggerString = '~';
+				testData.optionPath = '[text()="🍒 Cherry"]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>🍒</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else {
+				[ testData.triggerString, testData.snapshot ] = undefined;
+			}
+
+			await clickBlockAppender();
+			await page.keyboard.type( testData.triggerString );
+			await page.waitForXPath(
+				`//button[@role="option"]${ testData.optionPath }`
+			);
+			await pressKeyTimes( 'ArrowDown', 6 );
+			await page.keyboard.press( 'Enter' );
 
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
 				testData.snapshot
