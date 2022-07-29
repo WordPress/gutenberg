@@ -208,7 +208,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		// Return compiled layout styles to retain backwards compatibility.
 		// Since https://github.com/WordPress/gutenberg/pull/42452 we no longer call wp_enqueue_block_support_styles in this block supports file.
-		var_dump(gutenberg_style_engine_get_stylesheet_from_css_rules( $layout_styles ));
 		return gutenberg_style_engine_get_stylesheet_from_css_rules( $layout_styles );
 	}
 
