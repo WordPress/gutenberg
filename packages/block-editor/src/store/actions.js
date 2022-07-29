@@ -1021,9 +1021,15 @@ export const mergeBlocks =
 				blockB,
 				blockAType.name
 			);
-			if ( blocksWithTheSameType?.length !== 1 ) return;
+			if ( blocksWithTheSameType?.length !== 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
 			const [ blockWithSameType ] = blocksWithTheSameType;
-			if ( blockWithSameType.innerBlocks.length < 1 ) return;
+			if ( blockWithSameType.innerBlocks.length < 1 ) {
+				dispatch.selectBlock( blockA.clientId );
+				return;
+			}
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
