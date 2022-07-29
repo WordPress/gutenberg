@@ -71,7 +71,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				array(
 					'selector'         => "$selector .alignfull",
 					'css_declarations' => array( 'max-width' => 'none' ),
-				),
+				)
 			);
 
 			if ( isset( $block_spacing ) ) {
@@ -120,7 +120,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
 						),
-					),
+					)
 				);
 			}
 		}
