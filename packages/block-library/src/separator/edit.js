@@ -52,6 +52,7 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 					className,
 					style: hasCustomColor ? styles : undefined,
 				} ) }
+				contentEditable={ false }
 			/>
 		</>
 	);
