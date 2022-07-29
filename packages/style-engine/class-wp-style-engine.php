@@ -738,22 +738,3 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 
 	return $style_engine::compile_stylesheet_from_css_rules( $css_rule_objects );
 }
-
-/**
- * Returns a compiled stylesheet from stored CSS rules.
- *
- * @access public
- *
- * @param string $store_key        A valid store key.
- *
- * @return string A compiled stylesheet from stored CSS rules.
- */
-function wp_style_engine_get_stylesheet_from_store( $store_key ) {
-	if ( empty( $store_key ) || ! class_exists( 'WP_Style_Engine' ) ) {
-		return '';
-	}
-
-	$style_engine = WP_Style_Engine::get_instance();
-	$store        = $style_engine::get_store( $store_key );
-	return WP_Style_Engine::compile_stylesheet_from_css_rules( $store->get_all_rules() );
-}

@@ -512,40 +512,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
 	public function test_add_to_store() {
-		$css_rules = array(
-			array(
-				'selector'     => '.saruman',
-				'declarations' => array(
-					'color'        => 'white',
-					'height'       => '100px',
-					'border-style' => 'solid',
-					'align-self'   => 'unset',
-				),
-			),
-			array(
-				'selector'     => '.gandalf',
-				'declarations' => array(
-					'color'        => 'grey',
-					'height'       => '90px',
-					'border-style' => 'dotted',
-					'align-self'   => 'safe center',
-				),
-			),
-			array(
-				'selector'     => '.radagast',
-				'declarations' => array(
-					'color'        => 'brown',
-					'height'       => '60px',
-					'border-style' => 'dashed',
-					'align-self'   => 'stretch',
-				),
-			),
-		);
-		$store     = wp_style_engine_add_to_store( 'test-store', $css_rules );
+		$store = wp_style_engine_add_to_store( 'test-store', array() );
+
+		// wp_style_engine_add_to_store returns a store object.
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $store );
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_store( 'test-store' );
-		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
+		// Check that the style engine knows about the store.
+		$stored_store = WP_Style_Engine::get_instance()::get_store( 'test-store' );
+		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $stored_store );
 	}
 
 	/**
@@ -584,5 +558,49 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
 		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests that incoming styles are deduped and merged.
+	 */
+	public function test_get_deduped_and_merged_stylesheet() {
+		$css_rules = array(
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'color'         => 'white',
+					'height'        => '190px',
+					'padding'       => '10px',
+					'margin-bottom' => '100px',
+				),
+			),
+			array(
+				'selector'     => '.dumbledore',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.rincewind',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+		);
+
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$this->assertSame( '.gandalf {color: white; height: 190px; border-style: dotted; padding: 10px; margin-bottom: 100px;}.dumbledore,.rincewind {color: grey; height: 90px; border-style: dotted;}', $compiled_stylesheet );
 	}
 }

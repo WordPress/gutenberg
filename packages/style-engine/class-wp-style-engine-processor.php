@@ -90,7 +90,7 @@ class WP_Style_Engine_Processor {
 	private function combine_rules_selectors() {
 		// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
 		$selectors_json = array();
-		foreach ( $this->css_rules as $index => $rule ) {
+		foreach ( $this->css_rules as $rule ) {
 
 			$rule_selector = $rule->get_selector();
 			$declarations  = $rule->get_declarations()->get_declarations();
