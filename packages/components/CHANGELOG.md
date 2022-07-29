@@ -13,6 +13,7 @@
 -   `ColorPalette`: Fix background image in RTL mode ([#42510](https://github.com/WordPress/gutenberg/pull/42510)).
 -   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
 -   `Tooltip`: avoid unnecessary re-renders of select child elements ([#42483](https://github.com/WordPress/gutenberg/pull/42483)).
+-   `Popover`: Fix offset when the reference element is within an iframe. ([#42417](https://github.com/WordPress/gutenberg/pull/42417)).
 
 ### Enhancements
 
@@ -57,12 +58,10 @@
 -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
 -   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
 
-### Enhancement
-
--   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
 
 ### Enhancements
 
+-   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
 -   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
 
 ### Internal
