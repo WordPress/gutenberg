@@ -31,7 +31,7 @@ test.describe( 'Group', () => {
 		editor,
 		page,
 	} ) => {
-		await page.locator( 'role=button[name="Add default block"i]' ).click();
+		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/group' );
 		await page.waitForSelector(
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
