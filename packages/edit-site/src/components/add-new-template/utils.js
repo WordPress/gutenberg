@@ -437,7 +437,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 					queryArgs: ( { search } ) => {
 						return {
 							_fields: 'id,name,slug,link',
-							orderBy: search ? 'name' : 'count',
+							orderBy: search ? 'name' : 'registered_date',
 							exclude: authorInfo.user.existingEntitiesIds,
 							who: 'authors',
 						};
@@ -579,12 +579,12 @@ const useTemplatesToExclude = (
 const useEntitiesInfo = (
 	entityName,
 	templatePrefixes,
-	additionalQueryParameters
+	additionalQueryParameters = {}
 ) => {
 	const recordsToExcludePerEntity = useTemplatesToExclude(
 		entityName,
 		templatePrefixes,
-		( additionalQueryParameters = {} )
+		additionalQueryParameters
 	);
 	const entitiesInfo = useSelect(
 		( select ) => {
