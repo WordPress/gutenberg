@@ -105,15 +105,19 @@ function ListViewBlockSelectButton(
 					spacing={ 1 }
 				>
 					<span className="block-editor-list-view-block-select-button__title">
-						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
-					</span>
-					{ !! partialContent && (
-						<span className="block-editor-list-view-block-select-button__partial-content">
+						<span className="block-editor-list-view-block-select-button__title__inner-wrapper">
 							<Truncate ellipsizeMode="auto">
-								{ partialContent }
+								{ blockTitle }
 							</Truncate>
+							{ !! partialContent && (
+								<span className="block-editor-list-view-block-select-button__partial-content">
+									<Truncate ellipsizeMode="auto">
+										{ partialContent }
+									</Truncate>
+								</span>
+							) }
 						</span>
-					) }
+					</span>
 					{ blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }

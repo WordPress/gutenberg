@@ -301,12 +301,11 @@
 		min-width: 120px;
 	}
 
-	.block-editor-list-view-block-select-button__title,
-	.block-editor-list-view-block-select-button__partial-content {
+	.block-editor-list-view-block-select-button__title {
 		flex: 1;
 		position: relative;
 
-		.components-truncate {
+		.block-editor-list-view-block-select-button__title__inner-wrapper {
 			position: absolute;
 			width: 100%;
 			transform: translateY(-50%);
