@@ -2,7 +2,7 @@
 /**
  * WP_Style_Engine_Processor
  *
- * Compiles styles from a store of CSS rules.
+ * Compiles styles from stores or collection of CSS rules.
  *
  * @package Gutenberg
  */
@@ -12,11 +12,18 @@ if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
 }
 
 /**
- * Compiles styles from a collection of CSS rules.
+ * Compiles styles from stores or collection of CSS rules.
  *
  * @access private
  */
 class WP_Style_Engine_Processor {
+
+	/**
+	 * The Style-Engine Store objects
+	 *
+	 * @var WP_Style_Engine_CSS_Rules_Store[]
+	 */
+	protected $stores = array();
 
 	/**
 	 * The set of CSS rules that this processor will work on.
@@ -26,12 +33,12 @@ class WP_Style_Engine_Processor {
 	protected $css_rules = array();
 
 	/**
-	 * Constructor.
+	 * Add a store to the processor.
 	 *
-	 * @param WP_Style_Engine_CSS_Rule[] $css_rules An array of WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
 	 */
-	public function __construct( $css_rules = array() ) {
-		$this->add_rules( $css_rules );
+	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
+		$this->stores[] = $store;
 	}
 
 	/**
@@ -59,6 +66,11 @@ class WP_Style_Engine_Processor {
 	 * @return string The computed CSS.
 	 */
 	public function get_css() {
+		// If we have stores, get the rules from them.
+		foreach ( $this->stores as $store ) {
+			$this->add_rules( $store->get_all_rules() );
+		}
+
 		// Combine CSS selectors that have identical declarations.
 		$this->combine_rules_selectors();
 

@@ -367,7 +367,9 @@ class WP_Style_Engine {
 		$stores = WP_Style_Engine_CSS_Rules_Store::get_stores();
 
 		foreach ( $stores as $key => $store ) {
-			$styles = static::compile_stylesheet_from_css_rules( $store->get_all_rules() );
+			$processor = new WP_Style_Engine_Processor();
+			$processor->add_store( $store );
+			$styles = $processor->get_css();
 
 			if ( ! empty( $styles ) ) {
 				wp_register_style( $key, false, array(), true, true );
@@ -591,7 +593,8 @@ class WP_Style_Engine {
 	 * @return string A compiled stylesheet from stored CSS rules.
 	 */
 	public static function compile_stylesheet_from_css_rules( $css_rules ) {
-		$processor = new WP_Style_Engine_Processor( $css_rules );
+		$processor = new WP_Style_Engine_Processor();
+		$processor->add_rules( $css_rules );
 		return $processor->get_css();
 	}
 }
@@ -752,5 +755,5 @@ function wp_style_engine_get_stylesheet_from_store( $store_key ) {
 
 	$style_engine = WP_Style_Engine::get_instance();
 	$store        = $style_engine::get_store( $store_key );
-	return WP_Style_Engine::get_instance()::compile_stylesheet_from_css_rules( $store->get_all_rules() );
+	return WP_Style_Engine::compile_stylesheet_from_css_rules( $store->get_all_rules() );
 }

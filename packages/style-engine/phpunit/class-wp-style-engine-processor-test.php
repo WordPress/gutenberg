@@ -33,7 +33,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_processor = new WP_Style_Engine_Processor( array( $a_nice_css_rule, $a_nicer_css_rule ) );
+		$a_nice_processor = new WP_Style_Engine_Processor();
+		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
 		$this->assertEquals( '.a-nice-rule {color: var(--nice-color); background-color: purple;}.a-nicer-rule {font-family: Nice sans; font-size: 1em; background-color: purple;}', $a_nice_processor->get_css() );
 	}
 
@@ -55,7 +56,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_renderer = new WP_Style_Engine_Processor_Gutenberg( $a_nice_store->get_all_rules() );
+		$a_nice_renderer = new WP_Style_Engine_Processor_Gutenberg();
+		$a_nice_renderer->add_store( $a_nice_store );
 		$this->assertEquals( '.a-nice-rule {color: var(--nice-color); background-color: purple;}.a-nicer-rule {font-family: Nice sans; font-size: 1em; background-color: purple;}', $a_nice_renderer->get_css() );
 	}
 
@@ -116,7 +118,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$a_sweet_processor = new WP_Style_Engine_Processor( array( $a_sweet_rule, $a_sweeter_rule ) );
+		$a_sweet_processor = new WP_Style_Engine_Processor();
+		$a_sweet_processor->add_rules( array( $a_sweet_rule, $a_sweeter_rule ) );
 
 		$this->assertEquals( '.a-sweet-rule,#an-even-sweeter-rule > marquee {color: var(--sweet-color); background-color: purple;}', $a_sweet_processor->get_css() );
 	}
