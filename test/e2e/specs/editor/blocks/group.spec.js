@@ -19,10 +19,14 @@ test.describe( 'Group', () => {
 
 		await inserterButton.click();
 
-		const searchField = page.locator( '.components-search-control__input' );
-		await page.type( 'role=searchbox[name="Search for blocks and patterns"i]', 'Group' );
+		await page.type(
+			'role=searchbox[name="Search for blocks and patterns"i]',
+			'Group'
+		);
 
-		await page.click( 'role=listbox[name="Blocks"i] >> role=option[name="Group"i]' );
+		await page.click(
+			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
+		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -33,7 +37,9 @@ test.describe( 'Group', () => {
 	} ) => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/group' );
-		await expect( page.locator( 'role=option[name="Group"i][selected]' ) ).toBeVisible();
+		await expect(
+			page.locator( 'role=option[name="Group"i][selected]' )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -55,7 +61,9 @@ test.describe( 'Group', () => {
 
 		await page.locator( '.editor-block-list-item-group' ).click();
 		await page.click( 'role=button[name="Add block"i]' );
-		await page.click( 'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]' );
+		await page.click(
+			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
+		);
 		await page.keyboard.type( 'Group Block with a Paragraph' );
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
