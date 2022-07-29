@@ -20,7 +20,7 @@ test.describe( 'Group', () => {
 		await inserterButton.click();
 
 		const searchField = page.locator( '.components-search-control__input' );
-		await searchField.type( 'Group' );
+		await page.type( 'role=searchbox[name="Search for blocks and patterns"i]', 'Group' );
 
 		await page.locator( '.editor-block-list-item-group' ).click();
 
