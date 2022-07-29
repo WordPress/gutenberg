@@ -49,17 +49,7 @@ test.describe( 'Group', () => {
 		editor,
 		page,
 	} ) => {
-		// Search for the group block and insert it.
-		const inserterButton = page.locator(
-			'role=button[name="Toggle block inserter"i]'
-		);
-
-		await inserterButton.click();
-
-		const searchField = page.locator( '.components-search-control__input' );
-		await searchField.type( 'Group' );
-
-		await page.locator( '.editor-block-list-item-group' ).click();
+		await editor.insertBlock( { name: 'core/group' } );
 		await page.click( 'role=button[name="Add block"i]' );
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
