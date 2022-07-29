@@ -12,26 +12,45 @@ if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
 }
 
 /**
- * Compiles styles from a store of CSS rules.
+ * Compiles styles from a collection of CSS rules.
  *
  * @access private
  */
 class WP_Style_Engine_Processor {
 
 	/**
-	 * The Style-Engine Store object.
+	 * The set of CSS rules that this processor will work on.
 	 *
-	 * @var WP_Style_Engine_CSS_Rules_Store
+	 * @var WP_Style_Engine_CSS_Rule[]
 	 */
-	protected $store;
+	protected $css_rules = array();
 
 	/**
 	 * Constructor.
 	 *
-	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to render.
+	 * @param WP_Style_Engine_CSS_Rule[] $css_rules An array of WP_Style_Engine_CSS_Rule objects from a store or otherwise.
 	 */
-	public function __construct( WP_Style_Engine_CSS_Rules_Store $store ) {
-		$this->store = $store;
+	public function __construct( $css_rules = array() ) {
+		$this->add_rules( $css_rules );
+	}
+
+	/**
+	 * Adds rules to be processed.
+	 *
+	 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+	 */
+	public function add_rules( $css_rules ) {
+		if ( ! is_array( $css_rules ) ) {
+			$css_rules = array( $css_rules );
+		}
+		foreach ( $css_rules as $rule ) {
+			$selector = $rule->get_selector();
+			if ( isset( $this->css_rules[ $selector ] ) ) {
+				$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
+			} else {
+				$this->css_rules[ $rule->get_selector() ] = $rule;
+			}
+		}
 	}
 
 	/**
@@ -44,9 +63,8 @@ class WP_Style_Engine_Processor {
 		$this->combine_rules_selectors();
 
 		// Build the CSS.
-		$css   = '';
-		$rules = $this->store->get_all_rules();
-		foreach ( $rules as $rule ) {
+		$css = '';
+		foreach ( $this->css_rules as $rule ) {
 			$css .= $rule->get_css();
 		}
 		return $css;
@@ -58,14 +76,14 @@ class WP_Style_Engine_Processor {
 	 * @return void
 	 */
 	private function combine_rules_selectors() {
-		$rules = $this->store->get_all_rules();
-
 		// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
 		$selectors_json = array();
-		foreach ( $rules as $selector => $rule ) {
-			$declarations = $rule->get_declarations()->get_declarations();
+		foreach ( $this->css_rules as $index => $rule ) {
+
+			$rule_selector = $rule->get_selector();
+			$declarations  = $rule->get_declarations()->get_declarations();
 			ksort( $declarations );
-			$selectors_json[ $selector ] = json_encode( $declarations );
+			$selectors_json[ $rule_selector ] = wp_json_encode( $declarations );
 		}
 
 		// Combine selectors that have the same styles.
@@ -76,18 +94,17 @@ class WP_Style_Engine_Processor {
 			if ( 1 >= count( $duplicates ) ) {
 				continue;
 			}
+
+			$new_declarations = $this->css_rules[ $selector ]->get_declarations();
+
 			foreach ( $duplicates as $key ) {
 				// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
 				unset( $selectors_json[ $key ] );
-				// Remove the rules from the store.
-				$this->store->remove_rule( $key );
+				// Remove the rules from the rules collection.
+				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$new_rule = $this->store->add_rule( implode( ',', $duplicates ) );
-			// Set the declarations. The extra check is in place because `add_rule` in the store can return `null`.
-			if ( $new_rule ) {
-				$new_rule->add_declarations( $rules[ $selector ]->get_declarations() );
-			}
+			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $new_declarations );
 		}
 	}
 }

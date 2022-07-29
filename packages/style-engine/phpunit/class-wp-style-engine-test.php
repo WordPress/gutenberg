@@ -29,8 +29,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_block_supports_styles_fixtures
 	 *
-	 * @param array  $block_styles    The incoming block styles object.
-	 * @param array  $options         Style engine options.
+	 * @param array  $block_styles The incoming block styles object.
+	 * @param array  $options Style engine options.
 	 * @param string $expected_output The expected output.
 	 */
 	public function test_generate_block_supports_styles( $block_styles, $options, $expected_output ) {
@@ -512,30 +512,77 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
 	public function test_add_to_store() {
-		$styles = array(
-			'.saruman'  => array(
-				'color'        => 'white',
-				'height'       => '100px',
-				'border-style' => 'solid',
-				'align-self'   => 'unset',
+		$css_rules = array(
+			array(
+				'selector'         => '.saruman',
+				'css_declarations' => array(
+					'color'        => 'white',
+					'height'       => '100px',
+					'border-style' => 'solid',
+					'align-self'   => 'unset',
+				),
 			),
-			'.gandalf'  => array(
-				'color'        => 'grey',
-				'height'       => '90px',
-				'border-style' => 'dotted',
-				'align-self'   => 'safe center',
+			array(
+				'selector'         => '.gandalf',
+				'css_declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+					'align-self'   => 'safe center',
+				),
 			),
-			'.radagast' => array(
-				'color'        => 'brown',
-				'height'       => '60px',
-				'border-style' => 'dashed',
-				'align-self'   => 'stretch',
+			array(
+				'selector'         => '.radagast',
+				'css_declarations' => array(
+					'color'        => 'brown',
+					'height'       => '60px',
+					'border-style' => 'dashed',
+					'align-self'   => 'stretch',
+				),
 			),
 		);
-		$store  = wp_style_engine_add_to_store( 'test-store', $styles );
+		$store     = wp_style_engine_add_to_store( 'test-store', $css_rules );
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $store );
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet( 'test-store' );
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_store( 'test-store' );
+		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests retrieving a generated stylesheet from any rules.
+	 */
+	public function test_get_stylesheet_from_css_rules() {
+		$css_rules = array(
+			array(
+				'selector'         => '.saruman',
+				'css_declarations' => array(
+					'color'        => 'white',
+					'height'       => '100px',
+					'border-style' => 'solid',
+					'align-self'   => 'unset',
+				),
+			),
+			array(
+				'selector'         => '.gandalf',
+				'css_declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+					'align-self'   => 'safe center',
+				),
+			),
+			array(
+				'selector'         => '.radagast',
+				'css_declarations' => array(
+					'color'        => 'brown',
+					'height'       => '60px',
+					'border-style' => 'dashed',
+					'align-self'   => 'stretch',
+				),
+			),
+		);
+
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
 		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
 	}
 }
