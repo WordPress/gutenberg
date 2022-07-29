@@ -514,8 +514,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	public function test_add_to_store() {
 		$css_rules = array(
 			array(
-				'selector'         => '.saruman',
-				'css_declarations' => array(
+				'selector'     => '.saruman',
+				'declarations' => array(
 					'color'        => 'white',
 					'height'       => '100px',
 					'border-style' => 'solid',
@@ -523,8 +523,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 			array(
-				'selector'         => '.gandalf',
-				'css_declarations' => array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
 					'color'        => 'grey',
 					'height'       => '90px',
 					'border-style' => 'dotted',
@@ -532,8 +532,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 			array(
-				'selector'         => '.radagast',
-				'css_declarations' => array(
+				'selector'     => '.radagast',
+				'declarations' => array(
 					'color'        => 'brown',
 					'height'       => '60px',
 					'border-style' => 'dashed',
@@ -554,8 +554,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	public function test_get_stylesheet_from_css_rules() {
 		$css_rules = array(
 			array(
-				'selector'         => '.saruman',
-				'css_declarations' => array(
+				'selector'     => '.saruman',
+				'declarations' => array(
 					'color'        => 'white',
 					'height'       => '100px',
 					'border-style' => 'solid',
@@ -563,8 +563,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 			array(
-				'selector'         => '.gandalf',
-				'css_declarations' => array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
 					'color'        => 'grey',
 					'height'       => '90px',
 					'border-style' => 'dotted',
@@ -572,8 +572,8 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 			array(
-				'selector'         => '.radagast',
-				'css_declarations' => array(
+				'selector'     => '.radagast',
+				'declarations' => array(
 					'color'        => 'brown',
 					'height'       => '60px',
 					'border-style' => 'dashed',

@@ -390,8 +390,8 @@ class WP_Style_Engine {
 	 * );.
 	 *
 	 * @return array array(
-	 *     'css_declarations' => (array) An array of parsed CSS property => CSS value pairs.
-	 *     'classnames'       => (array) A flat array of classnames.
+	 *     'declarations' => (array) An array of parsed CSS property => CSS value pairs.
+	 *     'classnames'   => (array) A flat array of classnames.
 	 * );
 	 */
 	public function parse_block_styles( $block_styles, $options ) {
@@ -421,8 +421,8 @@ class WP_Style_Engine {
 		}
 
 		return array(
-			'classnames'       => $classnames,
-			'css_declarations' => $css_declarations,
+			'classnames'   => $classnames,
+			'declarations' => $css_declarations,
 		);
 	}
 
@@ -653,11 +653,11 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		return $styles_output;
 	}
 
-	if ( ! empty( $parsed_styles['css_declarations'] ) ) {
-		$styles_output['css']          = $style_engine::compile_css( $parsed_styles['css_declarations'], $options['selector'] );
-		$styles_output['declarations'] = $parsed_styles['css_declarations'];
+	if ( ! empty( $parsed_styles['declarations'] ) ) {
+		$styles_output['css']          = $style_engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
+		$styles_output['declarations'] = $parsed_styles['declarations'];
 		if ( true === $options['enqueue'] ) {
-			$style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['css_declarations'] );
+			$style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
 		}
 	}
 
@@ -676,7 +676,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  * @param string $store_key A valid store key.
  * @param array  $css_rules array(
  *     'selector'         => (string) A CSS selector.
- *     'css_declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ *     'declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
  * );.
  *
  * @return WP_Style_Engine_CSS_Rules_Store|null.
@@ -692,23 +692,23 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
 	}
 
 	foreach ( $css_rules as $css_rule ) {
-		if ( ! isset( $css_rule['selector'], $css_rule['css_declarations'] ) ) {
+		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
 			continue;
 		}
-		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['css_declarations'] );
+		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
 	}
 	return $style_engine::get_store( $store_key );
 }
 
 /**
- * Returns compiled CSS from a collection of selectors and css_declarations.
+ * Returns compiled CSS from a collection of selectors and declarations.
  * This won't add to any store, but is useful for returnin a compiled style sheet from any CSS selector + declarations combos.
  *
  * @access public
  *
  * @param array $css_rules array(
- *     'selector'         => (string) A CSS selector.
- *     'css_declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ *     'selector'     => (string) A CSS selector.
+ *     'declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
  * );.
  *
  * @return string A compiled CSS string.
@@ -722,14 +722,14 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 	$css_rule_objects = array();
 
 	foreach ( $css_rules as $css_rule ) {
-		if ( ! isset( $css_rule['selector'], $css_rule['css_declarations'] ) ) {
+		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
 			continue;
 		}
 
-		if ( empty( $css_rule['css_declarations'] ) || ! is_array( $css_rule['css_declarations'] ) ) {
+		if ( empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
 			continue;
 		}
-		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['css_declarations'] );
+		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
 	}
 
 	if ( empty( $css_rule_objects ) ) {

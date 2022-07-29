@@ -57,20 +57,20 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			array_push(
 				$layout_styles,
 				array(
-					'selector'         => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-					'css_declarations' => array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => array(
 						'max-width'    => $all_max_width_value,
 						'margin-left'  => 'auto !important',
 						'margin-right' => 'auto !important',
 					),
 				),
 				array(
-					'selector'         => "$selector > .alignwide",
-					'css_declarations' => array( 'max-width' => $wide_max_width_value ),
+					'selector'     => "$selector > .alignwide",
+					'declarations' => array( 'max-width' => $wide_max_width_value ),
 				),
 				array(
-					'selector'         => "$selector .alignfull",
-					'css_declarations' => array( 'max-width' => 'none' ),
+					'selector'     => "$selector .alignfull",
+					'declarations' => array( 'max-width' => 'none' ),
 				)
 			);
 
@@ -86,15 +86,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
 					$padding_right   = $block_spacing_values['declarations']['padding-right'];
 					$layout_styles[] = array(
-						'selector'         => "$selector > .alignfull",
-						'css_declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 					);
 				}
 				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
 					$padding_left    = $block_spacing_values['declarations']['padding-left'];
 					$layout_styles[] = array(
-						'selector'         => "$selector > .alignfull",
-						'css_declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
 					);
 				}
 			}
@@ -108,15 +108,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				array_push(
 					$layout_styles,
 					array(
-						'selector'         => "$selector > *",
-						'css_declarations' => array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
 							'margin-block-start' => '0',
 							'margin-block-end'   => '0',
 						),
 					),
 					array(
-						'selector'         => "$selector > * + *",
-						'css_declarations' => array(
+						'selector'     => "$selector > * + *",
+						'declarations' => array(
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
 						),
@@ -145,8 +145,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
 			$layout_styles[] = array(
-				'selector'         => $selector,
-				'css_declarations' => array( 'flex-wrap' => 'nowrap' ),
+				'selector'     => $selector,
+				'declarations' => array( 'flex-wrap' => 'nowrap' ),
 			);
 		}
 
@@ -158,8 +158,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
-					'selector'         => $selector,
-					'css_declarations' => array( 'gapp' => $gap_value ),
+					'selector'     => $selector,
+					'declarations' => array( 'gapp' => $gap_value ),
 				);
 			}
 		}
@@ -172,15 +172,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
-					'selector'         => $selector,
-					'css_declarations' => array( 'justify-content' => $justify_content_options[ $layout['justifyContent'] ] ),
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $justify_content_options[ $layout['justifyContent'] ] ),
 				);
 			}
 
 			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
-					'selector'         => $selector,
-					'css_declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
 				);
 			}
 		} else {
@@ -190,13 +190,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
-					'selector'         => $selector,
-					'css_declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
 				);
 			} else {
 				$layout_styles[] = array(
-					'selector'         => $selector,
-					'css_declarations' => array( 'align-items' => 'flex-start' ),
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => 'flex-start' ),
 				);
 			}
 		}
