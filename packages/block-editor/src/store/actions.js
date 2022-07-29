@@ -1021,6 +1021,7 @@ export const mergeBlocks =
 				blockB,
 				blockAType.name
 			);
+			// Only focus the previous block if it's not mergeable.
 			if ( blocksWithTheSameType?.length !== 1 ) {
 				dispatch.selectBlock( blockA.clientId );
 				return;
@@ -1102,6 +1103,7 @@ export const mergeBlocks =
 				? [ cloneB ]
 				: switchToBlockType( cloneB, blockA.name );
 
+		// If the block types can not match, do nothing.
 		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
 			return;
 		}
