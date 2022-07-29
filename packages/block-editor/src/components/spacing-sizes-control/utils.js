@@ -52,10 +52,13 @@ export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
 		return;
 	}
-	const slug = /var:preset\|spacing\|(.+)/.exec( value );
+
+	const slug = value.match( /var:preset\|spacing\|(.+)/ );
+
 	if ( ! slug ) {
 		return value;
 	}
+
 	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
 }
 
@@ -75,7 +78,7 @@ export function getSpacingPresetSlug( value ) {
 		return value;
 	}
 
-	const slug = /var:preset\|spacing\|(.+)/.exec( value );
+	const slug = value.match( /var:preset\|spacing\|(.+)/ );
 
 	return slug ? parseInt( slug[ 1 ], 10 ) : undefined;
 }
