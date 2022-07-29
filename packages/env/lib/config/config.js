@@ -15,6 +15,7 @@ const readRawConfigFile = require( './read-raw-config-file' );
 const parseConfig = require( './parse-config' );
 const { includeTestsPath, parseSourceString } = parseConfig;
 const md5 = require( '../md5' );
+const { getLatestWordPressVersion } = require( '../wordpress' );
 
 /**
  * wp-env configuration.
@@ -33,7 +34,7 @@ const md5 = require( '../md5' );
  * Base-level config for any particular environment. (development/tests/etc)
  *
  * @typedef WPServiceConfig
- * @property {?WPSource}                 coreSource    The WordPress installation to load in the environment.
+ * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
@@ -69,8 +70,9 @@ module.exports = async function readConfig( configPath ) {
 	);
 
 	// Default configuration which is overridden by .wp-env.json files.
+	const wpVersion = await getLatestWordPressVersion();
 	const defaultConfiguration = {
-		core: null,
+		core: `WordPress/WordPress#${ wpVersion }`,
 		phpVersion: null,
 		plugins: [],
 		themes: [],
