@@ -49,7 +49,7 @@ _Optional._ By default, all registered formats are allowed. This setting can be 
 
 ```js
 <RichText
-	tagName="h2" // The tag here is the element output and editable in the admin
+	tagName="h2"
 	value={ attributes.content } // Any existing content, either from the database or an attribute default
 	allowedFormats={ [ 'core/bold', 'core/italic' ] } // Allow the content to be made bold or italic, but do not allow othe formatting options
 	onChange={ ( content ) => setAttributes( { content } ) } // Store updated content as a block attribute
