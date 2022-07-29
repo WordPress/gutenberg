@@ -77,7 +77,24 @@ export default [
 	// Version with CSS grid
 	{
 		attributes: {
-			...baseAttributes,
+			align: {
+				type: 'string',
+				default: 'wide',
+			},
+			mediaAlt: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'figure img',
+				attribute: 'alt',
+				default: '',
+			},
+			mediaPosition: {
+				type: 'string',
+				default: 'left',
+			},
+			mediaId: {
+				type: 'number',
+			},
 			mediaUrl: {
 				type: 'string',
 				source: 'attribute',
@@ -114,6 +131,20 @@ export default [
 				selector: 'figure a',
 				attribute: 'class',
 			},
+			mediaType: {
+				type: 'string',
+			},
+			mediaWidth: {
+				type: 'number',
+				default: 50,
+			},
+			mediaSizeSlug: {
+				type: 'string',
+			},
+			isStackedOnMobile: {
+				type: 'boolean',
+				default: true,
+			},
 			verticalAlignment: {
 				type: 'string',
 			},
@@ -122,6 +153,15 @@ export default [
 			},
 			focalPoint: {
 				type: 'object',
+			},
+		},
+		supports: {
+			anchor: true,
+			align: [ 'wide', 'full' ],
+			html: false,
+			color: {
+				gradients: true,
+				link: true,
 			},
 		},
 		save( { attributes } ) {
