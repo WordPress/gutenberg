@@ -414,8 +414,10 @@ function GalleryEdit( props ) {
 
 	const hasImages = !! images.length;
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
-	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+	const imagesUploading = images.some( ( img ) =>
+		! Platform.isNative
+			? ! img.id && img.url?.indexOf( 'blob:' ) === 0
+			: img.url?.indexOf( 'file:' ) === 0
 	);
 
 	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.

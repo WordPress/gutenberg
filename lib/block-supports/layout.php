@@ -65,7 +65,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$style .= "$selector .alignfull { max-width: none; }";
 
 			if ( isset( $block_spacing ) ) {
-				$block_spacing_values = gutenberg_style_engine_get_block_supports_styles(
+				$block_spacing_values = gutenberg_style_engine_get_styles(
 					array(
 						'spacing' => $block_spacing,
 					)
@@ -226,30 +226,35 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$class_names[] = sanitize_title( $layout_classname );
 	}
 
-	$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
-	// Skip if gap value contains unsupported characters.
-	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-	// because we only want to match against the value, not the CSS attribute.
-	if ( is_array( $gap_value ) ) {
-		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+	// Only generate Layout styles if the theme has not opted-out.
+	// Attribute-based Layout classnames are output in all cases.
+	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
+
+		$gap_value = _wp_array_get( $block, array( 'attrs', 'style', 'spacing', 'blockGap' ) );
+		// Skip if gap value contains unsupported characters.
+		// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+		// because we only want to match against the value, not the CSS attribute.
+		if ( is_array( $gap_value ) ) {
+			foreach ( $gap_value as $key => $value ) {
+				$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+			}
+		} else {
+			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 		}
-	} else {
-		$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-	}
 
-	$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
-	$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
+		$fallback_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), '0.5em' );
+		$block_spacing      = _wp_array_get( $block, array( 'attrs', 'style', 'spacing' ), null );
 
-	// If a block's block.json skips serialization for spacing or spacing.blockGap,
-	// don't apply the user-defined value to the styles.
-	$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
-	$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
+		// If a block's block.json skips serialization for spacing or spacing.blockGap,
+		// don't apply the user-defined value to the styles.
+		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		$style                         = gutenberg_get_layout_style( ".$block_classname.$container_class", $used_layout, $has_block_gap_support, $gap_value, $should_skip_gap_serialization, $fallback_gap_value, $block_spacing );
 
-	// Only add container class and enqueue block support styles if unique styles were generated.
-	if ( ! empty( $style ) ) {
-		$class_names[] = $container_class;
-		wp_enqueue_block_support_styles( $style );
+		// Only add container class and enqueue block support styles if unique styles were generated.
+		if ( ! empty( $style ) ) {
+			$class_names[] = $container_class;
+			wp_enqueue_block_support_styles( $style );
+		}
 	}
 
 	// This assumes the hook only applies to blocks with a single wrapper.

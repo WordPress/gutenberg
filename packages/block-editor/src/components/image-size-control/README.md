@@ -32,6 +32,13 @@ const MyImageSizeControl = () => {
 
 The component accepts the following props:
 
+### imageSizeHelp
+
+If this property is added, a help text will be generated for the image size control, using imageSizeHelp property as the content.
+
+-   Type: `String|WPElement`
+-   Required: No
+
 ### slug
 
 The currently-selected image size slug (`thumbnail`, `large`, etc). This is used by the parent component to get the specific image, which is used to populate `imageHeight` & `imageWidth`. This is not required, but necessary when `imageSizeOptions` is used.

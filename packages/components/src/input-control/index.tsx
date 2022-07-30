@@ -30,6 +30,7 @@ function useUniqueId( idProp?: string ) {
 
 export function UnforwardedInputControl(
 	{
+		__next36pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -63,6 +64,7 @@ export function UnforwardedInputControl(
 
 	return (
 		<InputBase
+			__next36pxDefaultSize={ __next36pxDefaultSize }
 			__unstableInputWidth={ __unstableInputWidth }
 			className={ classes }
 			disabled={ disabled }
@@ -79,6 +81,7 @@ export function UnforwardedInputControl(
 		>
 			<InputField
 				{ ...props }
+				__next36pxDefaultSize={ __next36pxDefaultSize }
 				className="components-input-control__input"
 				disabled={ disabled }
 				id={ id }
