@@ -19,6 +19,7 @@ import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
+import { getBlockPreviewPatterns, getPatternsFromBlocks } from './patterns';
 
 export function BlockPreview( {
 	blocks,
@@ -34,9 +35,12 @@ export function BlockPreview( {
 	);
 	const settings = useMemo( () => {
 		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
+		_settings.__experimentalBlockPatterns = getBlockPreviewPatterns(
+			_settings.__experimentalBlockPatterns,
+			getPatternsFromBlocks( blocks )
+		);
 		return _settings;
-	}, [ originalSettings ] );
+	}, [ originalSettings, blocks ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
@@ -97,8 +101,14 @@ export function useBlockPreview( {
 	const disabledRef = useDisabled();
 	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
-		[ originalSettings ]
+		() => ( {
+			...originalSettings,
+			__experimentalBlockPatterns: getBlockPreviewPatterns(
+				originalSettings.__experimentalBlockPatterns,
+				getPatternsFromBlocks( blocks )
+			),
+		} ),
+		[ originalSettings, blocks ]
 	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 
