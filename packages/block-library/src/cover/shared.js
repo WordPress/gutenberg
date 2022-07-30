@@ -3,11 +3,6 @@
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 
-/**
- * External dependencies
- */
-import fetch from 'node-fetch';
-
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -113,7 +108,7 @@ export function attributesFromUrl( setAttributes, dimRatio ) {
 }
 
 async function getContentTypeFromUrl( url ) {
-	const response = await fetch( url );
+	const response = await window.fetch( url );
 	if ( response.ok ) {
 		return response.headers.get( 'Content-Type' );
 	}
