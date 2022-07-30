@@ -7,10 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createPortal, useState, useEffect } from '@wordpress/element';
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
-import { displayShortcut } from '@wordpress/keycodes';
+import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 
 /**
@@ -30,6 +30,15 @@ function Header( {
 		sidebar.hasUndo(),
 		sidebar.hasRedo(),
 	] );
+
+	const shortcut = isAppleOS()
+		? displayShortcut.primaryShift( 'z' )
+		: sprintf(
+				// translators: %1$s: Shortcut text. %2$s: Shortcut text.
+				'%1$s or %2$s',
+				displayShortcut.primaryShift( 'z' ),
+				displayShortcut.primary( 'y' )
+		  );
 
 	useEffect( () => {
 		return sidebar.subscribeHistory( () => {
@@ -64,7 +73,7 @@ function Header( {
 						icon={ ! isRTL() ? redoIcon : undoIcon }
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'Redo' ) }
-						shortcut={ displayShortcut.primaryShift( 'z' ) }
+						shortcut={ shortcut }
 						// If there are no undo levels we don't want to actually disable this
 						// button, because it will remove focus for keyboard users.
 						// See: https://github.com/WordPress/gutenberg/issues/3486
