@@ -347,6 +347,45 @@ _Returns_
 
 Returns an action object used to register a new keyboard shortcut.
 
+_Usage_
+
+```js
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+
+	useEffect( () => {
+		registerShortcut( {
+			name: 'custom/my-custom-shortcut',
+			category: 'my-category',
+			description: __( 'My custom shortcut' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'j',
+			},
+		} );
+	}, [] );
+
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutKeyCombination(
+				'custom/my-custom-shortcut'
+			),
+		[]
+	);
+
+	return shortcut ? (
+		<p>{ __( 'Shortcut is registered.' ) }</p>
+	) : (
+		<p>{ __( 'Shortcut is not registered.' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _config_ `WPShortcutConfig`: Shortcut config.
@@ -358,6 +397,37 @@ _Returns_
 ### unregisterShortcut
 
 Returns an action object used to unregister a keyboard shortcut.
+
+_Usage_
+
+```js
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+const ExampleComponent = () => {
+	const { unregisterShortcut } = useDispatch( keyboardShortcutsStore );
+
+	useEffect( () => {
+		unregisterShortcut( 'core/edit-post/next-region' );
+	}, [] );
+
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutKeyCombination(
+				'core/edit-post/next-region'
+			),
+		[]
+	);
+
+	return shortcut ? (
+		<p>{ __( 'Shortcut is not unregistered.' ) }</p>
+	) : (
+		<p>{ __( 'Shortcut is unregistered.' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
