@@ -45,8 +45,27 @@ class WP_Style_Engine_CSS_Rules_Store {
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
 			static::$stores[ $store_name ] = new static();
 		}
-		return static::$stores[ $store_name ];
+
+		$store = static::$stores[ $store_name ];
+
+		/**
+		 * Filters the CSS Rules Store.
+		 *
+		 * @param WP_Style_Engine_CSS_Rules_Store $store      The CSS Rules Store.
+		 * @param string                          $store_name The name of the store.
+		 */
+		return apply_filters( 'wp_style_engine_css_rules_store', $store, $store_name );
 	}
+
+	/**
+	 * Get an array of all available stores.
+	 *
+	 * @return WP_Style_Engine_CSS_Rules_Store[]
+	 */
+	public static function get_stores() {
+		return static::$stores;
+	}
+
 	/**
 	 * Get an array of all rules.
 	 *
