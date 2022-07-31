@@ -18,10 +18,14 @@ import { LINE_SEPARATOR } from './special-characters';
  * @return {number|void} The line index. Undefined if not found.
  */
 export function getLineIndex( { start, text }, startIndex = start ) {
+	const NEW_LINE_CHARACTER = '\n';
 	let index = startIndex;
 
 	while ( index-- ) {
-		if ( text[ index ] === LINE_SEPARATOR ) {
+		if (
+			text[ index ] === LINE_SEPARATOR ||
+			text[ index ] === NEW_LINE_CHARACTER
+		) {
 			return index;
 		}
 	}
