@@ -4,7 +4,7 @@
 import type { RequestUtils } from './index';
 import { WP_BASE_URL } from '../config';
 
-const THEMES_URL = new URL( '/wp-admin/themes.php', WP_BASE_URL ).href;
+const THEMES_URL = new URL( 'wp-admin/themes.php', WP_BASE_URL ).href;
 
 async function activateTheme(
 	this: RequestUtils,

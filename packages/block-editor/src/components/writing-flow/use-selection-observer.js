@@ -97,7 +97,40 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
+					// Only process if selection is enabled on the whole editor.
+					if ( node.getAttribute( 'contenteditable' ) === 'false' ) {
+						return;
+					}
+
+					let selectedNode = extractSelectionStartNode( selection );
+
 					setContentEditableWrapper( node, false );
+
+					const { activeElement } = ownerDocument;
+
+					// No selection.
+					if ( ! selectedNode ) return;
+					// Already focussed.
+					if ( selectedNode === activeElement ) return;
+					// Wrapper is focussed.
+					if ( node === activeElement ) return;
+					// Focus lies outside the editor.
+					if ( ! node.contains( activeElement ) ) return;
+
+					// Ensure that the selection is an element.
+					if ( selectedNode.nodeType !== selectedNode.ELEMENT_NODE ) {
+						selectedNode = selectedNode.parentElement;
+					}
+
+					// Find the closest focusable element.
+					selectedNode = selectedNode.closest( '[tabindex]' );
+
+					// Focus shouldn't be moved outside the editor.
+					if ( ! node.contains( selectedNode ) ) return;
+					// And focus shouldn't be moved to the editor's wrapper.
+					if ( selectedNode === node ) return;
+
+					selectedNode.focus();
 					return;
 				}
 

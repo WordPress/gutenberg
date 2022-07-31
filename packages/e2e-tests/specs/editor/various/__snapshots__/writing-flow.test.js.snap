@@ -258,13 +258,29 @@ exports[`Writing Flow should not have a dead zone above an aligned block 1`] = `
 <!-- /wp:image -->"
 `;
 
+exports[`Writing Flow should not have a dead zone abover separator 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator -->"
+`;
+
+exports[`Writing Flow should not have a dead zone abover separator 2`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>23</p>
+<p>32</p>
 <!-- /wp:paragraph -->"
 `;
 

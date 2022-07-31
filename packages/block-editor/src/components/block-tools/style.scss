@@ -2,6 +2,11 @@
  * Insertion Point.
  */
 
+.components-popover.block-editor-block-popover.block-editor-block-popover-in-between,
+.components-popover.block-editor-block-popover.block-editor-block-popover-in-between .components-popover__content > * {
+	pointer-events: none;
+}
+
 .block-editor-block-list__insertion-point {
 	position: absolute;
 	top: 0;
@@ -29,6 +34,7 @@
 
 // This is the clickable plus.
 .block-editor-block-list__insertion-point-inserter {
+	pointer-events: all;
 	// Don't show on mobile.
 	display: none;
 	position: absolute;

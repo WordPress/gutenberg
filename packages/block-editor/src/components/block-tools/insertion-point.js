@@ -24,7 +24,7 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
+	const { hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -73,12 +73,6 @@ function InsertionPointPopover( {
 	const isVertical = orientation === 'vertical';
 
 	const disableMotion = useReducedMotion();
-
-	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
-			selectBlock( nextClientId, -1 );
-		}
-	}
 
 	function onFocus( event ) {
 		// Only handle click on the wrapper specifically, and not an event
@@ -190,11 +184,8 @@ function InsertionPointPopover( {
 				exit="start"
 				ref={ ref }
 				tabIndex={ -1 }
-				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ classnames( className, {
-					'is-with-inserter': isInserterShown,
-				} ) }
+				className={ className }
 				onHoverEnd={ maybeHideInserterPoint }
 			>
 				<motion.div
@@ -205,7 +196,10 @@ function InsertionPointPopover( {
 					<motion.div
 						variants={ inserterVariants }
 						className={ classnames(
-							'block-editor-block-list__insertion-point-inserter'
+							'block-editor-block-list__insertion-point-inserter',
+							{
+								'is-with-inserter': isInserterShown,
+							}
 						) }
 					>
 						<Inserter
