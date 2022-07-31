@@ -24,24 +24,32 @@ function render_block_core_template_part( $attributes ) {
 		isset( $attributes['theme'] ) &&
 		wp_get_theme()->get_stylesheet() === $attributes['theme']
 	) {
-		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
-		$template_part_query = new WP_Query(
-			array(
-				'post_type'      => 'wp_template_part',
-				'post_status'    => 'publish',
-				'post_name__in'  => array( $attributes['slug'] ),
-				'tax_query'      => array(
-					array(
-						'taxonomy' => 'wp_theme',
-						'field'    => 'slug',
-						'terms'    => $attributes['theme'],
+		$template_part_id   = $attributes['theme'] . '//' . $attributes['slug'];
+		$last_changed       = wp_cache_get_last_changed( 'posts' );
+		$transient          = "render_block_core_template_part:$template_part_id:$last_changed";
+		$template_part_post = get_transient( $transient );
+
+		if ( false === $template_part_post ) {
+			$template_part_query = new WP_Query(
+				array(
+					'post_type'      => 'wp_template_part',
+					'post_status'    => 'publish',
+					'post_name__in'  => array( $attributes['slug'] ),
+					'tax_query'      => array(
+						array(
+							'taxonomy' => 'wp_theme',
+							'field'    => 'slug',
+							'terms'    => $attributes['theme'],
+						),
 					),
-				),
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
-			)
-		);
-		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+					'posts_per_page' => 1,
+					'no_found_rows'  => true,
+				)
+			);
+			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : 0;
+			set_transient( $transient, $template_part_post, DAY_IN_SECONDS );
+		}
+
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
