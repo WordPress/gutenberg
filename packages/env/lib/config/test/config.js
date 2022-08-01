@@ -19,6 +19,27 @@ jest.mock( 'fs', () => ( {
 	},
 } ) );
 
+// This mocks a small JSON response with a format matching the stable-check API.
+// It makes getLatestWordPressVersion resolve to "100.0.0".
+jest.mock( 'https', () => ( {
+	...jest.requireActual( 'https' ),
+	get: ( url, cb ) =>
+		cb( {
+			on: ( option, cb2 ) =>
+				cb2(
+					Buffer.from(
+						url ===
+							'https://api.wordpress.org/core/stable-check/1.0/'
+							? '{"99.0.0": "insecure", "100.0.0": "latest"}'
+							: null,
+						'utf8'
+					)
+				),
+			setEncoding: jest.fn(),
+		} ),
+	on: jest.fn(),
+} ) );
+
 jest.mock( '../detect-directory-type', () => jest.fn() );
 
 describe( 'readConfig', () => {
@@ -59,10 +80,29 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'core' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).not.toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'local' );
 			expect( config.env.tests.coreSource ).not.toBeNull();
 			expect( config.env.development.pluginSources ).toHaveLength( 0 );
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
+		} );
+
+		it( 'should use the most recent stable WordPress version for the default core source', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve( JSON.stringify( {} ) )
+			);
+			const config = await readConfig( '.wp-env.json' );
+
+			const expected = {
+				url: 'https://github.com/WordPress/WordPress.git',
+				type: 'git',
+				basename: 'WordPress',
+				ref: '100.0.0', // From the mock of https at the top of the file.
+			};
+
+			expect( config.env.development.coreSource ).toMatchObject(
+				expected
+			);
+			expect( config.env.tests.coreSource ).toMatchObject( expected );
 		} );
 
 		it( 'should infer a plugin config when ran from a plugin directory', async () => {
@@ -71,7 +111,7 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'plugin' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'git' );
 			expect( config.env.development.pluginSources ).toHaveLength( 1 );
 			expect( config.env.tests.pluginSources ).toHaveLength( 1 );
 			expect( config.env.development.themeSources ).toHaveLength( 0 );
@@ -83,8 +123,8 @@ describe( 'readConfig', () => {
 			);
 			detectDirectoryType.mockImplementation( () => 'theme' );
 			const config = await readConfig( '.wp-env.json' );
-			expect( config.env.development.coreSource ).toBeNull();
-			expect( config.env.tests.coreSource ).toBeNull();
+			expect( config.env.development.coreSource.type ).toBe( 'git' );
+			expect( config.env.tests.coreSource.type ).toBe( 'git' );
 			expect( config.env.development.themeSources ).toHaveLength( 1 );
 			expect( config.env.tests.themeSources ).toHaveLength( 1 );
 			expect( config.env.development.pluginSources ).toHaveLength( 0 );
@@ -197,6 +237,11 @@ describe( 'readConfig', () => {
 			// Remove generated values which are different on other machines.
 			delete config.dockerComposeConfigPath;
 			delete config.workDirectoryPath;
+
+			// This encodes both the version of WordPress (which can change frequently)
+			// as well as the wp-env directory which is unique on every machine.
+			delete config.env.development.coreSource;
+			delete config.env.tests.coreSource;
 			expect( config ).toMatchSnapshot();
 		} );
 	} );
