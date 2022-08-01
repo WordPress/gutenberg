@@ -694,7 +694,7 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
 	}
 
 	foreach ( $css_rules as $css_rule ) {
-		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
+		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) ) {
 			continue;
 		}
 		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
