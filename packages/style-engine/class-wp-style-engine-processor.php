@@ -38,7 +38,7 @@ class WP_Style_Engine_Processor {
 	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
 	 */
 	public function add_store( WP_Style_Engine_CSS_Rules_Store $store ) {
-		$this->stores[] = $store;
+		$this->stores[ $store->get_name() ] = $store;
 	}
 
 	/**

@@ -27,6 +27,14 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	protected static $stores = array();
 
+
+	/**
+	 * The store name.
+	 *
+	 * @var string
+	 */
+	protected $name = '';
+
 	/**
 	 * An array of CSS Rules objects assigned to the store.
 	 *
@@ -44,6 +52,8 @@ class WP_Style_Engine_CSS_Rules_Store {
 	public static function get_store( $store_name = 'default' ) {
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
 			static::$stores[ $store_name ] = new static();
+			// Set the store name.
+			static::$stores[ $store_name ]->name = $store_name;
 		}
 		return static::$stores[ $store_name ];
 	}
@@ -64,6 +74,15 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	public static function remove_all_stores() {
 		static::$stores = array();
+	}
+
+	/**
+	 * Get the store name.
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return $this->name;
 	}
 
 	/**
