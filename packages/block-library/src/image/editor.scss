@@ -176,3 +176,8 @@ figure.wp-block-image:not(.wp-block) {
 		padding-right: 0;
 	}
 }
+
+// Duotone editor styles
+.wp-block-image .components-placeholder {
+	filter: var(--wp--style--filter);
+}

@@ -13,6 +13,7 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useContext, createPortal } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -128,13 +129,19 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
-		return settings;
-	}
+	const hasDuotoneSupport = hasBlockSupport( settings, 'filter.duotone' );
+
+	const hasDeprecatedExperimentalDuotoneSupport = hasBlockSupport(
+		settings,
+		'color.__experimentalDuotone'
+	);
+
+	const shouldAddAttributes =
+		hasDuotoneSupport || hasDeprecatedExperimentalDuotoneSupport;
 
 	// Allow blocks to specify their own attribute definition with default
 	// values if needed.
-	if ( ! settings.attributes.style ) {
+	if ( ! settings.attributes.style && shouldAddAttributes ) {
 		Object.assign( settings.attributes, {
 			style: {
 				type: 'object',
@@ -157,6 +164,11 @@ const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
+			'filter.duotone'
+		);
+
+		const hasDeprecatedExperimentalDuotoneSupport = hasBlockSupport(
+			props.name,
 			'color.__experimentalDuotone'
 		);
 		const isContentLocked = useSelect(
@@ -168,17 +180,60 @@ const withDuotoneControls = createHigherOrderComponent(
 			[ props.clientId ]
 		);
 
+		const shouldShowPanel =
+			( hasDuotoneSupport || hasDeprecatedExperimentalDuotoneSupport ) &&
+			! isContentLocked;
+
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && ! isContentLocked && (
-					<DuotonePanel { ...props } />
-				) }
+				{ shouldShowPanel && <DuotonePanel { ...props } /> }
 			</>
 		);
 	},
 	'withDuotoneControls'
 );
+
+function setInlineFilter( wrapperProps, value ) {
+	return {
+		...wrapperProps,
+		style: {
+			'--wp--style--filter': value,
+			...wrapperProps?.style,
+		},
+	};
+}
+
+function DuotoneStyles( { BlockListBlock, ...props } ) {
+	const colors = props?.attributes?.style?.color?.duotone;
+	const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+	const element = useContext( BlockList.__unstableElementContext );
+
+	if ( ! colors ) {
+		return <BlockListBlock { ...props } />;
+	}
+
+	if ( 'unset' === colors ) {
+		const wrapperProps = setInlineFilter( props.wrapperProps, 'unset' );
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	}
+
+	const wrapperProps = setInlineFilter(
+		props.wrapperProps,
+		`url( #${ id } )`
+	);
+
+	return (
+		<>
+			{ element &&
+				createPortal(
+					<DuotoneFilter id={ id } colors={ colors } />,
+					element
+				) }
+			<BlockListBlock { ...props } wrapperProps={ wrapperProps } />
+		</>
+	);
+}
 
 /**
  * Function that scopes a selector with another one. This works a bit like
@@ -211,6 +266,49 @@ function scopeSelector( scope, selector ) {
 	return selectorsScoped.join( ', ' );
 }
 
+function DeprecatedExperimentalDuotoneStyles( {
+	BlockListBlock,
+	deprecatedExperimentalDuotoneSupport,
+	...props
+} ) {
+	deprecated( 'color.__experimentalDuotone selector block supports', {
+		since: '6.1',
+		alternative: 'filter.duotone block supports',
+		link: 'TODO',
+	} );
+
+	const colors = props?.attributes?.style?.color?.duotone;
+
+	const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
+
+	// Extra .editor-styles-wrapper specificity is needed in the editor
+	// since we're not using inline styles to apply the filter. We need to
+	// override duotone applied by global styles and theme.json.
+	const selectorsGroup = scopeSelector(
+		`.editor-styles-wrapper .${ id }`,
+		deprecatedExperimentalDuotoneSupport
+	);
+
+	const className = classnames( props?.className, id );
+
+	const element = useContext( BlockList.__unstableElementContext );
+
+	return (
+		<>
+			{ element &&
+				createPortal(
+					<InlineDuotone
+						selector={ selectorsGroup }
+						id={ id }
+						colors={ colors }
+					/>,
+					element
+				) }
+			<BlockListBlock { ...props } className={ className } />
+		</>
+	);
+}
+
 /**
  * Override the default block element to include duotone styles.
  *
@@ -220,44 +318,30 @@ function scopeSelector( scope, selector ) {
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const duotoneSupport = getBlockSupport(
+		const duotoneSupport = getBlockSupport( props.name, 'filter.duotone' );
+		if ( duotoneSupport ) {
+			return (
+				<DuotoneStyles BlockListBlock={ BlockListBlock } { ...props } />
+			);
+		}
+
+		const deprecatedExperimentalDuotoneSupport = getBlockSupport(
 			props.name,
 			'color.__experimentalDuotone'
 		);
-		const colors = props?.attributes?.style?.color?.duotone;
-
-		if ( ! duotoneSupport || ! colors ) {
-			return <BlockListBlock { ...props } />;
+		if ( deprecatedExperimentalDuotoneSupport ) {
+			return (
+				<DeprecatedExperimentalDuotoneStyles
+					BlockListBlock={ BlockListBlock }
+					deprecatedExperimentalDuotoneSupport={
+						deprecatedExperimentalDuotoneSupport
+					}
+					{ ...props }
+				/>
+			);
 		}
 
-		const id = `wp-duotone-${ useInstanceId( BlockListBlock ) }`;
-
-		// Extra .editor-styles-wrapper specificity is needed in the editor
-		// since we're not using inline styles to apply the filter. We need to
-		// override duotone applied by global styles and theme.json.
-		const selectorsGroup = scopeSelector(
-			`.editor-styles-wrapper .${ id }`,
-			duotoneSupport
-		);
-
-		const className = classnames( props?.className, id );
-
-		const element = useContext( BlockList.__unstableElementContext );
-
-		return (
-			<>
-				{ element &&
-					createPortal(
-						<InlineDuotone
-							selector={ selectorsGroup }
-							id={ id }
-							colors={ colors }
-						/>,
-						element
-					) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+		return <BlockListBlock { ...props } />;
 	},
 	'withDuotoneStyles'
 );
