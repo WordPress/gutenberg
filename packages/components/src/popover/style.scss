@@ -60,12 +60,61 @@
 
 .components-popover__arrow {
 	position: absolute;
-	background: $gray-400;
-	width: 8px;
-	height: 8px;
-	transform: rotate(45deg);
-	z-index: -1;
-	.is-alternate & {
-		background: $gray-900;
+	width: var(--wp-popover-arrow-size);
+	height: var(--wp-popover-arrow-size);
+	pointer-events: none;
+
+	// Thin line that helps to make sure that the underlying
+	// popover__content's outline is fully overlapped by the
+	// arrow
+	&::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 0;
+		height: 2px;
+		width: 100%;
+		background-color: $white;
+	}
+
+	// Position and rotate the arrow depending on the popover's placement.
+	// The `!important' is necessary to override the inline styles.
+	&--top {
+		bottom: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		transform: rotate(0);
+	}
+	&--right {
+		left: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		transform: rotate(90deg);
+	}
+	&--bottom {
+		top: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		transform: rotate(180deg);
+	}
+	&--left {
+		right: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		transform: rotate(-90deg);
+	}
+}
+
+.components-popover__triangle {
+	fill: transparent;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	stroke-width: $border-width;
+
+	// Same as popover content
+	&-bg {
+		fill: $white;
+		stroke: $white;
+	}
+
+	&-border {
+		stroke: $gray-400;
+	}
+
+	.is-alternate &-border {
+		stroke: $gray-900;
 	}
 }

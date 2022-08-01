@@ -32,6 +32,7 @@ import {
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
+import { Path, SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -47,6 +48,30 @@ import { getAnimateClassName } from '../animate';
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
+
+// An SVG displaying a triangle facing down, filled with a solid
+// color and bordered in such a way to create an arrow-like effect.
+// Keeping the SVG's viewbox squared simplify the arrow positioning
+// calculations.
+const ArrowTriangle = ( props ) => (
+	<SVG
+		{ ...props }
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox={ `0 0 100 100` }
+		className="components-popover__triangle"
+		role="presentation"
+	>
+		<Path
+			className="components-popover__triangle-bg"
+			d="M 0 0 L 50 50 L 100 0"
+		/>
+		<Path
+			className="components-popover__triangle-border"
+			d="M 0 0 L 50 50 L 100 0"
+			vectorEffect="non-scaling-stroke"
+		/>
+	</SVG>
+);
 
 const slotNameContext = createContext();
 
@@ -266,12 +291,7 @@ const Popover = (
 		placement: usedPlacement,
 		middleware: middlewares,
 	} );
-	const staticSide = {
-		top: 'bottom',
-		right: 'left',
-		bottom: 'top',
-		left: 'right',
-	}[ placementData.split( '-' )[ 0 ] ];
+
 	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
 
 	// Updates references
@@ -407,22 +427,25 @@ const Popover = (
 			<div className="components-popover__content">{ children }</div>
 			{ hasArrow && (
 				<div
-					className="components-popover__arrow"
 					ref={ arrowRef }
+					className={ [
+						'components-popover__arrow',
+						`components-popover__arrow--${
+							placementData.split( '-' )[ 0 ]
+						}`,
+					].join( ' ' ) }
 					style={ {
-						left:
-							! arrowData?.x || Number.isNaN( arrowData?.x )
-								? 0
-								: arrowData.x,
-						top:
-							! arrowData?.y || Number.isNaN( arrowData?.y )
-								? 0
-								: arrowData.y,
-						right: undefined,
-						bottom: undefined,
-						[ staticSide ]: '-4px',
+						left: Number.isFinite( arrowData?.x )
+							? `${ arrowData.x }px`
+							: '',
+						top: Number.isFinite( arrowData?.y )
+							? `${ arrowData.y }px`
+							: '',
+						'--wp-popover-arrow-size': '14px',
 					} }
-				/>
+				>
+					<ArrowTriangle />
+				</div>
 			) }
 		</div>
 	);
