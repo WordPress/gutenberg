@@ -464,7 +464,10 @@
 				{
 					"type": "array",
 					"items": {
-						"type": "string"
+						"oneOf": [
+							{ "type": "string" },
+							{ "type": "object" }
+						]
 					}
 				}
 			]
@@ -478,7 +481,10 @@
 				{
 					"type": "array",
 					"items": {
-						"type": "string"
+						"oneOf": [
+							{ "type": "string" },
+							{ "type": "object" }
+						]
 					}
 				}
 			]
