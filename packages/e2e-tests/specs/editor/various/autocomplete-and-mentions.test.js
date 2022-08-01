@@ -307,5 +307,74 @@ describe( 'Autocomplete', () => {
 						` );
 			}
 		);
+
+		it( 'should allow newlines after multiple completions', async () => {
+			const testData = {};
+			if ( type === 'mention' ) {
+				testData.triggerString = '@bu';
+				testData.optionPath = '//*[contains(text(),"Buddy Elf")]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>@buddytheelf test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>@buddytheelf test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>@buddytheelf test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>@buddytheelf test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.triggerString = '~b';
+				testData.optionPath = '[text()="🫐 Blueberry"]';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>🫐 test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>🫐 test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>🫐 test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p>🫐 test</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:paragraph -->
+					<p></p>
+					<!-- /wp:paragraph -->"
+					`;
+			}
+
+			await clickBlockAppender();
+
+			for ( let i = 0; i < 4; i++ ) {
+				await page.keyboard.type( testData.triggerString );
+				await page.waitForXPath(
+					`//button[@role="option"]${ testData.optionPath }`
+				);
+				await page.keyboard.press( 'Enter' );
+				await page.keyboard.type( ' test' );
+				await page.keyboard.press( 'Enter' );
+			}
+
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
 	} );
 } );
