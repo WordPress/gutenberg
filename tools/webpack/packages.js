@@ -40,6 +40,7 @@ const bundledPackagesPhpConfig = [
 			'WP_Style_Engine_CSS_Rules_Store',
 			'WP_Style_Engine_CSS_Rule',
 			'WP_Style_Engine_Processor',
+			'WP_Style_Engine_Parser',
 			'WP_Style_Engine',
 		],
 	},
