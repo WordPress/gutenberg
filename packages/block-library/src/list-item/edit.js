@@ -27,6 +27,7 @@ import {
 	useOutdentListItem,
 	useSplit,
 	useMerge,
+	useCopy,
 } from './hooks';
 import { convertToListItems } from './utils';
 
@@ -71,7 +72,7 @@ export default function ListItemEdit( {
 	const onMerge = useMerge( clientId );
 	return (
 		<>
-			<li { ...innerBlocksProps }>
+			<li { ...innerBlocksProps } ref={ useCopy( clientId ) }>
 				<RichText
 					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
 					identifier="content"
