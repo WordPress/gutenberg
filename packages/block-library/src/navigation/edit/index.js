@@ -144,6 +144,11 @@ function Navigation( {
 			name: 'block-library/core/navigation/status',
 		} );
 
+	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/classic-menu-conversion',
+		} );
+
 	const {
 		create: createNavigationMenu,
 		status: createNavigationMenuStatus,
@@ -374,13 +379,6 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const [
-		showClassicMenuConversionErrorNotice,
-		hideClassicMenuConversionErrorNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/classic-menu-conversion/error',
-	} );
-
 	const handleUpdateMenu = ( menuId ) => {
 		setRef( menuId );
 		selectBlock( clientId );
@@ -396,12 +394,12 @@ function Navigation( {
 			classicMenuConversionResult
 		) {
 			handleUpdateMenu( classicMenuConversionResult?.id );
-			hideClassicMenuConversionErrorNotice();
+			hideClassicMenuConversionNotice();
 			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
-			showClassicMenuConversionErrorNotice( classicMenuConversionError );
+			showClassicMenuConversionNotice( classicMenuConversionError );
 			speak( __( 'Classic menu import failed.' ) );
 		}
 	}, [
