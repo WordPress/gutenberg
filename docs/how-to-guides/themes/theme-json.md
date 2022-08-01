@@ -911,7 +911,7 @@ In addition to top-level and block-level styles, there's the concept of elements
 
 Supported by Gutenberg:
 
-- `button`: maps to the `wp-element-button` and `.wp-block-button__link` CSS classes.
+- `button`: maps to the `wp-element-button` CSS class. Also maps to `wp-block-button__link` for backwards compatibility.
 - `caption`: maps to the `.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption` CSS classes.
 - `heading`: maps to all headings, the `h1 to h6` CSS selectors.
 
