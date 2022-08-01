@@ -1998,7 +1998,6 @@ export const getInserterItems = createSelector(
 
 		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
 			const { variations = [] } = item;
-
 			// Exclude any block type item that is to be replaced by a default variation.
 			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
 				accumulator.push( item );
@@ -2007,7 +2006,6 @@ export const getInserterItems = createSelector(
 				const variationMapper = getItemFromVariation( state, item );
 				accumulator.push( ...variations.map( variationMapper ) );
 			}
-
 			return accumulator;
 		}, [] );
 
