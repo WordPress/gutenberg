@@ -159,7 +159,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'gapp' => $gap_value ),
+					'declarations' => array( 'gap' => $gap_value ),
 				);
 			}
 		}
