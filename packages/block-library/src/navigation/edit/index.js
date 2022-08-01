@@ -28,7 +28,7 @@ import {
 } from '@wordpress/block-editor';
 import { EntityProvider } from '@wordpress/core-data';
 
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import {
 	PanelBody,
 	ToggleControl,
@@ -61,8 +61,7 @@ import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_SUCCESS,
 } from './use-convert-classic-menu-to-block-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
-
-const EMPTY_ARRAY = [];
+import { useInnerBlocks } from './use-inner-blocks';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -190,37 +189,13 @@ function Navigation( {
 		hasUncontrolledInnerBlocks,
 		uncontrolledInnerBlocks,
 		isInnerBlockSelected,
-		hasSubmenus,
-	} = useSelect(
-		( select ) => {
-			const { getBlock, getBlocks, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+		innerBlocks,
+	} = useInnerBlocks( clientId );
 
-			// This relies on the fact that `getBlock` won't return controlled
-			// inner blocks, while `getBlocks` does. It might be more stable to
-			// introduce a selector like `getUncontrolledInnerBlocks`, just in
-			// case `getBlock` is fixed.
-			const _uncontrolledInnerBlocks = getBlock( clientId ).innerBlocks;
-			const _hasUncontrolledInnerBlocks =
-				!! _uncontrolledInnerBlocks?.length;
-			const _controlledInnerBlocks = _hasUncontrolledInnerBlocks
-				? EMPTY_ARRAY
-				: getBlocks( clientId );
-			const innerBlocks = _hasUncontrolledInnerBlocks
-				? _uncontrolledInnerBlocks
-				: _controlledInnerBlocks;
-
-			return {
-				hasSubmenus: !! innerBlocks.find(
-					( block ) => block.name === 'core/navigation-submenu'
-				),
-				hasUncontrolledInnerBlocks: _hasUncontrolledInnerBlocks,
-				uncontrolledInnerBlocks: _uncontrolledInnerBlocks,
-				isInnerBlockSelected: hasSelectedInnerBlock( clientId, true ),
-			};
-		},
-		[ clientId ]
+	const hasSubmenus = !! innerBlocks.find(
+		( block ) => block.name === 'core/navigation-submenu'
 	);
+
 	const {
 		replaceInnerBlocks,
 		selectBlock,
