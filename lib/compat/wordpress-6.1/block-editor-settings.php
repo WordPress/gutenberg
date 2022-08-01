@@ -26,7 +26,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	if ( 'other' === $context ) {
 		global $wp_version;
-		$is_wp_5_8 = version_compare( $wp_version, '5.8', '>=' ) && version_compare( $wp_version, '5.9', '<' );
 		$is_wp_5_9 = version_compare( $wp_version, '5.9', '>=' ) && version_compare( $wp_version, '6.0-beta1', '<' );
 		$is_wp_6_0 = version_compare( $wp_version, '6.0-beta1', '>=' );
 
@@ -40,7 +39,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$styles_without_existing_global_styles = array();
 		foreach ( $settings['styles'] as $style ) {
 			if (
-				( $is_wp_5_8 && ! gutenberg_is_global_styles_in_5_8( $style ) ) || // Can be removed when plugin minimum version is 5.9.
 				( $is_wp_5_9 && ! gutenberg_is_global_styles_in_5_9( $style ) ) || // Can be removed when plugin minimum version is 6.0.
 				( $is_wp_6_0 && ( ! isset( $style['isGlobalStyles'] ) || ! $style['isGlobalStyles'] ) )
 			) {
@@ -171,6 +169,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	}
 
 	$settings['localAutosaveInterval'] = 15;
+	$settings['disableLayoutStyles']   = current_theme_supports( 'disable-layout-styles' );
 
 	return $settings;
 }

@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 13.8.0-rc.2 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Theme JSON Resolver: Update cache check to also check that the object is an instance of the Gutenberg version. ([42756](https://github.com/WordPress/gutenberg/pull/42756))
+
+
+### Experiments
+
+#### Global Styles
+- Layout: Reduce specificity of fallback blockGap styles. ([42665](https://github.com/WordPress/gutenberg/pull/42665))
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong
+
+
 = 13.8.0-rc.1 =
 
 
