@@ -28,15 +28,14 @@ function render_block_core_site_title( $attributes ) {
 	}
 
 	if ( $attributes['isLink'] ) {
-		$link_attrs = array(
-			'href="' . esc_url( get_bloginfo( 'url' ) ) . '"',
-			'rel="' . esc_attr( 'home' ) . '"',
+		$link_target = ! empty( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '_self';
+		$site_title  = sprintf(
+			'<a href="%1$s" target="%2$s" rel="home"%3$s>%4$s</a>',
+			esc_url( home_url() ),
+			esc_attr( $link_target ),
 			$aria_current,
+			esc_html( $site_title )
 		);
-		if ( '_blank' === $attributes['linkTarget'] ) {
-			$link_attrs[] = 'target="_blank"';
-		}
-		$site_title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), esc_html( $site_title ) );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
