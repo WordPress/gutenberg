@@ -18,6 +18,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -95,6 +96,7 @@ function PostFeaturedImageDisplay( {
 	const blockProps = useBlockProps( {
 		style: { width, height },
 	} );
+	const borderProps = useBorderProps( attributes );
 
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
@@ -165,6 +167,11 @@ function PostFeaturedImageDisplay( {
 	}
 
 	const label = __( 'Add a featured image' );
+	const imageStyles = {
+		...borderProps.style,
+		height,
+		objectFit: height && scale,
+	};
 
 	if ( ! featuredImage ) {
 		image = (
@@ -196,6 +203,7 @@ function PostFeaturedImageDisplay( {
 			placeholder()
 		) : (
 			<img
+				className={ borderProps.className }
 				src={ mediaUrl }
 				alt={
 					media.alt_text
@@ -206,7 +214,7 @@ function PostFeaturedImageDisplay( {
 						  )
 						: __( 'Featured image' )
 				}
-				style={ { height, objectFit: height && scale } }
+				style={ imageStyles }
 			/>
 		);
 	}
