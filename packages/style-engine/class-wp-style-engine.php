@@ -600,7 +600,7 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine::get_styles to generate styles from a single style object, e.g.,
+ * Global public interface method to generate styles from a single style object, e.g.,
  * the value of a block's attributes.style object or the top level styles in theme.json.
  * See: https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles and
  * https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
@@ -685,17 +685,20 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
 		return null;
 	}
 
+	// Get instance here to ensure that we register hooks to enqueue stored styles.
+	$style_engine = WP_Style_Engine::get_instance();
+
 	if ( empty( $css_rules ) ) {
-		return WP_Style_Engine::get_store( $store_key );
+		return $style_engine::get_store( $store_key );
 	}
 
 	foreach ( $css_rules as $css_rule ) {
 		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
 			continue;
 		}
-		WP_Style_Engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
+		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
 	}
-	return WP_Style_Engine::get_store( $store_key );
+	return $style_engine::get_store( $store_key );
 }
 
 /**
