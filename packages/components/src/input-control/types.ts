@@ -130,6 +130,11 @@ export interface InputFieldProps extends BaseProps {
 	showTooltip?: boolean;
 	stateReducer?: StateReducer;
 	/**
+	 * Custom text to display when tooltips are enabled. If not provided enabled
+	 * tooltips will fallback to using the label value.
+	 */
+	tooltipText?: string;
+	/**
 	 * The current value of the input.
 	 */
 	value?: string;

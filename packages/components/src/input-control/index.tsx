@@ -59,6 +59,7 @@ export function UnforwardedInputControl(
 		onKeyDown = noop,
 		prefix,
 		showTooltip = false,
+		tooltipText: tooltipTextProp,
 		size = 'default',
 		suffix,
 		value,
@@ -77,7 +78,9 @@ export function UnforwardedInputControl(
 		onChange,
 	} );
 
-	const tooltipText = typeof label === 'string' ? label : undefined;
+	const tooltipText =
+		tooltipTextProp ||
+		( typeof label === 'string' ? ( label as string ) : undefined );
 
 	return (
 		<InputBase
