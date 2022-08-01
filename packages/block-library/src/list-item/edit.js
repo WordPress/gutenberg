@@ -62,7 +62,7 @@ export default function ListItemEdit( {
 	clientId,
 } ) {
 	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 	} );
@@ -72,7 +72,7 @@ export default function ListItemEdit( {
 	const onMerge = useMerge( clientId );
 	return (
 		<>
-			<li { ...innerBlocksProps } ref={ useCopy( clientId ) }>
+			<li { ...innerBlocksProps }>
 				<RichText
 					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
 					identifier="content"
