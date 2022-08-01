@@ -10,6 +10,7 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	pressKeyTimes,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 const userList = [
@@ -46,6 +47,10 @@ describe( 'Autocomplete', () => {
 
 		beforeEach( async () => {
 			await createNewPost();
+		} );
+
+		afterEach( async () => {
+			await publishPost();
 		} );
 
 		it( `should insert ${ type }`, async () => {
