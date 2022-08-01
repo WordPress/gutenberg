@@ -39,7 +39,10 @@ export default function EditSiteApp( { reboot, homeTemplate } ) {
 			<Routes>
 				{ ( { params } ) => {
 					const isListPage = getIsListPage( params );
+
+					// The existence of `'front-page` supersedes very other settings.
 					const homeTemplateType =
+						params.postId?.includes( 'front-page' ) ||
 						params.postId === homeTemplate?.postId
 							? 'site-editor'
 							: undefined;
