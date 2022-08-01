@@ -723,11 +723,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 	$css_rule_objects = array();
 
 	foreach ( $css_rules as $css_rule ) {
-		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
-			continue;
-		}
-
-		if ( empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
+		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
 			continue;
 		}
 		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
