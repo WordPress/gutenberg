@@ -61,6 +61,12 @@ function ContextScreens( { name } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/heading' }
+			>
+				<ScreenTypographyElement name={ name } element="heading" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/typography/button' }
 			>
 				<ScreenTypographyElement name={ name } element="button" />
