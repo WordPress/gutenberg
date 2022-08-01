@@ -283,7 +283,7 @@ class WP_Style_Engine {
 	 */
 	private function __construct() {
 		// Register the hook callback to render stored styles to the page.
-		static::render_styles( array( __CLASS__, 'process_and_enqueue_stored_styles' ) );
+		static::register_actions( array( __CLASS__, 'process_and_enqueue_stored_styles' ) );
 	}
 
 	/**
@@ -331,7 +331,7 @@ class WP_Style_Engine {
 	/**
 	 * Taken from gutenberg_enqueue_block_support_styles()
 	 *
-	 * This function takes care of adding inline styles
+	 * This function takes care of registering hooks to add inline styles
 	 * in the proper place, depending on the theme in use.
 	 *
 	 * For block themes, it's loaded in the head.
@@ -344,7 +344,7 @@ class WP_Style_Engine {
 	 *
 	 * @see gutenberg_enqueue_block_support_styles()
 	 */
-	protected static function render_styles( $callable, $priority = 10 ) {
+	protected static function register_actions( $callable, $priority = 10 ) {
 		if ( ! $callable ) {
 			return;
 		}
@@ -637,12 +637,13 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 		'enqueue'                    => false,
 	);
 
+	$style_engine  = WP_Style_Engine::get_instance();
 	$options       = wp_parse_args( $options, $defaults );
 	$parsed_styles = null;
 
 	// Block supports styles.
 	if ( 'block-supports' === $options['context'] ) {
-		$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
+		$parsed_styles = $style_engine::parse_block_styles( $block_styles, $options );
 	}
 
 	// Output.
@@ -653,10 +654,10 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	}
 
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
+		$styles_output['css']          = $style_engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
 		$styles_output['declarations'] = $parsed_styles['declarations'];
 		if ( true === $options['enqueue'] ) {
-			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
+			$style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
 		}
 	}
 

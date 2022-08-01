@@ -27,23 +27,23 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @dataProvider data_generate_block_supports_styles_fixtures
+	 * @dataProvider data_get_styles_fixtures
 	 *
 	 * @param array  $block_styles The incoming block styles object.
 	 * @param array  $options Style engine options.
 	 * @param string $expected_output The expected output.
 	 */
-	public function test_generate_block_supports_styles( $block_styles, $options, $expected_output ) {
+	public function test_generate_get_styles( $block_styles, $options, $expected_output ) {
 		$generated_styles = wp_style_engine_get_styles( $block_styles, $options );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
 	/**
-	 * Data provider.
+	 * Data provider for test_generate_get_styles().
 	 *
 	 * @return array
 	 */
-	public function data_generate_block_supports_styles_fixtures() {
+	public function data_get_styles_fixtures() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
@@ -506,6 +506,34 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
+	 */
+	public function test_enqueue_block_styles_store() {
+		$block_styles = array(
+			'spacing' => array(
+				'padding' => array(
+					'top'    => '42px',
+					'left'   => '2%',
+					'bottom' => '44px',
+					'right'  => '5rem',
+				),
+			),
+		);
+
+		$generated_styles = wp_style_engine_get_styles(
+			$block_styles,
+			array(
+				'enqueue'  => true,
+				'context'  => 'block-supports',
+				'selector' => 'article',
+			)
+		);
+		$store            = WP_Style_Engine::get_instance()::get_store( 'block-supports' );
+		$rule             = $store->get_all_rules()['article'];
+		$this->assertSame( $generated_styles['css'], $rule->get_css() );
 	}
 
 	/**
