@@ -211,7 +211,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 
 	// Block supports styles.
 	if ( 'block-supports' === $options['context'] ) {
-		$parsed_styles = $style_engine::parse_block_styles( $block_styles, $options );
+		$parsed_styles = WP_Style_Engine_Parser::parse_block_styles( $block_styles, $options );
 	}
 
 	// Output.
