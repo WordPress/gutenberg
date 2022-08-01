@@ -160,8 +160,9 @@ function usePaddingProps( name ) {
 		setRawPadding( padding );
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
-	const hasPaddingValue = () =>
-		!! paddingValues && Object.keys( paddingValues ).length;
+	const [ userSetPaddingValue ] = useStyle( 'spacing.padding', name, 'user' );
+	// The `hasPaddingValue` check does not need a parsed value, as `userSetPaddingValue` will be `undefined` if not set.
+	const hasPaddingValue = () => !! userSetPaddingValue;
 
 	return {
 		paddingValues,
