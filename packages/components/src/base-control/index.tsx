@@ -107,9 +107,11 @@ export const BaseControl = ( {
 export const VisualLabel = ( {
 	className,
 	children,
+	...props
 }: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
 	return (
 		<StyledVisualLabel
+			{ ...props }
 			className={ classnames(
 				'components-base-control__label',
 				className
