@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { spawn } = require( 'child_process' );
+const os = require("os");
 
 /**
  * Internal dependencies
@@ -53,6 +54,8 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 		'-f',
 		config.dockerComposeConfigPath,
 		'run',
+		'-u',
+		os.userInfo().uid,
 		'--rm',
 		container,
 		...command.split( ' ' ), // The command will fail if passed as a complete string.
