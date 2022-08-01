@@ -104,6 +104,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_get_layout_definitions
+	 *
+	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
+	 */
+	public function test_get_stylesheet_skips_layout_styles( $layout_definitions ) {
+		add_theme_support( 'disable-layout-styles' );
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'layout'  => array(
+						'definitions' => $layout_definitions,
+					),
+					'spacing' => array(
+						'blockGap' => null,
+					),
+				),
+			),
+			'default'
+		);
+		$stylesheet = $theme_json->get_stylesheet( array( 'base-layout-styles' ) );
+		remove_theme_support( 'disable-layout-styles' );
+
+		// All Layout styles should be skipped.
+		$this->assertEquals(
+			'',
+			$stylesheet
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array

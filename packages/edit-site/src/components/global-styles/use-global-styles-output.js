@@ -21,11 +21,13 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -550,7 +552,8 @@ export const toStyles = (
 	tree,
 	blockSelectors,
 	hasBlockGapSupport,
-	hasFallbackGapSupport
+	hasFallbackGapSupport,
+	disableLayoutStyles = false
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -626,7 +629,10 @@ export const toStyles = (
 			}
 
 			// Process blockGap and layout styles.
-			if ( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport ) {
+			if (
+				! disableLayoutStyles &&
+				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+			) {
 				ruleset += getLayoutStyles( {
 					tree,
 					style: styles,
@@ -783,6 +789,10 @@ export function useGlobalStylesOutput() {
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -798,7 +808,8 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
-			hasFallbackGapSupport
+			hasFallbackGapSupport,
+			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
@@ -813,7 +824,12 @@ export function useGlobalStylesOutput() {
 		] );
 		setSettings( mergedConfig.settings );
 		setSvgFilters( filters );
-	}, [ hasBlockGapSupport, hasFallbackGapSupport, mergedConfig ] );
+	}, [
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		mergedConfig,
+		disableLayoutStyles,
+	] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }
