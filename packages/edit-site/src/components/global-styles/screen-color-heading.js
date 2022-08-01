@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -121,10 +121,10 @@ function ScreenHeadingColor( { name } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
-				<h4>{ __( 'Heading Level' ) }</h4>
+				<h4>{ __( 'Select heading level' ) }</h4>
 
 				<ToggleGroupControl
-					label={ __( 'Heading Level' ) }
+					label={ __( 'Select heading level' ) }
 					hideLabelFromVision={ true }
 					value={ selectedLevel }
 					onChange={ setCurrentTab }
@@ -144,8 +144,15 @@ function ScreenHeadingColor( { name } ) {
 			</div>
 			{ hasTextColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>{ __( 'Text color' ) }</h4>
-
+					<h4>
+						{ selectedLevel === 'heading'
+							? __( 'Text color for all heading levels' )
+							: sprintf(
+									/* translators: %s: heading level (h1-h6) */
+									__( 'Text color for %s' ),
+									selectedLevel.toUpperCase()
+							  ) }
+					</h4>
 					<ColorGradientControl
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
@@ -162,8 +169,15 @@ function ScreenHeadingColor( { name } ) {
 			) }
 			{ hasBackgroundColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>{ __( 'Background color' ) }</h4>
-
+					<h4>
+						{ selectedLevel === 'heading'
+							? __( 'Background color for all heading levels' )
+							: sprintf(
+									/* translators: %s: heading level (h1-h6) */
+									__( 'Background color for %s' ),
+									selectedLevel.toUpperCase()
+							  ) }
+					</h4>
 					<ColorGradientControl
 						className="edit-site-screen-heading-background-color__control"
 						colors={ colorsPerOrigin }
