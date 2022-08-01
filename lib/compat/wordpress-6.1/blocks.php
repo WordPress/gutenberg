@@ -223,5 +223,23 @@ function gutenberg_multiple_block_styles_compat_6_1( $metadata ) {
 	return $metadata;
 }
 
-remove_filter( 'block_type_metadata', '_wp_multiple_block_styles' );
-add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles_compat_6_1', 9 );
+/*
+ * Priority 11 is used to ensure this runs *after* _wp_multiple_block_styles.
+ *
+ * The order of execution matters in WordPress 6.0 where style arrays such as below are unsupported:
+ *
+ * {
+ *  "style": [ "wp-block-button", {
+ *  		"border": {
+ *  				"radius": "9999px"
+ *  		}
+ *  } ]
+ * }
+ *
+ * _wp_multiple_block_styles flattens the above definition to just {"style": "wp-block-button"} which
+ * is supported in WordPress 6.0.
+ *
+ * In WordPress 6.1, _wp_multiple_block_styles is deprecated and doesn't do anything so the full style
+ * definition is preserved in block metadata for further processing in the theme resolver.
+ */
+add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles_compat_6_1', 11 );
