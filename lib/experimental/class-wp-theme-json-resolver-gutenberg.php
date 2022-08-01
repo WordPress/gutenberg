@@ -100,56 +100,6 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_1 {
 	}
 
 	/**
-	 * Gets the styles for blocks from the block.json file.
-	 *
-	 * @return WP_Theme_JSON
-	 */
-	public static function get_block_data() {
-		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = $registry->get_all_registered();
-		$config   = array( 'version' => 1 );
-		foreach ( $blocks as $block_name => $block_type ) {
-			if ( is_array( $block_type->style ) ) {
-				foreach ( $block_type->style as $style_override_maybe ) {
-					if ( is_array( $style_override_maybe ) ) {
-						$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $style_override_maybe );
-					}
-				}
-			}
-
-			if (
-				isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) &&
-				null === _wp_array_get( $config, array( 'styles', 'blocks', $block_name, 'spacing', 'blockGap' ), null )
-			) {
-				// Ensure an empty placeholder value exists for the block, if it provides a default blockGap value.
-				// The real blockGap value to be used will be determined when the styles are rendered for output.
-				$config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] = null;
-			}
-		}
-
-		// Core here means it's the lower level part of the styles chain.
-		// It can be a core or a third-party block.
-		return new WP_Theme_JSON_Gutenberg( $config, 'core' );
-	}
-
-	/**
-	 * When given an array, this will remove any keys with the name `//`.
-	 *
-	 * @param array $array The array to filter.
-	 * @return array The filtered array.
-	 */
-	private static function remove_JSON_comments( $array ) {
-		unset( $array['//'] );
-		foreach ( $array as $k => $v ) {
-			if ( is_array( $v ) ) {
-				$array[ $k ] = static::remove_JSON_comments( $v );
-			}
-		}
-
-		return $array;
-	}
-
-	/**
 	 * Returns the data merged from multiple origins.
 	 *
 	 * There are three sources of data (origins) for a site:
