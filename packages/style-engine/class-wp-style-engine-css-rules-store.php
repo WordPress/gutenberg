@@ -53,7 +53,7 @@ class WP_Style_Engine_CSS_Rules_Store {
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
 			static::$stores[ $store_name ] = new static();
 			// Set the store name.
-			static::$stores[ $store_name ]->name = $store_name;
+			static::$stores[ $store_name ]->set_name( $store_name );
 		}
 		return static::$stores[ $store_name ];
 	}
@@ -74,6 +74,17 @@ class WP_Style_Engine_CSS_Rules_Store {
 	 */
 	public static function remove_all_stores() {
 		static::$stores = array();
+	}
+
+	/**
+	 * Set the store name.
+	 *
+	 * @param string $name The store name.
+	 *
+	 * @return void
+	 */
+	public function set_name( $name ) {
+		$this->name = $name;
 	}
 
 	/**
