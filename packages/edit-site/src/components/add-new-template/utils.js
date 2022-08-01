@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { blockMeta, post } from '@wordpress/icons';
 
@@ -408,6 +408,24 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	return taxonomiesMenuItems;
 };
 
+function useAuthorNeedsUniqueIndentifier() {
+	const authors = useSelect( ( select ) =>
+		select( coreStore ).getUsers( { who: 'authors', per_page: -1 } )
+	);
+	const authorsCountByName = useMemo( () => {
+		return ( authors || [] ).reduce( ( { name }, authorsCount ) => {
+			authorsCount[ name ] = ( authorsCount[ name ] || 0 ) + 1;
+			return authorsCount;
+		}, {} );
+	}, [ authors ] );
+	return useCallback(
+		( name ) => {
+			return authorsCountByName[ name ] > 1;
+		},
+		[ authorsCountByName ]
+	);
+}
+
 const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
 const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
 export function useAuthorMenuItem( onClickMenuItem ) {
@@ -418,6 +436,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX,
 		USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS
 	);
+	const authorNeedsUniqueId = useAuthorNeedsUniqueIndentifier();
 	let authorMenuItem = defaultTemplateTypes?.find(
 		( { slug } ) => slug === 'author'
 	);
@@ -449,16 +468,33 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 						};
 					},
 					getSpecificTemplate: ( suggestion ) => {
-						const title = sprintf(
-							// translators: %s: Represents the name of an author e.g: "Jorge".
-							__( 'Author: %s' ),
+						const needsUniqueId = authorNeedsUniqueId(
 							suggestion.name
 						);
-						const description = sprintf(
-							// translators: %s: Represents the name of an author e.g: "Jorge".
-							__( 'Template for Author: %s' ),
-							suggestion.name
-						);
+						const title = needsUniqueId
+							? sprintf(
+									// translators: %1$s: Represents the name of an author e.g: "Jorge", %2$s: Represents the slug of an author e.g: "author-jorge-slug".
+									__( 'Author: %1$s (%2$s)' ),
+									suggestion.name,
+									suggestion.slug
+							  )
+							: sprintf(
+									// translators: %s: Represents the name of an author e.g: "Jorge".
+									__( 'Author: %s' ),
+									suggestion.name
+							  );
+						const description = needsUniqueId
+							? sprintf(
+									// translators: %1$s: Represents the name of an author e.g: "Jorge", %2$s: Represents the slug of an author e.g: "author-jorge-slug".
+									__( 'Template for Author: %1$s (%2$s)' ),
+									suggestion.name,
+									suggestion.slug
+							  )
+							: sprintf(
+									// translators: %s: Represents the name of an author e.g: "Jorge".
+									__( 'Template for Author: %s' ),
+									suggestion.name
+							  );
 						return {
 							title,
 							description,
