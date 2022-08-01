@@ -138,14 +138,22 @@ function Navigation( {
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
-	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
-		name: 'block-library/core/navigation/delete',
-	} );
-
-	const [ showNavigationMenuCreateNotice, hideNavigationMenuCreateNotice ] =
+	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
-			name: 'block-library/core/navigation/create',
+			name: 'block-library/core/navigation/status',
 		} );
+
+	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/classic-menu-conversion',
+		} );
+
+	const [
+		showNavigationMenuPermissionsNotice,
+		hideNavigationMenuPermissionsNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/update',
+	} );
 
 	const {
 		create: createNavigationMenu,
@@ -158,7 +166,7 @@ function Navigation( {
 	} = useCreateNavigationMenu( clientId );
 
 	useEffect( () => {
-		hideNavigationMenuCreateNotice();
+		hideNavigationMenuStatusNotice();
 
 		if ( isCreatingNavigationMenu ) {
 			speak( __( `Creating Navigation Menu.` ) );
@@ -168,13 +176,13 @@ function Navigation( {
 			setRef( createNavigationMenuPost.id );
 			selectBlock( clientId );
 
-			showNavigationMenuCreateNotice(
+			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
 			);
 		}
 
 		if ( createNavigationMenuIsError ) {
-			showNavigationMenuCreateNotice(
+			showNavigationMenuStatusNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
 		}
@@ -353,19 +361,13 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const [
-		showClassicMenuConversionErrorNotice,
-		hideClassicMenuConversionErrorNotice,
-	] = useNavigationNotice( {
-		name: 'block-library/core/navigation/classic-menu-conversion/error',
-	} );
-
 	const handleUpdateMenu = ( menuId ) => {
 		setRef( menuId );
 		selectBlock( clientId );
 	};
 
 	useEffect( () => {
+		hideClassicMenuConversionNotice();
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING ) {
 			speak( __( 'Classic menu importing.' ) );
 		}
@@ -375,12 +377,16 @@ function Navigation( {
 			classicMenuConversionResult
 		) {
 			handleUpdateMenu( classicMenuConversionResult?.id );
-			hideClassicMenuConversionErrorNotice();
+			showClassicMenuConversionNotice(
+				__( 'Classic menu imported successfully.' )
+			);
 			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
-			showClassicMenuConversionErrorNotice( classicMenuConversionError );
+			showClassicMenuConversionNotice(
+				__( 'Classic menu import failed.' )
+			);
 			speak( __( 'Classic menu import failed.' ) );
 		}
 	}, [
@@ -419,26 +425,9 @@ function Navigation( {
 		}
 	} );
 
-	const [ showCantEditNotice, hideCantEditNotice ] = useNavigationNotice( {
-		name: 'block-library/core/navigation/permissions/update',
-		message: __(
-			'You do not have permission to edit this Menu. Any changes made will not be saved.'
-		),
-	} );
-
-	const [ showCantCreateNotice, hideCantCreateNotice ] = useNavigationNotice(
-		{
-			name: 'block-library/core/navigation/permissions/create',
-			message: __(
-				'You do not have permission to create Navigation Menus.'
-			),
-		}
-	);
-
 	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
-			hideCantEditNotice();
-			hideCantCreateNotice();
+			hideNavigationMenuPermissionsNotice();
 		}
 
 		if ( isSelected || isInnerBlockSelected ) {
@@ -447,7 +436,11 @@ function Navigation( {
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
-				showCantEditNotice();
+				showNavigationMenuPermissionsNotice(
+					__(
+						'You do not have permission to edit this Menu. Any changes made will not be saved.'
+					)
+				);
 			}
 
 			if (
@@ -455,7 +448,11 @@ function Navigation( {
 				hasResolvedCanUserCreateNavigationMenu &&
 				! canUserCreateNavigationMenu
 			) {
-				showCantCreateNotice();
+				showNavigationMenuPermissionsNotice(
+					__(
+						'You do not have permission to create Navigation Menus.'
+					)
+				);
 			}
 		}
 	}, [
@@ -691,7 +688,7 @@ function Navigation( {
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 
-							showNavigationMenuCreateNotice(
+							showNavigationMenuStatusNotice(
 								__( `New Navigation Menu created.` )
 							);
 						} }
@@ -781,7 +778,7 @@ function Navigation( {
 								<NavigationMenuDeleteControl
 									onDelete={ ( deletedMenuTitle = '' ) => {
 										resetToEmptyBlock();
-										showNavigationMenuDeleteNotice(
+										showNavigationMenuStatusNotice(
 											sprintf(
 												// translators: %s: the name of a menu (e.g. Header navigation).
 												__(
