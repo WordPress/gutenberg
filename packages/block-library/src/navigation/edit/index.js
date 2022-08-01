@@ -139,13 +139,9 @@ function Navigation( {
 	// the Select Menu dropdown.
 	useNavigationEntities();
 
-	const [ showNavigationMenuDeleteNotice ] = useNavigationNotice( {
-		name: 'block-library/core/navigation/delete',
-	} );
-
-	const [ showNavigationMenuCreateNotice, hideNavigationMenuCreateNotice ] =
+	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
-			name: 'block-library/core/navigation/create',
+			name: 'block-library/core/navigation/status',
 		} );
 
 	const {
@@ -159,7 +155,7 @@ function Navigation( {
 	} = useCreateNavigationMenu( clientId );
 
 	useEffect( () => {
-		hideNavigationMenuCreateNotice();
+		hideNavigationMenuStatusNotice();
 
 		if ( isCreatingNavigationMenu ) {
 			speak( __( `Creating Navigation Menu.` ) );
@@ -169,13 +165,13 @@ function Navigation( {
 			setRef( createNavigationMenuPost.id );
 			selectBlock( clientId );
 
-			showNavigationMenuCreateNotice(
+			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
 			);
 		}
 
 		if ( createNavigationMenuIsError ) {
-			showNavigationMenuCreateNotice(
+			showNavigationMenuStatusNotice(
 				__( 'Failed to create Navigation Menu.' )
 			);
 		}
@@ -716,7 +712,7 @@ function Navigation( {
 							// Switch to using the wp_navigation entity.
 							setRef( post.id );
 
-							showNavigationMenuCreateNotice(
+							showNavigationMenuStatusNotice(
 								__( `New Navigation Menu created.` )
 							);
 						} }
@@ -806,7 +802,7 @@ function Navigation( {
 								<NavigationMenuDeleteControl
 									onDelete={ ( deletedMenuTitle = '' ) => {
 										resetToEmptyBlock();
-										showNavigationMenuDeleteNotice(
+										showNavigationMenuStatusNotice(
 											sprintf(
 												// translators: %s: the name of a menu (e.g. Header navigation).
 												__(
