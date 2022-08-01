@@ -33,8 +33,8 @@ const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 	}
 };
 
-function TaxonomyControls( { onChange, query } ) {
-	const taxonomies = useTaxonomies( query.postType );
+export const useTaxonomiesInfo = ( postType ) => {
+	const taxonomies = useTaxonomies( postType );
 	const taxonomiesInfo = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( coreStore );
@@ -51,6 +51,11 @@ function TaxonomyControls( { onChange, query } ) {
 		},
 		[ taxonomies ]
 	);
+	return taxonomiesInfo;
+};
+
+export function TaxonomyControls( { onChange, query } ) {
+	const taxonomiesInfo = useTaxonomiesInfo( query.postType );
 	const onTermsChange = ( taxonomySlug ) => ( newTermValues ) => {
 		const taxonomyInfo = taxonomiesInfo.find(
 			( { slug } ) => slug === taxonomySlug
@@ -114,5 +119,3 @@ function TaxonomyControls( { onChange, query } ) {
 		</>
 	);
 }
-
-export default TaxonomyControls;

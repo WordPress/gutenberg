@@ -28,7 +28,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
-import TaxonomyControls from './taxonomy-controls';
+import { TaxonomyControls, useTaxonomiesInfo } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import { usePostTypes } from '../../utils';
 
@@ -60,6 +60,7 @@ export default function QueryInspectorControls( {
 	} = query;
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const taxonomiesInfo = useTaxonomiesInfo( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
@@ -178,23 +179,26 @@ export default function QueryInspectorControls( {
 								search: '',
 								taxQuery: null,
 							} );
+							setQuerySearch( '' );
 						} }
-						// key={ panelId } // TODO: do I need this?
 						panelId={ clientId }
 					>
-						{ /* // TODO: probably have a hook for available taxonomies and add conditionally */ }
-						<ToolsPanelItem
-							label={ __( 'Taxonomies' ) }
-							hasValue={ () => true }
-							onDeselect={ () => setQuery( { taxQuery: null } ) }
-							panelId={ clientId }
-							isShownByDefault
-						>
-							<TaxonomyControls
-								onChange={ setQuery }
-								query={ query }
-							/>
-						</ToolsPanelItem>
+						{ !! taxonomiesInfo?.length && (
+							<ToolsPanelItem
+								label={ __( 'Taxonomies' ) }
+								hasValue={ () => !! taxQuery }
+								onDeselect={ () =>
+									setQuery( { taxQuery: null } )
+								}
+								panelId={ clientId }
+								isShownByDefault
+							>
+								<TaxonomyControls
+									onChange={ setQuery }
+									query={ query }
+								/>
+							</ToolsPanelItem>
+						) }
 						<ToolsPanelItem
 							hasValue={ () => !! authorIds }
 							label={ __( 'Authors' ) }
