@@ -200,8 +200,6 @@ describe( 'Autocomplete', () => {
 					<p>🍓</p>
 					<!-- /wp:paragraph -->"
 					`;
-			} else {
-				[ testData.triggerString, testData.snapshot ] = undefined;
 			}
 
 			await clickBlockAppender();
@@ -236,8 +234,6 @@ describe( 'Autocomplete', () => {
 					<p>🍒</p>
 					<!-- /wp:paragraph -->"
 					`;
-			} else {
-				[ testData.triggerString, testData.snapshot ] = undefined;
 			}
 
 			await clickBlockAppender();
@@ -274,8 +270,6 @@ describe( 'Autocomplete', () => {
 				<p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
 				<!-- /wp:paragraph -->"
 				`;
-			} else {
-				[ testData.triggerString, testData.snapshot ] = undefined;
 			}
 
 			await clickBlockAppender();
