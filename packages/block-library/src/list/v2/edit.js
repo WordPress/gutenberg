@@ -25,7 +25,6 @@ import {
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useCallback, useEffect, Platform } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -33,8 +32,10 @@ import deprecated from '@wordpress/deprecated';
  */
 import OrderedListSettings from '../ordered-list-settings';
 import { migrateToListV2 } from './migrate';
+import TagName from './tag-name';
 
 const TEMPLATE = [ [ 'core/list-item' ] ];
+const NATIVE_MARGIN_SPACING = 8;
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -135,14 +136,13 @@ function Edit( { attributes, setAttributes, clientId, style } ) {
 		allowedBlocks: [ 'core/list-item' ],
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
-		...( Platform.isNative && { marginVertical: 8, marginHorizontal: 8 } ),
+		...( Platform.isNative && {
+			marginVertical: NATIVE_MARGIN_SPACING,
+			marginHorizontal: NATIVE_MARGIN_SPACING,
+		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
 	const { ordered, reversed, start } = attributes;
-	const TagName = Platform.select( {
-		web: ordered ? 'ol' : 'ul',
-		native: View,
-	} );
 
 	const controls = (
 		<BlockControls group="block">
@@ -171,8 +171,9 @@ function Edit( { attributes, setAttributes, clientId, style } ) {
 	return (
 		<>
 			<TagName
+				ordered={ ordered }
 				reversed={ reversed }
-				start={ Platform.isWeb ? start : undefined }
+				start={ start }
 				{ ...innerBlocksProps }
 			/>
 			{ controls }
