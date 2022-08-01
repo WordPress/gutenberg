@@ -74,6 +74,11 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"style": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
 		}
 	},
 	"supports": {
@@ -93,11 +98,6 @@
 				"color": true,
 				"radius": true,
 				"width": true
-			}
-		},
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": "0 0 1em 0"
 			}
 		}
 	},
