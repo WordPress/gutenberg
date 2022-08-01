@@ -91,11 +91,9 @@ class WP_Style_Engine_Processor {
 		// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
 		$selectors_json = array();
 		foreach ( $this->css_rules as $rule ) {
-
-			$rule_selector = $rule->get_selector();
-			$declarations  = $rule->get_declarations()->get_declarations();
+			$declarations = $rule->get_declarations()->get_declarations();
 			ksort( $declarations );
-			$selectors_json[ $rule_selector ] = wp_json_encode( $declarations );
+			$selectors_json[ $rule->get_selector() ] = wp_json_encode( $declarations );
 		}
 
 		// Combine selectors that have the same styles.
@@ -107,7 +105,7 @@ class WP_Style_Engine_Processor {
 				continue;
 			}
 
-			$new_declarations = $this->css_rules[ $selector ]->get_declarations();
+			$declarations = $this->css_rules[ $selector ]->get_declarations();
 
 			foreach ( $duplicates as $key ) {
 				// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
@@ -116,7 +114,7 @@ class WP_Style_Engine_Processor {
 				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $new_declarations );
+			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $declarations );
 		}
 	}
 }
