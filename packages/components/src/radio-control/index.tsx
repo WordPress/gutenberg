@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import classnames from 'classnames';
 import type { ChangeEvent } from 'react';
 
@@ -65,7 +64,7 @@ export function RadioControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
-	if ( isEmpty( options ) ) {
+	if ( ! options?.length ) {
 		return null;
 	}
 

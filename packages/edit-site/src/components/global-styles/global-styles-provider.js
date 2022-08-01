@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, pickBy, isEmpty, isObject, mapValues } from 'lodash';
+import { mergeWith, pickBy, isEmpty, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,11 @@ export function mergeBaseAndUserConfigs( base, user ) {
 }
 
 const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(

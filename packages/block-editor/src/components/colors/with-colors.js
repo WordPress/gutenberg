@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -78,7 +78,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 		( colorObject, colorType ) => {
 			return {
 				...colorObject,
-				...( isString( colorType )
+				...( typeof colorType === 'string'
 					? { [ colorType ]: kebabCase( colorType ) }
 					: colorType ),
 			};

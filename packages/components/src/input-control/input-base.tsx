@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,8 +20,10 @@ import {
 	Prefix,
 	Suffix,
 	LabelWrapper,
+	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
+import { ContextSystemProvider } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -52,6 +54,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 
 export function InputBase(
 	{
+		__next36pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -71,6 +74,17 @@ export function InputBase(
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
+	const { paddingLeft, paddingRight } = getSizeConfig( {
+		inputSize: size,
+		__next36pxDefaultSize,
+	} );
+	const prefixSuffixContextValue = useMemo( () => {
+		return {
+			InputControlPrefixWrapper: { paddingLeft },
+			InputControlSuffixWrapper: { paddingRight },
+		};
+	}, [ paddingLeft, paddingRight ] );
+
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
@@ -87,7 +101,6 @@ export function InputBase(
 					hideLabelFromVision={ hideLabelFromVision }
 					labelPosition={ labelPosition }
 					htmlFor={ id }
-					size={ size }
 				>
 					{ label }
 				</Label>
@@ -99,17 +112,19 @@ export function InputBase(
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }
 			>
-				{ prefix && (
-					<Prefix className="components-input-control__prefix">
-						{ prefix }
-					</Prefix>
-				) }
-				{ children }
-				{ suffix && (
-					<Suffix className="components-input-control__suffix">
-						{ suffix }
-					</Suffix>
-				) }
+				<ContextSystemProvider value={ prefixSuffixContextValue }>
+					{ prefix && (
+						<Prefix className="components-input-control__prefix">
+							{ prefix }
+						</Prefix>
+					) }
+					{ children }
+					{ suffix && (
+						<Suffix className="components-input-control__suffix">
+							{ suffix }
+						</Suffix>
+					) }
+				</ContextSystemProvider>
 				<Backdrop disabled={ disabled } isFocused={ isFocused } />
 			</Container>
 		</Root>

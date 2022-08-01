@@ -148,7 +148,7 @@ const Popover = (
 			return anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			return anchorRect.ownerDocument;
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			return (
 				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
 				document
@@ -170,20 +170,42 @@ const Popover = (
 		}
 
 		const iframeRect = frameElement.getBoundingClientRect();
-		return {
-			name: 'iframeOffset',
-			fn( { x, y } ) {
-				return {
-					x: x + iframeRect.left,
-					y: y + iframeRect.top,
-				};
-			},
-		};
+		return { x: iframeRect.left, y: iframeRect.top };
 	}, [ ownerDocument ] );
 
 	const middlewares = [
-		frameOffset,
-		offset ? offsetMiddleware( offset ) : undefined,
+		frameOffset || offset
+			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+					if ( ! frameOffset ) {
+						return offset;
+					}
+
+					const isTopBottomPlacement =
+						currentPlacement.includes( 'top' ) ||
+						currentPlacement.includes( 'bottom' );
+
+					// The main axis should represent the gap between the
+					// floating element and the reference element. The cross
+					// axis is always perpendicular to the main axis.
+					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+
+					// When the popover is before the reference, subtract the offset,
+					// of the main axis else add it.
+					const hasBeforePlacement =
+						currentPlacement.includes( 'top' ) ||
+						currentPlacement.includes( 'left' );
+					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
+					const normalizedOffset = offset ? offset : 0;
+
+					return {
+						mainAxis:
+							normalizedOffset +
+							frameOffset[ mainAxis ] * mainAxisModifier,
+						crossAxis: frameOffset[ crossAxis ],
+					};
+			  } )
+			: undefined,
 		__unstableForcePosition ? undefined : flip(),
 		__unstableForcePosition
 			? undefined
@@ -210,15 +232,19 @@ const Popover = (
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
-	const onDialogClose = ( type, event ) => {
-		// Ideally the popover should have just a single onClose prop and
-		// not three props that potentially do the same thing.
-		if ( type === 'focus-outside' && onFocusOutside ) {
-			onFocusOutside( event );
-		} else if ( onClose ) {
-			onClose();
-		}
-	};
+	let onDialogClose;
+
+	if ( onClose || onFocusOutside ) {
+		onDialogClose = ( type, event ) => {
+			// Ideally the popover should have just a single onClose prop and
+			// not three props that potentially do the same thing.
+			if ( type === 'focus-outside' && onFocusOutside ) {
+				onFocusOutside( event );
+			} else if ( onClose ) {
+				onClose();
+			}
+		};
+	}
 
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount,
@@ -275,7 +301,7 @@ const Popover = (
 					return anchorRect;
 				},
 			};
-		} else if ( getAnchorRect && anchorRefFallback.current ) {
+		} else if ( getAnchorRect ) {
 			usedRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );

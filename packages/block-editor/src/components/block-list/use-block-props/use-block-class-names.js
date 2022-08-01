@@ -33,6 +33,7 @@ export function useBlockClassNames( clientId ) {
 				getSettings,
 				hasSelectedInnerBlock,
 				isTyping,
+				__unstableIsFullySelected,
 			} = select( blockEditorStore );
 			const { outlineMode } = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
@@ -44,10 +45,13 @@ export function useBlockClassNames( clientId ) {
 				clientId,
 				checkDeep
 			);
+			const isMultiSelected = isBlockMultiSelected( clientId );
 			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
-				'is-multi-selected': isBlockMultiSelected( clientId ),
+				'is-multi-selected': isMultiSelected,
+				'is-partially-selected':
+					isMultiSelected && ! __unstableIsFullySelected(),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,

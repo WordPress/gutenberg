@@ -21,6 +21,7 @@ export default function PostURL() {
 					position="bottom left"
 					className="edit-post-post-url__dropdown"
 					contentClassName="edit-post-post-url__dialog"
+					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<PostURLToggle isOpen={ isOpen } onClick={ onToggle } />
 					) }

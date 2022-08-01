@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isString, reduce, maxBy } from 'lodash';
+import { every, has, reduce, maxBy } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -75,7 +75,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 export function isValidIcon( icon ) {
 	return (
 		!! icon &&
-		( isString( icon ) ||
+		( typeof icon === 'string' ||
 			isValidElement( icon ) ||
 			typeof icon === 'function' ||
 			icon instanceof Component )
@@ -126,7 +126,7 @@ export function normalizeIconObject( icon ) {
  * @return {?Object} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
-	if ( isString( blockTypeOrName ) ) {
+	if ( typeof blockTypeOrName === 'string' ) {
 		return getBlockType( blockTypeOrName );
 	}
 

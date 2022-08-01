@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, first, isObject, last, some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -30,6 +25,9 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
  * Action which will insert a default block insert action if there
@@ -396,7 +394,7 @@ export const replaceBlocks =
 			castArray( blocks ),
 			select.getSettings()
 		);
-		const rootClientId = select.getBlockRootClientId( first( clientIds ) );
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
 			const block = blocks[ index ];
@@ -583,7 +581,7 @@ export const insertBlocks =
 	) =>
 	( { select, dispatch } ) => {
 		/* eslint-enable jsdoc/valid-types */
-		if ( isObject( initialPosition ) ) {
+		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
 			deprecated(
@@ -1504,7 +1502,7 @@ export const duplicateBlocks =
 
 		// Return early if blocks don't exist.
 		const blocks = select.getBlocksByClientId( clientIds );
-		if ( some( blocks, ( block ) => ! block ) ) {
+		if ( blocks.some( ( block ) => ! block ) ) {
 			return;
 		}
 
@@ -1520,8 +1518,9 @@ export const duplicateBlocks =
 		}
 
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		const clientIdsArray = castArray( clientIds );
 		const lastSelectedIndex = select.getBlockIndex(
-			last( castArray( clientIds ) )
+			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
 			__experimentalCloneSanitizedBlock( block )
@@ -1534,8 +1533,8 @@ export const duplicateBlocks =
 		);
 		if ( clonedBlocks.length > 1 && updateSelection ) {
 			dispatch.multiSelect(
-				first( clonedBlocks ).clientId,
-				last( clonedBlocks ).clientId
+				clonedBlocks[ 0 ].clientId,
+				clonedBlocks[ clonedBlocks.length - 1 ].clientId
 			);
 		}
 		return clonedBlocks.map( ( block ) => block.clientId );

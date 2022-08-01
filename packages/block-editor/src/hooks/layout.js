@@ -9,7 +9,11 @@ import { has, kebabCase } from 'lodash';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockDefaultClassName,
+	getBlockSupport,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -40,35 +44,40 @@ const layoutBlockSupportKey = '__experimentalLayout';
  * have the style engine generate a more extensive list of utility classnames which
  * will then replace this method.
  *
- * @param { Array } attributes Array of block attributes.
+ * @param { Object } layout            Layout object.
+ * @param { Object } layoutDefinitions An object containing layout definitions, stored in theme.json.
  *
  * @return { Array } Array of CSS classname strings.
  */
-function getLayoutClasses( attributes ) {
+function useLayoutClasses( layout, layoutDefinitions ) {
+	const rootPaddingAlignment = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalFeatures
+			?.useRootPaddingAwareAlignments;
+	}, [] );
 	const layoutClassnames = [];
 
-	if ( ! attributes.layout ) {
-		return layoutClassnames;
-	}
-
-	if ( attributes?.layout?.orientation ) {
+	if ( layoutDefinitions?.[ layout?.type || 'default' ]?.className ) {
 		layoutClassnames.push(
-			`is-${ kebabCase( attributes.layout.orientation ) }`
+			layoutDefinitions?.[ layout?.type || 'default' ]?.className
 		);
 	}
 
-	if ( attributes?.layout?.justifyContent ) {
+	if ( ( layout?.inherit || layout?.contentSize ) && rootPaddingAlignment ) {
+		layoutClassnames.push( 'has-global-padding' );
+	}
+
+	if ( layout?.orientation ) {
+		layoutClassnames.push( `is-${ kebabCase( layout.orientation ) }` );
+	}
+
+	if ( layout?.justifyContent ) {
 		layoutClassnames.push(
-			`is-content-justification-${ kebabCase(
-				attributes.layout.justifyContent
-			) }`
+			`is-content-justification-${ kebabCase( layout.justifyContent ) }`
 		);
 	}
 
-	if (
-		attributes?.layout?.flexWrap &&
-		attributes.layout.flexWrap === 'nowrap'
-	) {
+	if ( layout?.flexWrap && layout.flexWrap === 'nowrap' ) {
 		layoutClassnames.push( 'is-nowrap' );
 	}
 
@@ -136,7 +145,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								checked={ ! inherit }
 								onChange={ () =>
 									setAttributes( {
-										layout: { inherit: ! inherit },
+										layout: {
+											inherit: ! inherit,
+										},
 									} )
 								}
 							/>
@@ -253,10 +264,16 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const shouldRenderLayoutStyles = hasBlockSupport(
+		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
 		);
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderLayoutStyles =
+			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
@@ -266,13 +283,37 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const usedLayout = layout?.inherit
 			? defaultThemeLayout
 			: layout || defaultBlockLayout || {};
-		const layoutClasses = shouldRenderLayoutStyles
-			? getLayoutClasses( attributes )
+		const layoutClasses = hasLayoutBlockSupport
+			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
 			: null;
+		const selector = `.${ getBlockDefaultClassName(
+			name
+		) }.wp-container-${ id }`;
+		const blockGapSupport = useSetting( 'spacing.blockGap' );
+		const hasBlockGapSupport = blockGapSupport !== null;
+
+		// Get CSS string for the current layout type.
+		// The CSS and `style` element is only output if it is not empty.
+		let css;
+		if ( shouldRenderLayoutStyles ) {
+			const fullLayoutType = getLayoutType(
+				usedLayout?.type || 'default'
+			);
+			css = fullLayoutType?.getLayoutStyle?.( {
+				blockName: name,
+				selector,
+				layout: usedLayout,
+				layoutDefinitions: defaultThemeLayout?.definitions,
+				style: attributes?.style,
+				hasBlockGapSupport,
+			} );
+		}
+
+		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
 		const className = classnames(
 			props?.className,
 			{
-				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 			},
 			layoutClasses
 		);
@@ -281,10 +322,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 			<>
 				{ shouldRenderLayoutStyles &&
 					element &&
+					!! css &&
 					createPortal(
 						<LayoutStyle
 							blockName={ name }
-							selector={ `.wp-container-${ id }` }
+							selector={ selector }
+							css={ css }
 							layout={ usedLayout }
 							style={ attributes?.style }
 						/>,
