@@ -84,6 +84,7 @@
 		transform: rotate(0);
 	}
 	&--right {
+		/*rtl:begin:ignore*/
 		left: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(90deg);
 	}
@@ -92,8 +93,10 @@
 		transform: rotate(180deg);
 	}
 	&--left {
+		/*rtl:begin:ignore*/
 		right: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(-90deg);
+		/*rtl:end:ignore*/
 	}
 }
 
