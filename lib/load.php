@@ -129,6 +129,9 @@ if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-css-ru
 if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
 }
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-parser-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-parser-gutenberg.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/utils.php';
