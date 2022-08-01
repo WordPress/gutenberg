@@ -638,12 +638,11 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	);
 
 	$options       = wp_parse_args( $options, $defaults );
-	$style_engine  = WP_Style_Engine::get_instance();
 	$parsed_styles = null;
 
 	// Block supports styles.
 	if ( 'block-supports' === $options['context'] ) {
-		$parsed_styles = $style_engine::parse_block_styles( $block_styles, $options );
+		$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
 	}
 
 	// Output.
@@ -654,10 +653,10 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	}
 
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$styles_output['css']          = $style_engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
+		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
 		$styles_output['declarations'] = $parsed_styles['declarations'];
 		if ( true === $options['enqueue'] ) {
-			$style_engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
+			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
 		}
 	}
 
@@ -686,18 +685,17 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
 		return null;
 	}
 
-	$style_engine = WP_Style_Engine::get_instance();
 	if ( empty( $css_rules ) ) {
-		return $style_engine::get_store( $store_key );
+		return WP_Style_Engine::get_store( $store_key );
 	}
 
 	foreach ( $css_rules as $css_rule ) {
 		if ( ! isset( $css_rule['selector'], $css_rule['declarations'] ) ) {
 			continue;
 		}
-		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
+		WP_Style_Engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
 	}
-	return $style_engine::get_store( $store_key );
+	return WP_Style_Engine::get_store( $store_key );
 }
 
 /**
@@ -718,7 +716,6 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 		return '';
 	}
 
-	$style_engine     = WP_Style_Engine::get_instance();
 	$css_rule_objects = array();
 
 	foreach ( $css_rules as $css_rule ) {
@@ -736,5 +733,5 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 		return '';
 	}
 
-	return $style_engine::compile_stylesheet_from_css_rules( $css_rule_objects );
+	return WP_Style_Engine::compile_stylesheet_from_css_rules( $css_rule_objects );
 }
