@@ -19,6 +19,11 @@
 function gutenberg_update_date_settings( $scripts ) {
 	global $wp_locale;
 
+	// A check in case $wp_locale is not set by the time we enqueue scripts.
+	if ( ! isset( $wp_locale ) ) {
+		return;
+	}
+
 	$inline_scripts = $scripts->get_data( 'wp-date', 'after' );
 	if ( $inline_scripts ) {
 		foreach ( $inline_scripts as $index => $inline_script ) {
