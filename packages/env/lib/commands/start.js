@@ -193,7 +193,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
-	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
+	const e2eSiteUrl = `http://${ config.env.tests.config.WP_TESTS_DOMAIN }:${ config.env.tests.port }/`;
 
 	const { out: mySQLAddress } = await dockerCompose.port(
 		'mysql',

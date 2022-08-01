@@ -122,7 +122,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	function test_letter_spacing_with_individual_skipped_serialization_block_supports() {
-		$this->test_block_name = 'test/letter-spacing-with-individua-skipped-serialization-block-supports';
+		$this->test_block_name = 'test/letter-spacing-with-individual-skipped-serialization-block-supports';
 		register_block_type(
 			$this->test_block_name,
 			array(
@@ -206,5 +206,114 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 		$expected = array( 'class' => 'has-h-1-font-family' );
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
+	 *
+	 * @dataProvider data_generate_font_size_preset_fixtures
+	 */
+	function test_gutenberg_get_typography_font_size_value( $font_size_preset, $should_use_fluid_typography, $expected_output ) {
+		$actual = gutenberg_get_typography_font_size_value( $font_size_preset, $should_use_fluid_typography );
+
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_generate_font_size_preset_fixtures() {
+		return array(
+			'default_return_value'                        => array(
+				'font_size_preset'            => array(
+					'size' => '28px',
+				),
+				'should_use_fluid_typography' => false,
+				'expected_output'             => '28px',
+			),
+
+			'default_return_value_when_fluid_is_false'    => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => false,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '28px',
+			),
+
+			'return_fluid_value'                          => array(
+				'font_size_preset'            => array(
+					'size' => '1.75rem',
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
+			),
+
+			'return_default_fluid_values_with_empty_fluid_array' => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => array(),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+			),
+
+			'return_default_fluid_values_with_null_value' => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => null,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+			),
+
+			'return_size_with_invalid_fluid_units'        => array(
+				'font_size_preset'            => array(
+					'size'  => '10em',
+					'fluid' => array(
+						'min' => '20vw',
+						'max' => '50%',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '10em',
+			),
+
+			'return_fluid_clamp_value'                    => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => array(
+						'min' => '20px',
+						'max' => '50rem',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(20px, 1.25rem + ((1vw - 7.68px) * 93.75), 50rem)',
+			),
+
+			'return_clamp_value_with_default_fluid_max_value' => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => array(
+						'min' => '2.6rem',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(2.6rem, 2.6rem + ((1vw - 0.48rem) * 0.048), 42px)',
+			),
+
+			'default_return_clamp_value_with_default_fluid_min_value' => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => array(
+						'max' => '80px',
+					),
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 7.091), 80px)',
+			),
+		);
 	}
 }

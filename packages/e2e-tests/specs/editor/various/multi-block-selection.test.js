@@ -718,9 +718,8 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Clear the selected block.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Escape' );
 
 		await pressKeyWithModifier( 'primary', 'a' );
 

@@ -35,19 +35,34 @@ export const _default = () => {
 	const position = select( 'Position', positionOptions, 'top center' );
 	const delay = number( 'Delay', 700 );
 	return (
-		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
-			<div
-				style={ {
-					margin: '50px auto',
-					width: '200px',
-					padding: '20px',
-					textAlign: 'center',
-					border: '1px solid #ccc',
-				} }
-			>
-				Hover for more information
-			</div>
-		</Tooltip>
+		<>
+			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
+				<div
+					style={ {
+						margin: '50px auto',
+						width: '200px',
+						padding: '20px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+					} }
+				>
+					Hover for more information
+				</div>
+			</Tooltip>
+			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
+				<div
+					style={ {
+						margin: '50px auto',
+						width: 'min-content',
+						padding: '4px',
+						textAlign: 'center',
+						border: '1px solid #ccc',
+					} }
+				>
+					Small target
+				</div>
+			</Tooltip>
+		</>
 	);
 };
 

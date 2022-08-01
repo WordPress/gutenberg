@@ -6,10 +6,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   font-size: 13px;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }

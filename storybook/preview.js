@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithRTL } from './decorators/with-rtl';
 import './style.scss';
 
@@ -17,9 +18,23 @@ export const globalTypes = {
 			],
 		},
 	},
+	css: {
+		name: 'Global CSS',
+		description:
+			'Inject global CSS that may be loaded in certain contexts.',
+		defaultValue: 'basic',
+		toolbar: {
+			icon: 'document',
+			items: [
+				{ value: 'none', title: 'None' },
+				{ value: 'basic', title: 'Font only' },
+				{ value: 'wordpress', title: 'WordPress (common/forms)' },
+			],
+		},
+	},
 };
 
-export const decorators = [ WithRTL ];
+export const decorators = [ WithGlobalCSS, WithRTL ];
 
 export const parameters = {
 	controls: {

@@ -42,7 +42,6 @@ module.exports = {
 		'no-mixed-spaces-and-tabs': 'error',
 		'no-multiple-empty-lines': [ 'error', { max: 1 } ],
 		'no-multi-spaces': 'error',
-		'no-negated-in-lhs': 'error',
 		'no-nested-ternary': 'error',
 		'no-redeclare': 'error',
 		'no-shadow': 'error',

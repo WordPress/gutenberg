@@ -226,15 +226,17 @@ body.is-navigation-sidebar-open {
 		padding-right: 6px;
 	}
 
-	// The inserter and the template details toggle have custom labels, different from their aria-label, so we don't want to display both.
-	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+	// The template details toggle has a custom label, different from its aria-label, so we don't want to display both.
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		&::after {
 			content: none;
 		}
+	}
 
+	.edit-site-header-toolbar__inserter-toggle.edit-site-header-toolbar__inserter-toggle,
+	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		height: 36px;
-		padding: 0 6px;
+		padding: 0 $grid-unit-10;
 	}
 
 	.edit-site-header_start .edit-site-header__toolbar > * + * {

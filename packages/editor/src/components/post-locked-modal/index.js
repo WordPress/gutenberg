@@ -197,7 +197,7 @@ export default function PostLockedModal() {
 								? sprintf(
 										/* translators: %s: user's display name */
 										__(
-											'<strong>%s</strong> now has editing control of this posts (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+											'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
 										),
 										userDisplayName
 								  )

@@ -20,9 +20,6 @@ export default function QueryNoResultsEdit() {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	return (
-		<>
-			<div { ...innerBlocksProps } />
-		</>
-	);
+
+	return <div { ...innerBlocksProps } />;
 }

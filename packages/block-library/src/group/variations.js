@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { group, row, stack } from '@wordpress/icons';
 
 const variations = [
@@ -19,7 +19,7 @@ const variations = [
 	},
 	{
 		name: 'group-row',
-		title: __( 'Row' ),
+		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'inserter', 'transform' ],

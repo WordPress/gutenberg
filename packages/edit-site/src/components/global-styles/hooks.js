@@ -168,6 +168,8 @@ const ROOT_BLOCK_SUPPORTS = [
 	'textDecoration',
 	'textTransform',
 	'padding',
+	'contentSize',
+	'wideSize',
 ];
 
 export function getSupportedGlobalStylesPanels( name ) {

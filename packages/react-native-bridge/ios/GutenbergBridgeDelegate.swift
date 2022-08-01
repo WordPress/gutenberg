@@ -32,6 +32,7 @@ public enum Capabilities: String {
     case instagramEmbed
     case loomEmbed
     case smartframeEmbed
+    case shouldUseFastImage
 }
 
 /// Wrapper for single block data

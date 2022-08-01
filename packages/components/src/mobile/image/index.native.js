@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Text, View } from 'react-native';
+import { Image as RNImage, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 /**
@@ -37,6 +37,7 @@ const ImageComponent = ( {
 	height: imageHeight,
 	highlightSelected = true,
 	isSelected,
+	shouldUseFastImage,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
@@ -53,11 +54,15 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
+	const Image = ! shouldUseFastImage ? RNImage : FastImage;
+	const imageResizeMode = ! shouldUseFastImage
+		? resizeMode
+		: FastImage.resizeMode[ resizeMode ];
 
 	useEffect( () => {
 		let isCurrent = true;
 		if ( url ) {
-			Image.getSize( url, ( imgWidth, imgHeight ) => {
+			RNImage.getSize( url, ( imgWidth, imgHeight ) => {
 				if ( ! isCurrent ) {
 					return;
 				}
@@ -152,6 +157,9 @@ const ImageComponent = ( {
 			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
+		! resizeMode && {
+			aspectRatio: imageData?.aspectRatio,
+		},
 		focalPoint && styles.focalPoint,
 		focalPoint &&
 			getImageWithFocalPointStyles(
@@ -211,16 +219,13 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<FastImage
-							{ ...( ! resizeMode && {
-								aspectRatio: imageData?.aspectRatio,
-							} ) }
+						<Image
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
-							resizeMode={ FastImage.resizeMode[ resizeMode ] }
+							resizeMode={ imageResizeMode }
 						/>
 					</View>
 				) }

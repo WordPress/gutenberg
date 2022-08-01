@@ -10,7 +10,8 @@ import styled from '@emotion/styled';
 import { COLORS, rtl } from '../../utils';
 import type { SelectControlProps } from '../types';
 
-interface SelectProps extends Pick< SelectControlProps, 'disabled' > {
+interface SelectProps
+	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -45,11 +46,14 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 	`;
 };
 
-const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+const sizeStyles = ( {
+	__next36pxDefaultSize,
+	selectSize = 'default',
+}: SelectProps ) => {
 	const sizes = {
 		default: {
-			height: 30,
-			minHeight: 30,
+			height: 36,
+			minHeight: 36,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
@@ -67,16 +71,28 @@ const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 		},
 	};
 
-	const style = sizes[ selectSize ];
+	if ( ! __next36pxDefaultSize ) {
+		sizes.default = {
+			height: 30,
+			minHeight: 30,
+			paddingTop: 0,
+			paddingBottom: 0,
+		};
+	}
+
+	const style = sizes[ selectSize ] || sizes.default;
 
 	return css( style );
 };
 
-const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
+const sizePaddings = ( {
+	__next36pxDefaultSize,
+	selectSize = 'default',
+}: SelectProps ) => {
 	const sizes = {
 		default: {
-			paddingLeft: 8,
-			paddingRight: 24,
+			paddingLeft: 16,
+			paddingRight: 32,
 		},
 		small: {
 			paddingLeft: 8,
@@ -87,7 +103,15 @@ const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
 			paddingRight: 32,
 		},
 	};
-	return rtl( sizes[ selectSize ] );
+
+	if ( ! __next36pxDefaultSize ) {
+		sizes.default = {
+			paddingLeft: 8,
+			paddingRight: 24,
+		};
+	}
+
+	return rtl( sizes[ selectSize ] || sizes.default );
 };
 
 // TODO: Resolve need to use &&& to increase specificity

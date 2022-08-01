@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Rule {
 	 */
 	public function __construct( $selector = '', $declarations = array() ) {
 		$this->set_selector( $selector );
-		$this->set_declarations( $declarations );
+		$this->add_declarations( $declarations );
 	}
 
 	/**
@@ -70,7 +70,7 @@ class WP_Style_Engine_CSS_Rule {
 	 *
 	 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 	 */
-	public function set_declarations( $declarations ) {
+	public function add_declarations( $declarations ) {
 		$is_declarations_object = ! is_array( $declarations );
 		$declarations_array     = $is_declarations_object ? $declarations->get_declarations() : $declarations;
 

@@ -296,7 +296,8 @@ interface GetEntityRecord {
  * @param  kind  Entity kind.
  * @param  name  Entity name.
  * @param  key   Record's key
- * @param  query Optional query.
+ * @param  query Optional query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Record.
  */
@@ -526,7 +527,8 @@ interface GetEntityRecords {
  * @param  state State tree
  * @param  kind  Entity kind.
  * @param  name  Entity name.
- * @param  query Optional terms query.
+ * @param  query Optional terms query. If requesting specific
+ *               fields, fields must always include the ID.
  *
  * @return Records.
  */

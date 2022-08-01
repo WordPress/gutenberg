@@ -200,6 +200,36 @@ describe( 'RangeControl', () => {
 
 			expect( rangeInput?.value ).toBe( '10' );
 		} );
+
+		it( 'should clamp initialPosition between min and max on first render, and on reset', () => {
+			render(
+				<RangeControl
+					initialPosition={ 200 }
+					min={ 0 }
+					max={ 100 }
+					allowReset
+				/>
+			);
+
+			const numberInput = getNumberInput();
+			const rangeInput = getRangeInput();
+			const resetButton = getResetButton();
+
+			// Value should be clamped on initial load
+			expect( numberInput?.value ).toBe( '100' );
+			expect( rangeInput?.value ).toBe( '100' );
+
+			fireChangeEvent( numberInput, '50' );
+
+			expect( numberInput?.value ).toBe( '50' );
+			expect( rangeInput?.value ).toBe( '50' );
+
+			// Value should be clamped after resetting
+			fireEvent.click( resetButton as Element );
+
+			expect( numberInput?.value ).toBe( '100' );
+			expect( rangeInput?.value ).toBe( '100' );
+		} );
 	} );
 
 	describe( 'input field', () => {

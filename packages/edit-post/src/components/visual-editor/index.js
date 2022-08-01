@@ -118,13 +118,15 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeSupportsLayout, assets } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, assets } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				assets: _settings.__unstableResolvedAssets,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -241,13 +243,17 @@ export default function VisualEditor( { styles } ) {
 						assets={ assets }
 						style={ { paddingBottom } }
 					>
-						{ themeSupportsLayout && ! isTemplateMode && (
-							<LayoutStyle
-								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-								layout={ defaultLayout }
-								layoutDefinitions={ defaultLayout?.definitions }
-							/>
-						) }
+						{ themeSupportsLayout &&
+							! themeHasDisabledLayoutStyles &&
+							! isTemplateMode && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+									layoutDefinitions={
+										defaultLayout?.definitions
+									}
+								/>
+							) }
 						{ ! isTemplateMode && (
 							<div
 								className="edit-post-visual-editor__post-title-wrapper"

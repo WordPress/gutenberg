@@ -23,6 +23,7 @@ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 const noop = () => {};
 
 export default function ImageSizeControl( {
+	imageSizeHelp,
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -44,6 +45,7 @@ export default function ImageSizeControl( {
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
+					help={ imageSizeHelp }
 				/>
 			) }
 			{ isResizable && (

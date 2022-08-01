@@ -534,7 +534,7 @@ export function isEditedPostEmpty( state ) {
 
 	if ( blocks.length ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
-		// joined with with newlines such that even if every individual block
+		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
 		if ( blocks.length > 1 ) {
 			return false;

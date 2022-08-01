@@ -452,7 +452,7 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'getPossibleBlockTransformations()', () => {
-		it( 'should should show as available a simple "from" transformation"', () => {
+		it( 'should show as available a simple "from" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
 				attributes: {
 					value: {
@@ -1079,7 +1079,7 @@ describe( 'block factory', () => {
 				} );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of the same type', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
@@ -1096,7 +1096,7 @@ describe( 'block factory', () => {
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for multiple blocks of different types', () => {
+			it( 'should show wildcard "from" transformation as available for multiple blocks of different types', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 				registerBlockType( 'core/image-block', defaultBlockSettings );
 
@@ -1121,7 +1121,7 @@ describe( 'block factory', () => {
 				expect( availableBlocks[ 0 ].name ).toBe( 'core/group' );
 			} );
 
-			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+			it( 'should show wildcard "from" transformation as available for single blocks', () => {
 				registerBlockType( 'core/text-block', defaultBlockSettings );
 
 				const blocks = [ ...Array( 1 ).keys() ].map( ( index ) => {

@@ -50,7 +50,10 @@ export function useControlledRangeValue(
 	const { min, max, value: valueProp, initial } = settings;
 	const [ state, setInternalState ] = useControlledState(
 		floatClamp( valueProp, min, max ),
-		{ initial, fallback: null }
+		{
+			initial: floatClamp( initial ?? null, min, max ),
+			fallback: null,
+		}
 	);
 
 	const setState = useCallback(

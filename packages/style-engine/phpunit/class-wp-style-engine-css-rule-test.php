@@ -43,7 +43,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 			'font-size' => '4px',
 		);
 		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, $first_declaration );
-		$css_rule->set_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
+		$css_rule->add_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
 
 		$expected = '.taggart {font-size: 4px;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
@@ -52,13 +52,13 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	/**
 	 * Should set selector and rules on instantiation.
 	 */
-	public function test_set_declarations() {
+	public function test_add_declarations() {
 		// Declarations using a WP_Style_Engine_CSS_Declarations object.
 		$some_css_declarations = new WP_Style_Engine_CSS_Declarations( array( 'margin-top' => '10px' ) );
 		// Declarations using a property => value array.
 		$some_more_css_declarations = array( 'font-size' => '1rem' );
 		$css_rule                   = new WP_Style_Engine_CSS_Rule( '.hill-street-blues', $some_css_declarations );
-		$css_rule->set_declarations( $some_more_css_declarations );
+		$css_rule->add_declarations( $some_more_css_declarations );
 
 		$expected = '.hill-street-blues {margin-top: 10px; font-size: 1rem;}';
 		$this->assertSame( $expected, $css_rule->get_css() );

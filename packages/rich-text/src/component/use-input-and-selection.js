@@ -140,6 +140,15 @@ export function useInputAndSelection( props ) {
 			// for the rich text instance that contains the start or end of the
 			// selection.
 			if ( ownerDocument.activeElement !== element ) {
+				// Only process if the active elment is contentEditable, either
+				// this rich text instance or the writing flow parent. Fixes a
+				// bug in Firefox where it strangely selects the closest
+				// contentEditable element, even though the click was outside
+				// any contentEditable element.
+				if ( ownerDocument.activeElement.contentEditable !== 'true' ) {
+					return;
+				}
+
 				if ( ! ownerDocument.activeElement.contains( element ) ) {
 					return;
 				}

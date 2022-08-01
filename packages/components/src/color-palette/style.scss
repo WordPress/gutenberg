@@ -7,10 +7,15 @@
 	padding: $grid-unit-15;
 	font-family: inherit;
 	width: 100%;
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
 	background-image:
 		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
 		repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
 	background-position: 0 0, 25px 25px;
+	/*rtl:end:ignore*/
 	background-size: calc(2 * 25px) calc(2 * 25px);
 	box-sizing: border-box;
 	color: $white;

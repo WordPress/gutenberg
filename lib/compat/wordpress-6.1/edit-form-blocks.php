@@ -15,6 +15,7 @@
 function gutenberg_preload_template_permissions( $preload_paths, $context ) {
 	if ( ! empty( $context->post ) ) {
 		$preload_paths[] = array( rest_get_route_for_post_type_items( 'wp_template' ), 'OPTIONS' );
+		$preload_paths[] = array( '/wp/v2/settings', 'OPTIONS' );
 	}
 
 	return $preload_paths;

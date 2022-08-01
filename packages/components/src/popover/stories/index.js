@@ -27,6 +27,7 @@ export const _default = () => {
 	const show = boolean( 'Example: Show', true );
 	const children = text( 'children', 'Popover Content' );
 	const animate = boolean( 'animate', false );
+	const expandOnMobile = boolean( 'expandOnMobile', false );
 	const focusOnMount = select(
 		'focusOnMount',
 		{
@@ -41,6 +42,7 @@ export const _default = () => {
 	const props = {
 		animate,
 		children,
+		expandOnMobile,
 		focusOnMount,
 		noArrow,
 		isAlternate,

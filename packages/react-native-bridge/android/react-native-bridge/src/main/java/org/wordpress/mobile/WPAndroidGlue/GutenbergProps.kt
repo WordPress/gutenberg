@@ -18,9 +18,11 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableUnsupportedBlockEditor: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
     val isAudioBlockMediaUploadEnabled: Boolean,
+    val shouldUseFastImage: Boolean,
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
+    val hostAppNamespace: String,
     val featuredImageId: Int,
     val editorTheme: Bundle?,
     val translations: Bundle,
@@ -33,6 +35,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_INITIAL_TITLE, "")
         putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
+        putString(PROP_HOST_APP_NAMESPACE, hostAppNamespace)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
@@ -65,6 +68,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
+        putBoolean(PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE, shouldUseFastImage)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, enableFacebookEmbed)
         putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
@@ -84,6 +88,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
+        private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
@@ -109,6 +114,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
+        const val PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE = "shouldUseFastImage"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
 
         /**

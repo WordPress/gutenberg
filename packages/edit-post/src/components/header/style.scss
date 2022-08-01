@@ -146,12 +146,6 @@
 		}
 	}
 
-	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
-		&::after {
-			content: none;
-		}
-	}
 	// The post saved state button has a custom label only on small breakpoint
 	.editor-post-save-draft.editor-post-save-draft {
 		&::after {

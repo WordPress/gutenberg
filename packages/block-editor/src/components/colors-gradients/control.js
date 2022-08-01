@@ -115,6 +115,7 @@ function ColorGradientControlInner( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className={ classnames(
 				'block-editor-color-gradient-control',
 				className

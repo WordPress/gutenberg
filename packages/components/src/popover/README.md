@@ -71,6 +71,13 @@ Each of these base placements has an alignment in the form -start and -end. For 
 -   Required: No
 -   Default: `"bottom-start"`
 
+### offset
+
+The distance (in pixels) between the anchor and popover.
+
+-   Type: `Number`
+-   Required: No
+
 ### children
 
 The content to be displayed within the popover.

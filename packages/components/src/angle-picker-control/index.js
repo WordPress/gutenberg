@@ -34,7 +34,7 @@ export default function AnglePickerControl( {
 	const classes = classnames( 'components-angle-picker-control', className );
 
 	return (
-		<Root className={ classes }>
+		<Root className={ classes } gap={ 4 }>
 			<FlexBlock>
 				<NumberControl
 					label={ label }
@@ -62,7 +62,6 @@ export default function AnglePickerControl( {
 			</FlexBlock>
 			<FlexItem
 				style={ {
-					marginLeft: space( 4 ),
 					marginBottom: space( 1 ),
 					marginTop: 'auto',
 				} }

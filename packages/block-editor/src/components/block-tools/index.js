@@ -53,6 +53,8 @@ export default function BlockTools( {
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
+		if ( event.defaultPrevented ) return;
+
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
@@ -93,12 +95,13 @@ export default function BlockTools( {
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 ) {
+			if ( clientIds.length ) {
 				event.preventDefault();
 				clearSelectedBlock();
 				event.target.ownerDocument.defaultView
 					.getSelection()
 					.removeAllRanges();
+				__unstableContentRef?.current.focus();
 			}
 		}
 	}

@@ -86,5 +86,9 @@ export default function useCreateNavigationMenu( clientId ) {
 		status,
 		value,
 		error,
+		isIdle: status === CREATE_NAVIGATION_MENU_IDLE,
+		isPending: status === CREATE_NAVIGATION_MENU_PENDING,
+		isSuccess: status === CREATE_NAVIGATION_MENU_SUCCESS,
+		isError: status === CREATE_NAVIGATION_MENU_ERROR,
 	};
 }
