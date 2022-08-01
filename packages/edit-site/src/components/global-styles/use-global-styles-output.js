@@ -435,11 +435,12 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			selector: ROOT_BLOCK_SELECTOR,
 		} );
 	}
-	forEach( tree.styles?.elements, ( value, key ) => {
-		if ( !! value && !! ELEMENTS[ key ] ) {
+
+	forEach( ELEMENTS, ( selector, name ) => {
+		if ( tree.styles?.elements[ name ] ) {
 			nodes.push( {
-				styles: value,
-				selector: ELEMENTS[ key ],
+				styles: tree.styles?.elements?.name,
+				selector,
 			} );
 		}
 	} );
