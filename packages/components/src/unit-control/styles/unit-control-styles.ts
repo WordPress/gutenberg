@@ -68,6 +68,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			width: 20px;
 			color: ${ COLORS.darkGray[ 500 ] };
 			font-size: 8px;
+			line-height: 1;
 			letter-spacing: -0.5px;
 			text-transform: uppercase;
 			text-align-last: center;
@@ -81,6 +82,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 			padding: ${ space( 1 ) };
 			color: ${ COLORS.ui.theme };
 			font-size: 13px;
+			line-height: 1;
 			text-align-last: center;
 			white-space: nowrap;
 			overflow: hidden;
@@ -105,8 +107,6 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
 		default: css`
 			height: 100%;
-			/* Removing margin ensures focus styles neatly overlay the wrapper. */
-			margin: 0;
 			border: 1px solid transparent;
 			transition: box-shadow 0.1s linear, border 0.1s linear;
 
@@ -149,18 +149,24 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 };
 
 export const UnitSelect = styled.select< SelectProps >`
-	appearance: none;
-	background: transparent;
-	border-radius: 2px;
-	border: none;
-	display: block;
-	outline: none;
-	font-family: inherit;
+	// The && counteracts <select> styles in WP forms.css
+	&& {
+		appearance: none;
+		background: transparent;
+		border-radius: 2px;
+		border: none;
+		display: block;
+		outline: none;
+		/* Removing margin ensures focus styles neatly overlay the wrapper. */
+		margin: 0;
+		min-height: auto;
+		font-family: inherit;
 
-	&:not( :disabled ) {
-		cursor: pointer;
+		&:not( :disabled ) {
+			cursor: pointer;
+		}
+
+		${ baseUnitLabelStyles };
+		${ unitSelectSizes };
 	}
-
-	${ baseUnitLabelStyles };
-	${ unitSelectSizes };
 `;
