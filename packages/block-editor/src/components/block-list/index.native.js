@@ -304,9 +304,7 @@ export class BlockList extends Component {
 					}
 					title={ title }
 					ListHeaderComponent={ header }
-					ListEmptyComponent={
-						isRootList && ! isReadOnly && this.renderEmptyList
-					}
+					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 					onScroll={ onScroll }
 				/>
@@ -471,7 +469,7 @@ class EmptyListComponent extends Component {
 			renderFooterAppender,
 		} = this.props;
 
-		if ( renderFooterAppender ) {
+		if ( renderFooterAppender || renderAppender === false ) {
 			return null;
 		}
 
