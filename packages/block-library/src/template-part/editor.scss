@@ -1,5 +1,5 @@
-.block-editor-template-part__selection-modal {
-	z-index: z-index(".block-editor-template-part__selection-modal");
+.block-library-template-part-selection-modal {
+	z-index: z-index(".block-library-template-part-selection-modal");
 
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
@@ -17,10 +17,25 @@
 	}
 }
 
-.block-library-template-part__selection-search {
+.block-library-template-part-selection__search {
 	background: $white;
 	position: sticky;
 	top: 0;
 	padding: $grid-unit-20 0;
-	z-index: z-index(".block-library-template-part__selection-search");
+	z-index: z-index(".block-library-template-part-selection__search");
+}
+
+.block-library-template-part-selection-modal__footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: $grid-unit-80 + $grid-unit-15;
+	padding: 0 $grid-unit-40;
+	background: $white;
+	border-top: 1px solid #ddd;
+}
+
+// Allow space for the footer.
+.block-library-template-part-selection-modal__content {
+	margin-bottom: $grid-unit-80 + $grid-unit-15;
 }

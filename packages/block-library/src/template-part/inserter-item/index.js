@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalInserterListItemWithModal as InserterListItemWithModal } from '@wordpress/block-editor';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -26,7 +27,9 @@ export default function TemplatePartInserterItem( props ) {
 		<InserterListItemWithModal
 			{ ...props }
 			modalProps={ {
-				overlayClassName: 'block-editor-template-part__selection-modal',
+				overlayClassName: 'block-library-template-part-selection-modal',
+				contentClassName:
+					'block-library-template-part-selection-modal__content',
 				title: sprintf(
 					// Translators: %s as template part area title ("Header", "Footer", etc.).
 					__( 'Choose a %s' ),
@@ -51,12 +54,11 @@ export default function TemplatePartInserterItem( props ) {
 					onSelect( inserterItem, focusBlock );
 				} }
 				onPatternSelect={ async ( pattern, blocks ) => {
-					const templatePartPostData =
-						await createTemplatePartPostData(
-							area,
-							blocks,
-							pattern.title
-						);
+					const templatePartPostData = createTemplatePartPostData(
+						area,
+						blocks,
+						pattern.title
+					);
 
 					const templatePart = await saveEntityRecord(
 						'postType',
@@ -75,6 +77,37 @@ export default function TemplatePartInserterItem( props ) {
 					onSelect( inserterItem, focusBlock );
 				} }
 			/>
+			<HStack
+				alignment="right"
+				className="block-library-template-part-selection-modal__footer"
+			>
+				<Button
+					variant="tertiary"
+					onClick={ async () => {
+						const templatePartPostData =
+							createTemplatePartPostData( area );
+
+						const templatePart = await saveEntityRecord(
+							'postType',
+							'wp_template_part',
+							templatePartPostData
+						);
+
+						const inserterItem = {
+							name: 'core/template-part',
+							initialAttributes: {
+								slug: templatePart.slug,
+								theme: templatePart.theme,
+							},
+						};
+
+						const focusBlock = true;
+						onSelect( inserterItem, focusBlock );
+					} }
+				>
+					{ __( 'Start blank' ) }
+				</Button>
+			</HStack>
 		</InserterListItemWithModal>
 	);
 }

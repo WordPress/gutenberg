@@ -37,7 +37,7 @@ const convertTemplatePartsToPatterns = ( templateParts ) =>
 		templatePart,
 	} ) );
 
-export default function TemplatePartSelectionModalContent( {
+export default function TemplatePartSelection( {
 	area,
 	rootClientId,
 	templatePartId,
@@ -69,7 +69,7 @@ export default function TemplatePartSelectionModalContent( {
 
 	return (
 		<>
-			<div className="block-library-template-part__selection-search">
+			<div className="block-library-template-part-selection__search">
 				<SearchControl
 					onChange={ setSearchValue }
 					value={ searchValue }

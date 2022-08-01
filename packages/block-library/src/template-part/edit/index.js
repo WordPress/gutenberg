@@ -211,7 +211,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isTemplatePartSelectionOpen && (
 				<Modal
-					overlayClassName="block-editor-template-part__selection-modal"
+					overlayClassName="block-library-template-part-selection-modal"
 					title={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						__( 'Choose a %s' ),

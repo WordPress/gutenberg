@@ -58,6 +58,7 @@ function Modal( props, forwardedRef ) {
 		children,
 		style,
 		overlayClassName,
+		contentClassName,
 		className,
 		contentLabel,
 		onKeyDown,
@@ -157,10 +158,14 @@ function Modal( props, forwardedRef ) {
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
-							'hide-header': __experimentalHideHeader,
-							'has-scrolled-content': hasScrolledContent,
-						} ) }
+						className={ classnames(
+							'components-modal__content',
+							contentClassName,
+							{
+								'hide-header': __experimentalHideHeader,
+								'has-scrolled-content': hasScrolledContent,
+							}
+						) }
 						role="document"
 						onScroll={ onContentContainerScroll }
 					>
