@@ -73,7 +73,15 @@ function gutenberg_resolve_assets() {
 		}
 
 		if ( ! empty( $block_type->editor_style ) ) {
-			$style_handles[] = $block_type->editor_style;
+			if ( is_array( $block_type->editor_style ) ) {
+				foreach ( $block_type->editor_style as $single_style ) {
+					if ( is_string( $single_style ) ) {
+						$style_handles[] = $single_style;
+					}
+				}
+			} else {
+				$style_handles[] = $block_type->editor_style;
+			}
 		}
 
 		if ( ! empty( $block_type->script ) ) {
