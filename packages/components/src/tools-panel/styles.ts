@@ -16,6 +16,9 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
+	columns: ( columns: number ) => css`
+		grid-template-columns: ${ `repeat( ${ columns }, minmax(0, 1fr) )` };
+	`,
 	spacing: css`
 		column-gap: ${ space( 4 ) };
 		row-gap: ${ space( 6 ) };
@@ -27,7 +30,8 @@ const toolsPanelGrid = {
 	},
 };
 
-export const ToolsPanel = css`
+export const ToolsPanel = ( columns: number ) => css`
+	${ toolsPanelGrid.columns( columns ) };
 	${ toolsPanelGrid.spacing };
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
@@ -45,8 +49,8 @@ export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
 	return css`
 		> div:not( :first-of-type ) {
 			display: grid;
-			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
-			${ toolsPanelGrid.spacing }
+			${ toolsPanelGrid.columns( columns ) };
+			${ toolsPanelGrid.spacing };
 			${ toolsPanelGrid.item.fullWidth }
 		}
 	`;
