@@ -54,9 +54,9 @@ class WP_Style_Engine_Processor {
 			$selector = $rule->get_selector();
 			if ( isset( $this->css_rules[ $selector ] ) ) {
 				$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
-			} else {
-				$this->css_rules[ $rule->get_selector() ] = $rule;
+				continue;
 			}
+			$this->css_rules[ $rule->get_selector() ] = $rule;
 		}
 	}
 
