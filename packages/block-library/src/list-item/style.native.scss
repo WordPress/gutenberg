@@ -14,10 +14,13 @@
 
 .wp-block-list-item__list-item-icon {
 	align-items: center;
+	flex-grow: 0;
 }
 
 .wp-block-list-item__list-item-content {
 	flex-grow: 1;
+	flex-shrink: 1;
+	background-color: transparent;
 }
 
 .wp-block-list-item__list-item--default {

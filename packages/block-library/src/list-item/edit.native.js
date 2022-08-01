@@ -15,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ export default function ListItemEdit( {
 	clientId,
 	style,
 } ) {
+	const [ contentWidth, setContentWidth ] = useState();
 	const { placeholder, content } = attributes;
 	const {
 		blockIndex,
@@ -84,17 +86,24 @@ export default function ListItemEdit( {
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
+		renderAppender: false,
 	} );
-
-	const stylesParentList = [
-		styles[ 'wp-block-list-item__list-item-parent' ],
-	];
 
 	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId );
+	const onLayout = useCallback( ( { nativeEvent } ) => {
+		setContentWidth( ( prevState ) => {
+			const { width } = nativeEvent.layout;
+
+			if ( ! prevState || prevState.width !== width ) {
+				return Math.floor( width );
+			}
+			return prevState;
+		} );
+	}, [] );
 
 	return (
-		<View style={ stylesParentList }>
+		<View style={ styles[ 'wp-block-list-item__list-item-parent' ] }>
 			<View style={ styles[ 'wp-block-list-item__list-item' ] }>
 				<View style={ styles[ 'wp-block-list-item__list-item-icon' ] }>
 					<ListStyleType
@@ -109,6 +118,7 @@ export default function ListItemEdit( {
 				</View>
 				<View
 					style={ styles[ 'wp-block-list-item__list-item-content' ] }
+					onLayout={ onLayout }
 				>
 					<RichText
 						identifier="content"
@@ -125,6 +135,7 @@ export default function ListItemEdit( {
 						} }
 						style={ style }
 						deleteEnter={ true }
+						containerWidth={ contentWidth }
 					/>
 				</View>
 			</View>
