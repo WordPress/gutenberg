@@ -394,7 +394,7 @@ class WP_Style_Engine {
 	 *     'classnames'   => (array) A flat array of classnames.
 	 * );
 	 */
-	public function parse_block_styles( $block_styles, $options ) {
+	public static function parse_block_styles( $block_styles, $options ) {
 		if ( empty( $block_styles ) || ! is_array( $block_styles ) ) {
 			return array();
 		}
@@ -600,7 +600,7 @@ class WP_Style_Engine {
 }
 
 /**
- * Global public interface method to WP_Style_Engine->get_styles to generate styles from a single style object, e.g.,
+ * Global public interface method to WP_Style_Engine::get_styles to generate styles from a single style object, e.g.,
  * the value of a block's attributes.style object or the top level styles in theme.json.
  * See: https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles and
  * https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/
@@ -643,7 +643,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 
 	// Block supports styles.
 	if ( 'block-supports' === $options['context'] ) {
-		$parsed_styles = $style_engine->parse_block_styles( $block_styles, $options );
+		$parsed_styles = $style_engine::parse_block_styles( $block_styles, $options );
 	}
 
 	// Output.
@@ -702,7 +702,7 @@ function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
 
 /**
  * Returns compiled CSS from a collection of selectors and declarations.
- * This won't add to any store, but is useful for returnin a compiled style sheet from any CSS selector + declarations combos.
+ * This won't add to any store, but is useful for returning a compiled style sheet from any CSS selector + declarations combos.
  *
  * @access public
  *
