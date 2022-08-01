@@ -231,5 +231,43 @@ describe( 'Autocomplete', () => {
 				testData.snapshot
 			);
 		} );
+
+		it( 'should cancel selection via `Escape` keypress event', async () => {
+			const testData = {};
+			if ( type === 'mention' ) {
+				testData.triggerString = 'My name is @j';
+				testData.optionPath = '//*[contains(text(),"Jane Doe")]';
+				testData.postCompleterInput = ' ...a secret.';
+				testData.snapshot = `
+					"<!-- wp:paragraph -->
+					<p>My name is @j ...a secret.</p>
+					<!-- /wp:paragraph -->"
+					`;
+			} else if ( type === 'option' ) {
+				testData.triggerString = 'My favorite fruit is ~a';
+				testData.optionPath = '[text()="🍎 Apple"]';
+				testData.postCompleterInput =
+					" ...no I changed my mind. It's mango.";
+				testData.snapshot = `
+				"<!-- wp:paragraph -->
+				<p>My favorite fruit is ~a ...no I changed my mind. It's mango.</p>
+				<!-- /wp:paragraph -->"
+				`;
+			} else {
+				[ testData.triggerString, testData.snapshot ] = undefined;
+			}
+
+			await clickBlockAppender();
+			await page.keyboard.type( testData.triggerString );
+			await page.waitForXPath(
+				`//button[@role="option"]${ testData.optionPath }`
+			);
+			await page.keyboard.press( 'Escape' );
+			await page.keyboard.type( testData.postCompleterInput );
+			// The characters before `Escape` should remain (i.e. `~app`)
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot(
+				testData.snapshot
+			);
+		} );
 	} );
 } );
