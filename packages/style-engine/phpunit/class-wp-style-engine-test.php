@@ -271,34 +271,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
-	public function test_enqueue_block_styles_store() {
-		$block_styles = array(
-			'spacing' => array(
-				'padding' => array(
-					'top'    => '42px',
-					'left'   => '2%',
-					'bottom' => '44px',
-					'right'  => '5rem',
-				),
-			),
-		);
-
-		$generated_styles = wp_style_engine_get_styles(
-			$block_styles,
-			array(
-				'enqueue'  => true,
-				'context'  => 'block-supports',
-				'selector' => 'article',
-			)
-		);
-		$store            = WP_Style_Engine::get_instance()::get_store( 'block-supports' );
-		$rule             = $store->get_all_rules()['article'];
-		$this->assertSame( $generated_styles['css'], $rule->get_css() );
-	}
-
-	/**
-	 * Tests adding rules to a store and retrieving a generated stylesheet.
-	 */
 	public function test_add_to_store() {
 		$store = wp_style_engine_add_to_store( 'test-store', array() );
 
