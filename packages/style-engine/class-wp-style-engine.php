@@ -348,13 +348,9 @@ class WP_Style_Engine {
 		if ( ! $callable ) {
 			return;
 		}
-		$action_hook_name = 'wp_footer';
-		if ( wp_is_block_theme() ) {
-			$action_hook_name = 'wp_head';
-		}
 		add_action( 'wp_enqueue_scripts', $callable );
 		add_action(
-			$action_hook_name,
+			wp_is_block_theme() ? 'wp_head' : 'wp_footer',
 			$callable,
 			$priority
 		);
@@ -472,10 +468,7 @@ class WP_Style_Engine {
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
 	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
-		if (
-			isset( $style_definition['value_func'] ) &&
-			is_callable( $style_definition['value_func'] )
-		) {
+		if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
 			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
 		}
 
