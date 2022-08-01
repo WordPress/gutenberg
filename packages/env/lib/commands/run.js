@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { spawn } = require( 'child_process' );
-const os = require("os");
+const os = require('os');
 
 /**
  * Internal dependencies
