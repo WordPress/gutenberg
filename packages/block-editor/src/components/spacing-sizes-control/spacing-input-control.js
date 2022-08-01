@@ -220,6 +220,7 @@ export default function SpacingInputControl( {
 					options={ options }
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
+					__nextUnconstrainedWidth={ true }
 				/>
 			) }
 		</>

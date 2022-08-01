@@ -84,19 +84,6 @@
 		z-index: 3;
 	}
 
-	.components-custom-select-control {
-		.components-custom-select-control__label {
-			margin-bottom: 0;
-		}
-		button {
-			width: 100%;
-		}
-	}
-
-	.components-unit-control-wrapper {
-		height: 30px;
-	}
-
 	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
 	}
@@ -114,8 +101,5 @@
 
 	.components-spacing-sizes-control__custom-select-control {
 		grid-column: span 3;
-		.components-input-control__container {
-			width: 100%;
-		}
 	}
 }
