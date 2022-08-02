@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import Popover from '../';
 
 // Format: "[yAxis] [xAxis]"
@@ -82,13 +83,6 @@ export default {
 	},
 };
 
-const SimplePopover = ( args ) => <Popover { ...args } />;
-
-export const Default = SimplePopover.bind( {} );
-Default.args = {
-	children: <>Popover&apos;s&nbsp;content</>,
-};
-
 const PopoverWithAnchor = ( args ) => {
 	const anchorRef = useRef( null );
 
@@ -110,6 +104,33 @@ const PopoverWithAnchor = ( args ) => {
 			<Popover { ...args } anchorRef={ anchorRef } />
 		</div>
 	);
+};
+
+export const Default = ( args ) => {
+	const [ isVisible, setIsVisible ] = useState( false );
+	const toggleVisible = () => {
+		setIsVisible( ( state ) => ! state );
+	};
+
+	return (
+		<div
+			style={ {
+				minWidth: '600px',
+				minHeight: '600px',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			} }
+		>
+			<Button variant="secondary" onClick={ toggleVisible }>
+				Toggle Popover
+				{ isVisible && <Popover { ...args } /> }
+			</Button>
+		</div>
+	);
+};
+Default.args = {
+	children: <>Popover&apos;s&nbsp;content</>,
 };
 
 /**
