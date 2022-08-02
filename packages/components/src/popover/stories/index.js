@@ -58,7 +58,7 @@ export default {
 		expandOnMobile: { control: { type: 'boolean' } },
 		focusOnMount: {
 			control: { type: 'select' },
-			options: [ 'firstElement', 'container' ],
+			options: [ 'firstElement', 'container', false ],
 		},
 		getAnchorRect: { control: { type: null } },
 		headerTitle: { control: { type: 'text' } },
