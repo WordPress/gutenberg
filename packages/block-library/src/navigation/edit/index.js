@@ -303,27 +303,6 @@ function Navigation( {
 		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
-	const overlayClassnames = classnames( {
-		'has-text-color':
-			!! overlayTextColor.color || !! overlayTextColor?.class,
-		[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
-			!! overlayTextColor?.slug,
-		'has-background':
-			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
-		[ getColorClassName(
-			'background-color',
-			overlayBackgroundColor?.slug
-		) ]: !! overlayBackgroundColor?.slug,
-	} );
-
-	const overlayStyles = {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
-
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -644,8 +623,8 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
-					classNames={ overlayClassnames }
-					styles={ overlayStyles }
+					overlayBackgroundColor={ overlayBackgroundColor }
+					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
 						blockProps={ blockProps }
@@ -783,8 +762,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
-							classNames={ overlayClassnames }
-							styles={ overlayStyles }
+							overlayBackgroundColor={ overlayBackgroundColor }
+							overlayTextColor={ overlayTextColor }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
