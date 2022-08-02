@@ -73,9 +73,9 @@ $arrow-triangle-base-size: 14px;
 		content: "";
 		position: absolute;
 		top: -1px;
-		left: 0;
+		left: 1px;
 		height: 2px;
-		width: 100%;
+		right: 1px;
 		background-color: $white;
 	}
 
