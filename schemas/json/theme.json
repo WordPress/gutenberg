@@ -1154,6 +1154,9 @@
 				},
 				"caption": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"cite": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
 			"additionalProperties": false

@@ -12,6 +12,7 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
@@ -82,7 +83,10 @@ function PullQuoteEdit( {
 									citation: nextCitation,
 								} )
 							}
-							className="wp-block-pullquote__citation"
+							className={ classnames(
+								'wp-block-pullquote__citation',
+								__experimentalGetElementClassName( 'cite' )
+							) }
 							__unstableMobileNoFocusOnMount
 							textAlign="center"
 							__unstableOnSplitAtEnd={ () =>

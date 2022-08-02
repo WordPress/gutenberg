@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { textAlign, citation, value } = attributes;
@@ -23,7 +27,14 @@ export default function save( { attributes } ) {
 			<blockquote>
 				<RichText.Content value={ value } multiline />
 				{ shouldShowCitation && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="cite"
+						value={ citation }
+						className={ classnames(
+							'wp-block-pullquote__citation',
+							__experimentalGetElementClassName( 'cite' )
+						) }
+					/>
 				) }
 			</blockquote>
 		</figure>

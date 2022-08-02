@@ -6,7 +6,12 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { align, citation } = attributes;
@@ -19,7 +24,14 @@ export default function save( { attributes } ) {
 		<blockquote { ...useBlockProps.save( { className } ) }>
 			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( citation ) && (
-				<RichText.Content tagName="cite" value={ citation } />
+				<RichText.Content
+					tagName="cite"
+					value={ citation }
+					className={ classNames(
+						'wp-block-quote__citation',
+						__experimentalGetElementClassName( 'cite' )
+					) }
+				/>
 			) }
 		</blockquote>
 	);

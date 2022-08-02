@@ -14,6 +14,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
@@ -111,6 +112,10 @@ export default function QuoteEdit( {
 					<RichText
 						identifier="citation"
 						tagName={ isWebPlatform ? 'cite' : undefined }
+						className={ classNames(
+							'wp-block-quote__citation',
+							__experimentalGetElementClassName( 'cite' )
+						) }
 						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) => {
@@ -125,7 +130,6 @@ export default function QuoteEdit( {
 							// citation
 							__( 'Add citation' )
 						}
-						className="wp-block-quote__citation"
 						__unstableOnSplitAtEnd={ () =>
 							insertBlocksAfter(
 								createBlock( getDefaultBlockName() )
