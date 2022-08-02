@@ -2,11 +2,13 @@
  * WordPress dependencies
  */
 import { useState, useRef } from '@wordpress/element';
+import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Button from '../../button';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 import Popover from '../';
 
 // Format: "[yAxis] [xAxis]"
@@ -221,4 +223,52 @@ export const DynamicHeight = ( { children, ...args } ) => {
 DynamicHeight.args = {
 	...Default.args,
 	children: 'Content with dynamic height',
+};
+
+export const WithSlotOutsideIframe = ( args ) => {
+	const anchorRef = useRef( null );
+	const slotName = 'popover-with-slot-outside-iframe';
+
+	return (
+		<SlotFillProvider>
+			<div>
+				<Popover.Slot name={ slotName } />
+				<Iframe
+					style={ {
+						width: '100%',
+						height: '100%',
+					} }
+				>
+					<div
+						style={ {
+							height: '200vh',
+							paddingTop: '10vh',
+						} }
+					>
+						<p
+							style={ {
+								padding: '8px',
+								background: 'salmon',
+								maxWidth: '200px',
+								marginTop: '30px',
+								marginLeft: 'auto',
+								marginRight: 'auto',
+							} }
+							ref={ anchorRef }
+						>
+							Popover&apos;s anchor
+						</p>
+						<Popover
+							{ ...args }
+							__unstableSlotName={ slotName }
+							anchorRef={ anchorRef }
+						/>
+					</div>
+				</Iframe>
+			</div>
+		</SlotFillProvider>
+	);
+};
+WithSlotOutsideIframe.args = {
+	...Default.args,
 };
