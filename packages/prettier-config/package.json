@@ -27,9 +27,6 @@
 	],
 	"main": "lib/index.js",
 	"types": "build-types",
-	"dependencies": {
-		"is-plain-obj": "^4.1.0"
-	},
 	"peerDependencies": {
 		"prettier": ">=2"
 	},
