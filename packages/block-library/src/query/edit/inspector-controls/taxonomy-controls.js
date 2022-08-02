@@ -107,13 +107,17 @@ export function TaxonomyControls( { onChange, query } ) {
 						return null;
 					}
 					return (
-						<FormTokenField
+						<div
 							key={ slug }
-							label={ name }
-							value={ getExistingTaxQueryValue( slug ) }
-							suggestions={ terms.names }
-							onChange={ onTermsChange( slug ) }
-						/>
+							className="block-library-query-inspector__taxonomy-control"
+						>
+							<FormTokenField
+								label={ name }
+								value={ getExistingTaxQueryValue( slug ) }
+								suggestions={ terms.names }
+								onChange={ onTermsChange( slug ) }
+							/>
+						</div>
 					);
 				} ) }
 		</>

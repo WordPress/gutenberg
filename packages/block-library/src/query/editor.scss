@@ -43,3 +43,12 @@
 		max-height: none;
 	}
 }
+
+.block-library-query-toolspanel__filters {
+	.components-form-token-field__help {
+		margin-bottom: 0;
+	}
+	.block-library-query-inspector__taxonomy-control:not(:last-child) {
+		margin-bottom: calc(4px * 6);
+	}
+}

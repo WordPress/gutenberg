@@ -170,7 +170,7 @@ export default function QueryInspectorControls( {
 			{ ! inherit && (
 				<InspectorControls>
 					<ToolsPanel
-						className={ `block-support-panel` }
+						className="block-library-query-toolspanel__filters"
 						label={ __( 'Filters' ) }
 						resetAll={ () => {
 							setQuery( {
