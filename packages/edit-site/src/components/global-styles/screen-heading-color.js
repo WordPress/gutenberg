@@ -132,6 +132,8 @@ function ScreenHeadingColor( { name } ) {
 				>
 					<ToggleGroupControlOption
 						value="heading"
+						/* translators: 'All' refers to selecting all heading levels 
+						and applying the same style to h1-h6. */
 						label={ __( 'All' ) }
 					/>
 					<ToggleGroupControlOption value="h1" label={ __( 'H1' ) } />
