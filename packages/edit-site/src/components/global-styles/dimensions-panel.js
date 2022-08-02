@@ -11,7 +11,10 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
 } from '@wordpress/components';
-import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
+import {
+	__experimentalUseCustomSides as useCustomSides,
+	__experimentalSpacingSizesControl as SpacingSizesControl,
+} from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
@@ -340,8 +343,9 @@ export default function DimensionsPanel( { name } ) {
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={ true }
+					className="tools-panel-item-spacing"
 				>
-					<BoxControl
+					<SpacingSizesControl
 						values={ paddingValues }
 						onChange={ setPaddingValues }
 						label={ __( 'Padding' ) }

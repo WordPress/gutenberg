@@ -1,3 +1,9 @@
+.tools-panel-item-spacing {
+	display: grid;
+	grid-template-columns: 1fr 1fr 36px;
+	grid-row-gap: $grid-unit-10;
+}
+
 .component-spacing-sizes-control {
 	box-sizing: border-box;
 	padding-bottom: 12px;

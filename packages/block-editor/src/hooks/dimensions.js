@@ -77,7 +77,7 @@ export function DimensionsPanel( props ) {
 			<InspectorControls __experimentalGroup="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
-						className="tools-panel-item-padding"
+						className="tools-panel-item-spacing"
 						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
 						onDeselect={ () => resetPadding( props ) }
