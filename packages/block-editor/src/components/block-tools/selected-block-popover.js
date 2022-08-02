@@ -16,10 +16,12 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
+import useFlipBlockToolbar from './use-flip-block-toolbar';
 
 function selector( select ) {
 	const {
@@ -113,6 +115,12 @@ function SelectedBlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
+	const selectedBlockElement = useBlockElement( clientId );
+	const placement = useFlipBlockToolbar( {
+		contentElement: __unstableContentRef.current,
+		selectedBlockElement,
+	} );
+
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
 	}
@@ -126,6 +134,7 @@ function SelectedBlockPopover( {
 			} ) }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			placement={ placement }
 		>
 			{ shouldShowContextualToolbar && (
 				<BlockContextualToolbar
