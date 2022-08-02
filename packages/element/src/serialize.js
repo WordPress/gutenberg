@@ -28,7 +28,8 @@
 /**
  * External dependencies
  */
-import { kebabCase, isPlainObject } from 'lodash';
+import isPlainObject from 'is-plain-obj';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
