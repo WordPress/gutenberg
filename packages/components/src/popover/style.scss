@@ -101,23 +101,23 @@
 }
 
 .components-popover__triangle {
-	fill: transparent;
 	position: absolute;
 	height: 100%;
 	width: 100%;
+}
+
+.components-popover__triangle-bg {
+	// Fill color is the same as the .components-popover__content's background
+	fill: $white;
+}
+
+.components-popover__triangle-border {
+	// Stroke colors are the same as the .components-popover__content's outline
+	fill: transparent;
 	stroke-width: $border-width;
+	stroke: $gray-400;
 
-	// Same as popover content
-	&-bg {
-		fill: $white;
-		stroke: $white;
-	}
-
-	&-border {
-		stroke: $gray-400;
-	}
-
-	.is-alternate &-border {
+	.is-alternate & {
 		stroke: $gray-900;
 	}
 }
