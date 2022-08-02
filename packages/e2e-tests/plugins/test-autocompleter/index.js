@@ -1,5 +1,5 @@
 (function () {
-	const testCompleter = {
+	const fruits = {
 		name: 'fruit',
 		// The prefix that triggers this completer
 		triggerPrefix: '~',
@@ -24,17 +24,32 @@
 			option.visual 
 		),
 	};
-	
-	function appendTestCompleter( completers, blockName ) {
+
+	function duplicateUserMentions( completers ) {
+		const [ users ] = completers.filter(
+			( completer ) => completer.name === 'users'
+		);
+		return {
+			...users,
+			name: 'users-copy',
+			triggerPrefix: '+',
+			getOptionCompletion: ( user ) => `+${ user.slug }`,
+		};
+	}
+
+	function appendTestCompleters( completers, blockName ) {
+		const copiedUsers = duplicateUserMentions( completers );
 		return blockName === 'core/paragraph'
-			? [ ...completers, testCompleter ]
+			? [ ...completers, fruits, copiedUsers ]
 			: completers;
 	}
 	
-	// Adding the filter
+	// Adding the filter with a priority of 11
+	// to ensure it fires after the default user mentions are added.
 	wp.hooks.addFilter(
 		'editor.Autocomplete.completers',
 		'editor/autocompleters/test',
-		appendTestCompleter
+		appendTestCompleters,
+		11
 	);
 })()

@@ -51,19 +51,19 @@ describe( 'Autocomplete', () => {
 		await deactivatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
+	beforeEach( async () => {
+		await createNewPost();
+	} );
+
+	afterEach( async () => {
+		await publishPost();
+	} );
+
 	describe.each( [
 		[ 'User Mention', 'mention' ],
 		[ 'Custom Completer', 'option' ],
 	] )( '%s', ( ...completerAndOptionType ) => {
 		const [ , type ] = completerAndOptionType;
-
-		beforeEach( async () => {
-			await createNewPost();
-		} );
-
-		afterEach( async () => {
-			await publishPost();
-		} );
 
 		const isNotMention = () => {
 			return type !== 'mention' ? true : false;
@@ -376,5 +376,24 @@ describe( 'Autocomplete', () => {
 				testData.snapshot
 			);
 		} );
+	} );
+
+	it( 'should insert elements from multiple completers in a single block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '@fr' );
+		await page.waitForXPath(
+			'//button[@role="option"]//*[contains(text(),"Frodo Baggins")]'
+		);
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' +bi' );
+		await page.waitForXPath(
+			'//button[@role="option"]//*[contains(text(),"Bilbo Baggins")]'
+		);
+		await page.keyboard.press( 'Enter' );
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+		"<!-- wp:paragraph -->
+		<p>@ringbearer +thebetterhobbit</p>
+		<!-- /wp:paragraph -->"
+		` );
 	} );
 } );
