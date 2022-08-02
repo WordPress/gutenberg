@@ -15,11 +15,11 @@
 				]
 			}
 		],
-		"innerHTML": "\n<blockquote class=\"wp-block-quote is-style-large\"><cite>Maya Angelou</cite></blockquote>\n",
+		"innerHTML": "\n<blockquote class=\"wp-block-quote is-style-large\"><cite class=\"wp-block-quote__citation wp-element-cite\">Maya Angelou</cite></blockquote>\n",
 		"innerContent": [
 			"\n<blockquote class=\"wp-block-quote is-style-large\">",
 			null,
-			"<cite>Maya Angelou</cite></blockquote>\n"
+			"<cite class=\"wp-block-quote__citation wp-element-cite\">Maya Angelou</cite></blockquote>\n"
 		]
 	}
 ]
