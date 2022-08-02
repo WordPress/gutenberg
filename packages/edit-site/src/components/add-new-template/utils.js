@@ -409,11 +409,13 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 };
 
 function useAuthorNeedsUniqueIndentifier() {
-	const authors = useSelect( ( select ) =>
-		select( coreStore ).getUsers( { who: 'authors', per_page: -1 } )
+	const authors = useSelect(
+		( select ) =>
+			select( coreStore ).getUsers( { who: 'authors', per_page: -1 } ),
+		[]
 	);
 	const authorsCountByName = useMemo( () => {
-		return ( authors || [] ).reduce( ( { name }, authorsCount ) => {
+		return ( authors || [] ).reduce( ( authorsCount, { name } ) => {
 			authorsCount[ name ] = ( authorsCount[ name ] || 0 ) + 1;
 			return authorsCount;
 		}, {} );
@@ -483,18 +485,11 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 									__( 'Author: %s' ),
 									suggestion.name
 							  );
-						const description = needsUniqueId
-							? sprintf(
-									// translators: %1$s: Represents the name of an author e.g: "Jorge", %2$s: Represents the slug of an author e.g: "author-jorge-slug".
-									__( 'Template for Author: %1$s (%2$s)' ),
-									suggestion.name,
-									suggestion.slug
-							  )
-							: sprintf(
-									// translators: %s: Represents the name of an author e.g: "Jorge".
-									__( 'Template for Author: %s' ),
-									suggestion.name
-							  );
+						const description = sprintf(
+							// translators: %s: Represents the name of an author e.g: "Jorge".
+							__( 'Template for Author: %s' ),
+							suggestion.name
+						);
 						return {
 							title,
 							description,
