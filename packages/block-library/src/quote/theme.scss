@@ -3,14 +3,6 @@
 	margin: 0 0 1.75em 0;
 	padding-left: 1em;
 
-	cite,
-	footer {
-		color: currentColor;
-		font-size: 0.8125em;
-		position: relative;
-		font-style: normal;
-	}
-
 	&.has-text-align-right {
 		border-left: none;
 		border-right: 0.25em solid currentColor;
@@ -28,4 +20,13 @@
 	&.is-large {
 		border: none;
 	}
+}
+
+// Lower specificity so that the styles from theme.json elements.cite can be applied.
+:where(.wp-block-quote cite),
+:where(.wp-block-quote footer) {
+	color: currentColor;
+	font-size: 0.8125em;
+	position: relative;
+	font-style: normal;
 }

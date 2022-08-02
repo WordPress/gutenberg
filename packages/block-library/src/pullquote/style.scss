@@ -6,8 +6,7 @@
 	box-sizing: border-box;
 
 	p,
-	blockquote,
-	cite {
+	blockquote {
 		color: inherit;
 	}
 
@@ -31,6 +30,7 @@
 	footer {
 		position: relative;
 	}
+
 	.has-text-color a {
 		color: inherit;
 	}
@@ -67,6 +67,7 @@
 	}
 }
 
-.wp-block-pullquote cite {
+// Lower specificity so that the styles from theme.json elements.cite can be applied.
+:where(.wp-block-pullquote cite) {
 	color: inherit;
 }
