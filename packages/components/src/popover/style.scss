@@ -79,20 +79,20 @@
 
 	// Position and rotate the arrow depending on the popover's placement.
 	// The `!important' is necessary to override the inline styles.
-	&--top {
+	&.is-top {
 		bottom: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(0);
 	}
-	&--right {
+	&.is-right {
 		/*rtl:begin:ignore*/
 		left: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(90deg);
 	}
-	&--bottom {
+	&.is-bottom {
 		top: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(180deg);
 	}
-	&--left {
+	&.is-left {
 		/*rtl:begin:ignore*/
 		right: calc(-1 * var(--wp-popover-arrow-size)) !important;
 		transform: rotate(-90deg);

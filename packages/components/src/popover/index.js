@@ -430,9 +430,7 @@ const Popover = (
 					ref={ arrowRef }
 					className={ [
 						'components-popover__arrow',
-						`components-popover__arrow--${
-							placementData.split( '-' )[ 0 ]
-						}`,
+						`is-${ placementData.split( '-' )[ 0 ] }`,
 					].join( ' ' ) }
 					style={ {
 						left: Number.isFinite( arrowData?.x )
