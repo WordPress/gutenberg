@@ -176,9 +176,9 @@ const Popover = (
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
 			documentToReturn = anchorRect.ownerDocument;
 		} else if ( getAnchorRect ) {
-			documentToReturn =
-				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
-				document;
+			documentToReturn = getAnchorRect(
+				anchorRefFallback.current
+			)?.ownerDocument;
 		}
 
 		return documentToReturn ?? document;
