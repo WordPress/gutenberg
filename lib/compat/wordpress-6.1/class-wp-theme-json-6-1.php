@@ -1437,7 +1437,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 		// Skip outputting layout styles if explicitly disabled.
 		if ( current_theme_supports( 'disable-layout-styles' ) ) {
-			return $block_rules;
+			return $store;
 		}
 
 		if ( isset( $block_metadata['name'] ) ) {
