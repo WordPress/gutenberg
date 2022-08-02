@@ -8,7 +8,7 @@ import { dispatch, select } from '@wordpress/data';
  */
 import { store as blocksStore } from '../store';
 
-/** @typedef {import('../store/reducer').WPBlockCategory} WPBlockCategory */
+/** @typedef {import('../../types/api/').WPBlockCategory} WPBlockCategory */
 
 /**
  * Returns all the block categories.
