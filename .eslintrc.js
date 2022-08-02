@@ -114,6 +114,7 @@ module.exports = {
 							'keyBy',
 							'keys',
 							'lowerCase',
+							'maxBy',
 							'memoize',
 							'negate',
 							'noop',
