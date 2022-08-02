@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
@@ -16,12 +16,7 @@ import { store as editorStore } from '../../store';
 function EditorHistoryRedo( props, ref ) {
 	const shortcut = isAppleOS()
 		? displayShortcut.primaryShift( 'z' )
-		: sprintf(
-				// translators: %1$s: Shortcut text. %2$s: Shortcut text.
-				'%1$s or %2$s',
-				displayShortcut.primaryShift( 'z' ),
-				displayShortcut.primary( 'y' )
-		  );
+		: displayShortcut.primary( 'y' );
 
 	const hasRedo = useSelect(
 		( select ) => select( editorStore ).hasEditorRedo(),

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
@@ -11,12 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
 export default function RedoButton() {
 	const shortcut = isAppleOS()
 		? displayShortcut.primaryShift( 'z' )
-		: sprintf(
-				// translators: %1$s: Shortcut text. %2$s: Shortcut text.
-				'%1$s or %2$s',
-				displayShortcut.primaryShift( 'z' ),
-				displayShortcut.primary( 'y' )
-		  );
+		: displayShortcut.primary( 'y' );
 
 	const hasRedo = useSelect(
 		( select ) => select( coreStore ).hasRedo(),

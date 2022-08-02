@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createPortal, useState, useEffect } from '@wordpress/element';
-import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
@@ -33,12 +33,7 @@ function Header( {
 
 	const shortcut = isAppleOS()
 		? displayShortcut.primaryShift( 'z' )
-		: sprintf(
-				// translators: %1$s: Shortcut text. %2$s: Shortcut text.
-				'%1$s or %2$s',
-				displayShortcut.primaryShift( 'z' ),
-				displayShortcut.primary( 'y' )
-		  );
+		: displayShortcut.primary( 'y' );
 
 	useEffect( () => {
 		return sidebar.subscribeHistory( () => {
