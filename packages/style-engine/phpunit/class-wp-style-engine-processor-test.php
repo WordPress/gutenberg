@@ -42,7 +42,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	 * Should compile CSS rules from the store.
 	 */
 	public function test_return_store_rules_as_css() {
-		$a_nice_store = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_store( 'nice' );
+		$a_nice_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'nice' );
 		$a_nice_store->add_rule( '.a-nice-rule' )->add_declarations(
 			array(
 				'color'            => 'var(--nice-color)',

@@ -623,15 +623,14 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		return array();
 	}
-	$defaults = array(
+	$defaults      = array(
 		'selector'                   => null,
 		'context'                    => 'block-supports',
 		'convert_vars_to_classnames' => false,
 		'enqueue'                    => false,
 	);
-
-	$style_engine  = WP_Style_Engine::get_instance();
 	$options       = wp_parse_args( $options, $defaults );
+	$style_engine  = WP_Style_Engine::get_instance();
 	$parsed_styles = null;
 
 	// Block supports styles.
@@ -662,65 +661,46 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 }
 
 /**
- * Global public interface method to register styles to be enqueued and rendered.
- *
- * @access public
- *
- * @param string       $store_key A valid store key.
- * @param array<array> $css_rules array(
- *     array(
- *         'selector'         => (string) A CSS selector.
- *         declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
- *     )
- * );.
- *
- * @return WP_Style_Engine_CSS_Rules_Store|null.
- */
-function wp_style_engine_add_to_store( $store_key, $css_rules = array() ) {
-	if ( ! class_exists( 'WP_Style_Engine' ) || ! $store_key ) {
-		return null;
-	}
-
-	// Get instance here to ensure that we register hooks to enqueue stored styles.
-	$style_engine = WP_Style_Engine::get_instance();
-
-	if ( empty( $css_rules ) ) {
-		return $style_engine::get_store( $store_key );
-	}
-
-	foreach ( $css_rules as $css_rule ) {
-		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) ) {
-			continue;
-		}
-		$style_engine::store_css_rule( $store_key, $css_rule['selector'], $css_rule['declarations'] );
-	}
-	return $style_engine::get_store( $store_key );
-}
-
-/**
  * Returns compiled CSS from a collection of selectors and declarations.
  * This won't add to any store, but is useful for returning a compiled style sheet from any CSS selector + declarations combos.
  *
  * @access public
  *
- * @param array $css_rules array(
- *     'selector'     => (string) A CSS selector.
- *     'declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ * @param array<array>  $css_rules array(
+ *      array(
+ *          'selector'         => (string) A CSS selector.
+ *          declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ *      )
+ *  );.
+ * @param array<string> $options array(
+ *     'context'                    => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
  * );.
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
-	if ( ! class_exists( 'WP_Style_Engine' ) ) {
+function wp_style_engine_get_stylesheet( $css_rules, $options ) {
+	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $css_rules ) ) {
 		return '';
 	}
 
+	$defaults         = array(
+		'context' => 'block-supports',
+		'enqueue' => false,
+	);
+	$options          = wp_parse_args( $options, $defaults );
+	$style_engine     = WP_Style_Engine::get_instance();
 	$css_rule_objects = array();
 
 	foreach ( $css_rules as $css_rule ) {
 		if ( empty( $css_rule['selector'] ) || empty( $css_rule['declarations'] ) || ! is_array( $css_rule['declarations'] ) ) {
 			continue;
 		}
+
+		if ( true === $options['enqueue'] ) {
+			$style_engine::store_css_rule( $options['context'], $css_rule['selector'], $css_rule['declarations'] );
+		}
+
 		$css_rule_objects[] = new WP_Style_Engine_CSS_Rule( $css_rule['selector'], $css_rule['declarations'] );
 	}
 
@@ -728,5 +708,5 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules = array() ) {
 		return '';
 	}
 
-	return WP_Style_Engine::compile_stylesheet_from_css_rules( $css_rule_objects );
+	return $style_engine::compile_stylesheet_from_css_rules( $css_rule_objects );
 }

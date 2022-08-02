@@ -540,14 +540,39 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 */
 	public function test_add_to_store() {
-		$store = wp_style_engine_add_to_store( 'test-store', array() );
-
-		// wp_style_engine_add_to_store returns a store object.
-		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $store );
+		$css_rules           = array(
+			array(
+				'selector'     => '.frodo',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '10px',
+					'width'        => '30px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.samwise',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '20px',
+					'width'        => '50px',
+					'border-style' => 'solid',
+				),
+			),
+		);
+		$compiled_stylesheet = wp_style_engine_get_stylesheet(
+			$css_rules,
+			array(
+				'context' => 'test-store',
+				'enqueue' => true,
+			)
+		);
 
 		// Check that the style engine knows about the store.
-		$stored_store = WP_Style_Engine::get_instance()::get_store( 'test-store' );
+		$style_engine = WP_Style_Engine::get_instance();
+		$stored_store = $style_engine::get_store( 'test-store' );
 		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $stored_store );
+		$this->assertSame( $compiled_stylesheet, $style_engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
 	}
 
 	/**
@@ -584,7 +609,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$compiled_stylesheet = wp_style_engine_get_stylesheet( $css_rules );
 		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
 	}
 
@@ -628,7 +653,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$compiled_stylesheet = wp_style_engine_get_stylesheet( $css_rules );
 		$this->assertSame( '.gandalf {color: white; height: 190px; border-style: dotted; padding: 10px; margin-bottom: 100px;}.dumbledore,.rincewind {color: grey; height: 90px; border-style: dotted;}', $compiled_stylesheet );
 	}
 }
