@@ -439,7 +439,6 @@ const Popover = (
 						top: Number.isFinite( arrowData?.y )
 							? `${ arrowData.y }px`
 							: '',
-						'--wp-popover-arrow-size': '14px',
 					} }
 				>
 					<ArrowTriangle />

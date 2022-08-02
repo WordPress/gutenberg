@@ -1,3 +1,5 @@
+$arrow-triangle-base-size: 14px;
+
 .components-popover {
 	z-index: z-index(".components-popover");
 
@@ -60,8 +62,8 @@
 
 .components-popover__arrow {
 	position: absolute;
-	width: var(--wp-popover-arrow-size);
-	height: var(--wp-popover-arrow-size);
+	width: $arrow-triangle-base-size;
+	height: $arrow-triangle-base-size;
 	pointer-events: none;
 
 	// Thin line that helps to make sure that the underlying
@@ -80,21 +82,21 @@
 	// Position and rotate the arrow depending on the popover's placement.
 	// The `!important' is necessary to override the inline styles.
 	&.is-top {
-		bottom: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		bottom: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(0);
 	}
 	&.is-right {
 		/*rtl:begin:ignore*/
-		left: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		left: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(90deg);
 	}
 	&.is-bottom {
-		top: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		top: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(180deg);
 	}
 	&.is-left {
 		/*rtl:begin:ignore*/
-		right: calc(-1 * var(--wp-popover-arrow-size)) !important;
+		right: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(-90deg);
 		/*rtl:end:ignore*/
 	}
