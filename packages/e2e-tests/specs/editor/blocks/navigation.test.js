@@ -1317,9 +1317,10 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			await switchUserToAdmin();
 		} );
 
-		it( 'shows a warning if user does not have permission to create navigation menus', async () => {
+		it.skip( 'shows a warning if user does not have permission to create navigation menus', async () => {
 			const noticeText =
 				'You do not have permission to create Navigation Menus.';
+
 			// Switch to a Contributor role user - they should not have
 			// permission to update Navigations.
 			await loginUser( contributorUsername, contributorPassword );

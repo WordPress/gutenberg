@@ -23,6 +23,15 @@
 		},
 		"sizeSlug": {
 			"type": "string"
+		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": ""
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

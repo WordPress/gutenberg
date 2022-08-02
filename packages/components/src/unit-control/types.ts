@@ -43,7 +43,7 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
 	{ data?: WPUnitControlUnit }
 >;
 
-export type UnitSelectControlProps = {
+export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
 	 *
@@ -54,12 +54,6 @@ export type UnitSelectControlProps = {
 	 * A callback function invoked when the value is changed.
 	 */
 	onChange?: UnitControlOnChangeCallback;
-	/**
-	 * Size of the control option. Supports "default" and "small".
-	 *
-	 * @default 'default'
-	 */
-	size?: SelectSize;
 	/**
 	 * Current unit.
 	 */

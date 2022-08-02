@@ -51,7 +51,7 @@ class WP_Style_Engine_CSS_Rule {
 	 *
 	 * @param string $selector The CSS selector.
 	 *
-	 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
+	 * @return WP_Style_Engine_CSS_Rule|void Returns the object to allow chaining of methods.
 	 */
 	public function set_selector( $selector ) {
 		if ( empty( $selector ) ) {

@@ -226,7 +226,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 */
 	public function data_generate_font_size_preset_fixtures() {
 		return array(
-			'default_return_value'                 => array(
+			'default_return_value'                        => array(
 				'font_size_preset'            => array(
 					'size' => '28px',
 				),
@@ -234,7 +234,16 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '28px',
 			),
 
-			'return_fluid_value'                   => array(
+			'default_return_value_when_fluid_is_false'    => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => false,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => '28px',
+			),
+
+			'return_fluid_value'                          => array(
 				'font_size_preset'            => array(
 					'size' => '1.75rem',
 				),
@@ -242,7 +251,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(1.3125rem, 1.3125rem + ((1vw - 0.48rem) * 2.524), 2.625rem)',
 			),
 
-			'return_default_fluid_values_with_empty_fluidSize' => array(
+			'return_default_fluid_values_with_empty_fluid_array' => array(
 				'font_size_preset'            => array(
 					'size'  => '28px',
 					'fluid' => array(),
@@ -251,7 +260,16 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
 			),
 
-			'return_size_with_invalid_fluid_units' => array(
+			'return_default_fluid_values_with_null_value' => array(
+				'font_size_preset'            => array(
+					'size'  => '28px',
+					'fluid' => null,
+				),
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'clamp(21px, 1.3125rem + ((1vw - 7.68px) * 2.524), 42px)',
+			),
+
+			'return_size_with_invalid_fluid_units'        => array(
 				'font_size_preset'            => array(
 					'size'  => '10em',
 					'fluid' => array(
@@ -263,7 +281,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '10em',
 			),
 
-			'return_fluid_clamp_value'             => array(
+			'return_fluid_clamp_value'                    => array(
 				'font_size_preset'            => array(
 					'size'  => '28px',
 					'fluid' => array(

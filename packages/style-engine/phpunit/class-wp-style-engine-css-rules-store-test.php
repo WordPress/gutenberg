@@ -15,6 +15,13 @@ require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
  */
 class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 	/**
+	 * Tear down after each test.
+	 */
+	public function tear_down() {
+		parent::tear_down();
+		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+	}
+	/**
 	 * Should create a new store.
 	 */
 	public function test_create_new_store() {
@@ -34,6 +41,41 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 
 		$the_same_fish_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'fish-n-chips' );
 		$this->assertEquals( $selector, $the_same_fish_store->add_rule( $selector )->get_selector() );
+	}
+
+	/**
+	 * Should return all previously created stores.
+	 */
+	public function test_get_stores() {
+		$burrito_store    = WP_Style_Engine_CSS_Rules_Store::get_store( 'burrito' );
+		$quesadilla_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'quesadilla' );
+		$this->assertEquals(
+			array(
+				'burrito'    => $burrito_store,
+				'quesadilla' => $quesadilla_store,
+			),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
+	}
+
+	/**
+	 * Should delete all previously created stores.
+	 */
+	public function test_remove_all_stores() {
+		$dolmades_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'dolmades' );
+		$tzatziki_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'tzatziki' );
+		$this->assertEquals(
+			array(
+				'dolmades' => $dolmades_store,
+				'tzatziki' => $tzatziki_store,
+			),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
+		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+		$this->assertEquals(
+			array(),
+			WP_Style_Engine_CSS_Rules_Store::get_stores()
+		);
 	}
 
 	/**
