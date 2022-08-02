@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -66,6 +67,19 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 		}
 	);
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const { inherit } = layout;
+	useEffect( () => {
+		// If a block has not yet set the `inherit` value to either `true` or `false`,
+		// and it doesn't have any inner blocks, then set it to the desired default value.
+		// This ensures that newly inserted blocks are set to use the root/global content sizes.
+		if ( inherit === undefined && ! hasInnerBlocks ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { layout: { inherit: true } } );
+		}
+	}, [ hasInnerBlocks, inherit ] );
 
 	return (
 		<>
