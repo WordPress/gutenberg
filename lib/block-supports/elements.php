@@ -92,9 +92,6 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	/*
 	* For now we only care about link color.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
 	*/
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 

@@ -666,10 +666,12 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *
  * @access public
  *
- * @param string $store_key A valid store key.
- * @param array  $css_rules array(
- *     'selector'         => (string) A CSS selector.
- *     'declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ * @param string       $store_key A valid store key.
+ * @param array<array> $css_rules array(
+ *     array(
+ *         'selector'         => (string) A CSS selector.
+ *         declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
+ *     )
  * );.
  *
  * @return WP_Style_Engine_CSS_Rules_Store|null.
