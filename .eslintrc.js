@@ -103,6 +103,7 @@ module.exports = {
 							'isBoolean',
 							'isFinite',
 							'isFunction',
+							'isMatch',
 							'isNil',
 							'isNumber',
 							'isObject',
