@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Popover from '../';
@@ -81,5 +86,69 @@ const SimplePopover = ( args ) => <Popover { ...args } />;
 
 export const Default = SimplePopover.bind( {} );
 Default.args = {
-	children: 'Popover content',
+	children: <>Popover&apos;s&nbsp;content</>,
+};
+
+const PopoverWithAnchor = ( args ) => {
+	const anchorRef = useRef( null );
+
+	return (
+		<div
+			style={ {
+				height: '200px',
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
+			} }
+		>
+			<p
+				style={ { padding: '8px', background: 'salmon' } }
+				ref={ anchorRef }
+			>
+				Popover&apos;s anchor
+			</p>
+			<Popover { ...args } anchorRef={ anchorRef } />
+		</div>
+	);
+};
+
+/**
+ * Resize / scroll the viewport to test the behavior of the popovers when they
+ * reach the viewport boundaries.
+ */
+export const AllPlacements = ( { children, ...args } ) => (
+	<div
+		style={ {
+			minWidth: '600px',
+			marginLeft: 'auto',
+			marginRight: 'auto',
+		} }
+	>
+		<h2>
+			Resize / scroll the viewport to test the behavior of the popovers
+			when they reach the viewport boundaries.
+		</h2>
+		<div>
+			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
+				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
+					{ children }
+					<div>
+						<small>(placement: { p })</small>
+					</div>
+				</PopoverWithAnchor>
+			) ) }
+		</div>
+	</div>
+);
+// Excluding placement and position since they all possible values
+// are passed directly in code.
+AllPlacements.parameters = {
+	controls: {
+		exclude: [ 'placement', 'position' ],
+	},
+};
+AllPlacements.args = {
+	...Default.args,
+	noArrow: false,
+	offset: 10,
 };
