@@ -62,6 +62,7 @@ import useConvertClassicToBlockMenu, {
 } from './use-convert-classic-menu-to-block-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
+import { detectColors } from './utils';
 
 function Navigation( {
 	attributes,
