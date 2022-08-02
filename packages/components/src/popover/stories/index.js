@@ -106,51 +106,6 @@ const PopoverWithAnchor = ( args ) => {
 	);
 };
 
-const PopoverWithDynamicHeight = ( { children, ...args } ) => {
-	const [ height, setHeight ] = useState( 200 );
-	const increase = () => setHeight( height + 100 );
-	const decrease = () => setHeight( height - 100 );
-
-	return (
-		<div style={ { padding: '20px' } }>
-			<div>
-				<Button
-					variant="primary"
-					onClick={ increase }
-					style={ {
-						marginRight: '20px',
-					} }
-				>
-					Increase Size
-				</Button>
-
-				<Button variant="primary" onClick={ decrease }>
-					Decrease Size
-				</Button>
-			</div>
-
-			<p>
-				When the height of the popover exceeds the available space in
-				the canvas, a scrollbar inside the popover should appear.
-			</p>
-
-			<div>
-				<Popover { ...args }>
-					<div
-						style={ {
-							height,
-							background: '#eee',
-							padding: '20px',
-						} }
-					>
-						{ children }
-					</div>
-				</Popover>
-			</div>
-		</div>
-	);
-};
-
 export const Default = ( args ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
@@ -219,7 +174,50 @@ AllPlacements.args = {
 	offset: 10,
 };
 
-export const DynamicHeight = PopoverWithDynamicHeight.bind( {} );
+export const DynamicHeight = ( { children, ...args } ) => {
+	const [ height, setHeight ] = useState( 200 );
+	const increase = () => setHeight( height + 100 );
+	const decrease = () => setHeight( height - 100 );
+
+	return (
+		<div style={ { padding: '20px' } }>
+			<div>
+				<Button
+					variant="primary"
+					onClick={ increase }
+					style={ {
+						marginRight: '20px',
+					} }
+				>
+					Increase Size
+				</Button>
+
+				<Button variant="primary" onClick={ decrease }>
+					Decrease Size
+				</Button>
+			</div>
+
+			<p>
+				When the height of the popover exceeds the available space in
+				the canvas, a scrollbar inside the popover should appear.
+			</p>
+
+			<div>
+				<Popover { ...args }>
+					<div
+						style={ {
+							height,
+							background: '#eee',
+							padding: '20px',
+						} }
+					>
+						{ children }
+					</div>
+				</Popover>
+			</div>
+		</div>
+	);
+};
 DynamicHeight.args = {
 	...Default.args,
 	children: 'Content with dynamic height',
