@@ -623,6 +623,8 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
+					overlayBackgroundColor={ overlayBackgroundColor }
+					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
 						blockProps={ blockProps }
