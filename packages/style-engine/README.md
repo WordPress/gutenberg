@@ -2,6 +2,147 @@
 
 The Style Engine powering global styles and block customizations.
 
+## Backend API
+
+### wp_style_engine_get_styles()
+Global public interface method to generate styles from a single style object, e.g., the value of a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles) or the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
+
+_Parameters_
+- _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
+- _$options_ `array<string|boolean>` An array of options to determine the output.
+  - _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+  - _enqueue_ `boolean` When `true` will attempt to store and enqueue for rendering on the frontend.
+  - _convert_vars_to_classnames_ `boolean`  Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+  - _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+
+_Returns_
+`array<string|array>|null`
+
+
+```php
+array(
+    'css'           => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+    'declarations'  => (array) An array of property/value pairs representing parsed CSS declarations.
+    'classnames'    => (string) Classnames separated by a space.
+);
+```
+
+It will return compiled CSS declartions for inline styles, or, where a selector is provided, a complete CSS rule.
+
+To enqueue a style for rendering in the frontend, the `$options` array requires the following:
+
+1. **selector (string)** - this is the CSS selector for your block style CSS declarations.
+2. **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be batched together and printed in the same HTML style tag. The default is `'block-supports'`.
+3. **enqueue (boolean)** - tells the style engine to enqueue the styles and print them in the frontend.
+
+`wp_style_engine_get_styles` will return the compiled CSS and CSS declarations array.
+
+#### Usage
+
+```php
+$block_styles =  array(
+     'spacing' => array( 'padding' => '100px' )
+);
+$styles = wp_style_engine_get_styles(
+    $block_styles,
+    array(
+        'selector' => '.a-selector',
+        'context'  => 'block-supports',
+        'enqueue'  => true,
+    )
+);
+print_r( $styles );
+
+/*
+array(
+    'css'                 => '.a-selector{padding:10px}'
+    'declarations'  => array( 'padding' => '100px' )
+)
+*/
+```
+
+### wp_style_engine_add_to_store()
+
+Global public interface method to register styles to be enqueued and rendered.
+
+Use this function to enqueue any CSS rules. It will automatically merge declarations and combine selectors.
+
+_Parameters_
+- _$store_key_ `string` A valid store key.
+- _$css_rules_ `array<array>` 
+
+_Returns_
+`WP_Style_Engine_CSS_Rules_Store` A store.
+
+#### Usage
+
+```php
+$styles = array(
+    array(
+        'selector'.       => '.wp-pumpkin',
+        'declarations' => array( 'color' => 'orange' )
+    ),
+    array(
+        'selector'.       => '.wp-tomato',
+        'declarations' => array( 'color' => 'red' )
+    ),
+    array(
+        'selector'.       => '.wp-tomato',
+        'declarations' => array( 'padding' => '100px' )
+    ),
+    array(
+        'selector'.       => '.wp-kumquat',
+        'declarations' => array( 'color' => 'orange' )
+    ),
+);
+
+wp_style_engine_add_to_store( 'layout-block-supports', $styles );
+```
+
+The resulting stylesheet will be:
+```html
+<style id='layout-block-supports-inline-css'>
+.wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+</style>
+```
+
+### wp_style_engine_get_stylesheet_from_css_rules()
+
+Use this function to compile and return a stylesheet for any CSS rules. This function does not enqueue styles, but rather acts as a CSS compiler.
+
+_Parameters_
+- _$css_rules_ `array<array>` 
+
+_Returns_
+`string` A compiled CSS string.
+
+#### Usage
+
+
+```php
+$styles = array(
+    array(
+        'selector'.       => '.wp-pumpkin',
+        'declarations' => array( 'color' => 'orange' )
+    ),
+    array(
+        'selector'.       => '.wp-tomato',
+        'declarations' => array( 'color' => 'red' )
+    ),
+    array(
+        'selector'.       => '.wp-tomato',
+        'declarations' => array( 'padding' => '100px' )
+    ),
+    array(
+        'selector'.       => '.wp-kumquat',
+        'declarations' => array( 'color' => 'orange' )
+    ),
+);
+
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules( 'layout-block-supports', $styles );
+print_r( $stylesheet ); // .wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+```
+
 ## Installation (JS only)
 
 Install the module
