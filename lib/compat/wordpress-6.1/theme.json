@@ -261,7 +261,90 @@
 								"gap": null
 							}
 						}
-					]
+					],
+					"attributeStyles": {
+						"flexWrap": [
+							{
+								"className": "is-$slug",
+								"selector": ".is-$slug",
+								"validValues": [ "nowrap", "wrap" ],
+								"property": "flex-wrap",
+								"values": {
+									"nowrap": "nowrap",
+									"wrap": "wrap"
+								}
+							}
+						],
+						"orientation": [
+							{
+								"className": "is-$slug",
+								"selector": ".is-$slug",
+								"validValues": [ "vertical" ],
+								"property": "flex-direction",
+								"values": {
+									"vertical": "column"
+								},
+								"rules": {
+									"align-items": "flex-start"
+								}
+							}
+						],
+						"justifyContent": [
+							{
+								"className": "is-content-justification-$slug",
+								"selector": ".is-content-justification-$slug",
+								"dependsOn": {
+									"orientation": [ "horizontal", null ]
+								},
+								"property": "justify-content",
+								"validValues": [
+									"left",
+									"right",
+									"center",
+									"space-between"
+								],
+								"values": {
+									"left": "flex-start",
+									"right": "flex-end",
+									"center": "center"
+								}
+							},
+							{
+								"className": "is-content-justification-$slug",
+								"selector": ".is-vertical.is-content-justification-$slug",
+								"dependsOn": {
+									"orientation": [ "vertical" ]
+								},
+								"property": "justify-content",
+								"validValues": [
+									"left",
+									"right",
+									"center",
+									"space-between"
+								],
+								"values": {
+									"left": "flex-start",
+									"right": "flex-end",
+									"center": "center"
+								}
+							}
+						],
+						"verticalAlignment": [
+							{
+								"className": "is-vertical-alignment-$slug",
+								"selector": ".is-vertical-alignment-$slug",
+								"dependsOn": {
+									"orientation": [ "horizontal", null ]
+								},
+								"property": "align-items",
+								"values": {
+									"top": "flex-start",
+									"center": "center",
+									"bottom": "flex-end"
+								}
+							}
+						]
+					}
 				}
 			}
 		},
