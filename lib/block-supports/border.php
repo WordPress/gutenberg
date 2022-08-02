@@ -119,7 +119,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Collect classes and styles.
 	$attributes = array();
-	$styles     = gutenberg_style_engine_get_block_supports_styles( array( 'border' => $border_block_styles ) );
+	$styles     = gutenberg_style_engine_get_styles( array( 'border' => $border_block_styles ) );
 
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];

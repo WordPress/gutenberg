@@ -1,14 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * External dependencies
- */
-import { flatMap } from 'lodash';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { create, split, toHTMLString } from '@wordpress/rich-text';
 
@@ -39,7 +31,7 @@ function getListContentSchema( { phrasingContentSchema } ) {
 }
 
 function getListContentFlat( blocks ) {
-	return flatMap( blocks, ( { name, attributes, innerBlocks = [] } ) => {
+	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
 		if ( name === 'core/list-item' ) {
 			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
 		}

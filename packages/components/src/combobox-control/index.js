@@ -29,6 +29,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
+import { useControlledValue } from '../utils/hooks';
 
 const noop = () => {};
 
@@ -46,10 +47,10 @@ const DetectOutside = withFocusOutside(
 
 function ComboboxControl( {
 	__next36pxDefaultSize,
-	value,
+	value: valueProp,
 	label,
 	options,
-	onChange,
+	onChange: onChangeProp,
 	onFilterValueChange = noop,
 	hideLabelFromVision,
 	help,
@@ -59,6 +60,11 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 } ) {
+	const [ value, setValue ] = useControlledValue( {
+		value: valueProp,
+		onChange: onChangeProp,
+	} );
+
 	const currentOption = options.find( ( option ) => option.value === value );
 	const currentLabel = currentOption?.label ?? '';
 	// Use a custom prefix when generating the `instanceId` to avoid having
@@ -92,7 +98,7 @@ function ComboboxControl( {
 	}, [ inputValue, options, value ] );
 
 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
-		onChange( newSelectedSuggestion.value );
+		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
 		setInputValue( '' );
@@ -172,7 +178,7 @@ function ComboboxControl( {
 	};
 
 	const handleOnReset = () => {
-		onChange( null );
+		setValue( null );
 		inputContainer.current.focus();
 	};
 
