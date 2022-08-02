@@ -15,6 +15,12 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", false ]
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "column"
+			}
 		}
 	},
 	"supports": {
@@ -66,11 +72,7 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
-			"default": {
-				"type": "column"
-			}
-		}
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

@@ -112,12 +112,7 @@ const deprecated = [
 		migrate: ( attributes ) => {
 			const { layout = null } = attributes;
 			if ( ! layout ) {
-				return {
-					...attributes,
-					layout: {
-						type: 'default',
-					},
-				};
+				return attributes;
 			}
 			if ( layout.inherit || layout.contentSize ) {
 				return {
