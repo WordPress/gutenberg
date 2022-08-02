@@ -178,6 +178,18 @@ exports[`RichText should transform backtick to code 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should transform when typing backtick over selection 1`] = `
+"<!-- wp:paragraph -->
+<p>A <code>selection</code> test.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform when typing backtick over selection 2`] = `
+"<!-- wp:paragraph -->
+<p>A \`selection\` test.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should undo backtick transform with backspace 1`] = `
 "<!-- wp:paragraph -->
 <p>\`a\`</p>

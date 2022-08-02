@@ -17,7 +17,9 @@ import NumberControl from '../../number-control';
 import SelectControl from '../../select-control';
 import { Select } from '../../select-control/styles/select-control-styles';
 
-export const Wrapper = styled.div``;
+export const Wrapper = styled.div`
+	font-size: ${ CONFIG.fontSize };
+`;
 
 export const Fieldset = styled.fieldset`
 	border: 0;
