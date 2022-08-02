@@ -1,38 +1,6 @@
 <?php
-/**
- * Webfonts API class.
- *
- * @package    WordPress
- * @subpackage WebFonts
- * @since      6.0.0
- */
 
-if ( class_exists( 'WP_Webfonts' ) ) {
-	return;
-}
-
-/**
- * Class WP_Webfonts
- *
- * @since 6.0.0
- */
-class WP_Webfonts {
-
-	/**
-	 * An array of registered webfonts.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @var array[]
-	 */
-	private $registered_webfonts = array();
-
-	/**
-	 * An array of enqueued webfonts.
-	 *
-	 * @var array[]
-	 */
-	private $enqueued_webfonts = array();
+class WP_Webfonts extends WP_Dependencies {
 
 	/**
 	 * An array of registered providers.
@@ -44,192 +12,180 @@ class WP_Webfonts {
 	private $providers = array();
 
 	/**
-	 * Stylesheet handle.
 	 *
-	 * @since 6.0.0
-	 *
-	 * @var string
 	 */
-	private $stylesheet_handle = '';
+	public function __construct() {
+		/**
+		 * Fires when the WP_Webfonts instance is initialized.
+		 *
+		 * @since X.X.X
+		 *
+		 * @param WP_Webfonts $wp_webfonts WP_Webfonts instance (passed by reference).
+		 */
+		do_action_ref_array( 'wp_default_webfonts', array( &$this ) );
+	}
 
 	/**
-	 * Init.
+	 * Get the list of all registered web fonts and variations.
 	 *
 	 * @since 6.0.0
+	 *
+	 * @return strings[]
 	 */
-	public function init() {
-		// Register default providers.
-		$this->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
+	public function get_registered() {
+		return array_keys( $this->registered );
+	}
 
-		// Register callback to generate and enqueue styles.
-		if ( did_action( 'wp_enqueue_scripts' ) ) {
-			$this->stylesheet_handle = 'webfonts-footer';
-			$hook                    = 'wp_print_footer_scripts';
+	/**
+	 * Get the list of enqueued web fonts and variations.
+	 *
+	 * @return array[]
+	 */
+	public function get_enqueued() {
+		return $this->queue;
+	}
+
+	/**
+	 * Gets a list of all variations registered for a font family.
+	 *
+	 * @param $font_family
+	 * @return array
+	 */
+	public function get_variations( $font_family ) {
+		$font_family_handle = sanitize_title( $font_family );
+
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return array();
+		}
+
+		return $this->registered[ $font_family_handle ]->deps;
+	}
+
+	/**
+	 * Removes a font family and all registered variations.
+	 *
+	 * @param mixed|string|string[] $font_family
+	 */
+	function remove_family( $font_family ) {
+		$font_family_handle = sanitize_title( $font_family );
+
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return;
+		}
+
+		$variations = $this->registered[ $font_family_handle ]->deps;
+
+		foreach ( $variations as $variation ) {
+			$this->remove( $variation );
+		}
+
+		$this->remove( $font_family_handle );
+	}
+
+	/**
+	 * Removes a variation.
+	 *
+	 * @param $font_family
+	 * @param $variation_handle
+	 */
+	function remove_variation( $font_family, $variation_handle ) {
+		$font_family_handle = sanitize_title( $font_family );
+
+		$this->remove( $variation_handle );
+
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return;
+		}
+
+		// Remove the variation as a dependency.
+		$this->registered[ $font_family_handle ]->deps = array_values( array_diff(
+			$this->registered[ $font_family_handle ]->deps,
+			array( $variation_handle )
+		) );
+	}
+
+	/**
+	 * Registers a variation for a font family.
+	 *
+	 * @param string $font_family
+	 * @param string $variation_handle
+	 * @param array  $variation
+	 */
+	public function add_variation( $font_family, $variation_handle, $variation ) {
+		$font_family_handle = sanitize_title( $font_family );
+
+		// Register the font family when it does not yet exist.
+		if ( ! isset( $this->registered[ $font_family ] ) ) {
+			$this->add( $font_family_handle, false );
+		}
+
+		$variation = $this->validate_variation( $font_family, $variation );
+
+		// Variation validation failed.
+		if ( ! $variation ) {
+			return false;
+		}
+
+		$variation_handle = $font_family_handle . '-' . $variation_handle;
+
+		if ( $variation['src'] ) {
+			$result = $this->add( $variation_handle, $variation['src'], array(), false, array( 'font-properties' => $variation ) );
 		} else {
-			$this->stylesheet_handle = 'webfonts';
-			$hook                    = 'wp_enqueue_scripts';
-		}
-		add_action( $hook, array( $this, 'generate_and_enqueue_styles' ) );
-
-		// Enqueue webfonts in the block editor.
-		add_action( 'admin_init', array( $this, 'generate_and_enqueue_editor_styles' ) );
-	}
-
-	/**
-	 * Get the list of registered fonts.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return array[]
-	 */
-	public function get_registered_webfonts() {
-		return $this->registered_webfonts;
-	}
-
-	/**
-	 * Get the list of enqueued fonts.
-	 *
-	 * @return array[]
-	 */
-	public function get_enqueued_webfonts() {
-		return $this->enqueued_webfonts;
-	}
-
-	/**
-	 * Get the list of all fonts.
-	 *
-	 * @return array[]
-	 */
-	public function get_all_webfonts() {
-		return array_merge( $this->get_registered_webfonts(), $this->get_enqueued_webfonts() );
-	}
-
-	/**
-	 * Get the list of providers.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
-	 */
-	public function get_providers() {
-		return $this->providers;
-	}
-
-	/**
-	 * Register a webfont.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param array $webfont Webfont to be registered.
-	 * @return string|false The font family slug if successfully registered, else false.
-	 */
-	public function register_webfont( array $webfont ) {
-		$webfont = $this->validate_webfont( $webfont );
-
-		// If not valid, bail out.
-		if ( ! $webfont ) {
-			return false;
+			$result = $this->add( $variation_handle, false, array(), false, array( 'font-properties' => $variation ) );
 		}
 
-		$slug = $this->get_font_slug( $webfont );
-
-		// Initialize a new font-family collection.
-		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
-			$this->registered_webfonts[ $slug ] = array();
+		if ( $result ) {
+			$this->providers[ $variation['provider'] ]['fonts'][] = $variation_handle;
 		}
 
-		$this->registered_webfonts[ $slug ][] = $webfont;
-		return $slug;
+		return $result;
 	}
 
 	/**
-	 * Enqueue a font-family that has been already registered.
+	 * Adds a variation as a dependency for the main font alias.
 	 *
-	 * @param string $font_family_name The font family name to be enqueued.
-	 * @return bool True if successfully enqueued, else false.
+	 * @param $font_family_handle
+	 * @param $variation_handle
 	 */
-	public function enqueue_webfont( $font_family_name ) {
-		$slug = $this->get_font_slug( $font_family_name );
-
-		if ( isset( $this->enqueued_webfonts[ $slug ] ) ) {
-			return true;
-		}
-
-		if ( ! isset( $this->registered_webfonts[ $slug ] ) ) {
-			/* translators: %s unique slug to identify the font family of the webfont */
-			_doing_it_wrong( __METHOD__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
-
-			return false;
-		}
-
-		$this->enqueued_webfonts[ $slug ] = $this->registered_webfonts[ $slug ];
-		unset( $this->registered_webfonts[ $slug ] );
-		return true;
+	public function add_dependency( $font_family_handle, $variation_handle ) {
+		$this->registered[ $font_family_handle ]->deps[] = $variation_handle;
 	}
 
 	/**
-	 * Get the font slug.
+	 * Validates and sanitizes a variation.
 	 *
-	 * @since 6.0.0
-	 *
-	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
-	 *                                 or a font-family as a string.
-	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
+	 * @param $font_family
+	 * @param $variation
+	 * @return array|false|object
 	 */
-	public static function get_font_slug( $to_convert ) {
-		if ( is_array( $to_convert ) ) {
-			if ( isset( $to_convert['font-family'] ) ) {
-				$to_convert = $to_convert['font-family'];
-			} elseif ( isset( $to_convert['fontFamily'] ) ) {
-				$to_convert = $to_convert['fontFamily'];
-			} else {
-				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
-				return false;
-			}
-		}
-
-		return sanitize_title( $to_convert );
-	}
-
-	/**
-	 * Validate a webfont.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param array $webfont The webfont arguments.
-	 *
-	 * @return array|false The validated webfont arguments, or false if the webfont is invalid.
-	 */
-	public function validate_webfont( $webfont ) {
-		$webfont = wp_parse_args(
-			$webfont,
-			array(
-				'provider'     => 'local',
-				'font-family'  => '',
-				'font-style'   => 'normal',
-				'font-weight'  => '400',
-				'font-display' => 'fallback',
-			)
+	function validate_variation( $font_family, $variation ) {
+		$defaults = array(
+			'provider'     => 'local',
+			'font-style'   => 'normal',
+			'font-weight'  => '400',
+			'font-display' => 'fallback',
 		);
 
-		// Check the font-family.
-		if ( empty( $webfont['font-family'] ) || ! is_string( $webfont['font-family'] ) ) {
-			trigger_error( __( 'Webfont font family must be a non-empty string.', 'gutenberg' ) );
-			return false;
-		}
+		$defaults = apply_filters( 'wp_web_font_variation_defaults', $defaults );
+
+		$defaults['font-family'] = $font_family;
+		$variation = wp_parse_args( $variation, $defaults );
 
 		// Local fonts need a "src".
-		if ( 'local' === $webfont['provider'] ) {
+		if ( 'local' === $variation['provider'] ) {
 			// Make sure that local fonts have 'src' defined.
-			if ( empty( $webfont['src'] ) || ( ! is_string( $webfont['src'] ) && ! is_array( $webfont['src'] ) ) ) {
+			if ( empty( $variation['src'] ) || ( ! is_string( $variation['src'] ) && ! is_array( $variation['src'] ) ) ) {
 				trigger_error( __( 'Webfont src must be a non-empty string or an array of strings.', 'gutenberg' ) );
 				return false;
 			}
+		} elseif ( ! class_exists( $variation['provider'] ) ) {
+			trigger_error( __( 'The provider class specified does not exist.', 'gutenberg' ) );
+			return false;
 		}
 
 		// Validate the 'src' property.
-		if ( ! empty( $webfont['src'] ) ) {
-			foreach ( (array) $webfont['src'] as $src ) {
+		if ( ! empty( $variation['src'] ) ) {
+			foreach ( (array) $variation['src'] as $src ) {
 				if ( empty( $src ) || ! is_string( $src ) ) {
 					trigger_error( __( 'Each webfont src must be a non-empty string.', 'gutenberg' ) );
 					return false;
@@ -238,14 +194,14 @@ class WP_Webfonts {
 		}
 
 		// Check the font-weight.
-		if ( ! is_string( $webfont['font-weight'] ) && ! is_int( $webfont['font-weight'] ) ) {
+		if ( ! is_string( $variation['font-weight'] ) && ! is_int( $variation['font-weight'] ) ) {
 			trigger_error( __( 'Webfont font weight must be a properly formatted string or integer.', 'gutenberg' ) );
 			return false;
 		}
 
 		// Check the font-display.
-		if ( ! in_array( $webfont['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
-			$webfont['font-display'] = 'fallback';
+		if ( ! in_array( $variation['font-display'], array( 'auto', 'block', 'fallback', 'swap' ), true ) ) {
+			$variation['font-display'] = 'fallback';
 		}
 
 		$valid_props = array(
@@ -268,13 +224,68 @@ class WP_Webfonts {
 			'provider',
 		);
 
-		foreach ( $webfont as $prop => $value ) {
+		foreach ( $variation as $prop => $value ) {
 			if ( ! in_array( $prop, $valid_props, true ) ) {
-				unset( $webfont[ $prop ] );
+				unset( $variation[ $prop ] );
 			}
 		}
 
-		return $webfont;
+		return $variation;
+	}
+
+	/**
+	 * Generate styles for webfonts.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array[] $webfonts_by_provider Webfonts organized by provider.
+	 * @return string $styles Generated styles.
+	 */
+	public function do_item( $handle, $group = false ) {
+		if ( ! parent::do_item( $handle ) ) {
+			return false;
+		}
+
+		$styles    = '';
+		$providers = $this->get_providers();
+
+		$obj = $this->registered[ $handle ];
+
+		/*
+		 * Loop through each of the providers to get the CSS for their respective webfonts
+		 * to incrementally generate the collective styles for all of them.
+		 */
+		foreach ( $providers as $provider_id => $provider ) {
+			// Bail out if the provider class does not exist.
+			if ( ! class_exists( $provider['class'] ) ) {
+				/* translators: %s is the provider name. */
+				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
+				continue;
+			}
+
+			$fonts = $this->get_enqueued_fonts_for_provider( $provider_id );
+
+			// If there are no registered webfonts for this provider, skip it.
+			if ( empty( $fonts ) ) {
+				continue;
+			}
+
+			$provider_fonts = array();
+
+			foreach ( $fonts as $font_handle ) {
+				$provider_fonts[ $font_handle ] = $this->get_data( $font_handle, 'font-properties' );
+			}
+
+			/*
+			 * Process the webfonts by first passing them to the provider via `set_webfonts()`
+			 * and then getting the CSS from the provider.
+			 */
+			$provider = new $provider['class']();
+			$provider->set_webfonts( $provider_fonts );
+			$styles .= $provider->get_css();
+		}
+
+		return $styles;
 	}
 
 	/**
@@ -287,131 +298,44 @@ class WP_Webfonts {
 	 * @return bool True if successfully registered, else false.
 	 */
 	public function register_provider( $provider, $class ) {
-		if ( empty( $provider ) || empty( $class ) ) {
+		if ( empty( $provider ) || empty( $class ) || ! class_exists( $class ) ) {
 			return false;
 		}
-		$this->providers[ $provider ] = $class;
+
+		$this->providers[ $provider ] = array(
+			'class' => $class,
+			'fonts' => array(),
+		);
 		return true;
 	}
 
 	/**
-	 * Generate and enqueue webfonts styles.
-	 *
-	 * @since 6.0.0
-	 */
-	public function generate_and_enqueue_styles() {
-		// Generate the styles.
-		$webfonts = $this->get_webfonts_by_provider( $this->get_enqueued_webfonts() );
-		$styles   = $this->generate_styles( $webfonts );
-
-		// Bail out if there are no styles to enqueue.
-		if ( '' === $styles ) {
-			return;
-		}
-
-		// Enqueue the stylesheet.
-		wp_register_style( $this->stylesheet_handle, '' );
-		wp_enqueue_style( $this->stylesheet_handle );
-
-		// Add the styles to the stylesheet.
-		wp_add_inline_style( $this->stylesheet_handle, $styles );
-	}
-
-	/**
-	 * Generate and enqueue editor styles.
-	 *
-	 * @since 6.0.0
-	 */
-	public function generate_and_enqueue_editor_styles() {
-		// Generate the styles.
-		$webfonts = $this->get_webfonts_by_provider( $this->get_all_webfonts() );
-		$styles   = $this->generate_styles( $webfonts );
-
-		// Bail out if there are no styles to enqueue.
-		if ( '' === $styles ) {
-			return;
-		}
-
-		wp_enqueue_style( 'wp-block-library' );
-		wp_add_inline_style( 'wp-block-library', $styles );
-	}
-
-	/**
-	 * Generate styles for webfonts.
+	 * Get the list of providers.
 	 *
 	 * @since 6.0.0
 	 *
-	 * @param array[] $webfonts_by_provider Webfonts organized by provider.
-	 * @return string $styles Generated styles.
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
 	 */
-	private function generate_styles( array $webfonts_by_provider ) {
-		$styles    = '';
-		$providers = $this->get_providers();
-
-		/*
-		 * Loop through each of the providers to get the CSS for their respective webfonts
-		 * to incrementally generate the collective styles for all of them.
-		 */
-		foreach ( $providers as $provider_id => $provider_class ) {
-
-			// Bail out if the provider class does not exist.
-			if ( ! class_exists( $provider_class ) ) {
-				/* translators: %s is the provider name. */
-				trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider_id ) );
-				continue;
-			}
-
-			$provider_webfonts = isset( $webfonts_by_provider[ $provider_id ] )
-				? $webfonts_by_provider[ $provider_id ]
-				: array();
-
-			// If there are no registered webfonts for this provider, skip it.
-			if ( empty( $provider_webfonts ) ) {
-				continue;
-			}
-
-			/*
-			 * Process the webfonts by first passing them to the provider via `set_webfonts()`
-			 * and then getting the CSS from the provider.
-			 */
-			$provider = new $provider_class();
-			$provider->set_webfonts( $provider_webfonts );
-			$styles .= $provider->get_css();
-		}
-
-		return $styles;
+	public function get_providers() {
+		return $this->providers;
 	}
 
-
 	/**
-	 * Reorganizes webfonts grouped by font-family into grouped by provider.
+	 * Retrieves a list of enqueued web font variations for a provider.
 	 *
-	 * @param array[] $font_families Font families and each of their webfonts.
 	 * @return array[] Webfonts organized by providers.
 	 */
-	private function get_webfonts_by_provider( array $font_families ) {
-		$providers            = $this->get_providers();
-		$webfonts_by_provider = array();
+	private function get_enqueued_fonts_for_provider( $provider ) {
+		$providers = $this->get_providers();
 
-		foreach ( $font_families as $webfonts ) {
-			foreach ( $webfonts as $webfont ) {
-				$provider = $webfont['provider'];
-
-				// Skip if the provider is not registered.
-				if ( ! isset( $providers[ $provider ] ) ) {
-					/* translators: %s is the provider name. */
-					trigger_error( sprintf( __( 'Webfont provider "%s" is not registered.', 'gutenberg' ), $provider ) );
-					continue;
-				}
-
-				// Initialize a new provider collection.
-				if ( ! isset( $webfonts_by_provider[ $provider ] ) ) {
-					$webfonts_by_provider[ $provider ] = array();
-				}
-				$webfonts_by_provider[ $provider ][] = $webfont;
-			}
+		if ( empty( $providers[ $provider ] ) ) {
+			return array();
 		}
 
-		return $webfonts_by_provider;
+		return array_intersect(
+			$providers[ $provider ]['fonts'],
+			$this->get_enqueued()
+		);
 	}
+
 }
