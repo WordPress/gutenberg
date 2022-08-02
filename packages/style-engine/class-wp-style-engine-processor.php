@@ -63,8 +63,6 @@ class WP_Style_Engine_Processor {
 	/**
 	 * Get the CSS rules as a string.
 	 *
-	 * @param bool $cleanup_rules Whether to remove printed rules.
-	 *
 	 * @return string The computed CSS.
 	 */
 	public function get_css() {
@@ -80,10 +78,6 @@ class WP_Style_Engine_Processor {
 		$css = '';
 		foreach ( $this->css_rules as $rule ) {
 			$css .= $rule->get_css();
-			if ( $cleanup_rules ) {
-				// Remove the rule from the store to avoid double-rendering.
-				$this->store->remove_rule( $rule->get_selector() );
-			}
 		}
 		return $css;
 	}

@@ -485,7 +485,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_preset_classes( $setting_nodes, $origins ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_preset_classes_store( $setting_nodes, $origins ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_preset_classes_store( $setting_nodes, $origins ) ) )->get_css();
 	}
 
 	/**
@@ -534,7 +534,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_css_variables( $nodes, $origins ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_css_variables_store( $nodes, $origins ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_css_variables_store( $nodes, $origins ) ) )->get_css();
 	}
 
 	/**
@@ -765,7 +765,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_stylesheet_store( $types, $origins ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_stylesheet_store( $types, $origins ) ) )->get_css();
 	}
 
 	/**
@@ -965,7 +965,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_styles_store( $block_metadata ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_styles_store( $block_metadata ) ) )->get_css();
 	}
 
 	/**
@@ -1003,7 +1003,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The new stylesheet.
 	 */
 	protected function get_block_classes( $style_nodes ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_classes_store( $style_nodes ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_block_classes_store( $style_nodes ) ) )->get_css();
 	}
 
 	/**
@@ -1599,7 +1599,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string Layout styles for the block.
 	 */
 	protected function get_layout_styles( $block_metadata ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_layout_styles_store( $block_metadata ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( $this->get_layout_styles_store( $block_metadata ) ) )->get_css();
 	}
 
 	/**
@@ -1663,6 +1663,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
-		return ( new WP_Style_Engine_Processor_Gutenberg( static::compute_preset_classes_store( $settings, $selector, $origins ) ) )->get_css( true );
+		return ( new WP_Style_Engine_Processor_Gutenberg( static::compute_preset_classes_store( $settings, $selector, $origins ) ) )->get_css();
 	}
 }
