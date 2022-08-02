@@ -1,167 +1,85 @@
 /**
- * External dependencies
- */
-import { boolean, select, text } from '@storybook/addon-knobs';
-
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
-import { DraggableWrapper } from './_utils';
 import Popover from '../';
-import Button from '../../button';
+
+// Format: "[yAxis] [xAxis]"
+// Valid yAxis values: 'top', 'middle', 'bottom'
+// Valid xAxis values: 'left', 'center', 'right'
+const AVAILABLE_POSITIONS = [
+	'top left',
+	'top center',
+	'top right',
+	'middle left',
+	'middle center',
+	'middle right',
+	'bottom left',
+	'bottom center',
+	'bottom right',
+	'bottom left',
+	'bottom center',
+	'bottom right',
+];
+
+// Follows floating UI's conventions
+// See https://floating-ui.com/docs/computePosition#placement
+const AVAILABLE_PLACEMENTS = [
+	'top',
+	'top-start',
+	'top-end',
+	'right',
+	'right-start',
+	'right-end',
+	'bottom',
+	'bottom-start',
+	'bottom-end',
+	'left',
+	'left-start',
+	'left-end',
+];
 
 export default {
 	title: 'Components/Popover',
 	component: Popover,
+	argTypes: {
+		anchorRef: { control: { type: null } },
+		anchorRect: { control: { type: null } },
+		animate: { control: { type: 'boolean' } },
+		children: { control: { type: null } },
+		className: { control: { type: 'text' } },
+		expandOnMobile: { control: { type: 'boolean' } },
+		focusOnMount: {
+			control: { type: 'select' },
+			options: [ 'firstElement', 'container' ],
+		},
+		getAnchorRect: { control: { type: null } },
+		headerTitle: { control: { type: 'text' } },
+		isAlternate: { control: { type: 'boolean' } },
+		noArrow: { control: { type: 'boolean' } },
+		onClose: { control: { type: null } },
+		offset: { control: { type: 'number' } },
+		onFocusOutside: { control: { type: null } },
+		placement: {
+			control: { type: 'select' },
+			options: AVAILABLE_PLACEMENTS,
+		},
+		position: {
+			control: { type: 'select' },
+			options: AVAILABLE_POSITIONS,
+		},
+		__unstableSlotName: { control: { type: null } },
+		__unstableObserveElement: { control: { type: null } },
+		__unstableForcePosition: { control: { type: 'boolean' } },
+		__unstableShift: { control: { type: 'boolean' } },
+	},
 	parameters: {
-		knobs: { disable: false },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-export const _default = () => {
-	const show = boolean( 'Example: Show', true );
-	const children = text( 'children', 'Popover Content' );
-	const animate = boolean( 'animate', false );
-	const expandOnMobile = boolean( 'expandOnMobile', false );
-	const focusOnMount = select(
-		'focusOnMount',
-		{
-			firstElement: 'firstElement',
-			container: 'container',
-		},
-		'firstElement'
-	);
-	const noArrow = boolean( 'noArrow', false );
-	const isAlternate = boolean( 'isAlternate', false );
+const SimplePopover = ( args ) => <Popover { ...args } />;
 
-	const props = {
-		animate,
-		children,
-		expandOnMobile,
-		focusOnMount,
-		noArrow,
-		isAlternate,
-	};
-
-	if ( ! show ) {
-		return null;
-	}
-
-	return <Popover { ...props } />;
-};
-
-const DragExample = ( props ) => {
-	const { label, content, ...restProps } = props;
-
-	return (
-		<div>
-			<div style={ { position: 'absolute', color: '#555' } }>
-				<p>Move the gray box around.</p>
-				<p>
-					The{ ' ' }
-					<strong style={ { background: 'pink' } }>
-						pink bordered
-					</strong>{ ' ' }
-					element is a parent.
-				</p>
-				<p>
-					The{ ' ' }
-					<strong style={ { background: 'cyan' } }>
-						cyan bordered
-					</strong>{ ' ' }
-					element is a sibling to <strong>Popover</strong>.
-				</p>
-				<p>
-					<strong>Popover</strong> aligns to the content within
-					parent.
-				</p>
-			</div>
-			<div
-				style={ {
-					height: '100vh',
-					width: '100%',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				} }
-			>
-				<DraggableWrapper
-					style={ {
-						background: '#ddd',
-						border: '2px solid pink',
-						borderRadius: 4,
-						padding: 10,
-						userSelect: 'none',
-					} }
-				>
-					<div style={ { border: '2px solid cyan' } }>{ label }</div>
-					<Popover { ...restProps }>{ content }</Popover>
-				</DraggableWrapper>
-			</div>
-		</div>
-	);
-};
-
-export const positioning = () => {
-	const label = text( 'Example: Label', 'Drag Me!' );
-	const content = text( 'Example: Content', 'Popover' );
-	const noArrow = boolean( 'noArrow', false );
-
-	return (
-		<DragExample label={ label } content={ content } noArrow={ noArrow } />
-	);
-};
-
-function DynamicHeightPopover() {
-	const [ height, setHeight ] = useState( 200 );
-	const increase = () => setHeight( height + 100 );
-	const decrease = () => setHeight( height - 100 );
-
-	return (
-		<div style={ { padding: '20px' } }>
-			<div>
-				<Button
-					variant="primary"
-					onClick={ increase }
-					style={ {
-						marginRight: '20px',
-					} }
-				>
-					Increase Size
-				</Button>
-
-				<Button variant="primary" onClick={ decrease }>
-					Decrease Size
-				</Button>
-			</div>
-
-			<p>
-				When the height of the popover exceeds the available space in
-				the canvas, a scrollbar inside the popover should appear.
-			</p>
-
-			<div>
-				<Popover>
-					<div
-						style={ {
-							height,
-							background: '#eee',
-							padding: '20px',
-						} }
-					>
-						Content with dynamic height
-					</div>
-				</Popover>
-			</div>
-		</div>
-	);
-}
-
-export const dynamicHeight = () => {
-	return <DynamicHeightPopover />;
+export const Default = SimplePopover.bind( {} );
+Default.args = {
+	children: 'Popover content',
 };
