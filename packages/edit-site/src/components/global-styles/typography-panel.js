@@ -86,6 +86,12 @@ export default function TypographyPanel( { name, element } ) {
 	const hasAppearanceControl = useHasAppearanceControl( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
 
+	/* Disable font size controls when the option to style all headings is selected. */
+	let hasFontSizeEnabled = supports.includes( 'fontSize' );
+	if ( element === 'heading' && selectedLevel === 'heading' ) {
+		hasFontSizeEnabled = false;
+	}
+
 	const [ fontFamily, setFontFamily ] = useStyle(
 		prefix + 'typography.fontFamily',
 		name
@@ -186,7 +192,7 @@ export default function TypographyPanel( { name, element } ) {
 					onChange={ setFontFamily }
 				/>
 			) }
-			{ supports.includes( 'fontSize' ) && (
+			{ hasFontSizeEnabled && (
 				<FontSizePicker
 					value={ fontSize }
 					onChange={ setFontSize }

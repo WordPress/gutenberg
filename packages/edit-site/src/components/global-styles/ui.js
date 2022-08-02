@@ -20,7 +20,7 @@ import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
-import ScreenHeadingColor from './screen-color-heading';
+import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
