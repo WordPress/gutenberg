@@ -215,7 +215,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		// Note the `base-layout-styles` includes a fallback gap for the Columns block for backwards compatibility.
 		$this->assertEquals(
-			':where(.is-layout-flex){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}',
+			':where(.is-layout-flex){gap:0.5em;}body .is-layout-flow > .alignleft{float:left;margin-inline-start:0;margin-inline-end:2em;}body .is-layout-flow > .alignright{float:right;margin-inline-start:2em;margin-inline-end:0;}body .is-layout-flow > .aligncenter{margin-left:auto !important;margin-right:auto !important;}body .is-layout-flex{display:flex;flex-wrap:wrap;align-items:center;}:where(.wp-block-columns.is-layout-flex){gap:2em;}',
 			$stylesheet
 		);
 	}
@@ -575,7 +575,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'a:where(:not(.wp-element-button)){background-color: red;color: green;}a:where(:not(.wp-element-button)):hover{background-color: green;color: red;font-size: 10em;text-transform: uppercase;}a:where(:not(.wp-element-button)):focus{background-color: black;color: yellow;}';
+		$element_styles = 'a:where(:not(.wp-element-button)){background-color:red;color:green;}a:where(:not(.wp-element-button)):hover{background-color:green;color:red;font-size:10em;text-transform:uppercase;}a:where(:not(.wp-element-button)):focus{background-color:black;color:yellow;}';
 
 		$expected = $base_styles . $element_styles;
 
@@ -614,7 +614,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'a:where(:not(.wp-element-button)):hover{background-color: green;color: red;font-size: 10em;text-transform: uppercase;}a:where(:not(.wp-element-button)):focus{background-color: black;color: yellow;}';
+		$element_styles = 'a:where(:not(.wp-element-button)):hover{background-color:green;color:red;font-size:10em;text-transform:uppercase;}a:where(:not(.wp-element-button)):focus{background-color:black;color:yellow;}';
 
 		$expected = $base_styles . $element_styles;
 
@@ -653,7 +653,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'h4{background-color: red;color: green;}';
+		$element_styles = 'h4{background-color:red;color:green;}';
 
 		$expected = $base_styles . $element_styles;
 
@@ -692,7 +692,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'a:where(:not(.wp-element-button)){background-color: red;color: green;}a:where(:not(.wp-element-button)):hover{background-color: green;color: red;}';
+		$element_styles = 'a:where(:not(.wp-element-button)){background-color:red;color:green;}a:where(:not(.wp-element-button)):hover{background-color:green;color:red;}';
 
 		$expected = $base_styles . $element_styles;
 
@@ -740,7 +740,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = '.wp-block-group a:where(:not(.wp-element-button)){background-color: red;color: green;}.wp-block-group a:where(:not(.wp-element-button)):hover{background-color: green;color: red;font-size: 10em;text-transform: uppercase;}.wp-block-group a:where(:not(.wp-element-button)):focus{background-color: black;color: yellow;}';
+		$element_styles = '.wp-block-group a:where(:not(.wp-element-button)){background-color:red;color:green;}.wp-block-group a:where(:not(.wp-element-button)):hover{background-color:green;color:red;font-size:10em;text-transform:uppercase;}.wp-block-group a:where(:not(.wp-element-button)):focus{background-color:black;color:yellow;}';
 
 		$expected = $base_styles . $element_styles;
 
@@ -787,7 +787,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 
-		$element_styles = 'a:where(:not(.wp-element-button)){background-color: red;color: green;}a:where(:not(.wp-element-button)):hover{background-color: green;color: red;}.wp-block-group a:where(:not(.wp-element-button)):hover{background-color: black;color: yellow;}';
+		$element_styles = 'a:where(:not(.wp-element-button)){background-color:red;color:green;}a:where(:not(.wp-element-button)):hover{background-color:green;color:red;}.wp-block-group a:where(:not(.wp-element-button)):hover{background-color:black;color:yellow;}';
 
 		$expected = $base_styles . $element_styles;
 
