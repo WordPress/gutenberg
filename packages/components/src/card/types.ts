@@ -93,5 +93,5 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 export type HeaderProps = MarginalSubComponentProps;
 
 export type FooterProps = MarginalSubComponentProps & {
-	justify: CSSProperties[ 'justifyContent' ];
+	justify?: CSSProperties[ 'justifyContent' ];
 };

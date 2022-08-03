@@ -6,12 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { CardBodyProps } from './component';
+import type { BodyProps } from '../types';
 
-export function useCardBody( props: CardBodyProps ) {
+export function useCardBody(
+	props: WordPressComponentProps< BodyProps, 'div' >
+) {
 	const {
 		className,
 		isScrollable = false,

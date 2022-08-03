@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ComponentProps } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -11,12 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { CardMedia } from '../index';
+import type { MediaProps } from '../types';
 
-export function useCardMedia( props: ComponentProps< typeof CardMedia > ) {
+export function useCardMedia(
+	props: WordPressComponentProps< MediaProps, 'div' >
+) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 
 	const cx = useCx();

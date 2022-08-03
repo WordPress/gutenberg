@@ -7,11 +7,13 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useSurface } from '../../surface';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { CardProps } from './component';
+import type { Props } from '../types';
+
+type CardProps = WordPressComponentProps< Props, 'div' >;
 
 function useDeprecatedProps( {
 	elevation,

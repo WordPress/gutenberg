@@ -6,12 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { CardFooterProps } from './component';
+import type { FooterProps } from '../types';
 
-export function useCardFooter( props: CardFooterProps ) {
+export function useCardFooter(
+	props: WordPressComponentProps< FooterProps, 'div' >
+) {
 	const {
 		className,
 		justify,

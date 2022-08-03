@@ -11,10 +11,8 @@ import { Flex } from '../../flex';
 import { useCardFooter } from './hook';
 import type { FooterProps } from '../types';
 
-export type CardFooterProps = WordPressComponentProps< FooterProps, 'div' >;
-
 function CardFooter(
-	props: CardFooterProps,
+	props: WordPressComponentProps< FooterProps, 'div' >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const footerProps = useCardFooter( props );
@@ -35,7 +33,7 @@ function CardFooter(
  * </Card>
  * ```
  */
-const ConnectedCardFooter = contextConnect< CardFooterProps >(
+const ConnectedCardFooter = contextConnect< FooterProps >(
 	CardFooter,
 	'CardFooter'
 );

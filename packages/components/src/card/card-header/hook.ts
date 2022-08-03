@@ -6,12 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { CardHeaderProps } from './component';
+import type { HeaderProps } from '../types';
 
-export function useCardHeader( props: CardHeaderProps ) {
+export function useCardHeader(
+	props: WordPressComponentProps< HeaderProps, 'div' >
+) {
 	const {
 		className,
 		isBorderless = false,

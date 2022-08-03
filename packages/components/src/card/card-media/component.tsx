@@ -11,10 +11,8 @@ import { View } from '../../view';
 import { useCardMedia } from './hook';
 import type { MediaProps } from '../types';
 
-export type CardMediaProps = WordPressComponentProps< MediaProps, 'div' >;
-
 function CardMedia(
-	props: CardMediaProps,
+	props: WordPressComponentProps< MediaProps, 'div' >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const cardMediaProps = useCardMedia( props );
@@ -39,7 +37,7 @@ function CardMedia(
  * );
  * ```
  */
-const ConnectedCardMedia = contextConnect< CardMediaProps >(
+const ConnectedCardMedia = contextConnect< MediaProps >(
 	CardMedia,
 	'CardMedia'
 );
