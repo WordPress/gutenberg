@@ -80,9 +80,6 @@ export default {
 		__unstableForcePosition: { control: { type: 'boolean' } },
 		__unstableShift: { control: { type: 'boolean' } },
 	},
-	parameters: {
-		docs: { source: { state: 'open' } },
-	},
 };
 
 const PopoverWithAnchor = ( args ) => {
