@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
@@ -13,7 +11,7 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-let hiddenElements = [],
+let hiddenElements: Element[] = [],
 	isHidden = false;
 
 /**
@@ -26,9 +24,9 @@ let hiddenElements = [],
  * we should consider removing these helper functions in favor of
  * `aria-modal="true"`.
  *
- * @param {Element} unhiddenElement The element that should not be hidden.
+ * @param {HTMLDivElement} unhiddenElement The element that should not be hidden.
  */
-export function hideApp( unhiddenElement ) {
+export function hideApp( unhiddenElement?: HTMLDivElement ) {
 	if ( isHidden ) {
 		return;
 	}
@@ -52,13 +50,13 @@ export function hideApp( unhiddenElement ) {
  *
  * @return {boolean} Whether the element should not be hidden from screen-readers.
  */
-export function elementShouldBeHidden( element ) {
+export function elementShouldBeHidden( element: Element ) {
 	const role = element.getAttribute( 'role' );
 	return ! (
 		element.tagName === 'SCRIPT' ||
 		element.hasAttribute( 'aria-hidden' ) ||
 		element.hasAttribute( 'aria-live' ) ||
-		LIVE_REGION_ARIA_ROLES.has( role )
+		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
 	);
 }
 
