@@ -26,13 +26,14 @@ const meta: ComponentMeta< typeof Card > = {
 		controls: {
 			expanded: true,
 		},
+		knobs: { disable: false },
 		docs: { source: { state: 'open' } },
 	},
 };
 
 export default meta;
 
-export const Default: ComponentStory< typeof Card > = ( props ) => {
+const Template: ComponentStory< typeof Card > = ( props ) => {
 	return (
 		<Card { ...props }>
 			<CardHeader>
@@ -61,3 +62,6 @@ export const Default: ComponentStory< typeof Card > = ( props ) => {
 		</Card>
 	);
 };
+
+export const Default: ComponentStory< typeof Card > = Template.bind( {} );
+Default.args = {};

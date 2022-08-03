@@ -37,9 +37,6 @@ function CardMedia(
  * );
  * ```
  */
-const ConnectedCardMedia = contextConnect< MediaProps >(
-	CardMedia,
-	'CardMedia'
-);
+const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
 
 export default ConnectedCardMedia;

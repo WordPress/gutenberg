@@ -40,6 +40,6 @@ function CardBody(
  * </Card>
  * ```
  */
-const ConnectedCardBody = contextConnect< BodyProps >( CardBody, 'CardBody' );
+const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
 
 export default ConnectedCardBody;

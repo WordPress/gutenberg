@@ -33,9 +33,6 @@ function CardFooter(
  * </Card>
  * ```
  */
-const ConnectedCardFooter = contextConnect< FooterProps >(
-	CardFooter,
-	'CardFooter'
-);
+const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
 
 export default ConnectedCardFooter;

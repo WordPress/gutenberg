@@ -110,6 +110,6 @@ function Card(
  * }
  * ```
  */
-const ConnectedCard = contextConnect< Props >( Card, 'Card' );
+const ConnectedCard = contextConnect( Card, 'Card' );
 
 export default ConnectedCard;

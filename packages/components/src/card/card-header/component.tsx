@@ -32,9 +32,6 @@ function CardHeader(
  * </Card>
  * ```
  */
-const ConnectedCardHeader = contextConnect< HeaderProps >(
-	CardHeader,
-	'CardHeader'
-);
+const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
 
 export default ConnectedCardHeader;

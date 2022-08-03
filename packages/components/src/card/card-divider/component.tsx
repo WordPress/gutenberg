@@ -34,9 +34,6 @@ function CardDivider(
  * </Card>
  * ```
  */
-const ConnectedCardDivider = contextConnect< DividerProps >(
-	CardDivider,
-	'CardDivider'
-);
+const ConnectedCardDivider = contextConnect( CardDivider, 'CardDivider' );
 
 export default ConnectedCardDivider;
