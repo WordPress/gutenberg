@@ -56,7 +56,7 @@ The `value` property is handled in a manner similar to controlled form component
     -   `removed` - The user removed an existing token.
     -   `remove` - The user focused the button to remove the token.
     -   `__experimentalInvalid` - The user tried to add a token that didn't pass the validation.
--   `renderSuggestion` - Custom renderer for suggestions.
+-   `__experimentalRenderItem` - Custom renderer for suggestions.
 -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
 -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
 -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.

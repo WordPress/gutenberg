@@ -116,7 +116,7 @@ The current value of the input.
 -   Type: `mixed`
 -   Required: Yes
 
-#### renderOption
+#### \_\_experimentalRenderItem
 
 Custom renderer for options in suggestion list.
 
