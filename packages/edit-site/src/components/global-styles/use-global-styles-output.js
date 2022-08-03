@@ -21,11 +21,13 @@ import {
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useContext } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -62,10 +64,11 @@ function compileStyleValue( uncompiledValue ) {
  * Transform given preset tree into a set of style declarations.
  *
  * @param {Object} blockPresets
+ * @param {Object} mergedSettings Merged theme.json settings.
  *
- * @return {Array} An array of style declarations.
+ * @return {Array<Object>} An array of style declarations.
  */
-function getPresetsDeclarations( blockPresets = {} ) {
+function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
 	return reduce(
 		PRESET_METADATA,
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
@@ -73,7 +76,7 @@ function getPresetsDeclarations( blockPresets = {} ) {
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
-						if ( valueKey ) {
+						if ( valueKey && ! valueFunc ) {
 							declarations.push(
 								`--wp--preset--${ cssVarInfix }--${ kebabCase(
 									value.slug
@@ -86,7 +89,7 @@ function getPresetsDeclarations( blockPresets = {} ) {
 							declarations.push(
 								`--wp--preset--${ cssVarInfix }--${ kebabCase(
 									value.slug
-								) }: ${ valueFunc( value ) }`
+								) }: ${ valueFunc( value, mergedSettings ) }`
 							);
 						}
 					} );
@@ -328,14 +331,28 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector =
-								selector === ROOT_BLOCK_SELECTOR
-									? `${ selector } .${ className }${
-											spacingStyle?.selector || ''
-									  }`
-									: `${ selector }.${ className }${
-											spacingStyle?.selector || ''
-									  }`;
+							let combinedSelector = '';
+
+							if ( ! hasBlockGapSupport ) {
+								// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+								combinedSelector =
+									selector === ROOT_BLOCK_SELECTOR
+										? `:where(.${ className }${
+												spacingStyle?.selector || ''
+										  })`
+										: `:where(${ selector }.${ className }${
+												spacingStyle?.selector || ''
+										  })`;
+							} else {
+								combinedSelector =
+									selector === ROOT_BLOCK_SELECTOR
+										? `${ selector } .${ className }${
+												spacingStyle?.selector || ''
+										  }`
+										: `${ selector }.${ className }${
+												spacingStyle?.selector || ''
+										  }`;
+							}
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
 							) }; }`;
@@ -515,10 +532,9 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 
 export const toCustomProperties = ( tree, blockSelectors ) => {
 	const settings = getNodesWithSettings( tree, blockSelectors );
-
 	let ruleset = '';
 	settings.forEach( ( { presets, custom, selector } ) => {
-		const declarations = getPresetsDeclarations( presets );
+		const declarations = getPresetsDeclarations( presets, tree?.settings );
 		const customProps = flattenTree( custom, '--wp--custom--', '--' );
 		if ( customProps.length > 0 ) {
 			declarations.push( ...customProps );
@@ -536,7 +552,8 @@ export const toStyles = (
 	tree,
 	blockSelectors,
 	hasBlockGapSupport,
-	hasFallbackGapSupport
+	hasFallbackGapSupport,
+	disableLayoutStyles = false
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -612,7 +629,10 @@ export const toStyles = (
 			}
 
 			// Process blockGap and layout styles.
-			if ( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport ) {
+			if (
+				! disableLayoutStyles &&
+				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+			) {
 				ruleset += getLayoutStyles( {
 					tree,
 					style: styles,
@@ -769,6 +789,10 @@ export function useGlobalStylesOutput() {
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
+	const disableLayoutStyles = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return !! getSettings().disableLayoutStyles;
+	} );
 
 	useEffect( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
@@ -784,7 +808,8 @@ export function useGlobalStylesOutput() {
 			mergedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
-			hasFallbackGapSupport
+			hasFallbackGapSupport,
+			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		setStylesheets( [
@@ -799,7 +824,12 @@ export function useGlobalStylesOutput() {
 		] );
 		setSettings( mergedConfig.settings );
 		setSvgFilters( filters );
-	}, [ hasBlockGapSupport, hasFallbackGapSupport, mergedConfig ] );
+	}, [
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		mergedConfig,
+		disableLayoutStyles,
+	] );
 
 	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

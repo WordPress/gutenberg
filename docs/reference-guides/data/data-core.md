@@ -611,58 +611,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### receiveAutosaves
-
-Returns an action object used in signalling that the autosaves for a
-post have been received.
-
-_Parameters_
-
--   _postId_ `number`: The id of the post that is parent to the autosave.
--   _autosaves_ `Array|Object`: An array of autosaves or singular autosave object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentTheme
-
-Returns an action object used in signalling that the current theme has been received.
-
-_Parameters_
-
--   _currentTheme_ `Object`: The current theme.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveCurrentUser
-
-Returns an action used in signalling that the current user has been received.
-
-_Parameters_
-
--   _currentUser_ `Object`: Current user object.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveEmbedPreview
-
-Returns an action object used in signalling that the preview data for
-a given URl has been received.
-
-_Parameters_
-
--   _url_ `string`: URL to preview the embed for.
--   _preview_ `*`: Preview data.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -699,33 +647,6 @@ Returns an action object used in signalling that Upload permissions have been re
 _Parameters_
 
 -   _hasUploadPermissions_ `boolean`: Does the user have permission to upload files?
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveUserPermission
-
-Returns an action object used in signalling that the current user has
-permission to perform an action on a REST resource.
-
-_Parameters_
-
--   _key_ `string`: A key that represents the action and REST resource.
--   _isAllowed_ `boolean`: Whether or not the user can perform the action.
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveUserQuery
-
-Returns an action object used in signalling that authors have been received.
-
-_Parameters_
-
--   _queryID_ `string`: Query ID.
--   _users_ `Array|Object`: Users received.
 
 _Returns_
 

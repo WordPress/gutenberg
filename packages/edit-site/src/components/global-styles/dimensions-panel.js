@@ -104,6 +104,115 @@ function splitStyleValue( value ) {
 	return value;
 }
 
+// Props for managing `layout.contentSize`.
+function useContentSizeProps( name ) {
+	const [ contentSizeValue, setContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name
+	);
+	const [ userSetContentSizeValue ] = useSetting(
+		'layout.contentSize',
+		name,
+		'user'
+	);
+	const hasUserSetContentSizeValue = () => !! userSetContentSizeValue;
+	const resetContentSizeValue = () => setContentSizeValue( '' );
+	return {
+		contentSizeValue,
+		setContentSizeValue,
+		hasUserSetContentSizeValue,
+		resetContentSizeValue,
+	};
+}
+
+// Props for managing `layout.wideSize`.
+function useWideSizeProps( name ) {
+	const [ wideSizeValue, setWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name
+	);
+	const [ userSetWideSizeValue ] = useSetting(
+		'layout.wideSize',
+		name,
+		'user'
+	);
+	const hasUserSetWideSizeValue = () => !! userSetWideSizeValue;
+	const resetWideSizeValue = () => setWideSizeValue( '' );
+	return {
+		wideSizeValue,
+		setWideSizeValue,
+		hasUserSetWideSizeValue,
+		resetWideSizeValue,
+	};
+}
+
+// Props for managing `spacing.padding`.
+function usePaddingProps( name ) {
+	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
+	const paddingValues = splitStyleValue( rawPadding );
+	const paddingSides = useCustomSides( name, 'padding' );
+	const isAxialPadding =
+		paddingSides &&
+		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
+	const setPaddingValues = ( newPaddingValues ) => {
+		const padding = filterValuesBySides( newPaddingValues, paddingSides );
+		setRawPadding( padding );
+	};
+	const resetPaddingValue = () => setPaddingValues( {} );
+	const hasPaddingValue = () =>
+		!! paddingValues && Object.keys( paddingValues ).length;
+
+	return {
+		paddingValues,
+		paddingSides,
+		isAxialPadding,
+		setPaddingValues,
+		resetPaddingValue,
+		hasPaddingValue,
+	};
+}
+
+// Props for managing `spacing.margin`.
+function useMarginProps( name ) {
+	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
+	const marginValues = splitStyleValue( rawMargin );
+	const marginSides = useCustomSides( name, 'margin' );
+	const isAxialMargin =
+		marginSides &&
+		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+
+	const setMarginValues = ( newMarginValues ) => {
+		const margin = filterValuesBySides( newMarginValues, marginSides );
+		setRawMargin( margin );
+	};
+	const resetMarginValue = () => setMarginValues( {} );
+	const hasMarginValue = () =>
+		!! marginValues && Object.keys( marginValues ).length;
+
+	return {
+		marginValues,
+		marginSides,
+		isAxialMargin,
+		setMarginValues,
+		resetMarginValue,
+		hasMarginValue,
+	};
+}
+
+// Props for managing `spacing.blockGap`.
+function useBlockGapProps( name ) {
+	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
+	const resetGapValue = () => setGapValue( undefined );
+	const hasGapValue = () => !! gapValue;
+	return {
+		gapValue,
+		setGapValue,
+		resetGapValue,
+		hasGapValue,
+	};
+}
+
 export default function DimensionsPanel( { name } ) {
 	const showContentSizeControl = useHasContentSize( name );
 	const showWideSizeControl = useHasWideSize( name );
@@ -120,67 +229,45 @@ export default function DimensionsPanel( { name } ) {
 		],
 	} );
 
-	const [ contentSizeValue, setContentSizeValue ] = useSetting(
-		'layout.contentSize',
-		name
-	);
+	// Props for managing `layout.contentSize`.
+	const {
+		contentSizeValue,
+		setContentSizeValue,
+		hasUserSetContentSizeValue,
+		resetContentSizeValue,
+	} = useContentSizeProps( name );
 
-	const [ userSetContentSizeValue ] = useSetting(
-		'layout.contentSize',
-		name,
-		'user'
-	);
+	// Props for managing `layout.wideSize`.
+	const {
+		wideSizeValue,
+		setWideSizeValue,
+		hasUserSetWideSizeValue,
+		resetWideSizeValue,
+	} = useWideSizeProps( name );
 
-	const hasUserSetContentSizeValue = () => !! userSetContentSizeValue;
-	const resetContentSizeValue = () => setContentSizeValue( '' );
+	// Props for managing `spacing.padding`.
+	const {
+		paddingValues,
+		paddingSides,
+		isAxialPadding,
+		setPaddingValues,
+		resetPaddingValue,
+		hasPaddingValue,
+	} = usePaddingProps( name );
 
-	const [ wideSizeValue, setWideSizeValue ] = useSetting(
-		'layout.wideSize',
-		name
-	);
+	// Props for managing `spacing.margin`.
+	const {
+		marginValues,
+		marginSides,
+		isAxialMargin,
+		setMarginValues,
+		resetMarginValue,
+		hasMarginValue,
+	} = useMarginProps( name );
 
-	const [ userSetWideSizeValue ] = useSetting(
-		'layout.wideSize',
-		name,
-		'user'
-	);
-
-	const hasUserSetWideSizeValue = () => !! userSetWideSizeValue;
-	const resetWideSizeValue = () => setWideSizeValue( '' );
-
-	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
-	const paddingValues = splitStyleValue( rawPadding );
-	const paddingSides = useCustomSides( name, 'padding' );
-	const isAxialPadding =
-		paddingSides &&
-		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-
-	const setPaddingValues = ( newPaddingValues ) => {
-		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		setRawPadding( padding );
-	};
-	const resetPaddingValue = () => setPaddingValues( {} );
-	const hasPaddingValue = () =>
-		!! paddingValues && Object.keys( paddingValues ).length;
-
-	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
-	const marginValues = splitStyleValue( rawMargin );
-	const marginSides = useCustomSides( name, 'margin' );
-	const isAxialMargin =
-		marginSides &&
-		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-
-	const setMarginValues = ( newMarginValues ) => {
-		const margin = filterValuesBySides( newMarginValues, marginSides );
-		setRawMargin( margin );
-	};
-	const resetMarginValue = () => setMarginValues( {} );
-	const hasMarginValue = () =>
-		!! marginValues && Object.keys( marginValues ).length;
-
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
-	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
+	// Props for managing `spacing.blockGap`.
+	const { gapValue, setGapValue, resetGapValue, hasGapValue } =
+		useBlockGapProps( name );
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -205,7 +292,7 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={ true }
 				>
-					<HStack alignment="flex-end">
+					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
 							label={ __( 'Content' ) }
 							labelPosition="top"
@@ -230,7 +317,7 @@ export default function DimensionsPanel( { name } ) {
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={ true }
 				>
-					<HStack alignment="flex-end">
+					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
 							label={ __( 'Wide' ) }
 							labelPosition="top"

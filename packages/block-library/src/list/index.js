@@ -15,7 +15,7 @@ import settingsV2 from './v2';
 
 const { name } = metadata;
 
-export { metadata, name };
+export { metadata, name, settingsV2 };
 
 const settingsV1 = {
 	icon,
