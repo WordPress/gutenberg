@@ -186,6 +186,10 @@ This is expected. The draft release will contain only the plugin zip. Only once 
 
 Yes. The method for this is identical to the main Plugin release process. You will need a Gutenberg Core team member to approve the release workflow.
 
+> The release process failed to cherry-pick version bump commit to the trunk branch.
+
+First, confirm that the step failed by checking the latest commits on the trunk. Then revert version bump commit on the release branch - `git revert --no-edit {commitHash}`. Finally, push the changes and start the release process again.
+
 ## Packages Releases to npm and WordPress Core Updates
 
 The Gutenberg repository follows the [WordPress SVN repository's](https://make.wordpress.org/core/handbook/about/release-cycle/) branching strategy for every major WordPress release. In addition to that, it also contains two other special branches that control npm publishing workflows:
