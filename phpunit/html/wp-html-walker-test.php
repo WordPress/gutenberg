@@ -1,15 +1,20 @@
 <?php
+/**
+ * Unit tests covering WP_HTML_Walker functionality.
+ *
+ * @package WordPress
+ * @subpackage HTML
+ */
 
-use PHPUnit\Framework\TestCase;
-
-require_once './class-wp-html-walker.php';
-
-final class WP_HTML_Walker_Tests extends TestCase {
+/**
+ * @group html
+ */
+class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_to_string_with_no_updates_returns_the_original_html() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -17,7 +22,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_finding_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -25,7 +30,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_finding_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -33,7 +38,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_updates_after_a_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -43,7 +48,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_set_new_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -72,6 +77,8 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	 * Let's revisit if and when this becomes a problem.
 	 *
 	 * This test is in place to confirm this behavior, while incorrect, is well-defined.
+	 *
+	 * @ticket 56299
 	 */
 	public function test_remove_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
@@ -81,7 +88,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_set_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -91,7 +98,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_update_all_tags_using_a_loop() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -103,7 +110,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_remove_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -113,7 +120,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_remove_non_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -123,7 +130,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_add_class_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -133,7 +140,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_add_two_classes_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -144,7 +151,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_remove_class_when_there_is_no_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
@@ -154,7 +161,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_add_class_when_there_is_a_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -168,7 +175,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_remove_class_when_there_is_a_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -181,7 +188,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_removing_all_classes_removes_the_class_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -195,7 +202,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_does_not_add_duplicate_class_names() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -208,7 +215,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_preserves_class_name_order_when_a_duplicate_class_name_is_added() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -221,7 +228,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_set_attribute_takes_priority_over_add_class() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -244,7 +251,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_throws_no_exception_when_updating_an_attribute_without_matching_a_tag() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
@@ -253,7 +260,9 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 * @dataProvider parser_methods
+	 * @ticket 56299
+	 *
+	 * @dataProvider data_parser_methods
 	 */
 	public function test_interactions_with_a_closed_walker_throw_an_exception( $method, $args ) {
 		$this->expectException( WP_HTML_Walker_Exception::class );
@@ -266,7 +275,17 @@ final class WP_HTML_Walker_Tests extends TestCase {
 		$w->$method( ...$args );
 	}
 
-	public function parser_methods() {
+	/**
+	 * Data provider for test_interactions_with_a_closed_walker_throw_an_exception().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $method The name of the method to execute.
+	 *         @type array  $args   The arguments passed to the method.
+	 *     }
+	 * }
+	 */
+	public function data_parser_methods() {
 		return array(
 			array( 'next_tag', array( 'div' ) ),
 			array( 'set_attribute', array( 'id', 'test' ) ),
@@ -277,7 +296,7 @@ final class WP_HTML_Walker_Tests extends TestCase {
 	}
 
 	/**
-	 *
+	 * @ticket 56299
 	 */
 	public function test_advanced_use_case() {
 		$input = <<<HTML

@@ -1,5 +1,5 @@
 <?php
-/***
+/**
  * Scans through an HTML document to find specific tags, then
  * transforms those tags by adding, removing, or updating the
  * values of the HTML attributes within that tag (opener).
@@ -8,13 +8,17 @@
  * Instead this scans linearly through a document and only parses
  * the HTML tag openers.
  *
- * @package gutenberg
+ * @package WordPress
+ * @subpackage HTML
+ * @since 6.1.0
  */
 
 /**
  * Processes an input HTML document by applying a specified set
  * of patches to that input. Tokenizes HTML but does not fully
  * parse the input document.
+ *
+ * @since 6.1.0
  */
 class WP_HTML_Walker {
 
@@ -753,22 +757,4 @@ class WP_Tag_Find_Descriptor {
 
 		return true;
 	}
-}
-
-if ( ! function_exists( 'esc_attr' ) ) {
-	/**
-	 * Mock escaping to enable developing this code outside of WordPress.
-	 *
-	 * @TODO remove this mock.
-	 *
-	 * @param string $attr Value.
-	 *
-	 * @return string Escaped value.
-	 */
-	function esc_attr( $attr ) {
-		return htmlspecialchars( $attr );
-	}
-}
-
-class WP_HTML_Walker_Exception extends Exception {
 }
