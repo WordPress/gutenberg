@@ -164,7 +164,9 @@ export interface FormTokenFieldProps
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 }
 
-export interface SuggestionsListProps< T = string | { value: string } > {
+export interface SuggestionsListProps<
+	T = string | ( Record< string, unknown > & { value: string } )
+> {
 	selectedIndex: number;
 	scrollIntoView: boolean;
 	match: T;
