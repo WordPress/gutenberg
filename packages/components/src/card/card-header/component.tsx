@@ -12,7 +12,7 @@ import type { ForwardedRef } from 'react';
 
 function CardHeader(
 	props: WordPressComponentProps< HeaderProps, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useCardHeader( props );
 

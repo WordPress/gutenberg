@@ -13,7 +13,7 @@ import type { MediaProps } from '../types';
 
 function CardMedia(
 	props: WordPressComponentProps< MediaProps, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const cardMediaProps = useCardMedia( props );
 

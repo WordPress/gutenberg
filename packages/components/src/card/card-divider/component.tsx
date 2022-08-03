@@ -12,7 +12,7 @@ import { useCardDivider } from './hook';
 
 function CardDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
-	forwardedRef: ForwardedRef< HTMLHRElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const dividerProps = useCardDivider( props );
 

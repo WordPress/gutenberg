@@ -14,7 +14,7 @@ import type { BodyProps } from '../types';
 
 function CardBody(
 	props: WordPressComponentProps< BodyProps, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );
 

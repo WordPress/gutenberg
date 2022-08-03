@@ -20,13 +20,12 @@ import Button from '../../button';
 
 const meta: ComponentMeta< typeof Card > = {
 	component: Card,
-	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	title: 'Components/Card',
+	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	parameters: {
 		controls: {
 			expanded: true,
 		},
-		knobs: { disable: false },
 		docs: { source: { state: 'open' } },
 	},
 };
@@ -64,4 +63,12 @@ const Template: ComponentStory< typeof Card > = ( props ) => {
 };
 
 export const Default: ComponentStory< typeof Card > = Template.bind( {} );
-Default.args = {};
+Default.args = {
+	size: 'medium',
+	isBorderless: false,
+	isRounded: false,
+	elevation: 0,
+	style: {
+		width: 360,
+	},
+};

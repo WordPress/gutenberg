@@ -13,7 +13,7 @@ import type { FooterProps } from '../types';
 
 function CardFooter(
 	props: WordPressComponentProps< FooterProps, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const footerProps = useCardFooter( props );
 

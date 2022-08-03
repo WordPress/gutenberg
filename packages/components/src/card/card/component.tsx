@@ -27,7 +27,7 @@ import type { Props } from '../types';
 
 function Card(
 	props: WordPressComponentProps< Props, 'div' >,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		children,
