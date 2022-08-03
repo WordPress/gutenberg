@@ -204,11 +204,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 	if ( ! empty( $layout_styles ) ) {
 		// Add to the style engine store to enqueue and render layout styles.
-		gutenberg_style_engine_add_to_store( 'layout-block-supports', $layout_styles );
-
 		// Return compiled layout styles to retain backwards compatibility.
 		// Since https://github.com/WordPress/gutenberg/pull/42452 we no longer call wp_enqueue_block_support_styles in this block supports file.
-		return gutenberg_style_engine_get_stylesheet_from_css_rules( $layout_styles );
+		return gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$layout_styles,
+			array(
+				'context' => 'layout-block-supports',
+				'enqueue' => true,
+			)
+		);
 	}
 
 	return '';

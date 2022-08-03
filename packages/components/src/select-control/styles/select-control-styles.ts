@@ -140,7 +140,6 @@ export const Select = styled.select< SelectProps >`
 export const DownArrowWrapper = styled.div`
 	align-items: center;
 	bottom: 0;
-	box-sizing: border-box;
 	display: flex;
 	padding: 0 4px;
 	pointer-events: none;

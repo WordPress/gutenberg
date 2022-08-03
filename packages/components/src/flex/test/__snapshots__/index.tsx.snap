@@ -5,21 +5,30 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -7,14 +7,10 @@
+@@ -1,22 +1,18 @@
+  <div
+    class="components-flex css-1giw1wa-View-Flex-sx-Base-sx-Items-ItemsRow em57xhy0"
+-   data-testid="flex"
++   data-testid="base-flex"
+    data-wp-c16t="true"
+    data-wp-component="Flex"
+  >
+    <div
       class="components-flex-item css-mw3lhz-View-Item-sx-Base em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
-    />
-    <div
+    >
+      Item
+    </div>
+-   <div
 -     class="css-1mm2cvy-View em57xhy0"
 -   />
 -   <div />
--   <div
+    <div
       class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
-    />
-  </div>
+    >
 `;
 
 exports[`props should render align 1`] = `
@@ -97,6 +106,7 @@ exports[`props should render correctly 1`] = `
 
 <div
   class="components-flex emotion-0 emotion-1"
+  data-testid="base-flex"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
@@ -104,12 +114,16 @@ exports[`props should render correctly 1`] = `
     class="components-flex-item emotion-2 emotion-1"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
-  />
+  >
+    Item
+  </div>
   <div
     class="components-flex-item components-flex-block emotion-4 emotion-1"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
-  />
+  >
+    Item
+  </div>
 </div>
 `;
 
@@ -142,5 +156,31 @@ Snapshot Diff:
 
 exports[`props should render spacing 1`] = `
 Snapshot Diff:
-Compared values have no visual difference.
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+-     "margin-left": "calc(4px * 2)",
+-   },
+-   Object {
+-     "min-width": "0",
+-   },
+-   Object {
+      "-ms-flex": "1",
+      "-webkit-flex": "1",
+      "display": "block",
+      "flex": "1",
+      "max-height": "100%",
+      "max-width": "100%",
+      "min-height": "0",
++     "min-width": "0",
++   },
++   Object {
++     "margin-left": "calc(4px * 5)",
++   },
++   Object {
+      "min-width": "0",
+    },
+  ]
 `;

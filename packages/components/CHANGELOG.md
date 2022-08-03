@@ -8,6 +8,8 @@
 -   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
 -   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
 -   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
+-   `TextControl`, `TextareaControl`, `ToggleGroupControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+-   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
 
 ### Enhancements
 
@@ -15,9 +17,11 @@
 -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
 -   Update control labels to the new uppercase styles ([#42789](https://github.com/WordPress/gutenberg/pull/42789)).
 -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+-   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
 
 ### Internal
 
+-   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
 -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
 
 ## 19.16.0 (2022-07-27)

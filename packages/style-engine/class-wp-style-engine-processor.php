@@ -63,16 +63,27 @@ class WP_Style_Engine_Processor {
 	/**
 	 * Get the CSS rules as a string.
 	 *
+	 * @param array $options array(
+	 *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+	 * );.
+	 *
 	 * @return string The computed CSS.
 	 */
-	public function get_css() {
+	public function get_css( $options = array() ) {
+		$defaults = array(
+			'optimize' => true,
+		);
+		$options  = wp_parse_args( $options, $defaults );
+
 		// If we have stores, get the rules from them.
 		foreach ( $this->stores as $store ) {
 			$this->add_rules( $store->get_all_rules() );
 		}
 
 		// Combine CSS selectors that have identical declarations.
-		$this->combine_rules_selectors();
+		if ( true === $options['optimize'] ) {
+			$this->combine_rules_selectors();
+		}
 
 		// Build the CSS.
 		$css = '';

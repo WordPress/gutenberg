@@ -7,12 +7,14 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { baseLabelTypography, font, COLORS } from '../../utils';
+import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
 import { space } from '../../ui/utils/space';
 
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: ${ font( 'default.fontSize' ) };
+
+	${ boxSizingReset }
 `;
 
 const deprecatedMarginField = ( { __nextHasNoMarginBottom = false } ) => {
