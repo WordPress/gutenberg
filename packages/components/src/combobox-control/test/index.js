@@ -238,9 +238,11 @@ describe.each( [
 		// Pressing Enter/Return selects the currently focused option
 		await user.keyboard( '{Enter}' );
 
-		const itemSelectedAnnouncement = screen.getByText( 'Item selected.' );
-
-		expect( itemSelectedAnnouncement ).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Item selected.', {
+				selector: '[aria-live]',
+			} )
+		).toBeInTheDocument();
 	} );
 
 	it( 'should process multiple entries in a single session', async () => {
