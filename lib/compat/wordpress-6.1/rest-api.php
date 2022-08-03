@@ -43,3 +43,17 @@ function gutenberg_register_gutenberg_rest_block_patterns() {
 	$block_patterns->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_block_patterns', 100 );
+
+
+
+function gutenberg_update_navigation_rest_controller( $args, $post_type ) {
+	if ( in_array( $post_type, array( 'wp_navigation' ), true ) ) {
+		// Original set in
+		// https://github.com/WordPress/wordpress-develop/blob/6cbed78c94b9d8c6a9b4c8b472b88ee0cd56528c/src/wp-includes/post.php#L528.
+		$args['rest_controller_class'] = 'Gutenberg_REST_Navigation_Controller';
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_update_navigation_rest_controller', 10, 2 );
+
+
