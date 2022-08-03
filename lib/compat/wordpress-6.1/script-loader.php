@@ -41,16 +41,22 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 }
 
 /**
- * Fetches, processes and compiles stored block supports styles, then renders them to the page.
+ * Fetches, processes and compiles stored core styles, then combines and renders them to the page.
  * Styles are stored via the style engine API. See: packages/style-engine/README.md
  */
-function gutenberg_enqueue_stored_block_supports_styles() {
-	$styles  = gutenberg_style_engine_get_stylesheet_from_store( 'block-supports' );
-	$styles .= gutenberg_style_engine_get_stylesheet_from_store( 'layout-block-supports' );
+function gutenberg_enqueue_stored_styles() {
+	$core_styles_keys    = array( 'block-supports', 'layout-block-supports' );
+	$compiled_stylesheet = '';
+	foreach ( $core_styles_keys as $style_key ) {
+		$compiled_stylesheet .= gutenberg_style_engine_get_stylesheet_from_store( $style_key );
+	}
+
+	// Combine Core styles.
+	// @TODO check for `defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG` and split them for ease of debugging.
 	if ( ! empty( $styles ) ) {
 		$key = 'block-supports-styles';
 		wp_register_style( $key, false, array(), true, true );
-		wp_add_inline_style( $key, $styles );
+		wp_add_inline_style( $key, $compiled_stylesheet );
 		wp_enqueue_style( $key );
 	}
 }
@@ -128,7 +134,8 @@ remove_action( 'wp_footer', 'wp_enqueue_global_styles' );
 remove_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
 remove_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 
+// Enqueue global styles, and then block supports styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_block_supports_styles' );
-add_action( 'wp_footer', 'gutenberg_enqueue_stored_block_supports_styles', 1 );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
+add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );

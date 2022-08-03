@@ -24,13 +24,6 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  */
 class WP_Style_Engine {
 	/**
-	 * Container for the main instance of the class.
-	 *
-	 * @var WP_Style_Engine|null
-	 */
-	private static $instance = null;
-
-	/**
 	 * Style definitions that contain the instructions to
 	 * parse/output valid Gutenberg styles from a block's attributes.
 	 * For every style definition, the follow properties are valid:
