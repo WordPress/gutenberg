@@ -53,7 +53,7 @@ function gutenberg_enqueue_stored_styles() {
 
 	// Combine Core styles.
 	// @TODO check for `defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG` and split them for ease of debugging.
-	if ( ! empty( $styles ) ) {
+	if ( ! empty( $compiled_stylesheet ) ) {
 		$key = 'block-supports-styles';
 		wp_register_style( $key, false, array(), true, true );
 		wp_add_inline_style( $key, $compiled_stylesheet );

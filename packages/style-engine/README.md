@@ -5,19 +5,27 @@ The Style Engine powering global styles and block customizations.
 ## Backend API
 
 ### wp_style_engine_get_styles()
-Global public interface method to generate styles from a single style object, e.g., the value of a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles) or the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/).
+
+Global public interface method to generate styles from a single style object, e.g., the value of
+a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles)
+or
+the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/)
+.
 
 _Parameters_
-- _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
-- _$options_ `array<string|boolean>` An array of options to determine the output.
-  - _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
-  - _enqueue_ `boolean` When `true` will attempt to store and enqueue for rendering on the frontend.
-  - _convert_vars_to_classnames_ `boolean`  Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
-  - _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+
+-   _$block_styles_ `array` A block's `attributes.style` object or the top level styles in theme.json
+-   _$options_ `array<string|boolean>` An array of options to determine the output.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or '
+        global-styles'. Default is 'block-supports'.
+    -   _enqueue_ `boolean` When `true` will attempt to store and enqueue for rendering on the frontend.
+    -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* )
+        values. Default is `false`.
+    -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`,
+        otherwise a concatenated string of properties and values.
 
 _Returns_
 `array<string|array>|null`
-
 
 ```php
 array(
@@ -31,9 +39,10 @@ It will return compiled CSS declartions for inline styles, or, where a selector 
 
 To enqueue a style for rendering in the frontend, the `$options` array requires the following:
 
-1. **selector (string)** - this is the CSS selector for your block style CSS declarations.
-2. **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be batched together and printed in the same HTML style tag. The default is `'block-supports'`.
-3. **enqueue (boolean)** - tells the style engine to enqueue the styles and print them in the frontend.
+1.  **selector (string)** - this is the CSS selector for your block style CSS declarations.
+2.  **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be
+    batched together and printed in the same HTML style tag. The default is `'block-supports'`.
+3.  **enqueue (boolean)** - tells the style engine to enqueue the styles and print them in the frontend.
 
 `wp_style_engine_get_styles` will return the compiled CSS and CSS declarations array.
 
@@ -68,8 +77,9 @@ Global public interface method to register styles to be enqueued and rendered.
 Use this function to enqueue any CSS rules. It will automatically merge declarations and combine selectors.
 
 _Parameters_
-- _$store_key_ `string` A valid store key.
-- _$css_rules_ `array<array>` 
+
+-   _$store_key_ `string` A valid store key.
+-   _$css_rules_ `array<array>`
 
 _Returns_
 `WP_Style_Engine_CSS_Rules_Store` A store.
@@ -100,24 +110,34 @@ wp_style_engine_add_to_store( 'layout-block-supports', $styles );
 ```
 
 The resulting stylesheet will be:
+
 ```html
-<style id='layout-block-supports-inline-css'>
-.wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+<style id="layout-block-supports-inline-css">
+	.wp-pumpkin,
+	.wp-kumquat {
+		color: orange;
+	}
+
+	.wp-tomato {
+		color: red;
+		padding: 100px;
+	}
 </style>
 ```
 
 ### wp_style_engine_get_stylesheet_from_css_rules()
 
-Use this function to compile and return a stylesheet for any CSS rules. This function does not enqueue styles, but rather acts as a CSS compiler.
+Use this function to compile and return a stylesheet for any CSS rules. This function does not enqueue styles, but
+rather acts as a CSS compiler.
 
 _Parameters_
-- _$css_rules_ `array<array>` 
+
+-   _$css_rules_ `array<array>`
 
 _Returns_
 `string` A compiled CSS string.
 
 #### Usage
-
 
 ```php
 $styles = array(
@@ -151,13 +171,18 @@ Install the module
 npm install @wordpress/style-engine --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has
+limited or no support for such language features and APIs, you should
+include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
+in your code._
 
 ## Important
 
-This Package is considered experimental at the moment. The idea is to have a package used to generate styles based on a style object that is consistent between: backend, frontend, block style object and theme.json.
+This Package is considered experimental at the moment. The idea is to have a package used to generate styles based on a
+style object that is consistent between: backend, frontend, block style object and theme.json.
 
-Because this package is experimental and still in development it does not yet generate a `wp.styleEngine` global. To get there, the following tasks need to be completed:
+Because this package is experimental and still in development it does not yet generate a `wp.styleEngine` global. To get
+there, the following tasks need to be completed:
 
 **TODO List:**
 
@@ -167,7 +192,8 @@ Because this package is experimental and still in development it does not yet ge
 -   Support generating styles in the backend (block supports and theme.json stylesheet). (Ongoing)
 -   Refactor all block styles to use the style engine server side. (Ongoing)
 -   Consolidate global and block style rendering and enqueuing
--   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific attributes).
+-   Refactor all blocks to consistently use the "style" attribute for all customizations (get rid of the preset specific
+    attributes).
 
 See [Tracking: Add a Style Engine to manage rendering block styles #38167](https://github.com/WordPress/gutenberg/issues/38167)
 
