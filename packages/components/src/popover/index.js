@@ -293,10 +293,12 @@ const Popover = (
 
 	// Updates references
 	useLayoutEffect( () => {
-		// No ref or position have been passed
-		let usedRef;
+		let resultingReferenceRef;
+
 		if ( anchorRef?.top ) {
-			usedRef = {
+			// Create a virtual element for the ref. The expectation is that
+			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const topRect = anchorRef.top.getBoundingClientRect();
 					const bottomRect = anchorRef.bottom.getBoundingClientRect();
@@ -309,17 +311,22 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRef?.current ) {
-			usedRef = anchorRef.current;
+			// Standard React ref
+			resultingReferenceRef = anchorRef.current;
 		} else if ( anchorRef ) {
-			usedRef = anchorRef;
+			// If `anchorRef` holds directly the element's value (no `current` key)
+			// This is a weird scenario and should be deprecated.
+			resultingReferenceRef = anchorRef;
 		} else if ( anchorRect ) {
-			usedRef = {
+			// Create a virtual element for the ref.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					return anchorRect;
 				},
 			};
 		} else if ( getAnchorRect ) {
-			usedRef = {
+			// Create a virtual element for the ref.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );
 					return new window.DOMRect(
@@ -331,20 +338,24 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRefFallback.current ) {
-			usedRef = anchorRefFallback.current;
+			resultingReferenceRef = anchorRefFallback.current;
 		}
 
-		if ( ! usedRef ) {
+		if ( ! resultingReferenceRef ) {
 			return;
 		}
 
-		reference( usedRef );
+		reference( resultingReferenceRef );
 
 		if ( ! refs.floating.current ) {
 			return;
 		}
 
-		return autoUpdate( usedRef, refs.floating.current, update );
+		return autoUpdate(
+			resultingReferenceRef,
+			refs.floating.current,
+			update
+		);
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	// This is only needed for a smoth transition when moving blocks.
