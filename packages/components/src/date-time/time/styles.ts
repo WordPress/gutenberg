@@ -17,8 +17,6 @@ import NumberControl from '../../number-control';
 import SelectControl from '../../select-control';
 import { Select } from '../../select-control/styles/select-control-styles';
 
-export const Wrapper = styled.div``;
-
 export const Fieldset = styled.fieldset`
 	border: 0;
 	margin: 0 0 ${ space( 2 * 2 ) } 0;

@@ -17,20 +17,21 @@ import {
 import { __, _n } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { dateI18n } from '@wordpress/date';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DatePickerProps } from '../types';
 import {
-	Nav,
-	NavButton,
-	NavHeading,
+	Navigator,
+	NavigatorHeading,
 	Calendar,
 	DayOfWeek,
 	DayButton,
 } from './styles';
 import { inputToDate } from '../utils';
+import Button from '../../button';
 
 const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 // const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
@@ -114,22 +115,33 @@ export function DatePicker( {
 	startOfWeek = 0,
 }: DatePickerProps ) {
 	const date = currentDate ? inputToDate( currentDate ) : new Date();
+
 	const {
 		calendar,
 		viewing,
+		setSelected,
+		setViewing,
 		inRange,
+		isSelected,
 		viewPreviousMonth,
 		viewNextMonth,
-		setSelected,
 	} = useLilius( {
 		selected: [ date ],
 		viewing: date,
 		weekStartsOn: startOfWeek,
 	} );
+
+	// Update the month being viewed when currentDate changes.
+	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
+	if ( currentDate !== prevCurrentDate ) {
+		setPrevCurrentDate( currentDate );
+		setViewing( date );
+	}
+
 	return (
 		<div className="components-datetime__date">
-			<Nav>
-				<NavButton
+			<Navigator>
+				<Button
 					icon={ arrowLeft }
 					variant="tertiary"
 					// TODO: aria-label
@@ -143,11 +155,11 @@ export function DatePicker( {
 						);
 					} }
 				/>
-				<NavHeading level={ 3 }>
+				<NavigatorHeading level={ 3 }>
 					<strong>{ dateI18n( 'F', viewing ) }</strong>{ ' ' }
 					{ dateI18n( 'Y', viewing ) }
-				</NavHeading>
-				<NavButton
+				</NavigatorHeading>
+				<Button
 					icon={ arrowRight }
 					variant="tertiary"
 					// TODO: aria-label
@@ -161,7 +173,7 @@ export function DatePicker( {
 						);
 					} }
 				/>
-			</Nav>
+			</Navigator>
 			<Calendar>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
 					<DayOfWeek key={ day.toString() }>
@@ -197,11 +209,13 @@ export function DatePicker( {
 							<DayButton
 								key={ day.toString() }
 								className="components-datetime__date__day" // Unused, for backwards compatibility.
-								column={ index + 1 }
-								hasEvents={ numEvents > 0 }
 								disabled={
 									isInvalidDate ? isInvalidDate( day ) : false
 								}
+								column={ index + 1 }
+								isSelected={ isSelected( day ) }
+								isToday={ isSameDay( day, new Date() ) }
+								hasEvents={ numEvents > 0 }
 								// TODO: aria-label
 								onClick={ () => {
 									setSelected( [ day ] );
