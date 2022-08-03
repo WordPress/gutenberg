@@ -42,11 +42,11 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
-
-/**
- * @typedef {import('../animate').AppearOrigin} AppearOrigin
- * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
- */
+import {
+	positionToPlacement,
+	placementToAnimationOrigin,
+	getMainAxisFromPlacement,
+} from './utils';
 
 /**
  * Name of slot in which popover should fill.
@@ -80,78 +80,6 @@ const ArrowTriangle = ( props ) => (
 );
 
 const slotNameContext = createContext();
-
-// Converts the `Popover`'s legacy "position" prop to the
-// new "placement" prop (used by `floating-ui`).
-const positionToPlacement = ( position ) => {
-	const [ x, y, z ] = position.split( ' ' );
-
-	if ( [ 'top', 'bottom' ].includes( x ) ) {
-		let suffix = '';
-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
-			suffix = '-start';
-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
-			suffix = '-end';
-		}
-		return x + suffix;
-	}
-
-	return y;
-};
-
-/** @type {Object.<FloatingUIPlacement, AppearOrigin>} */
-const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
-	top: 'bottom',
-	'top-start': 'bottom left',
-	'top-end': 'bottom right',
-	right: 'middle left',
-	'right-start': 'top left',
-	'right-end': 'bottom left',
-	bottom: 'top',
-	'bottom-start': 'top left',
-	'bottom-end': 'top right',
-	left: 'middle right',
-	'left-start': 'top right',
-	'left-end': 'bottom right',
-};
-
-/**
- * Given the floating-ui `placement`, compute the origin used for the entrance
- * animation. The origin should be on the "opposite" side from the placement.
- *
- * @param {FloatingUIPlacement} placement A placement string from floating ui
- * @param {boolean}             rtl
- * @return {AppearOrigin} The Animation origin string
- */
-const placementToAnimationOrigin = ( placement, rtl ) => {
-	/** @type {AppearOrigin} */
-	let animationOrigin =
-		PLACEMENT_TO_ANIMATION_ORIGIN_MAP[ placement ] ?? 'middle';
-
-	if ( rtl && /left/gi.test( animationOrigin ) ) {
-		animationOrigin = animationOrigin.replace( /left/gi, 'right' );
-	} else if ( rtl && /right/gi.test( animationOrigin ) ) {
-		animationOrigin = animationOrigin.replace( /right/gi, 'left' );
-	}
-
-	return animationOrigin;
-};
-
-/**
- * @param {FloatingUIPlacement} placement
- * @return {'top' | 'right' | 'bottom' | 'left'} The side
- */
-export function getSide( placement ) {
-	return placement.split( '-' )[ 0 ];
-}
-
-/**
- * @param {FloatingUIPlacement} placement
- * @return {'x' | 'y'} The axis
- */
-export function getMainAxisFromPlacement( placement ) {
-	return [ 'top', 'bottom' ].includes( getSide( placement ) ) ? 'x' : 'y';
-}
 
 const Popover = (
 	{
