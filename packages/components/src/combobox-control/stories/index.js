@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-function CountryCodeComboboxControl( args ) {
+function Template( args ) {
 	const [ value, setValue ] = useState( null );
 
 	return (
@@ -275,88 +275,59 @@ function CountryCodeComboboxControl( args ) {
 				{ ...args }
 				value={ value }
 				onChange={ setValue }
-				label="Select a country"
-				options={ countryOptions }
 			/>
 			<p>Value: { value }</p>
 		</>
 	);
 }
-export const _default = CountryCodeComboboxControl.bind( {} );
-_default.args = {
+export const Default = Template.bind( {} );
+Default.args = {
 	__next36pxDefaultSize: false,
 	allowReset: false,
+	label: 'Select a country',
+	options: countryOptions,
 };
 
-const authors = [
+const authorOptions = [
 	{
-		name: 'Hermann P. Schnitzel',
-		age: 45,
-		country: 'Germany',
-	},
-	{
-		name: 'Shequondolisa Bivouac',
-		age: 43,
-		country: 'France',
-	},
-	{
-		name: 'Bodrum Salvador',
-		age: 42,
-		country: 'Spain',
-	},
-	{
-		name: 'Parsley Montana',
+		value: 'parsley',
+		label: 'Parsley Montana',
 		age: 48,
 		country: 'Germany',
 	},
 	{
-		name: 'Cabbage New York',
+		value: 'cabbage',
+		label: 'Cabbage New York',
 		age: 44,
 		country: 'France',
 	},
 	{
-		name: 'Jake Weary',
+		value: 'jake',
+		label: 'Jake Weary',
 		age: 41,
 		country: 'United Kingdom',
 	},
 ];
 
-const authorOptions = authors.map( ( { name, ...details } ) => ( {
-	value: name,
-	label: name,
-	...details,
-} ) );
-
-export const WithRenderOption = ( args ) => {
-	const [ value, setValue ] = useState( '' );
-
-	return (
-		<>
-			<ComboboxControl
-				{ ...args }
-				value={ value }
-				onChange={ setValue }
-				label="Select an author"
-				options={ authorOptions }
-				__experimentalRenderItem={ ( { item } ) => {
-					const { label, age, country } = item;
-					return (
-						<div>
-							<div style={ { marginBottom: '0.2rem' } }>
-								{ label }
-							</div>
-							<small>
-								Age: { age }, Country: { country }
-							</small>
-						</div>
-					);
-				} }
-			/>
-			<p>Selected author: { value }</p>
-		</>
-	);
-};
-
-WithRenderOption.args = {
-	allowReset: false,
+/**
+ * The rendered output of each suggestion can be customized by passing a
+ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+ * and is subject to change.)
+ */
+export const WithCustomRenderItem = Template.bind( {} );
+WithCustomRenderItem.args = {
+	...Default.args,
+	label: 'Select an author',
+	options: authorOptions,
+	__experimentalRenderItem: ( { item } ) => {
+		const { label, age, country } = item;
+		return (
+			<div>
+				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
+				<small>
+					Age: { age }, Country: { country }
+				</small>
+			</div>
+		);
+	},
 };
