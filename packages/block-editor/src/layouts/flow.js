@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 
-import { getBlockGapCSS } from './utils';
+import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -54,7 +54,26 @@ export default {
 	getOrientation() {
 		return 'vertical';
 	},
-	getAlignments() {
-		return [];
+	getAlignments( layout ) {
+		const alignmentInfo = getAlignmentsInfo( layout );
+		if ( layout.alignments !== undefined ) {
+			if ( ! layout.alignments.includes( 'none' ) ) {
+				layout.alignments.unshift( 'none' );
+			}
+			return layout.alignments.map( ( alignment ) => ( {
+				name: alignment,
+				info: alignmentInfo[ alignment ],
+			} ) );
+		}
+
+		const alignments = [
+			{ name: 'left' },
+			{ name: 'center' },
+			{ name: 'right' },
+		];
+
+		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
+
+		return alignments;
 	},
 };
