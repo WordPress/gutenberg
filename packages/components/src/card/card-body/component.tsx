@@ -12,8 +12,10 @@ import { View } from '../../view';
 import { useCardBody } from './hook';
 import type { BodyProps } from '../types';
 
+export type CardBodyProps = WordPressComponentProps< BodyProps, 'div' >;
+
 function CardBody(
-	props: WordPressComponentProps< BodyProps, 'div' >,
+	props: CardBodyProps,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );
@@ -40,8 +42,9 @@ function CardBody(
  * </Card>
  * ```
  */
-const ConnectedCardBody = contextConnect<
-	WordPressComponentProps< BodyProps, 'div' >
->( CardBody, 'CardBody' );
+const ConnectedCardBody = contextConnect< CardBodyProps >(
+	CardBody,
+	'CardBody'
+);
 
 export default ConnectedCardBody;
