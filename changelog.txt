@@ -1,39 +1,10 @@
 == Changelog ==
 
-= 13.8.0-rc.2 =
-
-## Changelog
-
-### Bug Fixes
-
-#### Global Styles
-- Theme JSON Resolver: Update cache check to also check that the object is an instance of the Gutenberg version. ([42756](https://github.com/WordPress/gutenberg/pull/42756))
-
-
-### Experiments
-
-#### Global Styles
-- Layout: Reduce specificity of fallback blockGap styles. ([42665](https://github.com/WordPress/gutenberg/pull/42665))
-
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@andrewserong
-
-
-= 13.8.0-rc.1 =
+= 13.8.0 =
 
 
 
 ## Changelog
-
-### Features
-
-#### Block Editor
-- feat: Inserter displays block collections. ([42405](https://github.com/WordPress/gutenberg/pull/42405))
 
 
 ### Enhancements
@@ -124,6 +95,7 @@ The following contributors merged PRs in this release:
 - Group block: Add context to the word "Row". ([42255](https://github.com/WordPress/gutenberg/pull/42255))
 - Hide prefix and suffix placeholders in post terms. ([42418](https://github.com/WordPress/gutenberg/pull/42418))
 - Theme.json: Fix schema for button elements. ([42431](https://github.com/WordPress/gutenberg/pull/42431))
+- [Media Text]: Fix deprecations regression. ([42816](https://github.com/WordPress/gutenberg/pull/42816))
 
 #### Components
 - AnglePickerControl: Fix gap between elements in RTL mode. ([42534](https://github.com/WordPress/gutenberg/pull/42534))
@@ -161,6 +133,8 @@ The following contributors merged PRs in this release:
 #### Global Styles
 - Elements: Fix heading and caption element selectors. ([42479](https://github.com/WordPress/gutenberg/pull/42479))
 - Layout content size controls: Add left alignment to line up with description and other elements. ([42576](https://github.com/WordPress/gutenberg/pull/42576))
+- Layout: Ensure defaultEditorStyles are still output in Classic themes. ([42906](https://github.com/WordPress/gutenberg/pull/42906))
+- Theme JSON Resolver: Update cache check to also check that the object is an instance of the Gutenberg version. ([42756](https://github.com/WordPress/gutenberg/pull/42756))
 
 #### Widgets Editor
 - Add configuration option to skip autop on freeform blocks when parsing blocks. ([42623](https://github.com/WordPress/gutenberg/pull/42623))
@@ -206,6 +180,7 @@ The following contributors merged PRs in this release:
 
 #### Global Styles
 - Block supports: Add fluid typography. ([39529](https://github.com/WordPress/gutenberg/pull/39529))
+- Layout: Reduce specificity of fallback blockGap styles. ([42665](https://github.com/WordPress/gutenberg/pull/42665))
 
 
 ### Documentation
@@ -269,6 +244,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @ajlende @amustaque97 @andrewserong @arcangelini @aristath @bph @carolinan @chad1008 @ciampo @danielbachhuber @DAreRodz @dcalhoun @ellatrix @fabiankaegy @geriux @getdave @gziolo @jameskoster @johnbillion @jorgefilipecosta @kkmuffme @Mamaduka @matiasbenedetto @mirka @ndiego @noisysocks @ntsekouras @oandregal @ObliviousHarmony @paulopmt1 @pedro-mendonca @pooja-muchandikar @ramonjd @ryanwelcher @scruffian @SiobhyB @sunil25393 @t-hamano @talldan @tellthemachines @tyxla @vcanales @walbo @westonruter @zaguiini
+
+
 
 
 = 13.7.3 =
