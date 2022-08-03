@@ -69,4 +69,13 @@ abstract class WP_Webfonts_Provider {
 	 * @return string The `@font-face` CSS.
 	 */
 	abstract public function get_css();
+
+	/**
+	 * Prints the generated styles.
+	 *
+	 * @since 6.1.0
+	 */
+	public function print_styles() {
+		echo $this->get_css();
+	}
 }

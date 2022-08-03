@@ -2,9 +2,9 @@
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts_Test
+ * @covers WP_Webfonts
  */
-class WP_Webfonts_Test extends WP_UnitTestCase {
+class Tests_Webfonts_WpWebfonts extends WP_UnitTestCase {
 	/**
 	 * WP_Webfonts instance reference
 	 *
@@ -26,47 +26,6 @@ class WP_Webfonts_Test extends WP_UnitTestCase {
 
 		$wp_webfonts = $this->old_wp_webfonts;
 		parent::tear_down();
-	}
-
-	/**
-	 * Test wp_register_webfonts() bulk register webfonts.
-	 *
-	 * @covers wp_register_webfonts
-	 * @covers WP_Webfonts::register_font
-	 * @covers WP_Webfonts::get_registered_fonts
-	 * @covers WP_Webfonts::get_enqueued_fonts
-	 */
-	public function test_wp_register_webfonts() {
-		$font_family_name = 'Source Serif Pro';
-
-		$fonts = array(
-			array(
-				'provider'     => 'local',
-				'font-family'  => $font_family_name,
-				'font-style'   => 'normal',
-				'font-weight'  => '200 900',
-				'font-stretch' => 'normal',
-				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2',
-				'font-display' => 'fallback',
-			),
-			array(
-				'provider'     => 'local',
-				'font-family'  => $font_family_name,
-				'font-style'   => 'italic',
-				'font-weight'  => '200 900',
-				'font-stretch' => 'normal',
-				'src'          => 'https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
-				'font-display' => 'fallback',
-			),
-		);
-
-		$expected = array(
-			wp_webfonts()->get_font_slug( $font_family_name ) => $fonts,
-		);
-
-		wp_register_webfonts( $fonts );
-		$this->assertEquals( $expected, wp_webfonts()->get_registered_webfonts() );
-		$this->assertEquals( array(), wp_webfonts()->get_enqueued_webfonts() );
 	}
 
 	/**

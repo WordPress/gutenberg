@@ -11,7 +11,7 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 	/**
 	 * Initialize $wp_webfonts if it has not been set.
 	 *
-	 * @since X.X.X
+	 * @since 6.1.0
 	 *
 	 * @global WP_Webfonts $wp_webfonts
 	 *
@@ -22,35 +22,42 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 
 		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
 			$wp_webfonts = new WP_Webfonts();
+			$wp_webfonts->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
 		}
 
 		return $wp_webfonts;
 	}
 }
 
-if ( ! function_exists( 'wp_register_web_font_family' ) ) {
+if ( ! function_exists( 'wp_register_font_family' ) ) {
 	/**
-	 * Registers a font family as an alias.
+	 * Registers a font family.
 	 *
-	 * @param $font_family
-	 * @return array|bool
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family The font family to register.
+	 * @return bool Whether the font family has been registered. True on success, false on failure.
 	 */
-	function wp_register_web_font_family( $font_family ) {
-		$wp_webfonts = wp_webfonts();
-
-		return $wp_webfonts->add( sanitize_title( $font_family ), false );
+	function wp_register_font_family( $font_family ) {
+		return wp_webfonts()->add( sanitize_title( $font_family ), false );
 	}
 }
 
-if ( ! function_exists( 'wp_register_web_font_variation' ) ) {
+if ( ! function_exists( 'wp_register_font_variation' ) ) {
 	/**
-	 * Registers a font variation.
+	 * Registers a variation to the given font family.
 	 *
-	 * @param $font_family
-	 * @return mixed
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param array  $variation          An array of variation properties to add.
+	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
+	 *                                   handle will be dynamically generated.
+	 *                                   Default empty string.
+	 * @return string|bool Variation handle on success. Else false.
 	 */
-	function wp_register_web_font_variation( $font_family, $variation_handle, $variation ) {
-		return wp_webfonts()->add_variation( $font_family, $variation_handle, $variation );
+	function wp_register_webfont_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
+		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle );
 	}
 }
 
@@ -58,43 +65,92 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
 	 * Registers a list of web fonts and variations.
 	 *
-	 * @param $webfonts
-	 * @return array
+	 * @since 6.1.0
+	 *
+	 * @param array[] $webfonts Web fonts to be registered.
+	 * @return string[] The font family handle of the registered webfonts.
 	 */
-	function wp_register_webfonts( $webfonts, $enqueue = false ) {
-		$registered = array();
+	function wp_register_webfonts( array $webfonts ) {
+		$registered  = array();
+		$wp_webfonts = wp_webfonts();
 
 		foreach ( $webfonts as $font_family => $variations ) {
-			wp_register_web_font_family( $font_family );
-
-			foreach ( $variations as $variation_handle => $variation ) {
-				$registered[] = wp_register_web_font_variation( $font_family, $variation_handle, $variation );
-
-				if ( $enqueue ) {
-					wp_enqueue_web_font( $variation_handle );
-				}
+			// Skip if the font family is not defined as a key.
+			if ( ! is_string( $font_family ) || empty( $font_family ) ) {
+				continue;
 			}
+
+			$font_family_handle = sanitize_title( $font_family );
+			$is_registered      = $wp_webfonts->add( $font_family_handle, false );
+			if ( ! $is_registered ) {
+				continue;
+			}
+
+			foreach ( $variations as $handle => $variation ) {
+				$wp_webfonts->add_variation(
+					$font_family_handle,
+					$variation,
+					is_string( $handle ) && '' !== $handle ? $handle : ''
+				);
+			}
+
+			$registered[] = $font_family_handle;
 		}
 
 		return $registered;
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_web_font' ) ) {
+if ( ! function_exists( 'wp_register_webfont' ) ) {
 	/**
-	 * Enqueues a web font family and all variations.
+	 * Registers a single webfont.
+	 *
+	 * Example of how to register Source Serif Pro font with font-weight range of 200-900:
+	 *
+	 * If the font file is contained within the theme:
+	 *
+	 * <code>
+	 * wp_register_webfont(
+	 *      array(
+	 *          'provider'    => 'local',
+	 *          'font-family' => 'Source Serif Pro',
+	 *          'font-weight' => '200 900',
+	 *          'font-style'  => 'normal',
+	 *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
+	 *      )
+	 * );
+	 * </code>
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param array $webfont Webfont to be registered.
+	 * @return string|false The font family slug if successfully registered, else false.
 	 */
-	function wp_enqueue_web_font( $handle ) {
-		$wp_webfonts = wp_webfonts();
-		$wp_webfonts->enqueue( $handle );
+	function wp_register_webfont( array $webfont ) {
+		return wp_webfonts()->register_webfont( $webfont );
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_web_font_variations' ) ) {
+if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	/**
-	 * Enqueues a specific set of web font variations.
+	 * Enqueues one or more font family and all of its variations.
+	 *
+	 * @param string|string[] $font_family Font family handle (string) or handles (array of strings).
 	 */
-	function wp_enqueue_web_font_variations( $variations ) {
+	function wp_enqueue_webfont( $font_family ) {
+		wp_webfonts()->enqueue( $font_family );
+	}
+}
+
+if ( ! function_exists( 'wp_enqueue_webfont_variations' ) ) {
+	/**
+	 * Enqueues a given set of web font variations.
+	 *
+	 * @TODO Is this needed?
+	 *
+	 * @param string[] $variations Font variations.
+	 */
+	function wp_enqueue_webfont_variations( $variations ) {
 		$wp_webfonts = wp_webfonts();
 
 		// Looking to enqueue all variations of a font family.
@@ -104,21 +160,30 @@ if ( ! function_exists( 'wp_enqueue_web_font_variations' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_deregister_web_font_family' ) ) {
+if ( ! function_exists( 'wp_deregister_font_family' ) ) {
 	/**
-	 * Unregisters an entire font family and all variations.
+	 * Deregisters a font family and all registered variations.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family_handle The font family to remove.
 	 */
-	function wp_deregister_web_font_family( $font_family ) {
-		wp_webfonts()->remove_family( $font_family );
+	function wp_deregister_font_family( $font_family_handle ) {
+		wp_webfonts()->remove_font_family( $font_family_handle );
 	}
 }
 
-if ( ! function_exists( 'wp_deregister_web_font_variation' ) ) {
+if ( ! function_exists( 'wp_deregister_webfont_variation' ) ) {
 	/**
-	 * @param $variation_handle
+	 * Deregisters a font variation.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family_handle The font family for this variation.
+	 * @param string $variation_handle   The variation's handle to remove.
 	 */
-	function wp_deregister_web_font_variation( $font_family, $variation_handle ) {
-		wp_webfonts()->remove_variation( $font_family, $variation_handle );
+	function wp_deregister_webfont_variation( $font_family_handle, $variation_handle ) {
+		wp_webfonts()->remove_variation( $font_family_handle, $variation_handle );
 	}
 }
 
@@ -176,13 +241,24 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 }
 
 if ( ! function_exists( 'wp_print_webfonts' ) ) {
+	/**
+	 * Invokes each provider to process and print its styles.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
+	 *                                       single item (string), or multiple items (array of strings).
+	 *                                       Default false.
+	 * @return array|string[] Array of web font handles that have been processed.
+	 *                        An empty array if none were processed.
+	 */
 	function wp_print_webfonts( $handles = false ) {
 		global $wp_webfonts;
 
 		/**
 		 * Fires before webfonts in the $handles queue are printed.
 		 *
-		 * @since X.X.X
+		 * @since 6.1.0
 		 */
 		do_action( 'wp_print_webfonts' );
 
@@ -202,14 +278,8 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	}
 }
 
-
-
-
-
-
-
-
-
+add_action( 'admin_print_styles', 'wp_print_webfonts' );
+add_action( 'wp_head', 'wp_print_webfonts' );
 
 /**
  * Add webfonts mime types.
