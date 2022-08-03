@@ -79,7 +79,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 *Should generate CSS rules.
+	 * Should generate CSS rules.
 	 */
 	public function test_get_css() {
 		$selector           = '.chips';
@@ -103,9 +103,9 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 			'margin-left' => '0',
 			'font-family' => 'Detective Sans',
 		);
-		$css_declarations = new WP_Style_Engine_CSS_Declarations( $input_declarations );
-		$css_rule         = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
-		$expected         = '.baptiste {
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+		$expected           = '.baptiste {
 	margin-left: 0;
 	font-family: Detective Sans;
 }';
