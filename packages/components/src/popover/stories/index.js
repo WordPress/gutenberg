@@ -24,9 +24,6 @@ const AVAILABLE_POSITIONS = [
 	'bottom left',
 	'bottom center',
 	'bottom right',
-	'bottom left',
-	'bottom center',
-	'bottom right',
 ];
 
 // Follows floating UI's conventions
