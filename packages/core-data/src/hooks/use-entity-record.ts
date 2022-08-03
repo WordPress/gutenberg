@@ -13,44 +13,44 @@ import { store as coreStore } from '../';
 import type { Status } from './constants';
 
 export interface EntityRecordResolution< RecordType > {
-	/** The requested entity record */
-	record: RecordType | null;
+  /** The requested entity record */
+  record: RecordType | null;
 
-	/** The edited entity record */
-	editedRecord: Partial< RecordType >;
+  /** The edited entity record */
+  editedRecord: Partial< RecordType >;
 
-	/** Apply edits to the edited entity record */
-	edit: ( diff: Partial< RecordType > ) => void;
+  /** Apply edits to the edited entity record */
+  edit: ( diff: Partial< RecordType > ) => void;
 
-	/** Persist the edits to the server */
-	save: () => Promise< void >;
+  /** Persist the edits to the server */
+  save: () => Promise< void >;
 
-	/**
-	 * Is the record still being resolved?
-	 */
-	isResolving: boolean;
+  /**
+   * Is the record still being resolved?
+   */
+  isResolving: boolean;
 
-	/**
-	 * Does the record have any edits?
-	 */
-	hasEdits: boolean;
+  /**
+   * Does the record have any edits?
+   */
+  hasEdits: boolean;
 
-	/**
-	 * Is the record resolved by now?
-	 */
-	hasResolved: boolean;
+  /**
+   * Is the record resolved by now?
+   */
+  hasResolved: boolean;
 
-	/** Resolution status */
-	status: Status;
+  /** Resolution status */
+  status: Status;
 }
 
 export interface Options {
-	/**
-	 * Whether to run the query or short-circuit and return null.
-	 *
-	 * @default true
-	 */
-	enabled: boolean;
+  /**
+   * Whether to run the query or short-circuit and return null.
+   *
+   * @default true
+   */
+  enabled: boolean;
 }
 
 /**
@@ -82,65 +82,117 @@ export interface Options {
  * application, the page and the resolution details will be retrieved from
  * the store state using `getEntityRecord()`, or resolved if missing.
  *
+ * @example
+ * ```js
+ * import { useEntityRecord } from '@wordpress/core-data';
+ *
+ * function PageRenameForm( { id } ) {
+ *   const page = useEntityRecord( 'postType', 'page', id );
+ *   const [ title, setTitle ] = useState( () => page.record.title.rendered );
+ *
+ *   if ( page.isResolving ) {
+ *     return 'Loading...';
+ *   }
+ *
+ *   async function onRename( event ) {
+ *       event.preventDefault();
+ *       page.edit({ title });
+ *       try {
+ *           await page.save({ throwOnError: true })
+ *           createSuccessNotice( __( 'Page renamed.' ), {
+ *               type: 'snackbar',
+ *           } );
+ *       } catch(e) {
+ *            const errorMessage =
+ *                error.message && error.code !== 'unknown_error'
+ *                    ? error.message
+ *                    : __( 'An error occurred while renaming the entity.' );
+ *
+ *            createErrorNotice( errorMessage, { type: 'snackbar' } );
+ *       }
+ *   }
+ *
+ *   return (
+ *       <form onSubmit={ onRename }>
+ *           <TextControl
+ *               label={ __( 'Name' ) }
+ *               value={ title }
+ *               onChange={ setTitle }
+ *           />
+ *           <Button variant="primary" type="submit">
+ *               { __( 'Save' ) }
+ *           </Button>
+ *       </form>
+ *   );
+ * }
+ *
+ * // Rendered in the application:
+ * // <PageRenameForm id={ 1 } />
+ * ```
+ *
+ * In the above example, updating and saving the page title is handled
+ * via the `edit()` and `save()` mutation helpers provided by
+ * `useEntityRecord()`;
+ *
  * @return Entity record data.
  * @template RecordType
  */
 export default function useEntityRecord< RecordType >(
-	kind: string,
-	name: string,
-	recordId: string | number,
-	options: Options = { enabled: true }
+  kind: string,
+  name: string,
+  recordId: string | number,
+  options: Options = { enabled: true }
 ): EntityRecordResolution< RecordType > {
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
-		coreStore
-	);
+  const { editEntityRecord, saveEditedEntityRecord } = useDispatch(
+    coreStore
+  );
 
-	const mutations = useMemo(
-		() => ( {
-			edit: ( record ) =>
-				editEntityRecord( kind, name, recordId, record ),
-			save: ( saveOptions: any ) =>
-				saveEditedEntityRecord( kind, name, recordId, saveOptions ),
-		} ),
-		[ recordId ]
-	);
+  const mutations = useMemo(
+    () => ( {
+      edit: ( record ) =>
+        editEntityRecord( kind, name, recordId, record ),
+      save: ( saveOptions: any ) =>
+        saveEditedEntityRecord( kind, name, recordId, saveOptions ),
+    } ),
+    [ recordId ]
+  );
 
-	const { editedRecord, hasEdits } = useSelect(
-		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
-		} ),
-		[ kind, name, recordId ]
-	);
+  const { editedRecord, hasEdits } = useSelect(
+    ( select ) => ( {
+      editedRecord: select( coreStore ).getEditedEntityRecord(),
+      hasEdits: select( coreStore ).hasEditsForEntityRecord(),
+    } ),
+    [ kind, name, recordId ]
+  );
 
-	const { data: record, ...querySelectRest } = useQuerySelect(
-		( query ) => {
-			if ( ! options.enabled ) {
-				return null;
-			}
-			return query( coreStore ).getEntityRecord( kind, name, recordId );
-		},
-		[ kind, name, recordId, options.enabled ]
-	);
+  const { data: record, ...querySelectRest } = useQuerySelect(
+    ( query ) => {
+      if ( ! options.enabled ) {
+        return null;
+      }
+      return query( coreStore ).getEntityRecord( kind, name, recordId );
+    },
+    [ kind, name, recordId, options.enabled ]
+  );
 
-	return {
-		record,
-		editedRecord,
-		hasEdits,
-		...querySelectRest,
-		...mutations,
-	};
+  return {
+    record,
+    editedRecord,
+    hasEdits,
+    ...querySelectRest,
+    ...mutations,
+  };
 }
 
 export function __experimentalUseEntityRecord(
-	kind: string,
-	name: string,
-	recordId: any,
-	options: any
+  kind: string,
+  name: string,
+  recordId: any,
+  options: any
 ) {
-	deprecated( `wp.data.__experimentalUseEntityRecord`, {
-		alternative: 'wp.data.useEntityRecord',
-		since: '6.1',
-	} );
-	return useEntityRecord( kind, name, recordId, options );
+  deprecated( `wp.data.__experimentalUseEntityRecord`, {
+    alternative: 'wp.data.useEntityRecord',
+    since: '6.1',
+  } );
+  return useEntityRecord( kind, name, recordId, options );
 }
