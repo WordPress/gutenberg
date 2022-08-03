@@ -240,3 +240,27 @@ export const getReferenceElement = ( {
 	// Convert any `undefined` value to `null`.
 	return referenceElement ?? null;
 };
+
+/**
+ * Checks the placement for a top/bottom value.
+ *
+ * @param  placement
+ * @return Whether the placement is top or bottom
+ */
+export const isTopBottomPlacement = (
+	placement: NonNullable< PopoverProps[ 'placement' ] >
+) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'bottom' );
+
+/**
+ * Checks the placement for a top/left value.
+ *
+ * @param  placement
+ * @return Whether the placement is top or left
+ */
+export const hasBeforePlacement = (
+	placement: NonNullable< PopoverProps[ 'placement' ] >
+) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'left' );
