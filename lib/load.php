@@ -109,6 +109,9 @@ if ( ! class_exists( 'WP_HTML_Walker_Exception' ) ) {
 if ( ! class_exists( 'WP_Text_Replacement' ) ) {
 	require __DIR__ . '/experimental/html/class-wp-text-replacement.php';
 }
+if ( ! class_exists( 'WP_Tag_Find_Descriptor' ) ) {
+	require __DIR__ . '/experimental/html/class-wp-tag-find-descriptor.php';
+}
 if ( ! class_exists( 'WP_HTML_Walker' ) ) {
 	require __DIR__ . '/experimental/html/class-wp-html-walker.php';
 }
