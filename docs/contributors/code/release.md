@@ -45,7 +45,7 @@ Don't rush this part -- it's important to bring the release notes into a nice sh
 When editing the notes, you should be sure to:
 
 1. Delete the `Various` section and move anything under it to a more appropriate section.
-2. Move all features under `Uncategorized` bullet points to a more suitable feature.q
+2. Move all features under `Uncategorized` bullet points to a more suitable feature.
 
 You can find some more tips on writing the release notes and post in the section below.
 
