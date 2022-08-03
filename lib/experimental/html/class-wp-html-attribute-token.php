@@ -16,7 +16,7 @@
  */
 class WP_HTML_Attribute_Token {
 	/**
-	 * Tag name.
+	 * Attribute name.
 	 *
 	 * @since 6.1.0
 	 * @var string
@@ -32,7 +32,7 @@ class WP_HTML_Attribute_Token {
 	public $value;
 
 	/**
-	 * Start position of the token.
+	 * The string offset where the attribute name starts.
 	 *
 	 * @since 6.1.0
 	 * @var integer
@@ -40,7 +40,7 @@ class WP_HTML_Attribute_Token {
 	public $start;
 
 	/**
-	 * End position of the token.
+	 * The string offset after the attribute value or its name.
 	 *
 	 * @since 6.1.0
 	 * @var integer
@@ -52,10 +52,10 @@ class WP_HTML_Attribute_Token {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param string  $name  Tag name.
+	 * @param string  $name  Attribute name.
 	 * @param string  $value Attribute value.
-	 * @param integer $start Start position of the token.
-	 * @param integer $end   End position of the token.
+	 * @param integer $start The string offset where the attribute name starts.
+	 * @param integer $end   The string offset after the attribute value or its name.
 	 */
 	public function __construct( $name, $value, $start, $end ) {
 		$this->name  = $name;

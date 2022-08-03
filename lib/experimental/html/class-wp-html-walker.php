@@ -571,62 +571,6 @@ class WP_HTML_Walker {
 }
 
 /**
- *
- */
-class WP_Class_Name_Update {
-	const REMOVE = false;
-	const ADD    = true;
-	/** @var string */
-	public $class_name;
-	/** @var boolean */
-	public $type;
-
-	/**
-	 * @param string $class_name
-	 * @param bool   $operation
-	 */
-	public function __construct( $class_name, $operation ) {
-		$this->class_name = $class_name;
-		$this->type       = $operation;
-	}
-}
-
-/**
- *
- */
-class WP_Text_Replacement {
-	/**
-	 * @var integer Byte offset into document where replacement span begins.
-	 */
-	public $start;
-
-	/**
-	 * @var integer Byte offset into document where replacement span ends.
-	 */
-	public $end;
-
-	/**
-	 * @var string Span of text to insert in document to replace existing content from start to end.
-	 */
-	public $text;
-
-	/**
-	 * @param $start
-	 * @param $end
-	 * @param $text
-	 */
-	public function __construct( $start, $end, $text ) {
-		$this->start = $start;
-		$this->end   = $end;
-		$this->text  = $text;
-	}
-}
-
-/**
- *
- */
-
-/**
  * Describes the search conditions for finding a given tag in an HTML document.
  */
 class WP_Tag_Find_Descriptor {
