@@ -112,7 +112,7 @@ class WP_Style_Engine_CSS_Rule {
 	 *
 	 * @return string
 	 */
-	public function get_css( $should_prettify = false, $indent_count = 0  ) {
+	public function get_css( $should_prettify = false, $indent_count = 0 ) {
 		$rule_indent         = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$declarations_indent = $should_prettify ? $indent_count + 1 : 0;
 		$new_line            = $should_prettify ? "\n" : '';
