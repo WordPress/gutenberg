@@ -85,7 +85,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$new_pie_store = WP_Style_Engine_CSS_Rules_Store::get_store( 'meat-pie' );
 		$selector      = '.wp-block-sauce a:hover';
 		$store_rule    = $new_pie_store->add_rule( $selector );
-		$expected      = "$selector {}";
+		$expected      = "$selector{}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 
 		$pie_declarations = array(
@@ -97,7 +97,7 @@ class WP_Style_Engine_CSS_Rules_Store_Test extends WP_UnitTestCase {
 		$store_rule->add_declarations( $css_declarations );
 
 		$store_rule = $new_pie_store->add_rule( $selector );
-		$expected   = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected   = "$selector{{$css_declarations->get_declarations_string()}}";
 		$this->assertEquals( $expected, $store_rule->get_css() );
 	}
 
