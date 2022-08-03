@@ -625,40 +625,6 @@ class WP_Text_Replacement {
 /**
  *
  */
-class WP_HTML_Attribute_Token {
-	/**
-	 * @var string
-	 */
-	public $name;
-
-	/**
-	 * @var string
-	 */
-	public $value;
-
-	/**
-	 * @var integer
-	 */
-	public $start;
-
-	/**
-	 * @var integer
-	 */
-	public $end;
-
-	/**
-	 * @param $name
-	 * @param $value
-	 * @param $start
-	 * @param $end
-	 */
-	public function __construct( $name, $value, $start, $end ) {
-		$this->name  = $name;
-		$this->value = $value;
-		$this->start = $start;
-		$this->end   = $end;
-	}
-}
 
 /**
  * Describes the search conditions for finding a given tag in an HTML document.
