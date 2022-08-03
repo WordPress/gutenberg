@@ -32,8 +32,8 @@ import {
 } from './styles';
 import { inputToDate } from '../utils';
 import Button from '../../button';
+import { TIMEZONELESS_FORMAT } from '../constants';
 
-const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 // const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
 // const noop = () => {};
 
@@ -144,7 +144,7 @@ export function DatePicker( {
 				<Button
 					icon={ arrowLeft }
 					variant="tertiary"
-					// TODO: aria-label
+					aria-label={ __( 'View previous month' ) }
 					onClick={ () => {
 						viewPreviousMonth();
 						onMonthPreviewed?.(
@@ -162,7 +162,7 @@ export function DatePicker( {
 				<Button
 					icon={ arrowRight }
 					variant="tertiary"
-					// TODO: aria-label
+					aria-label={ __( 'View next month' ) }
 					onClick={ () => {
 						viewNextMonth();
 						onMonthPreviewed?.(
@@ -212,11 +212,11 @@ export function DatePicker( {
 								disabled={
 									isInvalidDate ? isInvalidDate( day ) : false
 								}
+								// aria-label={ dateI18n( 'l, F j, Y', day ) } // TODO: why doesn't this work?
 								column={ index + 1 }
 								isSelected={ isSelected( day ) }
 								isToday={ isSameDay( day, new Date() ) }
 								hasEvents={ numEvents > 0 }
-								// TODO: aria-label
 								onClick={ () => {
 									setSelected( [ day ] );
 									onChange?.(

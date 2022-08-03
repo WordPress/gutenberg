@@ -39,8 +39,7 @@ import {
 	PRESS_UP,
 } from '../../input-control/reducer/actions';
 import { inputToDate } from '../utils';
-
-const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+import { TIMEZONELESS_FORMAT } from '../constants';
 
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
