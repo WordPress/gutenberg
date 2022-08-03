@@ -42,7 +42,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
 			// See https://github.com/WordPress/gutenberg/pull/41820
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [ items ] );
+		}, [ onChangeOptions, items ] );
 
 		if ( ! items.length > 0 ) {
 			return null;
