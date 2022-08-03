@@ -87,12 +87,12 @@ class WP_Style_Engine_Processor {
 		}
 
 		// Build the CSS.
-		$css      = '';
-		$new_line = $options['prettify'] ? "\n" : '';
+		$css = '';
 		foreach ( $this->css_rules as $rule ) {
-			$css .= $rule->get_css( $options['prettify'] ) . $new_line;
+			$css .= $rule->get_css( $options['prettify'] );
+			$css .= $options['prettify'] ? "\n" : '';
 		}
-		return rtrim( $css );
+		return $css;
 	}
 
 	/**

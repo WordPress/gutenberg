@@ -71,7 +71,8 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	font-family: Wonderful sans;
 	font-size: 1em;
 	background-color: orange;
-}';
+}
+';
 		$this->assertEquals(
 			$expected,
 			$a_wonderful_processor->get_css( array( 'prettify' => true ) )
