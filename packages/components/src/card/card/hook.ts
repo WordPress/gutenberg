@@ -11,13 +11,14 @@ import { useContextSystem } from '../../ui/context';
 import { useSurface } from '../../surface';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { CardProps } from './component';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
- */
-function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
-	/**@type {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} */
-	const propsToReturn = {
+function useDeprecatedProps( {
+	elevation,
+	isElevated,
+	...otherProps
+}: CardProps ): CardProps {
+	const propsToReturn: CardProps = {
 		...otherProps,
 	};
 	let computedElevation = elevation;
@@ -39,10 +40,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 	return propsToReturn;
 }
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
- */
-export function useCard( props ) {
+export function useCard( props: CardProps ) {
 	const {
 		className,
 		elevation = 0,

@@ -9,38 +9,37 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { CardHeaderProps } from './component';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
- */
-export function useCardBody( props ) {
+export function useCardHeader( props: CardHeaderProps ) {
 	const {
 		className,
-		isScrollable = false,
+		isBorderless = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
-	} = useContextSystem( props, 'CardBody' );
+	} = useContextSystem( props, 'CardHeader' );
 
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.Body,
+				styles.Header,
 				styles.borderRadius,
+				styles.borderColor,
 				styles.cardPaddings[ size ],
+				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
-				'components-card__body',
+				'components-card__header',
 				className
 			),
-		[ className, cx, isShady, size ]
+		[ className, cx, isBorderless, isShady, size ]
 	);
 
 	return {
 		...otherProps,
 		className: classes,
-		isScrollable,
 	};
 }

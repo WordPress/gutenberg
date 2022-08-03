@@ -9,29 +9,36 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { CardBodyProps } from './component';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
- */
-export function useCardMedia( props ) {
-	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+export function useCardBody( props: CardBodyProps ) {
+	const {
+		className,
+		isScrollable = false,
+		isShady = false,
+		size = 'medium',
+		...otherProps
+	} = useContextSystem( props, 'CardBody' );
 
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.Media,
+				styles.Body,
 				styles.borderRadius,
+				styles.cardPaddings[ size ],
+				isShady && styles.shady,
 				// This classname is added for legacy compatibility reasons.
-				'components-card__media',
+				'components-card__body',
 				className
 			),
-		[ className, cx ]
+		[ className, cx, isShady, size ]
 	);
 
 	return {
 		...otherProps,
 		className: classes,
+		isScrollable,
 	};
 }

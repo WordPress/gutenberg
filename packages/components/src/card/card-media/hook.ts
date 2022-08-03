@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentProps } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -9,25 +14,20 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { CardMedia } from '../index';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
- */
-export function useCardDivider( props ) {
-	const { className, ...otherProps } = useContextSystem(
-		props,
-		'CardDivider'
-	);
+export function useCardMedia( props: ComponentProps< typeof CardMedia > ) {
+	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.Divider,
-				styles.borderColor,
+				styles.Media,
+				styles.borderRadius,
 				// This classname is added for legacy compatibility reasons.
-				'components-card__divider',
+				'components-card__media',
 				className
 			),
 		[ className, cx ]
