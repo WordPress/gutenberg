@@ -19,7 +19,7 @@ class WP_Text_Replacement {
 	 * Byte offset into document where replacement span begins.
 	 *
 	 * @since 6.1.0
-	 * @var integer
+	 * @var int
 	 */
 	public $start;
 
@@ -27,7 +27,7 @@ class WP_Text_Replacement {
 	 * Byte offset into document where replacement span ends.
 	 *
 	 * @since 6.1.0
-	 * @var integer
+	 * @var int
 	 */
 	public $end;
 

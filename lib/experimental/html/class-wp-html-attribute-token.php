@@ -35,7 +35,7 @@ class WP_HTML_Attribute_Token {
 	 * The string offset where the attribute name starts.
 	 *
 	 * @since 6.1.0
-	 * @var integer
+	 * @var int
 	 */
 	public $start;
 
@@ -43,7 +43,7 @@ class WP_HTML_Attribute_Token {
 	 * The string offset after the attribute value or its name.
 	 *
 	 * @since 6.1.0
-	 * @var integer
+	 * @var int
 	 */
 	public $end;
 

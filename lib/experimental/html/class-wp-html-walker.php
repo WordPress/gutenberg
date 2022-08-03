@@ -29,37 +29,48 @@ class WP_HTML_Walker {
 	 * @var string
 	 */
 	private $html;
+
 	/**
 	 * The updated HTML document.
 	 *
+	 * @since 6.1.0
 	 * @var string
 	 */
 	private $updated_html = '';
+
 	/**
 	 * How many bytes from the original HTML document were already read.
 	 *
+	 * @since 6.1.0
 	 * @var int
 	 */
 	private $parsed_bytes = 0;
+
 	/**
 	 * How many bytes from the original HTML document were already treated
 	 * with the requested replacements.
 	 *
+	 * @since 6.1.0
 	 * @var int
 	 */
 	private $updated_bytes = 0;
+
 	/**
 	 * Whether the parsing is already finished.
 	 *
+	 * @since 6.1.0
 	 * @var bool
 	 */
 	private $closed = false;
+
 	/**
 	 * The name of the currently matched tag.
 	 *
+	 * @since 6.1.0
 	 * @var string|null
 	 */
 	private $tag_name;
+
 	/**
 	 * Byte offset after the name of current tag.
 	 * Example:
@@ -67,9 +78,11 @@ class WP_HTML_Walker {
 	 *   01234
 	 *       ^ tag_name_ends_at = 4
 	 *
+	 * @since 6.1.0
 	 * @var number
 	 */
 	private $tag_name_ends_at;
+
 	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
 	 *
@@ -94,7 +107,8 @@ class WP_HTML_Walker {
 	 *     // That's because it is the only value used by this class at the moment.
 	 * </code>
 	 *
-	 * @var array<WP_HTML_Attribute_Token>
+	 * @since 6.1.0
+	 * @var WP_HTML_Attribute_Token[]
 	 */
 	private $attributes = array();
 
@@ -119,7 +133,8 @@ class WP_HTML_Walker {
 	 *     );
 	 * </code>
 	 *
-	 * @var array<WP_Class_Name_Update>
+	 * @since 6.1.0
+	 * @var WP_Class_Name_Update[]
 	 */
 	private $classnames_updates = array();
 
@@ -148,11 +163,16 @@ class WP_HTML_Walker {
 	 *     );
 	 * </code>
 	 *
-	 * @var array<WP_Text_Replacement>
+	 * @since 6.1.0
+	 * @var WP_Text_Replacement[]
 	 */
 	private $attributes_updates = array();
 
 	/**
+	 * Constructor.
+	 *
+	 * @since 6.1.0
+	 *
 	 * @param string $html HTML to process.
 	 */
 	public function __construct( $html ) {
@@ -162,17 +182,16 @@ class WP_HTML_Walker {
 	/**
 	 * Finds the next tag matching the $query.
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param array|string $query {
 	 *     Which tag name to find, having which class, etc.
 	 *
-	 * @type string|null $tag_name Which tag to find, or `null` for "any tag."
-	 * @type int|null $match_offset Find the Nth tag matching all search criteria.
-	 *                                   0 for "first" tag, 2 for "third," etc.
-	 *                                   Defaults to first tag.
-	 * @type string|null $class_name Tag must contain this whole class name to match.
-	 * @type array<string|callable>  Tag must contain data-attribute of given name and optionally a given
-	 *                                   value, or a given predicate function which returns whether the
-	 *                                   attribute's value constitutes a match.
+	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
+	 *     @type int|null    $match_offset Find the Nth tag matching all search criteria.
+	 *                                     0 for "first" tag, 2 for "third," etc.
+	 *                                     Defaults to first tag.
+	 *     @type string|null $class_name   Tag must contain this whole class name to match.
 	 * }
 	 * @return boolean Whether a tag was matched.
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -206,6 +225,11 @@ class WP_HTML_Walker {
 		return true;
 	}
 
+	/**
+	 * Parses the next tag.
+	 *
+	 * @since 6.1.0
+	 */
 	private function parse_next_tag() {
 		$this->after_tag();
 		$matches = $this->consume_regexp(
@@ -221,6 +245,11 @@ class WP_HTML_Walker {
 		$this->tag_name_ends_at = $this->parsed_bytes;
 	}
 
+	/**
+	 * Parses the next attribute.
+	 *
+	 * @since 6.1.0
+	 */
 	private function parse_next_attribute() {
 		$name_match = $this->consume_regexp(
 			'~
@@ -285,6 +314,13 @@ class WP_HTML_Walker {
 		return $this->attributes[ $attribute_name ];
 	}
 
+	/**
+	 * Asserts that the HTML Walker has not been closed for further lookup or modifications.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @throws WP_HTML_Walker_Exception If the HTML Walker has been closed.
+	 */
 	private function assert_not_closed() {
 		if ( $this->closed ) {
 			throw new WP_HTML_Walker_Exception(
@@ -298,6 +334,8 @@ class WP_HTML_Walker {
 
 	/**
 	 * Applies attribute updates and cleans up once a tag is fully parsed.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @return void
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -316,6 +354,8 @@ class WP_HTML_Walker {
 	 *
 	 * This method is only meant to run right before the attribute updates are applied.
 	 * The behavior in all other cases is undefined.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @return void
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -370,6 +410,11 @@ class WP_HTML_Walker {
 		}
 	}
 
+	/**
+	 * Applies updates to attributes.
+	 *
+	 * @since 6.1.0
+	 */
 	private function apply_attributes_updates() {
 		if ( ! count( $this->attributes_updates ) ) {
 			return;
@@ -399,7 +444,9 @@ class WP_HTML_Walker {
 	/**
 	 * Updates or creates a new attribute on the currently matched tag.
 	 *
-	 * @param string $name The attribute name to target.
+	 * @since 6.1.0
+	 *
+	 * @param string $name  The attribute name to target.
 	 * @param string $value The new attribute value.
 	 *
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -453,6 +500,8 @@ class WP_HTML_Walker {
 	/**
 	 * Removes an attribute of the currently matched tag.
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param string $name The attribute name to remove.
 	 *
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -480,6 +529,14 @@ class WP_HTML_Walker {
 		}
 	}
 
+	/**
+	 * Returns the current tag attribute or false if not found.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $name The attribute name to target.
+	 * @return WP_HTML_Attribute_Token|boolean The attribute token, or false if not found.
+	 */
 	private function get_current_tag_attribute( $name ) {
 		if ( array_key_exists( $name, $this->attributes ) ) {
 			return $this->attributes[ $name ];
@@ -488,12 +545,21 @@ class WP_HTML_Walker {
 		return false;
 	}
 
+	/**
+	 * Return true when the HTML Walker is closed for further lookups and modifications.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @return boolean True if the HTML Walker is closed, false otherwise.
+	 */
 	public function is_closed() {
 		return $this->closed;
 	}
 
 	/**
 	 * Adds a new class name to the currently matched tag.
+	 *
+	 * @since 6.1.0
 	 *
 	 * @param string $class_name The class name to add.
 	 *
@@ -509,6 +575,8 @@ class WP_HTML_Walker {
 	/**
 	 * Removes a class name from the currently matched tag.
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param string $class_name The class name to remove.
 	 *
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
@@ -520,6 +588,15 @@ class WP_HTML_Walker {
 		}
 	}
 
+	/**
+	 * Returns the result of the search on the HTML document using the passed regular expression.
+	 * If there is no match found it returns false.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $regexp The regular expression to process with the HTML document.
+	 * @return array|false The result of the search or false if no matches found.
+	 */
 	private function consume_regexp( $regexp ) {
 		$matches = null;
 		$result  = preg_match(
@@ -538,16 +615,24 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * @param array $match
+	 * Returns the offset after the match.
 	 *
-	 * @return int|mixed
+	 * @since 6.1.0
+	 *
+	 * @param array $match The match result filled by preg_match.
+	 * @return int The offset after the match.
 	 */
 	private function offset_after_match( $match ) {
 		return $match[1] + strlen( $match[0] );
 	}
 
 	/**
-	 * @return string
+	 * Returns the string representation of the HTML Walker.
+	 * It closes the HTML Walker and prevents further lookups and modifications.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @return string The processed HTML.
 	 */
 	public function __toString() {
 		if ( ! $this->is_closed() ) {
@@ -561,12 +646,14 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * @param string $value
+	 * Processes the passed comparable value.
 	 *
-	 * @return string
+	 * @since 6.1.0
+	 *
+	 * @param string $value The comparable value to process.
+	 * @return string The processed value.
 	 */
 	public static function comparable( $value ) {
 		return trim( strtolower( $value ) );
 	}
-
 }
