@@ -22,7 +22,7 @@ import { View } from '../../view';
 import * as styles from '../styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
-import { useCx } from '../../utils';
+import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
 function Card(
