@@ -72,6 +72,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
+			'prettify' => false,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 
@@ -86,11 +87,12 @@ class WP_Style_Engine_Processor {
 		}
 
 		// Build the CSS.
-		$css = '';
+		$css      = '';
+		$new_line = $options['prettify'] ? "\n" : '';
 		foreach ( $this->css_rules as $rule ) {
-			$css .= $rule->get_css();
+			$css .= $rule->get_css( $options['prettify'] ) . $new_line;
 		}
-		return $css;
+		return rtrim( $css );
 	}
 
 	/**
