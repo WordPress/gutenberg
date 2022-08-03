@@ -174,7 +174,7 @@ describe( 'Quote', () => {
 		"<!-- wp:quote -->
 		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
 		<p>1</p>
-		<!-- /wp:paragraph --><cite>2</cite></blockquote>
+		<!-- /wp:paragraph --><cite class=\\"wp-block-quote__citation wp-element-cite\\">2</cite></blockquote>
 		<!-- /wp:quote -->"
 	` );
 
