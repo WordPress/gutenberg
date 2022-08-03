@@ -283,7 +283,7 @@ const Popover = (
 		// Positioning coordinates
 		x,
 		y,
-		// Callback refs *not regular refs) This allows the position to be updated
+		// Callback refs (not regular refs). This allows the position to be updated.
 		// when either elements change.
 		reference,
 		floating,
@@ -302,7 +302,7 @@ const Popover = (
 	// - "reference" refers to the popover's anchor element.
 	// - "floating" refers the floating popover's element.
 	// A floating element can also be positioned relative to a virtual element,
-	// instead of a real one — a virtual element is represented by an object
+	// instead of a real one. A virtual element is represented by an object
 	// with the `getBoundingClientRect()` function (like real elements).
 	// See https://floating-ui.com/docs/virtual-elements for more info.
 	useLayoutEffect( () => {
@@ -324,7 +324,7 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRef?.current ) {
-			// Standard React ref
+			// Standard React ref.
 			resultingReferenceRef = anchorRef.current;
 		} else if ( anchorRef ) {
 			// If `anchorRef` holds directly the element's value (no `current` key)
@@ -385,7 +385,7 @@ const Popover = (
 	}, [ __unstableObserveElement ] );
 
 	// If the reference element is in a different ownerDocument (e.g. iFrame),
-	// we need to manually update the floating's position as the reference's owner\
+	// we need to manually update the floating's position as the reference's owner
 	// document scrolls.
 	useLayoutEffect( () => {
 		if ( ownerDocument === document ) {
