@@ -53,9 +53,9 @@ const getLabel = ( labelText ) => screen.getByText( labelText );
 const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
 const getOption = ( name ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
-const setTargetOption = ( index ) => {
-	const searchString = timezones[ index ].label.substring( 0, 11 );
-	return { searchString, ...timezones[ index ] };
+const getTargetOption = ( options, index ) => {
+	const searchString = options[ index ].label.substring( 0, 11 );
+	return { searchString, ...options[ index ] };
 };
 const setupUser = () =>
 	userEvent.setup( {
@@ -138,7 +138,7 @@ describe.each( [
 
 	it( 'should select the correct option via click events', async () => {
 		const user = setupUser();
-		const targetOption = setTargetOption( 2 );
+		const targetOption = getTargetOption( timezones, 2 );
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -163,7 +163,7 @@ describe.each( [
 	it( 'should select the correct option via keypress events', async () => {
 		const user = setupUser();
 		const targetIndex = 4;
-		const targetOption = setTargetOption( targetIndex );
+		const targetOption = getTargetOption( timezones, targetIndex );
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -192,7 +192,7 @@ describe.each( [
 
 	it( 'should select the correct option from a search', async () => {
 		const user = setupUser();
-		const targetOption = setTargetOption( 13 );
+		const targetOption = getTargetOption( timezones, 13 );
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -219,7 +219,7 @@ describe.each( [
 
 	it( 'should render aria-live announcement upon selection', async () => {
 		const user = setupUser();
-		const targetOption = setTargetOption( 9 );
+		const targetOption = getTargetOption( timezones, 9 );
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
@@ -246,7 +246,7 @@ describe.each( [
 	it( 'should process multiple entries in a single session', async () => {
 		const user = setupUser();
 		const unmatchedString = 'Mordor';
-		const targetOption = setTargetOption( 6 );
+		const targetOption = getTargetOption( timezones, 6 );
 		const onChangeSpy = jest.fn();
 		render(
 			<Component
