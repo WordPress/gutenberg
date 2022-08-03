@@ -188,7 +188,7 @@ Yes. The method for this is identical to the main Plugin release process. You wi
 
 > The release process failed to cherry-pick version bump commit to the trunk branch.
 
-First, confirm that the step failed by checking the latest commits on the trunk. Then revert version bump commit on the release branch - `git revert --no-edit {commitHash}`. Finally, push the changes and start the release process again.
+First, confirm that the step failed by checking the latest commits on `trunk` do not include the version bump commit. Then revert the version bump commit on the release branch - `git revert --no-edit {commitHash}`. Finally, push the changes and start the release process again.
 
 ## Packages Releases to npm and WordPress Core Updates
 
