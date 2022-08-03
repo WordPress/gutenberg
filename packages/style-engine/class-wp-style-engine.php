@@ -679,7 +679,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet( $css_rules, $options = array() ) {
+function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = array() ) {
 	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $css_rules ) ) {
 		return '';
 	}
