@@ -113,6 +113,7 @@ function RichTextWrapper(
 		setRef,
 		disableSuggestions,
 		disableAutocorrection,
+		containerWidth,
 		...props
 	},
 	forwardedRef
@@ -639,6 +640,7 @@ function RichTextWrapper(
 			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
+			containerWidth={ containerWidth }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
