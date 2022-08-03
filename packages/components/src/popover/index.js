@@ -162,25 +162,26 @@ const Popover = (
 		: placement;
 
 	const ownerDocument = useMemo( () => {
+		let documentToReturn;
+
 		if ( anchorRef?.top ) {
-			return anchorRef?.top.ownerDocument;
+			documentToReturn = anchorRef?.top.ownerDocument;
 		} else if ( anchorRef?.startContainer ) {
-			return anchorRef.startContainer.ownerDocument;
+			documentToReturn = anchorRef.startContainer.ownerDocument;
 		} else if ( anchorRef?.current ) {
-			return anchorRef.current.ownerDocument;
+			documentToReturn = anchorRef.current.ownerDocument;
 		} else if ( anchorRef ) {
 			// This one should be deprecated.
-			return anchorRef.ownerDocument;
+			documentToReturn = anchorRef.ownerDocument;
 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
-			return anchorRect.ownerDocument;
+			documentToReturn = anchorRect.ownerDocument;
 		} else if ( getAnchorRect ) {
-			return (
-				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
-				document
-			);
+			documentToReturn = getAnchorRect(
+				anchorRefFallback.current
+			)?.ownerDocument;
 		}
 
-		return document;
+		return documentToReturn ?? document;
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
 	/**
