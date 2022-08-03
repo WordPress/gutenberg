@@ -18,6 +18,7 @@
 
 ### Enhancements
 
+- `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphn ([#42942](https://github.com/WordPress/gutenberg/pull/42942))
 -   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
 -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
 -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
