@@ -15,7 +15,6 @@ import { COLORS } from '../../utils';
 
 export const FocalPointWrapper = styled.div`
 	background-color: transparent;
-	box-sizing: border-box;
 	cursor: grab;
 	height: 30px;
 	margin: -15px 0 0 -15px;

@@ -24,9 +24,6 @@ const meta: ComponentMeta< typeof UnitControl > = {
 		__unstableStateReducer: {
 			control: { type: null },
 		},
-		size: {
-			control: { type: 'select' },
-		},
 		onChange: {
 			action: 'onChange',
 			control: { type: null },
@@ -54,16 +51,14 @@ const DefaultTemplate: ComponentStory< typeof UnitControl > = ( {
 	const [ value, setValue ] = useState< string | undefined >( '10px' );
 
 	return (
-		<div style={ { maxWidth: '100px' } }>
-			<UnitControl
-				{ ...args }
-				value={ value }
-				onChange={ ( v, extra ) => {
-					setValue( v );
-					onChange?.( v, extra );
-				} }
-			/>
-		</div>
+		<UnitControl
+			{ ...args }
+			value={ value }
+			onChange={ ( v, extra ) => {
+				setValue( v );
+				onChange?.( v, extra );
+			} }
+		/>
 	);
 };
 
@@ -125,16 +120,14 @@ export const WithCustomUnits: ComponentStory< typeof UnitControl > = ( {
 	const [ value, setValue ] = useState< string | undefined >( '80km' );
 
 	return (
-		<div style={ { maxWidth: '100px' } }>
-			<UnitControl
-				{ ...args }
-				value={ value }
-				onChange={ ( v, extra ) => {
-					setValue( v );
-					onChange?.( v, extra );
-				} }
-			/>
-		</div>
+		<UnitControl
+			{ ...args }
+			value={ value }
+			onChange={ ( v, extra ) => {
+				setValue( v );
+				onChange?.( v, extra );
+			} }
+		/>
 	);
 };
 WithCustomUnits.args = {

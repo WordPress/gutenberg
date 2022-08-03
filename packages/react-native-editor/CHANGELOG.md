@@ -11,8 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.80.0
 -   [*] Add React Native FastImage [#42009]
 -   [*] Block inserter displays block collections [#42405]
+-   [*] Fix incorrect spacing within Image alt text footnote [#42504]
+-   [***] Gallery and Image block - Performance improvements [#42178]
+
+## 1.79.1
 -   [**] Fix a crash when scrolling posts containing Embed blocks (Android 12 only) [#42514]
 
 ## 1.79.0

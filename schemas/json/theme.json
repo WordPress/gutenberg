@@ -364,7 +364,8 @@
 										"type": "string"
 									},
 									"fluid": {
-										"type": "object",
+										"description": "Specifics the minimum and maximum font size value of a fluid font size. Set to `false` to bypass fluid calculations and use the static `size` value.",
+										"type": [ "object", "boolean" ],
 										"properties": {
 											"min": {
 												"description": "A min font size for fluid font size calculations in px, rem or em.",
@@ -1102,7 +1103,7 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"link": {
 					"type": "object",
@@ -1130,6 +1131,9 @@
 						}
 					]
 				},
+				"heading": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
 				"h1": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
@@ -1146,6 +1150,9 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"h6": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"caption": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
