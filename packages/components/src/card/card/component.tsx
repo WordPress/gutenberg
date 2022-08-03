@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -11,19 +12,23 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, ContextSystemProvider } from '../../ui/context';
+import {
+	contextConnect,
+	ContextSystemProvider,
+	WordPressComponentProps,
+} from '../../ui/context';
 import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from '../styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx } from '../../utils';
+import type { Props } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
- */
-function Card( props, forwardedRef ) {
+function Card(
+	props: WordPressComponentProps< Props, 'div' >,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const {
 		children,
 		elevation,
@@ -105,6 +110,9 @@ function Card( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedCard = contextConnect( Card, 'Card' );
+const ConnectedCard = contextConnect< WordPressComponentProps< Props, 'div' > >(
+	Card,
+	'Card'
+);
 
 export default ConnectedCard;

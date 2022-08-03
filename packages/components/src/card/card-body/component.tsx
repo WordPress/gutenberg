@@ -1,16 +1,21 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
  * Internal dependencies
  */
-import { contextConnect } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { Scrollable } from '../../scrollable';
 import { View } from '../../view';
 import { useCardBody } from './hook';
+import type { BodyProps } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
- */
-function CardBody( props, forwardedRef ) {
+function CardBody(
+	props: WordPressComponentProps< BodyProps, 'div' >,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const { isScrollable, ...otherProps } = useCardBody( props );
 
 	if ( isScrollable ) {
@@ -35,6 +40,8 @@ function CardBody( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
+const ConnectedCardBody = contextConnect<
+	WordPressComponentProps< BodyProps, 'div' >
+>( CardBody, 'CardBody' );
 
 export default ConnectedCardBody;

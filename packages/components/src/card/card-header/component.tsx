@@ -1,15 +1,19 @@
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
-
+import type { HeaderProps } from '../types';
 /**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+ * External dependencies
  */
-function CardHeader( props, forwardedRef ) {
+import type { ForwardedRef } from 'react';
+
+function CardHeader(
+	props: WordPressComponentProps< HeaderProps, 'div' >,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const headerProps = useCardHeader( props );
 
 	return <Flex { ...headerProps } ref={ forwardedRef } />;
@@ -28,6 +32,8 @@ function CardHeader( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
+const ConnectedCardHeader = contextConnect<
+	WordPressComponentProps< HeaderProps, 'div' >
+>( CardHeader, 'CardHeader' );
 
 export default ConnectedCardHeader;

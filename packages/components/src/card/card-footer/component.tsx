@@ -1,15 +1,20 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { contextConnect } from '../../ui/context';
-import { Flex } from '../../flex';
-import { useCardFooter } from './hook';
+import type { ForwardedRef } from 'react';
 
 /**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+ * Internal dependencies
  */
-function CardFooter( props, forwardedRef ) {
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import { Flex } from '../../flex';
+import { useCardFooter } from './hook';
+import type { FooterProps } from '../types';
+
+function CardFooter(
+	props: WordPressComponentProps< FooterProps, 'div' >,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const footerProps = useCardFooter( props );
 
 	return <Flex { ...footerProps } ref={ forwardedRef } />;
@@ -28,6 +33,8 @@ function CardFooter( props, forwardedRef ) {
  * </Card>
  * ```
  */
-const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
+const ConnectedCardFooter = contextConnect<
+	WordPressComponentProps< FooterProps, 'div' >
+>( CardFooter, 'CardFooter' );
 
 export default ConnectedCardFooter;
