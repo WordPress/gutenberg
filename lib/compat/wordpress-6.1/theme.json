@@ -269,7 +269,7 @@
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
-			"customSpacingSizes": true,
+			"customSpacingSize": true,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingScale": {
 				"operator": "*",
