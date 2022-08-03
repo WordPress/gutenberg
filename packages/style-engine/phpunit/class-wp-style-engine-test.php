@@ -6,7 +6,10 @@
  * @subpackage style-engine
  */
 
+require __DIR__ . '/../class-wp-style-engine-processor.php';
 require __DIR__ . '/../class-wp-style-engine-css-declarations.php';
+require __DIR__ . '/../class-wp-style-engine-css-rule.php';
+require __DIR__ . '/../class-wp-style-engine-css-rules-store.php';
 require __DIR__ . '/../class-wp-style-engine.php';
 
 /**
@@ -14,36 +17,44 @@ require __DIR__ . '/../class-wp-style-engine.php';
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
+	 * Tear down after each test.
+	 */
+	public function tear_down() {
+		parent::tear_down();
+		WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+	}
+
+	/**
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @dataProvider data_generate_block_supports_styles_fixtures
+	 * @dataProvider data_get_styles_fixtures
 	 *
-	 * @param array  $block_styles    The incoming block styles object.
-	 * @param array  $options         Style engine options.
+	 * @param array  $block_styles The incoming block styles object.
+	 * @param array  $options Style engine options.
 	 * @param string $expected_output The expected output.
 	 */
-	public function test_generate_block_supports_styles( $block_styles, $options, $expected_output ) {
+	public function test_generate_get_styles( $block_styles, $options, $expected_output ) {
 		$generated_styles = wp_style_engine_get_styles( $block_styles, $options );
 		$this->assertSame( $expected_output, $generated_styles );
 	}
 
 	/**
-	 * Data provider.
+	 * Data provider for test_generate_get_styles().
 	 *
 	 * @return array
 	 */
-	public function data_generate_block_supports_styles_fixtures() {
+	public function data_get_styles_fixtures() {
 		return array(
 			'default_return_value'                         => array(
 				'block_styles'    => array(),
 				'options'         => null,
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_empty'            => array(
 				'block_styles'    => 'hello world!',
 				'options'         => null,
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 
 			'inline_invalid_block_styles_unknown_style'    => array(
@@ -72,7 +83,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(),
 			),
 
-			'valid_inline_css_and_classnames'              => array(
+			'valid_inline_css_and_classnames_as_default_context' => array(
 				'block_styles'    => array(
 					'color'   => array(
 						'text' => 'var:preset|color|texas-flood',
@@ -98,6 +109,44 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 					'classnames'   => 'has-text-color has-texas-flood-color has-border-color has-cool-caramel-border-color',
 				),
+			),
+
+			'valid_inline_css_and_classnames_with_context' => array(
+				'block_styles'    => array(
+					'color'   => array(
+						'text' => 'var:preset|color|little-lamb',
+					),
+					'spacing' => array(
+						'margin' => '20px',
+					),
+				),
+				'options'         => array(
+					'convert_vars_to_classnames' => true,
+					'context'                    => 'block-supports',
+				),
+				'expected_output' => array(
+					'css'          => 'margin: 20px;',
+					'declarations' => array(
+						'margin' => '20px',
+					),
+					'classnames'   => 'has-text-color has-little-lamb-color',
+				),
+			),
+
+			'invalid_context'                              => array(
+				'block_styles'    => array(
+					'color'   => array(
+						'text' => 'var:preset|color|sugar',
+					),
+					'spacing' => array(
+						'padding' => '20000px',
+					),
+				),
+				'options'         => array(
+					'convert_vars_to_classnames' => true,
+					'context'                    => 'i-love-doughnuts',
+				),
+				'expected_output' => array(),
 			),
 
 			'inline_valid_box_model_style'                 => array(
@@ -187,7 +236,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'selector' => '.wp-selector > p' ),
 				'expected_output' => array(
-					'css'          => '.wp-selector > p { padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; }',
+					'css'          => '.wp-selector > p {padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem;}',
 					'declarations' => array(
 						'padding-top'    => '42px',
 						'padding-left'   => '2%',
@@ -207,7 +256,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'          => '.wp-selector { color: var(--wp--preset--color--my-little-pony); }',
+					'css'          => '.wp-selector {color: var(--wp--preset--color--my-little-pony);}',
 					'declarations' => array(
 						'color' => 'var(--wp--preset--color--my-little-pony)',
 					),
@@ -457,5 +506,154 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
+	 */
+	public function test_enqueue_block_styles_store() {
+		$block_styles = array(
+			'spacing' => array(
+				'padding' => array(
+					'top'    => '42px',
+					'left'   => '2%',
+					'bottom' => '44px',
+					'right'  => '5rem',
+				),
+			),
+		);
+
+		$generated_styles = wp_style_engine_get_styles(
+			$block_styles,
+			array(
+				'enqueue'  => true,
+				'context'  => 'block-supports',
+				'selector' => 'article',
+			)
+		);
+		$store            = WP_Style_Engine::get_instance()::get_store( 'block-supports' );
+		$rule             = $store->get_all_rules()['article'];
+		$this->assertSame( $generated_styles['css'], $rule->get_css() );
+	}
+
+	/**
+	 * Tests adding rules to a store and retrieving a generated stylesheet.
+	 */
+	public function test_add_to_store() {
+		$css_rules           = array(
+			array(
+				'selector'     => '.frodo',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '10px',
+					'width'        => '30px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.samwise',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '20px',
+					'width'        => '50px',
+					'border-style' => 'solid',
+				),
+			),
+		);
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+			$css_rules,
+			array(
+				'context' => 'test-store',
+				'enqueue' => true,
+			)
+		);
+
+		// Check that the style engine knows about the store.
+		$style_engine = WP_Style_Engine::get_instance();
+		$stored_store = $style_engine::get_store( 'test-store' );
+		$this->assertInstanceOf( 'WP_Style_Engine_CSS_Rules_Store', $stored_store );
+		$this->assertSame( $compiled_stylesheet, $style_engine::compile_stylesheet_from_css_rules( $stored_store->get_all_rules() ) );
+	}
+
+	/**
+	 * Tests retrieving a generated stylesheet from any rules.
+	 */
+	public function test_get_stylesheet_from_css_rules() {
+		$css_rules = array(
+			array(
+				'selector'     => '.saruman',
+				'declarations' => array(
+					'color'        => 'white',
+					'height'       => '100px',
+					'border-style' => 'solid',
+					'align-self'   => 'unset',
+				),
+			),
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+					'align-self'   => 'safe center',
+				),
+			),
+			array(
+				'selector'     => '.radagast',
+				'declarations' => array(
+					'color'        => 'brown',
+					'height'       => '60px',
+					'border-style' => 'dashed',
+					'align-self'   => 'stretch',
+				),
+			),
+		);
+
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests that incoming styles are deduped and merged.
+	 */
+	public function test_get_deduped_and_merged_stylesheet() {
+		$css_rules = array(
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.gandalf',
+				'declarations' => array(
+					'color'         => 'white',
+					'height'        => '190px',
+					'padding'       => '10px',
+					'margin-bottom' => '100px',
+				),
+			),
+			array(
+				'selector'     => '.dumbledore',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+			array(
+				'selector'     => '.rincewind',
+				'declarations' => array(
+					'color'        => 'grey',
+					'height'       => '90px',
+					'border-style' => 'dotted',
+				),
+			),
+		);
+
+		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
+		$this->assertSame( '.gandalf {color: white; height: 190px; border-style: dotted; padding: 10px; margin-bottom: 100px;}.dumbledore,.rincewind {color: grey; height: 90px; border-style: dotted;}', $compiled_stylesheet );
 	}
 }

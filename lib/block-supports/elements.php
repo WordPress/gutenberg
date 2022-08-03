@@ -92,9 +92,6 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	/*
 	* For now we only care about link color.
-	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
-	* and work for any element and style.
 	*/
 	$skip_link_color_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 
@@ -104,18 +101,14 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	$class_name        = gutenberg_get_elements_class_name( $block );
 	$link_block_styles = isset( $element_block_styles['link'] ) ? $element_block_styles['link'] : null;
 
-	if ( $link_block_styles ) {
-		$styles = gutenberg_style_engine_get_styles(
-			$link_block_styles,
-			array(
-				'selector' => ".$class_name a",
-			)
-		);
-
-		if ( ! empty( $styles['css'] ) ) {
-			gutenberg_enqueue_block_support_styles( $styles['css'] );
-		}
-	}
+	gutenberg_style_engine_get_styles(
+		$link_block_styles,
+		array(
+			'selector' => ".$class_name a",
+			'context'  => 'block-supports',
+			'enqueue'  => true,
+		)
+	);
 
 	return null;
 }
