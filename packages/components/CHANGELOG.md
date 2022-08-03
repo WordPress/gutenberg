@@ -20,6 +20,7 @@
 
 ### Internal
 
+-   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
 -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
 
 ## 19.16.0 (2022-07-27)
