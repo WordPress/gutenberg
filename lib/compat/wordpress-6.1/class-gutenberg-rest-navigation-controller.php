@@ -25,14 +25,14 @@ class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 		$post = $result;
 
-		if ( 'publish' !== $post->post_status || 'draft' !== $post->post_status ) {
+		if ( 'publish' === $post->post_status || 'draft' === $post->post_status ) {
+			return $post;
+		} else {
 			return new WP_Error(
 				'rest_post_invalid_id',
 				__( 'Invalid post ID.' ),
 				array( 'status' => 404 )
 			);
-		} else {
-			return $post;
 		}
 
 	}
