@@ -45,7 +45,7 @@ Don't rush this part -- it's important to bring the release notes into a nice sh
 When editing the notes, you should be sure to:
 
 1. Delete the `Various` section and move anything under it to a more appropriate section.
-2. Move all features under `Uncategorized` bullet points to a more suitable feature.
+2. Move all features under `Uncategorized` bullet points to a more suitable feature.q
 
 You can find some more tips on writing the release notes and post in the section below.
 
@@ -129,7 +129,7 @@ Once the post content is ready, an author already having permissions to post in 
 If a bug is found in a release candidate and a fix is committed to `trunk`, we should include that fix in the stable version (or optionally in another release candidate before that). To do this you'll need to use `git cherry-pick` to add these changes to the milestone's release branch. This way only the desired fixes are added rather than all the new code that has landed on `trunk` since tagging:
 
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
-2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`.
+2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/auto-cherry-picking.md).
 3. When done, push the changes to GitHub: `git push`.
 
 If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
@@ -145,6 +145,8 @@ The method for point releases is nearly identical to the main Plugin release pro
 #### Updating the release branch
 
 The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release branch (e.g. `release/12.5`) locally and then cherry pick any commits that you require into that branch.
+
+The cherry-picking process can be automated with the [`npm run cherry-pick` script](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/auto-cherry-picking.md).
 
 You must also ensure that all PRs being included are assigned to the Github Milestone on which the point release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in Github and re-assign the Milestone.
 
@@ -233,7 +235,7 @@ The following workflow is needed when bug or security fixes need to be backporte
 -   For WordPress minor releases and WordPress security releases (example `5.1.1`).
 
 1. Check out the relevant WordPress major branch (If the minor release is 5.2.1, check out `wp/5.2`).
-2. Create a feature branch from that branch, and cherry-pick the merge commits for the needed bug fixes onto it.
+2. Create a feature branch from that branch, and cherry-pick the merge commits for the needed bug fixes onto it. The cherry-picking process can be automated with the [`npm run cherry-pick` script](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/auto-cherry-picking.md).
 3. Create a Pull Request from this branch targeting the WordPress major branch used above.
 4. Merge the Pull Request using the "Rebase and Merge" button to keep the history of the commits.
 
