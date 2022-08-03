@@ -74,6 +74,13 @@ export type BodyProps = BaseSubComponentProps & {
 	isScrollable?: boolean;
 };
 
+export type MediaProps = {
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
+};
+
 type MarginalSubComponentProps = BaseSubComponentProps & {
 	/**
 	 * Renders without a border.
