@@ -90,7 +90,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should compile css declarations into a css declarations block string.
+	 * Should compile css declarations into a prettified css declarations block string.
 	 */
 	public function test_generate_prettified_css_declarations_string() {
 		$input_declarations = array(
@@ -107,7 +107,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should compile css declarations into a css declarations block string.
+	 * Should compile css declarations into a prettified and indented css declarations block string.
 	 */
 	public function test_generate_prettified_with_indent_css_declarations_string() {
 		$input_declarations = array(

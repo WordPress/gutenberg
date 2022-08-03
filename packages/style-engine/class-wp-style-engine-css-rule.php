@@ -116,6 +116,7 @@ class WP_Style_Engine_CSS_Rule {
 		$rule_indent         = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$declarations_indent = $should_prettify ? $indent_count + 1 : 0;
 		$new_line            = $should_prettify ? "\n" : '';
-		return $rule_indent . $this->get_selector() . " {{$new_line}" . $this->declarations->get_declarations_string( $should_prettify, $declarations_indent ) . "{$new_line}{$rule_indent}}";
+		$space               = $should_prettify ? ' ' : '';
+		return $rule_indent . $this->get_selector() . "{$space}{{$new_line}" . $this->declarations->get_declarations_string( $should_prettify, $declarations_indent ) . "{$new_line}{$rule_indent}}";
 	}
 }
