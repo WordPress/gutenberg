@@ -280,18 +280,31 @@ const Popover = (
 	} );
 
 	const {
+		// Positioning coordinates
 		x,
 		y,
+		// Callback refs *not regular refs) This allows the position to be updated
+		// when either elements change.
 		reference,
 		floating,
-		strategy,
+		// Object with "regular" refs to both "reference" and "floating"
 		refs,
+		// Type of CSS position property to use (absolute or fixed)
+		strategy,
 		update,
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
 
-	// Updates references
+	// Update the `reference`'s ref.
+	//
+	// In floating-ui's terms:
+	// - "reference" refers to the popover's anchor element.
+	// - "floating" refers the floating popover's element.
+	// A floating element can also be positioned relative to a virtual element,
+	// instead of a real one — a virtual element is represented by an object
+	// with the `getBoundingClientRect()` function (like real elements).
+	// See https://floating-ui.com/docs/virtual-elements for more info.
 	useLayoutEffect( () => {
 		let resultingReferenceRef;
 
@@ -358,7 +371,7 @@ const Popover = (
 		);
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
-	// This is only needed for a smoth transition when moving blocks.
+	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
 		if ( ! __unstableObserveElement ) {
 			return;
@@ -371,7 +384,9 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement ] );
 
-	// If we're using getAnchorRect, we need to update the position as we scroll the iframe.
+	// If the reference element is in a different ownerDocument (e.g. iFrame),
+	// we need to manually update the floating's position as the reference's owner\
+	// document scrolls.
 	useLayoutEffect( () => {
 		if ( ownerDocument === document ) {
 			return;
@@ -425,6 +440,7 @@ const Popover = (
 					  }
 			}
 		>
+			{ /* Prevents scroll on the document */ }
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
 				<div className="components-popover__header">
