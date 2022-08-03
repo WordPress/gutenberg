@@ -23,7 +23,7 @@
 			"default": "",
 			"__experimentalRole": "content"
 		},
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},

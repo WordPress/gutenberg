@@ -9,6 +9,7 @@ import { omit } from 'lodash';
  */
 import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
 export const migrateToQuoteV2 = ( attributes ) => {
 	const { value } = attributes;
@@ -33,6 +34,73 @@ export const migrateToQuoteV2 = ( attributes ) => {
 			  )
 			: createBlock( 'core/paragraph' ),
 	];
+};
+
+const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
+
+// Migrate existing text alignment settings to the renamed attribute.
+const migrateTextAlign = ( attributes ) => {
+	const { align, ...rest } = attributes;
+	return TEXT_ALIGN_OPTIONS.includes( align )
+		? { ...rest, textAlign: align }
+		: attributes;
+};
+
+// Renamed the 'align' attribute to 'textAlign'.
+const v4 = {
+	attributes: {
+		value: {
+			type: 'string',
+			source: 'html',
+			selector: 'blockquote',
+			multiline: 'p',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		citation: {
+			type: 'string',
+			source: 'html',
+			selector: 'cite',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		__experimentalSlashInserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextTransform: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, value, citation } = attributes;
+
+		const className = classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} );
+
+		return (
+			<blockquote { ...useBlockProps.save( { className } ) }>
+				<RichText.Content multiline value={ value } />
+				{ ! RichText.isEmpty( citation ) && (
+					<RichText.Content tagName="cite" value={ citation } />
+				) }
+			</blockquote>
+		);
+	},
+	migrate: compose( migrateToQuoteV2, migrateTextAlign ),
 };
 
 const v3 = {
@@ -238,4 +306,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v3, v2, v1, v0 ];
+export default [ v4, v3, v2, v1, v0 ];
