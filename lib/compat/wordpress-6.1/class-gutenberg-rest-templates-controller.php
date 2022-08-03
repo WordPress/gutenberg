@@ -27,16 +27,17 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 					'callback'            => array( $this, 'get_template_fallback' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(
-						'slug'      => array(
+						'slug'            => array(
 							'description' => __( 'The slug of the template to get the fallback for', 'gutenberg' ),
 							'type'        => 'string',
 						),
-						'hierarchy' => array(
-							'description' => __( 'The template hierarchy to use to resolve the fallback template', 'gutenberg' ),
-							'type'        => 'array',
-							'items'       => array(
-								'type' => 'string',
-							),
+						'is_custom'       => array(
+							'description' => __( ' Indicates if a template is custom or part of the template hierarchy', 'gutenberg' ),
+							'type'        => 'boolean',
+						),
+						'template_prefix' => array(
+							'description' => __( 'The template prefix for the created template. This is used to extract the main template type ex. in `taxonomy-books` we extract the `taxonomy`', 'gutenberg' ),
+							'type'        => 'string',
 						),
 					),
 				),
@@ -60,14 +61,8 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 				array( 'status' => 400 )
 			);
 		}
-		if ( empty( $request['hierarchy'] ) || ! is_array( $request['hierarchy'] ) ) {
-			return new WP_Error(
-				'rest_invalid_param',
-				__( 'Invalid hierarchy.', 'gutenberg' ),
-				array( 'status' => 400 )
-			);
-		}
-		$fallback_template = resolve_block_template( $request['slug'], $request['hierarchy'], '' );
+		$hierarchy         = get_template_hierarchy( $request['slug'], $request['is_custom'], $request['template_prefix'] );
+		$fallback_template = resolve_block_template( $request['slug'], $hierarchy, '' );
 		return rest_ensure_response( $fallback_template );
 	}
 

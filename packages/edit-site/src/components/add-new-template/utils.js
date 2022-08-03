@@ -465,7 +465,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		( { slug } ) => slug === 'author'
 	);
 	if ( authorInfo.user?.hasEntities ) {
-		authorMenuItem = { ...authorMenuItem };
+		authorMenuItem = { ...authorMenuItem, templatePrefix: 'author' };
 		authorMenuItem.onClick = ( template ) => {
 			onClickMenuItem( {
 				type: 'root',
@@ -504,6 +504,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 							title,
 							description,
 							slug: `author-${ suggestion.slug }`,
+							templatePrefix: 'author',
 						};
 					},
 				},
@@ -663,65 +664,4 @@ const useEntitiesInfo = (
 		[ templatePrefixes, recordsToExcludePerEntity ]
 	);
 	return entitiesInfo;
-};
-
-/**
- * Helper function to get the Template Hierarchy for a given slug.
- * We need to Handle special cases here like `front-page`, `singular` and `archive` templates.
- *
- * Noting that we always add `index` as the last fallback template.
- *
- * @param {string}  templateSlug        The template slug to be created.
- * @param {Object}  meta                Metadata about the template to be created.
- * @param {boolean} meta.isCustom       Indicates if a template is custom or part of the template hierarchy.
- * @param {string}  meta.templatePrefix The template prefix for the created template. This is used to extract the main template type ex. in `taxonomy-books` we extract the `taxonomy`.
- *
- * @return {string[]} The template hierarchy.
- */
-export const getTemplateHierarchy = ( templateSlug, meta ) => {
-	if ( templateSlug === 'index' ) {
-		return [ 'index' ];
-	}
-	if ( meta?.isCustom ) {
-		return [ 'page', 'singular', 'index' ];
-	}
-	if ( templateSlug === 'front-page' ) {
-		return [ 'front-page', 'home', 'index' ];
-	}
-	const templateHierarchy = [ templateSlug ];
-	// Most default templates don't have `templatePrefix` property.
-	if ( meta?.templatePrefix ) {
-		const [ type ] = meta.templatePrefix.split( '-' );
-		// We need these checks because we always add the `templateSlug` above.
-		if ( ! [ templateSlug, type ].includes( meta.templatePrefix ) ) {
-			templateHierarchy.push( meta.templatePrefix );
-		}
-		if ( templateSlug !== type ) {
-			templateHierarchy.push( type );
-		}
-	}
-	// Handle `archive` template.
-	if (
-		templateSlug.startsWith( 'author' ) ||
-		templateSlug.startsWith( 'taxonomy' ) ||
-		templateSlug.startsWith( 'category' ) ||
-		templateSlug.startsWith( 'tag' ) ||
-		templateSlug === 'date'
-	) {
-		templateHierarchy.push( 'archive' );
-	}
-	// Handle `single` template.
-	if ( templateSlug === 'attachment' ) {
-		templateHierarchy.push( 'single' );
-	}
-	// Handle `singular` template.
-	if (
-		templateSlug.startsWith( 'single' ) ||
-		templateSlug.startsWith( 'page' ) ||
-		templateSlug === 'attachment'
-	) {
-		templateHierarchy.push( 'singular' );
-	}
-	templateHierarchy.push( 'index' );
-	return templateHierarchy;
 };
