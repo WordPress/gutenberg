@@ -306,7 +306,8 @@
 								"values": {
 									"left": "flex-start",
 									"right": "flex-end",
-									"center": "center"
+									"center": "center",
+									"space-between": "space-between"
 								}
 							},
 							{
@@ -316,12 +317,7 @@
 									"orientation": [ "vertical" ]
 								},
 								"property": "justify-content",
-								"validValues": [
-									"left",
-									"right",
-									"center",
-									"space-between"
-								],
+								"validValues": [ "left", "right", "center" ],
 								"values": {
 									"left": "flex-start",
 									"right": "flex-end",

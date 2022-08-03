@@ -1354,7 +1354,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		// Output base styles.
+		// Output base styles and attribute styles.
 		if (
 			static::ROOT_BLOCK_SELECTOR === $selector
 		) {
@@ -1362,6 +1362,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			foreach ( $layout_definitions as $layout_definition ) {
 				$class_name       = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
 				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
+				$attribute_styles = _wp_array_get( $layout_definition, array( 'attributeStyles' ), array() );
 
 				if (
 					! empty( $class_name ) &&
@@ -1389,6 +1390,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 						);
 					}
 
+					// Output base styles.
 					foreach ( $base_style_rules as $base_style_rule ) {
 						$declarations = array();
 
@@ -1415,9 +1417,64 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 							$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
 						}
 					}
+
+					// Output attribute-based styles.
+
+					if ( ! empty( $attribute_styles ) ) {
+						foreach ( $attribute_styles as $attribute_key => $styles_for_attribute_key ) {
+							foreach ( $styles_for_attribute_key as $attribute_style ) {
+								foreach ( $attribute_style['values'] as $value_key => $value_value ) {
+									$declarations = array();
+
+									if ( ! empty( $attribute_style['rules'] ) ) {
+										foreach ( $attribute_style['rules'] as $css_property => $css_value ) {
+											if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
+												$declarations[] = array(
+													'name'  => $css_property,
+													'value' => $css_value,
+												);
+											}
+										}
+									}
+
+									if ( ! empty( $attribute_style['property'] ) ) {
+										if ( static::is_safe_css_declaration( $attribute_style['property'], $value_value ) ) {
+											$declarations[] = array(
+												'name'  => $attribute_style['property'],
+												'value' => $value_value,
+											);
+										}
+									}
+
+									// TODO: Improve the interpolation here in a safer way.
+									$attribute_selector = strtr(
+										$attribute_style['selector'],
+										array( '$slug' => $value_key )
+									);
+
+									$layout_selector = sprintf(
+										'%s .%s%s',
+										$selector,
+										$class_name,
+										$attribute_selector
+									);
+
+									if ( ! empty( $declarations ) ) {
+										// TODO: Remove line breaks before merge.
+										$block_rules .= "\n";
+										$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
+
+		// TODO: Remove line breaks before merge.
+		$block_rules .= "\n";
+
 		return $block_rules;
 	}
 }
