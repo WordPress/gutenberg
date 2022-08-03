@@ -72,7 +72,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			remove: __( 'Remove item' ),
 			__experimentalInvalid: __( 'Invalid item' ),
 		},
-		renderSuggestion,
+		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
@@ -693,7 +693,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 						scrollIntoView={ selectedSuggestionScroll }
 						onHover={ onSuggestionHovered }
 						onSelect={ onSuggestionSelected }
-						renderSuggestion={ renderSuggestion }
+						__experimentalRenderItem={ __experimentalRenderItem }
 					/>
 				) }
 			</div>

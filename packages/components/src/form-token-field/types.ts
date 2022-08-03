@@ -161,7 +161,7 @@ export interface FormTokenFieldProps
 	/**
 	 * Custom renderer for suggestions.
 	 */
-	renderSuggestion?: ( args: { suggestion: string } ) => ReactNode;
+	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 }
 
 export interface SuggestionsListProps< T = string | { value: string } > {
@@ -173,7 +173,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
 	suggestions: T[];
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
-	renderSuggestion?: ( args: { suggestion: T } ) => ReactNode;
+	__experimentalRenderItem?: ( args: { item: T } ) => ReactNode;
 }
 
 export interface TokenProps extends TokenItem {

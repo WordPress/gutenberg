@@ -338,8 +338,8 @@ export const WithRenderOption = ( args ) => {
 				onChange={ setValue }
 				label="Select an author"
 				options={ authorOptions }
-				renderOption={ ( { option } ) => {
-					const { label, age, country } = option;
+				__experimentalRenderItem={ ( { item } ) => {
+					const { label, age, country } = item;
 					return (
 						<div>
 							<div style={ { marginBottom: '0.2rem' } }>
@@ -355,4 +355,8 @@ export const WithRenderOption = ( args ) => {
 			<p>Selected author: { value }</p>
 		</>
 	);
+};
+
+WithRenderOption.args = {
+	allowReset: false,
 };

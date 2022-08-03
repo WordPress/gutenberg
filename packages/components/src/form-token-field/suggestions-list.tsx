@@ -31,7 +31,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	suggestions = [],
 	displayTransform,
 	instanceId,
-	renderSuggestion,
+	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
 
@@ -125,8 +125,8 @@ export function SuggestionsList< T extends string | { value: string } >( {
 
 				let output: ReactNode;
 
-				if ( typeof renderSuggestion === 'function' ) {
-					output = renderSuggestion( { suggestion } );
+				if ( typeof __experimentalRenderItem === 'function' ) {
+					output = __experimentalRenderItem( { item: suggestion } );
 				} else if ( matchText ) {
 					output = (
 						<span aria-label={ displayTransform( suggestion ) }>
