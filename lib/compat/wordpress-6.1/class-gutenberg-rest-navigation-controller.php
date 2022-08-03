@@ -9,10 +9,10 @@
 class Gutenberg_REST_Navigation_Controller extends WP_REST_Posts_Controller {
 
 	/**
-	 * Overide WP_REST_Posts_Controller function to query for
-	 * `wp_navigation` posts by post_name / slug instead of ID.
+	 * Overide WP_REST_Posts_Controller function to discard
+	 * certain post statuses and treat as missing.
 	 *
-	 * @param string $id the slug of the Navigation post.
+	 * @param int $id the ID of the Navigation post.
 	 * @return WP_Post|null
 	 */
 	protected function get_post( $id ) {
