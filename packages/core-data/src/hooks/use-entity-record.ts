@@ -31,7 +31,7 @@ export interface EntityRecordResolution< RecordType > {
 	isResolving: boolean;
 
 	/**
-	 * Does the record have any edits?
+	 * Does the record have any local edits?
 	 */
 	hasEdits: boolean;
 
