@@ -41,6 +41,8 @@ const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
 // Migrate existing text alignment settings to the renamed attribute.
 const migrateTextAlign = ( attributes ) => {
 	const { align, ...rest } = attributes;
+	// Check if there are valid alignments stored in the old attribute
+	// and assign them to the new attribute name.
 	return TEXT_ALIGN_OPTIONS.includes( align )
 		? { ...rest, textAlign: align }
 		: attributes;
