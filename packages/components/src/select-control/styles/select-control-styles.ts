@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { COLORS, rtl } from '../../utils';
+import { space } from '../../ui/utils/space';
 import type { SelectControlProps } from '../types';
 
 interface SelectProps
@@ -92,22 +93,22 @@ const sizePaddings = ( {
 	const sizes = {
 		default: {
 			paddingLeft: 16,
-			paddingRight: 32,
+			paddingRight: 16,
 		},
 		small: {
 			paddingLeft: 8,
-			paddingRight: 24,
+			paddingRight: 8,
 		},
 		'__unstable-large': {
 			paddingLeft: 16,
-			paddingRight: 32,
+			paddingRight: 16,
 		},
 	};
 
 	if ( ! __next36pxDefaultSize ) {
 		sizes.default = {
 			paddingLeft: 8,
-			paddingRight: 24,
+			paddingRight: 8,
 		};
 	}
 
@@ -138,17 +139,6 @@ export const Select = styled.select< SelectProps >`
 `;
 
 export const DownArrowWrapper = styled.div`
-	align-items: center;
-	bottom: 0;
-	display: flex;
-	padding: 0 4px;
-	pointer-events: none;
-	position: absolute;
-	top: 0;
-
-	${ rtl( { right: 0 } ) }
-
-	svg {
-		display: block;
-	}
+	margin-inline-end: ${ space( -1 ) };
+	line-height: 0;
 `;
