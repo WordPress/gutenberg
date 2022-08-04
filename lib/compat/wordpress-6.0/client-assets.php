@@ -41,9 +41,12 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 function gutenberg_resolve_assets() {
 	global $pagenow;
 
+	gutenberg_enqueue_global_styles();
+
 	$script_handles = array();
 	$style_handles  = array(
 		'wp-block-editor',
+		'global-styles',
 		'wp-block-library',
 		'wp-edit-blocks',
 	);
