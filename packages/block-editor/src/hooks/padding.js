@@ -13,6 +13,7 @@ import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
+	__experimentalSpacingSizesBoxControl as SpacingSizesBoxControl,
 } from '@wordpress/components';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -124,12 +125,7 @@ export function PaddingEdit( props ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				padding: {
-					top: next,
-					right: next,
-					bottom: next,
-					left: next,
-				},
+				padding: next,
 			},
 		};
 
@@ -141,16 +137,28 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				{ /* <BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					label={ __( 'Padding' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/> */ }
-				<SpacingSizeEdit onChange={ onChange } />
+				{
+					<BoxControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				}
+				{
+					<SpacingSizeEdit
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+					/>
+				}
 			</>
 		),
 		native: null,

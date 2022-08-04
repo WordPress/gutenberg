@@ -1,19 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { RangeControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { __experimentalSpacingSizesBoxControl as SpacingSizesBoxControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
 
-export function getSpacingPresetCssVar( presetVar ) {
-	if ( ! presetVar ) {
+export function getSpacingPresetCssVar( value ) {
+	if ( ! value ) {
 		return;
 	}
-	const slug = /var:preset\|spacing\|(.+)/.exec( presetVar );
+	const slug = /var:preset\|spacing\|(.+)/.exec( value );
+	if ( ! slug ) {
+		return value;
+	}
 	return `var(--wp--preset--spacing--${ slug[ 1 ] })`;
 }
 
@@ -25,26 +27,23 @@ export function getSpacingPresetCssVar( presetVar ) {
  * @return {WPElement} Font size edit element.
  */
 export function SpacingSizeEdit( props ) {
-	const [ valueNow, setValueNow ] = useState( null );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
-	const customTooltipContent = ( value ) => spacingSizes[ value ].name;
+
 	return (
 		<>
-			<RangeControl
-				label="Padding"
-				value=""
-				onChange={ ( newSize ) => {
-					setValueNow( newSize );
-					props.onChange(
-						`var:preset|spacing|${ spacingSizes[ newSize ].slug }`
-					);
-				} }
-				min={ 0 }
-				max={ spacingSizes.length - 1 }
+			<SpacingSizesBoxControl
+				values={ props.value }
+				// onChange={ props.onChange }
+				label={ props.label }
+				sides={ props.sides }
+				allowReset={ false }
+				splitOnAxis={ props.splitOnAxis }
+				onChange={ props.onChange }
 				withInputField={ false }
-				aria-valuenow={ valueNow }
-				aria-valuetext={ spacingSizes[ valueNow ]?.name }
-				renderTooltipContent={ customTooltipContent }
+				spacingSizes={ spacingSizes }
+				// ariaValueNow={ valueNow }
+				// ariaValueText={ spacingSizes[ valueNow ]?.name }
+				// renderTooltipContent={ customTooltipContent }
 			/>
 		</>
 	);
