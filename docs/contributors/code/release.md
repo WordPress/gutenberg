@@ -129,7 +129,7 @@ Once the post content is ready, an author already having permissions to post in 
 If a bug is found in a release candidate and a fix is committed to `trunk`, we should include that fix in the stable version (or optionally in another release candidate before that). To do this you'll need to use `git cherry-pick` to add these changes to the milestone's release branch. This way only the desired fixes are added rather than all the new code that has landed on `trunk` since tagging:
 
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
-2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/auto-cherry-picking.md).
+2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md).
 3. When done, push the changes to GitHub: `git push`.
 
 If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
