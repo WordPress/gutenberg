@@ -20,6 +20,37 @@ import type { WordPressComponentProps } from '../ui/context';
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
 
+/**
+ * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
+ *
+ * @example
+ * ```js
+ * import { Button, Disabled, TextControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyDisabled = () => {
+ * 	const [ isDisabled, setIsDisabled ] = useState( true );
+ *
+ * 	let input = <TextControl label="Input" onChange={ () => {} } />;
+ * 	if ( isDisabled ) {
+ * 		input = <Disabled>{ input }</Disabled>;
+ * 	}
+ *
+ * 	const toggleDisabled = () => {
+ * 		setIsDisabled( ( state ) => ! state );
+ * 	};
+ *
+ * 	return (
+ * 		<div>
+ * 			{ input }
+ * 			<Button variant="primary" onClick={ toggleDisabled }>
+ * 				Toggle Disabled
+ * 			</Button>
+ * 		</div>
+ * 	);
+ * };
+ * ```
+ */
 function Disabled( {
 	className,
 	children,
