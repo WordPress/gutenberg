@@ -12,6 +12,7 @@
 class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
+	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
 
 	/**
 	 * @ticket 56299
@@ -381,5 +382,88 @@ HTML;
 		$w->next_tag( 'non-existent' );
 		$w->set_attribute( 'class', 'test' );
 		$this->assertSame( $expected_output, (string) $w );
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_works_with_single_quote_marks() {
+		$w = new WP_HTML_Walker(
+			'<div id=\'first\'><span id=\'second\'>Text</span></div>'
+		);
+		$w->next_tag( array(
+			'tag_name' => 'div',
+			'id'       => 'first',
+		) );
+		$w->remove_attribute( 'id' );
+		$w->next_tag( array(
+			'tag_name' => 'span',
+			'id'       => 'second',
+		) );
+		$w->set_attribute( 'id', 'single-quote' );
+		$this->assertSame(
+			'<div ><span id="single-quote">Text</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_works_with_boolean_attributes() {
+		$w = new WP_HTML_Walker(
+			'<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
+		);
+		$w->next_tag( 'input' );
+		$w->set_attribute( 'checked', true );
+		$this->assertSame(
+			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_works_with_wrongly_nested_tags() {
+		$w = new WP_HTML_Walker(
+			'<span>123<p>456</span>789</p>'
+		);
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'class', 'span-class' );
+		$w->next_tag( 'p' );
+		$w->set_attribute( 'class', 'p-class' );
+		$this->assertSame(
+			'<span class="span-class">123<p class="p-class">456</span>789</p>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_updates_attributes_in_malformed_html() {
+		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'id', 'first' );
+		$w->next_tag( 'span' );
+		$w->set_attribute( 'id', 'second' );
+		$this->assertSame(
+			'<div><span id="first" class="d-md-none" Notifications</span><span id="second" class="d-none d-md-inline">Back to notifications</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_removes_attributes_in_malformed_html() {
+		$w = new WP_HTML_Walker( self::HTML_MALFORMED );
+		$w->next_tag( 'span' );
+		$w->remove_attribute( 'Notifications<' );
+		$this->assertSame(
+			'<div><span class="d-md-none" /span><span class="d-none d-md-inline">Back to notifications</span></div>',
+			(string) $w
+		);
 	}
 }
