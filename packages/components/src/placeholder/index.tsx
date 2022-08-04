@@ -13,6 +13,8 @@ import { SVG, Path } from '@wordpress/primitives';
  * Internal dependencies
  */
 import Icon from '../icon';
+import type { PlaceholderProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 const PlaceholderIllustration = (
 	<SVG
@@ -29,31 +31,33 @@ const PlaceholderIllustration = (
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
  *
- * @param {Object}    props                  The component props.
- * @param {WPIcon}    props.icon             An icon rendered before the label.
- * @param {WPElement} props.children         Children to be rendered.
- * @param {string}    props.label            Title of the placeholder.
- * @param {string}    props.instructions     Instructions of the placeholder.
- * @param {string}    props.className        Class to set on the container div.
- * @param {Object}    props.notices          A rendered notices list.
- * @param {Object}    props.preview          Preview to be rendered in the placeholder.
- * @param {boolean}   props.isColumnLayout   Whether a column layout should be used.
- * @param {boolean}   props.withIllustration Whether to add an illustration to the placeholder.
+ * ```jsx
+ * import { Placeholder } from '@wordpress/components';
+ * import { more } from '@wordpress/icons';
  *
- * @return {Object} The rendered placeholder.
+ * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
+ * ```
  */
-function Placeholder( {
-	icon,
-	children,
-	label,
-	instructions,
-	className,
-	notices,
-	preview,
-	isColumnLayout,
-	withIllustration,
-	...additionalProps
-} ) {
+export function Placeholder< IconProps = unknown >(
+	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
+	// ref forwarding to Placeholder.
+	props: Omit<
+		WordPressComponentProps< PlaceholderProps< IconProps >, 'div', false >,
+		'ref'
+	>
+) {
+	const {
+		icon,
+		children,
+		label,
+		instructions,
+		className,
+		notices,
+		preview,
+		isColumnLayout,
+		withIllustration,
+		...additionalProps
+	} = props;
 	const [ resizeListener, { width } ] = useResizeObserver();
 
 	// Since `useResizeObserver` will report a width of `null` until after the
