@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { isNil } from 'lodash';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import stringWidth from 'string-width';
 
 export const TRUNCATE_ELLIPSIS = '…';
 export const TRUNCATE_TYPE = {
@@ -34,16 +32,9 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 		return '';
 	}
 	const wordLength = word.length;
-	// Calculate the average character width per character.
-	const splitWord = word.split( `` );
-	let total = 0;
-	for ( let i = 0; i < splitWord.length; i++ ) {
-		total += stringWidth( splitWord[ i ] );
-	}
-	const average = total / splitWord.length;
 	// Setting default values
 	// eslint-disable-next-line no-bitwise
-	const frontLength = ~~headLength / average; // Will cast to integer
+	const frontLength = ~~headLength; // Will cast to integer
 	// eslint-disable-next-line no-bitwise
 	const backLength = ~~tailLength;
 	/* istanbul ignore next */

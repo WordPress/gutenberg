@@ -226,7 +226,6 @@
 		"snapshot-diff": "0.8.1",
 		"source-map-loader": "3.0.0",
 		"sprintf-js": "1.1.1",
-		"string-width": "5.1.2",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.1.4",
 		"typescript": "4.4.2",
