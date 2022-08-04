@@ -12,26 +12,25 @@ import { ALL_SIDES, LABELS } from './utils';
 const noop = () => {};
 
 export default function BoxInputControls( {
-	onChange = noop,
-	onFocus = noop,
 	values,
 	selectedUnits,
 	setSelectedUnits,
 	sides,
+	onChange,
 	...props
 } ) {
-	const createHandleOnFocus = ( side ) => ( event ) => {
-		onFocus( event, { side } );
-	};
+	// Filter sides if custom configuration provided, maintaining default order.
+	const filteredSides = sides?.length
+		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
+		: ALL_SIDES;
 
-	const handleOnChange = ( nextValues ) => {
-		onChange( nextValues );
-	};
-
+	const first = filteredSides[ 0 ];
+	const last = filteredSides[ filteredSides.length - 1 ];
+	const only = first === last && first;
 	const createHandleOnChange = ( side ) => ( next ) => {
 		// const { altKey } = event;
 		const altKey = null;
-		const nextValues = { ...values };
+		const nextValues = { ...props.values };
 		nextValues[ side ] = next;
 
 		/**
@@ -55,17 +54,8 @@ export default function BoxInputControls( {
 			}
 		}
 
-		handleOnChange( nextValues );
+		onChange( nextValues );
 	};
-
-	// Filter sides if custom configuration provided, maintaining default order.
-	const filteredSides = sides?.length
-		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
-		: ALL_SIDES;
-
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
 
 	return (
 		<Flex className="component-spacing-sizes-control__input-controls-wrapper">
@@ -92,12 +82,12 @@ export default function BoxInputControls( {
 							// value={ [ parsedQuantity, computedUnit ].join(
 							// 	''
 							// ) }
-							value={ null }
-							onChange={ createHandleOnChange( side ) }
-							onFocus={ createHandleOnFocus( side ) }
+							value={ values[ side ] }
 							label={ LABELS[ side ] }
 							key={ `box-control-${ side }` }
 							withInputField={ false }
+							side={ side }
+							onChange={ createHandleOnChange( side ) }
 						/>
 					);
 				} ) }

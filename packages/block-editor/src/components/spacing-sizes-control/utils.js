@@ -13,6 +13,14 @@ import { __ } from '@wordpress/i18n';
  */
 //import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 
+export function getSpacingPresetSlug( value ) {
+	if ( ! value ) {
+		return;
+	}
+	const slug = /var:preset\|spacing\|(.+)/.exec( value );
+
+	return slug ? slug[ 1 ] : undefined;
+}
 export const LABELS = {
 	all: __( 'All' ),
 	top: __( 'Top' ),

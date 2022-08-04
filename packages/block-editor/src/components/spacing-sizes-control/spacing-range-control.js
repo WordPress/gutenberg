@@ -4,6 +4,7 @@
 import { useState } from '@wordpress/element';
 import { RangeControl } from '@wordpress/components';
 
+import { getSpacingPresetSlug } from './utils';
 /**
  * Inspector control panel containing the spacing size related configuration
  *
@@ -14,6 +15,17 @@ import { RangeControl } from '@wordpress/components';
 export default function SpacingRangeControl( props ) {
 	const [ valueNow, setValueNow ] = useState( null );
 	const customTooltipContent = ( value ) => props.spacingSizes[ value ].name;
+	const createHandleOnFocus = ( side ) => () => {
+		props.onFocus( side );
+	};
+
+	// const handleOnChange = ( nextValues ) => {
+	// 	props.onChange( nextValues );
+	// };
+	const slug = getSpacingPresetSlug( props.value );
+	const value = props.spacingSizes.findIndex( ( spacingSize ) => {
+		return spacingSize.slug === parseInt( slug, 10 );
+	} );
 
 	return (
 		<RangeControl
@@ -28,6 +40,7 @@ export default function SpacingRangeControl( props ) {
 					`var:preset|spacing|${ props.spacingSizes[ newSize ].slug }`
 				);
 			} }
+			onFocus={ createHandleOnFocus( props.side ) }
 			withInputField={ false }
 			aria-valuenow={ valueNow }
 			aria-valuetext={ props.spacingSizes[ valueNow ]?.name }

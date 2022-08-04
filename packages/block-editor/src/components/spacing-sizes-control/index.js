@@ -3,7 +3,13 @@
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Flex, FlexItem, FlexBlock, Button } from '@wordpress/components';
+import {
+	Flex,
+	FlexItem,
+	FlexBlock,
+	Button,
+	__experimentalBoxControlIcon as BoxControlIcon,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -57,7 +63,7 @@ export default function SpacingSizesControl( {
 		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
 	};
 
-	const handleOnFocus = ( event, { side: nextSide } ) => {
+	const handleOnFocus = ( nextSide ) => {
 		setSide( nextSide );
 	};
 
@@ -104,7 +110,7 @@ export default function SpacingSizesControl( {
 			</Flex>
 			<Flex className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<div>Box Icon</div>
+					<BoxControlIcon side={ side } sides={ sides } />
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
