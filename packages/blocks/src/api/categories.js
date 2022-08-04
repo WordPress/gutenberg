@@ -12,6 +12,9 @@ import { store as blocksStore } from '../store';
 
 /**
  * Returns all the block categories.
+ * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ *
+ * @ignore
  *
  * @return {WPBlockCategory[]} Block categories.
  */
@@ -26,6 +29,11 @@ export function getCategories() {
  *
  * @example
  * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { store as blocksStore, setCategories } from '@wordpress/blocks';
+ * import { useSelect } from '@wordpress/data';
+ * import { Button } from '@wordpress/components';
+ *
  * const ExampleComponent = () => {
  *     // Retrieve the list of current categories.
  *     const blockCategories = useSelect(
@@ -59,6 +67,25 @@ export function setCategories( categories ) {
  * @param {string}          slug     Block category slug.
  * @param {WPBlockCategory} category Object containing the category properties
  *                                   that should be updated.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { updateCategory } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 updateCategory( 'text', { title: __( 'Written Word' ) } );
+ *             } }
+ *         >
+ *             { __( 'Update Text category title' ) }
+ *         </Button>
+ * )    ;
+ * };
+ * ```
  */
 export function updateCategory( slug, category ) {
 	dispatch( blocksStore ).updateCategory( slug, category );

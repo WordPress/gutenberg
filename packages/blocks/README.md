@@ -383,14 +383,6 @@ _Returns_
 
 -   `(WPBlockVariation[]|void)`: Block variations.
 
-### getCategories
-
-Returns all the block categories.
-
-_Returns_
-
--   `WPBlockCategory[]`: Block categories.
-
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
@@ -803,6 +795,11 @@ Sets the block categories.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { store as blocksStore, setCategories } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+
 const ExampleComponent = () => {
 	// Retrieve the list of current categories.
 	const blockCategories = useSelect(
@@ -983,6 +980,26 @@ _Parameters_
 ### updateCategory
 
 Updates a category.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { updateCategory } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				updateCategory( 'text', { title: __( 'Written Word' ) } );
+			} }
+		>
+			{ __( 'Update Text category title' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
