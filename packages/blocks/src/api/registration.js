@@ -385,6 +385,12 @@ export function registerBlockCollection( namespace, { title, icon } ) {
  *
  * @param {string} namespace The namespace to group blocks by in the inserter; corresponds to the block namespace
  *
+ * @example
+ * ```js
+ * import { unregisterBlockCollection } from '@wordpress/blocks';
+ *
+ * unregisterBlockCollection( 'my-collection' );
+ * ```
  */
 export function unregisterBlockCollection( namespace ) {
 	dispatch( blocksStore ).removeBlockCollection( namespace );
