@@ -13,6 +13,7 @@ import {
 	getBlockSelectors,
 	toCustomProperties,
 	toStyles,
+	getStylesDeclarations,
 } from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
@@ -679,6 +680,62 @@ describe( 'global styles renderer', () => {
 					hasLayoutSupport: false,
 				},
 			} );
+		} );
+	} );
+
+	describe( 'getStylesDeclarations', () => {
+		const blockStyles = {
+			spacing: {
+				padding: {
+					top: '33px',
+					right: '33px',
+					bottom: '33px',
+					left: '33px',
+				},
+			},
+			color: {
+				background: 'var:preset|color|light-green-cyan',
+			},
+		};
+
+		it( 'Should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
+			expect(
+				getStylesDeclarations( blockStyles, 'body', true )
+			).toEqual( [
+				'--wp--style--root--padding-top: 33px',
+				'--wp--style--root--padding-right: 33px',
+				'--wp--style--root--padding-bottom: 33px',
+				'--wp--style--root--padding-left: 33px',
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+			] );
+		} );
+
+		it( 'Should output padding and other properties if useRootPaddingAwareAlignments is disabled', () => {
+			expect(
+				getStylesDeclarations( blockStyles, 'body', false )
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+			] );
+		} );
+
+		it( 'Should not output padding variables if selector is not root', () => {
+			expect(
+				getStylesDeclarations(
+					blockStyles,
+					'.wp-block-button__link',
+					true
+				)
+			).toEqual( [
+				'background-color: var(--wp--preset--color--light-green-cyan)',
+				'padding-top: 33px',
+				'padding-right: 33px',
+				'padding-bottom: 33px',
+				'padding-left: 33px',
+			] );
 		} );
 	} );
 } );

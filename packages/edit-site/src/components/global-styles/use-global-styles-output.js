@@ -192,7 +192,7 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations(
+export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
 	useRootPaddingAlign
@@ -210,6 +210,16 @@ function getStylesDeclarations(
 			}
 
 			const styleValue = get( blockStyles, pathToValue );
+
+			// Root-level padding styles don't currently support strings with CSS shorthand values.
+			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
+			if (
+				( key === '--wp--style--root--padding' &&
+					typeof styleValue === 'string' ) ||
+				! useRootPaddingAlign
+			) {
+				return declarations;
+			}
 
 			if ( !! properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
@@ -230,13 +240,6 @@ function getStylesDeclarations(
 						) }`
 					);
 				} );
-			} else if (
-				key === '--wp--style--root--padding' &&
-				typeof styleValue === 'string'
-			) {
-				// Root-level padding styles don't currently support strings with CSS shorthand values.
-				// This may change: https://github.com/WordPress/gutenberg/issues/40132.
-				return declarations;
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key
@@ -253,14 +256,18 @@ function getStylesDeclarations(
 		[]
 	);
 
-	if ( isRoot && useRootPaddingAlign ) {
-		return output;
-	}
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
+		// Don't output padding properties if padding variables are set.
+		if (
+			isRoot &&
+			useRootPaddingAlign &&
+			rule.key.startsWith( 'padding' )
+		) {
+			return;
+		}
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
