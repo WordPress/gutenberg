@@ -344,12 +344,14 @@ button.wp-block-navigation-item__content {
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-:where(.wp-block-navigation.has-background .wp-block-navigation-link a:not(.wp-element-button)) {
+:where(.wp-block-navigation.has-background .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation.has-background .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-link a:not(.wp-element-button)) {
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
 
