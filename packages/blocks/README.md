@@ -800,6 +800,32 @@ _Returns_
 
 Sets the block categories.
 
+_Usage_
+
+```js
+const ExampleComponent = () => {
+	// Retrieve the list of current categories.
+	const blockCategories = useSelect(
+		( select ) => select( blocksStore ).getCategories(),
+		[]
+	);
+
+	return (
+		<Button
+			onClick={ () => {
+				// Add a custom category to the existing list.
+				setCategories( [
+					...blockCategories,
+					{ title: 'Custom Category', slug: 'custom-category' },
+				] );
+			} }
+		>
+			{ __( 'Add a new custom block category' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _categories_ `WPBlockCategory[]`: Block categories.
