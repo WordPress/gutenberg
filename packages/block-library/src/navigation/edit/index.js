@@ -36,6 +36,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
+import { close, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -465,8 +466,18 @@ function Navigation( {
 								setOverlayMenuPreview( ! overlayMenuPreview );
 							} }
 						>
-							{ hasIcon && <OverlayMenuIcon /> }
-							{ ! hasIcon && <span>{ __( 'Menu' ) }</span> }
+							{ hasIcon && (
+								<>
+									<OverlayMenuIcon />
+									<Icon icon={ close } />
+								</>
+							) }
+							{ ! hasIcon && (
+								<>
+									<span>{ __( 'Menu' ) }</span>
+									<span>{ __( 'Close' ) }</span>
+								</>
+							) }
 						</Button>
 					) }
 					{ overlayMenuPreview && (

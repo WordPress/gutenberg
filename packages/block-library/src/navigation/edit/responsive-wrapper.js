@@ -107,7 +107,12 @@ export default function ResponsiveWrapper( {
 							aria-label={ __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
 						>
-							<Icon icon={ close } />
+							{ hasIcon && <Icon icon={ close } /> }
+							{ ! hasIcon && (
+								<span className="wp-block-navigation__toggle_button_label">
+									{ __( 'Close' ) }
+								</span>
+							) }
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"
