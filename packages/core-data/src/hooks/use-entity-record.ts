@@ -102,7 +102,7 @@ export interface Options {
  *           createSuccessNotice( __( 'Page renamed.' ), {
  *               type: 'snackbar',
  *           } );
- *       } catch(e) {
+ *       } catch( error ) {
  *            const errorMessage =
  *                error.message && error.code !== 'unknown_error'
  *                    ? error.message
