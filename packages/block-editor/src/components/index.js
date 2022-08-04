@@ -147,7 +147,10 @@ export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 export { default as useBlockDisplayInformation } from './use-block-display-information';
 export { default as __unstableIframe } from './iframe';
-export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+export {
+	RecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion as __experimentalUseHasRecursion,
+} from './recursion-provider';
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';

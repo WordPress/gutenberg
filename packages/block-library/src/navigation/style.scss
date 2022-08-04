@@ -452,6 +452,10 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
+	.wp-block-navigation-link a {
+		color: inherit;
+	}
+
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
 		flex-wrap: var(--navigation-layout-wrap, wrap);

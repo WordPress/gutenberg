@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { difference, zip } from 'lodash';
+import { difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -170,7 +170,12 @@ const batchInsertPlaceholderMenuItems =
 			.__experimentalBatch( tasks );
 
 		// Return an updated navigation block with all the IDs in.
-		const blockToResult = new Map( zip( blocksWithoutRecordId, results ) );
+		const blockToResult = new Map(
+			blocksWithoutRecordId.map( ( block, index ) => [
+				block,
+				results[ index ],
+			] )
+		);
 		return mapBlocksTree( navigationBlock, ( block ) => {
 			if ( ! blockToResult.has( block ) ) {
 				return block;
