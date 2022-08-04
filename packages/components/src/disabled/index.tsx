@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { RefCallback } from 'react';
 
 /**
  * WordPress dependencies
@@ -14,7 +15,6 @@ import { createContext } from '@wordpress/element';
  */
 import { StyledWrapper } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
-import type { RefCallback } from 'react';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;

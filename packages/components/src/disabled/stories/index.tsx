@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -11,10 +16,6 @@ import Button from '../../button/';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
-/**
- * External dependencies
- */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 const meta: ComponentMeta< typeof Disabled > = {
 	title: 'Components/Disabled',
