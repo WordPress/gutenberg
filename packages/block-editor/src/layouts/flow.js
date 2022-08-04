@@ -38,7 +38,7 @@ export default {
 				? blockGapStyleValue?.top
 				: '';
 
-		let output;
+		let output = '';
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
 		if ( hasBlockGapSupport && blockGapValue ) {
