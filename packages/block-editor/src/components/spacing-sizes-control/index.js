@@ -5,6 +5,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	Flex,
 	FlexItem,
 	FlexBlock,
 	Text,
@@ -19,13 +20,7 @@ import {
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
-import BoxControlIcon from './icon';
 import LinkedButton from './linked-button';
-import {
-	Root,
-	Header,
-	HeaderControlWrapper,
-} from './styles/box-control-styles';
 import {
 	DEFAULT_VALUES,
 	getInitialSide,
@@ -109,8 +104,8 @@ export default function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="region" aria-labelledby={ headingId }>
-			<Header className="component-box-control__header">
+		<div role="region" className="components-border-radius-control">
+			<Flex className="components-border-radius-control__header">
 				<FlexItem>
 					<Text
 						id={ headingId }
@@ -132,10 +127,10 @@ export default function BoxControl( {
 						</Button>
 					</FlexItem>
 				) }
-			</Header>
-			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
+			</Flex>
+			<Flex className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<BoxControlIcon side={ side } sides={ sides } />
+					<div style="font-size: 6px">Box Icon</div>
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
@@ -158,10 +153,10 @@ export default function BoxControl( {
 						/>
 					</FlexItem>
 				) }
-			</HeaderControlWrapper>
+			</Flex>
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }
-		</Root>
+		</div>
 	);
 }

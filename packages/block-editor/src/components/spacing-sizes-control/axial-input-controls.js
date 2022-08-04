@@ -1,9 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { Flex } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import SpacingRangeControl from './spacing-range-control';
 import { LABELS } from './utils';
-import { Layout } from './styles/box-control-styles';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
@@ -89,7 +93,7 @@ export default function AxialInputControls( {
 	const only = first === last;
 
 	return (
-		<Layout
+		<Flex
 			gap={ 0 }
 			align="top"
 			className="component-box-control__vertical-horizontal-input-controls"
@@ -114,6 +118,6 @@ export default function AxialInputControls( {
 					/>
 				);
 			} ) }
-		</Layout>
+		</Flex>
 	);
 }

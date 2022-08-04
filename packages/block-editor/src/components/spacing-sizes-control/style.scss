@@ -1,0 +1,37 @@
+.component-spacing-sizes-control {
+	box-sizing: border-box;
+	max-width: 235px;
+	padding-bottom: 12px;
+	width: 100%;
+
+	.components-spacing-sizes-control__header {
+		margin-bottom: $grid-unit-10;
+	}
+
+	.component-spacing-sizes-control__wrapper {
+		min-height: 30px;
+		gap: 0;
+	}
+	.component-spacing-sizes-control__input-controls-wrapper {
+		justify-content: center;
+		padding-top: 8px;
+
+		.component-spacing-sizes-control__input-controls {
+			position: relative;
+			height: 100%;
+			width: 100%;
+			justify-content: flex-start;
+			flex-direction: column;
+		}
+	}
+	.component-spacing-sizes-control__linked-button.has-icon {
+		display: flex;
+		justify-content: center;
+		margin-left: 2px;
+		margin-top: 3px;
+
+		svg {
+			margin-right: 0;
+		}
+	}
+}

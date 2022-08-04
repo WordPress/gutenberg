@@ -1,9 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { Flex } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import SpacingRangeControl from './spacing-range-control';
 import { ALL_SIDES, LABELS } from './utils';
-import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 const noop = () => {};
 
@@ -64,11 +68,11 @@ export default function BoxInputControls( {
 	const only = first === last && first;
 
 	return (
-		<LayoutContainer className="component-box-control__input-controls-wrapper">
-			<Layout
+		<Flex className="component-spacing-sizes-control__input-controls-wrapper">
+			<Flex
 				gap={ 0 }
 				align="top"
-				className="component-box-control__input-controls"
+				className="component-spacing-sizes-control__input-controls"
 			>
 				{ filteredSides.map( ( side ) => {
 					// const [ parsedQuantity, parsedUnit ] =
@@ -96,7 +100,7 @@ export default function BoxInputControls( {
 						/>
 					);
 				} ) }
-			</Layout>
-		</LayoutContainer>
+			</Flex>
+		</Flex>
 	);
 }

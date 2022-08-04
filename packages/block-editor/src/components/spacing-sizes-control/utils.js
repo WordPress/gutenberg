@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+//import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -65,8 +65,8 @@ export function getAllValue(
 	availableSides = ALL_SIDES
 ) {
 	const sides = normalizeSides( availableSides );
-	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
-		parseQuantityAndUnitFromRawValue( values[ side ] )
+	const parsedQuantitiesAndUnits = sides.map(
+		( side ) => null // parseQuantityAndUnitFromRawValue( values[ side ] )
 	);
 	const allParsedQuantities = parsedQuantitiesAndUnits.map(
 		( value ) => value[ 0 ] ?? ''

@@ -1,12 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { __experimentalSpacingSizesBoxControl as SpacingSizesBoxControl } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
+import SpacingSizesBoxControl from '../components/spacing-sizes-control';
 
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {

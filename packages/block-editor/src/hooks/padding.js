@@ -13,7 +13,6 @@ import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
-	__experimentalSpacingSizesBoxControl as SpacingSizesBoxControl,
 } from '@wordpress/components';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -29,7 +28,7 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
-import { SpacingSizeEdit, getSpacingPresetCssVar } from './spacing-size';
+//import { SpacingSizeEdit, getSpacingPresetCssVar } from './spacing-size';
 
 /**
  * Determines if there is padding support.
@@ -149,16 +148,16 @@ export function PaddingEdit( props ) {
 					/>
 				}
 				{
-					<SpacingSizeEdit
-						values={ style?.spacing?.padding }
-						onChange={ onChange }
-						label={ __( 'Padding' ) }
-						sides={ sides }
-						units={ units }
-						allowReset={ false }
-						splitOnAxis={ splitOnAxis }
-					/>
-				}
+					// <SpacingSizeEdit
+					// 	values={ style?.spacing?.padding }
+					// 	onChange={ onChange }
+					// 	label={ __( 'Padding' ) }
+					// 	sides={ sides }
+					// 	units={ units }
+					// 	allowReset={ false }
+					// 	splitOnAxis={ splitOnAxis }
+					// />
+				 }
 			</>
 		),
 		native: null,
