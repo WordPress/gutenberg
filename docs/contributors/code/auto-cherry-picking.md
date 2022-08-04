@@ -4,7 +4,7 @@
 
 It's especially useful for major WordPress releases as by default the script looks for merged Pull Requests with the `Backport to WP Beta/RC` label.
 
-You can pass a custom label as the first argument, though, and use it in other scenarios such as Gutenberg plugin releases.
+You can also use it in different scenarios by passing a custom label as the first argument. See the Gutenberg plugin release example at the end of this document.
 
 Running `npm run cherry-pick` yields the following prompt:
 
