@@ -19,7 +19,7 @@ export interface EntityRecordResolution< RecordType > {
 	/** The edited entity record */
 	editedRecord: Partial< RecordType >;
 
-	/** Apply edits to the edited entity record */
+	/** Apply local (in-browser) edits to the edited entity record */
 	edit: ( diff: Partial< RecordType > ) => void;
 
 	/** Persist the edits to the server */
