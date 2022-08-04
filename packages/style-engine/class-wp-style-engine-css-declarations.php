@@ -185,6 +185,11 @@ class WP_Style_Engine_CSS_Declarations {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
+
+		if ( $should_prettify ) {
+			// Remove empty lines.
+			$declarations_output = str_replace( "\n\n", "\n", $declarations_output );
+		}
 		return $declarations_output;
 	}
 
