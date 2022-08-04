@@ -184,9 +184,9 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Resolves ref into the value it is pointing to.
  *
- * @param {Object} refObj      The reference we are pointing to.
+ * @param {Object} refObj      The reference in the block styles tree.
  *
- * @param {string} blockStyles Block styles.
+ * @param {string} blockStyles The tree of block styles.
  *
  * @return {string} The resolved referenced value.
  */
