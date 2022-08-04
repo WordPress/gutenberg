@@ -112,19 +112,26 @@ function MultiplePalettes( {
 	);
 }
 
-export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+export function CustomColorPickerDropdown( {
+	isRenderedInSidebar,
+	popoverProps: receivedPopoverProps,
+	...props
+} ) {
+	const popoverProps = {
+		__unstableShift: true,
+		...( isRenderedInSidebar
+			? {
+					placement: 'bottom-start',
+					offset: 20,
+			  }
+			: {} ),
+		...receivedPopoverProps,
+	};
+
 	return (
 		<Dropdown
 			contentClassName="components-color-palette__custom-color-dropdown-content"
-			popoverProps={
-				isRenderedInSidebar
-					? {
-							placement: 'left-start',
-							offset: 20,
-							__unstableShift: true,
-					  }
-					: undefined
-			}
+			popoverProps={ popoverProps }
 			{ ...props }
 		/>
 	);
