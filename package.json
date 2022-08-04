@@ -250,10 +250,10 @@
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "rimraf node_modules packages/*/node_modules",
+		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
-		"docs:build": "npm-run-all docs:gen docs:blocks docs:ref docs:theme-ref",
+		"docs:build": "npm-run-all docs:gen docs:blocks docs:api-ref docs:theme-ref",
 		"docs:gen": "node ./docs/tool/index.js",
-		"docs:ref": "node ./bin/api-docs/update-api-docs.js",
 		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.js",
 		"env": "wp-env",
 		"fixtures:clean": "rimraf \"test/integration/fixtures/blocks/*.+(json|serialized.html)\"",
@@ -330,7 +330,7 @@
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.{js,ts,tsx,json}": [
-			"npm run docs:ref",
+			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
