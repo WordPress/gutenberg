@@ -241,6 +241,7 @@
 	},
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
+		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
@@ -272,7 +273,6 @@
 		"lint:php": "wp-env run composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"native": "npm run --prefix packages/react-native-editor",
-		"other:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
 		"other:check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build",
