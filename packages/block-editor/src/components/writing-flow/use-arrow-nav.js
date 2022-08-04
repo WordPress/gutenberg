@@ -17,6 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -146,6 +147,15 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
+		function isClosestTabbableABlock( target, isReverse ) {
+			const closestTabbable = getClosestTabbable(
+				target,
+				isReverse,
+				node
+			);
+			return closestTabbable && getBlockClientId( closestTabbable );
+		}
+
 		function onKeyDown( event ) {
 			const { keyCode, target } = event;
 			const isUp = keyCode === UP;
@@ -230,7 +240,10 @@ export default function useArrowNav() {
 			const { keepCaretInsideBlock } = getSettings();
 
 			if ( isShift ) {
-				if ( isNavEdge( target, isReverse ) ) {
+				if (
+					isClosestTabbableABlock( target, isReverse ) &&
+					isNavEdge( target, isReverse )
+				) {
 					node.contentEditable = true;
 					// Firefox doesn't automatically move focus.
 					node.focus();
