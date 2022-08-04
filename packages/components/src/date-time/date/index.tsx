@@ -78,10 +78,11 @@ export function DatePicker( {
 		weekStartsOn: startOfWeek,
 	} );
 
-	// Update the month being viewed when currentDate changes.
+	// Update selected date and month being viewed when currentDate prop changes.
 	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
 	if ( currentDate !== prevCurrentDate ) {
 		setPrevCurrentDate( currentDate );
+		setSelected( [ date ] );
 		setViewing( date );
 	}
 
