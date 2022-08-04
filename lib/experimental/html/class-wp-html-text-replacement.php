@@ -8,13 +8,13 @@
  */
 
 /**
- * Data structure used to replace existing content from start to end.
+ * Data structure used to replace existing content from start to end that allows to drastically improve performance.
  *
  * @since 6.1.0
  *
  * @see WP_HTML_Walker
  */
-class WP_Text_Replacement {
+class WP_HTML_Text_Replacement {
 	/**
 	 * Byte offset into document where replacement span begins.
 	 *

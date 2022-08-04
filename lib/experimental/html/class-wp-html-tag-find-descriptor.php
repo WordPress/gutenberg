@@ -14,7 +14,7 @@
  *
  * @see WP_HTML_Walker
  */
-class WP_Tag_Find_Descriptor {
+class WP_HTML_Tag_Find_Descriptor {
 	/**
 	 * We're looking for an HTML tag of this name, up to the comparable
 	 * equivalence of those names (lower-cased, Unicode-normalized, etc...).
@@ -66,10 +66,10 @@ class WP_Tag_Find_Descriptor {
 	 *                                     Defaults to first tag.
 	 *     @type string|null $class_name   Tag must contain this whole class name to match.
 	 * }
-	 * @return WP_Tag_Find_Descriptor Used by WP_HTML_Processor when scanning HTML.
+	 * @return WP_HTML_Tag_Find_Descriptor Used by WP_HTML_Processor when scanning HTML.
 	 */
 	public static function parse( $query ) {
-		$descriptor = new WP_Tag_Find_Descriptor();
+		$descriptor = new WP_HTML_Tag_Find_Descriptor();
 
 		if ( is_array( $query ) ) {
 			if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {

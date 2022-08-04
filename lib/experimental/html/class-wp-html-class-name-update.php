@@ -8,13 +8,13 @@
  */
 
 /**
- * Data structure used for class name update operations.
+ * Data structure used for class name update operations that allows to drastically improve performance.
  *
  * @since 6.1.0
  *
  * @see WP_HTML_Walker
  */
-class WP_Class_Name_Update {
+class WP_HTML_Class_Name_Update {
 	/**
 	 * Class name removal.
 	 *

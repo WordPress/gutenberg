@@ -134,7 +134,7 @@ class WP_HTML_Walker {
 	 * </code>
 	 *
 	 * @since 6.1.0
-	 * @var WP_Class_Name_Update[]
+	 * @var WP_HTML_Class_Name_Update[]
 	 */
 	private $classnames_updates = array();
 
@@ -154,17 +154,17 @@ class WP_HTML_Walker {
 	 *     // sourced from the lazily-parsed HTML recognizer.
 	 *     $start = $attributes['src']->start;
 	 *     $end   = $attributes['src']->end;
-	 *     $modifications[] = new WP_Text_Replacement( $start, $end, get_the_post_thumbnail_url() );
+	 *     $modifications[] = new WP_HTML_Text_Replacement( $start, $end, get_the_post_thumbnail_url() );
 	 *
 	 *     // Correspondingly, something like this
 	 *     // will appear in the replacements array.
 	 *     $replacements = array(
-	 *         WP_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
+	 *         WP_HTML_Text_Replacement( 14, 28, 'https://my-site.my-domain/wp-content/uploads/2014/08/kittens.jpg' )
 	 *     );
 	 * </code>
 	 *
 	 * @since 6.1.0
-	 * @var WP_Text_Replacement[]
+	 * @var WP_HTML_Text_Replacement[]
 	 */
 	private $attributes_updates = array();
 
@@ -198,7 +198,7 @@ class WP_HTML_Walker {
 	 */
 	public function next_tag( $query = null ) {
 		$this->assert_not_closed();
-		$descriptor           = WP_Tag_Find_Descriptor::parse( $query );
+		$descriptor           = WP_HTML_Tag_Find_Descriptor::parse( $query );
 		$current_match_offset = - 1;
 		do {
 			/*
@@ -384,7 +384,7 @@ class WP_HTML_Walker {
 				$seen_classes[ $comparable_name ] = true;
 				if (
 					array_key_exists( $comparable_name, $classname_updates ) &&
-					WP_Class_Name_Update::REMOVE === $classname_updates[ $comparable_name ]->type
+					WP_HTML_Class_Name_Update::REMOVE === $classname_updates[ $comparable_name ]->type
 				) {
 					return '';
 				}
@@ -396,7 +396,7 @@ class WP_HTML_Walker {
 
 		// Add new classes.
 		foreach ( $classname_updates as $comparable_name => $operation ) {
-			if ( WP_Class_Name_Update::ADD === $operation->type && ! isset( $seen_classes[ $comparable_name ] ) ) {
+			if ( WP_HTML_Class_Name_Update::ADD === $operation->type && ! isset( $seen_classes[ $comparable_name ] ) ) {
 				$new_class .= " {$operation->class_name}";
 			}
 		}
@@ -472,7 +472,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attributes_updates[ $name ] = new WP_Text_Replacement(
+			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$attr->start,
 				$attr->end,
 				$updated_attribute
@@ -489,7 +489,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attributes_updates[ $name ] = new WP_Text_Replacement(
+			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_ends_at,
 				$this->tag_name_ends_at,
 				' ' . $updated_attribute
@@ -521,7 +521,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div />
 			 */
-			$this->attributes_updates[ $name ] = new WP_Text_Replacement(
+			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$attr->start,
 				$attr->end,
 				''
@@ -568,7 +568,7 @@ class WP_HTML_Walker {
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
 		if ( $this->tag_name ) {
-			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, true );
+			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_HTML_Class_Name_Update( $class_name, true );
 		}
 	}
 
@@ -584,7 +584,7 @@ class WP_HTML_Walker {
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
 		if ( $this->tag_name ) {
-			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_Class_Name_Update( $class_name, false );
+			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_HTML_Class_Name_Update( $class_name, false );
 		}
 	}
 
