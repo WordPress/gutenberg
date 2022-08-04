@@ -46,7 +46,7 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 	}
 
 	// Starting here, it's the fallback for themes not supporting the layout config.
-	if ( layoutType.name !== 'default' ) {
+	if ( layoutType.name !== 'column' ) {
 		return [];
 	}
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;

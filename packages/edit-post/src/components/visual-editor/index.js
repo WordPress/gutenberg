@@ -181,10 +181,12 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		if ( themeSupportsLayout ) {
-			return defaultLayout;
+			// We need to ensure support for wide and full alignments,
+			// so we add the column type.
+			return { ...defaultLayout, type: 'column' };
 		}
-
-		return undefined;
+		// Set column layout for classic themes so all alignments are supported.
+		return { type: 'column' };
 	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
 	const titleRef = useRef();
@@ -265,7 +267,7 @@ export default function VisualEditor( { styles } ) {
 								className={
 									isTemplateMode
 										? 'wp-site-blocks'
-										: 'is-layout-flow' // Ensure root level blocks receive default/flow blockGap styling rules.
+										: 'is-layout-column' // Ensure root level blocks receive default/flow blockGap styling rules.
 								}
 								__experimentalLayout={ layout }
 							/>

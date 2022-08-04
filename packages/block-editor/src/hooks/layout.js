@@ -123,11 +123,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const usedLayout = layout || defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
 	/**
-	 * `themeSupportsLayout` is only relevant to the `default/flow`
-	 * layout and it should not be taken into account when other
+	 * `themeSupportsLayout` is only relevant to the `default/flow` or
+	 * `column` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
-	if ( type === 'default' && ! themeSupportsLayout ) {
+	if (
+		( type === 'default' || type === 'column' ) &&
+		! themeSupportsLayout
+	) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
