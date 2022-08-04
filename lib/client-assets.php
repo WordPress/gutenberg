@@ -293,7 +293,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-library',
 		gutenberg_url( 'build/block-library/' . $block_library_filename . '.css' ),
-		array(),
+		array( 'global-styles-css-custom-properties' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );

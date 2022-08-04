@@ -72,14 +72,18 @@ export default function EditorStyles( { styles } ) {
 		[ styles ]
 	);
 
-	return (
+	/*return (
 		<>
 			{ /* Use an empty style element to have a document reference,
-			     but this could be any element. */ }
+			     but this could be any element. *//* }
 			<style ref={ useDarkThemeBodyClassName( styles ) } />
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
 		</>
-	);
+	);*/
+
+	const editorStylesCSS = transformedStyles.map( ( css, index ) => css ).join();
+	document.getElementById( 'global-styles-css-custom-properties-inline-css' ).innerHTML = editorStylesCSS;
+	return <p>hello</p>;
 }
