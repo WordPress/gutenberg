@@ -288,7 +288,7 @@ class WP_HTML_Walker {
 					(?P<QUOTE>['\"])(?P<VALUE>.*?)\k<QUOTE>
 					|
 					# An unquoted attribute value
-					(?P<VALUE>[^=\/>\x{09}\x{0a}\x{0c}\x{20}]*)
+					(?P<VALUE>[^>\x{09}\x{0a}\x{0c}\x{20}]*)
 				)
 				~miuJx"
 			);
