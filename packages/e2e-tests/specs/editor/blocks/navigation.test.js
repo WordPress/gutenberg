@@ -1681,13 +1681,10 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			);
 		} );
 
-		// Skip reason: running it in interactive works but selecting and
-		// checking for focus consistently fails in the test.
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should always focus select menu button after item selection', async () => {
+		it( 'keeps focus the menu item after navigation menu selection', async () => {
 			// Create some navigation menus to work with.
 			await createNavigationMenu( {
-				title: 'First navigation',
+				title: 'First Example Navigation',
 				content:
 					'<!-- wp:navigation-link {"label":"WordPress Example Navigation","type":"custom","url":"http://www.wordpress.org/","kind":"custom","isTopLevelLink":true} /-->',
 			} );
@@ -1703,23 +1700,26 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 			// Insert new block and wait for the insert to complete.
 			await insertBlock( 'Navigation' );
 			await waitForBlock( 'Navigation' );
-
-			const navigationSelector = await page.waitForXPath(
-				"//button[text()='Select Menu']"
-			);
-			await navigationSelector.click();
-
-			const theOption = await page.waitForXPath(
-				"//button[@aria-checked='false'][contains(., 'First navigation')]"
-			);
-			theOption.click();
-
-			// Once the options are closed, does select menu button receive focus?
-			const selectMenuDropdown2 = await page.$(
+			// First select a menu from the block placeholder
+			const selectMenuDropdown = await page.waitForSelector(
 				'[aria-label="Select Menu"]'
 			);
+			await selectMenuDropdown.click();
+			const firstNavigationOption = await page.waitForXPath(
+				'//button[.="First Example Navigation"]'
+			);
+			await firstNavigationOption.click();
 
-			await expect( selectMenuDropdown2 ).toHaveFocus();
+			// Next switch menu using the toolbar.
+			await clickBlockToolbarButton( 'Select Menu' );
+
+			const secondNavigationOption = await page.waitForXPath(
+				'//button[.="Second Example Navigation"]'
+			);
+			await secondNavigationOption.click();
+
+			// The menu item should still have focus.
+			await expect( secondNavigationOption ).toHaveFocus();
 		} );
 	} );
 } );

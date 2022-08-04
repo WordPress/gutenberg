@@ -10,7 +10,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { addQueryArgs } from '@wordpress/url';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,18 +18,15 @@ import { forwardRef, useMemo } from '@wordpress/element';
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
-function NavigationMenuSelector(
-	{
-		currentMenuId,
-		onSelectNavigationMenu,
-		onSelectClassicMenu,
-		onCreateNew,
-		showManageActions = false,
-		actionLabel,
-		toggleProps = {},
-	},
-	forwardedRef
-) {
+export default function NavigationMenuSelector( {
+	currentMenuId,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
+	onCreateNew,
+	showManageActions = false,
+	actionLabel,
+	toggleProps = {},
+} ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -78,7 +75,6 @@ function NavigationMenuSelector(
 
 	return (
 		<ToolbarDropdownMenu
-			ref={ forwardedRef }
 			label={ __( 'Select Menu' ) }
 			text={ __( 'Select Menu' ) }
 			icon={ null }
@@ -90,10 +86,7 @@ function NavigationMenuSelector(
 						<MenuGroup label={ __( 'Menus' ) }>
 							<MenuItemsChoice
 								value={ currentMenuId }
-								onSelect={ ( menuId ) => {
-									onClose();
-									onSelectNavigationMenu( menuId );
-								} }
+								onSelect={ onSelectNavigationMenu }
 								choices={ menuChoices }
 							/>
 						</MenuGroup>
@@ -142,5 +135,3 @@ function NavigationMenuSelector(
 		</ToolbarDropdownMenu>
 	);
 }
-
-export default forwardRef( NavigationMenuSelector );
