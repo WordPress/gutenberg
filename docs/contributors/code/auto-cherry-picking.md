@@ -1,10 +1,12 @@
 # Cherry-picking automation
 
-The cherry-picking automation makes cherry-picking PRs into WordPress and Gutenberg release branches a breeze.
+`npm run cherry-pick` automates cherry-picking Pull Requests with a specific label into the **current branch**.
 
-It works as follows: you switch to the relevant release branch and run  `npm run cherry-pick`.
+It's especially useful for major WordPress releases as by default the script looks for merged Pull Requests with the `Backport to WP Beta/RC` label.
 
-It gives you the following prompt:
+You can pass a custom label as the first argument, though, and use it in other scenarios such as Gutenberg plugin releases.
+
+Running `npm run cherry-pick` yields the following prompt:
 
 ```
 You are on branch "wp/6.2".
@@ -71,3 +73,21 @@ Yes! Pass it as the first argument:
 ```
 npm run cherry-pick "Another Label"
 ```
+
+### How can I use it for a Gutenberg plugin release?
+
+```
+# Switch to the release branch
+git checkout release/X.Y
+
+# Cherry-pick all the merged PRs with a relevant backport label
+npm run cherry-pick "Backport to Gutenberg RC"
+```
+
+### Future improvements
+
+In the future, it would be great if the script automatically selected the
+relevant label based on the currently selected branch:
+
+* release/X.Y - plugin release – "Backport to Gutenberg RC"
+* wp/X.Y - WP release – "Backport to WP Beta/RC"
