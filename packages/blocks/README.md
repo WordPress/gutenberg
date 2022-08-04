@@ -707,6 +707,29 @@ _Parameters_
 
 Registers a new block style variation for the given block.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockStyle } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				registerBlockStyle( 'core/quote', {
+					name: 'fancy-quote',
+					label: __( 'Fancy Quote' ),
+				} );
+			} }
+		>
+			{ __( 'Add a new block style for core/quote' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Name of block (example: “core/latest-posts”).
@@ -933,6 +956,26 @@ _Returns_
 ### unregisterBlockStyle
 
 Unregisters a block style variation for the given block.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockStyle } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				unregisterBlockStyle( 'core/quote', 'plain' );
+			} }
+		>
+			{ __( 'Remove the "Plain" block style for core/quote' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
