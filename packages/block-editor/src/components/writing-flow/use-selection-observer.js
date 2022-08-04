@@ -35,8 +35,7 @@ function extractSelectionStartNode( selection ) {
 /**
  * Extract the selection end node from the selection. When the focus node is not
  * a text node, the selection offset is the index of a child node. The selection
- * reaches up to but excluding that child node. If the index is 0, return the
- * focus node.
+ * reaches up to but excluding that child node.
  *
  * @param {Selection} selection The selection.
  *
