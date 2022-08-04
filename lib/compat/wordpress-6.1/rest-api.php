@@ -50,6 +50,8 @@ add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_block_patterns',
  * This is used for fetching this information when user has no rights
  * to update settings.
  *
+ * Note: Backports into wp-includes/rest-api/class-wp-rest-server.php file.
+ *
  * @param WP_REST_Response $response REST API response.
  * @return WP_REST_Response $response REST API response.
  */
