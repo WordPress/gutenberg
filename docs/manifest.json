@@ -2118,6 +2118,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Cherry-picking automation",
+		"slug": "auto-cherry-picking",
+		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
+		"parent": "release"
+	},
+	{
 		"title": "React Native mobile editor",
 		"slug": "react-native",
 		"markdown_source": "../docs/contributors/code/react-native/README.md",
