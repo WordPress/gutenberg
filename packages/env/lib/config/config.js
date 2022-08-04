@@ -69,10 +69,37 @@ module.exports = async function readConfig( configPath ) {
 		md5( configPath )
 	);
 
+	// The specified base configuration from .wp-env.json or from the local
+	// source type which was automatically detected.
+	const baseConfig =
+		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
+		( await getDefaultBaseConfig( configPath ) );
+
+	// Overriden .wp-env.json on a per-user case.
+	const overrideConfig =
+		( await readRawConfigFile(
+			'.wp-env.override.json',
+			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
+		) ) || {};
+
+	const detectedLocalConfig =
+		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
+
+	// If there is no local WordPress version, use the latest stable version from GitHub.
+	let coreRef;
+	if ( ! overrideConfig.core && ! baseConfig.core ) {
+		const wpVersion = await getLatestWordPressVersion();
+		if ( ! wpVersion ) {
+			throw new ValidationError(
+				'Could not find the latest WordPress version. There may be a network issue.'
+			);
+		}
+		coreRef = `WordPress/WordPress#${ wpVersion }`;
+	}
+
 	// Default configuration which is overridden by .wp-env.json files.
-	const wpVersion = await getLatestWordPressVersion();
 	const defaultConfiguration = {
-		core: `WordPress/WordPress#${ wpVersion }`,
+		core: coreRef,
 		phpVersion: null,
 		plugins: [],
 		themes: [],
@@ -97,22 +124,6 @@ module.exports = async function readConfig( configPath ) {
 			},
 		},
 	};
-
-	// The specified base configuration from .wp-env.json or from the local
-	// source type which was automatically detected.
-	const baseConfig =
-		( await readRawConfigFile( '.wp-env.json', configPath ) ) ||
-		( await getDefaultBaseConfig( configPath ) );
-
-	// Overriden .wp-env.json on a per-user case.
-	const overrideConfig =
-		( await readRawConfigFile(
-			'.wp-env.override.json',
-			configPath.replace( /\.wp-env\.json$/, '.wp-env.override.json' )
-		) ) || {};
-
-	const detectedLocalConfig =
-		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
 
 	// A quick validation before merging on a service by service level allows us
 	// to check the root configuration options and provide more helpful errors.
