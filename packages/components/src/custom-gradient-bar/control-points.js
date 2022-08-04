@@ -82,7 +82,7 @@ function GradientColorPickerDropdown( {
 		const result = {
 			className:
 				'components-custom-gradient-picker__color-picker-popover',
-			position: 'top',
+			placement: 'top',
 		};
 		if ( isRenderedInSidebar ) {
 			result.anchorRef = gradientPickerDomRef;
