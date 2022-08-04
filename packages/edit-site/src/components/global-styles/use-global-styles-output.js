@@ -214,9 +214,8 @@ export function getStylesDeclarations(
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
 			if (
-				( key === '--wp--style--root--padding' &&
-					typeof styleValue === 'string' ) ||
-				! useRootPaddingAlign
+				key === '--wp--style--root--padding' &&
+				( typeof styleValue === 'string' || ! useRootPaddingAlign )
 			) {
 				return declarations;
 			}

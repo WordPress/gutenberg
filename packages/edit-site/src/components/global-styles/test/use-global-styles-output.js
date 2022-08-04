@@ -696,12 +696,16 @@ describe( 'global styles renderer', () => {
 			color: {
 				background: 'var:preset|color|light-green-cyan',
 			},
+			typography: {
+				fontFamily: 'sans-serif',
+			},
 		};
 
 		it( 'Should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
+				'font-family: sans-serif',
 				'--wp--style--root--padding-top: 33px',
 				'--wp--style--root--padding-right: 33px',
 				'--wp--style--root--padding-bottom: 33px',
@@ -714,6 +718,7 @@ describe( 'global styles renderer', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', false )
 			).toEqual( [
+				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
@@ -730,6 +735,7 @@ describe( 'global styles renderer', () => {
 					true
 				)
 			).toEqual( [
+				'font-family: sans-serif',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'padding-top: 33px',
 				'padding-right: 33px',
