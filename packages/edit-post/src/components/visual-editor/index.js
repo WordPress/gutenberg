@@ -27,7 +27,7 @@ import {
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -175,11 +175,6 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer();
 
-	const [ , RecursionProvider ] = useNoRecursiveRenders(
-		wrapperUniqueId,
-		wrapperBlockName
-	);
-
 	const layout = useMemo( () => {
 		if ( isTemplateMode ) {
 			return { type: 'default' };
@@ -262,7 +257,10 @@ export default function VisualEditor( { styles } ) {
 								<PostTitle ref={ titleRef } />
 							</div>
 						) }
-						<RecursionProvider>
+						<RecursionProvider
+							blockName={ wrapperBlockName }
+							uniqueId={ wrapperUniqueId }
+						>
 							<BlockList
 								className={
 									isTemplateMode
