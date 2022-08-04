@@ -707,6 +707,9 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 
 /**
  * Returns an array with the variations of a given block type.
+ * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ *
+ * @ignore
  *
  * @param {string}                blockName Name of block (example: “core/columns”).
  * @param {WPBlockVariationScope} [scope]   Block variation scope name.
@@ -722,6 +725,29 @@ export const getBlockVariations = ( blockName, scope ) => {
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockVariation } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 registerBlockVariation( 'core/embed', {
+ *                     name: 'custom',
+ *                     title: __( 'My Custom Embed' ),
+ *                     attributes: { providerNameSlug: 'custom' },
+ *                 } );
+ *             } }
+ *          >
+ *              __( 'Add a custom variation for core/embed' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
@@ -732,6 +758,25 @@ export const registerBlockVariation = ( blockName, variation ) => {
  *
  * @param {string} blockName     Name of the block (example: “core/columns”).
  * @param {string} variationName Name of the variation defined for the block.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { unregisterBlockVariation } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 unregisterBlockVariation( 'core/embed', 'youtube' );
+ *             } }
+ *         >
+ *             { __( 'Remove the YouTube variation from core/embed' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  */
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );

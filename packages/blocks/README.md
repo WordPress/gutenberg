@@ -370,19 +370,6 @@ _Returns_
 
 -   `Array`: Block settings.
 
-### getBlockVariations
-
-Returns an array with the variations of a given block type.
-
-_Parameters_
-
--   _blockName_ `string`: Name of block (example: “core/columns”).
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
-
-_Returns_
-
--   `(WPBlockVariation[]|void)`: Block variations.
-
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
@@ -769,6 +756,30 @@ _Returns_
 
 Registers a new block variation for the given block type.
 
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockVariation } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				registerBlockVariation( 'core/embed', {
+					name: 'custom',
+					title: __( 'My Custom Embed' ),
+					attributes: { providerNameSlug: 'custom' },
+				} );
+			} }
+		>
+			__( 'Add a custom variation for core/embed' ) }
+		</Button>
+	);
+};
+```
+
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
@@ -1014,6 +1025,26 @@ _Returns_
 ### unregisterBlockVariation
 
 Unregisters a block variation defined for the given block type.
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { unregisterBlockVariation } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
+
+const ExampleComponent = () => {
+	return (
+		<Button
+			onClick={ () => {
+				unregisterBlockVariation( 'core/embed', 'youtube' );
+			} }
+		>
+			{ __( 'Remove the YouTube variation from core/embed' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
