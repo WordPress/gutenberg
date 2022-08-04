@@ -12,7 +12,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Disabled from '../';
-import Button from '../../button/';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
@@ -59,28 +58,10 @@ const Form = () => {
 	);
 };
 
-export const Default: ComponentStory< typeof Disabled > = () => {
+export const Default: ComponentStory< typeof Disabled > = ( args ) => {
 	return (
-		<Disabled>
+		<Disabled { ...args }>
 			<Form />
 		</Disabled>
-	);
-};
-
-export const DisabledWithProp: ComponentStory< typeof Disabled > = () => {
-	const [ isDisabled, setState ] = useState( true );
-	const toggleDisabled = () => {
-		setState( () => ! isDisabled );
-	};
-
-	return (
-		<>
-			<Disabled isDisabled={ isDisabled }>
-				<Form />
-			</Disabled>
-			<Button variant="primary" onClick={ toggleDisabled }>
-				Set isDisabled to { isDisabled ? 'false' : 'true' }
-			</Button>
-		</>
 	);
 };

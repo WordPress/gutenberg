@@ -15,6 +15,7 @@ import { createContext } from '@wordpress/element';
  */
 import { StyledWrapper } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
@@ -24,8 +25,8 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: DisabledProps ) {
-	const ref: RefCallback< HTMLDivElement > = useDisabled();
+}: WordPressComponentProps< DisabledProps, 'div' > ) {
+	const ref: RefCallback< HTMLElement > = useDisabled();
 
 	if ( ! isDisabled ) {
 		return <Provider value={ false }>{ children }</Provider>;
