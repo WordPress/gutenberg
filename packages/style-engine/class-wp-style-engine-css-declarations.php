@@ -58,7 +58,7 @@ class WP_Style_Engine_CSS_Declarations {
 		}
 
 		// Trim the value. If empty, bail early.
-		$value = trim( $value );
+		$value = $this->sanitize_value( $value );
 		if ( '' === $value ) {
 			return;
 		}
@@ -143,15 +143,25 @@ class WP_Style_Engine_CSS_Declarations {
 		$indent              = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$suffix              = $should_prettify ? ' ' : '';
 		$suffix              = $should_prettify && $indent_count > 0 ? "\n" : $suffix;
+		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			$spacer               = $should_prettify ? ' ' : '';
+			if ( 0 === strpos( $property, '--' ) ) { // Account for CSS variables.
+				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
+				continue;
+			}
 			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
-		return rtrim( $declarations_output );
+
+		// Trim if there's no indentation.
+		if ( $should_prettify && 0 === $indent_count ) {
+			$declarations_output = trim( $declarations_output );
+		}
+
+		return $declarations_output;
 	}
 
 	/**
@@ -163,5 +173,20 @@ class WP_Style_Engine_CSS_Declarations {
 	 */
 	protected function sanitize_property( $property ) {
 		return sanitize_key( $property );
+	}
+
+	/**
+	 * Sanitize values.
+	 *
+	 * @param string $value The CSS value.
+	 *
+	 * @return string The sanitized value.
+	 */
+	protected function sanitize_value( $value ) {
+		// Escape HTML.
+		$value = esc_html( $value );
+		// Fix quotes to account for URLs.
+		$value = str_replace( array( '&#039;', '&#39;', '&#034;', '&#34;', '&quot;', '&apos;' ), array( "'", "'", '"', '"', '"', "'" ), $value );
+		return trim( $value );
 	}
 }
