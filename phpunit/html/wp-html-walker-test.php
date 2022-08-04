@@ -24,7 +24,7 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_finding_existing_tag() {
+	public function test_finding_any_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertTrue( $w->next_tag(), 'Querying an existing tag returns true' );
 	}
@@ -40,11 +40,12 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_updates_after_a_non_existing_tag() {
+	public function test_updates_ignored_after_a_non_existing_tag() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$this->assertFalse( $w->next_tag( 'p' ) );
 		$this->assertFalse( $w->next_tag( 'div' ) );
 		$w->set_attribute( 'id', 'primary' );
+		$this->assertSame( self::HTML_SIMPLE, (string) $w );
 	}
 
 	/**
@@ -60,8 +61,10 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	/**
 	 * According to HTML spec, only the first instance of an attribute counts.
 	 * The other ones are ignored.
+	 *
+	 * @ticket 56299
 	 */
-	public function test_update_duplicated_attribute() {
+	public function test_update_first_when_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
 		$w->next_tag();
 		$w->set_attribute( 'id', 'updated-id' );
@@ -80,7 +83,7 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	 *
 	 * @ticket 56299
 	 */
-	public function test_remove_duplicated_attribute() {
+	public function test_remove_first_when_duplicated_attribute() {
 		$w = new WP_HTML_Walker( '<div id="update-me" id="ignored-id"><span id="second">Text</span></div>' );
 		$w->next_tag();
 		$w->remove_attribute( 'id' );
@@ -122,7 +125,7 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
-	public function test_remove_non_existing_attribute() {
+	public function test_remove_ignored_when_non_existing_attribute() {
 		$w = new WP_HTML_Walker( self::HTML_SIMPLE );
 		$w->next_tag();
 		$w->remove_attribute( 'no-such-attribute' );
