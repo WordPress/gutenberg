@@ -182,6 +182,26 @@ function flattenTree( input = {}, prefix, token ) {
 }
 
 /**
+ * Resolves ref into the value it is pointing to.
+ *
+ * @param {Object} refObj      The reference we are pointing to.
+ *
+ * @param {string} blockStyles Block styles.
+ *
+ * @return {string} The resolved referenced value.
+ */
+function resolveRefValue( refObj, blockStyles ) {
+	if ( ! refObj.ref ) {
+		return refObj;
+	}
+
+	const refPath = refObj.ref.split( '.' );
+	const styleValue = get( blockStyles, refPath );
+
+	return styleValue;
+}
+
+/**
  * Transform given style tree into a set of style declarations.
  *
  * @param {Object}  blockStyles         Block styles.
@@ -190,12 +210,14 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {boolean} useRootPaddingAlign Whether to use CSS custom properties in root selector.
  *
+ * @param {Object}  tree				A theme.json tree containing layout definitions.
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
-	useRootPaddingAlign
+	useRootPaddingAlign,
+	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = reduce(
@@ -270,7 +292,11 @@ export function getStylesDeclarations(
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
-		output.push( `${ cssProperty }: ${ compileStyleValue( rule.value ) }` );
+		let ruleValue = rule.value;
+		if ( typeof ruleValue !== 'string' ) {
+			ruleValue = resolveRefValue( rule.value, tree );
+		}
+		output.push( `${ cssProperty }: ${ compileStyleValue( ruleValue ) }` );
 	} );
 
 	return output;
@@ -654,7 +680,8 @@ export const toStyles = (
 			const declarations = getStylesDeclarations(
 				styles,
 				selector,
-				useRootPaddingAlign
+				useRootPaddingAlign,
+				tree
 			);
 			if ( declarations?.length ) {
 				ruleset =
