@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, forwardRef, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { BottomSheetContext } from '@wordpress/components';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 class Picker extends Component {
 	presentPicker() {
@@ -23,6 +24,7 @@ class Picker extends Component {
 			isBottomSheetOpened,
 			closeBottomSheet,
 			onHandleClosingBottomSheet,
+			tintColor,
 		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
@@ -35,6 +37,7 @@ class Picker extends Component {
 				destructiveButtonIndex,
 				disabledButtonIndices,
 				anchor: getAnchor && getAnchor(),
+				tintColor,
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {
@@ -66,6 +69,8 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
+	const darkModeEnabled = usePreferredColorScheme() === 'dark';
+
 	return (
 		<Picker
 			ref={ ref }
@@ -73,6 +78,7 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 			isBottomSheetOpened={ isBottomSheetOpened }
 			closeBottomSheet={ closeGeneralSidebar }
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
+			tintColor={ darkModeEnabled ? '#5198d9' : '#2271b1' }
 		/>
 	);
 } );
