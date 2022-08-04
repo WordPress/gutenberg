@@ -606,6 +606,7 @@ body.editor-styles-wrapper
 .wp-block-navigation__overlay-menu-preview {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
