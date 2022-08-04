@@ -484,7 +484,7 @@ function Navigation( {
 						<ToggleControl
 							label={ __( 'Show icon button' ) }
 							help={ __(
-								'Configure the visual appearance of the button opening the overlay menu.'
+								'Configure the visual appearance of the button opening and closing the overlay menu.'
 							) }
 							onChange={ ( value ) =>
 								setAttributes( { hasIcon: value } )
