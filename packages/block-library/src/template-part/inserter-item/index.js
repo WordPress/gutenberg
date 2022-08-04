@@ -1,10 +1,20 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalInserterListItemWithModal as InserterListItemWithModal } from '@wordpress/block-editor';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	Spinner,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,6 +25,7 @@ import TemplatePartSelection from '../components/template-part-selection';
 import createTemplatePartPostData from '../utils/create-template-part-post-data';
 
 export default function TemplatePartInserterItem( props ) {
+	const [ isSaving, setIsSaving ] = useState( false );
 	const { rootClientId, item, onSelect } = props;
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -54,6 +65,7 @@ export default function TemplatePartInserterItem( props ) {
 					onSelect( inserterItem, focusBlock );
 				} }
 				onPatternSelect={ async ( pattern, blocks ) => {
+					setIsSaving( true );
 					const templatePartPostData = createTemplatePartPostData(
 						area,
 						blocks,
@@ -73,6 +85,7 @@ export default function TemplatePartInserterItem( props ) {
 							theme: templatePart.theme,
 						},
 					};
+
 					const focusBlock = true;
 					onSelect( inserterItem, focusBlock );
 				} }
@@ -84,6 +97,7 @@ export default function TemplatePartInserterItem( props ) {
 				<Button
 					variant="tertiary"
 					onClick={ async () => {
+						setIsSaving( true );
 						const templatePartPostData =
 							createTemplatePartPostData( area );
 
@@ -108,6 +122,14 @@ export default function TemplatePartInserterItem( props ) {
 					{ __( 'Start blank' ) }
 				</Button>
 			</HStack>
+			<div
+				className={ classnames(
+					'block-library-template-part-selection__saving-overlay',
+					{ 'is-saving': isSaving }
+				) }
+			>
+				<Spinner className="block-library-template-part-selection__spinner" />
+			</div>
 		</InserterListItemWithModal>
 	);
 }

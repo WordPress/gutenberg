@@ -19,6 +19,7 @@ $z-layers: (
 	".block-editor-inserter__tabs .components-tab-panel__tabs": 1, // higher sticky element
 	".block-editor-inserter__search": 1, // higher sticky element
 	".block-library-template-part-selection__search": 1, // higher sticky element
+	".block-library-template-part-selection__overlay": 1, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
