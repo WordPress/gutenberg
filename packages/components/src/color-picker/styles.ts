@@ -11,6 +11,7 @@ import InnerSelectControl from '../select-control';
 import InnerRangeControl from '../range-control';
 import { StyledField } from '../base-control/styles/base-control-styles';
 import { space } from '../ui/utils/space';
+import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
@@ -58,6 +59,7 @@ export const AuxiliaryColorArtefactWrapper = styled.div`
 `;
 
 export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`
+	${ boxSizingReset };
 	padding-left: ${ space( 4 ) };
 	padding-right: ${ space( 4 ) };
 `;
