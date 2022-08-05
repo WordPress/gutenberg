@@ -45,6 +45,10 @@ module.exports = ( { config } ) => {
 			enforce: 'post',
 		},
 		{
+			test: /\.html$/i,
+			loader: 'html-loader',
+		},
+		{
 			test: /\.scss$/,
 			exclude: /\.lazy\.scss$/,
 			use: scssLoaders( { isLazy: false } ),

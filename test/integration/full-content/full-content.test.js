@@ -34,6 +34,7 @@ import {
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
+	writeBlockFixtureStory,
 } from '../fixtures';
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
@@ -187,6 +188,8 @@ describe( 'full post content fixture', () => {
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				serializedExpected = serializedActual;
 				writeBlockFixtureSerializedHTML( basename, serializedExpected );
+				// Generate story file
+				writeBlockFixtureStory( basename );
 			} else {
 				throw new Error(
 					`Missing fixture file: ${ serializedHTMLFileName }`
