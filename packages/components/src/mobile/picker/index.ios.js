@@ -74,10 +74,10 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
-	const buttonTitle = usePreferredColorSchemeStyle(
+	const buttonTitleColor = usePreferredColorSchemeStyle(
 		styles[ 'components-picker__button-title' ],
 		styles[ 'components-picker__button-title--dark' ]
-	);
+	).color;
 
 	return (
 		<Picker
@@ -86,7 +86,7 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 			isBottomSheetOpened={ isBottomSheetOpened }
 			closeBottomSheet={ closeGeneralSidebar }
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-			tintColor={ buttonTitle.color }
+			tintColor={ buttonTitleColor }
 		/>
 	);
 } );
