@@ -64,6 +64,21 @@ function gutenberg_enqueue_stored_styles() {
 		wp_add_inline_style( $style_tag_id, $compiled_core_stylesheet );
 		wp_enqueue_style( $style_tag_id );
 	}
+
+	// If there are any other stores registered by themes etc, print them out.
+	$additional_stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
+	foreach ( array_keys( $additional_stores ) as $store_name ) {
+		if ( in_array( $store_name, $core_styles_keys, true ) ) {
+			continue;
+		}
+		$styles = gutenberg_style_engine_get_stylesheet_from_store( $store_name );
+		if ( ! empty( $styles ) ) {
+			$key = "wp-style-engine-$store_name";
+			wp_register_style( $key, false, array(), true, true );
+			wp_add_inline_style( $key, $styles );
+			wp_enqueue_style( $key );
+		}
+	}
 }
 
 /**

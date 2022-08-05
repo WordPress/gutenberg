@@ -42,7 +42,7 @@ To enqueue a style for rendering in the frontend, the `$options` array requires 
 1.  **selector (string)** - this is the CSS selector for your block style CSS declarations.
 2.  **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be
     batched together and printed in the same HTML style tag. The default is `'block-supports'`.
-3.  **enqueue (boolean)** - tells the style engine to enqueue the styles and print them in the frontend.
+3.  **enqueue (boolean)** - tells the style engine to store the styles.
 
 `wp_style_engine_get_styles` will return the compiled CSS and CSS declarations array.
 
@@ -70,72 +70,22 @@ array(
 */
 ```
 
-### wp_style_engine_add_to_store()
-
-Global public interface method to register styles to be enqueued and rendered.
-
-Use this function to enqueue any CSS rules. It will automatically merge declarations and combine selectors.
-
-_Parameters_
-
--   _$store_key_ `string` A valid store key.
--   _$css_rules_ `array<array>`
-
-_Returns_
-`WP_Style_Engine_CSS_Rules_Store` A store.
-
-#### Usage
-
-```php
-$styles = array(
-    array(
-        'selector'.       => '.wp-pumpkin',
-        'declarations' => array( 'color' => 'orange' )
-    ),
-    array(
-        'selector'.       => '.wp-tomato',
-        'declarations' => array( 'color' => 'red' )
-    ),
-    array(
-        'selector'.       => '.wp-tomato',
-        'declarations' => array( 'padding' => '100px' )
-    ),
-    array(
-        'selector'.       => '.wp-kumquat',
-        'declarations' => array( 'color' => 'orange' )
-    ),
-);
-
-wp_style_engine_add_to_store( 'layout-block-supports', $styles );
-```
-
-The resulting stylesheet will be:
-
-```html
-<style id="layout-block-supports-inline-css">
-	.wp-pumpkin,
-	.wp-kumquat {
-		color: orange;
-	}
-
-	.wp-tomato {
-		color: red;
-		padding: 100px;
-	}
-</style>
-```
-
 ### wp_style_engine_get_stylesheet_from_css_rules()
 
-Use this function to compile and return a stylesheet for any CSS rules. This function does not enqueue styles, but
-rather acts as a CSS compiler.
+Use this function to compile and return a stylesheet for any CSS rules. The style engine will automatically merge declarations and combine selectors.
+
+This function acts as a CSS compiler, but will also enqueue styles for rendering where `enqueue` and `context` strings are passed in the options.
 
 _Parameters_
 
 -   _$css_rules_ `array<array>`
+-   _$options_ `array<string|boolean>` An array of options to determine the output.
+    -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or '
+        global-styles'. Default is 'block-supports'.
+    -   _enqueue_ `boolean` When `true` will store using the `context` value as a key.
 
 _Returns_
-`string` A compiled CSS string.
+`string` A compiled CSS string based on `$css_rules`.
 
 #### Usage
 
@@ -159,8 +109,49 @@ $styles = array(
     ),
 );
 
-$stylesheet = wp_style_engine_get_stylesheet_from_css_rules( 'layout-block-supports', $styles );
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+    $styles,
+    array(
+        'context'  => 'block-supports', // Indicates that these styles should be stored with block supports CSS.
+        'enqueue'  => true, // Render the styles for output.
+    )
+);
 print_r( $stylesheet ); // .wp-pumpkin, .wp-kumquat {color:orange}.wp-tomato{color:red;padding:100px}
+```
+
+### wp_style_engine_get_stylesheet_from_store()
+
+Returns compiled CSS from a store, if found.
+
+_Parameters_
+
+-   _$store_key_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or ' global-styles'. Default is 'block-supports'.
+
+_Returns_
+`string` A compiled CSS string from the stored CSS rules.
+
+#### Usage
+
+```php
+// First register some styles.
+$styles = array(
+    array(
+        'selector'.       => '.wp-apple',
+        'declarations' => array( 'color' => 'green' )
+    ),
+);
+
+$stylesheet = wp_style_engine_get_stylesheet_from_css_rules(
+    $styles,
+    array(
+        'context'  => 'fruit-styles',
+        'enqueue'  => true,
+    )
+);
+
+// Later, fetch compiled rules from store.
+$stylesheet = gutenberg_style_engine_get_stylesheet_from_store( 'fruit-styles' );
+print_r( $stylesheet ); // .wp-apple{color:green;}
 ```
 
 ## Installation (JS only)

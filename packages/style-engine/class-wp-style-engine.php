@@ -538,9 +538,9 @@ class WP_Style_Engine {
  * );.
  *
  * @return array<string|array>|null array(
- *     'css'           => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
- *     'declarations'  => (array) An array of property/value pairs representing parsed CSS declarations.
- *     'classnames'    => (string) Classnames separated by a space.
+ *     'css'          => (string) A CSS ruleset or declarations block formatted to be placed in an HTML `style` attribute or tag.
+ *     'declarations' => (array) An array of property/value pairs representing parsed CSS declarations.
+ *     'classnames'   => (string) Classnames separated by a space.
  * );
  */
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
@@ -592,13 +592,13 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *
  * @param array<array>  $css_rules array(
  *      array(
- *          'selector'         => (string) A CSS selector.
+ *          'selector'    => (string) A CSS selector.
  *          declarations' => (boolean) An array of CSS definitions, e.g., array( "$property" => "$value" ).
  *      )
  *  );.
  * @param array<string> $options array(
- *     'context'                    => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
+ *     'context' => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *     'enqueue' => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
  * );.
  *
  * @return string A compiled CSS string.
