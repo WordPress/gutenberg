@@ -10,7 +10,7 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { Divider, DividerProps } from '../../divider';
 import { useCardDivider } from './hook';
 
-function CardDivider(
+function UnconnectedCardDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -34,6 +34,9 @@ function CardDivider(
  * </Card>
  * ```
  */
-const ConnectedCardDivider = contextConnect( CardDivider, 'CardDivider' );
+export const CardDivider = contextConnect(
+	UnconnectedCardDivider,
+	'CardDivider'
+);
 
-export default ConnectedCardDivider;
+export default CardDivider;

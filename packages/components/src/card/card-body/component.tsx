@@ -12,7 +12,7 @@ import { View } from '../../view';
 import { useCardBody } from './hook';
 import type { BodyProps } from '../types';
 
-function CardBody(
+function UnconnectedCardBody(
 	props: WordPressComponentProps< BodyProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -40,6 +40,6 @@ function CardBody(
  * </Card>
  * ```
  */
-const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
+export const CardBody = contextConnect( UnconnectedCardBody, 'CardBody' );
 
-export default ConnectedCardBody;
+export default CardBody;

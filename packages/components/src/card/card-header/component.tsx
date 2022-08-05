@@ -10,7 +10,7 @@ import type { HeaderProps } from '../types';
  */
 import type { ForwardedRef } from 'react';
 
-function CardHeader(
+function UnconnectedCardHeader(
 	props: WordPressComponentProps< HeaderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -32,6 +32,6 @@ function CardHeader(
  * </Card>
  * ```
  */
-const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
+export const CardHeader = contextConnect( UnconnectedCardHeader, 'CardHeader' );
 
-export default ConnectedCardHeader;
+export default CardHeader;

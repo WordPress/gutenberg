@@ -13,7 +13,7 @@ import {
 	CardDivider,
 	CardMedia,
 	CardFooter,
-} from '../index';
+} from '..';
 import { Text } from '../../text';
 import { Heading } from '../../heading';
 import Button from '../../button';
@@ -22,6 +22,14 @@ const meta: ComponentMeta< typeof Card > = {
 	component: Card,
 	title: 'Components/Card',
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
+	argTypes: {
+		as: {
+			control: { type: null },
+		},
+		children: {
+			control: { type: null },
+		},
+	},
 	parameters: {
 		controls: {
 			expanded: true,
@@ -32,9 +40,9 @@ const meta: ComponentMeta< typeof Card > = {
 
 export default meta;
 
-const Template: ComponentStory< typeof Card > = ( props ) => {
+const Template: ComponentStory< typeof Card > = ( args ) => {
 	return (
-		<Card { ...props }>
+		<Card { ...args }>
 			<CardHeader>
 				<Heading>CardHeader</Heading>
 			</CardHeader>
