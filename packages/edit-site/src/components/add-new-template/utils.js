@@ -152,7 +152,10 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 				);
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -167,6 +170,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 						icon: icon?.startsWith( 'dashicons-' )
 							? icon.slice( 10 )
 							: post,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -210,6 +214,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 									title,
 									description,
 									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -317,7 +322,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 				);
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -327,6 +335,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 							labels.singular_name
 						),
 						icon: blockMeta,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -369,6 +378,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 									title,
 									description,
 									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -455,7 +465,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 		( { slug } ) => slug === 'author'
 	);
 	if ( authorInfo.user?.hasEntities ) {
-		authorMenuItem = { ...authorMenuItem };
+		authorMenuItem = { ...authorMenuItem, templatePrefix: 'author' };
 		authorMenuItem.onClick = ( template ) => {
 			onClickMenuItem( {
 				type: 'root',
@@ -494,6 +504,7 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 							title,
 							description,
 							slug: `author-${ suggestion.slug }`,
+							templatePrefix: 'author',
 						};
 					},
 				},

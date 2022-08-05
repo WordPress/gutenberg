@@ -129,7 +129,7 @@ const Popover = (
 		noArrow = true,
 		isAlternate,
 		position,
-		placement = 'bottom-start',
+		placement: placementProp = 'bottom-start',
 		offset,
 		focusOnMount = 'firstElement',
 		anchorRef,
@@ -139,11 +139,11 @@ const Popover = (
 		onFocusOutside,
 		__unstableSlotName = SLOT_NAME,
 		__unstableObserveElement,
-		__unstableForcePosition,
+		__unstableForcePosition = false,
 		__unstableShift = false,
 		...contentProps
 	},
-	ref
+	forwardedRef
 ) => {
 	if ( range ) {
 		deprecated( 'range prop in Popover component', {
@@ -154,12 +154,13 @@ const Popover = (
 
 	const arrowRef = useRef( null );
 	const anchorRefFallback = useRef( null );
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const hasArrow = ! isExpanded && ! noArrow;
-	const usedPlacement = position
+	const normalizedPlacementFromProps = position
 		? positionToPlacement( position )
-		: placement;
+		: placementProp;
 
 	const ownerDocument = useMemo( () => {
 		let documentToReturn;
@@ -199,7 +200,7 @@ const Popover = (
 		return { x: iframeRect.left, y: iframeRect.top };
 	}, [ ownerDocument ] );
 
-	const middlewares = [
+	const middleware = [
 		frameOffset || offset
 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
 					if ( ! frameOffset ) {
@@ -279,28 +280,38 @@ const Popover = (
 	} );
 
 	const {
+		// Positioning coordinates
 		x,
 		y,
+		// Callback refs (not regular refs). This allows the position to be updated.
+		// when either elements change.
 		reference,
 		floating,
-		strategy,
+		// Object with "regular" refs to both "reference" and "floating"
 		refs,
+		// Type of CSS position property to use (absolute or fixed)
+		strategy,
 		update,
-		placement: placementData,
+		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
-	} = useFloating( {
-		placement: usedPlacement,
-		middleware: middlewares,
-	} );
+	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
 
-	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
-
-	// Updates references
+	// Update the `reference`'s ref.
+	//
+	// In floating-ui's terms:
+	// - "reference" refers to the popover's anchor element.
+	// - "floating" refers the floating popover's element.
+	// A floating element can also be positioned relative to a virtual element,
+	// instead of a real one. A virtual element is represented by an object
+	// with the `getBoundingClientRect()` function (like real elements).
+	// See https://floating-ui.com/docs/virtual-elements for more info.
 	useLayoutEffect( () => {
-		// No ref or position have been passed
-		let usedRef;
+		let resultingReferenceRef;
+
 		if ( anchorRef?.top ) {
-			usedRef = {
+			// Create a virtual element for the ref. The expectation is that
+			// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const topRect = anchorRef.top.getBoundingClientRect();
 					const bottomRect = anchorRef.bottom.getBoundingClientRect();
@@ -313,17 +324,22 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRef?.current ) {
-			usedRef = anchorRef.current;
+			// Standard React ref.
+			resultingReferenceRef = anchorRef.current;
 		} else if ( anchorRef ) {
-			usedRef = anchorRef;
+			// If `anchorRef` holds directly the element's value (no `current` key)
+			// This is a weird scenario and should be deprecated.
+			resultingReferenceRef = anchorRef;
 		} else if ( anchorRect ) {
-			usedRef = {
+			// Create a virtual element for the ref.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					return anchorRect;
 				},
 			};
 		} else if ( getAnchorRect ) {
-			usedRef = {
+			// Create a virtual element for the ref.
+			resultingReferenceRef = {
 				getBoundingClientRect() {
 					const rect = getAnchorRect( anchorRefFallback.current );
 					return new window.DOMRect(
@@ -335,23 +351,27 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRefFallback.current ) {
-			usedRef = anchorRefFallback.current;
+			resultingReferenceRef = anchorRefFallback.current;
 		}
 
-		if ( ! usedRef ) {
+		if ( ! resultingReferenceRef ) {
 			return;
 		}
 
-		reference( usedRef );
+		reference( resultingReferenceRef );
 
 		if ( ! refs.floating.current ) {
 			return;
 		}
 
-		return autoUpdate( usedRef, refs.floating.current, update );
+		return autoUpdate(
+			resultingReferenceRef,
+			refs.floating.current,
+			update
+		);
 	}, [ anchorRef, anchorRect, getAnchorRect ] );
 
-	// This is only needed for a smoth transition when moving blocks.
+	// This is only needed for a smooth transition when moving blocks.
 	useLayoutEffect( () => {
 		if ( ! __unstableObserveElement ) {
 			return;
@@ -364,7 +384,9 @@ const Popover = (
 		};
 	}, [ __unstableObserveElement ] );
 
-	// If we're using getAnchorRect, we need to update the position as we scroll the iframe.
+	// If the reference element is in a different ownerDocument (e.g. iFrame),
+	// we need to manually update the floating's position as the reference's owner
+	// document scrolls.
 	useLayoutEffect( () => {
 		if ( ownerDocument === document ) {
 			return;
@@ -379,8 +401,14 @@ const Popover = (
 		!! animate &&
 		getAnimateClassName( {
 			type: 'appear',
-			origin: placementToAnimationOrigin( placementData ),
+			origin: placementToAnimationOrigin( computedPlacement ),
 		} );
+
+	const mergedFloatingRef = useMergeRefs( [
+		floating,
+		dialogRef,
+		forwardedRef,
+	] );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
@@ -399,7 +427,7 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			ref={ mergedRefs }
+			ref={ mergedFloatingRef }
 			{ ...dialogProps }
 			tabIndex="-1"
 			style={
@@ -412,6 +440,7 @@ const Popover = (
 					  }
 			}
 		>
+			{ /* Prevents scroll on the document */ }
 			{ isExpanded && <ScrollLock /> }
 			{ isExpanded && (
 				<div className="components-popover__header">
@@ -431,7 +460,7 @@ const Popover = (
 					ref={ arrowRef }
 					className={ [
 						'components-popover__arrow',
-						`is-${ placementData.split( '-' )[ 0 ] }`,
+						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
 					].join( ' ' ) }
 					style={ {
 						left: Number.isFinite( arrowData?.x )
