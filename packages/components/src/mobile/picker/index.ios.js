@@ -10,7 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { Component, forwardRef, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { BottomSheetContext } from '@wordpress/components';
-import { usePreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 class Picker extends Component {
 	presentPicker() {
@@ -69,7 +74,10 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
-	const darkModeEnabled = usePreferredColorScheme() === 'dark';
+	const buttonTitle = usePreferredColorSchemeStyle(
+		styles[ 'components-picker__button-title' ],
+		styles[ 'components-picker__button-title--dark' ]
+	);
 
 	return (
 		<Picker
@@ -78,7 +86,7 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 			isBottomSheetOpened={ isBottomSheetOpened }
 			closeBottomSheet={ closeGeneralSidebar }
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-			tintColor={ darkModeEnabled ? '#5198d9' : '#2271b1' }
+			tintColor={ buttonTitle.color }
 		/>
 	);
 } );
