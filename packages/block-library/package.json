@@ -67,7 +67,6 @@
 		"memize": "^1.1.0",
 		"micromodal": "^0.4.10",
 		"moment": "^2.22.1",
-		"node-fetch": "^3.2.6",
 		"remove-accents": "^0.4.2"
 	},
 	"peerDependencies": {
