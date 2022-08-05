@@ -29,10 +29,15 @@ class Picker extends Component {
 			isBottomSheetOpened,
 			closeBottomSheet,
 			onHandleClosingBottomSheet,
-			tintColor,
+			colorScheme,
 		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
+
+		const buttonTitleColor =
+			colorScheme === 'light'
+				? styles[ 'components-picker__button-title' ].color
+				: styles[ 'components-picker__button-title--dark' ].color;
 
 		ActionSheetIOS.showActionSheetWithOptions(
 			{
@@ -42,7 +47,7 @@ class Picker extends Component {
 				destructiveButtonIndex,
 				disabledButtonIndices,
 				anchor: getAnchor && getAnchor(),
-				tintColor,
+				tintColor: buttonTitleColor,
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {
@@ -75,10 +80,6 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
 	const colorScheme = usePreferredColorScheme();
-	const buttonTitleColor =
-		colorScheme === 'light'
-			? styles[ 'components-picker__button-title' ].color
-			: styles[ 'components-picker__button-title--dark' ].color;
 
 	return (
 		<Picker
@@ -87,7 +88,7 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 			isBottomSheetOpened={ isBottomSheetOpened }
 			closeBottomSheet={ closeGeneralSidebar }
 			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
-			tintColor={ buttonTitleColor }
+			colorScheme={ colorScheme }
 		/>
 	);
 } );
