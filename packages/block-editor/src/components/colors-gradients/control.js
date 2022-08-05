@@ -148,11 +148,7 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => (
-								<div className="block-editor-color-gradient-control__tab-panel">
-									{ renderPanelType( tab.value ) }
-								</div>
-							) }
+							{ ( tab ) => renderPanelType( tab.value ) }
 						</TabPanel>
 					) }
 					{ ! canChooseAGradient &&
