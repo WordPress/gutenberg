@@ -9,7 +9,6 @@ import {
 	addMonths,
 	startOfDay,
 	isEqual,
-	subDays,
 	addDays,
 	subWeeks,
 	addWeeks,
@@ -98,7 +97,7 @@ export function DatePicker( {
 		<div className="components-datetime__date">
 			<Navigator>
 				<Button
-					icon={ arrowLeft }
+					icon={ isRTL() ? arrowRight : arrowLeft }
 					variant="tertiary"
 					aria-label={ __( 'View previous month' ) }
 					onClick={ () => {
@@ -123,7 +122,7 @@ export function DatePicker( {
 					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
 				</NavigatorHeading>
 				<Button
-					icon={ arrowRight }
+					icon={ isRTL() ? arrowLeft : arrowRight }
 					variant="tertiary"
 					aria-label={ __( 'View next month' ) }
 					onClick={ () => {
@@ -191,10 +190,16 @@ export function DatePicker( {
 								onKeyDown={ ( event ) => {
 									let nextFocusable;
 									if ( event.key === 'ArrowLeft' ) {
-										nextFocusable = subDays( day, 1 );
+										nextFocusable = addDays(
+											day,
+											isRTL() ? 1 : -1
+										);
 									}
 									if ( event.key === 'ArrowRight' ) {
-										nextFocusable = addDays( day, 1 );
+										nextFocusable = addDays(
+											day,
+											isRTL() ? -1 : 1
+										);
 									}
 									if ( event.key === 'ArrowUp' ) {
 										nextFocusable = subWeeks( day, 1 );
@@ -311,7 +316,7 @@ function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
 	}
 
 	if ( isRTL() ) {
-		return parts.reverse().join( '. ' );
+		return parts.reverse().join( ' .' );
 	}
 
 	return parts.join( '. ' );
