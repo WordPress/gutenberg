@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	BaseControl,
 	RangeControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -70,7 +71,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
 
 	return (
 		<fieldset className="components-border-radius-control">
-			<legend>{ __( 'Radius' ) }</legend>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Radius' ) }
+			</BaseControl.VisualLabel>
 			<div className="components-border-radius-control__wrapper">
 				{ isLinked ? (
 					<>
