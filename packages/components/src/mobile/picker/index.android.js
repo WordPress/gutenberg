@@ -71,7 +71,7 @@ export default class Picker extends Component {
 	}
 
 	render() {
-		const { hideCancelButton, title, testID } = this.props;
+		const { hideCancelButton, title, testID, description } = this.props;
 		const { isVisible } = this.state;
 
 		return (
@@ -81,7 +81,11 @@ export default class Picker extends Component {
 				hideHeader
 				testID={ testID }
 			>
-				<PanelBody title={ title } style={ styles.panelBody }>
+				<PanelBody
+					title={ title }
+					description={ description }
+					style={ styles.panelBody }
+				>
 					{ this.getOptions() }
 					{ ! hideCancelButton && (
 						<TextControl
