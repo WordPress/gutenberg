@@ -244,7 +244,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * registerBlockType( 'namespace/block-name', {
  *     title: __( 'My First Block' ),
  *     edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
- *     save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+ *     save: () => <div>Hello from the saved content!</div>,
  * } );
  * ```
  *
