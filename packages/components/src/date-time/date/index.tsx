@@ -81,10 +81,17 @@ export function DatePicker( {
 		weekStartsOn: startOfWeek,
 	} );
 
+	// Used to implement a roving tab index. Tracks the day that receives focus
+	// when the user tabs into the calendar.
 	const [ focusable, setFocusable ] = useState( startOfDay( date ) );
-	const [ isFocusAllowed, setIsFocusAllowed ] = useState( false );
 
-	// Update selected date and month being viewed when currentDate prop changes.
+	// Allows us to only programmatically focus() a day when focus was already
+	// within the calendar. This stops us stealing focus from e.g. a TimePicker
+	// input.
+	const [ isFocusWithinCalendar, setIsFocusWithinCalendar ] =
+		useState( false );
+
+	// Update internal state when currentDate prop changes.
 	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
 	if ( currentDate !== prevCurrentDate ) {
 		setPrevCurrentDate( currentDate );
@@ -138,8 +145,8 @@ export function DatePicker( {
 				/>
 			</Navigator>
 			<Calendar
-				onFocus={ () => setIsFocusAllowed( true ) }
-				onBlur={ () => setIsFocusAllowed( false ) }
+				onFocus={ () => setIsFocusWithinCalendar( true ) }
+				onBlur={ () => setIsFocusWithinCalendar( false ) }
 			>
 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
 					<DayOfWeek key={ day.toString() }>
@@ -158,7 +165,7 @@ export function DatePicker( {
 								column={ index + 1 }
 								isSelected={ isSelected( day ) }
 								isFocusable={ isEqual( day, focusable ) }
-								isFocusAllowed={ isFocusAllowed }
+								isFocusAllowed={ isFocusWithinCalendar }
 								isToday={ isSameDay( day, new Date() ) }
 								isInvalid={
 									isInvalidDate ? isInvalidDate( day ) : false
@@ -261,9 +268,10 @@ function Day( {
 }: DayProps ) {
 	const ref = useRef< HTMLButtonElement >();
 
-	// Focus the button when an arrow key is pressed, but only when focus was
-	// already within the calendar grid. This prevents stealing focus from an
-	// external field e.g. one of the TimePicker fields.
+	// Focus the day when it becomes focusable, e.g. because an arrow key is
+	// pressed. Only do this if focus is allowed - this stops us stealing focus
+	// from e.g. a TimePicker input. Note that isFocusAllowed is not a dep as
+	// there is no point calling focus() on an already focused element.
 	useEffect( () => {
 		if ( ref.current && isFocusable && isFocusAllowed ) {
 			ref.current.focus();
