@@ -1126,4 +1126,28 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = 'body{padding-top: 10px;padding-right: 12px;padding-bottom: 10px;padding-left: 12px;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
 		$this->assertEquals( $expected, $theme_json->get_styles_for_block( $metadata ) );
 	}
+
+	function test_get_styles_for_block_with_content_width() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => 2,
+				'settings' => array(
+					'layout' => array(
+						'contentSize' => '800px',
+						'wideSize'    => '1000px',
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'path'     => array(
+				'0' => 'settings',
+			),
+			'selector' => 'body',
+		);
+
+		$expected = 'body { margin: 0;--wp--style--global--content-size: 800px;--wp--style--global--wide-size: 1000px;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$this->assertEquals( $expected, $theme_json->get_styles_for_block( $metadata ) );
+	}
 }
