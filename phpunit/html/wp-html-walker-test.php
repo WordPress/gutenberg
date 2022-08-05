@@ -186,7 +186,7 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 		$w->next_tag();
 		$w->remove_class( 'main' );
 		$this->assertSame(
-			'<div class="with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			'<div class=" with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			(string) $w
 		);
 	}
@@ -329,8 +329,8 @@ HTML;
 		$expected_output = <<<HTML
 <div data-details="{ &quot;key&quot;: &quot;value&quot; }" selected class="merge-message is-processed" checked>
 	<div class="select-menu d-inline-block">
-		<div checked class="MixedCaseHTML position-relative button-group Another-Mixed-Case" />
-		<div checked class="MixedCaseHTML position-relative button-group Another-Mixed-Case">
+		<div checked class=" MixedCaseHTML position-relative button-group Another-Mixed-Case" />
+		<div checked class=" MixedCaseHTML position-relative button-group Another-Mixed-Case">
 			<button type="button" class="merge-box-button btn-group-merge rounded-left-2 btn  BtnGroup-item js-details-target hx_create-pr-button" aria-expanded="false" data-details-container=".js-merge-pr" disabled="">
 			  Merge pull request
 			</button>

@@ -449,14 +449,14 @@ class WP_HTML_Walker {
 		while ( $at < strlen( $existing_class ) ) {
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, ' ', $ws_at );
-			$sep       = strpos( $existing_class, ' ', $at + $ws_length );
+			$sep_at    = strpos( $existing_class, ' ', $at + $ws_length );
 			$at       += $ws_length;
-			if ( false === $sep ) {
-				$sep = strlen( $existing_class );
+			if ( false === $sep_at ) {
+				$sep_at = strlen( $existing_class );
 			}
 
-			$name = substr( $existing_class, $at, $sep - $at );
-			$at   = $sep;
+			$name = substr( $existing_class, $at, $sep_at - $at );
+			$at   = $sep_at;
 
 			$remove_class = array_key_exists( $name, $this->classname_updates ) && self::REMOVE_CLASS === $this->classname_updates[ $name ];
 			unset( $this->classname_updates[ $name ] );
@@ -477,12 +477,17 @@ class WP_HTML_Walker {
 
 		// Add new classes by appending the ones we haven't already seen.
 		if ( count( $this->classname_updates ) > 0 ) {
-			$modified = true;
 			foreach ( $this->classname_updates as $name => $do_keep ) {
-				$class .= ( strlen( $class ) > 0 ? ' ' : '' ) . $name;
+				if ( self::ADD_CLASS === $do_keep ) {
+					$modified = true;
+					$sep      = strlen( $class ) > 0 ? ' ' : '';
+
+					$class .= $sep . $name;
+				}
 			}
 		}
 
+		$this->classname_updates = array();
 		if ( ! $modified ) {
 			return;
 		}
