@@ -182,7 +182,7 @@ class WP_Style_Engine_CSS_Declarations {
 		foreach ( $declarations_array as $property => $value ) {
 			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
-				$declarations_output .= "{$indent}{$filtered_declaration}$suffix";
+				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
 
