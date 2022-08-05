@@ -29,7 +29,7 @@ const colorsAndGradientKeys = [
 
 const TAB_COLOR = {
 	name: 'color',
-	title: 'Solid color',
+	title: 'Solid',
 	value: 'color',
 };
 const TAB_GRADIENT = {
@@ -115,6 +115,7 @@ function ColorGradientControlInner( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className={ classnames(
 				'block-editor-color-gradient-control',
 				className
