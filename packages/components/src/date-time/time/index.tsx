@@ -17,6 +17,7 @@ import ButtonGroup from '../../button-group';
 import TimeZone from './timezone';
 import type { TimePickerProps } from '../types';
 import {
+	Wrapper,
 	Fieldset,
 	Legend,
 	HoursInput,
@@ -219,7 +220,7 @@ export function TimePicker( {
 	);
 
 	return (
-		<div
+		<Wrapper
 			className="components-datetime__time" // Unused, for backwards compatibility.
 		>
 			<Fieldset>
@@ -352,7 +353,7 @@ export function TimePicker( {
 					/>
 				</HStack>
 			</Fieldset>
-		</div>
+		</Wrapper>
 	);
 }
 
