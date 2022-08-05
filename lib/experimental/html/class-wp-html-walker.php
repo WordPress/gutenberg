@@ -12,7 +12,9 @@
  * @subpackage HTML
  * @since 6.1.0
  */
-
+function esc_attr($x) {
+	return htmlspecialchars($x);
+}
 /**
  * Processes an input HTML document by applying a specified set
  * of patches to that input. Tokenizes HTML but does not fully
@@ -263,23 +265,33 @@ class WP_HTML_Walker {
 				return true;
 			}
 
+			// <! transitions to markup declaration open state
+			// https://html.spec.whatwg.org/multipage/parsing.html#markup-declaration-open-state
 			if ( '!' === $html[ $at + 1 ] ) {
+				// <!-- transitions to a bogus comment state – we can skip to the nearest -->
+				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				if ( '-' === $html[ $at + 2 ] && '-' === $html[ $at + 3 ] ) {
 					$at = strpos( $html, '-->', $at + 4 ) + 3;
 					continue;
 				}
 
+				// <![CDATA[ transitions to CDATA section state – we can skip to the nearest ]]>
+				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				if ( 1 === preg_match( '~\[CDATA\[~Amiu', $html, $chunk, 0, $at + 2 ) ) {
 					$at = strpos( $html, ']]>', $at + 9 ) + 3;
 					continue;
 				}
 
+				// <!DOCTYPE transitions to DOCTYPE state – we can skip to the nearest >
+				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				if ( 1 === preg_match( '~DOCTYPE~Amiu', $html, $chunk, 0, $at + 2 ) )  {
 					$at = strpos( $html, '>', $at + 9 ) + 1;
 					continue;
 				}
 			}
 
+			// <? transitions to a bogus comment state – we can skip to the nearest >
+			// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			if ( '?' === $html[ $at + 1 ] ) {
 				$at = strpos( $html, '>', $at + 2 ) + 1;
 				continue;
