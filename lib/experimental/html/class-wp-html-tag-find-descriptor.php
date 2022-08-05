@@ -92,7 +92,7 @@ class WP_HTML_Tag_Find_Descriptor {
 		$descriptor->match_offset  = 0;
 
 		if ( is_string( $query ) ) {
-			$descriptor->tag_name = WP_HTML_Walker::comparable( $query );
+			$descriptor->tag_name = $query;
 			return $descriptor;
 		}
 
@@ -101,7 +101,7 @@ class WP_HTML_Tag_Find_Descriptor {
 		}
 
 		if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {
-			$descriptor->tag_name = WP_HTML_Walker::comparable( $query['tag_name'] );
+			$descriptor->tag_name = strtolower( $query['tag_name'] );
 		}
 
 		if ( isset( $query['match_offset'] ) && is_integer( $query['match_offset'] ) ) {
@@ -125,14 +125,51 @@ class WP_HTML_Tag_Find_Descriptor {
 	 *
 	 * @return boolean
 	 */
-	public function matches( $tag, $attributes ) {
-		if ( $this->tag_name && WP_HTML_Walker::comparable( $tag ) !== $this->tag_name ) {
-			return false;
-		}
-		if ( $this->class_pattern ) {
-			$existing_class = isset( $attributes['class'] ) ? WP_HTML_Walker::comparable( $attributes['class']->value ) : '';
-			if ( 1 !== preg_match( "~(?:^|[\t ]){$this->class_pattern}(?:[\t ]|$)~Smui", $existing_class ) ) {
+	public function matches( $walker ) {
+		if ( $this->tag_name ) {
+			$length = $walker->tag_name_ends_at - $walker->tag_name_starts_at;
+			if ( $length !== strlen( $this->tag_name ) ) {
 				return false;
+			}
+
+			for ( $i = 0; $i < $length; $i++ ) {
+				$html_char = $walker->html[ $walker->tag_name_starts_at + $i ];
+				$tag_char  = $this->tag_name[ $i ];
+
+				if ( $html_char !== $tag_char && strtolower( $html_char ) !== $tag_char ) {
+					return false;
+				}
+			}
+		}
+
+		if ( $this->class_pattern ) {
+			if ( ! isset( $walker->attributes['class'] ) ) {
+				return false;
+			}
+
+			$classes  = $walker->attributes['class']->value;
+			$class_at = 0;
+
+			while ( false !== ( $class_at = strpos( $classes, $this->class_pattern, $class_at ) ) ) {
+				// Verify this class starts at a boundary.
+				if ( $class_at > 0 ) {
+					$c = $classes[ $class_at - 1 ];
+
+					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+						continue;
+					}
+				}
+
+				// Verify this class ends at a boundary.
+				if ( $class_at + strlen( $this->class_pattern ) < strlen( $classes ) ) {
+					$c = $classes[ $class_at + 1 ];
+
+					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+						continue;
+					}
+				}
+
+				return true;
 			}
 		}
 

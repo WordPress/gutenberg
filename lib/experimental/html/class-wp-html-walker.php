@@ -67,9 +67,9 @@ class WP_HTML_Walker {
 	 * The name of the currently matched tag.
 	 *
 	 * @since 6.1.0
-	 * @var string|null
+	 * @var integer|null
 	 */
-	private $tag_name;
+	private $tag_name_starts_at;
 
 	/**
 	 * Byte offset after the name of current tag.
@@ -221,7 +221,7 @@ class WP_HTML_Walker {
 				// Twiddle our thumbs...
 			}
 
-			if ( $descriptor->matches( $this->tag_name, $this->attributes ) ) {
+			if ( $descriptor->matches( $this ) ) {
 				$current_match_offset++;
 			}
 		} while ( $current_match_offset !== $descriptor->match_offset );
@@ -262,7 +262,7 @@ class WP_HTML_Walker {
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
 				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
-				$this->tag_name         = substr( $html, $at, $tag_name_length );
+				$this->tag_name_starts_at = $at;
 				$this->tag_name_ends_at = $at + $tag_name_length;
 				$this->parsed_bytes     = $at + $tag_name_length;
 				return true;
@@ -450,7 +450,7 @@ class WP_HTML_Walker {
 	private function after_tag() {
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
-		$this->tag_name         = null;
+		$this->tag_name_starts_at = null;
 		$this->tag_name_ends_at = null;
 		$this->attributes       = array();
 	}
@@ -644,7 +644,7 @@ class WP_HTML_Walker {
 	 */
 	public function set_attribute( $name, $value ) {
 		$this->assert_not_closed();
-		if ( ! $this->tag_name ) {
+		if ( $this->tag_name_starts_at === null ) {
 			return;
 		}
 
@@ -759,7 +759,7 @@ class WP_HTML_Walker {
 	 */
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name ) {
+		if ( $this->tag_name_starts_at !== null ) {
 			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
 		}
 	}
@@ -775,7 +775,7 @@ class WP_HTML_Walker {
 	 */
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name ) {
+		if ( $this->tag_name !== null ) {
 			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
 	}
