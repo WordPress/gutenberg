@@ -5,7 +5,7 @@ const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
-const https = require( 'https' );
+const got = require( 'got' );
 
 /**
  * Promisified dependencies
@@ -278,28 +278,15 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
  * @return {string} The latest stable version of WordPress, like "6.0.1"
  */
 async function getLatestWordPressVersion() {
-	return new Promise( ( resolve, reject ) => {
-		https
-			.get(
-				'https://api.wordpress.org/core/stable-check/1.0/',
-				( response ) => {
-					response.setEncoding( 'utf8' );
-					let res = '';
-					response.on( 'data', ( data ) => ( res += data ) );
-					response.on( 'end', () => {
-						const versions = JSON.parse( res );
-						for ( const [ version, status ] of Object.entries(
-							versions
-						) ) {
-							if ( status === 'latest' ) {
-								resolve( version );
-							}
-						}
-					} );
-				}
-			)
-			.on( 'error', reject );
-	} );
+	const versions = await got(
+		'https://api.wordpress.org/core/stable-check/1.0/'
+	).json();
+
+	for ( const [ version, status ] of Object.entries( versions ) ) {
+		if ( status === 'latest' ) {
+			return version;
+		}
+	}
 }
 
 module.exports = {

@@ -19,26 +19,22 @@ jest.mock( 'fs', () => ( {
 	},
 } ) );
 
-// This mocks a small JSON response with a format matching the stable-check API.
+// This mocks a small response with a format matching the stable-check API.
 // It makes getLatestWordPressVersion resolve to "100.0.0".
-jest.mock( 'https', () => ( {
-	...jest.requireActual( 'https' ),
-	get: ( url, cb ) =>
-		cb( {
-			on: ( option, cb2 ) =>
-				cb2(
-					Buffer.from(
-						url ===
-							'https://api.wordpress.org/core/stable-check/1.0/'
-							? '{"99.0.0": "insecure", "100.0.0": "latest"}'
-							: null,
-						'utf8'
-					)
-				),
-			setEncoding: jest.fn(),
-		} ),
-	on: jest.fn(),
-} ) );
+jest.mock( 'got', () =>
+	jest.fn( ( url ) => ( {
+		json: () => {
+			if ( url === 'https://api.wordpress.org/core/stable-check/1.0/' ) {
+				return Promise.resolve( {
+					'1.0': 'insecure',
+					'99.1.1': 'outdated',
+					'100.0.0': 'latest',
+					'100.0.1': 'fancy',
+				} );
+			}
+		},
+	} ) )
+);
 
 jest.mock( '../detect-directory-type', () => jest.fn() );
 
