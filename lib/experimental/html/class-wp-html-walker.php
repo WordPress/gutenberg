@@ -31,6 +31,26 @@ class WP_HTML_Walker {
 	private $html;
 
 	/**
+	 * @var array|null
+	 */
+	private $last_query;
+
+	/**
+	 * @var string|null
+	 */
+	private $sought_tag_name;
+
+	/**
+	 * @var string|null
+	 */
+	private $sought_class_name;
+
+	/**
+	 * @var int|null
+	 */
+	private $sought_match_offset;
+
+	/**
 	 * The updated HTML document.
 	 *
 	 * @since 6.1.0
@@ -67,9 +87,9 @@ class WP_HTML_Walker {
 	 * The name of the currently matched tag.
 	 *
 	 * @since 6.1.0
-	 * @var string|null
+	 * @var integer|null
 	 */
-	private $tag_name;
+	private $tag_name_starts_at;
 
 	/**
 	 * Byte offset after the name of current tag.
@@ -181,6 +201,7 @@ class WP_HTML_Walker {
 	 */
 	public function __construct( $html ) {
 		$this->html = $html;
+		$this->last_query = null;
 	}
 
 	/**
@@ -202,8 +223,9 @@ class WP_HTML_Walker {
 	 */
 	public function next_tag( $query = null ) {
 		$this->assert_not_closed();
-		$descriptor           = WP_HTML_Tag_Find_Descriptor::parse( $query );
-		$current_match_offset = - 1;
+		$this->parse_query( $query );
+		$already_found = 0;
+
 		do {
 			/*
 			 * Unfortunately we can't try to search for only the tag name we want because that might
@@ -221,10 +243,10 @@ class WP_HTML_Walker {
 				// Twiddle our thumbs...
 			}
 
-			if ( $descriptor->matches( $this->tag_name, $this->attributes ) ) {
-				$current_match_offset++;
+			if ( $this->matches() ) {
+				$already_found++;
 			}
-		} while ( $current_match_offset !== $descriptor->match_offset );
+		} while ( $already_found < $this->sought_match_offset );
 
 		return true;
 	}
@@ -262,7 +284,7 @@ class WP_HTML_Walker {
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
 				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
-				$this->tag_name         = substr( $html, $at, $tag_name_length );
+				$this->tag_name_starts_at = $at;
 				$this->tag_name_ends_at = $at + $tag_name_length;
 				$this->parsed_bytes     = $at + $tag_name_length;
 				return true;
@@ -450,9 +472,9 @@ class WP_HTML_Walker {
 	private function after_tag() {
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
-		$this->tag_name         = null;
-		$this->tag_name_ends_at = null;
-		$this->attributes       = array();
+		$this->tag_name_starts_at = null;
+		$this->tag_name_ends_at   = null;
+		$this->attributes         = array();
 	}
 
 	/**
@@ -644,7 +666,7 @@ class WP_HTML_Walker {
 	 */
 	public function set_attribute( $name, $value ) {
 		$this->assert_not_closed();
-		if ( ! $this->tag_name ) {
+		if ( $this->tag_name_starts_at === null ) {
 			return;
 		}
 
@@ -760,7 +782,7 @@ class WP_HTML_Walker {
 	 */
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name ) {
+		if ( $this->tag_name_starts_at !== null ) {
 			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
 		}
 	}
@@ -776,7 +798,7 @@ class WP_HTML_Walker {
 	 */
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
-		if ( $this->tag_name ) {
+		if ( $this->tag_name_starts_at !== null ) {
 			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
 	}
@@ -801,14 +823,144 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Processes the passed comparable value.
+	 * Prepares tag search criteria from input interface.
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param string $value The comparable value to process.
-	 * @return string The processed value.
+	 * @param array|string $query {
+	 *     Which tag name to find, having which class.
+	 *
+	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
+	 *     @type string|null $class_name   Tag must contain this class name to match.
+	 * }
 	 */
-	public static function comparable( $value ) {
-		return trim( strtolower( $value ) );
+	private function parse_query( $query ) {
+		if ( null !== $query && $query === $this->last_query ) {
+			return;
+		}
+
+		$this->last_query          = $query;
+		$this->sought_tag_name     = null;
+		$this->sought_class_name   = null;
+		$this->sought_match_offset = 1;
+
+		// A single string value means "find the tag of this name."
+		if ( is_string( $query ) ) {
+			$this->sought_tag_name = $query;
+			return;
+		}
+
+		// If not using the string interface we have to pass an associative array.
+		if ( ! is_array( $query ) ) {
+			return;
+		}
+
+		if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {
+			$this->sought_tag_name = $query['tag_name'];
+		}
+
+		if ( isset( $query['class_name'] ) && is_string( $query['class_name'] ) ) {
+			$this->sought_class_name = $query['class_name'];
+		}
+
+		if ( isset( $query['match_offset'] ) && is_int( $query['match_offset'] ) && 0 < $query['match_offset'] ) {
+			$this->sought_match_offset = $query['match_offset'];
+		}
+	}
+
+
+	/**
+	 * Checks whether a given tag and its attributes match the search criteria.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @return boolean
+	 */
+	private function matches() {
+		// Do we match a case-insensitive HTML tag name?
+		if ( null !== $this->sought_tag_name ) {
+			/*
+			 * String (byte) length lookup is fast. If they aren't the
+			 * same length then they can't be the same string values.
+			 */
+			$length = $this->tag_name_ends_at - $this->tag_name_starts_at;
+			if ( $length !== strlen( $this->sought_tag_name ) ) {
+				return false;
+			}
+
+			/*
+			 * Otherwise we have to check for each character if they
+			 * are the same, and only `strtolower()` if we have to.
+			 * Presuming that most people will supply lowercase tag
+			 * names and most HTML will contain lowercase tag names,
+			 * most of the time this runs we shouldn't expect to
+			 * actually run the case-folding comparison.
+			 */
+			for ( $i = 0; $i < $length; $i++ ) {
+				$html_char = $this->html[ $this->tag_name_starts_at + $i ];
+				$tag_char  = $this->sought_tag_name[ $i ];
+
+				if ( $html_char !== $tag_char && strtolower( $html_char ) !== $tag_char ) {
+					return false;
+				}
+			}
+		}
+
+		// Do we match a byte-for-byte (case-sensitive and encoding-form-sensitive) class name?
+		if ( null !== $this->sought_class_name ) {
+			if ( ! isset( $this->attributes['class'] ) ) {
+				return false;
+			}
+
+			$classes  = $this->attributes['class']->value;
+			$class_at = 0;
+
+			/*
+			 * We're going to have to jump through potential matches here because
+			 * it's possible that we have classes containing the class name we're
+			 * looking for. For instance, if we are looking for "even" we don't
+			 * want to be confused when we come to the class "not-even." This is
+			 * secured by ensuring that we find our sought-after class and that
+			 * it's surrounded on both sides by proper boundaries.
+			 *
+			 * See https://html.spec.whatwg.org/#attributes-3
+			 * See https://html.spec.whatwg.org/#space-separated-tokens
+			 */
+			while ( false !== ( $class_at = strpos( $classes, $this->sought_class_name, $class_at ) ) ) {
+				/*
+				 * Verify this class starts at a boundary. If it were at 0 we'd be at
+				 * the start of the string and that would be fine, otherwise we have
+				 * to start at a place where the preceding character is whitespace.
+				 */
+				if ( $class_at > 0 ) {
+					$c = $classes[ $class_at - 1 ];
+
+					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+						$class_at += strlen( $this->sought_class_name );
+						continue;
+					}
+				}
+
+				/*
+				 * Similarly, verify this class ends at a boundary as well. Here we
+				 * can end at the very end of the string value, otherwise we have
+				 * to end at a place where the next character is whitespace.
+				 */
+				if ( $class_at + strlen( $this->sought_class_name ) < strlen( $classes ) ) {
+					$c = $classes[ $class_at + strlen( $this->sought_class_name ) ];
+
+					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
+						$class_at += strlen( $this->sought_class_name );
+						continue;
+					}
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 }

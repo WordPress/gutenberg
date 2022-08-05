@@ -6,6 +6,12 @@
  * @subpackage HTML
  */
 
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $s ) {
+		return str_replace( '"', '&quot;', $s );
+	}
+}
+
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
 	class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
 }
@@ -402,36 +408,36 @@ HTML;
 HTML;
 
 		$w = new WP_HTML_Walker( $input );
-		$w->next_tag( 'div' );
+		$this->assertTrue( $w->next_tag( 'div' ) );
 		$w->set_attribute( 'data-details', '{ "key": "value" }' );
 		$w->add_class( 'is-processed' );
-		$w->next_tag(
+		$this->assertTrue( $w->next_tag(
 			array(
 				'tag_name'   => 'div',
 				'class_name' => 'BtnGroup',
 			)
-		);
+		) );
 		$w->remove_class( 'BtnGroup' );
 		$w->add_class( 'button-group' );
 		$w->add_class( 'Another-Mixed-Case' );
-		$w->next_tag(
+		$this->assertTrue( $w->next_tag(
 			array(
 				'tag_name'   => 'div',
 				'class_name' => 'BtnGroup',
 			)
-		);
+		) );
 		$w->remove_class( 'BtnGroup' );
 		$w->add_class( 'button-group' );
 		$w->add_class( 'Another-Mixed-Case' );
-		$w->next_tag(
+		$this->assertTrue( $w->next_tag(
 			array(
 				'tag_name'     => 'button',
 				'class_name'   => 'btn',
-				'match_offset' => 2,
+				'match_offset' => 3,
 			)
-		);
+		) );
 		$w->remove_attribute( 'class' );
-		$w->next_tag( 'non-existent' );
+		$this->assertFalse( $w->next_tag( 'non-existent' ) );
 		$w->set_attribute( 'class', 'test' );
 		$this->assertSame( $expected_output, (string) $w );
 	}
