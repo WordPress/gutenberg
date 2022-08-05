@@ -765,11 +765,18 @@ application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
 
 ```js
+import { useState } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
+import { store as noticeStore } from '@wordpress/notices';
 import { useEntityRecord } from '@wordpress/core-data';
 
 function PageRenameForm( { id } ) {
 	const page = useEntityRecord( 'postType', 'page', id );
 	const [ title, setTitle ] = useState( () => page.record.title.rendered );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticeStore );
 
 	if ( page.isResolving ) {
 		return 'Loading...';
@@ -783,13 +790,8 @@ function PageRenameForm( { id } ) {
 			createSuccessNotice( __( 'Page renamed.' ), {
 				type: 'snackbar',
 			} );
-		} catch ( e ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while renaming the entity.' );
-
-			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		} catch ( error ) {
+			createErrorNotice( error.message, { type: 'snackbar' } );
 		}
 	}
 
@@ -800,9 +802,7 @@ function PageRenameForm( { id } ) {
 				value={ title }
 				onChange={ setTitle }
 			/>
-			<Button variant="primary" type="submit">
-				{ __( 'Save' ) }
-			</Button>
+			<button type="submit">{ __( 'Save' ) }</button>
 		</form>
 	);
 }
