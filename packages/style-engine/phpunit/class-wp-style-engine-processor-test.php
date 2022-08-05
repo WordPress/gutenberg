@@ -70,14 +70,14 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_wonderful_processor = new WP_Style_Engine_Processor();
 		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule, $a_more_wonderful_css_rule ) );
 
-		$expected = '.a-wonderful-rule,
-.a-very_wonderful-rule {
-	color: var(--wonderful-color);
-	background-color: orange;
-}
-.a-more-wonderful-rule {
+		$expected = '.a-more-wonderful-rule {
 	font-family: Wonderful sans;
 	font-size: 1em;
+	background-color: orange;
+}
+.a-wonderful-rule,
+.a-very_wonderful-rule {
+	color: var(--wonderful-color);
 	background-color: orange;
 }
 ';
