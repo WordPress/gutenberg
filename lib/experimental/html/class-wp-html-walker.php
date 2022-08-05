@@ -311,7 +311,7 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function parse_next_attribute() {
-		$this->skip_ws();
+		$this->skip_whitespace();
 
 		$name_length = '=' === $this->html[ $this->parsed_bytes ]
 			? 1 + strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes + 1 )
@@ -326,12 +326,12 @@ class WP_HTML_Walker {
 		$attribute_name      = substr( $this->html, $attribute_start, $name_length );
 		$this->parsed_bytes += $name_length;
 
-		$this->skip_ws();
+		$this->skip_whitespace();
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
 			$this->parsed_bytes++;
-			$this->skip_ws();
+			$this->skip_whitespace();
 
 			switch ( $this->html[ $this->parsed_bytes ] ) {
 				case "'":
@@ -376,7 +376,7 @@ class WP_HTML_Walker {
 	 *
 	 * @return void
 	 */
-	private function skip_ws() {
+	private function skip_whitespace() {
 		$this->parsed_bytes += strspn( $this->html, " \t\r\n", $this->parsed_bytes );
 	}
 
