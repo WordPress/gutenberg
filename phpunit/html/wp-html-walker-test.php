@@ -391,15 +391,19 @@ HTML;
 		$w = new WP_HTML_Walker(
 			'<div id=\'first\'><span id=\'second\'>Text</span></div>'
 		);
-		$w->next_tag( array(
-			'tag_name' => 'div',
-			'id'       => 'first',
-		) );
+		$w->next_tag(
+			array(
+				'tag_name' => 'div',
+				'id'       => 'first',
+			)
+		);
 		$w->remove_attribute( 'id' );
-		$w->next_tag( array(
-			'tag_name' => 'span',
-			'id'       => 'second',
-		) );
+		$w->next_tag(
+			array(
+				'tag_name' => 'span',
+				'id'       => 'second',
+			)
+		);
 		$w->set_attribute( 'id', 'single-quote' );
 		$this->assertSame(
 			'<div ><span id="single-quote">Text</span></div>',
@@ -410,7 +414,7 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
-	public function test_works_with_boolean_attributes() {
+	public function test_adds_boolean_attributes() {
 		$w = new WP_HTML_Walker(
 			'<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
 		);
@@ -420,6 +424,32 @@ HTML;
 			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>',
 			(string) $w
 		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_removes_boolean_attributes_when_false_passed() {
+		$w = new WP_HTML_Walker(
+			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
+		);
+		$w->next_tag( 'input' );
+		$w->set_attribute( 'checked', false );
+		$this->assertSame(
+			'<form action="/action_page.php"><input  type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_does_nothing_when_no_boolean_attribute_and_false_passed() {
+		$html_input = '<form action="/action_page.php"><input type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>';
+		$w          = new WP_HTML_Walker( $html_input );
+		$w->next_tag( 'input' );
+		$w->set_attribute( 'checked', false );
+		$this->assertSame( $html_input, (string) $w );
 	}
 
 	/**

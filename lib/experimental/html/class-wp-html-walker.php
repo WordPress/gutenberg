@@ -569,12 +569,16 @@ class WP_HTML_Walker {
 	}
 
 	/**
-	 * Updates or creates a new attribute on the currently matched tag.
+	 * Updates or creates a new attribute on the currently matched tag with the value passed.
+	 *
+	 * For boolean attributes special handling is provided:
+	 *  - When `true` is passed as the value, then only the attribute name is added to the tag.
+	 *  - When `false` is passed, the attribute gets removed if it existed before.
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param string $name  The attribute name to target.
-	 * @param string $value The new attribute value.
+	 * @param string         $name  The attribute name to target.
+	 * @param string|boolean $value The new attribute value.
 	 *
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
 	 */
