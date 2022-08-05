@@ -254,10 +254,10 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function parse_next_attribute() {
+		$this->skip_ws();
+
 		$name_match = $this->consume_regexp(
 			'~
-			# Preceeding whitespace:
-			[\x{09}\x{0a}\x{0c}\x{20} ]*
 			# The next attribute:
 			(?P<NAME>(?>
 				# Attribute names starting with an equals sign (yes, this is valid)
@@ -276,16 +276,14 @@ class WP_HTML_Walker {
 
 		list( $attribute_name, $attribute_start ) = $name_match['NAME'];
 
-		// Skip whitespace.
-		$this->consume_regexp( '~[\x{09}\x{0a}\x{0c}\x{20}]*~u' );
+		$this->skip_ws();
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
+			$this->skip_ws();
 			$this->parsed_bytes ++;
 			$value_match     = $this->consume_regexp(
 				"~
-				# Preceeding whitespace
-				[\x{09}\x{0a}\x{0c}\x{20}]*
 				(?:
 					# A quoted attribute value
 					(?P<QUOTE>['\"])(?P<VALUE>.*?)\k<QUOTE>
@@ -315,6 +313,17 @@ class WP_HTML_Walker {
 		}
 
 		return $this->attributes[ $attribute_name ];
+	}
+
+	/**
+	 * Move the pointer past any immediate successive whitespace.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @return void
+	 */
+	private function skip_ws() {
+		$this->parsed_bytes += strspn( $this->html, " \t\r\n", $this->parsed_bytes );
 	}
 
 	/**
