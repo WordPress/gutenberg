@@ -253,7 +253,11 @@ class WP_HTML_Walker {
 			 * if we have at least one letter following the "<" then we _do_ have
 			 * a tag opener and can process it as such. This is more common than
 			 * HTML comments, DOCTYPE tags, and other structure starting with "<"
-			 * so it's good to check first for the presence of the tag
+			 * so it's good to check first for the presence of the tag.
+			 *
+			 * Reference:
+			 * * https://html.spec.whatwg.org/multipage/parsing.html#data-state
+			 * * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			 */
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
