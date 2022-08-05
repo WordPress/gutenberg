@@ -134,9 +134,12 @@ class WP_HTML_Walker {
 	 * </code>
 	 *
 	 * @since 6.1.0
-	 * @var WP_HTML_Class_Name_Update[]
+	 * @var bool[]
 	 */
-	private $classnames_updates = array();
+	private $classname_updates = array();
+
+	const ADD_CLASS = true;
+	const REMOVE_CLASS = false;
 
 	/**
 	 * Lexical replacements to apply to input HTML document.
@@ -355,17 +358,16 @@ class WP_HTML_Walker {
 	 * This method is only meant to run right before the attribute updates are applied.
 	 * The behavior in all other cases is undefined.
 	 *
-	 * @since 6.1.0
-	 *
 	 * @return void
 	 * @throws WP_HTML_Walker_Exception Once this object was already stringified and closed.
-	 * @see $classnames_updates
+	 * @since 6.1.0
+	 *
+	 * @see $classname_updates
 	 * @see $attributes_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		$classname_updates        = $this->classnames_updates;
-		$this->classnames_updates = array();
-		if ( empty( $classname_updates ) || array_key_exists( 'class', $this->attributes_updates ) ) {
+		if ( empty( $this->classname_updates ) || array_key_exists( 'class', $this->attributes_updates ) ) {
+			$this->classname_updates = array();
 			return;
 		}
 
@@ -377,14 +379,13 @@ class WP_HTML_Walker {
 		// Remove unwanted classes.
 		$new_class = preg_replace_callback(
 			'~(?:^|[ \t])([^ \t]+)~miu',
-			function ( $matches ) use ( &$seen_classes, $classname_updates ) {
+			function ( $matches ) use ( &$seen_classes ) {
 				list( $full_match, $class_name ) = $matches;
 
-				$comparable_name                  = self::comparable( $class_name );
-				$seen_classes[ $comparable_name ] = true;
+				$seen_classes[ $class_name ] = true;
 				if (
-					array_key_exists( $comparable_name, $classname_updates ) &&
-					WP_HTML_Class_Name_Update::REMOVE === $classname_updates[ $comparable_name ]->type
+					array_key_exists( $class_name, $this->classname_updates ) &&
+					self::REMOVE_CLASS === $this->classname_updates[ $class_name ]
 				) {
 					return '';
 				}
@@ -395,9 +396,9 @@ class WP_HTML_Walker {
 		);
 
 		// Add new classes.
-		foreach ( $classname_updates as $comparable_name => $operation ) {
-			if ( WP_HTML_Class_Name_Update::ADD === $operation->type && ! isset( $seen_classes[ $comparable_name ] ) ) {
-				$new_class .= " {$operation->class_name}";
+		foreach ( $this->classname_updates as $class_name => $operation ) {
+			if ( self::ADD_CLASS === $operation && ! isset( $seen_classes[ $class_name ] ) ) {
+				$new_class .= " {$class_name}";
 			}
 		}
 
@@ -408,6 +409,8 @@ class WP_HTML_Walker {
 				$this->remove_attribute( 'class' );
 			}
 		}
+
+		$this->classname_updates = array();
 	}
 
 	/**
@@ -568,7 +571,7 @@ class WP_HTML_Walker {
 	public function add_class( $class_name ) {
 		$this->assert_not_closed();
 		if ( $this->tag_name ) {
-			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_HTML_Class_Name_Update( $class_name, true );
+			$this->classname_updates[ $class_name ] = self::ADD_CLASS;
 		}
 	}
 
@@ -584,7 +587,7 @@ class WP_HTML_Walker {
 	public function remove_class( $class_name ) {
 		$this->assert_not_closed();
 		if ( $this->tag_name ) {
-			$this->classnames_updates[ self::comparable( $class_name ) ] = new WP_HTML_Class_Name_Update( $class_name, false );
+			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
 	}
 
