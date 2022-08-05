@@ -313,6 +313,9 @@ class WP_HTML_Walker {
 	private function parse_next_attribute() {
 		$this->skip_whitespace();
 
+		// Treat the equal sign ("=") as a part of the attribute name if it is the
+		// first encountered byte:
+		// https://html.spec.whatwg.org/multipage/parsing.html#before-attribute-name-state
 		$name_length = '=' === $this->html[ $this->parsed_bytes ]
 			? 1 + strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes + 1 )
 			: strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes );
@@ -336,8 +339,9 @@ class WP_HTML_Walker {
 			switch ( $this->html[ $this->parsed_bytes ] ) {
 				case "'":
 				case '"':
+					$quote              = $this->html[ $this->parsed_bytes ];
 					$value_start        = $this->parsed_bytes + 1;
-					$value_length       = strcspn( $this->html, $this->html[ $this->parsed_bytes ], $value_start );
+					$value_length       = strcspn( $this->html, $quote, $value_start );
 					$attribute_end      = $value_start + $value_length + 1;
 					$this->parsed_bytes = $attribute_end;
 					break;
@@ -354,6 +358,7 @@ class WP_HTML_Walker {
 			$attribute_end = $attribute_start + $name_length;
 		}
 
+		// If an attribute is listed many times, only use the first declaration and ignore the rest.
 		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
 			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
 				$attribute_name,
