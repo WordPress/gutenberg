@@ -455,6 +455,21 @@ HTML;
 	/**
 	 * @ticket 56299
 	 */
+	public function test_updates_boolean_attributes_when_string_passed() {
+		$w = new WP_HTML_Walker(
+			'<form action="/action_page.php"><input checked type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>'
+		);
+		$w->next_tag( 'input' );
+		$w->set_attribute( 'checked', 'checked' );
+		$this->assertSame(
+			'<form action="/action_page.php"><input checked="checked" type="checkbox" name="vehicle" value="Bike"><label for="vehicle">I have a bike</label></form>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
 	public function test_works_with_wrongly_nested_tags() {
 		$w = new WP_HTML_Walker(
 			'<span>123<p>456</span>789</p>'
@@ -494,6 +509,128 @@ HTML;
 		$this->assertSame(
 			'<div><span class="d-md-none" /span><span class="d-none d-md-inline">Back to notifications</span></div>',
 			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 * @dataProvider data_malformed_tag
+	 */
+	public function test_updates_when_malformed_tag( $html_input, $html_expected ) {
+		$w = new WP_HTML_Walker( $html_input );
+		$w->next_tag( 'hr' );
+		$w->set_attribute( 'foo', 'bar' );
+		$w->add_class( 'firstTag' );
+		$w->next_tag( 'span' );
+		$w->add_class( 'secondTag' );
+		$this->assertSame(
+			$html_expected,
+			(string) $w
+		);
+	}
+
+	public function data_malformed_tag() {
+		return array(
+			array(
+				'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
+				'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr title="This is a &quot;double-quote&quot;"><span>test</span>',
+				'<hr foo="bar" class="firstTag" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id=code><span>test</span>',
+				'<hr foo="bar" class="firstTag" id=code><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id= 	<code> ><span>test</span>',
+				'<hr foo="bar" class="firstTag" id= 	<code> ><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id=code>><span>test</span>',
+				'<hr foo="bar" class="firstTag" id=code>><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id=&quo;code><span>test</span>',
+				'<hr foo="bar" class="firstTag" id=&quo;code><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id/test=5><span>test</span>',
+				'<hr foo="bar" class="firstTag" id/test=5><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr title="<hr>"><span>test</span>',
+				'<hr foo="bar" class="firstTag" title="<hr>"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id=>code><span>test</span>',
+				'<hr foo="bar" class="firstTag" id=>code><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id"quo="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr idzero="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" idzero="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr >id="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" >id="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr =id="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr ===name="value"><span>test</span>',
+				'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr asdf="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" asdf="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr =asdf="tes"><span>test</span>',
+				'<hr foo="bar" class="firstTag" =asdf="tes"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr ==="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" ==="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr =><span>test</span>',
+				'<hr foo="bar" class="firstTag" =><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr =5><span>test</span>',
+				'<hr foo="bar" class="firstTag" =5><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr ==><span>test</span>',
+				'<hr foo="bar" class="firstTag" ==><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr ===><span>test</span>',
+				'<hr foo="bar" class="firstTag" ===><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr disabled><span>test</span>',
+				'<hr foo="bar" class="firstTag" disabled><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr a"sdf="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id   =5><span>test</span>',
+				'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id a  =5><span>test</span>',
+				'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
+			),
 		);
 	}
 }
