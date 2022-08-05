@@ -90,6 +90,12 @@
 		z-index: 3;
 	}
 
+	.component-spacing-sizes-control__not-set {
+		[class*="Thumb-thumbColor"] {
+			background-color: $gray-600;
+		}
+	}
+
 	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
 	}

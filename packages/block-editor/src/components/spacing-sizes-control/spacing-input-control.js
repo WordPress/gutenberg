@@ -65,7 +65,14 @@ export default function SpacingInputControl( {
 			[ currentValue ]
 		)[ 1 ] || units[ 0 ].value;
 
-	const customTooltipContent = ( newValue ) => spacingSizes[ newValue ]?.name;
+	const setInitialValue = () => {
+		if ( value === undefined ) {
+			onChange( '0' );
+		}
+	};
+
+	const customTooltipContent = ( newValue ) =>
+		value === undefined ? __( 'Inherit' ) : spacingSizes[ newValue ]?.name;
 
 	const customRangeValue = parseInt( currentValue );
 
@@ -79,9 +86,6 @@ export default function SpacingInputControl( {
 		setValueNow( newSize );
 		const size = parseInt( newSize, 10 );
 		if ( size === 0 ) {
-			return undefined;
-		}
-		if ( size === 1 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
@@ -188,11 +192,18 @@ export default function SpacingInputControl( {
 			) }
 			{ spacingSizes.length <= 9 && ! showCustomValueControl && (
 				<RangeControl
-					className="components-spacing-sizes-control__range-control"
+					className={ classnames(
+						'components-spacing-sizes-control__range-control',
+						{
+							'component-spacing-sizes-control__not-set':
+								value === undefined,
+						}
+					) }
 					value={ currentValue }
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
 					}
+					onClick={ setInitialValue }
 					withInputField={ false }
 					aria-valuenow={ valueNow }
 					aria-valuetext={ spacingSizes[ valueNow ]?.name }

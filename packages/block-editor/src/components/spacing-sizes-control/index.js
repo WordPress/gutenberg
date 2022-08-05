@@ -29,14 +29,17 @@ export default function SpacingSizesControl( {
 	useSelect,
 } ) {
 	const spacingSizes = [
-		{
-			name: __( 'Inherit style' ),
-			slug: 'default',
-			size: undefined,
-		},
 		{ name: 0, slug: '0', size: 0 },
 		...useSetting( 'spacing.spacingSizes' ),
 	];
+
+	if ( spacingSizes.length > 8 ) {
+		spacingSizes.unshift( {
+			name: __( 'Inherit' ),
+			slug: 'default',
+			size: undefined,
+		} );
+	}
 
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( values );
