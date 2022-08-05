@@ -124,13 +124,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
 		if ( isset( $property ) && isset( $value ) && '' === trim( $spacer ) ) {
-			// Allow a controlled set of `display` values.
-			if (
-				'display' === $property &&
-				in_array( $value, array( 'block', 'inline', 'inline-block', 'flex', 'inline-flex', 'grid', 'inline-grid' ), true )
-			) {
-				return "{$property}:{$spacer}{$value}";
-			}
 			return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
 		}
 		return '';
