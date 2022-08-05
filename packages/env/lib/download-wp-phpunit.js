@@ -4,6 +4,7 @@
  */
 const SimpleGit = require( 'simple-git' );
 const fs = require( 'fs' );
+const got = require( 'got' );
 const path = require( 'path' );
 
 /**
@@ -119,10 +120,18 @@ async function downloadTestSuite(
 	}
 
 	// Figure out the ref that we need to checkout to get the correct version of the PHPUnit library.
+	// If no version is specified, use the latest release of WordPress.
 	// Alpha, Beta, and RC versions are bleeding edge and should pull from trunk.
+
+	if ( ! wpVersion ) {
+		log( 'Fetching latest WordPress release version.' );
+		const releaseVersion = await getLatestWordPressReleaseVersion();
+		wpVersion = releaseVersion ? releaseVersion : 'trunk';
+	}
+
 	let ref;
 	const fetchRaw = [];
-	if ( ! wpVersion || wpVersion.match( /-(?:alpha|beta|rc)/ ) ) {
+	if ( wpVersion.match( /-(?:alpha|beta|rc)/ ) ) {
 		ref = 'trunk';
 		fetchRaw.push( 'fetch', 'origin', ref, '--depth', '1' );
 	} else {
@@ -137,4 +146,27 @@ async function downloadTestSuite(
 	await git.checkout( ref );
 
 	onProgress( 1 );
+}
+
+/**
+ * Retrieves the latest WordPress release version using the WordPress.org API.
+ * Returns null if request does not complete successfully.
+ */
+async function getLatestWordPressReleaseVersion() {
+	let latestRelease = null;
+
+	try {
+		const { offers } = await got(
+			'https://api.wordpress.org/core/version-check/1.7/'
+		).json();
+
+		if ( offers && offers.length > 0 ) {
+			const { version } = offers[ 0 ];
+			latestRelease = version;
+		}
+	} catch ( exception ) {
+		// Use default null value for API failure
+	}
+
+	return latestRelease;
 }
