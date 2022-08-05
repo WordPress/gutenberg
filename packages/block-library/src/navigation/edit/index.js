@@ -17,7 +17,8 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	PanelColorSettings,
@@ -104,9 +105,8 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ ref }`
-	);
+	const recursionId = `navigationMenu/${ ref }`;
+	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -702,7 +702,7 @@ function Navigation( {
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
-			<RecursionProvider>
+			<RecursionProvider uniqueId={ recursionId }>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">

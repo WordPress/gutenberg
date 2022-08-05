@@ -32,6 +32,7 @@ const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 
 const PADDING = 12; // $solid-border-space
 const UNKNOWN_VALUE = 'undefined';
+const DEFAULT_FONT_SIZE = 16;
 
 export function getBlockPaddings(
 	mergedStyle,
@@ -190,7 +191,7 @@ export function getBlockTypography(
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
-	const variables = [ 'preset', 'custom', 'var' ];
+	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
 
 	if ( ! stylesBase ) {
 		return styles;
@@ -203,6 +204,7 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		// var:preset|color|custom-color-2
 		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
 		const varRegex = /\"var:preset\|color\|(.*?)\"/gm;
+		const fontSizeRegex = /"fontSize":"(.*?)"/gm;
 
 		if ( variable === 'preset' ) {
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
@@ -242,6 +244,21 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 					return `"${ matchedValue?.color }"`;
 				}
 				return UNKNOWN_VALUE;
+			} );
+		}
+
+		if ( variable === 'fontSize' ) {
+			const { width, height } = Dimensions.get( 'window' );
+
+			stylesBase = stylesBase.replace( fontSizeRegex, ( _$1, $2 ) => {
+				const parsedFontSize =
+					getPxFromCssUnit( $2, {
+						width,
+						height,
+						fontSize: DEFAULT_FONT_SIZE,
+					} ) || `${ DEFAULT_FONT_SIZE }px`;
+
+				return `"fontSize":"${ parsedFontSize }"`;
 			} );
 		}
 	} );
@@ -297,7 +314,7 @@ function normalizeFontSizes( fontSizes ) {
 						{
 							width: dimensions.width,
 							height: dimensions.height,
-							fontSize: 16,
+							fontSize: DEFAULT_FONT_SIZE,
 						}
 					);
 					return fontSizeObject;

@@ -65,6 +65,7 @@ class WP_Style_Engine_Processor {
 	 *
 	 * @param array $options array(
 	 *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+	 *    'prettify' => (boolean) Whether to add new lines to output.
 	 * );.
 	 *
 	 * @return string The computed CSS.
@@ -72,6 +73,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
+			'prettify' => false,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 
@@ -88,7 +90,8 @@ class WP_Style_Engine_Processor {
 		// Build the CSS.
 		$css = '';
 		foreach ( $this->css_rules as $rule ) {
-			$css .= $rule->get_css();
+			$css .= $rule->get_css( $options['prettify'] );
+			$css .= $options['prettify'] ? "\n" : '';
 		}
 		return $css;
 	}

@@ -29,7 +29,7 @@
  * External dependencies
  */
 import isPlainObject from 'is-plain-obj';
-import { kebabCase } from 'lodash';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies

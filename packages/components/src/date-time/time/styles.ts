@@ -31,11 +31,6 @@ export const Fieldset = styled.fieldset`
 	}
 `;
 
-export const Legend = styled.legend`
-	margin-bottom: ${ space( 2 ) };
-	padding: 0;
-`;
-
 export const TimeWrapper = styled.div`
 	direction: ltr;
 	display: flex;

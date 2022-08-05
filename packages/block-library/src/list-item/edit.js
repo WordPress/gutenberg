@@ -30,7 +30,7 @@ import {
 } from './hooks';
 import { convertToListItems } from './utils';
 
-function IndentUI( { clientId } ) {
+export function IndentUI( { clientId } ) {
 	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
 	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
 
