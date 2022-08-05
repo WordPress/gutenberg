@@ -98,7 +98,7 @@ export interface Options {
  *       event.preventDefault();
  *       page.edit({ title });
  *       try {
- *           await page.save({ throwOnError: true })
+ *           await page.save()
  *           createSuccessNotice( __( 'Page renamed.' ), {
  *               type: 'snackbar',
  *           } );
@@ -150,8 +150,11 @@ export default function useEntityRecord< RecordType >(
 		() => ( {
 			edit: ( record ) =>
 				editEntityRecord( kind, name, recordId, record ),
-			save: ( saveOptions: any ) =>
-				saveEditedEntityRecord( kind, name, recordId, saveOptions ),
+			save: ( saveOptions: any = {} ) =>
+				saveEditedEntityRecord( kind, name, recordId, {
+					throwOnError: true,
+					...saveOptions,
+				} ),
 		} ),
 		[ recordId ]
 	);

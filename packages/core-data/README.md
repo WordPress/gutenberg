@@ -779,7 +779,7 @@ function PageRenameForm( { id } ) {
 		event.preventDefault();
 		page.edit( { title } );
 		try {
-			await page.save( { throwOnError: true } );
+			await page.save();
 			createSuccessNotice( __( 'Page renamed.' ), {
 				type: 'snackbar',
 			} );
