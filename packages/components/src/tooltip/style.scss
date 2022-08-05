@@ -2,7 +2,7 @@
 	z-index: z-index(".components-tooltip");
 
 	.components-popover__content {
-		min-width: 0;
+		min-width: min-content;
 	}
 }
 

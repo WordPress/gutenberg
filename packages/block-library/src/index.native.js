@@ -41,6 +41,7 @@ import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -75,6 +76,7 @@ export const coreBlocks = [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -179,6 +181,14 @@ const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
+// To be removed once List V2 is released on the web editor.
+function listCheck( listBlock, blocksFlags ) {
+	if ( blocksFlags?.__experimentalEnableListBlockV2 ) {
+		listBlock.settings = listBlock?.settingsV2;
+	}
+	return listBlock;
+}
+
 // Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
@@ -230,9 +240,11 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
+ * @param {Object} [blocksFlags] Experimental flags
+ *
  *
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -244,7 +256,8 @@ export const registerCoreBlocks = () => {
 		video,
 		nextpage,
 		separator,
-		list,
+		listCheck( list, blocksFlags ),
+		listItem,
 		quote,
 		mediaText,
 		preformatted,

@@ -84,8 +84,63 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
+			'color:red;border-top-left-radius:99px;text-decoration:underline;',
 			$css_declarations->get_declarations_string()
+		);
+	}
+
+	/**
+	 * Should compile css declarations into a prettified css declarations block string.
+	 */
+	public function test_generate_prettified_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
+			$css_declarations->get_declarations_string( true )
+		);
+	}
+
+	/**
+	 * Should compile css declarations into a prettified and indented css declarations block string.
+	 */
+	public function test_generate_prettified_with_indent_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'	color: red;
+	border-top-left-radius: 99px;
+	text-decoration: underline;',
+			$css_declarations->get_declarations_string( true, 1 )
+		);
+	}
+
+	/**
+	 * Should compile css declarations into a css declarations block string.
+	 */
+	public function test_generate_prettified_with_more_indents_css_declarations_string() {
+		$input_declarations = array(
+			'color'                  => 'red',
+			'border-top-left-radius' => '99px',
+			'text-decoration'        => 'underline',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'		color: red;
+		border-top-left-radius: 99px;
+		text-decoration: underline;',
+			$css_declarations->get_declarations_string( true, 2 )
 		);
 	}
 
@@ -101,7 +156,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: &lt;red/&gt;; margin-right: 10em;',
+			'color:&lt;red/&gt;;margin-right:10em;',
 			$css_declarations->get_declarations_string()
 		);
 	}
@@ -118,13 +173,13 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: tomato; margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			'color:tomato;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string()
 		);
 
 		$css_declarations->remove_declaration( 'color' );
 		$this->assertSame(
-			'margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			'margin:10em 10em 20em 1px;font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string()
 		);
 	}
@@ -141,13 +196,13 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: cucumber; margin: 10em 10em 20em 1px; font-family: Happy Font serif;',
+			'color:cucumber;margin:10em 10em 20em 1px;font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string()
 		);
 
 		$css_declarations->remove_declarations( array( 'color', 'margin' ) );
 		$this->assertSame(
-			'font-family: Happy Font serif;',
+			'font-family:Happy Font serif;',
 			$css_declarations->get_declarations_string()
 		);
 	}

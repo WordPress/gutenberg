@@ -28,7 +28,6 @@ const thumbSize = 12;
 
 export const Root = styled.div`
 	-webkit-tap-highlight-color: transparent;
-	box-sizing: border-box;
 	align-items: flex-start;
 	display: inline-flex;
 	justify-content: flex-start;
@@ -45,7 +44,6 @@ const wrapperMargin = ( { marks }: WrapperProps ) =>
 	css( { marginBottom: marks ? 16 : undefined } );
 
 export const Wrapper = styled.div< WrapperProps >`
-	box-sizing: border-box;
 	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
@@ -81,7 +79,6 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
 
 export const Rail = styled.span`
 	background-color: ${ COLORS.lightGray[ 600 ] };
-	box-sizing: border-box;
 	left: 0;
 	pointer-events: none;
 	right: 0;
@@ -108,7 +105,6 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 export const Track = styled.span`
 	background-color: currentColor;
 	border-radius: ${ railHeight }px;
-	box-sizing: border-box;
 	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
@@ -120,7 +116,6 @@ export const Track = styled.span`
 `;
 
 export const MarksWrapper = styled.span`
-	box-sizing: border-box;
 	display: block;
 	pointer-events: none;
 	position: relative;
@@ -141,7 +136,6 @@ const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
 };
 
 export const Mark = styled.span`
-	box-sizing: border-box;
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
@@ -158,7 +152,6 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 };
 
 export const MarkLabel = styled.span`
-	box-sizing: border-box;
 	color: ${ COLORS.lightGray[ 600 ] };
 	left: 0;
 	font-size: 11px;
@@ -181,7 +174,6 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
 
 export const ThumbWrapper = styled.span`
 	align-items: center;
-	box-sizing: border-box;
 	display: flex;
 	height: ${ thumbSize }px;
 	justify-content: center;
@@ -223,7 +215,6 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
 	border-radius: 50%;
-	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
 	position: absolute;
@@ -272,7 +263,6 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
 export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: 2px;
-	box-sizing: border-box;
 	color: white;
 	display: inline-block;
 	font-size: 12px;
@@ -298,7 +288,6 @@ export const Tooltip = styled.span< TooltipProps >`
 // @todo: Refactor RangeControl with latest HStack configuration
 // @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
-	box-sizing: border-box;
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
@@ -312,7 +301,6 @@ export const InputNumber = styled( NumberControl )`
 `;
 
 export const ActionRightWrapper = styled.span`
-	box-sizing: border-box;
 	display: block;
 	margin-top: 0;
 
