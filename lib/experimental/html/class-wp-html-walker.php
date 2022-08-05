@@ -519,8 +519,18 @@ class WP_HTML_Walker {
 		if ( ! $this->tag_name ) {
 			return;
 		}
-		$escaped_new_value = esc_attr( $value );
-		$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
+
+		/*
+		 * > The values "true" and "false" are not allowed on boolean attributes.
+		 * > To represent a false value, the attribute has to be omitted altogether.
+		 *     - HTML5 spec, https://html.spec.whatwg.org/#boolean-attributes
+		 */
+		if ( true === $value ) {
+			$updated_attribute = $name;
+		} else {
+			$escaped_new_value = esc_attr( $value );
+			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
+		}
 
 		$attr = $this->get_current_tag_attribute( $name );
 		if ( $attr ) {
