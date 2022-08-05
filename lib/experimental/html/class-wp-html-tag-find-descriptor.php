@@ -57,7 +57,7 @@ class WP_HTML_Tag_Find_Descriptor {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param array|string $query {
+	 * @param array|string|WP_HTML_Tag_Find_Descriptor $query {
 	 *     Which tag name to find, having which class, etc.
 	 *
 	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
@@ -69,22 +69,47 @@ class WP_HTML_Tag_Find_Descriptor {
 	 * @return WP_HTML_Tag_Find_Descriptor Used by WP_HTML_Processor when scanning HTML.
 	 */
 	public static function parse( $query ) {
-		$descriptor = new WP_HTML_Tag_Find_Descriptor();
+		static $descriptor = null;
+		static $last_query = null;
 
-		if ( is_array( $query ) ) {
-			if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {
-				$descriptor->tag_name = WP_HTML_Walker::comparable( $query['tag_name'] );
-			}
+		if ( $query instanceof WP_HTML_Tag_Find_Descriptor ) {
+			return $query;
+		}
 
-			if ( isset( $query['match_offset'] ) && is_integer( $query['match_offset'] ) ) {
-				$descriptor->match_offset = $query['match_offset'];
-			}
+		if ( null === $descriptor ) {
+			$descriptor = new WP_HTML_Tag_Find_Descriptor();
+		}
 
-			if ( isset( $query['class_name'] ) && is_string( $query['class_name'] ) ) {
-				$descriptor->class_pattern = preg_quote( WP_HTML_Walker::comparable( $query['class_name'] ), '~' );
-			}
-		} elseif ( is_string( $query ) ) {
+		if ( $last_query === $query ) {
+			return $descriptor;
+		}
+
+		$last_query = $query;
+
+		// Reset the descriptor, reusing the already-allocated one.
+		$descriptor->tag_name      = null;
+		$descriptor->class_pattern = null;
+		$descriptor->match_offset  = 0;
+
+		if ( is_string( $query ) ) {
 			$descriptor->tag_name = WP_HTML_Walker::comparable( $query );
+			return $descriptor;
+		}
+
+		if ( ! is_array( $query ) ) {
+			return $descriptor;
+		}
+
+		if ( isset( $query['tag_name'] ) && is_string( $query['tag_name'] ) ) {
+			$descriptor->tag_name = WP_HTML_Walker::comparable( $query['tag_name'] );
+		}
+
+		if ( isset( $query['match_offset'] ) && is_integer( $query['match_offset'] ) ) {
+			$descriptor->match_offset = $query['match_offset'];
+		}
+
+		if ( isset( $query['class_name'] ) && is_string( $query['class_name'] ) ) {
+			$descriptor->class_pattern = $query['class_name'];
 		}
 
 		return $descriptor;
