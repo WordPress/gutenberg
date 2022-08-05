@@ -260,7 +260,7 @@ class WP_HTML_Walker {
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
-				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\x0c\r\n/>", $at + $tag_name_prefix_length );
+				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\f\r\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name         = substr( $html, $at, $tag_name_length );
 				$this->tag_name_ends_at = $at + $tag_name_length;
 				$this->parsed_bytes     = $at + $tag_name_length;
@@ -352,8 +352,8 @@ class WP_HTML_Walker {
 		 * https://html.spec.whatwg.org/multipage/parsing.html#before-attribute-name-state
 		 */
 		$name_length = '=' === $this->html[ $this->parsed_bytes ]
-			? 1 + strcspn( $this->html, "=/> \t\x0c\r\n", $this->parsed_bytes + 1 )
-			: strcspn( $this->html, "=/> \t\x0c\r\n", $this->parsed_bytes );
+			? 1 + strcspn( $this->html, "=/> \t\f\r\n", $this->parsed_bytes + 1 )
+			: strcspn( $this->html, "=/> \t\f\r\n", $this->parsed_bytes );
 
 		// No attribute, just tag closer.
 		if ( 0 === $name_length ) {
@@ -383,7 +383,7 @@ class WP_HTML_Walker {
 
 				default:
 					$value_start        = $this->parsed_bytes;
-					$value_length       = strcspn( $this->html, "> \t\x0c\r\n", $value_start );
+					$value_length       = strcspn( $this->html, "> \t\f\r\n", $value_start );
 					$attribute_end      = $value_start + $value_length;
 					$this->parsed_bytes = $attribute_end;
 			}
@@ -417,7 +417,7 @@ class WP_HTML_Walker {
 	 * @return void
 	 */
 	private function skip_whitespace() {
-		$this->parsed_bytes += strspn( $this->html, " \t\x0c\r\n", $this->parsed_bytes );
+		$this->parsed_bytes += strspn( $this->html, " \t\f\r\n", $this->parsed_bytes );
 	}
 
 	/**
@@ -486,21 +486,27 @@ class WP_HTML_Walker {
 		while ( $at < strlen( $existing_class ) ) {
 			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
-			$ws_length = strspn( $existing_class, ' ', $ws_at );
+			$ws_length = strspn( $existing_class, " \t\f\r\n", $ws_at );
 			$at       += $ws_length;
 
 			// Capture the class name – it's everything until the next whitespace.
-			$sep_at = strpos( $existing_class, ' ', $at );
-			if ( false === $sep_at ) {
-				$sep_at = strlen( $existing_class );
+			$name_length = strcspn( $existing_class, " \t\f\r\n", $at );
+			if ( 0 === $name_length ) {
+				// We're done, no more class names
+				break;
 			}
 
-			$name = substr( $existing_class, $at, $sep_at - $at );
-			$at   = $sep_at;
+			$name = substr( $existing_class, $at, $name_length );
+			$at  += $name_length;
 
 			// If this class is marked for removal, start processing the next one.
-			$remove_class             = array_key_exists( $name, $this->classname_updates ) && self::REMOVE_CLASS === $this->classname_updates[ $name ];
-			$seen_classnames[ $name ] = true;
+			$remove_class = (
+				array_key_exists( $name, $this->classname_updates ) &&
+				self::REMOVE_CLASS === $this->classname_updates[ $name ]
+			);
+
+			// Once we've seen a class, we should never add it again.
+			$this->classname_updates[ $name ] = self::REMOVE_CLASS;
 
 			if ( $remove_class ) {
 				$modified = true;
@@ -520,7 +526,7 @@ class WP_HTML_Walker {
 
 		// Add new classes by appending the ones we haven't already seen.
 		foreach ( $this->classname_updates as $name => $do_keep ) {
-			if ( self::ADD_CLASS === $do_keep && ! array_key_exists( $name, $seen_classnames ) ) {
+			if ( self::ADD_CLASS === $do_keep ) {
 				$modified = true;
 				$sep      = strlen( $class ) > 0 ? ' ' : '';
 
