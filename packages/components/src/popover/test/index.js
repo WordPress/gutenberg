@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,5 +48,22 @@ describe( 'Popover', () => {
 		} );
 
 		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
+	} );
+
+	it( 'should render correctly when anchorRef is provided', () => {
+		const PopoverWithAnchor = ( args ) => {
+			const anchorRef = useRef( null );
+
+			return (
+				<div>
+					<p ref={ anchorRef }>Anchor</p>
+					<Popover { ...args } anchorRef={ anchorRef } />
+				</div>
+			);
+		};
+
+		render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
+
+		expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
 	} );
 } );

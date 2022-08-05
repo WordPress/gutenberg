@@ -14,6 +14,9 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.81.0
 -   [***] List block V2 [#42702]
 
+## 1.80.1
+-   [*] Image - Workaround for Android and orientation changes [#42900]
+
 ## 1.80.0
 -   [*] Add React Native FastImage [#42009]
 -   [*] Block inserter displays block collections [#42405]

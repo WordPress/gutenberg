@@ -184,9 +184,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				);
 			}
 		} else {
-			$layout_styles[ $selector ] = array(
-				'flex-direction' => 'column',
-				'align-items'    => 'flex-start',
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-direction' => 'column' ),
 			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
@@ -209,7 +209,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		return gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$layout_styles,
 			array(
-				'context' => 'layout-block-supports',
+				'context' => 'block-supports',
 				'enqueue' => true,
 			)
 		);

@@ -100,7 +100,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'convert_vars_to_classnames' => true ),
 				'expected_output' => array(
-					'css'          => 'border-style: dotted; border-width: 2rem; padding: 0; margin: 111px;',
+					'css'          => 'border-style:dotted;border-width:2rem;padding:0;margin:111px;',
 					'declarations' => array(
 						'border-style' => 'dotted',
 						'border-width' => '2rem',
@@ -125,7 +125,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'context'                    => 'block-supports',
 				),
 				'expected_output' => array(
-					'css'          => 'margin: 20px;',
+					'css'          => 'margin:20px;',
 					'declarations' => array(
 						'margin' => '20px',
 					),
@@ -176,7 +176,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'border-top-left-radius: 99px; border-top-right-radius: 98px; border-bottom-left-radius: 97px; border-bottom-right-radius: 96px; padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem; margin-top: 12rem; margin-left: 2vh; margin-bottom: 2px; margin-right: 10em;',
+					'css'          => 'border-top-left-radius:99px;border-top-right-radius:98px;border-bottom-left-radius:97px;border-bottom-right-radius:96px;padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;margin-top:12rem;margin-left:2vh;margin-bottom:2px;margin-right:10em;',
 					'declarations' => array(
 						'border-top-left-radius'     => '99px',
 						'border-top-right-radius'    => '98px',
@@ -209,7 +209,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-family: Roboto,Oxygen-Sans,Ubuntu,sans-serif; font-style: italic; font-weight: 800; line-height: 1.3; text-decoration: underline; text-transform: uppercase; letter-spacing: 2;',
+					'css'          => 'font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;text-decoration:underline;text-transform:uppercase;letter-spacing:2;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -236,7 +236,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array( 'selector' => '.wp-selector > p' ),
 				'expected_output' => array(
-					'css'          => '.wp-selector > p {padding-top: 42px; padding-left: 2%; padding-bottom: 44px; padding-right: 5rem;}',
+					'css'          => '.wp-selector > p{padding-top:42px;padding-left:2%;padding-bottom:44px;padding-right:5rem;}',
 					'declarations' => array(
 						'padding-top'    => '42px',
 						'padding-left'   => '2%',
@@ -256,7 +256,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'          => '.wp-selector {color: var(--wp--preset--color--my-little-pony);}',
+					'css'          => '.wp-selector{color:var(--wp--preset--color--my-little-pony);}',
 					'declarations' => array(
 						'color' => 'var(--wp--preset--color--my-little-pony)',
 					),
@@ -302,7 +302,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'color: var(--wp--preset--color--teal-independents);',
+					'css'          => 'color:var(--wp--preset--color--teal-independents);',
 					'declarations' => array(
 						'color' => 'var(--wp--preset--color--teal-independents)',
 					),
@@ -319,7 +319,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'color: #fff;',
+					'css'          => 'color:#fff;',
 					'declarations' => array(
 						'color' => '#fff',
 					),
@@ -353,7 +353,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'padding: var(--wp--preset--spacing--20); margin: var(--wp--preset--spacing--10);',
+					'css'          => 'padding:var(--wp--preset--spacing--20);margin:var(--wp--preset--spacing--10);',
 					'declarations' => array(
 						'padding' => 'var(--wp--preset--spacing--20)',
 						'margin'  => 'var(--wp--preset--spacing--10)',
@@ -380,7 +380,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'padding-left: var(--wp--preset--spacing--30); padding-right: var(--wp--preset--spacing--40); padding-top: 14px; padding-bottom: 14px; margin-left: var(--wp--preset--spacing--10); margin-right: var(--wp--preset--spacing--20); margin-top: 1rem; margin-bottom: 1rem;',
+					'css'          => 'padding-left:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-top:14px;padding-bottom:14px;margin-left:var(--wp--preset--spacing--10);margin-right:var(--wp--preset--spacing--20);margin-top:1rem;margin-bottom:1rem;',
 					'declarations' => array(
 						'padding-left'   => 'var(--wp--preset--spacing--30)',
 						'padding-right'  => 'var(--wp--preset--spacing--40)',
@@ -407,7 +407,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'margin-top: 1rem; margin-bottom: 0;',
+					'css'          => 'margin-top:1rem;margin-bottom:0;',
 					'declarations' => array(
 						'margin-top'    => '1rem',
 						'margin-bottom' => '0',
@@ -456,7 +456,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'border-top-color: #fe1; border-top-width: 1.5rem; border-top-style: dashed; border-right-color: #fe2; border-right-width: 1.4rem; border-right-style: solid; border-bottom-color: #fe3; border-bottom-width: 1.3rem; border-left-color: var(--wp--preset--color--swampy-yellow); border-left-width: 0.5rem; border-left-style: dotted;',
+					'css'          => 'border-top-color:#fe1;border-top-width:1.5rem;border-top-style:dashed;border-right-color:#fe2;border-right-width:1.4rem;border-right-style:solid;border-bottom-color:#fe3;border-bottom-width:1.3rem;border-left-color:var(--wp--preset--color--swampy-yellow);border-left-width:0.5rem;border-left-style:dotted;',
 					'declarations' => array(
 						'border-top-color'    => '#fe1',
 						'border-top-width'    => '1.5rem',
@@ -499,7 +499,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'border-bottom-color: var(--wp--preset--color--terrible-lizard);',
+					'css'          => 'border-bottom-color:var(--wp--preset--color--terrible-lizard);',
 					'declarations' => array(
 						'border-bottom-color' => 'var(--wp--preset--color--terrible-lizard)',
 					),
@@ -610,7 +610,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 
 		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
-		$this->assertSame( '.saruman {color: white; height: 100px; border-style: solid; align-self: unset;}.gandalf {color: grey; height: 90px; border-style: dotted; align-self: safe center;}.radagast {color: brown; height: 60px; border-style: dashed; align-self: stretch;}', $compiled_stylesheet );
+		$this->assertSame( '.saruman{color:white;height:100px;border-style:solid;align-self:unset;}.gandalf{color:grey;height:90px;border-style:dotted;align-self:safe center;}.radagast{color:brown;height:60px;border-style:dashed;align-self:stretch;}', $compiled_stylesheet );
 	}
 
 	/**
@@ -654,6 +654,6 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 		);
 
 		$compiled_stylesheet = wp_style_engine_get_stylesheet_from_css_rules( $css_rules );
-		$this->assertSame( '.gandalf {color: white; height: 190px; border-style: dotted; padding: 10px; margin-bottom: 100px;}.dumbledore,.rincewind {color: grey; height: 90px; border-style: dotted;}', $compiled_stylesheet );
+		$this->assertSame( '.gandalf{color:white;height:190px;border-style:dotted;padding:10px;margin-bottom:100px;}.dumbledore,.rincewind{color:grey;height:90px;border-style:dotted;}', $compiled_stylesheet );
 	}
 }
