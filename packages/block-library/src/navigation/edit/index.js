@@ -31,6 +31,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToolbarGroup,
 	Button,
 	Spinner,
@@ -808,6 +809,14 @@ function Navigation( {
 				</BlockControls>
 				<InspectorControls>
 					<ToolsPanel label={ __( 'Menu details' ) }>
+						<ToolsPanelItem
+							hasValue={ () => true }
+							label={ 'Some tool' }
+							onDeselect={ () => null }
+							isShownByDefault={ true }
+						>
+							<p>What?</p>
+						</ToolsPanelItem>
 						<ListView blocks={ innerBlocks } />
 					</ToolsPanel>
 				</InspectorControls>
