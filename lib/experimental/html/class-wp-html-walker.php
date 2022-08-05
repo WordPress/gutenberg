@@ -138,8 +138,9 @@ class WP_HTML_Walker {
 	 */
 	private $classname_updates = array();
 
-	const ADD_CLASS    = true;
-	const REMOVE_CLASS = false;
+	const ADD_CLASS     = true;
+	const REMOVE_CLASS  = false;
+	const CLASS_HANDLED = null;
 
 	/**
 	 * Lexical replacements to apply to input HTML document.
@@ -506,7 +507,9 @@ class WP_HTML_Walker {
 			);
 
 			// Once we've seen a class, we should never add it again.
-			$this->classname_updates[ $name ] = self::REMOVE_CLASS;
+			if ( ! $remove_class ) {
+				$this->classname_updates[ $name ] = self::CLASS_HANDLED;
+			}
 
 			if ( $remove_class ) {
 				$modified = true;
