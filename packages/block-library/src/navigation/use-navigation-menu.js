@@ -99,7 +99,9 @@ function selectExistingMenu( select, ref ) {
 		args
 	);
 
-	// Trashed Navigation posts are considered invalid.
+	// Only published Navigation posts are considered valid.
+	// If this is changed then a corresponding change must also be made
+	// in the index.php file.
 	const isNavigationMenuPublished = editedNavigationMenu.status === 'publish';
 
 	return {
