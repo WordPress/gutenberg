@@ -413,51 +413,64 @@ class WP_HTML_Walker {
 	 * @see $attributes_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( empty( $this->classname_updates ) || array_key_exists( 'class', $this->attributes_updates ) ) {
+		if ( count( $this->classname_updates ) === 0 || array_key_exists( 'class', $this->attributes_updates ) ) {
 			$this->classname_updates = array();
 			return;
 		}
 
 		$existing_class_attr = $this->get_current_tag_attribute( 'class' );
 		$existing_class      = $existing_class_attr ? $existing_class_attr->value : '';
+		$class               = '';
+		$at                  = 0;
+		$modified            = false;
 
-		$seen_classes = array();
+		// Remove unwanted classes by only copying the new ones.
+		while ( $at < strlen( $existing_class ) ) {
+			$ws_at     = $at;
+			$ws_length = strspn( $existing_class, ' ', $ws_at );
+			$sep       = strpos( $existing_class, ' ', $at + $ws_length );
+			$at       += $ws_length;
+			if ( false === $sep ) {
+				$sep = strlen( $existing_class );
+			}
 
-		// Remove unwanted classes.
-		$new_class = preg_replace_callback(
-			'~(?:^|[ \t])([^ \t]+)~miu',
-			function ( $matches ) use ( &$seen_classes ) {
-				list( $full_match, $class_name ) = $matches;
+			$name = substr( $existing_class, $at, $sep - $at );
+			$at   = $sep;
 
-				$seen_classes[ $class_name ] = true;
-				if (
-					array_key_exists( $class_name, $this->classname_updates ) &&
-					self::REMOVE_CLASS === $this->classname_updates[ $class_name ]
-				) {
-					return '';
-				}
+			$remove_class = array_key_exists( $name, $this->classname_updates ) && self::REMOVE_CLASS === $this->classname_updates[ $name ];
+			unset( $this->classname_updates[ $name ] );
 
-				return $full_match;
-			},
-			$existing_class
-		);
+			if ( $remove_class ) {
+				$modified = true;
+				continue;
+			}
 
-		// Add new classes.
-		foreach ( $this->classname_updates as $class_name => $operation ) {
-			if ( self::ADD_CLASS === $operation && ! isset( $seen_classes[ $class_name ] ) ) {
-				$new_class .= " {$class_name}";
+			/*
+			 * By preserving the existing whitespace we'll introduce fewer changes
+			 * to the HTML content and hopefully make comparing before/after easier
+			 * for people trying to debug the modified output.
+			 */
+			$class .= substr( $existing_class, $ws_at, $ws_length );
+			$class .= $name;
+		}
+
+		// Add new classes by appending the ones we haven't already seen.
+		if ( count( $this->classname_updates ) > 0 ) {
+			$modified = true;
+			foreach ( $this->classname_updates as $name => $do_keep ) {
+				$class .= ( strlen( $class ) > 0 ? ' ' : '' ) . $name;
 			}
 		}
 
-		if ( $existing_class !== $new_class ) {
-			if ( $new_class ) {
-				$this->set_attribute( 'class', trim( $new_class ) );
-			} else {
-				$this->remove_attribute( 'class' );
-			}
+		if ( ! $modified ) {
+			return;
 		}
 
-		$this->classname_updates = array();
+		if ( strlen( $class ) > 0 ) {
+			$this->set_attribute( 'class', $class );
+		} else {
+			$this->remove_attribute( 'class' );
+		}
 	}
 
 	/**
