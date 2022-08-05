@@ -188,7 +188,7 @@ class WP_HTML_Walker {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param array|string $query {
+	 * @param array|string|WP_HTML_Tag_Find_Descriptor $query {
 	 *     Which tag name to find, having which class, etc.
 	 *
 	 *     @type string|null $tag_name     Which tag to find, or `null` for "any tag."
@@ -222,7 +222,7 @@ class WP_HTML_Walker {
 			}
 
 			if ( $descriptor->matches( $this->tag_name, $this->attributes ) ) {
-				++$current_match_offset;
+				$current_match_offset++;
 			}
 		} while ( $current_match_offset !== $descriptor->match_offset );
 
@@ -470,13 +470,14 @@ class WP_HTML_Walker {
 	 * @see $attribute_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || array_key_exists( 'class', $this->attribute_updates ) ) {
+		if ( count( $this->classname_updates ) === 0 || isset( $this->attribute_updates['class'] ) ) {
 			$this->classname_updates = array();
 			return;
 		}
 
-		$existing_class_attr = $this->get_current_tag_attribute( 'class' );
-		$existing_class      = $existing_class_attr ? $existing_class_attr->value : '';
+		$existing_class = isset( $this->attributes['class'] )
+			? $this->attributes['class']->value
+			: '';
 
 		/**
 		 * Updated "class" attribute value.
@@ -516,7 +517,6 @@ class WP_HTML_Walker {
 		 */
 		$modified = false;
 
-		$seen_classnames = array();
 		// Remove unwanted classes by only copying the new ones.
 		while ( $at < strlen( $existing_class ) ) {
 			// Skip to the first non-whitespace character.
@@ -536,7 +536,7 @@ class WP_HTML_Walker {
 
 			// If this class is marked for removal, start processing the next one.
 			$remove_class = (
-				array_key_exists( $name, $this->classname_updates ) &&
+				isset( $this->classname_updates[ $name ] ) &&
 				self::REMOVE_CLASS === $this->classname_updates[ $name ]
 			);
 
@@ -665,8 +665,7 @@ class WP_HTML_Walker {
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
-		$attr = $this->get_current_tag_attribute( $name );
-		if ( $attr ) {
+		if ( isset( $this->attributes[ $name ] ) ) {
 			/*
 			 * Update an existing attribute.
 			 *
@@ -678,9 +677,10 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
+			$existing_attribute = $this->attributes[ $name ];
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
-				$attr->start,
-				$attr->end,
+				$existing_attribute->start,
+				$existing_attribute->end,
 				$updated_attribute
 			);
 		} else {
@@ -714,41 +714,27 @@ class WP_HTML_Walker {
 	 */
 	public function remove_attribute( $name ) {
 		$this->assert_not_closed();
-		$attr = $this->get_current_tag_attribute( $name );
-		if ( $attr ) {
-			/*
-			 * Removes an existing tag attribute.
-			 *
-			 * Example – remove the attribute id from <div id="main"/>:
-			 *    <div id="initial_id"/>
-			 *         ^-------------^
-			 *         start         end
-			 *    replacement: ``
-			 *
-			 *    Result: <div />
-			 */
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
-				$attr->start,
-				$attr->end,
-				''
-			);
-		}
-	}
 
-	/**
-	 * Returns the current tag attribute or false if not found.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param string $name The attribute name to target.
-	 * @return WP_HTML_Attribute_Token|boolean The attribute token, or false if not found.
-	 */
-	private function get_current_tag_attribute( $name ) {
-		if ( array_key_exists( $name, $this->attributes ) ) {
-			return $this->attributes[ $name ];
+		if ( ! isset( $this->attributes[ $name ] ) ) {
+			return;
 		}
 
-		return false;
+		/*
+		 * Removes an existing tag attribute.
+		 *
+		 * Example – remove the attribute id from <div id="main"/>:
+		 *    <div id="initial_id"/>
+		 *         ^-------------^
+		 *         start         end
+		 *    replacement: ``
+		 *
+		 *    Result: <div />
+		 */
+		$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attributes[ $name ]->start,
+			$this->attributes[ $name ]->end,
+			''
+		);
 	}
 
 	/**
