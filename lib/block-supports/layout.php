@@ -47,8 +47,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				$style .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
-				$style .= "$selector > * + * { margin-block-start: $gap_value; margin-block-end: 0; }";
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
+						),
+					),
+					array(
+						'selector'     => "$selector > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
+					)
+				);
 			}
 		}
 	} elseif ( 'column' === $layout_type ) {
