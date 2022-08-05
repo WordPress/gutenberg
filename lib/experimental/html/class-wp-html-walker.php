@@ -272,21 +272,40 @@ class WP_HTML_Walker {
 			if ( '!' === $html[ $at + 1 ] ) {
 				// <!-- transitions to a bogus comment state – we can skip to the nearest -->
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
-				if ( '-' === $html[ $at + 2 ] && '-' === $html[ $at + 3 ] ) {
+				if (
+					'-' === $html[ $at + 2 ] &&
+					'-' === $html[ $at + 3 ]
+				) {
 					$at = strpos( $html, '-->', $at + 4 ) + 3;
 					continue;
 				}
 
 				// <![CDATA[ transitions to CDATA section state – we can skip to the nearest ]]>
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
-				if ( 1 === preg_match( '~\[CDATA\[~Amiu', $html, $chunk, 0, $at + 2 ) ) {
+				if (
+					'[' === $html[ $at + 2 ] &&
+					'C' === strtoupper( $html[ $at + 3 ] ) &&
+					'D' === strtoupper( $html[ $at + 4 ] ) &&
+					'A' === strtoupper( $html[ $at + 5 ] ) &&
+					'T' === strtoupper( $html[ $at + 6 ] ) &&
+					'A' === strtoupper( $html[ $at + 7 ] ) &&
+					'[' === $html[ $at + 8 ]
+				) {
 					$at = strpos( $html, ']]>', $at + 9 ) + 3;
 					continue;
 				}
 
 				// <!DOCTYPE transitions to DOCTYPE state – we can skip to the nearest >
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
-				if ( 1 === preg_match( '~DOCTYPE~Amiu', $html, $chunk, 0, $at + 2 ) ) {
+				if (
+					'D' === strtoupper( $html[ $at + 2 ] ) &&
+					'O' === strtoupper( $html[ $at + 3 ] ) &&
+					'C' === strtoupper( $html[ $at + 4 ] ) &&
+					'T' === strtoupper( $html[ $at + 5 ] ) &&
+					'Y' === strtoupper( $html[ $at + 6 ] ) &&
+					'P' === strtoupper( $html[ $at + 7 ] ) &&
+					'E' === strtoupper( $html[ $at + 8 ] )
+				) {
 					$at = strpos( $html, '>', $at + 9 ) + 1;
 					continue;
 				}
