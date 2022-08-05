@@ -235,17 +235,58 @@ class WP_HTML_Walker {
 	 */
 	private function parse_next_tag() {
 		$this->after_tag();
-		$matches = $this->consume_regexp(
-			'~<!--(?>.*?-->)|<!\[CDATA\[(?>.*?\]\]>)|<\?(?>.*?)>|<(?P<TAG_NAME>[a-z][^\x{09}\x{0a}\x{0c}\x{20}\/>]*)~mui'
-		);
-		if ( false === $matches ) {
-			return false;
+
+		$html = $this->html;
+		$at = $this->parsed_bytes;
+
+		while ( true ) {
+			$at = strpos( $html, '<', $at );
+			if ( false === $at ) {
+				return false;
+			}
+
+			/*
+			 * HTML tag names must start with [a-zA-Z] otherwise they are not tags.
+			 * For example, "<3" is rendered as text, not a tag opener. This means
+			 * if we have at least one letter following the "<" then we _do_ have
+			 * a tag opener and can process it as such. This is more common than
+			 * HTML comments, DOCTYPE tags, and other structure starting with "<"
+			 * so it's good to check first for the presence of the tag
+			 */
+			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
+			if ( $tag_name_prefix_length > 0 ) {
+				$at++;
+				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\r\n/>", $at + $tag_name_prefix_length );
+				$this->tag_name         = substr( $html, $at, $tag_name_length );
+				$this->tag_name_ends_at = $at + $tag_name_length;
+				$this->parsed_bytes     = $at + $tag_name_length;
+				return true;
+			}
+
+			if ( '!' === $html[ $at + 1 ] ) {
+				if ( '-' === $html[ $at + 2 ] && '-' === $html[ $at + 3 ] ) {
+					$at = strpos( $html, '-->', $at + 4 ) + 3;
+					continue;
+				}
+
+				if ( 1 === preg_match( '~\[CDATA\[~Amiu', $html, $chunk, 0, $at + 2 ) ) {
+					$at = strpos( $html, ']]>', $at + 9 ) + 3;
+					continue;
+				}
+
+				if ( 1 === preg_match( '~DOCTYPE~Amiu', $html, $chunk, 0, $at + 2 ) )  {
+					$at = strpos( $html, '>', $at + 9 ) + 1;
+					continue;
+				}
+			}
+
+			if ( '?' === $html[ $at + 1 ] ) {
+				$at = strpos( $html, '>', $at + 2 ) + 1;
+				continue;
+			}
+
+			$at++;
 		}
-		if ( empty( $matches['TAG_NAME'][0] ) ) {
-			return $this->parse_next_tag();
-		}
-		$this->tag_name         = $matches['TAG_NAME'][0];
-		$this->tag_name_ends_at = $this->parsed_bytes;
 	}
 
 	/**
@@ -256,48 +297,45 @@ class WP_HTML_Walker {
 	private function parse_next_attribute() {
 		$this->skip_ws();
 
-		$name_match = $this->consume_regexp(
-			'~
-			# The next attribute:
-			(?P<NAME>(?>
-				# Attribute names starting with an equals sign (yes, this is valid)
-				=?[^=\/>\x{09}\x{0a}\x{0c}\x{20}]*
-				|
-				# Attribute names starting with anything other than an equals sign:
-				[^=\/>\x{09}\x{0a}\x{0c}\x{20}]+
-			))
-			~miux'
-		);
+		$name_length = '=' === $this->html[ $this->parsed_bytes ]
+			? 1 + strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes + 1 )
+			: strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes );
 
 		// No attribute, just tag closer.
-		if ( empty( $name_match['NAME'][0] ) ) {
+		if ( 0 === $name_length ) {
 			return false;
 		}
 
-		list( $attribute_name, $attribute_start ) = $name_match['NAME'];
+		$attribute_start     = $this->parsed_bytes;
+		$attribute_name      = substr( $this->html, $attribute_start, $name_length );
+		$this->parsed_bytes += $name_length;
 
 		$this->skip_ws();
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
+			$this->parsed_bytes++;
 			$this->skip_ws();
-			$this->parsed_bytes ++;
-			$value_match     = $this->consume_regexp(
-				"~
-				(?:
-					# A quoted attribute value
-					(?P<QUOTE>['\"])(?P<VALUE>.*?)\k<QUOTE>
-					|
-					# An unquoted attribute value
-					(?P<VALUE>[^>\x{09}\x{0a}\x{0c}\x{20}]*)
-				)
-				~miuJx"
-			);
-			$attribute_value = $value_match['VALUE'][0];
-			$attribute_end   = $this->offset_after_match( $value_match[0] );
+
+			switch ( $this->html[ $this->parsed_bytes ] ) {
+				case "'":
+				case '"':
+					$value_start        = $this->parsed_bytes + 1;
+					$value_length       = strcspn( $this->html, $this->html[ $this->parsed_bytes ], $value_start );
+					$attribute_end      = $value_start + $value_length + 1;
+					$this->parsed_bytes = $attribute_end;
+					break;
+
+				default:
+					$value_start        = $this->parsed_bytes;
+					$value_length       = strcspn( $this->html, "> \t\r\n", $value_start );
+					$attribute_end      = $value_start + $value_length;
+					$this->parsed_bytes = $attribute_end;
+			}
 		} else {
-			$attribute_value = 'true';
-			$attribute_end   = $this->offset_after_match( $name_match['NAME'] );
+			$value_start   = $this->parsed_bytes;
+			$value_length  = 0;
+			$attribute_end = $attribute_start + $name_length;
 		}
 
 		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
@@ -306,7 +344,7 @@ class WP_HTML_Walker {
 				// Avoid storing large, base64-encoded images. This class only ever uses the "class"
 				// attribute value, so let's store just that. If we need to do attribute-based matching
 				// in the future, this function could start accepting a list of relevant attributes.
-				'class' === $attribute_name ? $attribute_value : null,
+				'class' === $attribute_name ? substr( $this->html, $value_start, $value_length ) : null,
 				$attribute_start,
 				$attribute_end
 			);
@@ -598,44 +636,6 @@ class WP_HTML_Walker {
 		if ( $this->tag_name ) {
 			$this->classname_updates[ $class_name ] = self::REMOVE_CLASS;
 		}
-	}
-
-	/**
-	 * Returns the result of the search on the HTML document using the passed regular expression.
-	 * If there is no match found it returns false.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param string $regexp The regular expression to process with the HTML document.
-	 * @return array|false The result of the search or false if no matches found.
-	 */
-	private function consume_regexp( $regexp ) {
-		$matches = null;
-		$result  = preg_match(
-			$regexp,
-			$this->html,
-			$matches,
-			PREG_OFFSET_CAPTURE,
-			$this->parsed_bytes
-		);
-		if ( 1 !== $result ) {
-			return false;
-		}
-		$this->parsed_bytes = $this->offset_after_match( $matches[0] );
-
-		return $matches;
-	}
-
-	/**
-	 * Returns the offset after the match.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param array $match The match result filled by preg_match.
-	 * @return int The offset after the match.
-	 */
-	private function offset_after_match( $match ) {
-		return $match[1] + strlen( $match[0] );
 	}
 
 	/**
