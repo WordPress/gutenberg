@@ -106,7 +106,13 @@ function ListViewBlockSelectButton(
 				>
 					<span className="block-editor-list-view-block-select-button__title">
 						<span className="block-editor-list-view-block-select-button__title__inner-wrapper">
-							<Truncate ellipsizeMode="auto">
+							<Truncate
+								ellipsizeMode="auto"
+								className={ classnames( {
+									'block-editor-list-view-block-select-button__title--no-shrink':
+										!! partialContent,
+								} ) }
+							>
 								{ blockTitle }
 							</Truncate>
 							{ !! partialContent && (

@@ -306,14 +306,22 @@
 		position: relative;
 
 		.block-editor-list-view-block-select-button__title__inner-wrapper {
+			display: flex;
+			gap: 0.5em;
 			position: absolute;
 			width: 100%;
 			transform: translateY(-50%);
 		}
 	}
 
+	.block-editor-list-view-block-select-button__title--no-shrink {
+		flex-shrink: 0;
+	}
+
 	.block-editor-list-view-block-select-button__partial-content {
 		opacity: 0.5;
+		flex-basis: 100%;
+		overflow: hidden;
 	}
 
 	.block-editor-list-view-block-select-button__anchor {
