@@ -12,8 +12,8 @@
  * @subpackage HTML
  * @since 6.1.0
  */
-function esc_attr($x) {
-	return htmlspecialchars($x);
+function esc_attr( $x ) {
+	return htmlspecialchars( $x );
 }
 /**
  * Processes an input HTML document by applying a specified set
@@ -140,7 +140,7 @@ class WP_HTML_Walker {
 	 */
 	private $classname_updates = array();
 
-	const ADD_CLASS = true;
+	const ADD_CLASS    = true;
 	const REMOVE_CLASS = false;
 
 	/**
@@ -239,7 +239,7 @@ class WP_HTML_Walker {
 		$this->after_tag();
 
 		$html = $this->html;
-		$at = $this->parsed_bytes;
+		$at   = $this->parsed_bytes;
 
 		while ( true ) {
 			$at = strpos( $html, '<', $at );
@@ -288,7 +288,7 @@ class WP_HTML_Walker {
 
 				// <!DOCTYPE transitions to DOCTYPE state – we can skip to the nearest >
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
-				if ( 1 === preg_match( '~DOCTYPE~Amiu', $html, $chunk, 0, $at + 2 ) )  {
+				if ( 1 === preg_match( '~DOCTYPE~Amiu', $html, $chunk, 0, $at + 2 ) ) {
 					$at = strpos( $html, '>', $at + 9 ) + 1;
 					continue;
 				}
@@ -441,16 +441,21 @@ class WP_HTML_Walker {
 
 		$existing_class_attr = $this->get_current_tag_attribute( 'class' );
 		$existing_class      = $existing_class_attr ? $existing_class_attr->value : '';
-		$class               = '';
-		$at                  = 0;
-		$modified            = false;
+		// The updated "class" attribute value.
+		$class    = '';
+		$at       = 0;
+		$modified = false;
 
+		$seen_classnames = array();
 		// Remove unwanted classes by only copying the new ones.
 		while ( $at < strlen( $existing_class ) ) {
+			// Skip to the first non-whitespace character
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, ' ', $ws_at );
-			$sep_at    = strpos( $existing_class, ' ', $at + $ws_length );
 			$at       += $ws_length;
+
+			// Capture the class name – it's everything until the next whitespace
+			$sep_at = strpos( $existing_class, ' ', $at );
 			if ( false === $sep_at ) {
 				$sep_at = strlen( $existing_class );
 			}
@@ -458,8 +463,9 @@ class WP_HTML_Walker {
 			$name = substr( $existing_class, $at, $sep_at - $at );
 			$at   = $sep_at;
 
-			$remove_class = array_key_exists( $name, $this->classname_updates ) && self::REMOVE_CLASS === $this->classname_updates[ $name ];
-			unset( $this->classname_updates[ $name ] );
+			// If this class is marked for removal, start processing the next one.
+			$remove_class             = array_key_exists( $name, $this->classname_updates ) && self::REMOVE_CLASS === $this->classname_updates[ $name ];
+			$seen_classnames[ $name ] = true;
 
 			if ( $remove_class ) {
 				$modified = true;
@@ -467,6 +473,8 @@ class WP_HTML_Walker {
 			}
 
 			/*
+			 * Otherwise, append it to the new "class" attribute value.
+			 *
 			 * By preserving the existing whitespace we'll introduce fewer changes
 			 * to the HTML content and hopefully make comparing before/after easier
 			 * for people trying to debug the modified output.
@@ -476,14 +484,12 @@ class WP_HTML_Walker {
 		}
 
 		// Add new classes by appending the ones we haven't already seen.
-		if ( count( $this->classname_updates ) > 0 ) {
-			foreach ( $this->classname_updates as $name => $do_keep ) {
-				if ( self::ADD_CLASS === $do_keep ) {
-					$modified = true;
-					$sep      = strlen( $class ) > 0 ? ' ' : '';
+		foreach ( $this->classname_updates as $name => $do_keep ) {
+			if ( self::ADD_CLASS === $do_keep && ! array_key_exists( $name, $seen_classnames ) ) {
+				$modified = true;
+				$sep      = strlen( $class ) > 0 ? ' ' : '';
 
-					$class .= $sep . $name;
-				}
+				$class .= $sep . $name;
 			}
 		}
 
