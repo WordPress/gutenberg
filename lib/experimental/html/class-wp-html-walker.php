@@ -311,9 +311,11 @@ class WP_HTML_Walker {
 	private function parse_next_attribute() {
 		$this->skip_whitespace();
 
-		// Treat the equal sign ("=") as a part of the attribute name if it is the
-		// first encountered byte:
-		// https://html.spec.whatwg.org/multipage/parsing.html#before-attribute-name-state
+		/*
+		 * Treat the equal sign ("=") as a part of the attribute name if it is the
+		 * first encountered byte:
+		 * https://html.spec.whatwg.org/multipage/parsing.html#before-attribute-name-state
+		 */
 		$name_length = '=' === $this->html[ $this->parsed_bytes ]
 			? 1 + strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes + 1 )
 			: strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes );
@@ -447,12 +449,12 @@ class WP_HTML_Walker {
 		$seen_classnames = array();
 		// Remove unwanted classes by only copying the new ones.
 		while ( $at < strlen( $existing_class ) ) {
-			// Skip to the first non-whitespace character
+			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, ' ', $ws_at );
 			$at       += $ws_length;
 
-			// Capture the class name – it's everything until the next whitespace
+			// Capture the class name – it's everything until the next whitespace.
 			$sep_at = strpos( $existing_class, ' ', $at );
 			if ( false === $sep_at ) {
 				$sep_at = strlen( $existing_class );
@@ -539,8 +541,8 @@ class WP_HTML_Walker {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param object $a
-	 * @param object $b
+	 * @param object $a First attribute update.
+	 * @param object $b Second attribute update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
