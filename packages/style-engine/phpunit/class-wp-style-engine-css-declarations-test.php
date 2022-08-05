@@ -150,6 +150,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	public function test_remove_unsafe_properties_and_values() {
 		$input_declarations = array(
 			'color'        => '<red/>',
+			'display'      => 'none',
 			'margin-right' => '10em',
 			'potato'       => 'uppercase',
 		);
@@ -157,6 +158,30 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'color:&lt;red/&gt;;margin-right:10em;',
+			$css_declarations->get_declarations_string()
+		);
+	}
+
+	/**
+	 * Should allow calc, clamp, min, max, and minmax CSS functions.
+	 */
+	public function test_allow_particular_css_functions() {
+		$input_declarations = array(
+			'display'          => 'flex',
+			'background'       => 'var(--wp--preset--color--primary, 10px)', // Simple var().
+			'font-size'        => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
+			'width'            => 'min(150vw, 100px)',
+			'min-width'        => 'max(150vw, 100px)',
+			'max-width'        => 'minmax(400px, 50%)',
+			'padding'          => 'calc(80px * -1)',
+			'background-image' => 'url("https://wordpress.org")',
+			'line-height'      => 'url("https://wordpress.org")',
+			'margin'           => 'illegalfunction(30px)',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'display:flex;background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url(&quot;https://wordpress.org&quot;);',
 			$css_declarations->get_declarations_string()
 		);
 	}
