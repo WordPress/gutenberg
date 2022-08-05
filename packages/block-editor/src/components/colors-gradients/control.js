@@ -9,6 +9,7 @@ import { every, isEmpty } from 'lodash';
  */
 import {
 	BaseControl,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalVStack as VStack,
 	TabPanel,
 	ColorPalette,
@@ -69,47 +70,51 @@ function ColorGradientControlInner( {
 
 	const tabPanels = {
 		[ TAB_COLOR.value ]: (
-			<ColorPalette
-				value={ colorValue }
-				onChange={
-					canChooseAGradient
-						? ( newColor ) => {
-								onColorChange( newColor );
-								onGradientChange();
-						  }
-						: onColorChange
-				}
-				{ ...{ colors, disableCustomColors } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				enableAlpha={ enableAlpha }
-			/>
+			<DropdownContentWrapper paddingSize="medium">
+				<ColorPalette
+					value={ colorValue }
+					onChange={
+						canChooseAGradient
+							? ( newColor ) => {
+									onColorChange( newColor );
+									onGradientChange();
+							  }
+							: onColorChange
+					}
+					{ ...{ colors, disableCustomColors } }
+					__experimentalHasMultipleOrigins={
+						__experimentalHasMultipleOrigins
+					}
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ clearable }
+					enableAlpha={ enableAlpha }
+				/>
+			</DropdownContentWrapper>
 		),
 		[ TAB_GRADIENT.value ]: (
-			<GradientPicker
-				value={ gradientValue }
-				onChange={
-					canChooseAColor
-						? ( newGradient ) => {
-								onGradientChange( newGradient );
-								onColorChange();
-						  }
-						: onGradientChange
-				}
-				{ ...{ gradients, disableCustomGradients } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-			/>
+			<DropdownContentWrapper paddingSize="medium">
+				<GradientPicker
+					value={ gradientValue }
+					onChange={
+						canChooseAColor
+							? ( newGradient ) => {
+									onGradientChange( newGradient );
+									onColorChange();
+							  }
+							: onGradientChange
+					}
+					{ ...{ gradients, disableCustomGradients } }
+					__experimentalHasMultipleOrigins={
+						__experimentalHasMultipleOrigins
+					}
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ clearable }
+				/>
+			</DropdownContentWrapper>
 		),
 	};
 
@@ -142,11 +147,7 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => (
-								<div className="block-editor-color-gradient-control__tab-panel">
-									{ tabPanels[ tab.value ] }
-								</div>
-							) }
+							{ ( tab ) => tabPanels[ tab.value ] }
 						</TabPanel>
 					) }
 					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
