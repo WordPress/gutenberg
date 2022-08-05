@@ -22,7 +22,7 @@ import {
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -265,13 +265,18 @@ function Day( {
 		}
 	}, [ isFocusable ] );
 
+	const label = useMemo(
+		() => getDayLabel( day, isSelected, numEvents ),
+		[ day, isSelected, numEvents ]
+	);
+
 	return (
 		<DayButton
 			ref={ ref }
 			className="components-datetime__date__day" // Unused, for backwards compatibility.
 			disabled={ isInvalid }
 			tabIndex={ isFocusable ? 0 : -1 }
-			aria-label={ getDayLabel( day, isSelected, numEvents ) }
+			aria-label={ label }
 			column={ column }
 			isSelected={ isSelected }
 			isToday={ isToday }
