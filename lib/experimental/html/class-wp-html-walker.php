@@ -273,6 +273,7 @@ class WP_HTML_Walker {
 				// <!-- transitions to a bogus comment state – we can skip to the nearest -->
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				if (
+					strlen( $html ) > $at + 3 &&
 					'-' === $html[ $at + 2 ] &&
 					'-' === $html[ $at + 3 ]
 				) {
@@ -281,23 +282,29 @@ class WP_HTML_Walker {
 				}
 
 				// <![CDATA[ transitions to CDATA section state – we can skip to the nearest ]]>
+				// The CDATA is case-sensitive.
 				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				if (
+					strlen( $html ) > $at + 8 &&
 					'[' === $html[ $at + 2 ] &&
-					'C' === strtoupper( $html[ $at + 3 ] ) &&
-					'D' === strtoupper( $html[ $at + 4 ] ) &&
-					'A' === strtoupper( $html[ $at + 5 ] ) &&
-					'T' === strtoupper( $html[ $at + 6 ] ) &&
-					'A' === strtoupper( $html[ $at + 7 ] ) &&
+					'C' === $html[ $at + 3 ] &&
+					'D' === $html[ $at + 4 ] &&
+					'A' === $html[ $at + 5 ] &&
+					'T' === $html[ $at + 6 ] &&
+					'A' === $html[ $at + 7 ] &&
 					'[' === $html[ $at + 8 ]
 				) {
 					$at = strpos( $html, ']]>', $at + 9 ) + 3;
 					continue;
 				}
 
-				// <!DOCTYPE transitions to DOCTYPE state – we can skip to the nearest >
-				// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
+				/*
+				 * <!DOCTYPE transitions to DOCTYPE state – we can skip to the nearest >
+				 * These are ASCII-case-insensitive.
+				 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
+				 */
 				if (
+					strlen( $html ) > $at + 8 &&
 					'D' === strtoupper( $html[ $at + 2 ] ) &&
 					'O' === strtoupper( $html[ $at + 3 ] ) &&
 					'C' === strtoupper( $html[ $at + 4 ] ) &&
@@ -309,10 +316,19 @@ class WP_HTML_Walker {
 					$at = strpos( $html, '>', $at + 9 ) + 1;
 					continue;
 				}
+
+				/*
+				 * Anything else here is an incorrectly-opened comment and transitions
+				 * to the bogus comment state - we can skip to the nearest >.
+				 */
+				$at = strpos( $html, '>', $at + 1 );
+				continue;
 			}
 
-			// <? transitions to a bogus comment state – we can skip to the nearest >
-			// https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
+			/*
+			 * <? transitions to a bogus comment state – we can skip to the nearest >
+			 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
+			 */
 			if ( '?' === $html[ $at + 1 ] ) {
 				$at = strpos( $html, '>', $at + 2 ) + 1;
 				continue;
