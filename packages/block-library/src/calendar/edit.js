@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import memoize from 'memize';
 
 /**
@@ -19,10 +18,10 @@ const getYearMonth = memoize( ( date ) => {
 	if ( ! date ) {
 		return {};
 	}
-	const momentDate = moment( date );
+	const dateObj = new Date( date );
 	return {
-		year: momentDate.year(),
-		month: momentDate.month() + 1,
+		year: dateObj.getFullYear(),
+		month: dateObj.getMonth() + 1,
 	};
 } );
 
