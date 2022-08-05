@@ -142,12 +142,6 @@ export default function ColorGradientSettingsDropdown( {
 					showTitle: false,
 					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
-					__experimentalRenderPanel: ( { content } ) => (
-						<DropdownContentWrapper
-							paddingSize="medium"
-							children={ content }
-						/>
-					),
 					...setting,
 				};
 				const toggleSettings = {

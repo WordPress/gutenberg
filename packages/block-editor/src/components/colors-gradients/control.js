@@ -47,8 +47,6 @@ function ColorGradientControlInner( {
 	disableCustomGradients,
 	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
-	// Caution: This API is likely to change soon.
-	__experimentalRenderPanel = ( { content } ) => content,
 	className,
 	label,
 	onColorChange,
@@ -115,8 +113,11 @@ function ColorGradientControlInner( {
 		),
 	};
 
-	const renderPanelType = ( type ) =>
-		__experimentalRenderPanel( { content: tabPanels[ type ] } );
+	const renderPanelType = ( type ) => (
+		<div className="block-editor-color-gradient-control__panel">
+			{ tabPanels[ type ] }
+		</div>
+	);
 
 	return (
 		<BaseControl
