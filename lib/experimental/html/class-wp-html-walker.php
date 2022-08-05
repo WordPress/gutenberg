@@ -12,9 +12,7 @@
  * @subpackage HTML
  * @since 6.1.0
  */
-function esc_attr( $x ) {
-	return htmlspecialchars( $x );
-}
+
 /**
  * Processes an input HTML document by applying a specified set
  * of patches to that input. Tokenizes HTML but does not fully
