@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, forwardRef, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { BottomSheetContext } from '@wordpress/components';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -74,10 +74,11 @@ const PickerComponent = forwardRef( ( props, ref ) => {
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
 
-	const buttonTitleColor = usePreferredColorSchemeStyle(
-		styles[ 'components-picker__button-title' ],
-		styles[ 'components-picker__button-title--dark' ]
-	).color;
+	const colorScheme = usePreferredColorScheme();
+	const buttonTitleColor =
+		colorScheme === 'light'
+			? styles[ 'components-picker__button-title' ].color
+			: styles[ 'components-picker__button-title--dark' ].color;
 
 	return (
 		<Picker
