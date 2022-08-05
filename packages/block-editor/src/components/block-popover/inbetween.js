@@ -180,6 +180,7 @@ function BlockPopoverInbetween( {
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
+				'block-editor-block-popover__inbetween',
 				props.className
 			) }
 			__unstableForcePosition

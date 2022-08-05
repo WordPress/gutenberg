@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isPlainObject } from 'lodash';
+import isPlainObject from 'is-plain-obj';
 
 /* eslint-disable jsdoc/valid-types */
 /**

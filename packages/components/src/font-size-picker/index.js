@@ -8,6 +8,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { BaseControl } from '../base-control';
 import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -131,12 +132,16 @@ function FontSizePicker(
 				className={ `${ baseClassName }__header` }
 			>
 				<FlexItem>
-					{ __( 'Size' ) }
-					{ headerHint && (
-						<span className={ `${ baseClassName }__header__hint` }>
-							{ headerHint }
-						</span>
-					) }
+					<BaseControl.VisualLabel>
+						{ __( 'Size' ) }
+						{ headerHint && (
+							<span
+								className={ `${ baseClassName }__header__hint` }
+							>
+								{ headerHint }
+							</span>
+						) }
+					</BaseControl.VisualLabel>
 				</FlexItem>
 				{ ! disableCustomFontSizes && (
 					<FlexItem>

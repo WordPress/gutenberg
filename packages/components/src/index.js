@@ -30,7 +30,10 @@ export {
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
-export { default as __experimentalBoxControl } from './box-control';
+export {
+	default as __experimentalBoxControl,
+	applyValueToSides as __experimentalApplyValueToSides,
+} from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export {
@@ -66,6 +69,7 @@ export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
+export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
