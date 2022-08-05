@@ -221,7 +221,7 @@ class WP_HTML_Walker {
 			}
 
 			if ( $descriptor->matches( $this->tag_name, $this->attributes ) ) {
-				++ $current_match_offset;
+				++$current_match_offset;
 			}
 		} while ( $current_match_offset !== $descriptor->match_offset );
 
