@@ -95,6 +95,18 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should return empty string with no declarations.
+	 */
+	public function test_get_css_no_declarations() {
+		$selector           = '.holmes';
+		$input_declarations = array();
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+
+		$this->assertSame( '', $css_rule->get_css() );
+	}
+
+	/**
 	 * Should generate prettified CSS rules.
 	 */
 	public function test_get_prettified_css() {

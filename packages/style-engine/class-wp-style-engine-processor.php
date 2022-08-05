@@ -65,6 +65,7 @@ class WP_Style_Engine_Processor {
 	 *
 	 * @param array $options array(
 	 *    'optimize' => (boolean) Whether to optimize the CSS output, e.g., combine rules.
+	 *    'prettify' => (boolean) Whether to add new lines to output.
 	 * );.
 	 *
 	 * @return string The computed CSS.
