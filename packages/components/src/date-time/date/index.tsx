@@ -101,7 +101,11 @@ export function DatePicker( {
 	}
 
 	return (
-		<div className="components-datetime__date">
+		<div
+			className="components-datetime__date"
+			role="application"
+			aria-label={ __( 'Calendar' ) }
+		>
 			<Navigator>
 				<Button
 					icon={ isRTL() ? arrowRight : arrowLeft }
