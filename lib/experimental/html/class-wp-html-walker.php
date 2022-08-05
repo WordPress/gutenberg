@@ -138,9 +138,9 @@ class WP_HTML_Walker {
 	 */
 	private $classname_updates = array();
 
-	const ADD_CLASS     = true;
-	const REMOVE_CLASS  = false;
-	const CLASS_HANDLED = null;
+	const ADD_CLASS    = true;
+	const REMOVE_CLASS = false;
+	const SKIP_CLASS   = null;
 
 	/**
 	 * Lexical replacements to apply to input HTML document.
@@ -477,9 +477,43 @@ class WP_HTML_Walker {
 
 		$existing_class_attr = $this->get_current_tag_attribute( 'class' );
 		$existing_class      = $existing_class_attr ? $existing_class_attr->value : '';
-		// The updated "class" attribute value.
-		$class    = '';
-		$at       = 0;
+
+		/**
+		 * Updated "class" attribute value.
+		 *
+		 * This is incrementally built as we scan through the existing class
+		 * attribute, omitting removed classes as we do so, and then appending
+		 * added classes at the end. Only when we're done processing will the
+		 * value contain the final new value.
+
+		 * @var string
+		 */
+		$class = '';
+
+		/**
+		 * Tracks the cursor position in the existing class
+		 * attribute value where we're currently parsing.
+		 *
+		 * @var integer
+		 */
+		$at = 0;
+
+		/**
+		 * Indicates if we have made any actual modifications to the existing
+		 * class attribute value, used to short-circuit string copying.
+		 *
+		 * It's possible that we are intending to remove certain classes and
+		 * add others in such a way that we don't modify the existing value
+		 * because calls to `add_class()` and `remove_class()` occur
+		 * independent of the input values sent to the walker. That is, we
+		 * might call `remove_class()` for a class that isn't already present
+		 * and we might call `add_class()` for one that is, in which case we
+		 * wouldn't need to break apart the string and rebuild it.
+		 *
+		 * This flag is set upon the first change that requires a string update.
+		 *
+		 * @var boolean
+		 */
 		$modified = false;
 
 		$seen_classnames = array();
@@ -508,7 +542,7 @@ class WP_HTML_Walker {
 
 			// Once we've seen a class, we should never add it again.
 			if ( ! $remove_class ) {
-				$this->classname_updates[ $name ] = self::CLASS_HANDLED;
+				$this->classname_updates[ $name ] = self::SKIP_CLASS;
 			}
 
 			if ( $remove_class ) {
@@ -519,21 +553,22 @@ class WP_HTML_Walker {
 			/*
 			 * Otherwise, append it to the new "class" attribute value.
 			 *
-			 * By preserving the existing whitespace we'll introduce fewer changes
-			 * to the HTML content and hopefully make comparing before/after easier
-			 * for people trying to debug the modified output.
+			 * By preserving the existing whitespace instead of only adding a single
+			 * space (which is a valid transformation we can make) we'll introduce
+			 * fewer changes to the HTML content and hopefully make comparing
+			 * before/after easier for people trying to debug the modified output.
 			 */
 			$class .= substr( $existing_class, $ws_at, $ws_length );
 			$class .= $name;
 		}
 
 		// Add new classes by appending the ones we haven't already seen.
-		foreach ( $this->classname_updates as $name => $do_keep ) {
-			if ( self::ADD_CLASS === $do_keep ) {
-				$modified = true;
-				$sep      = strlen( $class ) > 0 ? ' ' : '';
+		foreach ( $this->classname_updates as $name => $operation ) {
+			if ( self::ADD_CLASS === $operation ) {
+				$modified  = true;
 
-				$class .= $sep . $name;
+				$class .= strlen( $class ) > 0 ? ' ' : '';
+				$class .= $name;
 			}
 		}
 
