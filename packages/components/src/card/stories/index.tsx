@@ -71,12 +71,3 @@ const Template: ComponentStory< typeof Card > = ( args ) => {
 };
 
 export const Default: ComponentStory< typeof Card > = Template.bind( {} );
-Default.args = {
-	size: 'medium',
-	isBorderless: false,
-	isRounded: false,
-	elevation: 0,
-	style: {
-		width: 360,
-	},
-};
