@@ -169,7 +169,7 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 * @var WP_HTML_Text_Replacement[]
 	 */
-	private $attributes_updates = array();
+	private $attribute_updates = array();
 
 	/**
 	 * Constructor.
@@ -410,10 +410,10 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 *
 	 * @see $classname_updates
-	 * @see $attributes_updates
+	 * @see $attribute_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || array_key_exists( 'class', $this->attributes_updates ) ) {
+		if ( count( $this->classname_updates ) === 0 || array_key_exists( 'class', $this->attribute_updates ) ) {
 			$this->classname_updates = array();
 			return;
 		}
@@ -479,29 +479,42 @@ class WP_HTML_Walker {
 	 * @since 6.1.0
 	 */
 	private function apply_attributes_updates() {
-		if ( ! count( $this->attributes_updates ) ) {
+		if ( ! count( $this->attribute_updates ) ) {
 			return;
 		}
-		$updates = array_values( $this->attributes_updates );
-		/**
-		 * The replacement algorithm only works when the updates are
-		 * sorted by their start byte offset. However, they can be
-		 * enqueued by the user in any arbitrary order.
-		 * Well, let's sort them!
-		 */
-		usort(
-			$updates,
-			function ( $update1, $update2 ) {
-				return $update1->start - $update2->start;
-			}
-		);
 
-		foreach ( $updates as $diff ) {
+		/**
+		 * Attribute updates can be enqueued in any order but as we
+		 * progress through the document to replace them we have to
+		 * make our replacements in the order in which they are found
+		 * in that document.
+		 *
+		 * Sorting the updates ensures we don't make our replacements
+		 * out of order, which could otherwise lead to mangled output,
+		 * partially-duplicate attributes, and overwritten attributes.
+		 */
+		usort( $this->attribute_updates, array( 'self', 'sort_start_ascending' ) );
+
+		foreach ( $this->attribute_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
 		}
-		$this->attributes_updates = array();
+
+		$this->attribute_updates = array();
+	}
+
+	/**
+	 * Sort function to arrange objects with a start property in asending order.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param object $a
+	 * @param object $b
+	 * @return integer
+	 */
+	private static function sort_start_ascending( $a, $b ) {
+		return $a->start - $b->start;
 	}
 
 	/**
@@ -545,7 +558,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$attr->start,
 				$attr->end,
 				$updated_attribute
@@ -562,7 +575,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_ends_at,
 				$this->tag_name_ends_at,
 				' ' . $updated_attribute
@@ -594,7 +607,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div />
 			 */
-			$this->attributes_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$attr->start,
 				$attr->end,
 				''
