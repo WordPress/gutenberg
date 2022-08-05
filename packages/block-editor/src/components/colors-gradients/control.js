@@ -9,7 +9,6 @@ import { every, isEmpty } from 'lodash';
  */
 import {
 	BaseControl,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalVStack as VStack,
 	TabPanel,
 	ColorPalette,
@@ -48,6 +47,8 @@ function ColorGradientControlInner( {
 	disableCustomGradients,
 	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
+	// Caution: This API is likely to change soon.
+	__experimentalRenderPanel = ( { content } ) => content,
 	className,
 	label,
 	onColorChange,
@@ -70,53 +71,52 @@ function ColorGradientControlInner( {
 
 	const tabPanels = {
 		[ TAB_COLOR.value ]: (
-			<DropdownContentWrapper paddingSize="medium">
-				<ColorPalette
-					value={ colorValue }
-					onChange={
-						canChooseAGradient
-							? ( newColor ) => {
-									onColorChange( newColor );
-									onGradientChange();
-							  }
-							: onColorChange
-					}
-					{ ...{ colors, disableCustomColors } }
-					__experimentalHasMultipleOrigins={
-						__experimentalHasMultipleOrigins
-					}
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ clearable }
-					enableAlpha={ enableAlpha }
-				/>
-			</DropdownContentWrapper>
+			<ColorPalette
+				value={ colorValue }
+				onChange={
+					canChooseAGradient
+						? ( newColor ) => {
+								onColorChange( newColor );
+								onGradientChange();
+						  }
+						: onColorChange
+				}
+				{ ...{ colors, disableCustomColors } }
+				__experimentalHasMultipleOrigins={
+					__experimentalHasMultipleOrigins
+				}
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				clearable={ clearable }
+				enableAlpha={ enableAlpha }
+			/>
 		),
 		[ TAB_GRADIENT.value ]: (
-			<DropdownContentWrapper paddingSize="medium">
-				<GradientPicker
-					value={ gradientValue }
-					onChange={
-						canChooseAColor
-							? ( newGradient ) => {
-									onGradientChange( newGradient );
-									onColorChange();
-							  }
-							: onGradientChange
-					}
-					{ ...{ gradients, disableCustomGradients } }
-					__experimentalHasMultipleOrigins={
-						__experimentalHasMultipleOrigins
-					}
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ clearable }
-				/>
-			</DropdownContentWrapper>
+			<GradientPicker
+				value={ gradientValue }
+				onChange={
+					canChooseAColor
+						? ( newGradient ) => {
+								onGradientChange( newGradient );
+								onColorChange();
+						  }
+						: onGradientChange
+				}
+				{ ...{ gradients, disableCustomGradients } }
+				__experimentalHasMultipleOrigins={
+					__experimentalHasMultipleOrigins
+				}
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				clearable={ clearable }
+			/>
 		),
 	};
+
+	const renderPanelType = ( type ) =>
+		__experimentalRenderPanel( { content: tabPanels[ type ] } );
 
 	return (
 		<BaseControl
@@ -147,11 +147,17 @@ function ColorGradientControlInner( {
 									: !! canChooseAColor && TAB_COLOR.value
 							}
 						>
-							{ ( tab ) => tabPanels[ tab.value ] }
+							{ ( tab ) => (
+								<div className="block-editor-color-gradient-control__tab-panel">
+									{ renderPanelType( tab.value ) }
+								</div>
+							) }
 						</TabPanel>
 					) }
-					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
-					{ ! canChooseAColor && tabPanels[ TAB_GRADIENT.value ] }
+					{ ! canChooseAGradient &&
+						renderPanelType( TAB_COLOR.value ) }
+					{ ! canChooseAColor &&
+						renderPanelType( TAB_GRADIENT.value ) }
 				</VStack>
 			</fieldset>
 		</BaseControl>
