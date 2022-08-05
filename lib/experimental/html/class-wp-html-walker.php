@@ -260,7 +260,7 @@ class WP_HTML_Walker {
 			$tag_name_prefix_length = strspn( $html, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $at + 1 );
 			if ( $tag_name_prefix_length > 0 ) {
 				$at++;
-				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\r\n/>", $at + $tag_name_prefix_length );
+				$tag_name_length        = $tag_name_prefix_length + strcspn( $html, " \t\x0c\n/>", $at + $tag_name_prefix_length );
 				$this->tag_name         = substr( $html, $at, $tag_name_length );
 				$this->tag_name_ends_at = $at + $tag_name_length;
 				$this->parsed_bytes     = $at + $tag_name_length;
@@ -317,8 +317,8 @@ class WP_HTML_Walker {
 		 * https://html.spec.whatwg.org/multipage/parsing.html#before-attribute-name-state
 		 */
 		$name_length = '=' === $this->html[ $this->parsed_bytes ]
-			? 1 + strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes + 1 )
-			: strcspn( $this->html, "=/> \t\r\n", $this->parsed_bytes );
+			? 1 + strcspn( $this->html, "=/> \t\x0c\n", $this->parsed_bytes + 1 )
+			: strcspn( $this->html, "=/> \t\x0c\n", $this->parsed_bytes );
 
 		// No attribute, just tag closer.
 		if ( 0 === $name_length ) {
@@ -348,7 +348,7 @@ class WP_HTML_Walker {
 
 				default:
 					$value_start        = $this->parsed_bytes;
-					$value_length       = strcspn( $this->html, "> \t\r\n", $value_start );
+					$value_length       = strcspn( $this->html, "> \t\x0c\n", $value_start );
 					$attribute_end      = $value_start + $value_length;
 					$this->parsed_bytes = $attribute_end;
 			}
@@ -382,7 +382,7 @@ class WP_HTML_Walker {
 	 * @return void
 	 */
 	private function skip_whitespace() {
-		$this->parsed_bytes += strspn( $this->html, " \t\r\n", $this->parsed_bytes );
+		$this->parsed_bytes += strspn( $this->html, " \t\x0c\n", $this->parsed_bytes );
 	}
 
 	/**
