@@ -538,6 +538,11 @@ class WP_HTML_Walker {
 		 * > To represent a false value, the attribute has to be omitted altogether.
 		 *     - HTML5 spec, https://html.spec.whatwg.org/#boolean-attributes
 		 */
+		if ( false === $value ) {
+			$this->remove_attribute( $name );
+			return;
+		}
+
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
