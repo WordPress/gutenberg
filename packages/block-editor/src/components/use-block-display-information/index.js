@@ -20,6 +20,7 @@ import { store as blockEditorStore } from '../../store';
  * @property {WPIcon} icon        Block type icon.
  * @property {string} description A detailed block type description.
  * @property {string} anchor      HTML anchor.
+ * @property {string} tagName     HTML tagName of element.
  */
 
 /**
@@ -63,6 +64,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
+				tagName: attributes?.tagName,
 			};
 		},
 		[ clientId ]
