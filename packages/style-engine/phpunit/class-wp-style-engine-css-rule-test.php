@@ -27,7 +27,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $selector, $css_rule->get_selector() );
 
-		$expected = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected = "$selector{{$css_declarations->get_declarations_string()}}";
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
@@ -45,12 +45,12 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_rule                    = new WP_Style_Engine_CSS_Rule( $selector, $first_declaration );
 		$css_rule->add_declarations( new WP_Style_Engine_CSS_Declarations( $overwrite_first_declaration ) );
 
-		$expected = '.taggart {font-size: 4px;}';
+		$expected = '.taggart{font-size:4px;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
 	/**
-	 * Should set selector and rules on instantiation.
+	 * Should add declarations.
 	 */
 	public function test_add_declarations() {
 		// Declarations using a WP_Style_Engine_CSS_Declarations object.
@@ -60,12 +60,12 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		$css_rule                   = new WP_Style_Engine_CSS_Rule( '.hill-street-blues', $some_css_declarations );
 		$css_rule->add_declarations( $some_more_css_declarations );
 
-		$expected = '.hill-street-blues {margin-top: 10px; font-size: 1rem;}';
+		$expected = '.hill-street-blues{margin-top:10px;font-size:1rem;}';
 		$this->assertSame( $expected, $css_rule->get_css() );
 	}
 
 	/**
-	 * Should set selector and rules on instantiation.
+	 * Should set selector.
 	 */
 	public function test_set_selector() {
 		$selector = '.taggart';
@@ -79,7 +79,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should set selector and rules on instantiation.
+	 * Should generate CSS rules.
 	 */
 	public function test_get_css() {
 		$selector           = '.chips';
@@ -89,8 +89,39 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
-		$expected           = "$selector {{$css_declarations->get_declarations_string()}}";
+		$expected           = "$selector{{$css_declarations->get_declarations_string()}}";
 
 		$this->assertSame( $expected, $css_rule->get_css() );
+	}
+
+	/**
+	 * Should return empty string with no declarations.
+	 */
+	public function test_get_css_no_declarations() {
+		$selector           = '.holmes';
+		$input_declarations = array();
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+
+		$this->assertSame( '', $css_rule->get_css() );
+	}
+
+	/**
+	 * Should generate prettified CSS rules.
+	 */
+	public function test_get_prettified_css() {
+		$selector           = '.baptiste';
+		$input_declarations = array(
+			'margin-left' => '0',
+			'font-family' => 'Detective Sans',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+		$css_rule           = new WP_Style_Engine_CSS_Rule( $selector, $css_declarations );
+		$expected           = '.baptiste {
+	margin-left: 0;
+	font-family: Detective Sans;
+}';
+
+		$this->assertSame( $expected, $css_rule->get_css( true ) );
 	}
 }

@@ -1,16 +1,21 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
  * Internal dependencies
  */
-import { contextConnect } from '../../ui/context';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useFlex } from './hook';
 import { FlexContext } from './../context';
 import { View } from '../../view';
+import type { FlexProps } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
- * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
- */
-function Flex( props, forwardedRef ) {
+function UnconnectedFlex(
+	props: WordPressComponentProps< FlexProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
 	const { children, isColumn, ...otherProps } = useFlex( props );
 
 	return (
@@ -29,9 +34,9 @@ function Flex( props, forwardedRef ) {
  * horizontally or vertically. `Flex` powers components like `HStack` and
  * `VStack`.
  *
- * `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+ * `Flex` is used with any of its two sub-components, `FlexItem` and
+ * `FlexBlock`.
  *
- * @example
  * ```jsx
  * import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
  *
@@ -49,6 +54,6 @@ function Flex( props, forwardedRef ) {
  * }
  * ```
  */
-const ConnectedFlex = contextConnect( Flex, 'Flex' );
+export const Flex = contextConnect( UnconnectedFlex, 'Flex' );
 
-export default ConnectedFlex;
+export default Flex;

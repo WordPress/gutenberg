@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import useNoRecursiveRenders from '../';
+import { useHasRecursion, RecursionProvider } from '..';
 import {
 	BlockEditContextProvider,
 	useBlockEditContext,
@@ -16,15 +16,14 @@ import {
 // of calling itself depending on its `uniqueId` attribute.
 function Edit( { attributes: { uniqueId } } ) {
 	const { name } = useBlockEditContext();
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( uniqueId );
+	const hasRecursion = useHasRecursion( uniqueId );
 
-	if ( hasAlreadyRendered ) {
+	if ( hasRecursion ) {
 		return <div className={ `wp-block__${ name }--halted` }>Halt</div>;
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ uniqueId }>
 			<div className={ `wp-block__${ name }` }>
 				{ uniqueId === 'SIMPLE' && <p>Done</p> }
 				{ uniqueId === 'SINGLY-RECURSIVE' && (
@@ -48,7 +47,7 @@ function Edit( { attributes: { uniqueId } } ) {
 	);
 }
 
-describe( 'useNoRecursiveRenders', () => {
+describe( 'useHasRecursion/RecursionProvider', () => {
 	const context = { name: 'reusable-block' };
 
 	it( 'allows a single block to render', () => {

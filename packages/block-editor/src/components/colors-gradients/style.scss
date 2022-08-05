@@ -58,6 +58,7 @@ $swatch-gap: 12px;
 */
 .block-editor-tools-panel-color-gradient-settings__item {
 	padding: 0;
+	max-width: 100%;
 
 	// Border styles.
 	border-left: 1px solid rgba(0, 0, 0, 0.1);
@@ -87,17 +88,30 @@ $swatch-gap: 12px;
 	padding: 0;
 
 	> button {
-		height: 46px;
+		height: auto;
+		padding-top: $grid-unit * 1.25;
+		padding-bottom: $grid-unit * 1.25;
+		text-align: left;
 
 		&.is-open {
 			background: $gray-100;
 			color: var(--wp-admin-theme-color);
 		}
 	}
+
+	.block-editor-panel-color-gradient-settings__color-name {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown {
 	width: 100%;
+
+	.component-color-indicator {
+		flex-shrink: 0;
+	}
 }
 
 .block-editor-color-gradient-control__tab-panel {

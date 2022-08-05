@@ -39,9 +39,8 @@ function gutenberg_register_layout_support( $block_type ) {
  * @return string                                CSS style.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
-	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
-
-	$style = '';
+	$layout_type   = isset( $layout['type'] ) ? $layout['type'] : 'default';
+	$layout_styles = array();
 	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : '';
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : '';
@@ -55,14 +54,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 		if ( $content_size || $wide_size ) {
-			$style  = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {";
-			$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-			$style .= 'margin-left: auto !important;';
-			$style .= 'margin-right: auto !important;';
-			$style .= '}';
-
-			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-			$style .= "$selector .alignfull { max-width: none; }";
+			array_push(
+				$layout_styles,
+				array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => array(
+						'max-width'    => $all_max_width_value,
+						'margin-left'  => 'auto !important',
+						'margin-right' => 'auto !important',
+					),
+				),
+				array(
+					'selector'     => "$selector > .alignwide",
+					'declarations' => array( 'max-width' => $wide_max_width_value ),
+				),
+				array(
+					'selector'     => "$selector .alignfull",
+					'declarations' => array( 'max-width' => 'none' ),
+				)
+			);
 
 			if ( isset( $block_spacing ) ) {
 				$block_spacing_values = gutenberg_style_engine_get_styles(
@@ -74,12 +84,18 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				// Handle negative margins for alignfull children of blocks with custom padding set.
 				// They're added separately because padding might only be set on one side.
 				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-					$padding_right = $block_spacing_values['declarations']['padding-right'];
-					$style        .= "$selector > .alignfull { margin-right:calc($padding_right * -1); }";
+					$padding_right   = $block_spacing_values['declarations']['padding-right'];
+					$layout_styles[] = array(
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
+					);
 				}
 				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-					$padding_left = $block_spacing_values['declarations']['padding-left'];
-					$style       .= "$selector > .alignfull { margin-left: calc($padding_left * -1); }";
+					$padding_left    = $block_spacing_values['declarations']['padding-left'];
+					$layout_styles[] = array(
+						'selector'     => "$selector > .alignfull",
+						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
+					);
 				}
 			}
 		}
@@ -89,8 +105,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value = isset( $gap_value['top'] ) ? $gap_value['top'] : null;
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				$style .= "$selector > * { margin-block-start: 0; margin-block-end: 0; }";
-				$style .= "$selector > * + * { margin-block-start: $gap_value; margin-block-end: 0; }";
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => "$selector > *",
+						'declarations' => array(
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
+						),
+					),
+					array(
+						'selector'     => "$selector > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
+					)
+				);
 			}
 		}
 	} elseif ( 'flex' === $layout_type ) {
@@ -113,7 +144,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
-			$style .= "$selector { flex-wrap: nowrap; }";
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-wrap' => 'nowrap' ),
+			);
 		}
 
 		if ( $has_block_gap_support ) {
@@ -123,9 +157,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$gap_value  = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
 			}
 			if ( $gap_value && ! $should_skip_gap_serialization ) {
-				$style .= "$selector {";
-				$style .= "gap: $gap_value;";
-				$style .= '}';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'gap' => $gap_value ),
+				);
 			}
 		}
 
@@ -136,29 +171,51 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * by custom css.
 			 */
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "$selector {";
-				$style .= "justify-content: {$justify_content_options[ $layout['justifyContent'] ]};";
-				$style .= '}';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $justify_content_options[ $layout['justifyContent'] ] ),
+				);
 			}
 
 			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
-				$style .= "$selector {";
-				$style .= "align-items: {$vertical_alignment_options[ $layout['verticalAlignment'] ]};";
-				$style .= '}';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+				);
 			}
 		} else {
-			$style .= "$selector {";
-			$style .= 'flex-direction: column;';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'flex-direction' => 'column' ),
+			);
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
-				$style .= "align-items: {$justify_content_options[ $layout['justifyContent'] ]};";
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
+				);
 			} else {
-				$style .= 'align-items: flex-start;';
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => 'flex-start' ),
+				);
 			}
-			$style .= '}';
 		}
 	}
 
-	return $style;
+	if ( ! empty( $layout_styles ) ) {
+		// Add to the style engine store to enqueue and render layout styles.
+		// Return compiled layout styles to retain backwards compatibility.
+		// Since https://github.com/WordPress/gutenberg/pull/42452 we no longer call wp_enqueue_block_support_styles in this block supports file.
+		return gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$layout_styles,
+			array(
+				'context' => 'block-supports',
+				'enqueue' => true,
+			)
+		);
+	}
+
+	return '';
 }
 
 /**
@@ -253,7 +310,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {
 			$class_names[] = $container_class;
-			wp_enqueue_block_support_styles( $style );
 		}
 	}
 

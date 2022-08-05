@@ -24,7 +24,7 @@ function ScreenColorPalette( { name } ) {
 				tabs={ [
 					{
 						name: 'solid',
-						title: 'Solid color',
+						title: 'Solid',
 						value: 'solid',
 					},
 					{

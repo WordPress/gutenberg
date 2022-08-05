@@ -253,7 +253,7 @@ export function useInputAndSelection( props ) {
 			// during composition, the placeholder doesn't get removed. There's
 			// no need to re-add it, when the value is updated on compositionend
 			// it will be re-added when the value is empty.
-			element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` ).remove();
+			element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` )?.remove();
 		}
 
 		function onCompositionEnd() {

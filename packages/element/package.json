@@ -32,7 +32,8 @@
 		"@types/react": "^17.0.37",
 		"@types/react-dom": "^17.0.11",
 		"@wordpress/escape-html": "file:../escape-html",
-		"lodash": "^4.17.21",
+		"change-case": "^4.1.2",
+		"is-plain-obj": "^4.1.0",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2"
 	},

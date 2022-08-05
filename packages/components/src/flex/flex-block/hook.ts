@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem, WordPressComponentProps } from '../../ui/context';
 import { useFlexItem } from '../flex-item';
+import type { FlexBlockProps } from '../types';
 
-/**
- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
- */
-export function useFlexBlock( props ) {
+export function useFlexBlock(
+	props: WordPressComponentProps< FlexBlockProps, 'div' >
+) {
 	const otherProps = useContextSystem( props, 'FlexBlock' );
 	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
 

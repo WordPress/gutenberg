@@ -29,7 +29,7 @@ const colorsAndGradientKeys = [
 
 const TAB_COLOR = {
 	name: 'color',
-	title: 'Solid color',
+	title: 'Solid',
 	value: 'color',
 };
 const TAB_GRADIENT = {

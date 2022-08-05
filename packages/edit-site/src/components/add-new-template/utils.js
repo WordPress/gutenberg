@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { blockMeta, post } from '@wordpress/icons';
 
@@ -152,7 +152,10 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 				);
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -167,6 +170,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 						icon: icon?.startsWith( 'dashicons-' )
 							? icon.slice( 10 )
 							: post,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -210,6 +214,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 									title,
 									description,
 									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -317,7 +322,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 				);
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -327,6 +335,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 							labels.singular_name
 						),
 						icon: blockMeta,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -369,6 +378,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 									title,
 									description,
 									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -407,6 +417,112 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	);
 	return taxonomiesMenuItems;
 };
+
+function useAuthorNeedsUniqueIndentifier() {
+	const authors = useSelect(
+		( select ) =>
+			select( coreStore ).getUsers( { who: 'authors', per_page: -1 } ),
+		[]
+	);
+	const authorsCountByName = useMemo( () => {
+		return ( authors || [] ).reduce( ( authorsCount, { name } ) => {
+			authorsCount[ name ] = ( authorsCount[ name ] || 0 ) + 1;
+			return authorsCount;
+		}, {} );
+	}, [ authors ] );
+	return useCallback(
+		( name ) => {
+			return authorsCountByName[ name ] > 1;
+		},
+		[ authorsCountByName ]
+	);
+}
+
+const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
+const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
+export function useAuthorMenuItem( onClickMenuItem ) {
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const authorInfo = useEntitiesInfo(
+		'root',
+		USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX,
+		USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS
+	);
+	const authorNeedsUniqueId = useAuthorNeedsUniqueIndentifier();
+	let authorMenuItem = defaultTemplateTypes?.find(
+		( { slug } ) => slug === 'author'
+	);
+	if ( ! authorMenuItem ) {
+		authorMenuItem = {
+			description: __(
+				'Displays latest posts written by a single author.'
+			),
+			slug: 'author',
+			title: 'Author',
+		};
+	}
+	const hasGeneralTemplate = !! existingTemplates?.find(
+		( { slug } ) => slug === 'author'
+	);
+	if ( authorInfo.user?.hasEntities ) {
+		authorMenuItem = { ...authorMenuItem, templatePrefix: 'author' };
+		authorMenuItem.onClick = ( template ) => {
+			onClickMenuItem( {
+				type: 'root',
+				slug: 'user',
+				config: {
+					queryArgs: ( { search } ) => {
+						return {
+							_fields: 'id,name,slug,link',
+							orderBy: search ? 'name' : 'registered_date',
+							exclude: authorInfo.user.existingEntitiesIds,
+							who: 'authors',
+						};
+					},
+					getSpecificTemplate: ( suggestion ) => {
+						const needsUniqueId = authorNeedsUniqueId(
+							suggestion.name
+						);
+						const title = needsUniqueId
+							? sprintf(
+									// translators: %1$s: Represents the name of an author e.g: "Jorge", %2$s: Represents the slug of an author e.g: "author-jorge-slug".
+									__( 'Author: %1$s (%2$s)' ),
+									suggestion.name,
+									suggestion.slug
+							  )
+							: sprintf(
+									// translators: %s: Represents the name of an author e.g: "Jorge".
+									__( 'Author: %s' ),
+									suggestion.name
+							  );
+						const description = sprintf(
+							// translators: %s: Represents the name of an author e.g: "Jorge".
+							__( 'Template for Author: %s' ),
+							suggestion.name
+						);
+						return {
+							title,
+							description,
+							slug: `author-${ suggestion.slug }`,
+							templatePrefix: 'author',
+						};
+					},
+				},
+				labels: {
+					singular_name: __( 'Author' ),
+					search_items: __( 'Search Authors' ),
+					not_found: __( 'No authors found.' ),
+					all_items: __( 'All Authors' ),
+				},
+				hasGeneralTemplate,
+				template,
+			} );
+		};
+	}
+	if ( ! hasGeneralTemplate || authorInfo.user?.hasEntities ) {
+		return authorMenuItem;
+	}
+}
 
 /**
  * Helper hook that filters all the existing templates by the given
@@ -456,11 +572,16 @@ const useExistingTemplateSlugs = ( templatePrefixes ) => {
  * Helper hook that finds the existing records with an associated template,
  * as they need to be excluded from the template suggestions.
  *
- * @param {string}                entityName       The entity's name.
- * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the existing records as value.
  */
-const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
+const useTemplatesToExclude = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters = {}
+) => {
 	const slugsToExcludePerEntity =
 		useExistingTemplateSlugs( templatePrefixes );
 	const recordsToExcludePerEntity = useSelect(
@@ -473,6 +594,7 @@ const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
 						_fields: 'id',
 						context: 'view',
 						slug: slugsWithTemplates,
+						...additionalQueryParameters[ slug ],
 					} );
 					if ( entitiesWithTemplates?.length ) {
 						accumulator[ slug ] = entitiesWithTemplates;
@@ -497,14 +619,20 @@ const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
  * First we need to find the existing records with an associated template,
  * to query afterwards for any remaining record, by excluding them.
  *
- * @param {string}                entityName       The entity's name.
- * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the EntitiesInfo as value.
  */
-const useEntitiesInfo = ( entityName, templatePrefixes ) => {
+const useEntitiesInfo = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters = {}
+) => {
 	const recordsToExcludePerEntity = useTemplatesToExclude(
 		entityName,
-		templatePrefixes
+		templatePrefixes,
+		additionalQueryParameters
 	);
 	const entitiesInfo = useSelect(
 		( select ) => {
@@ -523,6 +651,7 @@ const useEntitiesInfo = ( entityName, templatePrefixes ) => {
 								_fields: 'id',
 								context: 'view',
 								exclude: existingEntitiesIds,
+								...additionalQueryParameters[ slug ],
 							}
 						)?.length,
 						existingEntitiesIds,
