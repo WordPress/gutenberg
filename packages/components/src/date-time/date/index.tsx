@@ -21,7 +21,7 @@ import {
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
-import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -270,18 +270,13 @@ function Day( {
 		}
 	}, [ isFocusable ] );
 
-	const label = useMemo(
-		() => getDayLabel( day, isSelected, numEvents ),
-		[ day, isSelected, numEvents ]
-	);
-
 	return (
 		<DayButton
 			ref={ ref }
 			className="components-datetime__date__day" // Unused, for backwards compatibility.
 			disabled={ isInvalid }
 			tabIndex={ isFocusable ? 0 : -1 }
-			aria-label={ label }
+			aria-label={ getDayLabel( day, isSelected, numEvents ) }
 			column={ column }
 			isSelected={ isSelected }
 			isToday={ isToday }
@@ -295,31 +290,42 @@ function Day( {
 }
 
 function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
-	const parts = [];
-
 	const { formats } = __experimentalGetSettings();
-	const datePart = dateI18n( formats.date, date, -date.getTimezoneOffset() );
-	parts.push( datePart );
-
-	if ( isSelected ) {
-		parts.push( __( 'Selected' ) );
-	}
-
-	if ( numEvents > 0 ) {
-		parts.push(
-			sprintf(
-				// translators: %d: Number of events on given calendar day.
-				_n( 'There is %d event', 'There are %d events', numEvents ),
+	const localizedDate = dateI18n(
+		formats.date,
+		date,
+		-date.getTimezoneOffset()
+	);
+	if ( isSelected && numEvents > 0 ) {
+		return sprintf(
+			// translators: 1: The calendar date. 2: Number of events on the calendar date.
+			_n(
+				'%1$s. Selected. There is %2$d event',
+				'%1$s. Selected. There are %2$d events',
 				numEvents
-			)
+			),
+			localizedDate,
+			numEvents
+		);
+	} else if ( isSelected ) {
+		return sprintf(
+			// translators: %s: The calendar date.
+			__( '%1$s. Selected' ),
+			localizedDate
+		);
+	} else if ( numEvents > 0 ) {
+		return sprintf(
+			// translators: 1: The calendar date. 2: Number of events on the calendar date.
+			_n(
+				'%1$s. There is %2$d event',
+				'%1$s. There are %2$d events',
+				numEvents
+			),
+			localizedDate,
+			numEvents
 		);
 	}
-
-	if ( isRTL() ) {
-		return parts.reverse().join( ' .' );
-	}
-
-	return parts.join( '. ' );
+	return localizedDate;
 }
 
 export default DatePicker;
