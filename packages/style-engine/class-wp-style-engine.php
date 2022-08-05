@@ -498,6 +498,7 @@ class WP_Style_Engine {
 			return $css_rule->get_css();
 		}
 		$css_declarations = new WP_Style_Engine_CSS_Declarations( $css_declarations );
+
 		return $css_declarations->get_declarations_string();
 	}
 
@@ -511,7 +512,7 @@ class WP_Style_Engine {
 	public static function compile_stylesheet_from_css_rules( $css_rules ) {
 		$processor = new WP_Style_Engine_Processor();
 		$processor->add_rules( $css_rules );
-		return $processor->get_css();
+		return $processor->get_css( array( 'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) );
 	}
 }
 

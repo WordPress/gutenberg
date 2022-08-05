@@ -45,19 +45,24 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
  * Styles are stored via the style engine API. See: packages/style-engine/README.md
  */
 function gutenberg_enqueue_stored_styles() {
-	$core_styles_keys    = array( 'block-supports', 'layout-block-supports' );
-	$compiled_stylesheet = '';
+	$core_styles_keys         = array( 'block-supports' );
+	$compiled_core_stylesheet = '';
+	$style_tag_id             = 'core';
 	foreach ( $core_styles_keys as $style_key ) {
-		$compiled_stylesheet .= gutenberg_style_engine_get_stylesheet_from_store( $style_key );
+		// Add comment to identify core styles sections in debugging.
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
+		}
+		// Chain core store ids to signify what the styles contain.
+		$style_tag_id             .= $style_tag_id ? '-' . $style_key : $style_key;
+		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_store( $style_key );
 	}
 
 	// Combine Core styles.
-	// @TODO check for `defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG` and split them for ease of debugging.
-	if ( ! empty( $compiled_stylesheet ) ) {
-		$key = 'block-supports-styles';
-		wp_register_style( $key, false, array(), true, true );
-		wp_add_inline_style( $key, $compiled_stylesheet );
-		wp_enqueue_style( $key );
+	if ( ! empty( $compiled_core_stylesheet ) ) {
+		wp_register_style( $style_tag_id, false, array(), true, true );
+		wp_add_inline_style( $style_tag_id, $compiled_core_stylesheet );
+		wp_enqueue_style( $style_tag_id );
 	}
 }
 
