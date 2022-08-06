@@ -31,6 +31,7 @@ import {
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
+import { VStack } from '../v-stack';
 
 function FontSizePicker(
 	{
@@ -125,6 +126,13 @@ function FontSizePicker(
 		return null;
 	}
 
+	const MaybeVstack = ( { children } ) =>
+		! __nextHasNoMarginBottom ? (
+			children
+		) : (
+			<VStack spacing={ 6 } children={ children } />
+		);
+
 	// This is used for select control only. We need to add support
 	// for ToggleGroupControl.
 	const currentFontSizeSR = sprintf(
@@ -172,124 +180,133 @@ function FontSizePicker(
 					</FlexItem>
 				) }
 			</Flex>
-			<div
-				className={ classNames( `${ baseClassName }__controls`, {
-					'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
-				} ) }
-			>
-				{ !! fontSizes.length &&
-					shouldUseSelectControl &&
-					! showCustomValueControl && (
-						<CustomSelectControl
-							__nextUnconstrainedWidth
+			<MaybeVstack>
+				<div
+					className={ classNames( `${ baseClassName }__controls`, {
+						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
+					} ) }
+				>
+					{ !! fontSizes.length &&
+						shouldUseSelectControl &&
+						! showCustomValueControl && (
+							<CustomSelectControl
+								__nextUnconstrainedWidth
+								className={ `${ baseClassName }__select` }
+								label={ __( 'Font size' ) }
+								hideLabelFromVision
+								describedBy={ currentFontSizeSR }
+								options={ options }
+								value={ options.find(
+									( option ) =>
+										option.key === selectedOption.slug
+								) }
+								onChange={ ( { selectedItem } ) => {
+									onChange(
+										hasUnits
+											? selectedItem.size
+											: Number( selectedItem.size )
+									);
+									if (
+										selectedItem.key === CUSTOM_FONT_SIZE
+									) {
+										setShowCustomValueControl( true );
+									}
+								} }
+								size={ size }
+							/>
+						) }
+					{ ! shouldUseSelectControl && ! showCustomValueControl && (
+						<ToggleGroupControl
 							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-							className={ `${ baseClassName }__select` }
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
-							describedBy={ currentFontSizeSR }
-							options={ options }
-							value={ options.find(
-								( option ) => option.key === selectedOption.slug
-							) }
-							onChange={ ( { selectedItem } ) => {
+							value={ value }
+							onChange={ ( newValue ) => {
 								onChange(
-									hasUnits
-										? selectedItem.size
-										: Number( selectedItem.size )
+									hasUnits ? newValue : Number( newValue )
 								);
-								if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
-									setShowCustomValueControl( true );
-								}
 							} }
+							isBlock
 							size={ size }
-						/>
-					) }
-				{ ! shouldUseSelectControl && ! showCustomValueControl && (
-					<ToggleGroupControl
-						label={ __( 'Font size' ) }
-						hideLabelFromVision
-						value={ value }
-						onChange={ ( newValue ) => {
-							onChange(
-								hasUnits ? newValue : Number( newValue )
-							);
-						} }
-						isBlock
-						size={ size }
-					>
-						{ options.map( ( option ) => (
-							<ToggleGroupControlOption
-								key={ option.key }
-								value={ option.value }
-								label={ option.label }
-								aria-label={ option.name }
-								showTooltip={ true }
-							/>
-						) ) }
-					</ToggleGroupControl>
-				) }
-				{ ! withSlider &&
-					! disableCustomFontSizes &&
-					showCustomValueControl && (
-						<Flex
-							justify="space-between"
-							className={ `${ baseClassName }__custom-size-control` }
 						>
-							<FlexItem isBlock>
-								<UnitControl
-									label={ __( 'Custom' ) }
-									labelPosition="top"
-									hideLabelFromVision
-									value={ value }
-									onChange={ ( nextSize ) => {
-										if (
-											0 === parseFloat( nextSize ) ||
-											! nextSize
-										) {
-											onChange( undefined );
-										} else {
-											onChange(
-												hasUnits
-													? nextSize
-													: parseInt( nextSize, 10 )
-											);
-										}
-									} }
-									size={ size }
-									units={ hasUnits ? units : [] }
+							{ options.map( ( option ) => (
+								<ToggleGroupControlOption
+									key={ option.key }
+									value={ option.value }
+									label={ option.label }
+									aria-label={ option.name }
+									showTooltip={ true }
 								/>
-							</FlexItem>
-							{ withReset && (
-								<FlexItem isBlock>
-									<Button
-										className="components-color-palette__clear"
-										disabled={ value === undefined }
-										onClick={ () => {
-											onChange( undefined );
-										} }
-										isSmall
-										variant="secondary"
-									>
-										{ __( 'Reset' ) }
-									</Button>
-								</FlexItem>
-							) }
-						</Flex>
+							) ) }
+						</ToggleGroupControl>
 					) }
-			</div>
-			{ withSlider && (
-				<RangeControl
-					className={ `${ baseClassName }__custom-input` }
-					label={ __( 'Custom Size' ) }
-					value={ ( isPixelValue && noUnitsValue ) || '' }
-					initialPosition={ fallbackFontSize }
-					onChange={ ( newValue ) => {
-						onChange( hasUnits ? newValue + 'px' : newValue );
-					} }
-					min={ 12 }
-					max={ 100 }
-				/>
-			) }
+					{ ! withSlider &&
+						! disableCustomFontSizes &&
+						showCustomValueControl && (
+							<Flex
+								justify="space-between"
+								className={ `${ baseClassName }__custom-size-control` }
+							>
+								<FlexItem isBlock>
+									<UnitControl
+										label={ __( 'Custom' ) }
+										labelPosition="top"
+										hideLabelFromVision
+										value={ value }
+										onChange={ ( nextSize ) => {
+											if (
+												0 === parseFloat( nextSize ) ||
+												! nextSize
+											) {
+												onChange( undefined );
+											} else {
+												onChange(
+													hasUnits
+														? nextSize
+														: parseInt(
+																nextSize,
+																10
+														  )
+												);
+											}
+										} }
+										size={ size }
+										units={ hasUnits ? units : [] }
+									/>
+								</FlexItem>
+								{ withReset && (
+									<FlexItem isBlock>
+										<Button
+											className="components-color-palette__clear"
+											disabled={ value === undefined }
+											onClick={ () => {
+												onChange( undefined );
+											} }
+											isSmall
+											variant="secondary"
+										>
+											{ __( 'Reset' ) }
+										</Button>
+									</FlexItem>
+								) }
+							</Flex>
+						) }
+				</div>
+				{ withSlider && (
+					<RangeControl
+						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+						className={ `${ baseClassName }__custom-input` }
+						label={ __( 'Custom Size' ) }
+						value={ ( isPixelValue && noUnitsValue ) || '' }
+						initialPosition={ fallbackFontSize }
+						onChange={ ( newValue ) => {
+							onChange( hasUnits ? newValue + 'px' : newValue );
+						} }
+						min={ 12 }
+						max={ 100 }
+					/>
+				) }
+			</MaybeVstack>
 		</fieldset>
 	);
 }
