@@ -257,6 +257,9 @@ const countries = [
 export default {
 	title: 'Components/ComboboxControl',
 	component: ComboboxControl,
+	argTypes: {
+		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+	},
 };
 
 const mapCountryOption = ( country ) => ( {
