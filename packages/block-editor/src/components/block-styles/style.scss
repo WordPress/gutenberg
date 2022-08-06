@@ -43,6 +43,16 @@
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 
+		&-text {
+			word-break: break-all;
+			// The Button component is white-space: nowrap, and that won't work with line-clamp.
+			white-space: normal;
+
+			// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+			text-align: start;
+			text-align-last: center;
+		}
+
 		&:focus,
 		&:hover {
 			color: var(--wp-admin-theme-color);
