@@ -40,8 +40,12 @@ export const Root = styled.div`
 const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
 	css( { color } );
 
-const wrapperMargin = ( { marks }: WrapperProps ) =>
-	css( { marginBottom: marks ? 16 : undefined } );
+const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+	if ( ! __nextHasNoMarginBottom ) {
+		return css( { marginBottom: marks ? 16 : undefined } );
+	}
+	return '';
+};
 
 export const Wrapper = styled.div< WrapperProps >`
 	color: ${ COLORS.blue.medium.focus };
