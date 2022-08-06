@@ -88,6 +88,12 @@ export type ToggleGroupControlProps = Omit<
 	 */
 	isBlock?: boolean;
 	/**
+	 * Removes the outer border from the control. A good style to use with `ToggleGroupControlOptionIcon`s.
+	 *
+	 * @default false
+	 */
+	isBorderless?: boolean;
+	/**
 	 * Callback when a segment is selected.
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;

@@ -24,6 +24,7 @@ export default {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
 	argTypes: {
+		isBorderless: { control: { type: 'boolean' } },
 		size: {
 			control: 'select',
 			options: [ 'default', '__unstable-large' ],
