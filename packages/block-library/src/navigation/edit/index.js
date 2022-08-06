@@ -808,12 +808,13 @@ function Navigation( {
 					) }
 				</BlockControls>
 				<InspectorControls>
-					<ToolsPanel label={ __( 'Menu details' ) }>
+					<ToolsPanel label={ __( 'Menu items' ) }>
 						<ToolsPanelItem
-							hasValue={ () => true }
+							hasValue={ () => false }
 							label={ 'Some tool' }
+							onSelect={ () => null }
 							onDeselect={ () => null }
-							isShownByDefault={ true }
+							isShownByDefault={ false }
 						>
 							<p>What?</p>
 						</ToolsPanelItem>
