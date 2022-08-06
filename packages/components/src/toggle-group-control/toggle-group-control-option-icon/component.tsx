@@ -15,7 +15,7 @@ export default function ToggleGroupControlOptionIcon(
 ) {
 	const { icon, ...restProps } = props;
 	return (
-		<ToggleGroupControlOptionBase { ...restProps }>
+		<ToggleGroupControlOptionBase { ...restProps } isIcon>
 			<Icon icon={ icon } />
 		</ToggleGroupControlOptionBase>
 	);

@@ -22,6 +22,7 @@ import {
  */
 import {
 	contextConnect,
+	ContextSystemProvider,
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
@@ -82,6 +83,11 @@ function ToggleGroupControl(
 		}
 	}, [ value ] );
 
+	const optionsContext = useMemo(
+		() => ( { ToggleGroupControlOptionBase: { size } } ),
+		[ size ]
+	);
+
 	const classes = useMemo(
 		() =>
 			cx(
@@ -119,7 +125,9 @@ function ToggleGroupControl(
 						containerWidth={ sizes.width }
 						isAdaptiveWidth={ isAdaptiveWidth }
 					/>
-					{ children }
+					<ContextSystemProvider value={ optionsContext }>
+						{ children }
+					</ContextSystemProvider>
 				</RadioGroup>
 			</ToggleGroupControlContext.Provider>
 		</BaseControl>
