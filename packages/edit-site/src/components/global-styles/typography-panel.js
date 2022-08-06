@@ -153,6 +153,7 @@ export default function TypographyPanel( { name, element } ) {
 						value={ selectedLevel }
 						onChange={ setCurrentTab }
 						isBlock
+						size="__unstable-large"
 					>
 						<ToggleGroupControlOption
 							value="heading"
@@ -205,15 +206,17 @@ export default function TypographyPanel( { name, element } ) {
 				/>
 			) }
 			{ hasLineHeightEnabled && (
-				<Spacer marginBottom={ 6 }>
-					<LineHeightControl
-						__nextHasNoMarginBottom={ true }
-						__unstableInputWidth={ '50%' }
-						value={ lineHeight }
-						onChange={ setLineHeight }
-						size="__unstable-large"
-					/>
-				</Spacer>
+				<div className="edit-site-typography-panel__half-width-control">
+					<Spacer marginBottom={ 6 }>
+						<LineHeightControl
+							__nextHasNoMarginBottom={ true }
+							__unstableInputWidth="auto"
+							value={ lineHeight }
+							onChange={ setLineHeight }
+							size="__unstable-large"
+						/>
+					</Spacer>
+				</div>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl
@@ -235,12 +238,14 @@ export default function TypographyPanel( { name, element } ) {
 				/>
 			) }
 			{ hasLetterSpacingControl && (
-				<LetterSpacingControl
-					value={ letterSpacing }
-					onChange={ setLetterSpacing }
-					size="__unstable-large"
-					__unstableInputWidth={ '50%' }
-				/>
+				<div className="edit-site-typography-panel__half-width-control">
+					<LetterSpacingControl
+						value={ letterSpacing }
+						onChange={ setLetterSpacing }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				</div>
 			) }
 		</PanelBody>
 	);
