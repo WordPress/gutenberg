@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,6 +34,8 @@ import {
 
 function FontSizePicker(
 	{
+		/** Start opting into the new margin-free styles that will become the default in a future version. */
+		__nextHasNoMarginBottom = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
@@ -165,12 +172,17 @@ function FontSizePicker(
 					</FlexItem>
 				) }
 			</Flex>
-			<div className={ `${ baseClassName }__controls` }>
+			<div
+				className={ classNames( `${ baseClassName }__controls`, {
+					'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
+				} ) }
+			>
 				{ !! fontSizes.length &&
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<CustomSelectControl
 							__nextUnconstrainedWidth
+							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 							className={ `${ baseClassName }__select` }
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
