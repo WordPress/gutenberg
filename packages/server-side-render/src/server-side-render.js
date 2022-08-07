@@ -85,7 +85,11 @@ export default function ServerSideRender( props ) {
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
 	const prevProps = usePrevious( props );
+	const preAttributes = usePrevious( attributes );
+	const prevUrlQueryArgs = usePrevious( urlQueryArgs );
 	const [ isLoading, setIsLoading ] = useState( false );
+	const isAttributesChanged = isEqual( attributes, preAttributes );
+	const isUrlQueryArgsChanged = isEqual( urlQueryArgs, prevUrlQueryArgs );
 
 	const fetchData = useCallback( () => {
 		if ( ! isMountedRef.current ) {
@@ -146,7 +150,7 @@ export default function ServerSideRender( props ) {
 			} ) );
 
 		return fetchRequest;
-	}, [ isMountedRef, prevProps ] );
+	}, [ httpMethod, isAttributesChanged, isUrlQueryArgsChanged ] );
 
 	const debouncedFetchData = useDebounce( fetchData, 500 );
 
