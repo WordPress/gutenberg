@@ -23,6 +23,7 @@ const meta: ComponentMeta< typeof SelectControl > = {
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		value: { control: { type: null } },
+		multiple: { control: { type: Array } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -86,4 +87,15 @@ export const WithCustomChildren: ComponentStory< typeof SelectControl > = (
 			</optgroup>
 		</SelectControlWithState>
 	);
+};
+
+/**
+ * Select Multiple options
+ */
+export const SelectMultiple = SelectControlWithState.bind( {} );
+SelectMultiple.args = {
+	...Default.args,
+	help: 'Select any number of options.',
+	label: 'Select Multiple',
+	multiple: true,
 };

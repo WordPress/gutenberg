@@ -85,6 +85,15 @@ function UnforwardedSelectControl(
 
 	const classes = classNames( 'components-select-control', className );
 
+	const downArrowWrapper =
+		multiple === false ? (
+			<DownArrowWrapper>
+				<Icon icon={ chevronDown } size={ 18 } />
+			</DownArrowWrapper>
+		) : (
+			Boolean
+		);
+
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<BaseControl
@@ -100,13 +109,7 @@ function UnforwardedSelectControl(
 				isFocused={ isFocused }
 				label={ label }
 				size={ size }
-				suffix={
-					suffix || (
-						<DownArrowWrapper>
-							<Icon icon={ chevronDown } size={ 18 } />
-						</DownArrowWrapper>
-					)
-				}
+				suffix={ suffix || downArrowWrapper }
 				prefix={ prefix }
 				labelPosition={ labelPosition }
 			>
