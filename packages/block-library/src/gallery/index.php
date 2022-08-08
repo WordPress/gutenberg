@@ -102,9 +102,22 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$style = '.wp-block-gallery.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+	$gallery_styles   = array();
+	$gallery_styles[] = array(
+		'selector'     => ".wp-block-gallery.{$class}",
+		'declarations' => array(
+			'--wp--style--unstable-gallery-gap' => $gap_column,
+			'gap'                               => $gap_value,
+		),
+	);
 
-	wp_enqueue_block_support_styles( $style, 11 );
+	gutenberg_style_engine_get_stylesheet_from_css_rules(
+		$gallery_styles,
+		array(
+			'context' => 'block-supports',
+			'enqueue' => true,
+		)
+	);
 	return $content;
 }
 /**
