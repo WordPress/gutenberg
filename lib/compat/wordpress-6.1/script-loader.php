@@ -54,7 +54,7 @@ function gutenberg_enqueue_stored_styles() {
 			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
 		}
 		// Chain core store ids to signify what the styles contain.
-		$style_tag_id             .= $style_tag_id ? '-' . $style_key : $style_key;
+		$style_tag_id             .= '-' . $style_key;
 		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_store( $style_key );
 	}
 
