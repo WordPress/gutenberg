@@ -35,7 +35,7 @@ export default function SpacingSizesControl( {
 
 	if ( spacingSizes.length > 8 ) {
 		spacingSizes.unshift( {
-			name: __( 'Inherited' ),
+			name: __( 'Inherit' ),
 			slug: 'default',
 			size: undefined,
 		} );

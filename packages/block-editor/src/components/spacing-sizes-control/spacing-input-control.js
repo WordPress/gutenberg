@@ -18,8 +18,7 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { settings, edit } from '@wordpress/icons';
-import { usePrevious } from '@wordpress/compose';
+import { settings } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,16 +42,6 @@ export default function SpacingInputControl( {
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		value !== undefined && ! isValueSpacingPreset( value )
 	);
-
-	// If control is reset we need to toggle off display custom value control.
-	const previousValue = usePrevious( value );
-	if (
-		showCustomValueControl === true &&
-		value !== previousValue &&
-		( value === undefined || isValueSpacingPreset( value ) )
-	) {
-		setShowCustomValueControl( false );
-	}
 
 	const [ valueNow, setValueNow ] = useState( null );
 
@@ -83,9 +72,7 @@ export default function SpacingInputControl( {
 	};
 
 	const customTooltipContent = ( newValue ) =>
-		value === undefined
-			? __( 'Inherited' )
-			: spacingSizes[ newValue ]?.name;
+		value === undefined ? __( 'Inherit' ) : spacingSizes[ newValue ]?.name;
 
 	const customRangeValue = parseInt( currentValue );
 
@@ -160,27 +147,25 @@ export default function SpacingInputControl( {
 					</Text>
 				) }
 
-			{ value !== undefined && (
-				<Button
-					label={
-						showCustomValueControl
-							? __( 'Use size preset' )
-							: __( 'Set custom size' )
-					}
-					icon={ settings }
-					onClick={ () => {
-						setShowCustomValueControl( ! showCustomValueControl );
-					} }
-					isPressed={ showCustomValueControl }
-					isSmall
-					className={ classnames( {
-						'components-spacing-sizes-control__custom-toggle-all':
-							side === 'all',
-						'components-spacing-sizes-control__custom-toggle-single':
-							side !== 'all',
-					} ) }
-				/>
-			) }
+			<Button
+				label={
+					showCustomValueControl
+						? __( 'Use size preset' )
+						: __( 'Set custom size' )
+				}
+				icon={ settings }
+				onClick={ () => {
+					setShowCustomValueControl( ! showCustomValueControl );
+				} }
+				isPressed={ showCustomValueControl }
+				isSmall
+				className={ classnames( {
+					'components-spacing-sizes-control__custom-toggle-all':
+						side === 'all',
+					'components-spacing-sizes-control__custom-toggle-single':
+						side !== 'all',
+				} ) }
+			/>
 			{ showCustomValueControl && (
 				<>
 					<UnitControl
@@ -205,42 +190,31 @@ export default function SpacingInputControl( {
 					/>
 				</>
 			) }
-			{ spacingSizes.length <= 9 &&
-				! showCustomValueControl &&
-				value !== undefined && (
-					<RangeControl
-						className="components-spacing-sizes-control__range-control"
-						value={ currentValue }
-						onChange={ ( newSize ) =>
-							onChange( getNewPresetValue( newSize ) )
+			{ spacingSizes.length <= 9 && ! showCustomValueControl && (
+				<RangeControl
+					className={ classnames(
+						'components-spacing-sizes-control__range-control',
+						{
+							'component-spacing-sizes-control__not-set':
+								value === undefined,
 						}
-						withInputField={ false }
-						aria-valuenow={ valueNow }
-						aria-valuetext={ spacingSizes[ valueNow ]?.name }
-						renderTooltipContent={ customTooltipContent }
-						min={ 0 }
-						max={ spacingSizes.length - 1 }
-						marks={ marks }
-						label={ ariaLabel }
-						hideLabelFromVision={ true }
-					/>
-				) }
-			{ spacingSizes.length <= 9 &&
-				! showCustomValueControl &&
-				value === undefined && (
-					<Button
-						icon={ edit }
-						label={ __( 'Edit' ) }
-						className={ classnames( {
-							'components-spacing-sizes-control__change-button-all':
-								side === 'all',
-							'components-spacing-sizes-control__change-button-single':
-								side !== 'all',
-						} ) }
-						onClick={ setInitialValue }
-						iconSize={ 24 }
-					/>
-				) }
+					) }
+					value={ currentValue }
+					onChange={ ( newSize ) =>
+						onChange( getNewPresetValue( newSize ) )
+					}
+					onClick={ setInitialValue }
+					withInputField={ false }
+					aria-valuenow={ valueNow }
+					aria-valuetext={ spacingSizes[ valueNow ]?.name }
+					renderTooltipContent={ customTooltipContent }
+					min={ 0 }
+					max={ spacingSizes.length - 1 }
+					marks={ marks }
+					label={ ariaLabel }
+					hideLabelFromVision={ true }
+				/>
+			) }
 			{ spacingSizes.length > 9 && ! showCustomValueControl && (
 				<CustomSelectControl
 					className="components-spacing-sizes-control__custom-select-control"
