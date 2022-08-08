@@ -51,9 +51,12 @@ module.exports = async (
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
+	const creationMessage = blockOnly
+		? `Creating a new block in the "${ folderName }/${ slug }" directory.`
+		: `Creating a new WordPress plugin in the "${ slug }" directory.`;
 
 	info( '' );
-	info( `Creating a new WordPress plugin in the "${ slug }" directory.` );
+	info( creationMessage );
 
 	const view = {
 		$schema,
@@ -128,9 +131,10 @@ module.exports = async (
 	}
 
 	info( '' );
-	success(
-		`Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
-	);
+	const successMessage = blockOnly
+		? `Done: Block "${ title }" bootstrapped in the "${ folderName }/${ slug }" directory.`
+		: `Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`;
+	success( successMessage );
 
 	if ( ! blockOnly && wpScripts ) {
 		info( '' );
@@ -156,11 +160,11 @@ module.exports = async (
 		info( '' );
 		code( '  $ npm run packages-update' );
 		info( '    Updates WordPress packages to the latest version.' );
+		info( '' );
+		info( 'To enter the directory type:' );
+		info( '' );
+		code( `  $ cd ${ slug }` );
 	}
-	info( '' );
-	info( 'To enter the directory type:' );
-	info( '' );
-	code( `  $ cd ${ slug }` );
 	if ( ! blockOnly && wpScripts ) {
 		info( '' );
 		info( 'You can start development with:' );
