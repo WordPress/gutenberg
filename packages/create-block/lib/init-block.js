@@ -70,7 +70,7 @@ module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			const pathName = view.blockOnly
-				? join( process.cwd(), view.folderName, view.slug, outputFile )
+				? join( process.cwd(), view.slug, outputFile )
 				: join( view.folderName, outputFile );
 
 			await writeOutputTemplate(
