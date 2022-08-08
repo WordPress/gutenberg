@@ -679,7 +679,7 @@ registerBlockCollection( 'my-collection', {
 registerBlockType( 'my-collection/block-name', {
 	title: __( 'My First Block' ),
 	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+	save: () => <div>'Hello from the saved content!</div>,
 } );
 ```
 
@@ -693,6 +693,8 @@ _Parameters_
 ### registerBlockStyle
 
 Registers a new block style variation for the given block.
+
+For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
 
 _Usage_
 
@@ -739,7 +741,7 @@ import { registerBlockType } from '@wordpress/blocks';
 registerBlockType( 'namespace/block-name', {
 	title: __( 'My First Block' ),
 	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+	save: () => <div>Hello from the saved content!</div>,
 } );
 ```
 
@@ -755,6 +757,8 @@ _Returns_
 ### registerBlockVariation
 
 Registers a new block variation for the given block type.
+
+For more information on block variations see [the official documentation ](/docs/reference-guides/block-api/block-variations.md)
 
 _Usage_
 

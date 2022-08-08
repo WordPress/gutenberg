@@ -244,7 +244,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * registerBlockType( 'namespace/block-name', {
  *     title: __( 'My First Block' ),
  *     edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
- *     save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+ *     save: () => <div>Hello from the saved content!</div>,
  * } );
  * ```
  *
@@ -372,7 +372,7 @@ function translateBlockSettingUsingI18nSchema(
  * registerBlockType( 'my-collection/block-name', {
  *     title: __( 'My First Block' ),
  *     edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
- *     save: () => <div>{ __( 'Hello from the saved content!' ) }</div>,
+ *     save: () => <div>'Hello from the saved content!</div>,
  * } );
  * ```
  */
@@ -653,6 +653,8 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 /**
  * Registers a new block style variation for the given block.
  *
+ * For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
+ *
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  *
@@ -661,6 +663,7 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * import { __ } from '@wordpress/i18n';
  * import { registerBlockStyle } from '@wordpress/blocks';
  * import { Button } from '@wordpress/components';
+ *
  *
  * const ExampleComponent = () => {
  *     return (
@@ -728,6 +731,8 @@ export const getBlockVariations = ( blockName, scope ) => {
 
 /**
  * Registers a new block variation for the given block type.
+ *
+ * For more information on block variations see [the official documentation ](/docs/reference-guides/block-api/block-variations.md)
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).
  * @param {WPBlockVariation} variation Object describing a block variation.
