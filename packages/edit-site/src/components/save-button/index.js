@@ -30,18 +30,15 @@ export default function SaveButton( {
 	const disabled = ! isDirty || isSaving;
 
 	return (
-		<>
-			<Button
-				variant="primary"
-				className="edit-site-save-button__button"
-				aria-disabled={ disabled }
-				aria-expanded={ isEntitiesSavedStatesOpen }
-				disabled={ disabled }
-				isBusy={ isSaving }
-				onClick={ disabled ? undefined : openEntitiesSavedStates }
-			>
-				{ __( 'Save' ) }
-			</Button>
-		</>
+		<Button
+			variant="primary"
+			className="edit-site-save-button__button"
+			aria-disabled={ disabled }
+			aria-expanded={ isEntitiesSavedStatesOpen }
+			isBusy={ isSaving }
+			onClick={ disabled ? undefined : openEntitiesSavedStates }
+		>
+			{ __( 'Save' ) }
+		</Button>
 	);
 }

@@ -85,6 +85,7 @@
 		"src/spacer/**/*",
 		"src/spinner/**/*",
 		"src/surface/**/*",
+		"src/swatch/**/*",
 		"src/text/**/*",
 		"src/text-control/**/*",
 		"src/text-highlight/**/*",

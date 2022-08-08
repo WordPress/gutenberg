@@ -4,9 +4,45 @@
 
 ### Bug Fix
 
+-   `Popover`: make sure that `ownerDocument` is always defined ([#42886](https://github.com/WordPress/gutenberg/pull/42886)).
+-   `ExternalLink`: Check if the link is an internal anchor link and prevent anchor links from being opened. ([#42259](https://github.com/WordPress/gutenberg/pull/42259)).
+-   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+-   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
+-   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
+-   `TextControl`, `TextareaControl`, `ToggleGroupControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+-   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
+-   `Popover`: fix minor glitch in arrow [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+
+### Enhancements
+
+-   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
+-   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
+-   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+-   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
+-   Update control labels to the new uppercase styles ([#42789](https://github.com/WordPress/gutenberg/pull/42789)).
+-   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+-   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+-   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
+
+### Internal
+
+-   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+-   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
+-   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+-   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
+
+## 19.16.0 (2022-07-27)
+
+### Bug Fix
+
+-   Context System: Stop explicitly setting `undefined` to the `children` prop. This fixes a bug where `Icon` could not be correctly rendered via the `as` prop of a context-connected component ([#42686](https://github.com/WordPress/gutenberg/pull/42686)).
+-   `Popover`, `Dropdown`: Fix width when `expandOnMobile` is enabled ([#42635](https://github.com/WordPress/gutenberg/pull/42635/)).
 -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+-   `ColorPalette`: Fix background image in RTL mode ([#42510](https://github.com/WordPress/gutenberg/pull/42510)).
 -   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
+-   `Tooltip`: avoid unnecessary re-renders of select child elements ([#42483](https://github.com/WordPress/gutenberg/pull/42483)).
+-   `Popover`: Fix offset when the reference element is within an iframe. ([#42417](https://github.com/WordPress/gutenberg/pull/42417)).
 
 ### Enhancements
 
@@ -15,6 +51,7 @@
 -   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
 -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
 -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+-   `ColorPalette`: Display checkered preview background when `value` is transparent ([#42232](https://github.com/WordPress/gutenberg/pull/42232)).
 -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
 -   `Dropdown`: Implement wrapper subcomponent for adding different padding to the dropdown content ([#42595](https://github.com/WordPress/gutenberg/pull/42595/)).
@@ -35,7 +72,9 @@
 -   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+-   `StyleProvider`: Convert to TypeScript ([#42541](https://github.com/WordPress/gutenberg/pull/42541)).
 -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
+-   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
 
 ## 19.15.0 (2022-07-13)
 
@@ -48,12 +87,10 @@
 -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
 -   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
 
-### Enhancement
-
--   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
 
 ### Enhancements
 
+-   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
 -   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
 
 ### Internal

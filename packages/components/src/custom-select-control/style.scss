@@ -1,10 +1,6 @@
 .components-custom-select-control {
 	position: relative;
-}
-
-.components-custom-select-control__label {
-	display: block;
-	margin-bottom: $grid-unit-10;
+	font-size: $default-font-size;
 }
 
 .components-custom-select-control__button {

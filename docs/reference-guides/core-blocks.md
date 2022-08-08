@@ -177,7 +177,7 @@ An advanced block that allows displaying post comments using different visual co
 -	**Name:** core/comments
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
--	**Attributes:** tagName
+-	**Attributes:** legacy, tagName
 
 ## Comments Pagination
 
@@ -485,15 +485,6 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 -	**Supports:** ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
 
-## Post Comments (deprecated)
-
-This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments))
-
--	**Name:** core/post-comments
--	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
--	**Attributes:** textAlign
-
 ## Post Comments Count
 
 Display a post's comments count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count))
@@ -555,7 +546,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, isLink, scale, sizeSlug, width
+-	**Attributes:** height, isLink, linkTarget, rel, scale, sizeSlug, width
 
 ## Post Navigation Link
 
@@ -672,7 +663,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/query-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, textAlign, type
+-	**Attributes:** level, showSearchTerm, textAlign, type
 
 ## Quote
 

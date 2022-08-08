@@ -17,6 +17,7 @@ import { useCallback, useState } from '@wordpress/element';
 import { VisuallyHidden } from '../';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
 import InputBase from '../input-control/input-base';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -138,13 +139,13 @@ export default function CustomSelectControl( {
 				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
-				<label
+				<StyledLabel
 					{ ...getLabelProps( {
 						className: 'components-custom-select-control__label',
 					} ) }
 				>
 					{ label }
-				</label>
+				</StyledLabel>
 			) }
 			<InputBase
 				isFocused={ isOpen || isFocused }

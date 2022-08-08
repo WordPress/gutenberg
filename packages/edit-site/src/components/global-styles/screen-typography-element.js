@@ -18,6 +18,10 @@ const elements = {
 		description: __( 'Manage the fonts and typography used on the links.' ),
 		title: __( 'Links' ),
 	},
+	heading: {
+		description: __( 'Manage the fonts and typography used on headings.' ),
+		title: __( 'Headings' ),
+	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
 		title: __( 'Buttons' ),

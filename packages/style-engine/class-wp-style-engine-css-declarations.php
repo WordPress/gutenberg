@@ -116,15 +116,23 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Filters and compiles the CSS declarations.
 	 *
+	 * @param boolean $should_prettify Whether to add spacing, new lines and indents.
+	 * @param number  $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
+	 *
 	 * @return string The CSS declarations.
 	 */
-	public function get_declarations_string() {
+	public function get_declarations_string( $should_prettify = false, $indent_count = 0 ) {
 		$declarations_array  = $this->get_declarations();
 		$declarations_output = '';
+		$indent              = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
+		$suffix              = $should_prettify ? ' ' : '';
+		$suffix              = $should_prettify && $indent_count > 0 ? "\n" : $suffix;
+
 		foreach ( $declarations_array as $property => $value ) {
-			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}: {$value}" ) );
+			$spacer               = $should_prettify ? ' ' : '';
+			$filtered_declaration = esc_html( safecss_filter_attr( "{$property}:{$spacer}{$value}" ) );
 			if ( $filtered_declaration ) {
-				$declarations_output .= $filtered_declaration . '; ';
+				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
 		return rtrim( $declarations_output );

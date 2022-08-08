@@ -3,11 +3,11 @@
  */
 import { Keyboard } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { delay } from 'lodash';
+
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 import { LinkPicker } from '@wordpress/components';
 
@@ -19,9 +19,12 @@ import linkSettingsScreens from './screens';
 const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
+	const navigateToLinkTimeoutRef = useRef( null );
+	const navigateBackTimeoutRef = useRef( null );
+
 	const onLinkPicked = ( { url, title } ) => {
 		Keyboard.dismiss();
-		delay( () => {
+		navigateToLinkTimeoutRef.current = setTimeout( () => {
 			navigation.navigate( linkSettingsScreens.settings, {
 				inputValue: url,
 				text: title,
@@ -31,10 +34,17 @@ const LinkPickerScreen = () => {
 
 	const onCancel = () => {
 		Keyboard.dismiss();
-		delay( () => {
+		navigateBackTimeoutRef.current = setTimeout( () => {
 			navigation.goBack();
 		}, 100 );
 	};
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( navigateToLinkTimeoutRef.current );
+			clearTimeout( navigateBackTimeoutRef.current );
+		};
+	}, [] );
 
 	const { inputValue } = route.params;
 	return useMemo( () => {

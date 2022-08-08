@@ -12,14 +12,12 @@ import { COLORS } from '../../utils';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
-	box-sizing: border-box;
 	text-align: center;
 	width: 100%;
 `;
 
 export const MediaContainer = styled.div`
 	align-items: center;
-	box-sizing: border-box;
 	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
 	cursor: pointer;
 	display: inline-flex;
@@ -44,7 +42,6 @@ export const MediaContainer = styled.div`
 
 export const MediaPlaceholder = styled.div`
 	background: ${ COLORS.lightGray[ 300 ] };
-	box-sizing: border-box;
 	height: 170px;
 	max-width: 280px;
 	min-width: 200px;
@@ -61,7 +58,6 @@ export const ControlWrapper = styled( Flex )`
 `;
 
 export const GridView = styled.div`
-	box-sizing: border-box;
 	left: 50%;
 	opacity: 0;
 	overflow: hidden;
@@ -80,7 +76,6 @@ export const GridView = styled.div`
 `;
 
 export const GridLine = styled.div`
-	box-sizing: border-box;
 	background: white;
 	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
 	position: absolute;
