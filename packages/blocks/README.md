@@ -907,7 +907,7 @@ import { setGroupingBlockName } from '@wordpress/blocks';
 const ExampleComponent = () => {
 	return (
 		<Button onClick={ () => setGroupingBlockName( 'core/columns' ) }>
-			{ __( 'Set the default grouping block to Columns' ) }
+			{ __( 'Set the default block to Heading' ) }
 		</Button>
 	);
 };
