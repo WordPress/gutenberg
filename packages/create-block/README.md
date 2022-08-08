@@ -41,6 +41,7 @@ Options:
 ```bash
 -V, --version                output the version number
 -t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+--block-only                 scaffold a new block
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block and the WordPress plugin
 --short-description <value>  short description for the block and the WordPress plugin
