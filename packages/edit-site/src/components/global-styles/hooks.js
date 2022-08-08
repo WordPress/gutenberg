@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { getValueFromVariableOrRef, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
@@ -127,22 +127,22 @@ export function useStyle( path, blockName, source = 'all' ) {
 	let result;
 	switch ( source ) {
 		case 'all':
-			result = getValueFromVariable(
-				mergedConfig.settings,
+			result = getValueFromVariableOrRef(
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
-			result = getValueFromVariable(
-				mergedConfig.settings,
+			result = getValueFromVariableOrRef(
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath )
 			);
 			break;
 		case 'base':
-			result = getValueFromVariable(
-				baseConfig.settings,
+			result = getValueFromVariableOrRef(
+				baseConfig,
 				blockName,
 				get( baseConfig, finalPath )
 			);

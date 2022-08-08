@@ -219,6 +219,26 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 	return getValueFromVariable( features, blockName, result );
 }
 
+export function getValueFromVariableOrRef(
+	themeJSONObject,
+	blockName,
+	variable
+) {
+	if (
+		typeof variable !== 'string' &&
+		variable?.ref &&
+		typeof variable.ref === 'string'
+	) {
+		const refPath = variable.ref.split( '.' );
+		variable = get( themeJSONObject, refPath );
+	}
+	return getValueFromVariable(
+		themeJSONObject.settings,
+		blockName,
+		variable
+	);
+}
+
 export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
 		return variable;
