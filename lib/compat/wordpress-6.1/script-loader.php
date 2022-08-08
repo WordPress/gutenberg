@@ -19,10 +19,14 @@
  *
  * @link https://core.trac.wordpress.org/ticket/53494.
  *
+ * @deprecated 6.1 Block supports styles are now stored for enqueuing via the style engine API. See: packages/style-engine/README.md.
+ *
  * @param string $style String containing the CSS styles to be added.
  * @param int    $priority To set the priority for the add_action.
  */
 function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
+	_deprecated_function( __FUNCTION__, '6.1' );
+
 	$action_hook_name = 'wp_footer';
 	if ( wp_is_block_theme() ) {
 		$action_hook_name = 'wp_head';
