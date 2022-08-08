@@ -53,7 +53,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
-	// behaviour. Filtering CSS only values prevents invalid style values.
+	// behaviour. Filtering CSS unit only values prevents invalid style values.
 	const [ selectedUnits, setSelectedUnits ] = useState( {
 		flat:
 			typeof values === 'string'
