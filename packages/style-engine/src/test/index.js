@@ -51,6 +51,8 @@ describe( 'generate', () => {
 					color: {
 						text: '#cccccc',
 						background: '#111111',
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -77,7 +79,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			'.some-selector { color: #cccccc; background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }'
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -202,6 +204,8 @@ describe( 'getCSSRules', () => {
 					color: {
 						text: '#dddddd',
 						background: '#555555',
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -230,6 +234,11 @@ describe( 'getCSSRules', () => {
 			},
 			{
 				selector: '.some-selector',
+				key: 'background',
+				value: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+			},
+			{
+				selector: '.some-selector',
 				key: 'backgroundColor',
 				value: '#555555',
 			},
@@ -252,6 +261,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'paddingBottom',
 				value: '5px',
+			},
+			{
+				key: 'fontFamily',
+				selector: '.some-selector',
+				value: "'Helvetica Neue',sans-serif",
 			},
 			{
 				key: 'fontSize',
