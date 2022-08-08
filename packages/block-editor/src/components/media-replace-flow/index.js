@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -38,6 +33,7 @@ import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+let uniqueId = 0;
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -59,14 +55,11 @@ const MediaReplaceFlow = ( {
 	addToGallery,
 	handleUpload = true,
 } ) => {
-	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = useRef();
-	const errorNoticeID = uniqueId(
-		'block-editor/media-replace-flow/error-notice/'
-	);
+	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -94,7 +87,6 @@ const MediaReplaceFlow = ( {
 			onToggleFeaturedImage();
 		}
 		closeMenu();
-		setMediaURLValue( media?.url );
 		// Calling `onSelect` after the state update since it might unmount the component.
 		onSelect( media );
 		speak( __( 'The media file has been replaced' ) );
@@ -219,14 +211,13 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURLValue } position="bottom">
+							<Tooltip text={ mediaURL } position="bottom">
 								<div>
 									<LinkControl
-										value={ { url: mediaURLValue } }
+										value={ { url: mediaURL } }
 										settings={ [] }
 										showSuggestions={ false }
 										onChange={ ( { url } ) => {
-											setMediaURLValue( url );
 											onSelectURL( url );
 											editMediaButtonRef.current.focus();
 										} }

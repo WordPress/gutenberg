@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,21 +23,41 @@ export default function ResponsiveWrapper( {
 	isResponsive,
 	onToggle,
 	isHiddenByDefault,
-	classNames,
-	styles,
+	overlayBackgroundColor,
+	overlayTextColor,
 	hasIcon,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
 	}
+
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
-		classNames,
 		{
+			'has-text-color':
+				!! overlayTextColor.color || !! overlayTextColor?.class,
+			[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
+				!! overlayTextColor?.slug,
+			'has-background':
+				!! overlayBackgroundColor.color ||
+				overlayBackgroundColor?.class,
+			[ getColorClassName(
+				'background-color',
+				overlayBackgroundColor?.slug
+			) ]: !! overlayBackgroundColor?.slug,
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
 		}
 	);
+
+	const styles = {
+		color: ! overlayTextColor?.slug && overlayTextColor?.color,
+		backgroundColor:
+			! overlayBackgroundColor?.slug &&
+			overlayBackgroundColor?.color &&
+			overlayBackgroundColor.color,
+	};
+
 	const openButtonClasses = classnames(
 		'wp-block-navigation__responsive-container-open',
 		{ 'always-shown': isHiddenByDefault }

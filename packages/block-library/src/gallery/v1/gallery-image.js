@@ -16,6 +16,7 @@ import {
 	RichText,
 	MediaPlaceholder,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
@@ -245,6 +246,9 @@ class GalleryImage extends Component {
 				{ ! isEditing && ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Image caption text' ) }
 						placeholder={ isSelected ? __( 'Add caption' ) : null }
 						value={ caption }

@@ -22,10 +22,6 @@ figure.wp-block-image:not(.wp-block) {
 		margin-top: -9px;
 		margin-left: -9px;
 	}
-
-	&:not(.is-style-rounded) > div:not(.components-placeholder) {
-		border-radius: inherit;
-	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
@@ -94,6 +90,15 @@ figure.wp-block-image:not(.wp-block) {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
+	overflow: hidden;
+
+	// This removes the border from the img within the image cropper so it
+	// can be applied to the cropper itself. This then allows the image to be
+	// cropped within the visual border providing more accurate editing and
+	// smoother UX.
+	.reactEasyCrop_Container .reactEasyCrop_Image {
+		border: none;
+	}
 }
 
 .wp-block-image__crop-icon {

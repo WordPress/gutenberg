@@ -392,7 +392,7 @@ describe( 'Links', () => {
 		await page.waitForSelector( '.block-editor-link-control__search-item' );
 		await page.keyboard.press( 'ArrowDown' );
 
-		// Expect the the escape key to dismiss the popover when the autocomplete suggestion list is open.
+		// Expect the escape key to dismiss the popover when the autocomplete suggestion list is open.
 		await page.keyboard.press( 'Escape' );
 		expect(
 			await page.$(
@@ -417,7 +417,7 @@ describe( 'Links', () => {
 			)
 		).not.toBeNull();
 
-		// Expect the the escape key to dismiss the popover normally.
+		// Expect the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
 		expect(
 			await page.$(
@@ -440,7 +440,7 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
-		// Expect the the escape key to dismiss the popover normally.
+		// Expect the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
 		expect(
 			await page.$(

@@ -8,6 +8,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { BaseControl } from '../base-control';
 import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -32,6 +33,8 @@ function FontSizePicker(
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
+		/** @type {'default' | '__unstable-large'} */
+		size = 'default',
 		value,
 		withSlider = false,
 		withReset = true,
@@ -52,7 +55,7 @@ function FontSizePicker(
 	 * than six and a select control when they are more.
 	 */
 	const fontSizesContainComplexValues = fontSizes.some(
-		( { size } ) => ! isSimpleCssValue( size )
+		( { size: sizeArg } ) => ! isSimpleCssValue( sizeArg )
 	);
 	const shouldUseSelectControl = fontSizes.length > 5;
 	const options = useMemo(
@@ -131,12 +134,16 @@ function FontSizePicker(
 				className={ `${ baseClassName }__header` }
 			>
 				<FlexItem>
-					{ __( 'Size' ) }
-					{ headerHint && (
-						<span className={ `${ baseClassName }__header__hint` }>
-							{ headerHint }
-						</span>
-					) }
+					<BaseControl.VisualLabel>
+						{ __( 'Size' ) }
+						{ headerHint && (
+							<span
+								className={ `${ baseClassName }__header__hint` }
+							>
+								{ headerHint }
+							</span>
+						) }
+					</BaseControl.VisualLabel>
 				</FlexItem>
 				{ ! disableCustomFontSizes && (
 					<FlexItem>
@@ -163,6 +170,7 @@ function FontSizePicker(
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<CustomSelectControl
+							__nextUnconstrainedWidth
 							className={ `${ baseClassName }__select` }
 							label={ __( 'Font size' ) }
 							hideLabelFromVision
@@ -181,6 +189,7 @@ function FontSizePicker(
 									setShowCustomValueControl( true );
 								}
 							} }
+							size={ size }
 						/>
 					) }
 				{ ! shouldUseSelectControl && ! showCustomValueControl && (
@@ -194,6 +203,7 @@ function FontSizePicker(
 							);
 						} }
 						isBlock
+						size={ size }
 					>
 						{ options.map( ( option ) => (
 							<ToggleGroupControlOption
@@ -233,6 +243,7 @@ function FontSizePicker(
 											);
 										}
 									} }
+									size={ size }
 									units={ hasUnits ? units : [] }
 								/>
 							</FlexItem>

@@ -1,6 +1,6 @@
 # Managing Packages
 
-This repository uses [lerna] to manage WordPress modules and publish them as packages to [npm].
+This repository uses [monorepo] to manage WordPress modules and publish them with [lerna] as packages to [npm].
 
 ## Creating a New Package
 
@@ -101,7 +101,7 @@ Next, you need to run `npm install` in the root of the project to ensure that `p
 
 #### Updating Existing Dependencies
 
-This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
+This is the most confusing part of working with [monorepo] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
 
 1.  First, remove the existing dependency as described in the previous section.
 2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
@@ -180,64 +180,7 @@ While other section naming can be used when appropriate, it's important that are
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
-
-## Releasing Packages
-
-Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check` from the branch that keeps the code for a given `wp/X.Y` release type (example `wp/5.7`).
-
-If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
-
-### Before Releasing
-
-Confirm that you're logged in to [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
-
-If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
-
-```json
-{
-	"publishConfig": {
-		"access": "public"
-	}
-}
-```
-
-You can check your package configs by running `npm run lint-pkg-json`.
-
-### Development Release
-
-Run the following commands from the `trunk` branch to publish to npm (with a `next` dist tag) a development version of the packages.
-
-```bash
-npm install
-./bin/plugin/cli.js npm-next
-```
-
-See more details in [Development Releases](/docs/contributors/code/release.md#development-releases) section of the Gutenberg release process documentation.
-
-### Production Release
-
-To release a production version for the outdated packages, run the following commands from the `trunk` branch:
-
-```bash
-npm install
-./bin/plugin/cli.js npm-latest
-```
-
-See more details in [Synchronizing WordPress Trunk](/docs/contributors/code/release.md#synchronizing-wordpress-trunk) section of the Gutenberg release process documentation.
-
-### Legacy Patch Release
-
-To release a patch for the older major or minor version of packages, run the following commands from the corresponding `wp/X.Y` (example `wp/5.7`) release branch:
-
-```bash
-npm install
-npm run publish:patch
-```
-
-This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.
-
-See more details in [Minor WordPress Releases](/docs/contributors/code/release.md#minor-wordpress-releases) section of the Gutenberg release process documentation.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 
@@ -296,6 +239,7 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
 [lerna]: https://lerna.js.org/
+[monorepo]: https://monorepo.tools
 [npm]: https://www.npmjs.com/
 
 ## Optimizing for bundlers
@@ -323,4 +267,8 @@ If your package includes a few files with side effects, you can list them instea
 }
 ```
 
-Please consult the [side effects documentation](./side-effects.md) for more information on identifying and declaring side effects.
+Please consult the [side effects documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/side-effects.md) for more information on identifying and declaring side effects.
+
+## Publishing to npm
+
+Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates).

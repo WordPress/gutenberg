@@ -293,6 +293,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+					imageSizeHelp={ __( 'Select which image size to load.' ) }
 				/>
 			) }
 			{ mediaUrl && (
@@ -354,6 +355,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 				) }
 			</BlockControls>
 			<div { ...blockProps }>
+				{ mediaPosition === 'right' && <div { ...innerBlocksProps } /> }
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -373,7 +375,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaWidth,
 					} }
 				/>
-				<div { ...innerBlocksProps } />
+				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
 			</div>
 		</>
 	);

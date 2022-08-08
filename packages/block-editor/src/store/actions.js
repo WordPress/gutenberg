@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, findKey, first, isObject, last, some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -26,6 +21,13 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import {
+	retrieveSelectedAttribute,
+	START_OF_SELECTED_AREA,
+} from '../utils/selection';
+
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
  * Action which will insert a default block insert action if there
@@ -392,7 +394,7 @@ export const replaceBlocks =
 			castArray( blocks ),
 			select.getSettings()
 		);
-		const rootClientId = select.getBlockRootClientId( first( clientIds ) );
+		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
 			const block = blocks[ index ];
@@ -579,7 +581,7 @@ export const insertBlocks =
 	) =>
 	( { select, dispatch } ) => {
 		/* eslint-enable jsdoc/valid-types */
-		if ( isObject( initialPosition ) ) {
+		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
 			deprecated(
@@ -771,10 +773,6 @@ export const __unstableDeleteSelection =
 			...mapRichTextSettings( attributeDefinitionB ),
 		} );
 
-		// A robust way to retain selection position through various transforms
-		// is to insert a special character at the position and then recover it.
-		const START_OF_SELECTED_AREA = '\u0086';
-
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
@@ -822,12 +820,7 @@ export const __unstableDeleteSelection =
 			);
 		}
 
-		const newAttributeKey = findKey(
-			updatedAttributes,
-			( v ) =>
-				typeof v === 'string' &&
-				v.indexOf( START_OF_SELECTED_AREA ) !== -1
-		);
+		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
 		const convertedValue = create( {
@@ -1052,10 +1045,6 @@ export const mergeBlocks =
 			}
 		}
 
-		// A robust way to retain selection position through various transforms
-		// is to insert a special character at the position and then recover it.
-		const START_OF_SELECTED_AREA = '\u0086';
-
 		// Clone the blocks so we don't insert the character in a "live" block.
 		const cloneA = cloneBlock( blockA );
 		const cloneB = cloneBlock( blockB );
@@ -1098,12 +1087,8 @@ export const mergeBlocks =
 		);
 
 		if ( canRestoreTextSelection ) {
-			const newAttributeKey = findKey(
-				updatedAttributes,
-				( v ) =>
-					typeof v === 'string' &&
-					v.indexOf( START_OF_SELECTED_AREA ) !== -1
-			);
+			const newAttributeKey =
+				retrieveSelectedAttribute( updatedAttributes );
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
 			const convertedValue = create( {
 				html: convertedHtml,
@@ -1517,7 +1502,7 @@ export const duplicateBlocks =
 
 		// Return early if blocks don't exist.
 		const blocks = select.getBlocksByClientId( clientIds );
-		if ( some( blocks, ( block ) => ! block ) ) {
+		if ( blocks.some( ( block ) => ! block ) ) {
 			return;
 		}
 
@@ -1533,8 +1518,9 @@ export const duplicateBlocks =
 		}
 
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
+		const clientIdsArray = castArray( clientIds );
 		const lastSelectedIndex = select.getBlockIndex(
-			last( castArray( clientIds ) )
+			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
 			__experimentalCloneSanitizedBlock( block )
@@ -1547,8 +1533,8 @@ export const duplicateBlocks =
 		);
 		if ( clonedBlocks.length > 1 && updateSelection ) {
 			dispatch.multiSelect(
-				first( clonedBlocks ).clientId,
-				last( clonedBlocks ).clientId
+				clonedBlocks[ 0 ].clientId,
+				clonedBlocks[ clonedBlocks.length - 1 ].clientId
 			);
 		}
 		return clonedBlocks.map( ( block ) => block.clientId );

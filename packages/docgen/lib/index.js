@@ -11,6 +11,7 @@ const { last } = require( 'lodash' );
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
 const isSymbolPrivate = require( './is-symbol-private' );
+const isSymbolIgnore = require( './is-symbol-ignore' );
 
 /**
  * Helpers functions.
@@ -119,7 +120,7 @@ module.exports = ( sourceFile, options ) => {
 	// Process.
 	const result = processFile( processDir, sourceFile );
 	const filteredIR = result.ir.filter( ( symbol ) => {
-		if ( isSymbolPrivate( symbol ) ) {
+		if ( isSymbolPrivate( symbol ) || isSymbolIgnore( symbol ) ) {
 			return false;
 		}
 

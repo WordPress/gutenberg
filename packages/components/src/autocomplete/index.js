@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escapeRegExp, find, deburr } from 'lodash';
+import { escapeRegExp, find } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -284,7 +285,7 @@ function useAutocomplete( {
 			return;
 		}
 
-		const text = deburr( textContent );
+		const text = removeAccents( textContent );
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
@@ -375,14 +376,10 @@ function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query );
-	}, [
-		textContent,
-		AutocompleterUI,
-		autocompleter,
-		completers,
-		record,
-		filteredOptions.length,
-	] );
+		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+		// See https://github.com/WordPress/gutenberg/pull/41820
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
 	const { className } = autocompleter || {};

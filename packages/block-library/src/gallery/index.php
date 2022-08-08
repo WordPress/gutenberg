@@ -50,9 +50,13 @@ function block_core_gallery_render( $attributes, $content ) {
 	// because we only want to match against the value, not the CSS attribute.
 	if ( is_array( $gap ) ) {
 		foreach ( $gap as $key => $value ) {
+			// Make sure $value is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
+			$value       = is_string( $value ) ? $value : '';
 			$gap[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
 		}
 	} else {
+		// Make sure $gap is a string to avoid PHP 8.1 deprecation error in preg_match() when the value is null.
+		$gap = is_string( $gap ) ? $gap : '';
 		$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? null : $gap;
 	}
 
@@ -77,7 +81,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$style = '.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+	$style = '.wp-block-gallery.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
 
 	gutenberg_enqueue_block_support_styles( $style, 11 );
 	return $content;

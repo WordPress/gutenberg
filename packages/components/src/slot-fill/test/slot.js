@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
 import { render, fireEvent } from '@testing-library/react';
 
 /**
@@ -120,9 +119,9 @@ describe( 'Slot', () => {
 				<div>
 					<Slot name="chicken">
 						{ ( fills ) =>
-							! isEmpty( fills ) && (
+							[ ...fills ].length ? (
 								<blockquote>{ fills }</blockquote>
-							)
+							) : null
 						}
 					</Slot>
 				</div>

@@ -147,6 +147,13 @@ export interface FormTokenFieldProps
 	 * @default true
 	 */
 	__experimentalShowHowTo?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next36pxDefaultSize?: boolean;
 }
 
 export interface SuggestionsListProps< T = string | { value: string } > {

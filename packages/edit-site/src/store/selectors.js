@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, keyBy } from 'lodash';
+import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -341,10 +341,16 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = keyBy(
-			templateParts,
-			( templatePart ) => templatePart.id
-		);
+		const templatePartsById = templateParts
+			? // Key template parts by their ID.
+			  templateParts.reduce(
+					( newTemplateParts, part ) => ( {
+						...newTemplateParts,
+						[ part.id ]: part,
+					} ),
+					{}
+			  )
+			: {};
 
 		return ( template.blocks ?? [] )
 			.filter( ( block ) => isTemplatePart( block ) )

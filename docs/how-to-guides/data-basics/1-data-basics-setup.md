@@ -43,6 +43,29 @@ window.addEventListener(
 	background: #fff;
 	height: 1000px;
 }
+button .components-spinner {
+	width: 15px;
+	height: 15px;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+.form-buttons {
+	display: flex;
+}
+.my-gutenberg-form .form-buttons {
+	margin-top: 20px;
+	margin-left: 1px;
+}
+.form-error {
+	color: #cc1818;
+}
+.form-buttons button {
+	margin-right: 4px;
+}
+.form-buttons .components-spinner {
+	margin-top: 0;
+}
 #my-first-gutenberg-app {
 	max-width: 500px;
 }
@@ -50,26 +73,22 @@ window.addEventListener(
 #my-first-gutenberg-app ul li {
 	list-style-type: disc;
 }
-.my-gutenberg-form .form-buttons {
-	display: flex;
-	margin-top: 20px;
-	margin-left: 1px;
-}
-.my-gutenberg-form .form-error {
-	color: #cc1818;
-}
-.my-gutenberg-form .form-buttons button {
-	margin-right: 4px;
-}
-.my-gutenberg-form .form-buttons .components-spinner {
-	margin-top: 0;
-}
 #my-first-gutenberg-app ul {
 	padding-left: 20px;
 }
 #my-first-gutenberg-app .components-search-control__input {
 	height: 36px;
 	margin-left: 0;
+}
+
+#my-first-gutenberg-app .list-controls {
+	display: flex;
+	width: 100%;
+}
+
+#my-first-gutenberg-app .list-controls .components-search-control {
+	flex-grow: 1;
+	margin-right: 8px;
 }
 ```
 

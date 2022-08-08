@@ -41,7 +41,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		const isWeb = Platform.OS === 'web';
 		const { canUser, getEntityRecord } = select( coreStore );
 
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -127,6 +129,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'disableLayoutStyles',
 				'enableCustomLineHeight',
 				'enableCustomSpacing',
 				'enableCustomUnits',
@@ -136,6 +139,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'generateAnchors',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'hasInlineToolbar',
 				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',

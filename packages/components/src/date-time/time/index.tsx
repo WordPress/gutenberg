@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import BaseControl from '../../base-control';
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
 import TimeZone from './timezone';
@@ -19,7 +20,6 @@ import type { TimePickerProps } from '../types';
 import {
 	Wrapper,
 	Fieldset,
-	Legend,
 	HoursInput,
 	TimeSeparator,
 	MinutesInput,
@@ -220,11 +220,12 @@ export function TimePicker( {
 			className="components-datetime__time" // Unused, for backwards compatibility.
 		>
 			<Fieldset>
-				<Legend
+				<BaseControl.VisualLabel
+					as="legend"
 					className="components-datetime__time-legend" // Unused, for backwards compatibility.
 				>
 					{ __( 'Time' ) }
-				</Legend>
+				</BaseControl.VisualLabel>
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
@@ -309,11 +310,12 @@ export function TimePicker( {
 				</HStack>
 			</Fieldset>
 			<Fieldset>
-				<Legend
+				<BaseControl.VisualLabel
+					as="legend"
 					className="components-datetime__time-legend" // Unused, for backwards compatibility.
 				>
 					{ __( 'Date' ) }
-				</Legend>
+				</BaseControl.VisualLabel>
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>

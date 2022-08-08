@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, compact, uniq, map, mapKeys } from 'lodash';
+import { camelCase, find, get, includes, map, mapKeys, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,7 +50,8 @@ export const getCurrentUser =
  * @param {string}           name  Entity name.
  * @param {number|string}    key   Record's key
  * @param {Object|undefined} query Optional object of query parameters to
- *                                 include with request.
+ *                                 include with request. If requesting specific
+ *                                 fields, fields must always include the ID.
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
@@ -131,7 +132,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  *
  * @param {string}  kind  Entity kind.
  * @param {string}  name  Entity name.
- * @param {Object?} query Query Object.
+ * @param {Object?} query Query Object. If requesting specific fields, fields
+ *                        must always include the ID.
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
@@ -304,7 +306,7 @@ export const canUser =
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
 		const allowHeader = response.headers?.get( 'allow' );
-		const key = compact( [ action, resource, id ] ).join( '/' );
+		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
 		const isAllowed = includes( allowHeader, method );
 		dispatch.receiveUserPermission( key, isAllowed );
 	};
@@ -339,11 +341,10 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
-		const { rest_base: restBase } = await resolveSelect.getPostType(
-			postType
-		);
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			await resolveSelect.getPostType( postType );
 		const autosaves = await apiFetch( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
 
 		if ( autosaves && autosaves.length ) {
@@ -476,16 +477,7 @@ export const getBlockPatterns =
 			path: '/wp/v2/block-patterns/patterns',
 		} );
 		const patterns = map( restPatterns, ( pattern ) =>
-			mapKeys( pattern, ( value, key ) => {
-				switch ( key ) {
-					case 'block_types':
-						return 'blockTypes';
-					case 'viewport_width':
-						return 'viewportWidth';
-					default:
-						return key;
-				}
-			} )
+			mapKeys( pattern, ( value, key ) => camelCase( key ) )
 		);
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};

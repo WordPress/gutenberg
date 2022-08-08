@@ -3,7 +3,6 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +30,7 @@ afterEach( () => {
 	container = null;
 } );
 
-const inputId = uniqueId();
+const inputId = 'input-12345678';
 
 const sizeOptions = [
 	{

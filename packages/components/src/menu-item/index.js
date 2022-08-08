@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +40,7 @@ export function MenuItem( props, ref ) {
 		);
 	}
 
-	if ( icon && ! isString( icon ) ) {
+	if ( icon && typeof icon !== 'string' ) {
 		icon = cloneElement( icon, {
 			className: classnames( 'components-menu-items__item-icon', {
 				'has-icon-right': iconPosition === 'right',

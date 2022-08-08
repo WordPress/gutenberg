@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clamp } from 'lodash';
-
-/**
  * Parses and retrieves a number value.
  *
  * @param {unknown} value The incoming value.
@@ -59,6 +54,20 @@ export function subtract( ...args ) {
 function getPrecision( value ) {
 	const split = ( value + '' ).split( '.' );
 	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
+}
+
+/**
+ * Clamps a value based on a min/max range.
+ *
+ * @param {number} value The value.
+ * @param {number} min   The minimum range.
+ * @param {number} max   The maximum range.
+ *
+ * @return {number} The clamped value.
+ */
+export function clamp( value, min, max ) {
+	const baseValue = getNumber( value );
+	return Math.max( min, Math.min( baseValue, max ) );
 }
 
 /**

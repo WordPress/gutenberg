@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, keys, isEqual } from 'lodash';
+import { omit, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ export function getPostRawValue( value ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	return isEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**

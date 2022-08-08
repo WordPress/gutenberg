@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -49,7 +44,9 @@ function MenuTitleSearch( {
 			return;
 		}
 
-		const count = filter( items, '_isVisible' ).length;
+		const count = Object.values( items ).filter(
+			( item ) => item._isVisible
+		).length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),

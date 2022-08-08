@@ -118,7 +118,11 @@ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
 			contentClassName="components-color-palette__custom-color-dropdown-content"
 			popoverProps={
 				isRenderedInSidebar
-					? { placement: 'left-start', offset: 20 }
+					? {
+							placement: 'left-start',
+							offset: 20,
+							__unstableShift: true,
+					  }
 					: undefined
 			}
 			{ ...props }
@@ -156,6 +160,13 @@ export const extractColorNameFromCurrentValue = (
 
 	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
 	return __( 'Custom' );
+};
+
+export const showTransparentBackground = ( currentValue ) => {
+	if ( typeof currentValue === 'undefined' ) {
+		return true;
+	}
+	return colord( currentValue ).alpha() === 0;
 };
 
 export default function ColorPalette( {
@@ -224,14 +235,18 @@ export default function ColorPalette( {
 							aria-haspopup="true"
 							onClick={ onToggle }
 							aria-label={ customColorAccessibleLabel }
-							style={ {
-								background: value,
-								color:
-									colordColor.contrast() >
-									colordColor.contrast( '#000' )
-										? '#fff'
-										: '#000',
-							} }
+							style={
+								showTransparentBackground( value )
+									? { color: '#000' }
+									: {
+											background: value,
+											color:
+												colordColor.contrast() >
+												colordColor.contrast( '#000' )
+													? '#fff'
+													: '#000',
+									  }
+							}
 						>
 							<FlexItem
 								isBlock

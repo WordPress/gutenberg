@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { get, find, isString } from 'lodash';
+import { get, find } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { getTypographyFontSizeValue } from './typography-utils';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -11,6 +16,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -57,6 +63,8 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
+		valueFunc: ( preset, { typography: typographySettings } ) =>
+			getTypographyFontSizeValue( preset, typographySettings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -75,6 +83,11 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
+	'elements.button.color.text': 'color',
+	'elements.button.backgroundColor': 'background-color',
+	'elements.heading.color': 'color',
+	'elements.heading.backgroundColor': 'background-color',
+	'elements.heading.gradient': 'gradient',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
@@ -210,7 +223,7 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
 }
 
 export function getValueFromVariable( features, blockName, variable ) {
-	if ( ! variable || ! isString( variable ) ) {
+	if ( ! variable || typeof variable !== 'string' ) {
 		return variable;
 	}
 	const USER_VALUE_PREFIX = 'var:';
@@ -251,4 +264,35 @@ export function getValueFromVariable( features, blockName, variable ) {
 		);
 	}
 	return variable;
+}
+
+/**
+ * Function that scopes a selector with another one. This works a bit like
+ * SCSS nesting except the `&` operator isn't supported.
+ *
+ * @example
+ * ```js
+ * const scope = '.a, .b .c';
+ * const selector = '> .x, .y';
+ * const merged = scopeSelector( scope, selector );
+ * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
+ * ```
+ *
+ * @param {string} scope    Selector to scope to.
+ * @param {string} selector Original selector.
+ *
+ * @return {string} Scoped selector.
+ */
+export function scopeSelector( scope, selector ) {
+	const scopes = scope.split( ',' );
+	const selectors = selector.split( ',' );
+
+	const selectorsScoped = [];
+	scopes.forEach( ( outer ) => {
+		selectors.forEach( ( inner ) => {
+			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
+		} );
+	} );
+
+	return selectorsScoped.join( ', ' );
 }

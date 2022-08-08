@@ -27,56 +27,70 @@ function Example() {
 
 ## Props
 
-##### align
-
-**Type**: `CSS['alignItems']`
+##### `align`: `CSS['alignItems']`
 
 Adjusts the block alignment of children.
 
-##### alignment
+-   Required: No
 
-**Type**: `GridAlignment`
+##### `alignment`: `GridAlignment`
 
 Adjusts the horizontal and vertical alignment of children.
 
-##### columns
+-   Required: No
 
-**Type**: `number`,`(number`,`null)[]`
+##### `columnGap`: `CSSProperties['gridColumnGap']`
+
+Adjusts the `grid-column-gap`.
+
+-   Required: No
+
+##### `columns`: `number`
 
 Adjusts the number of columns of the `Grid`.
 
-##### gap
+-   Required: No
+-   Default: `2`
 
-**Type**: `number`
+##### `gap`: `number`
 
 Gap between each child.
 
-##### isInline
+-   Required: No
+-   Default: `3`
 
-**Type**: `boolean`
+##### `isInline`: `boolean`
 
 Changes the CSS display from `grid` to `inline-grid`.
 
-##### justify
+-   Required: No
 
-**Type**: `CSS['justifyContent']`
+##### `justify`: `CSS['justifyContent']`
 
 Adjusts the inline alignment of children.
 
-##### rows
+-   Required: No
 
-**Type**: `number`,`(number`,`null)[]`
+##### `rowGap`: `CSSProperties['gridRowGap']`
+
+Adjusts the `grid-row-gap`.
+
+-   Required: No
+
+##### `rows`: `number`
 
 Adjusts the number of rows of the `Grid`.
 
-##### templateColumns
+-   Required: No
 
-**Type**: `CSS['gridTemplateColumns']`
+##### `templateColumns`: `CSS['gridTemplateColumns']`
 
 Adjusts the CSS grid `template-columns`.
 
-##### templateRows
+-   Required: No
 
-**Type**: `CSS['gridTemplateRows']`
+##### `templateRows`: `CSS['gridTemplateRows']`
 
 Adjusts the CSS grid `template-rows`.
+
+-   Required: No

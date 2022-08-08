@@ -4,8 +4,6 @@
 import {
 	pickBy,
 	isEmpty,
-	isObject,
-	identity,
 	mapValues,
 	forEach,
 	get,
@@ -19,6 +17,8 @@ import {
  */
 import { getBlockSupport } from '@wordpress/blocks';
 
+const identity = ( x ) => x;
+
 /**
  * Removed falsy values from nested object.
  *
@@ -26,7 +26,11 @@ import { getBlockSupport } from '@wordpress/blocks';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(

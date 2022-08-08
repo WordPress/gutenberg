@@ -43,6 +43,7 @@ const BorderBoxControlSplitControls = (
 				placement: popoverPlacement,
 				offset: popoverOffset,
 				anchorRef: containerRef,
+				__unstableShift: true,
 		  }
 		: undefined;
 

@@ -1,11 +1,6 @@
 /* eslint-disable react/forbid-elements */
 
 /**
- * External dependencies
- */
-import { get, omit, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
@@ -39,6 +34,14 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { store as blocksStore } from '../../store';
 
 const noop = () => {};
+const omit = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+const pick = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
+	);
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
@@ -766,10 +769,7 @@ describe( 'blocks', () => {
 										styles: [],
 										variations: [],
 										save: () => null,
-										...get(
-											serverSideBlockDefinitions,
-											name
-										),
+										...serverSideBlockDefinitions[ name ],
 										...blockSettingsWithDeprecations,
 									},
 									DEPRECATED_ENTRY_KEYS

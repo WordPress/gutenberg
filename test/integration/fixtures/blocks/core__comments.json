@@ -1,0 +1,146 @@
+[
+	{
+		"name": "core/comments",
+		"isValid": true,
+		"attributes": {
+			"tagName": "div",
+			"legacy": false,
+			"className": "comments-post-extra"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/comments-title",
+				"isValid": true,
+				"attributes": {
+					"showPostTitle": true,
+					"showCommentsCount": true,
+					"level": 2
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/comment-template",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/columns",
+						"isValid": true,
+						"attributes": {
+							"isStackedOnMobile": true
+						},
+						"innerBlocks": [
+							{
+								"name": "core/column",
+								"isValid": true,
+								"attributes": {
+									"width": "40px"
+								},
+								"innerBlocks": [
+									{
+										"name": "core/avatar",
+										"isValid": true,
+										"attributes": {
+											"size": 40,
+											"isLink": false,
+											"linkTarget": "_self",
+											"style": {
+												"border": {
+													"radius": "20px"
+												}
+											}
+										},
+										"innerBlocks": []
+									}
+								]
+							},
+							{
+								"name": "core/column",
+								"isValid": true,
+								"attributes": {},
+								"innerBlocks": [
+									{
+										"name": "core/comment-author-name",
+										"isValid": true,
+										"attributes": {
+											"isLink": true,
+											"linkTarget": "_self",
+											"fontSize": "small"
+										},
+										"innerBlocks": []
+									},
+									{
+										"name": "core/group",
+										"isValid": true,
+										"attributes": {
+											"tagName": "div",
+											"style": {
+												"spacing": {
+													"margin": {
+														"top": "0px",
+														"bottom": "0px"
+													}
+												}
+											},
+											"layout": {
+												"type": "flex"
+											}
+										},
+										"innerBlocks": [
+											{
+												"name": "core/comment-date",
+												"isValid": true,
+												"attributes": {
+													"isLink": true,
+													"fontSize": "small"
+												},
+												"innerBlocks": []
+											},
+											{
+												"name": "core/comment-edit-link",
+												"isValid": true,
+												"attributes": {
+													"linkTarget": "_self",
+													"fontSize": "small"
+												},
+												"innerBlocks": []
+											}
+										]
+									},
+									{
+										"name": "core/comment-content",
+										"isValid": true,
+										"attributes": {},
+										"innerBlocks": []
+									},
+									{
+										"name": "core/comment-reply-link",
+										"isValid": true,
+										"attributes": {
+											"fontSize": "small"
+										},
+										"innerBlocks": []
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			{
+				"name": "core/comments-pagination",
+				"isValid": true,
+				"attributes": {
+					"paginationArrow": "none"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/post-comments-form",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
+			}
+		]
+	}
+]
