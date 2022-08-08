@@ -16,7 +16,33 @@
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"width": true,
+			"__experimentalSelector": "th, td",
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"width": true
+			}
+		},
+		"color": {
+			"link": true,
+			"background": true,
+			"__experimentalSelector": "thead, tbody",
+			"__experimentalDefaultControls": {
+				"text": true
+			}
+		},
+		"__experimentalStyle": {
+			"border": {
+				"style": "solid",
+				"width": "1px"
+			}
+		}
 	},
 	"style": "wp-block-calendar"
 }
