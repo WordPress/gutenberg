@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -11,60 +11,57 @@ import Tooltip from '../';
  * WordPress dependencies
  */
 import { TOOLTIP_DELAY } from '../index.js';
-import { act } from '@testing-library/react';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
-			// Mount: Enzyme shallow does not support wrapping multiple nodes.
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip>
 					<div />
 					<div />
 				</Tooltip>
 			);
 
-			expect( wrapper.children() ).toHaveLength( 2 );
+			expect( container.children ).toHaveLength( 2 );
 		} );
 
 		it( 'should render children', () => {
-			const wrapper = shallow(
+			render(
 				<Tooltip position="bottom right" text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			expect( wrapper.type() ).toBe( 'button' );
-			expect( button.children() ).toHaveLength( 1 );
-			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
+			const button = screen.getByRole( 'button' );
+			expect( button.nodeName ).toBe( 'BUTTON' );
+			expect( button.childNodes ).toHaveLength( 1 );
+			expect( button.textContent ).toBe( 'Hover Me!' );
 		} );
 
 		it( 'should render children with additional popover when over', () => {
-			const wrapper = shallow(
+			const { container } = render(
 				<Tooltip position="bottom right" text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
 
-			const event = { type: 'focus', currentTarget: {} };
-			wrapper.simulate( 'focus', event );
+			const button = screen.getByRole( 'button' );
+			button.focus();
 
-			const button = wrapper.find( 'button' );
-			const popover = wrapper.find( 'ForwardRef(Popover)' );
-			expect( wrapper.type() ).toBe( 'button' );
-			expect( button.children() ).toHaveLength( 2 );
-			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
-			expect( button.childAt( 1 ).name() ).toBe( 'ForwardRef(Popover)' );
-			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
-			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect( popover.children().first().text() ).toBe( 'Help text' );
+			const popover =
+				container.getElementsByClassName( 'components-popover' );
+			expect( button.nodeName ).toBe( 'BUTTON' );
+			expect( button.childNodes ).toHaveLength( 2 );
+			expect( button.childNodes[ 0 ].textContent ).toBe( 'Hover Me!' );
+			expect( button.childNodes[ 1 ] ).toHaveClass(
+				'components-popover'
+			);
+			expect( popover[ 0 ].firstChild.textContent ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
 			const originalFocus = jest.fn();
-			const event = { type: 'focus', currentTarget: {} };
-			const wrapper = shallow(
+			const { container } = render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalFocus }
@@ -75,18 +72,23 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'focus', event );
+			const button = screen.getByRole( 'button' );
+			button.focus();
 
-			const popover = wrapper.find( 'ForwardRef(Popover)' );
-			expect( originalFocus ).toHaveBeenCalledWith( event );
+			const popover =
+				container.getElementsByClassName( 'components-popover' );
+			expect( originalFocus ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'focus',
+				} )
+			);
 			expect( popover ).toHaveLength( 1 );
 		} );
 
 		it( 'should show not popover on focus as result of mousedown', async () => {
 			const originalOnMouseDown = jest.fn();
 			const originalOnMouseUp = jest.fn();
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Help text">
 					<button
 						onMouseDown={ originalOnMouseDown }
@@ -97,29 +99,23 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-
-			let event;
-
-			event = { type: 'mousedown' };
-			button.simulate( event.type, event );
+			const button = screen.getByRole( 'button' );
+			fireEvent.mouseDown( button );
 			expect( originalOnMouseDown ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					type: event.type,
+					type: 'mousedown',
 				} )
 			);
 
-			event = { type: 'focus', currentTarget: {} };
-			button.simulate( event.type, event );
-
-			const popover = wrapper.find( 'Popover' );
+			button.focus();
+			const popover =
+				container.getElementsByClassName( 'components-popover' );
 			expect( popover ).toHaveLength( 0 );
 
-			event = new window.MouseEvent( 'mouseup' );
-			await act( async () => document.dispatchEvent( event ) );
+			fireEvent.mouseUp( button );
 			expect( originalOnMouseUp ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					type: event.type,
+					type: 'mouseup',
 				} )
 			);
 		} );
@@ -127,7 +123,7 @@ describe( 'Tooltip', () => {
 		it( 'should show popover on delayed mouseenter', () => {
 			const originalMouseEnter = jest.fn();
 			jest.useFakeTimers();
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -138,16 +134,17 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter', { type: 'mouseenter' } );
-
-			const popoverBeforeTimeout = wrapper.find( 'Popover' );
+			const button = screen.getByRole( 'button' );
+			fireEvent.mouseOver( button );
+			const popoverBeforeTimeout =
+				container.getElementsByClassName( 'components-popover' );
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
 			// Force delayedSetIsOver to be called.
 			setTimeout( () => {
-				const popoverAfterTimeout = wrapper.find( 'Popover' );
+				const popoverAfterTimeout =
+					container.getElementsByClassName( 'components-popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
 
 				jest.runOnlyPendingTimers();
@@ -158,7 +155,7 @@ describe( 'Tooltip', () => {
 		it( 'should respect custom delay prop when showing popover', () => {
 			const originalMouseEnter = jest.fn();
 			jest.useFakeTimers();
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Help text" delay={ 2000 }>
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -169,58 +166,55 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter', { type: 'mouseenter' } );
-
-			const popoverBeforeTimeout = wrapper.find( 'Popover' );
+			const button = screen.getByRole( 'button' );
+			fireEvent.mouseOver( button );
+			const popoverBeforeTimeout =
+				container.getElementsByClassName( 'components-popover' );
 			expect( popoverBeforeTimeout ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 
 			// Popover does not yet exist after default delay, because custom delay is passed.
 			setTimeout( () => {
-				const popoverBetweenTimeout = wrapper.find( 'Popover' );
+				const popoverBetweenTimeout =
+					container.getElementsByClassName( 'components-popover' );
 				expect( popoverBetweenTimeout ).toHaveLength( 0 );
 			}, TOOLTIP_DELAY );
-
 			// Popover appears after custom delay.
 			setTimeout( () => {
-				const popoverAfterTimeout = wrapper.find( 'Popover' );
+				const popoverAfterTimeout =
+					container.getElementsByClassName( 'components-popover' );
 				expect( popoverAfterTimeout ).toHaveLength( 1 );
-
 				jest.runOnlyPendingTimers();
 				jest.useRealTimers();
 			}, 2000 );
 		} );
 
 		it( 'should show tooltip when an element is disabled', () => {
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Show helpful text here">
 					<button disabled>Click me</button>
 				</Tooltip>
 			);
-			const button = wrapper.find( 'button[disabled]' );
-			const buttonNode = button.at( 0 ).getDOMNode();
-			const buttonRect = buttonNode.getBoundingClientRect();
-			const eventCatcher = wrapper.find( '.event-catcher' );
-			const eventCatcherNode = eventCatcher.at( 0 ).getDOMNode();
-			const eventCatcherRect = eventCatcherNode.getBoundingClientRect();
+
+			const button = screen.getByRole( 'button' );
+			const buttonRect = button.getBoundingClientRect();
+			const eventCatcher =
+				container.getElementsByClassName( 'event-catcher' )[ 0 ];
+			const eventCatcherRect = eventCatcher.getBoundingClientRect();
 			expect( buttonRect ).toEqual( eventCatcherRect );
 
-			eventCatcher.simulate( 'mouseenter', {
-				type: 'mouseenter',
-				currentTarget: {},
-			} );
+			fireEvent.mouseOver( eventCatcher );
 
 			setTimeout( () => {
-				const popover = wrapper.find( 'Popover' );
+				const popover =
+					container.getElementsByClassName( 'components-popover' );
 				expect( popover ).toHaveLength( 1 );
 			}, TOOLTIP_DELAY );
 		} );
 
 		it( 'should not emit events back to children when they are disabled', () => {
 			const handleClick = jest.fn();
-
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Show helpful text here">
 					<button disabled onClick={ handleClick }>
 						Click me
@@ -228,20 +222,15 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const eventCatcher = wrapper.find( '.event-catcher' );
-			eventCatcher.simulate( 'click', {
-				type: 'click',
-				currentTarget: {},
-			} );
-
+			const eventCatcher =
+				container.getElementsByClassName( 'event-catcher' )[ 0 ];
+			fireEvent.click( eventCatcher );
 			expect( handleClick ).toHaveBeenCalledTimes( 0 );
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', () => {
-			// Mount: Issues with using `setState` asynchronously with shallow-
-			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
-			const wrapper = mount(
+			const { container } = render(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -252,11 +241,11 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = wrapper.find( 'button' );
-			button.simulate( 'mouseenter' );
-
+			const button = screen.getByRole( 'button' );
+			fireEvent.mouseOver( button );
 			setTimeout( () => {
-				const popover = wrapper.find( 'Popover' );
+				const popover =
+					container.getElementsByClassName( 'components-popover' );
 				expect( popover ).toHaveLength( 0 );
 			}, TOOLTIP_DELAY );
 		} );
