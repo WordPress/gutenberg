@@ -46,7 +46,7 @@
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img",
+			"__experimentalSelector": "img, .block-editor-media-placeholder",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
