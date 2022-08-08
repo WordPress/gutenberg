@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import Placeholder from '../';
+import BasePlaceholder from '../';
 
 jest.mock( '@wordpress/compose', () => {
 	return {
@@ -20,6 +20,17 @@ jest.mock( '@wordpress/compose', () => {
 		useResizeObserver: jest.fn( () => [] ),
 	};
 } );
+
+const Placeholder = ( props ) => (
+	<BasePlaceholder data-testid="placeholder" { ...props } />
+);
+
+const getPlaceholder = () => screen.getByTestId( 'placeholder' );
+
+const getLabel = () => {
+	const placeholder = getPlaceholder();
+	return placeholder.querySelector( '.components-placeholder__label' );
+};
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
@@ -31,105 +42,87 @@ describe( 'Placeholder', () => {
 
 	describe( 'basic rendering', () => {
 		it( 'should by default render label section and fieldset.', () => {
-			const placeholder = shallow( <Placeholder /> );
-			const placeholderLabel = placeholder.find(
-				'.components-placeholder__label'
-			);
-			const placeholderInstructions = placeholder.find(
+			render( <Placeholder /> );
+			const placeholder = getPlaceholder();
+
+			expect( placeholder ).toHaveClass( 'components-placeholder' );
+
+			// Test for empty label.
+			const label = getLabel();
+			expect( label ).toBeInTheDocument();
+			expect( label ).toBeEmptyDOMElement();
+
+			// Test for non existent instructions.
+			const placeholderInstructions = placeholder.querySelector(
 				'.components-placeholder__instructions'
 			);
-			const placeholderFieldset = placeholder.find(
-				'.components-placeholder__fieldset'
-			);
+			expect( placeholderInstructions ).not.toBeInTheDocument();
 
-			expect( placeholder.hasClass( 'components-placeholder' ) ).toBe(
-				true
-			);
-			// Test for empty label.
-			expect( placeholderLabel.exists() ).toBe( true );
-			expect( placeholderLabel.find( 'Dashicon' ).exists() ).toBe(
-				false
-			);
-			// Test for non existant instructions.
-			expect( placeholderInstructions.exists() ).toBe( false );
 			// Test for empty fieldset.
-			expect( placeholderFieldset.exists() ).toBe( true );
+			const placeholderFieldset =
+				within( placeholder ).getByRole( 'group' );
+			expect( placeholderFieldset ).toBeInTheDocument();
+			expect( placeholderFieldset ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render an Icon in the label section', () => {
-			const placeholder = shallow( <Placeholder icon={ more } /> );
-			const placeholderLabel = placeholder.find(
-				'.components-placeholder__label'
-			);
+			render( <Placeholder icon={ more } /> );
+			const icon = getLabel()?.querySelector( 'svg' );
 
-			expect( placeholderLabel.exists() ).toBe( true );
-			expect( placeholderLabel.find( 'Icon' ).exists() ).toBe( true );
+			expect( icon ).toBeInTheDocument();
 		} );
 
 		it( 'should render a label section', () => {
 			const label = 'WordPress';
-			const placeholder = shallow( <Placeholder label={ label } /> );
-			const placeholderLabel = placeholder.find(
-				'.components-placeholder__label'
-			);
-			const child = placeholderLabel.childAt( 1 );
+			render( <Placeholder label={ label } /> );
+			const placeholderLabel = getLabel();
 
-			expect( child.text() ).toBe( label );
+			expect( placeholderLabel ).toHaveTextContent( label );
 		} );
 
 		it( 'should display an instructions element', () => {
-			const element = <div>Instructions</div>;
-			const placeholder = shallow(
-				<Placeholder instructions={ element } />
-			);
-			const placeholderInstructions = placeholder.find(
-				'.components-placeholder__instructions'
-			);
-			const child = placeholderInstructions.childAt( 0 );
+			const element = <div data-testid="instructions">Instructions</div>;
+			render( <Placeholder instructions={ element } /> );
+			const placeholderInstructions =
+				screen.getByTestId( 'instructions' );
 
-			expect( placeholderInstructions.exists() ).toBe( true );
-			expect( child.matchesElement( element ) ).toBe( true );
+			expect( placeholderInstructions ).toBeInTheDocument();
 		} );
 
 		it( 'should display a fieldset from the children property', () => {
-			const element = <div>Fieldset</div>;
-			const placeholder = shallow( <Placeholder children={ element } /> );
-			const placeholderFieldset = placeholder.find(
-				'fieldset.components-placeholder__fieldset'
-			);
-			const child = placeholderFieldset.childAt( 0 );
+			const content = 'Fieldset';
+			render( <Placeholder>{ content }</Placeholder> );
+			const placeholderFieldset = screen.getByRole( 'group' );
 
-			expect( placeholderFieldset.exists() ).toBe( true );
-			expect( child.matchesElement( element ) ).toBe( true );
+			expect( placeholderFieldset ).toBeInTheDocument();
+			expect( placeholderFieldset ).toHaveTextContent( content );
 		} );
 
 		it( 'should display a legend if instructions are passed', () => {
-			const element = <div>Fieldset</div>;
 			const instructions = 'Choose an option.';
-			const placeholder = shallow(
-				<Placeholder
-					children={ element }
-					instructions={ instructions }
-				/>
+			render(
+				<Placeholder instructions={ instructions }>
+					<div>Fieldset</div>
+				</Placeholder>
 			);
-			const placeholderLegend = placeholder.find(
-				'legend.components-placeholder__instructions'
-			);
+			const placeholderLegend = screen.getByText( instructions );
 
-			expect( placeholderLegend.exists() ).toBe( true );
-			expect( placeholderLegend.text() ).toEqual( instructions );
+			expect( placeholderLegend ).toBeInTheDocument();
+			expect( placeholderLegend.tagName ).toBe( 'LEGEND' );
 		} );
 
 		it( 'should add an additional className to the top container', () => {
-			const placeholder = shallow(
-				<Placeholder className="wp-placeholder" />
-			);
-			expect( placeholder.hasClass( 'wp-placeholder' ) ).toBe( true );
+			render( <Placeholder className="wp-placeholder" /> );
+			const placeholder = getPlaceholder();
+
+			expect( placeholder ).toHaveClass( 'wp-placeholder' );
 		} );
 
 		it( 'should add additional props to the top level container', () => {
-			const placeholder = shallow( <Placeholder test="test" /> );
-			expect( placeholder.prop( 'test' ) ).toBe( 'test' );
+			render( <Placeholder test="test" /> );
+			const placeholder = getPlaceholder();
+
+			expect( placeholder ).toHaveAttribute( 'test', 'test' );
 		} );
 	} );
 
@@ -140,11 +133,12 @@ describe( 'Placeholder', () => {
 				{ width: 480 },
 			] );
 
-			const placeholder = shallow( <Placeholder /> );
+			render( <Placeholder /> );
+			const placeholder = getPlaceholder();
 
-			expect( placeholder.hasClass( 'is-large' ) ).toBe( true );
-			expect( placeholder.hasClass( 'is-medium' ) ).toBe( false );
-			expect( placeholder.hasClass( 'is-small' ) ).toBe( false );
+			expect( placeholder ).toHaveClass( 'is-large' );
+			expect( placeholder ).not.toHaveClass( 'is-medium' );
+			expect( placeholder ).not.toHaveClass( 'is-small' );
 		} );
 
 		it( 'should assign modifier class', () => {
@@ -153,11 +147,12 @@ describe( 'Placeholder', () => {
 				{ width: null },
 			] );
 
-			const placeholder = shallow( <Placeholder /> );
+			render( <Placeholder /> );
+			const placeholder = getPlaceholder();
 
-			expect( placeholder.hasClass( 'is-large' ) ).toBe( false );
-			expect( placeholder.hasClass( 'is-medium' ) ).toBe( false );
-			expect( placeholder.hasClass( 'is-small' ) ).toBe( false );
+			expect( placeholder ).not.toHaveClass( 'is-large' );
+			expect( placeholder ).not.toHaveClass( 'is-medium' );
+			expect( placeholder ).not.toHaveClass( 'is-small' );
 		} );
 	} );
 } );
