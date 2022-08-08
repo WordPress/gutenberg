@@ -35,7 +35,7 @@ describe( 'Tooltip', () => {
 			const button = screen.getByRole( 'button' );
 			expect( button.nodeName ).toBe( 'BUTTON' );
 			expect( button.childNodes ).toHaveLength( 1 );
-			expect( button.textContent ).toBe( 'Hover Me!' );
+			expect( button ).toHaveTextContent( 'Hover Me!' );
 		} );
 
 		it( 'should render children with additional popover when over', () => {
@@ -52,11 +52,11 @@ describe( 'Tooltip', () => {
 				container.getElementsByClassName( 'components-popover' );
 			expect( button.nodeName ).toBe( 'BUTTON' );
 			expect( button.childNodes ).toHaveLength( 2 );
-			expect( button.childNodes[ 0 ].textContent ).toBe( 'Hover Me!' );
+			expect( button.childNodes[ 0 ] ).toHaveTextContent( 'Hover Me!' );
 			expect( button.childNodes[ 1 ] ).toHaveClass(
 				'components-popover'
 			);
-			expect( popover[ 0 ].firstChild.textContent ).toBe( 'Help text' );
+			expect( popover[ 0 ].firstChild ).toHaveTextContent( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
