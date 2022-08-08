@@ -35,15 +35,21 @@ if ( ! function_exists( 'wp_register_font_family' ) ) {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @param string $font_family The font family to register.
-	 * @return bool Whether the font family has been registered. True on success, false on failure.
+	 * @param string $font_family The font family's name or handle to register.
+	 * @return string|null The font family handle when successfully registered. Else null.
 	 */
 	function wp_register_font_family( $font_family ) {
-		return wp_webfonts()->add( sanitize_title( $font_family ), false );
+		$handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+		if ( ! $handle ) {
+			return null;
+		}
+
+		$result = wp_webfonts()->add( $handle, false ) ? $handle : null;
+		return $result ? $handle : null;
 	}
 }
 
-if ( ! function_exists( 'wp_register_font_variation' ) ) {
+if ( ! function_exists( 'wp_register_webfont_variation' ) ) {
 	/**
 	 * Registers a variation to the given font family.
 	 *
@@ -54,7 +60,7 @@ if ( ! function_exists( 'wp_register_font_variation' ) ) {
 	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
 	 *                                   handle will be dynamically generated.
 	 *                                   Default empty string.
-	 * @return string|bool Variation handle on success. Else false.
+	 * @return string|null Variation handle on success. Else null.
 	 */
 	function wp_register_webfont_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
 		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle );
@@ -68,29 +74,43 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 * @since 6.1.0
 	 *
 	 * @param array[] $webfonts Web fonts to be registered.
-	 * @return string[] The font family handle of the registered webfonts.
+	 * @return string[] The font family handle of the registered web fonts.
 	 */
 	function wp_register_webfonts( array $webfonts ) {
-		$registered  = array();
-		$wp_webfonts = wp_webfonts();
+		$registered = array();
 
 		foreach ( $webfonts as $font_family => $variations ) {
-			// Skip if the font family is not defined as a key.
-			if ( ! is_string( $font_family ) || empty( $font_family ) ) {
+			/*
+			 * Handle the deprecated web font's structure but alert developers
+			 * to modify their web font structure to group and key by font family.
+			 *
+			 * Note: This code block will not be backported to Core.
+			 */
+			if ( ! WP_Webfonts_Utils::is_defined( $font_family ) ) {
+				_doing_it_wrong(
+					__FUNCTION__,
+					__( 'Variations must be grouped and keyed by their font family.', 'gutenberg' ),
+					'6.1.0'
+				);
+				$font_family_handle = wp_register_webfont( $variations );
+				if ( ! $font_family_handle ) {
+					continue;
+				}
+				$registered[ $font_family_handle ] = true;
+				continue;
+			} // end of code block for deprecated web fonts structure.
+
+			$font_family_handle = wp_register_font_family( $font_family );
+			if ( ! $font_family_handle ) {
 				continue;
 			}
 
-			$font_family_handle = sanitize_title( $font_family );
-			$is_registered      = $wp_webfonts->add( $font_family_handle, false );
-			if ( ! $is_registered ) {
-				continue;
-			}
-
+			// Register each of the variations for this font family.
 			foreach ( $variations as $handle => $variation ) {
-				$wp_webfonts->add_variation(
-					$font_family_handle,
+				wp_register_webfont(
 					$variation,
-					is_string( $handle ) && '' !== $handle ? $handle : ''
+					$font_family_handle,
+					WP_Webfonts_Utils::is_defined( $handle ) ? $handle : ''
 				);
 			}
 
@@ -103,31 +123,33 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 
 if ( ! function_exists( 'wp_register_webfont' ) ) {
 	/**
-	 * Registers a single webfont.
+	 * Registers a single web font.
 	 *
-	 * Example of how to register Source Serif Pro font with font-weight range of 200-900:
+	 * @since 6.1.0
 	 *
-	 * If the font file is contained within the theme:
-	 *
-	 * <code>
-	 * wp_register_webfont(
-	 *      array(
-	 *          'provider'    => 'local',
-	 *          'font-family' => 'Source Serif Pro',
-	 *          'font-weight' => '200 900',
-	 *          'font-style'  => 'normal',
-	 *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
-	 *      )
-	 * );
-	 * </code>
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param array $webfont Webfont to be registered.
-	 * @return string|false The font family slug if successfully registered, else false.
+	 * @param array  $variation          Array of variation properties to be registered.
+	 * @param string $font_family_handle Optional. Font family handle for the given variation.
+	 *                                   Default empty string.
+	 * @param string $variation_handle   Optional. Handle for the variation to register.
+	 * @return string|null The font family slug if successfully registered. Else null.
 	 */
-	function wp_register_webfont( array $webfont ) {
-		return wp_webfonts()->register_webfont( $webfont );
+	function wp_register_webfont( array $variation, $font_family_handle = '', $variation_handle = '' ) {
+		// When font family's handle is not passed, attempt to get it from the variation.
+		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $variation );
+			if ( $font_family ) {
+				$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+			}
+		}
+
+		if ( empty( $font_family_handle ) ) {
+			trigger_error( 'Font family handle must be a non-empty string.' );
+			return null;
+		}
+
+		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle )
+			? $font_family_handle
+			: null;
 	}
 }
 

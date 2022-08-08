@@ -82,10 +82,16 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 						}
 					}
 
-					$font_family_handle = array_key_exists( 'fontFamily', $font_face )
-						? WP_Webfonts::get_font_slug( $font_face['fontFamily'] )
-						: $font_family['slug'];
-					$handles[]          = $font_family_handle;
+					$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $font_face );
+					if ( empty( $font_family_handle ) ) {
+						$font_family = $font_family['slug'];
+					}
+					$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+					if ( is_null( $font_family_handle ) ) {
+						_doing_it_wrong( __FUNCTION__, __( 'Font family not defined in the variation or "slug".', 'gutenberg' ), '6.1.0' );
+					}
+
+					$handles[] = $font_family_handle;
 					if ( ! array_key_exists( $font_family_handle, $webfonts ) ) {
 						$webfonts[ $font_family_handle ] = array();
 					}

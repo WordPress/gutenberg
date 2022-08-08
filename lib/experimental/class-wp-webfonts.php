@@ -148,13 +148,23 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
 	 *                                   handle will be dynamically generated.
 	 *                                   Default empty string.
-	 * @return string|bool Variation handle on success. Else false.
+	 * @return string|null Variation handle on success. Else null.
 	 */
 	public function add_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
+		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+			trigger_error( 'Font family handle must be a non-empty string.' );
+			return null;
+		}
+
+		if ( '' !== $variation_handle && ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+			trigger_error( 'Variant handle must be a non-empty string.' );
+			return null;
+		}
+
 		// Register the font family when it does not yet exist.
 		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
 			if ( ! $this->add( $font_family_handle, false ) ) {
-				return false;
+				return null;
 			}
 		}
 
@@ -162,22 +172,30 @@ class WP_Webfonts extends WP_Dependencies {
 
 		// Variation validation failed.
 		if ( ! $variation ) {
-			return false;
+			return null;
 		}
 
 		if ( '' === $variation_handle ) {
-			$variation_handle = static::get_variation_handle( $font_family_handle, $variation );
+			$variation_handle = WP_Webfonts_Utils::convert_variation_into_handle( $font_family_handle, $variation );
+			if ( is_null( $variation_handle ) ) {
+				return null;
+			}
 		}
 
-		if ( $variation['src'] ) {
+		// Bail out if the variant is already registered.
+		if ( $this->is_variation_registered( $font_family_handle, $variation_handle ) ) {
+			return $variation_handle;
+		}
+
+		if ( array_key_exists( 'src', $variation ) ) {
 			$result = $this->add( $variation_handle, $variation['src'] );
 		} else {
-			$result = $this->add( $variation_handle );
+			$result = $this->add( $variation_handle, false );
 		}
 
 		// Bail out if the registration failed.
 		if ( ! $result ) {
-			return false;
+			return null;
 		}
 
 		$this->add_data( $variation_handle, 'font-properties', $variation );
@@ -188,6 +206,23 @@ class WP_Webfonts extends WP_Dependencies {
 		$this->providers[ $variation['provider'] ]['fonts'][] = $variation_handle;
 
 		return $variation_handle;
+	}
+
+	/**
+	 * Checks if the variation is registered.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $font_family_handle The font family's handle for this variation.
+	 * @param string $variant_handle      Variation's handle.
+	 * @return bool
+	 */
+	private function is_variation_registered( $font_family_handle, $variant_handle ) {
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return array();
+		}
+
+		return in_array( $variant_handle, $this->registered[ $font_family_handle ]->deps );
 	}
 
 	/**
@@ -248,7 +283,7 @@ class WP_Webfonts extends WP_Dependencies {
 
 		// Check the font-weight.
 		if ( ! is_string( $variation['font-weight'] ) && ! is_int( $variation['font-weight'] ) ) {
-			trigger_error( __( 'Webfont font weight must be a properly formatted string or integer.', 'gutenberg' ) );
+			trigger_error( __( 'Webfont font-weight must be a properly formatted string or integer.', 'gutenberg' ) );
 			return false;
 		}
 
@@ -425,38 +460,24 @@ class WP_Webfonts extends WP_Dependencies {
 	/**
 	 * Get the font slug.
 	 *
-	 * @since 6.1.0
+	 * @since X.X.X
+	 * @deprecated Use WP_Webfonts_Utils::convert_font_family_into_handle()
 	 *
 	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
 	 *                                 or a font-family as a string.
 	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
 	 */
 	public static function get_font_slug( $to_convert ) {
-		if ( is_array( $to_convert ) ) {
-			if ( isset( $to_convert['font-family'] ) ) {
-				$to_convert = $to_convert['font-family'];
-			} elseif ( isset( $to_convert['fontFamily'] ) ) {
-				$to_convert = $to_convert['fontFamily'];
-			} else {
-				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
-				return false;
-			}
-		}
+		_deprecated_function(
+			__METHOD__,
+			'X.X.X', // Gutenberg version, not Core as this method will not be backported to Core.
+			'Use WP_Webfonts_Utils::get_font_family_from_variation() to get the font family from an array and WP_Webfonts_Utils::convert_font_family_into_handle() to get the handle'
+		);
 
-		return sanitize_title( $to_convert );
-	}
+		$font_family = is_array( $to_convert )
+			? WP_Webfonts_Utils::get_font_family_from_variation( $to_convert )
+			: $to_convert;
 
-	/**
-	 * Gets a handle for the given variation.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param string $font_family The font family's handle for this variation.
-	 * @param array  $variation   An array of variation properties.
-	 * @return string The variation handle.
-	 */
-	public static function get_variation_handle( $font_family, array $variation ) {
-		$handle = sprintf( '%s-%s', $font_family, implode( ' ', array( $variation['font-weight'], $variation['font-style'] ) ) );
-		return sanitize_title( $handle );
+		return WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
 	}
 }
