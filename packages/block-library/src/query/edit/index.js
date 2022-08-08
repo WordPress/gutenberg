@@ -104,7 +104,6 @@ export function QueryContent( {
 	return (
 		<>
 			<QueryInspectorControls
-				clientId={ clientId }
 				attributes={ attributes }
 				setQuery={ updateQuery }
 				setDisplayLayout={ updateDisplayLayout }

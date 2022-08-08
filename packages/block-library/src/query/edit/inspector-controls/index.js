@@ -43,7 +43,6 @@ function useIsPostTypeHierarchical( postType ) {
 }
 
 export default function QueryInspectorControls( {
-	clientId,
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
@@ -181,7 +180,6 @@ export default function QueryInspectorControls( {
 							} );
 							setQuerySearch( '' );
 						} }
-						panelId={ clientId }
 					>
 						{ !! taxonomiesInfo?.length && (
 							<ToolsPanelItem
@@ -190,7 +188,6 @@ export default function QueryInspectorControls( {
 								onDeselect={ () =>
 									setQuery( { taxQuery: null } )
 								}
-								panelId={ clientId }
 								isShownByDefault
 							>
 								<TaxonomyControls
@@ -203,7 +200,6 @@ export default function QueryInspectorControls( {
 							hasValue={ () => !! authorIds }
 							label={ __( 'Authors' ) }
 							onDeselect={ () => setQuery( { author: '' } ) }
-							panelId={ clientId }
 						>
 							<AuthorControl
 								value={ authorIds }
@@ -214,7 +210,6 @@ export default function QueryInspectorControls( {
 							hasValue={ () => !! querySearch }
 							label={ __( 'Keyword' ) }
 							onDeselect={ () => setQuerySearch( '' ) }
-							panelId={ clientId }
 						>
 							<TextControl
 								label={ __( 'Keyword' ) }
@@ -227,7 +222,6 @@ export default function QueryInspectorControls( {
 								hasValue={ () => !! parents?.length }
 								label={ __( 'Parents' ) }
 								onDeselect={ () => setQuery( { parents: [] } ) }
-								panelId={ clientId }
 							>
 								<ParentControl
 									parents={ parents }
