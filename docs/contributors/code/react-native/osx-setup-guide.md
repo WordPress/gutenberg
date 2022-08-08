@@ -14,7 +14,7 @@ git clone git@github.com:WordPress/gutenberg.git
 
 If you’re working in multiple JS projects, a node version manager may make sense. A manager will let you switch between different node and npm versions of your choosing.
 
-We recommend [nvm](https://github.com/nvm-sh/nvm). 
+We recommend [nvm](https://github.com/nvm-sh/nvm).
 
 After installing nvm, run the following from the top-level directory of the cloned project:
 
@@ -63,9 +63,9 @@ arch -x86_64 pod install
 
 #### Ruby Manager
 
-It may not be necessary to manually install Cocoapods or the `ffi` package if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance. 
+It may not be necessary to manually install Cocoapods or the `ffi` package if you're using a Ruby Version manager. Please refer to your chosen manager's documentation for guidance.
 
-[`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app). 
+[`rbenv`](https://github.com/rbenv/rbenv) is the recommended manager if you're running Gutenberg from within [the WordPress iOS app](https://github.com/wordpress-mobile/WordPress-iOS) (vs. only the demo app).
 
 ### Set up Xcode
 
@@ -121,9 +121,9 @@ If you already have a JDK installed on your system, it should be JDK 11 or newer
 
 ### Set up Android Studio
 
-To compile the Android app, [download Android Studio](https://developer.android.com/studio). 
+To compile the Android app, [download Android Studio](https://developer.android.com/studio).
 
-Next, open an existing project and select the Gutenberg folder you cloned. 
+Next, open an existing project and select the Gutenberg folder you cloned.
 
 From here, click on the cube icon that's highlighted in the following screenshot to access the SDK Manager. Another way to the SDK Manager is to navigate to `Tools > SDK Manager`:
 
