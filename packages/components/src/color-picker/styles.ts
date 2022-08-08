@@ -59,7 +59,6 @@ export const AuxiliaryColorArtefactWrapper = styled.div`
 `;
 
 export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`
-	${ boxSizingReset };
 	padding-left: ${ space( 4 ) };
 	padding-right: ${ space( 4 ) };
 `;
@@ -72,6 +71,8 @@ export const ColorInputWrapper = styled( Flex )`
 `;
 
 export const ColorfulWrapper = styled.div`
+	${ boxSizingReset };
+
 	width: 216px;
 
 	.react-colorful {
