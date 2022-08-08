@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { swatch } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import ColorPalette from '../color-palette';
-import Swatch from '../swatch';
+import ColorIndicator from '../color-indicator';
+import Icon from '../icon';
+import { Flex, FlexItem } from '../flex';
 
 function ColorOption( {
 	label,
@@ -23,10 +26,16 @@ function ColorOption( {
 		<>
 			<Button
 				className="components-color-list-picker__swatch-button"
-				icon={ <Swatch fill={ value } /> }
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 			>
-				{ label }
+				<Flex justify="flex-start">
+					{ value ? (
+						<ColorIndicator colorValue={ value } />
+					) : (
+						<Icon icon={ swatch } />
+					) }
+					<FlexItem>{ label }</FlexItem>
+				</Flex>
 			</Button>
 			{ isOpen && (
 				<ColorPalette
