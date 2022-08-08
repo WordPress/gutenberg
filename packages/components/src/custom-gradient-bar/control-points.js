@@ -82,11 +82,9 @@ function GradientColorPickerDropdown( {
 		const result = {
 			className:
 				'components-custom-gradient-picker__color-picker-popover',
-			placement: 'top',
 		};
-		if ( isRenderedInSidebar ) {
-			result.anchorRef = gradientPickerDomRef;
-			result.placement = 'bottom-start';
+		if ( ! isRenderedInSidebar ) {
+			result.placement = 'top';
 		}
 		return result;
 	}, [ gradientPickerDomRef, isRenderedInSidebar ] );
