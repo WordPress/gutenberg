@@ -6,7 +6,7 @@ import markdownConverter from '../markdown-converter';
 describe( 'markdownConverter', () => {
 	it( 'should correct Slack variant', () => {
 		const input = '```test```';
-		const output = '<pre><code>test</code></pre>\n';
+		const output = '<pre><code>test</code></pre>';
 		expect( markdownConverter( input ) ).toEqual( output );
 	} );
 
