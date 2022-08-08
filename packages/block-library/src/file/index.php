@@ -19,34 +19,25 @@ function render_block_core_file( $attributes, $content ) {
 		wp_enqueue_script( 'wp-block-file-view' );
 	}
 
-	// translate object's aria-label attribute.
-	$default_label            = 'PDF embed';
-	$default_label_translated = __( 'PDF embed' );
+	// Update object's aria-label attribute if present in block HTML.
 
-	$has_filename_label = 'Embed of %s.';
-	/* translators: %s: filename. */
-	$has_filename_label_translated = __( 'Embed of %s.' );
+	// Match an aria-label attribute from an object tag.
+	$pattern = '@<object.+(?<attribute>aria-label="(?<filename>[^"]+)?")@i';
+	$content = preg_replace_callback(
+		$pattern,
+		function ( $matches ) {
+			$filename     = ! empty( $matches['filename'] ) ? $matches['filename'] : '';
+			$has_filename = ! empty( $filename );
+			$label        = $has_filename ?
+				sprintf(
+					/* translators: %s: filename. */
+					__( 'Embed of %s.' ),
+					$filename
+				)
+				: __( 'PDF embed' );
 
-	$search  = $default_label;
-	$replace = $default_label_translated;
-
-	$pattern     = sprintf(
-		'@aria-label="%s"@i',
-		sprintf(
-			preg_quote( $has_filename_label, '@' ),
-			'(?<filename>.+)'
-		)
-	);
-	$has_matches = preg_match( $pattern, $content, $matches );
-	if ( $has_matches ) {
-		$filename = $matches['filename'];
-		$search   = sprintf( $has_filename_label, $filename );
-		$replace  = sprintf( $has_filename_label_translated, $filename );
-	}
-
-	$content = str_replace(
-		$search,
-		$replace,
+			return str_replace( $matches['attribute'], sprintf( 'aria-label="%s"', $label ), $matches[0] );
+		},
 		$content
 	);
 
