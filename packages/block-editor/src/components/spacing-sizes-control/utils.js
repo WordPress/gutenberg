@@ -19,7 +19,8 @@ export function isValueSpacingPreset( value ) {
 	if ( ! value?.includes ) {
 		return false;
 	}
-	return value.includes( 'var:preset|spacing|' );
+
+	return value === '0' || value.includes( 'var:preset|spacing|' );
 }
 
 /**

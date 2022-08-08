@@ -1,6 +1,6 @@
 .tools-panel-item-spacing {
 	display: grid;
-	grid-template-columns: 1fr 1fr 36px;
+	grid-template-columns: 1fr 1fr auto;
 	grid-row-gap: $grid-unit-10;
 }
 
@@ -90,12 +90,6 @@
 		z-index: 3;
 	}
 
-	.component-spacing-sizes-control__not-set {
-		[class*="Thumb-thumbColor"] {
-			background-color: $gray-600;
-		}
-	}
-
 	.component-spacing-sizes-control__header {
 		margin-bottom: $grid-unit-10;
 	}
@@ -113,5 +107,19 @@
 
 	.components-spacing-sizes-control__custom-select-control {
 		grid-column: span 3;
+	}
+
+	.components-spacing-sizes-control__change-button-all,
+	.components-spacing-sizes-control__change-button-single {
+		height: 24px;
+		margin-left: auto;
+	}
+
+	.components-spacing-sizes-control__change-button-all {
+		margin-right: $grid-unit-05;
+	}
+
+	.components-spacing-sizes-control__change-button-single {
+		grid-column: 3 / 3;
 	}
 }
