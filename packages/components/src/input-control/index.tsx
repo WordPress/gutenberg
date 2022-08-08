@@ -32,6 +32,9 @@ function useUniqueId( idProp?: string ) {
 
 const WithTooltip = ( { showTooltip, text, children }: WithTooltipProps ) => {
 	if ( showTooltip && text ) {
+		// Children are wrapped in a simple `div` (`TooltipWrapper`) to prevent
+		// rendering issue with Tooltips.
+		// See: https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
 		return (
 			<Tooltip text={ text } position="top center">
 				<TooltipWrapper>{ children }</TooltipWrapper>
