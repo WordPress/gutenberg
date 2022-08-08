@@ -184,11 +184,14 @@ export default function QueryInspectorControls( {
 						{ !! taxonomiesInfo?.length && (
 							<ToolsPanelItem
 								label={ __( 'Taxonomies' ) }
-								hasValue={ () => !! taxQuery }
+								hasValue={ () =>
+									Object.values( taxQuery || {} ).some(
+										( terms ) => !! terms.length
+									)
+								}
 								onDeselect={ () =>
 									setQuery( { taxQuery: null } )
 								}
-								isShownByDefault
 							>
 								<TaxonomyControls
 									onChange={ setQuery }
