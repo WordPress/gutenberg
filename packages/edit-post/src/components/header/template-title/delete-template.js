@@ -84,12 +84,12 @@ export default function DeleteTemplate() {
 					} }
 					info={
 						isRevertable
-							? __( 'Use the template as supplied by the theme' )
+							? __( 'Use the template as supplied by the theme.' )
 							: undefined
 					}
 				>
 					{ isRevertable
-						? __( 'Delete custom template' )
+						? __( 'Clear customizations' )
 						: __( 'Delete template' ) }
 				</MenuItem>
 				<ConfirmDialog

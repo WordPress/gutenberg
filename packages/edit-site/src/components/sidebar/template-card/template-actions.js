@@ -29,14 +29,14 @@ export default function Actions( { template } ) {
 				<MenuGroup>
 					<MenuItem
 						info={ __(
-							'Use the template as supplied by the theme'
+							'Use the template as supplied by the theme.'
 						) }
 						onClick={ () => {
 							revertTemplate( template );
 							onClose();
 						} }
 					>
-						{ __( 'Delete custom template' ) }
+						{ __( 'Clear customizations' ) }
 					</MenuItem>
 				</MenuGroup>
 			) }

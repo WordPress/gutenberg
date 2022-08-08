@@ -80,14 +80,14 @@ export default function Actions( { template } ) {
 					{ isRevertable && (
 						<MenuItem
 							info={ __(
-								'Use the template as supplied by the theme'
+								'Use the template as supplied by the theme.'
 							) }
 							onClick={ () => {
 								revertAndSaveTemplate();
 								onClose();
 							} }
 						>
-							{ __( 'Delete custom template' ) }
+							{ __( 'Clear customizations' ) }
 						</MenuItem>
 					) }
 				</MenuGroup>

@@ -60,11 +60,11 @@ function TemplatePartItemMore( {
 				<MenuGroup>
 					<MenuItem
 						info={ __(
-							'Use the template part as supplied by the theme'
+							'Use the template part as supplied by the theme.'
 						) }
 						onClick={ clearCustomizations }
 					>
-						{ __( 'Delete custom template part' ) }
+						{ __( 'Clear customizations' ) }
 					</MenuItem>
 				</MenuGroup>
 			) }

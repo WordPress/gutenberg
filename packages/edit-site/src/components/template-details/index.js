@@ -80,11 +80,11 @@ export default function TemplateDetails( { template, onClose } ) {
 					<MenuItem
 						className="edit-site-template-details__revert-button"
 						info={ __(
-							'Use the template as supplied by the theme'
+							'Use the template as supplied by the theme.'
 						) }
 						onClick={ revert }
 					>
-						{ __( 'Delete custom template' ) }
+						{ __( 'Clear customizations' ) }
 					</MenuItem>
 				</MenuGroup>
 			) }
