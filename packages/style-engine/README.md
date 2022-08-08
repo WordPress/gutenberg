@@ -37,7 +37,7 @@ array(
 
 It will return compiled CSS declartions for inline styles, or, where a selector is provided, a complete CSS rule.
 
-To enqueue a style for rendering in the frontend, the `$options` array requires the following:
+To enqueue a style for rendering in the site's frontend, the `$options` array requires the following:
 
 1.  **selector (string)** - this is the CSS selector for your block style CSS declarations.
 2.  **context (string)** - this tells the style engine where to store the styles. Styles in the same context will be
