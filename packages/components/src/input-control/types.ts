@@ -73,13 +73,13 @@ export type WithTooltipProps = {
 	 */
 	children: ReactNode;
 	/**
-	 * Whether or not to wrap children in a Tooltip component.
+	 * Whether or not to wrap children in a tooltip.
 	 *
 	 * @default false
 	 */
 	showTooltip?: boolean;
 	/**
-	 * Text to display within the Tooltip component.
+	 * Text to display within the tooltip.
 	 */
 	text?: string;
 };
@@ -123,7 +123,7 @@ export interface InputFieldProps extends BaseProps {
 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
 	setIsFocused: ( isFocused: boolean ) => void;
 	/**
-	 * Whether to wrap input field in a Tooltip component.
+	 * Whether to wrap input field in a tooltip.
 	 *
 	 * @default false
 	 */
