@@ -250,7 +250,7 @@ Attribute available in the block:
 
 ### `html` source
 
-Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerHTML).
+Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML).
 
 Saved content:
 ```html
