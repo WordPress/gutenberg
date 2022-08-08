@@ -306,6 +306,8 @@ export default function Image( {
 		);
 	}
 
+	const describedById = `wp-image-caption-${ id }`;
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -323,6 +325,11 @@ export default function Image( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
+						aria-describedby={
+							! alt && ! RichText.isEmpty( caption )
+								? describedById
+								: undefined
+						}
 					/>
 				) }
 				{ allowCrop && (
@@ -444,6 +451,11 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
+				aria-describedby={
+					! alt && ! RichText.isEmpty( caption )
+						? describedById
+						: undefined
+				}
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setLoadedNaturalSize( {
@@ -593,6 +605,11 @@ export default function Image( {
 					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
+					id={
+						! alt && ! RichText.isEmpty( caption )
+							? describedById
+							: undefined
+					}
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}

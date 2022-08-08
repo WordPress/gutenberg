@@ -46,10 +46,17 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
+	const describedById = `wp-image-caption-${ id }`;
+
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
+			aria-describedby={
+				! alt && ! RichText.isEmpty( caption )
+					? describedById
+					: undefined
+			}
 			className={ imageClasses || undefined }
 			style={ borderProps.style }
 			width={ width }
@@ -66,6 +73,11 @@ export default function save( { attributes } ) {
 					href={ href }
 					target={ linkTarget }
 					rel={ newRel }
+					aria-describedby={
+						! alt && ! RichText.isEmpty( caption )
+							? describedById
+							: undefined
+					}
 				>
 					{ image }
 				</a>
@@ -77,6 +89,11 @@ export default function save( { attributes } ) {
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					tagName="figcaption"
 					value={ caption }
+					id={
+						! alt && ! RichText.isEmpty( caption )
+							? describedById
+							: undefined
+					}
 				/>
 			) }
 		</>
