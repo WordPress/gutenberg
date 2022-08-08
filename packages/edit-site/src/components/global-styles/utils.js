@@ -224,6 +224,17 @@ export function getValueFromVariableOrRef(
 	blockName,
 	variable
 ) {
+	if ( typeof variable !== 'string' && variable?.ref ) {
+		variable = getValueFromRef( themeJSONObject, variable );
+	}
+	return getValueFromVariable(
+		themeJSONObject.settings,
+		blockName,
+		variable
+	);
+}
+
+function getValueFromRef( themeJSONObject, variable ) {
 	if (
 		typeof variable !== 'string' &&
 		variable?.ref &&
@@ -232,11 +243,7 @@ export function getValueFromVariableOrRef(
 		const refPath = variable.ref.split( '.' );
 		variable = get( themeJSONObject, refPath );
 	}
-	return getValueFromVariable(
-		themeJSONObject.settings,
-		blockName,
-		variable
-	);
+	return variable;
 }
 
 export function getValueFromVariable( features, blockName, variable ) {
