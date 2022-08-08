@@ -85,7 +85,7 @@ describe( 'Tooltip', () => {
 			expect( popover ).toHaveLength( 1 );
 		} );
 
-		it( 'should show not popover on focus as result of mousedown', async () => {
+		it( 'should not show popover on focus as result of mousedown', async () => {
 			const originalOnMouseDown = jest.fn();
 			const originalOnMouseUp = jest.fn();
 			const { container } = render(
