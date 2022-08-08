@@ -47,7 +47,7 @@ export const settings = {
 	edit,
 };
 
-// Importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+// Importing this file includes side effects. This is added in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
 	'core/template-part',

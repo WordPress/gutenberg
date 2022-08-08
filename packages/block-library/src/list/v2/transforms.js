@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
-import {
-	__UNSTABLE_LINE_SEPARATOR,
-	create,
-	split,
-	toHTMLString,
-} from '@wordpress/rich-text';
+import { createBlock } from '@wordpress/blocks';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -33,6 +28,15 @@ function getListContentSchema( { phrasingContentSchema } ) {
 	} );
 
 	return listContentSchema;
+}
+
+function getListContentFlat( blocks ) {
+	return blocks.flatMap( ( { name, attributes, innerBlocks = [] } ) => {
+		if ( name === 'core/list-item' ) {
+			return [ attributes.content, ...getListContentFlat( innerBlocks ) ];
+		}
+		return getListContentFlat( innerBlocks );
+	} );
 }
 
 const transforms = {
@@ -63,26 +67,6 @@ const transforms = {
 						anchor: blockAttributes.anchor,
 					},
 					childBlocks
-				);
-			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/quote', 'core/pullquote' ],
-			transform: ( { value, anchor } ) => {
-				return createBlock(
-					'core/list',
-					{
-						anchor,
-					},
-					split(
-						create( { html: value, multilineTag: 'p' } ),
-						__UNSTABLE_LINE_SEPARATOR
-					).map( ( result ) => {
-						return createBlock( 'core/list-item', {
-							content: toHTMLString( { value: result } ),
-						} );
-					} )
 				);
 			},
 		},
@@ -123,25 +107,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ block ],
 			transform: ( _attributes, childBlocks ) => {
-				return childBlocks
-					.filter( ( { name } ) => name === 'core/list-item' )
-					.map( ( { attributes } ) =>
-						createBlock( block, {
-							content: attributes.content,
-						} )
-					);
-			},
-		} ) ),
-		...[ 'core/quote', 'core/pullquote' ].map( ( block ) => ( {
-			type: 'block',
-			blocks: [ block ],
-			transform: ( attributes, innerBlocks ) => {
-				return switchToBlockType(
-					switchToBlockType(
-						createBlock( 'core/list', attributes, innerBlocks ),
-						'core/paragraph'
-					),
-					block
+				return getListContentFlat( childBlocks ).map( ( content ) =>
+					createBlock( block, {
+						content,
+					} )
 				);
 			},
 		} ) ),

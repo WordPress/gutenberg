@@ -24,6 +24,7 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -200,6 +201,9 @@ function AudioEdit( {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
 						aria-label={ __( 'Audio caption text' ) }
 						placeholder={ __( 'Add caption' ) }
 						value={ caption }

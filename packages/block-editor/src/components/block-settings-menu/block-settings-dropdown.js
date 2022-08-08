@@ -42,7 +42,9 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+	const copyMenuItemLabel =
+		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
+	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
 export function BlockSettingsDropdown( {
@@ -123,7 +125,10 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
-	const blockTitle = useBlockDisplayTitle( firstBlockClientId, 25 );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: firstBlockClientId,
+		maximumLength: 25,
+	} );
 
 	const updateSelectionAfterRemove = useCallback(
 		__experimentalSelectBlock

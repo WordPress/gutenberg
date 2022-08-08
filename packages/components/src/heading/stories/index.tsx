@@ -19,7 +19,11 @@ const meta: ComponentMeta< typeof Heading > = {
 		letterSpacing: { control: { type: 'text' } },
 		lineHeight: { control: { type: 'text' } },
 		optimizeReadabilityFor: { control: { type: 'color' } },
-		variant: { control: { type: 'radio' }, options: [ 'muted' ] },
+		variant: {
+			control: { type: 'radio' },
+			options: [ 'undefined', 'muted' ],
+			mapping: { undefined, muted: 'muted' },
+		},
 		weight: { control: { type: 'text' } },
 	},
 	parameters: {

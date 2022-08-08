@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flatMap, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -51,8 +46,8 @@ export function rawHandler( { HTML = '' } ) {
 	const pieces = shortcodeConverter( HTML );
 	const blockContentSchema = getBlockContentSchema();
 
-	return compact(
-		flatMap( pieces, ( piece ) => {
+	return pieces
+		.map( ( piece ) => {
 			// Already a block from shortcode.
 			if ( typeof piece !== 'string' ) {
 				return piece;
@@ -78,5 +73,6 @@ export function rawHandler( { HTML = '' } ) {
 
 			return htmlToBlocks( piece );
 		} )
-	);
+		.flat()
+		.filter( Boolean );
 }

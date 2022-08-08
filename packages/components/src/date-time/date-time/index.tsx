@@ -34,6 +34,7 @@ function UnforwardedDateTimePicker(
 		onMonthPreviewed = noop,
 		onChange,
 		events,
+		startOfWeek,
 		__nextRemoveHelpButton = false,
 		__nextRemoveResetButton = false,
 	}: DateTimePickerProps,
@@ -76,6 +77,7 @@ function UnforwardedDateTimePicker(
 						isInvalidDate={ isInvalidDate }
 						events={ events }
 						onMonthPreviewed={ onMonthPreviewed }
+						startOfWeek={ startOfWeek }
 					/>
 				</>
 			) }

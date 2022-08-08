@@ -12,6 +12,7 @@ import { useMemo } from '@wordpress/element';
 import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
+import { __unstablePresetDuotoneFilter as PresetDuotoneFilter } from '../../components/duotone';
 import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
@@ -28,11 +29,12 @@ function AutoBlockPreview( {
 		useResizeObserver();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, assets } = useSelect( ( select ) => {
+	const { styles, assets, duotone } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
 			assets: settings.__unstableResolvedAssets,
+			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
 
@@ -51,11 +53,14 @@ function AutoBlockPreview( {
 		return styles;
 	}, [ styles ] );
 
+	const svgFilters = useMemo( () => {
+		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
+	}, [ duotone ] );
+
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
-
 	return (
 		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
@@ -100,12 +105,21 @@ function AutoBlockPreview( {
 						// See: https://github.com/WordPress/gutenberg/pull/38175.
 						maxHeight: MAX_HEIGHT,
 						minHeight:
-							scale < 1 && __experimentalMinHeight
+							scale !== 0 && scale < 1 && __experimentalMinHeight
 								? __experimentalMinHeight / scale
 								: __experimentalMinHeight,
 					} }
 				>
 					{ contentResizeListener }
+					{
+						/* Filters need to be rendered before children to avoid Safari rendering issues. */
+						svgFilters.map( ( preset ) => (
+							<PresetDuotoneFilter
+								preset={ preset }
+								key={ preset.slug }
+							/>
+						) )
+					}
 					<MemoizedBlockList renderAppender={ false } />
 				</Iframe>
 			</Disabled>

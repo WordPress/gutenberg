@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, has, isString, includes, some } from 'lodash';
+import { find, get, has, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -534,7 +534,7 @@ export function isEditedPostEmpty( state ) {
 
 	if ( blocks.length ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
-		// joined with with newlines such that even if every individual block
+		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
 		if ( blocks.length > 1 ) {
 			return false;
@@ -1605,10 +1605,9 @@ export function __experimentalGetTemplateInfo( state, template ) {
 	const { title: defaultTitle, description: defaultDescription } =
 		__experimentalGetDefaultTemplateType( state, slug );
 
-	const templateTitle = isString( title ) ? title : title?.rendered;
-	const templateDescription = isString( description )
-		? description
-		: description?.raw;
+	const templateTitle = typeof title === 'string' ? title : title?.rendered;
+	const templateDescription =
+		typeof description === 'string' ? description : description?.raw;
 	const templateIcon =
 		__experimentalGetDefaultTemplatePartAreas( state ).find(
 			( item ) => area === item.area

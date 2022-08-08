@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, omit, sortBy, zip } from 'lodash';
+import { get, omit, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -199,8 +199,8 @@ function mapMenuItemsToBlocks( menuItems ) {
 		return createBlock( itemBlockName, attributes, nestedBlocks );
 	} );
 
-	return zip( blocks, sortedItems ).map( ( [ block, menuItem ] ) =>
-		addRecordIdToBlock( block, menuItem.id )
+	return blocks.map( ( block, blockIndex ) =>
+		addRecordIdToBlock( block, sortedItems[ blockIndex ].id )
 	);
 }
 

@@ -9,6 +9,7 @@ import { mapValues } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -18,6 +19,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 
 export default function EditTemplateTitle() {
+	const [ forceEmpty, setForceEmpty ] = useState( false );
 	const { template } = useSelect( ( select ) => {
 		const { getEditedPostTemplate } = select( editPostStore );
 		return {
@@ -45,11 +47,18 @@ export default function EditTemplateTitle() {
 		<div className="edit-site-template-details__group">
 			<TextControl
 				label={ __( 'Title' ) }
-				value={ templateTitle }
+				value={ forceEmpty ? '' : templateTitle }
 				help={ __(
 					'Give the template a title that indicates its purpose, e.g. "Full Width".'
 				) }
 				onChange={ ( newTitle ) => {
+					// Allow having the field temporarily empty while typing.
+					if ( ! newTitle && ! forceEmpty ) {
+						setForceEmpty( true );
+						return;
+					}
+					setForceEmpty( false );
+
 					const settings = getEditorSettings();
 					const newAvailableTemplates = mapValues(
 						settings.availableTemplates,
@@ -68,6 +77,7 @@ export default function EditTemplateTitle() {
 						title: newTitle,
 					} );
 				} }
+				onBlur={ () => setForceEmpty( false ) }
 			/>
 		</div>
 	);

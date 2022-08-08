@@ -20,12 +20,12 @@ import {
 	contextConnect,
 	WordPressComponentProps,
 } from '../ui/context';
-import { HStack } from '../h-stack';
-import { Spacer } from '../spacer';
 import {
 	ColorfulWrapper,
 	SelectControl,
 	AuxiliaryColorArtefactWrapper,
+	AuxiliaryColorArtefactHStackHeader,
+	ColorInputWrapper,
 } from './styles';
 import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
@@ -95,7 +95,7 @@ const ColorPicker = (
 				enableAlpha={ enableAlpha }
 			/>
 			<AuxiliaryColorArtefactWrapper>
-				<HStack justify="space-between">
+				<AuxiliaryColorArtefactHStackHeader justify="space-between">
 					<SelectControl
 						options={ options }
 						value={ colorType }
@@ -109,14 +109,15 @@ const ColorPicker = (
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
 					/>
-				</HStack>
-				<Spacer margin={ 4 } />
-				<ColorInput
-					colorType={ colorType }
-					color={ safeColordColor }
-					onChange={ handleChange }
-					enableAlpha={ enableAlpha }
-				/>
+				</AuxiliaryColorArtefactHStackHeader>
+				<ColorInputWrapper direction="column" gap={ 2 }>
+					<ColorInput
+						colorType={ colorType }
+						color={ safeColordColor }
+						onChange={ handleChange }
+						enableAlpha={ enableAlpha }
+					/>
+				</ColorInputWrapper>
 			</AuxiliaryColorArtefactWrapper>
 		</ColorfulWrapper>
 	);

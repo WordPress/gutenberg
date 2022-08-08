@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flattenDeep } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -28,7 +23,7 @@ export const ALIGNMENT_LABEL = {
 };
 
 // Transforms GRID into a flat Array of values.
-export const ALIGNMENTS = flattenDeep( GRID );
+export const ALIGNMENTS = GRID.flat();
 
 /**
  * Parses and transforms an incoming value to better match the alignment values

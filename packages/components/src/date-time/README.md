@@ -77,6 +77,13 @@ List of events to show in the date picker. Each event will appear as a dot on th
 -   Type: `Array`
 -   Required: No
 
+### `startOfWeek`: `number`
+
+The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+
+- Required: No
+- Default: 0
+
 ### `__nextRemoveHelpButton`: `boolean`
 
 Start opting in to not displaying a Help button which will become the default in a future version.

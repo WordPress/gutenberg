@@ -15,7 +15,10 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
+class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver {
+
+
+
 	/**
 	 * Given a theme.json structure modifies it in place
 	 * to update certain values by its translated strings
@@ -33,23 +36,6 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 		}
 
 		return translate_settings_using_i18n_schema( static::$i18n_schema, $theme_json, $domain );
-	}
-
-	/**
-	 * Return core's origin config.
-	 *
-	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
-	 */
-	public static function get_core_data() {
-		if ( null !== static::$core ) {
-			return static::$core;
-		}
-
-		$config       = static::read_json_file( __DIR__ . '/theme.json' );
-		$config       = static::translate( $config );
-		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
-
-		return static::$core;
 	}
 
 	/**
@@ -158,5 +144,154 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver_5_9 {
 			}
 		}
 		return $variations;
+	}
+
+	/**
+	 * Returns the custom post type that contains the user's origin config
+	 * for the current theme or a void array if none are found.
+	 *
+	 * This can also create and return a new draft custom post type.
+	 *
+	 * @param WP_Theme $theme              The theme object.  If empty, it
+	 *                                     defaults to the current theme.
+	 * @param bool     $create_post        Optional. Whether a new custom post
+	 *                                     type should be created if none are
+	 *                                     found.  False by default.
+	 * @param array    $post_status_filter Filter Optional. custom post type by
+	 *                                     post status.  ['publish'] by default,
+	 *                                     so it only fetches published posts.
+	 * @return array Custom Post Type for the user's origin config.
+	 */
+	public static function get_user_data_from_wp_global_styles( $theme, $create_post = false, $post_status_filter = array( 'publish' ) ) {
+		if ( ! $theme instanceof WP_Theme ) {
+			$theme = wp_get_theme();
+		}
+		$user_cpt         = array();
+		$post_type_filter = 'wp_global_styles';
+		$args             = array(
+			'numberposts' => 1,
+			'orderby'     => 'date',
+			'order'       => 'desc',
+			'post_type'   => $post_type_filter,
+			'post_status' => $post_status_filter,
+			'tax_query'   => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $theme->get_stylesheet(),
+				),
+			),
+		);
+
+		$cache_key = sprintf( 'wp_global_styles_%s', md5( serialize( $args ) ) );
+		$post_id   = wp_cache_get( $cache_key );
+
+		if ( (int) $post_id > 0 ) {
+			return get_post( $post_id, ARRAY_A );
+		}
+
+		// Special case: '-1' is a results not found.
+		if ( -1 === $post_id && ! $create_post ) {
+			return $user_cpt;
+		}
+
+		$recent_posts = wp_get_recent_posts( $args );
+		if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
+			$user_cpt = $recent_posts[0];
+		} elseif ( $create_post ) {
+			$cpt_post_id = wp_insert_post(
+				array(
+					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_status'  => 'publish',
+					'post_title'   => __( 'Custom Styles', 'default' ),
+					'post_type'    => $post_type_filter,
+					'post_name'    => 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() ),
+					'tax_input'    => array(
+						'wp_theme' => array( wp_get_theme()->get_stylesheet() ),
+					),
+				),
+				true
+			);
+			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
+		}
+		$cache_expiration = $user_cpt ? DAY_IN_SECONDS : HOUR_IN_SECONDS;
+		wp_cache_set( $cache_key, $user_cpt ? $user_cpt['ID'] : -1, '', $cache_expiration );
+
+		return $user_cpt;
+	}
+
+	/**
+	 * Returns the user's origin config.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
+	 */
+	public static function get_user_data() {
+		if ( null !== static::$user ) {
+			return static::$user;
+		}
+
+		$config   = array();
+		$user_cpt = static::get_user_data_from_wp_global_styles( wp_get_theme() );
+
+		if ( array_key_exists( 'post_content', $user_cpt ) ) {
+			$decoded_data = json_decode( $user_cpt['post_content'], true );
+
+			$json_decoding_error = json_last_error();
+			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+			}
+
+			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
+			// If is not true the content was not escaped and is not safe.
+			if (
+				is_array( $decoded_data ) &&
+				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
+				$decoded_data['isGlobalStylesUserThemeJSON']
+			) {
+				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+				$config = $decoded_data;
+			}
+		}
+		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+
+		return static::$user;
+	}
+
+	/**
+	 * There are three sources of data (origins) for a site:
+	 * default, theme, and custom. The custom's has higher priority
+	 * than the theme's, and the theme's higher than defaults's.
+	 *
+	 * Unlike the getters {@link get_core_data},
+	 * {@link get_theme_data}, and {@link get_user_data},
+	 * this method returns data after it has been merged
+	 * with the previous origins. This means that if the same piece of data
+	 * is declared in different origins (user, theme, and core),
+	 * the last origin overrides the previous.
+	 *
+	 * For example, if the user has set a background color
+	 * for the paragraph block, and the theme has done it as well,
+	 * the user preference wins.
+	 *
+	 * @param string $origin Optional. To what level should we merge data.
+	 *                       Valid values are 'theme' or 'custom'.
+	 *                       Default is 'custom'.
+	 * @return WP_Theme_JSON_Gutenberg
+	 */
+	public static function get_merged_data( $origin = 'custom' ) {
+		if ( is_array( $origin ) ) {
+			_deprecated_argument( __FUNCTION__, '5.9' );
+		}
+
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( static::get_core_data() );
+		$result->merge( static::get_theme_data() );
+
+		if ( 'custom' === $origin ) {
+			$result->merge( static::get_user_data() );
+		}
+
+		return $result;
 	}
 }

@@ -65,12 +65,31 @@ function useStylesCompatibility() {
 				return;
 			}
 
-			const isMatch = Array.from( cssRules ).find(
-				( { selectorText } ) =>
-					selectorText &&
-					( selectorText.includes( `.${ BODY_CLASS_NAME }` ) ||
-						selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-			);
+			function matchFromRules( _cssRules ) {
+				return Array.from( _cssRules ).find(
+					( {
+						selectorText,
+						conditionText,
+						cssRules: __cssRules,
+					} ) => {
+						// If the rule is conditional then it will not have selector text.
+						// Recurse into child CSS ruleset to determine selector eligibility.
+						if ( conditionText ) {
+							return matchFromRules( __cssRules );
+						}
+
+						return (
+							selectorText &&
+							( selectorText.includes(
+								`.${ BODY_CLASS_NAME }`
+							) ||
+								selectorText.includes( `.${ BLOCK_PREFIX }` ) )
+						);
+					}
+				);
+			}
+
+			const isMatch = matchFromRules( cssRules );
 
 			if (
 				isMatch &&

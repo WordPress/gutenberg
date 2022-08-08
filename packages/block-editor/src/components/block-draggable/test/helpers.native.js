@@ -7,7 +7,7 @@ import {
 	initializeEditor,
 	waitForStoreResolvers,
 	within,
-	advanceAnimationByFrame,
+	advanceAnimationByFrames,
 } from 'test/helpers';
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
@@ -135,7 +135,7 @@ export const fireLongPress = (
 	}
 	// Advance timers one frame to ensure that shared values
 	// are updated and trigger animation reactions.
-	act( () => advanceAnimationByFrame( 1 ) );
+	act( () => advanceAnimationByFrames( 1 ) );
 };
 
 /**
@@ -162,7 +162,7 @@ export const firePanGesture = (
 	] );
 	// Advance timers one frame to ensure that shared values
 	// are updated and trigger animation reactions.
-	act( () => advanceAnimationByFrame( 1 ) );
+	act( () => advanceAnimationByFrames( 1 ) );
 };
 
 /**

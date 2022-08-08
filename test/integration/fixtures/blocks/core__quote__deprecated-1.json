@@ -3,9 +3,18 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>Testing deprecated quote block...</p>",
 			"citation": "...with a caption"
 		},
-		"innerBlocks": []
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Testing deprecated quote block...",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
 	}
 ]

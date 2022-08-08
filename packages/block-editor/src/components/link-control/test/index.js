@@ -4,7 +4,6 @@
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 import { queryByText, queryByRole } from '@testing-library/react';
-import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -18,13 +17,20 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import LinkControl from '../';
-import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+import {
+	fauxEntitySuggestions,
+	fetchFauxEntitySuggestions,
+	uniqueId,
+} from './fixtures';
 
 // Mock debounce() so that it runs instantly.
-lodash.debounce = jest.fn( ( callback ) => {
-	callback.cancel = jest.fn();
-	return callback;
-} );
+jest.mock( 'lodash', () => ( {
+	...jest.requireActual( 'lodash' ),
+	debounce: ( fn ) => {
+		fn.cancel = jest.fn();
+		return fn;
+	},
+} ) );
 
 const mockFetchSearchSuggestions = jest.fn();
 
@@ -357,7 +363,7 @@ describe( 'Searching for a link', () => {
 
 	it( 'should display only search suggestions when current input value is not URL-like', async () => {
 		const searchTerm = 'Hello world';
-		const firstFauxSuggestion = first( fauxEntitySuggestions );
+		const firstFauxSuggestion = fauxEntitySuggestions[ 0 ];
 
 		act( () => {
 			render( <LinkControl />, container );
@@ -377,9 +383,9 @@ describe( 'Searching for a link', () => {
 
 		const searchResultElements = getSearchResults();
 
-		const firstSearchResultItemHTML =
-			first( searchResultElements ).innerHTML;
-		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
+		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
+		const lastSearchResultItemHTML =
+			searchResultElements[ searchResultElements.length - 1 ].innerHTML;
 
 		expect( searchResultElements ).toHaveLength(
 			fauxEntitySuggestions.length
@@ -502,7 +508,8 @@ describe( 'Searching for a link', () => {
 			const searchResultElements = getSearchResults();
 
 			const lastSearchResultItemHTML =
-				last( searchResultElements ).innerHTML;
+				searchResultElements[ searchResultElements.length - 1 ]
+					.innerHTML;
 			const additionalDefaultFallbackURLSuggestionLength = 1;
 
 			// We should see a search result for each of the expect search suggestions
@@ -974,11 +981,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				'[role="listbox"] [role="option"]'
 			);
 
-			const createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
-				)
-			);
+			const createButton = Array.from( searchResultElements ).filter(
+				( result ) => result.innerHTML.includes( 'Create:' )
+			)[ 0 ];
 
 			expect( createButton ).not.toBeNull();
 			expect( createButton.innerHTML ).toEqual(
@@ -1071,11 +1076,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			'[role="listbox"] [role="option"]'
 		);
 
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
-			)
-		);
+		const createButton = Array.from( searchResultElements ).filter(
+			( result ) => result.innerHTML.includes( 'Create:' )
+		)[ 0 ];
 
 		await act( async () => {
 			Simulate.click( createButton );
@@ -1143,11 +1146,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
-			)
-		);
+		const createButton = Array.from( searchResultElements ).filter(
+			( result ) => result.innerHTML.includes( 'Create:' )
+		)[ 0 ];
 
 		// Step down into the search results, highlighting the first result item.
 		act( () => {
@@ -1210,11 +1211,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			'[role="listbox"] [role="option"]'
 		);
 
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Custom suggestion text' )
-			)
-		);
+		const createButton = Array.from( searchResultElements ).filter(
+			( result ) => result.innerHTML.includes( 'Custom suggestion text' )
+		)[ 0 ];
 
 		expect( createButton ).not.toBeNull();
 	} );
@@ -1241,11 +1240,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				const searchResultElements = container.querySelectorAll(
 					'[role="listbox"] [role="option"]'
 				);
-				const createButton = first(
-					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'Create:' )
-					)
-				);
+				const createButton = Array.from( searchResultElements ).filter(
+					( result ) => result.innerHTML.includes( 'Create:' )
+				)[ 0 ];
 
 				// Verify input has no value.
 				expect( searchInput.value ).toBe( '' );
@@ -1275,11 +1272,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
-			const createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
-				)
-			);
+			const createButton = Array.from( searchResultElements ).filter(
+				( result ) => result.innerHTML.includes( 'New page' )
+			)[ 0 ];
 
 			// Verify input has no value.
 			expect( searchInput.value ).toBe( '' );
@@ -1321,11 +1316,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					'[role="listbox"] [role="option"]'
 				);
 
-				const createButton = first(
-					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
-					)
-				);
+				const createButton = Array.from( searchResultElements ).filter(
+					( result ) => result.innerHTML.includes( 'New page' )
+				)[ 0 ];
 
 				expect( createButton ).toBeFalsy(); // Shouldn't exist!
 			}
@@ -1366,11 +1359,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			let searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
-			let createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
-				)
-			);
+			let createButton = Array.from( searchResultElements ).filter(
+				( result ) => result.innerHTML.includes( 'Create:' )
+			)[ 0 ];
 
 			await act( async () => {
 				Simulate.click( createButton );
@@ -1407,18 +1398,16 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			searchResultElements = container.querySelectorAll(
 				'[role="listbox"] [role="option"]'
 			);
-			createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
-				)
-			);
+			createButton = Array.from( searchResultElements ).filter(
+				( result ) => result.innerHTML.includes( 'New page' )
+			)[ 0 ];
 		} );
 	} );
 } );
 
 describe( 'Selecting links', () => {
 	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -1447,7 +1436,7 @@ describe( 'Selecting links', () => {
 	} );
 
 	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
@@ -1484,7 +1473,7 @@ describe( 'Selecting links', () => {
 
 	describe( 'Selection using mouse click', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
+			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1528,7 +1517,7 @@ describe( 'Selecting links', () => {
 
 				const searchResultElements = getSearchResults();
 
-				const firstSearchSuggestion = first( searchResultElements );
+				const firstSearchSuggestion = searchResultElements[ 0 ];
 
 				// Simulate selecting the first of the search suggestions.
 				act( () => {
@@ -1557,7 +1546,7 @@ describe( 'Selecting links', () => {
 
 	describe( 'Selection using keyboard', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
+			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1607,8 +1596,8 @@ describe( 'Selecting links', () => {
 
 				const searchResultElements = getSearchResults();
 
-				const firstSearchSuggestion = first( searchResultElements );
-				const secondSearchSuggestion = nth( searchResultElements, 1 );
+				const firstSearchSuggestion = searchResultElements[ 0 ];
+				const secondSearchSuggestion = searchResultElements[ 1 ];
 
 				let selectedSearchResultElement = container.querySelector(
 					'[role="option"][aria-selected="true"]'
@@ -1711,8 +1700,8 @@ describe( 'Selecting links', () => {
 
 			const searchResultElements = getSearchResults();
 
-			const firstSearchSuggestion = first( searchResultElements );
-			const secondSearchSuggestion = nth( searchResultElements, 1 );
+			const firstSearchSuggestion = searchResultElements[ 0 ];
+			const secondSearchSuggestion = searchResultElements[ 1 ];
 
 			let selectedSearchResultElement = container.querySelector(
 				'[role="option"][aria-selected="true"]'
@@ -1758,7 +1747,7 @@ describe( 'Selecting links', () => {
 
 describe( 'Addition Settings UI', () => {
 	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 		const expectedSettingText = 'Open in new tab';
 
 		const LinkControlConsumer = () => {
@@ -1791,7 +1780,7 @@ describe( 'Addition Settings UI', () => {
 	} );
 
 	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const customSettings = [
 			{
@@ -2266,7 +2255,7 @@ describe( 'Rich link previews', () => {
 } );
 
 describe( 'Controlling link title text', () => {
-	const selectedLink = first( fauxEntitySuggestions );
+	const selectedLink = fauxEntitySuggestions[ 0 ];
 
 	it( 'should not show a means to alter the link title text by default', async () => {
 		act( () => {
@@ -2285,7 +2274,7 @@ describe( 'Controlling link title text', () => {
 		'should not show the link title text input when the URL is `%s`',
 		async ( urlValue ) => {
 			const selectedLinkWithoutURL = {
-				...first( fauxEntitySuggestions ),
+				...fauxEntitySuggestions[ 0 ],
 				url: urlValue,
 			};
 
@@ -2428,10 +2417,12 @@ describe( 'Controlling link title text', () => {
 			Simulate.keyDown( textInput, { keyCode: ENTER } );
 		} );
 
-		expect( mockOnChange ).toHaveBeenCalledWith( {
-			title: textValue,
-			url: selectedLink.url,
-		} );
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: textValue,
+				url: selectedLink.url,
+			} )
+		);
 
 		// The text input should not be showing as the form is submitted.
 		expect(

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { fireEvent, render } from '@testing-library/react';
-import { each } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,7 @@ import { NavigableMenu } from '../menu';
 
 function simulateVisible( container, selector ) {
 	const elements = container.querySelectorAll( selector );
-	each( elements, ( elem ) => {
+	elements.forEach( ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
 		];

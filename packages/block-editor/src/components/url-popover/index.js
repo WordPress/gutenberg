@@ -33,6 +33,7 @@ function URLPopover( {
 			className="block-editor-url-popover"
 			focusOnMount={ focusOnMount }
 			position={ position }
+			__unstableShift
 			{ ...popoverProps }
 		>
 			<div className="block-editor-url-popover__input-container">

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 12.8.0 (2022-07-27)
+
+### Code Quality
+
+-   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)). 
+
+## 12.6.0 (2022-06-29)
+
+-   Enable `no-unused-vars`'s setting `ignoreRestSiblings` to allow unused variables when destructuring with rest properties ([#41897](https://github.com/WordPress/gutenberg/pull/41897)).
+
 ## 12.2.0 (2022-05-04)
 
 ### Bug Fix

@@ -156,6 +156,7 @@ Attribute available in the block:
 
 Most attributes from markup will be of type `string`. Numeric attributes in HTML are still stored as strings, and are not converted automatically.
 
+Attribute definition:
 ```js
 {
 	width: {
@@ -167,12 +168,14 @@ Most attributes from markup will be of type `string`. Numeric attributes in HTML
 }
 ```
 
+Attribute available in the block:
 ```js
 { "width": "50" }
 ```
 
 The only exception is when checking for the existence of an attribute (for example, the `disabled` attribute on a `button`). In that case type `boolean` can be used and the stored value will be a boolean.
 
+Attribute definition:
 ```js
 {
 	disabled: {
@@ -184,6 +187,7 @@ The only exception is when checking for the existence of an attribute (for examp
 }
 ```
 
+Attribute available in the block:
 ```js
 { "disabled": true }
 ```
@@ -230,7 +234,7 @@ Saved content:
 
 Attribute definition:
 ```js
-attributes: {
+{
 	content: {
 		type: 'string',
 		source: 'text',
@@ -244,7 +248,7 @@ Attribute available in the block:
 { "content": "The inner text of .my-content class" }
 ```
 
-### `html`
+### `html` source
 
 Use `html` to extract the inner HTML from markup. Note that text is returned according to the rules of [`innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerHTML).
 
@@ -259,7 +263,7 @@ Saved content:
 
 Attribute definition:
 ```js
-attributes {
+{
 	content: {
 		type: 'string',
 		source: 'html',
@@ -275,6 +279,7 @@ Attribute available in the block:
 
 Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
 
+Attribute definition:
 ```js
 {
 	content: {
@@ -291,7 +296,7 @@ Attribute available in the block:
 { "content": "<p>First line</p><p>Second line</p>" }
 ```
 
-### `query`
+### `query` source
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the `selector` argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.
 
@@ -333,21 +338,22 @@ Attribute definition:
 Attribute available in the block:
 ```js
 {
-  "images": [
-    { "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
-    { "url": "https://lorempixel.com/50/50/", "alt": "small image" }
-  ]
+	"images": [
+		{ "url": "https://lorempixel.com/1200/800/", "alt": "large image" },
+		{ "url": "https://lorempixel.com/50/50/", "alt": "small image" }
+	]
 }
 ```
 
-## Meta (deprecated)
+### Meta source (deprecated)
 
 <div class="callout callout-alert">
 Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/#step-2-add-meta-block">Create Meta Block how-to</a>.
 </div>
 
-Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key:
+Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key.
 
+Attribute definition:
 ```js
 {
 	author: {
@@ -390,7 +396,7 @@ edit: function( props ) {
 
 {% end %}
 
-### Considerations
+#### Considerations
 
 By default, a meta field will be excluded from a post object's meta. This can be circumvented by explicitly making the field visible:
 

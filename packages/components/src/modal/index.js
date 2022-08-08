@@ -10,8 +10,10 @@ import classnames from 'classnames';
  */
 import {
 	createPortal,
+	useCallback,
 	useEffect,
 	useRef,
+	useState,
 	forwardRef,
 } from '@wordpress/element';
 import {
@@ -24,7 +26,7 @@ import {
 } from '@wordpress/compose';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -73,6 +75,8 @@ function Modal( props, forwardedRef ) {
 	const focusReturnRef = useFocusReturn();
 	const focusOutsideProps = useFocusOutside( onRequestClose );
 
+	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+
 	useEffect( () => {
 		openModalCount++;
 
@@ -89,7 +93,7 @@ function Modal( props, forwardedRef ) {
 				ariaHelper.showApp();
 			}
 		};
-	}, [] );
+	}, [ bodyOpenClassName ] );
 
 	function handleEscapeKeyDown( event ) {
 		if (
@@ -103,6 +107,19 @@ function Modal( props, forwardedRef ) {
 			}
 		}
 	}
+
+	const onContentContainerScroll = useCallback(
+		( e ) => {
+			const scrollY = e?.target?.scrollTop ?? -1;
+
+			if ( ! hasScrolledContent && scrollY > 0 ) {
+				setHasScrolledContent( true );
+			} else if ( hasScrolledContent && scrollY <= 0 ) {
+				setHasScrolledContent( false );
+			}
+		},
+		[ hasScrolledContent ]
+	);
 
 	return createPortal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -142,8 +159,10 @@ function Modal( props, forwardedRef ) {
 					<div
 						className={ classnames( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
+							'has-scrolled-content': hasScrolledContent,
 						} ) }
 						role="document"
+						onScroll={ onContentContainerScroll }
 					>
 						{ ! __experimentalHideHeader && (
 							<div className="components-modal__header">
@@ -168,7 +187,7 @@ function Modal( props, forwardedRef ) {
 								{ isDismissible && (
 									<Button
 										onClick={ onRequestClose }
-										icon={ closeSmall }
+										icon={ close }
 										label={
 											closeButtonLabel ||
 											__( 'Close dialog' )

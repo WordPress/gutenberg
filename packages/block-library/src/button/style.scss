@@ -8,7 +8,6 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	text-decoration: none;
 	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
 
@@ -27,6 +26,19 @@ $blocks-block__margin: 0.5em;
 		/*rtl:ignore*/
 		text-align: right;
 	}
+}
+
+// These rules are set to zero specificity to keep the default styles for buttons.
+// They are needed for backwards compatibility.
+:where(.wp-block-button__link) {
+	// This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+	text-decoration: none;
+
+	// 100% causes an oval, but any explicit but really high value retains the pill shape.
+	border-radius: 9999px;
+
+	// The extra 2px are added to size solids the same as the outline versions.
+	padding: calc(0.667em + 2px) calc(1.333em + 2px);
 }
 
 // Increased specificity needed to override margins.

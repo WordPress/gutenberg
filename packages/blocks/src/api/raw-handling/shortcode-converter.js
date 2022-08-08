@@ -83,35 +83,69 @@ function segmentHTMLToShortcodeBlock(
 			] );
 		}
 
-		const attributes = mapValues(
-			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
+		let blocks = [];
+		if ( typeof transformation.transform === 'function' ) {
 			// Passing all of `match` as second argument is intentionally broad
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			( schema ) => schema.shortcode( match.shortcode.attrs, match )
-		);
+			blocks = [].concat(
+				transformation.transform( match.shortcode.attrs, match )
+			);
 
-		const transformationBlockType = {
-			...getBlockType( transformation.blockName ),
-			attributes: transformation.attributes,
-		};
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			blocks = blocks.map( ( block ) => {
+				block.originalContent = match.shortcode.content;
+				return applyBuiltInValidationFixes(
+					block,
+					getBlockType( block.name )
+				);
+			} );
+		} else {
+			const attributes = mapValues(
+				pickBy(
+					transformation.attributes,
+					( schema ) => schema.shortcode
+				),
+				// Passing all of `match` as second argument is intentionally broad
+				// but shouldn't be too relied upon.
+				//
+				// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+				( schema ) => schema.shortcode( match.shortcode.attrs, match )
+			);
 
-		let block = createBlock(
-			transformation.blockName,
-			getBlockAttributes(
-				transformationBlockType,
-				match.shortcode.content,
-				attributes
-			)
-		);
-		block.originalContent = match.shortcode.content;
-		// Applying the built-in fixes can enhance the attributes with missing content like "className".
-		block = applyBuiltInValidationFixes( block, transformationBlockType );
+			const blockType = getBlockType( transformation.blockName );
+			if ( ! blockType ) {
+				return [ HTML ];
+			}
+
+			const transformationBlockType = {
+				...blockType,
+				attributes: transformation.attributes,
+			};
+
+			let block = createBlock(
+				transformation.blockName,
+				getBlockAttributes(
+					transformationBlockType,
+					match.shortcode.content,
+					attributes
+				)
+			);
+
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			block.originalContent = match.shortcode.content;
+			block = applyBuiltInValidationFixes(
+				block,
+				transformationBlockType
+			);
+
+			blocks = [ block ];
+		}
 
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML ),
-			block,
+			...blocks,
 			...segmentHTMLToShortcodeBlock( afterHTML ),
 		];
 	}

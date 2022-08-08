@@ -41,7 +41,7 @@ export default function Edit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	const displayName = useSelect(
+	let displayName = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 
@@ -92,15 +92,7 @@ export default function Edit( {
 	);
 
 	if ( ! commentId || ! displayName ) {
-		return (
-			<>
-				{ inspectorControls }
-				{ blockControls }
-				<div { ...blockProps }>
-					{ _x( 'Comment Author', 'block title' ) }
-				</div>
-			</>
-		);
+		displayName = _x( 'Comment Author', 'block title' );
 	}
 
 	const displayAuthor = isLink ? (
@@ -111,9 +103,8 @@ export default function Edit( {
 			{ displayName }
 		</a>
 	) : (
-		{ displayName }
+		displayName
 	);
-
 	return (
 		<>
 			{ inspectorControls }

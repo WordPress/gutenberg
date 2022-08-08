@@ -44,7 +44,6 @@ $navigation-icon-size: 24px;
 	// By adding low specificity, we enable compatibility with link colors set in theme.json,
 	// but still allow them to be overridden by user-set colors.
 	.wp-block-navigation-item__content {
-		color: inherit;
 		display: block;
 
 		// Set the default menu item padding to zero, to allow text-only buttons.
@@ -106,7 +105,7 @@ $navigation-icon-size: 24px;
 			width: inherit;
 			height: inherit;
 
-			// Position the arrow to balance with the the text.
+			// Position the arrow to balance with the text.
 			margin-top: 0.075em;
 		}
 	}
@@ -453,6 +452,10 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
+	.wp-block-navigation-link a {
+		color: inherit;
+	}
+
 	.wp-block-navigation__responsive-container-content {
 		display: flex;
 		flex-wrap: var(--navigation-layout-wrap, wrap);
@@ -673,6 +676,16 @@ button.wp-block-navigation-item__content {
 
 .wp-block-navigation__responsive-dialog {
 	position: relative;
+}
+
+// Adjust open dialog top margin when admin-bar is visible.
+.has-modal-open .admin-bar .wp-block-navigation__responsive-dialog {
+	margin-top: $admin-bar-height-big;
+
+	// Handle smaller admin-bar.
+	@include break-medium() {
+		margin-top: $admin-bar-height;
+	}
 }
 
 // Prevent scrolling of the parent content when the modal is open.

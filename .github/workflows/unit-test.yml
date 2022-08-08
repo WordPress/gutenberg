@@ -46,10 +46,10 @@ jobs:
                   npx lerna run build
 
             - name: Running the tests
-              run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
         name: PHP
@@ -75,14 +75,14 @@ jobs:
                   npm run wp-env start
 
             - name: Running lint check
-              run: npm run lint-php
+              run: npm run lint:php
 
             - name: Running single site unit tests
-              run: npm run test-unit-php
+              run: npm run test:unit:php
               if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
-              run: npm run test-unit-php-multisite
+              run: npm run test:unit:php:multisite
               if: ${{ success() || failure() }}
 
     mobile-unit-js:

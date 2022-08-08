@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { unescape } from 'lodash';
 import type { ComponentProps } from 'react';
 
 /**
@@ -22,7 +21,8 @@ const {
 
 function unescapeAndFormatSpaces( str: string ) {
 	const nbsp = String.fromCharCode( 160 );
-	return unescape( str ).replace( / /g, nbsp );
+	const escaped = new DOMParser().parseFromString( str, 'text/html' );
+	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
 
 class TokenFieldWrapper extends Component<

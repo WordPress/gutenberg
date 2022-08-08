@@ -28,12 +28,15 @@ module.exports = {
 		'/packages/e2e-test-utils-playwright/src/test.ts',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.*/build-types/',
+		'<rootDir>/.+.d.ts$',
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
+	transformIgnorePatterns: [ 'node_modules/(?!(is-plain-obj))' ],
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
 		'@emotion/jest/serializer',

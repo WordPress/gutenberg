@@ -98,13 +98,8 @@ class KeyboardAvoidingView extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			enabled,
-			keyboardVerticalOffset, // eslint-disable-line no-unused-vars
-			style,
-			...props
-		} = this.props;
+		const { children, enabled, keyboardVerticalOffset, style, ...props } =
+			this.props;
 
 		let finalStyle = style;
 		if ( Platform.OS === 'ios' ) {

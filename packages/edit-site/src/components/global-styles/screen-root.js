@@ -46,7 +46,10 @@ function ScreenRoot() {
 					</Card>
 					{ !! variations?.length && (
 						<ItemGroup>
-							<NavigationButtonAsItem path="/variations">
+							<NavigationButtonAsItem
+								path="/variations"
+								aria-label={ __( 'Browse styles' ) }
+							>
 								<HStack justify="space-between">
 									<FlexItem>
 										{ __( 'Browse styles' ) }
@@ -82,7 +85,10 @@ function ScreenRoot() {
 					) }
 				</Spacer>
 				<ItemGroup>
-					<NavigationButtonAsItem path="/blocks">
+					<NavigationButtonAsItem
+						path="/blocks"
+						aria-label={ __( 'Blocks styles' ) }
+					>
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
 							<IconWithCurrentColor

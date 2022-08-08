@@ -96,7 +96,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- /wp:paragraph -->`;
 
 exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
-<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption>C'est la vie my friends</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->

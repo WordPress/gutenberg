@@ -68,7 +68,7 @@ export default function PostVisibility( { onClose } ) {
 	};
 
 	return (
-		<>
+		<div className="editor-post-visibility">
 			<InspectorPopoverHeader
 				title={ __( 'Visibility' ) }
 				help={ __( 'Control how this post is viewed.' ) }
@@ -128,7 +128,7 @@ export default function PostVisibility( { onClose } ) {
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>
-		</>
+		</div>
 	);
 }
 

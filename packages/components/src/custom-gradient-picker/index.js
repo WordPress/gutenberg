@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -34,11 +29,8 @@ import {
 } from './styles/custom-gradient-picker-styles';
 
 const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
-	const angle = get(
-		gradientAST,
-		[ 'orientation', 'value' ],
-		DEFAULT_LINEAR_GRADIENT_ANGLE
-	);
+	const angle =
+		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
 	const onAngleChange = ( newAngle ) => {
 		onChange(
 			serializeGradient( {
@@ -74,9 +66,10 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 
 	const onSetRadialGradient = () => {
+		const { orientation, ...restGradientAST } = gradientAST;
 		onChange(
 			serializeGradient( {
-				...omit( gradientAST, [ 'orientation' ] ),
+				...restGradientAST,
 				type: 'radial-gradient',
 			} )
 		);

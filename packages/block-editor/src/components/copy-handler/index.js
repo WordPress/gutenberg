@@ -10,6 +10,7 @@ import {
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
+	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -156,7 +157,10 @@ export function useClipboardHandler() {
 					}
 					const serialized = serialize( blocks );
 
-					event.clipboardData.setData( 'text/plain', serialized );
+					event.clipboardData.setData(
+						'text/plain',
+						toPlainText( serialized )
+					);
 					event.clipboardData.setData( 'text/html', serialized );
 				}
 			}
@@ -210,6 +214,23 @@ export function useClipboardHandler() {
 
 function CopyHandler( { children } ) {
 	return <div ref={ useClipboardHandler() }>{ children }</div>;
+}
+
+/**
+ * Given a string of HTML representing serialized blocks, returns the plain
+ * text extracted after stripping the HTML of any tags and fixing line breaks.
+ *
+ * @param {string} html Serialized blocks.
+ * @return {string} The plain-text content with any html removed.
+ */
+function toPlainText( html ) {
+	// Manually handle BR tags as line breaks prior to `stripHTML` call
+	html = html.replace( /<br>/g, '\n' );
+
+	const plainText = stripHTML( html ).trim();
+
+	// Merge any consecutive line breaks
+	return plainText.replace( /\n\n+/g, '\n\n' );
 }
 
 /**

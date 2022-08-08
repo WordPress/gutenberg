@@ -1,7 +1,6 @@
-/**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
+let uniqueIdCounter = 1;
+
+export const uniqueId = () => uniqueIdCounter++;
 
 export const fauxEntitySuggestions = [
 	{

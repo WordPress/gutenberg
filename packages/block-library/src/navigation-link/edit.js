@@ -312,7 +312,7 @@ const useIsInvalidLink = ( kind, type, id ) => {
 	return [ isInvalid, isDraft ];
 };
 
-const useMissingText = ( type ) => {
+function getMissingText( type ) {
 	let missingText = '';
 
 	switch ( type ) {
@@ -338,7 +338,7 @@ const useMissingText = ( type ) => {
 	}
 
 	return missingText;
-};
+}
 
 /**
  * Removes HTML from a given string.
@@ -682,7 +682,7 @@ export default function NavigationLinkEdit( {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
-	const missingText = useMissingText( type, isInvalid, isDraft );
+	const missingText = getMissingText( type );
 	/* translators: Whether the navigation link is Invalid or a Draft. */
 	const placeholderText = `(${
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
@@ -849,6 +849,7 @@ export default function NavigationLinkEdit( {
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
+							__unstableShift
 						>
 							<LinkControl
 								hasTextControl

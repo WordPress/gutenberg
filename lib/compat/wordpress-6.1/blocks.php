@@ -6,6 +6,26 @@
  */
 
 /**
+ * Update allowed inline style attributes list.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.1.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_style_attrs_6_1( $attrs ) {
+	$attrs[] = 'flex-wrap';
+	$attrs[] = 'gap';
+	$attrs[] = 'margin-block-start';
+	$attrs[] = 'margin-block-end';
+	$attrs[] = 'margin-inline-start';
+	$attrs[] = 'margin-inline-end';
+
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_1' );
+
+/**
  * Registers view scripts for core blocks if handling is missing in WordPress core.
  *
  * @since 6.1.0

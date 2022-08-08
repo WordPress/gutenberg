@@ -211,23 +211,45 @@ function CoverEdit( {
 		overlayColor,
 	};
 
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			id: undefined,
+			url: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			backgroundType: useFeaturedImage
+				? IMAGE_BACKGROUND_TYPE
+				: undefined,
+		} );
+	};
+
+	const blockControls = (
+		<CoverBlockControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			onSelectMedia={ onSelectMedia }
+			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+		/>
+	);
+
+	const inspectorControls = (
+		<CoverInspectorControls
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			clientId={ clientId }
+			setOverlayColor={ setOverlayColor }
+			coverRef={ ref }
+			currentSettings={ currentSettings }
+			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+		/>
+	);
+
 	if ( ! useFeaturedImage && ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
-				<CoverBlockControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					onSelectMedia={ onSelectMedia }
-					currentSettings={ currentSettings }
-				/>
-				<CoverInspectorControls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-					setOverlayColor={ setOverlayColor }
-					coverRef={ ref }
-					currentSettings={ currentSettings }
-				/>
+				{ blockControls }
+				{ inspectorControls }
 				<div
 					{ ...blockProps }
 					className={ classnames(
@@ -241,6 +263,7 @@ function CoverEdit( {
 						style={ {
 							minHeight: minHeightWithUnit || undefined,
 						} }
+						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -286,20 +309,8 @@ function CoverEdit( {
 
 	return (
 		<>
-			<CoverBlockControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				onSelectMedia={ onSelectMedia }
-				currentSettings={ currentSettings }
-			/>
-			<CoverInspectorControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-				setOverlayColor={ setOverlayColor }
-				coverRef={ ref }
-				currentSettings={ currentSettings }
-			/>
+			{ blockControls }
+			{ inspectorControls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
@@ -388,6 +399,7 @@ function CoverEdit( {
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }
 					onError={ onUploadError }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>
 				<div { ...innerBlocksProps } />
 			</div>

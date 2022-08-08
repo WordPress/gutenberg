@@ -250,10 +250,12 @@ export const trashPost =
 			.resolveSelect( coreStore )
 			.getPostType( postTypeSlug );
 		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			postType;
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
-				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
 				method: 'DELETE',
 			} );
 

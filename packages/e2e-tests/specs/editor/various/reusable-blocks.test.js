@@ -364,6 +364,8 @@ describe( 'Reusable blocks', () => {
 			'.block-editor-block-list__block[aria-label="Block: Quote"]'
 		);
 		await quoteBlock.click();
+		// Select the quote block.
+		await page.keyboard.press( 'ArrowDown' );
 		await openDocumentSettingsSidebar();
 		await page.waitForXPath(
 			'//*[@role="region"][@aria-label="Editor settings"]//button[.="Styles"]'
