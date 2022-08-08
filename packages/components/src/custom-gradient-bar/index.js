@@ -136,9 +136,6 @@ export default function CustomGradientBar( {
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							gradientPickerDomRef={
-								gradientMarkersContainerDomRef
-							}
 							disableAlpha={ disableAlpha }
 							insertPosition={ gradientBarState.insertPosition }
 							value={ controlPoints }
