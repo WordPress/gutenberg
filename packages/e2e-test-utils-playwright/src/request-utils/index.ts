@@ -22,6 +22,7 @@ import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
 import { resetPreferences } from './preferences';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
+import { createUser, deleteUser } from './users';
 
 interface StorageState {
 	cookies: Cookie[];
@@ -38,7 +39,7 @@ class RequestUtils {
 	baseURL?: string;
 
 	pluginsMap: Record< string, string > | null = null;
-
+	userID?: number;
 	static async setup( {
 		user,
 		storageStatePath,
@@ -133,6 +134,9 @@ class RequestUtils {
 	uploadMedia = uploadMedia.bind( this );
 	deleteMedia = deleteMedia.bind( this );
 	deleteAllMedia = deleteAllMedia.bind( this );
+	createUser = createUser.bind( this );
+	deleteUser = deleteUser.bind( this );
+	// getUserID = getUserID.bind( this );
 }
 
 export type { StorageState };
