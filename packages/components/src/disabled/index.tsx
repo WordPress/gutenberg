@@ -57,7 +57,7 @@ function Disabled( {
 	isDisabled = true,
 	...props
 }: WordPressComponentProps< DisabledProps, 'div' > ) {
-	const ref: RefCallback< HTMLElement > = useDisabled();
+	const ref = useDisabled();
 
 	if ( ! isDisabled ) {
 		return <Provider value={ false }>{ children }</Provider>;
