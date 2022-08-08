@@ -74,8 +74,6 @@ export type WithTooltipProps = {
 	children: ReactNode;
 	/**
 	 * Whether or not to wrap children in a tooltip.
-	 *
-	 * @default false
 	 */
 	showTooltip?: boolean;
 	/**
