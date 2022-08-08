@@ -47,10 +47,12 @@ $swatch-gap: 12px;
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
-	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ); // Ensure the popover perfectly wraps the swatches.
-
 	.block-editor-color-gradient-control__panel {
-		padding: $grid-unit-20;
+		$panelPadding: $grid-unit-20;
+
+		// Ensure the popover perfectly wraps the swatches.
+		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
+		padding: $panelPadding;
 	}
 }
 
