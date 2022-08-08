@@ -149,14 +149,14 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	 */
 	public function test_remove_unsafe_properties_and_values() {
 		$input_declarations = array(
-			'color'        => '<red/>',
+			'color'        => 'url("https://wordpress.org")',
 			'margin-right' => '10em',
 			'potato'       => 'uppercase',
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color:&lt;red/&gt;;margin-right:10em;',
+			'margin-right:10em;',
 			$css_declarations->get_declarations_string()
 		);
 	}
@@ -179,7 +179,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url(&quot;https://wordpress.org&quot;);',
+			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url("https://wordpress.org");',
 			$css_declarations->get_declarations_string()
 		);
 	}
