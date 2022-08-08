@@ -6,7 +6,7 @@ The Style Engine powering global styles and block customizations.
 
 ### wp_style_engine_get_styles()
 
-Global public interface method to generate styles from a single style object, e.g., the value of
+Global public function to generate styles from a single style object, e.g., the value of
 a [block's attributes.style object](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#styles)
 or
 the [top level styles in theme.json](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/)
@@ -18,7 +18,7 @@ _Parameters_
 -   _$options_ `array<string|boolean>` An array of options to determine the output.
     -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or '
         global-styles'. Default is 'block-supports'.
-    -   _enqueue_ `boolean` When `true` will attempt to store and enqueue for rendering on the frontend.
+    -   _enqueue_ `boolean` When `true` will attempt to store and enqueue for rendering in a `style` tag on the site frontend.
     -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* )
         values. Default is `false`.
     -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`,
