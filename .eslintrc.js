@@ -86,6 +86,7 @@ module.exports = {
 							'countBy',
 							'defaults',
 							'defaultTo',
+							'delay',
 							'differenceWith',
 							'dropRight',
 							'each',

@@ -7,6 +7,7 @@ import {
 	initializeEditor,
 	getEditorHtml,
 	render,
+	waitFor,
 } from 'test/helpers';
 import { Image } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -38,16 +39,6 @@ subscribeMediaUpload.mockImplementation( ( callback ) => {
 } );
 sendMediaUpload.mockImplementation( ( payload ) => {
 	uploadCallBack( payload );
-} );
-
-/**
- * Immediately invoke delayed functions. A better alternative would be using
- * fake timers and test the delay itself. However, fake timers does not work
- * with our custom waitFor implementation.
- */
-jest.mock( 'lodash', () => {
-	const actual = jest.requireActual( 'lodash' );
-	return { ...actual, delay: ( cb ) => cb() };
 } );
 
 function mockGetMedia( media ) {
@@ -157,6 +148,9 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
+		await waitFor(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
+		);
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
 <figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
@@ -183,6 +177,7 @@ describe( 'Image Block', () => {
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
+		await waitFor( () => screen.getByText( 'Custom URL' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
@@ -191,6 +186,7 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByA11yLabel( 'Apply' ) );
+		await waitFor( () => screen.getByText( 'Custom URL' ) );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -30,7 +30,9 @@ const TEXT_DECORATIONS = [
 export default function TextDecorationControl( { value, onChange } ) {
 	return (
 		<fieldset className="block-editor-text-decoration-control">
-			<legend>{ __( 'Decoration' ) }</legend>
+			<BaseControl.VisualLabel as="legend">
+				{ __( 'Decoration' ) }
+			</BaseControl.VisualLabel>
 			<div className="block-editor-text-decoration-control__buttons">
 				{ TEXT_DECORATIONS.map( ( textDecoration ) => {
 					return (

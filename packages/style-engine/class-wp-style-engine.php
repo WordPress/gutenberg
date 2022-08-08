@@ -365,7 +365,12 @@ class WP_Style_Engine {
 		foreach ( $stores as $key => $store ) {
 			$processor = new WP_Style_Engine_Processor();
 			$processor->add_store( $store );
-			$styles = $processor->get_css( array( 'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) );
+			$styles = $processor->get_css(
+				array(
+					'optimize' => false,
+					'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+				)
+			);
 
 			if ( ! empty( $styles ) ) {
 				wp_register_style( $key, false, array(), true, true );
