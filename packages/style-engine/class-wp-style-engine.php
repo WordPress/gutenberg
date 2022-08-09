@@ -135,7 +135,7 @@ class WP_Style_Engine {
 			),
 		),
 		'spacing'    => array(
-			'padding' => array(
+			'padding'  => array(
 				'property_keys' => array(
 					'default'    => 'padding',
 					'individual' => 'padding-%s',
@@ -145,13 +145,21 @@ class WP_Style_Engine {
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
-			'margin'  => array(
+			'margin'   => array(
 				'property_keys' => array(
 					'default'    => 'margin',
 					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
 				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
+			),
+			'blockGap' => array(
+				'value_func'      => 'static::get_layout_style_css_declarations',
+				'path'            => array( 'spacing', 'blockGap' ),
+				'layout_property' => 'spacingStyles',
+				'css_vars'        => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
@@ -302,6 +310,7 @@ class WP_Style_Engine {
 	 * @param array $options      array(
 	 *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
+	 *     'layout_definitions'         => (array) An array of Layout definitions for use in generating layout styles.
 	 * );.
 	 *
 	 * @return array array(
@@ -314,9 +323,8 @@ class WP_Style_Engine {
 			return array();
 		}
 
-		$css_declarations     = array();
-		$classnames           = array();
-		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$css_declarations = array();
+		$classnames       = array();
 
 		// Collect CSS and classnames.
 		foreach ( static::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
@@ -331,7 +339,9 @@ class WP_Style_Engine {
 				}
 
 				$classnames       = array_merge( $classnames, static::get_classnames( $style_value, $style_definition ) );
-				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $should_skip_css_vars ) );
+
+				// TODO: Instead of just grabbing declarations, can these be rules? Block spacing will require separate selectors.
+				$css_declarations = array_merge( $css_declarations, static::get_css_declarations( $style_value, $style_definition, $options ) );
 			}
 		}
 
@@ -380,15 +390,17 @@ class WP_Style_Engine {
 	/**
 	 * Returns an array of CSS declarations based on valid block style values.
 	 *
-	 * @param array         $style_value          A single raw style value from the generate() $block_styles array.
-	 * @param array<string> $style_definition     A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean       $should_skip_css_vars Whether to skip compiling CSS var values.
+	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
+	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array         $options          Option values, typically provided by `parse_block_styles`.
 	 *
 	 * @return array        An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_css_declarations( $style_value, $style_definition, $should_skip_css_vars = false ) {
+	protected static function get_css_declarations( $style_value, $style_definition, $options = array() ) {
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+
 		if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
-			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $should_skip_css_vars );
+			return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
 		}
 
 		$css_declarations    = array();
@@ -440,13 +452,15 @@ class WP_Style_Engine {
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
-	 * @param array   $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array   $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
-	 * @param boolean $should_skip_css_vars           Whether to skip compiling CSS var values.
+	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array $options                        Option values, typically provided by `parse_block_styles`.
 	 *
 	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
 	 */
-	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $should_skip_css_vars ) {
+	protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options ) {
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+
 		$css_declarations = array();
 
 		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -478,6 +492,68 @@ class WP_Style_Engine {
 			}
 		}
 		return $css_declarations;
+	}
+
+	/**
+	 * Style value parser that returns a CSS definition array comprising style properties
+	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
+	 * e.g., "$style_property-$individual_feature: $value;", which could represent the following:
+	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
+	 * "border-image-{outset|source|width|repeat|slice}: {value};"
+	 *
+	 * @param array $value                          A single raw Gutenberg style attributes value for a CSS property.
+	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array $options                        Option values, typically provided by `parse_block_styles`.
+	 *
+	 * @return array An array of CSS definitions, e.g., array( "$property" => "$value" ).
+	 */
+	protected static function get_layout_style_css_declarations( $value, $individual_property_definition, $options ) {
+		$should_skip_css_vars = isset( $options['convert_vars_to_classnames'] ) && true === $options['convert_vars_to_classnames'];
+		$layout_prop          = $individual_property_definition['layout_property'];
+		$layout_definitions   = _wp_array_get( $options, array( 'layoutDefinitions' ), array() );
+		$layout_type          = _wp_array_get( $options, array( 'layout', 'type' ), 'default' );
+		$selector             = _wp_array_get( $options, array( 'selector' ), '' );
+
+		$rules = array();
+
+		if ( empty( $selector ) ) {
+			return $rules;
+		}
+
+		if ( 'spacingStyles' === $layout_prop ) {
+			// TODO: Convert $style_value from array to string if it's an array.
+			if ( $should_skip_css_vars ) {
+				// Set a CSS var if there is a valid preset value.
+				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
+					$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
+				}
+			}
+		}
+
+		$style_value = $value;
+
+		// TODO: This lookup approach works for individual blocks, but does it hold true for a potential global styles implementation?
+		if ( isset( $layout_definitions[ $layout_type ] ) ) {
+			$layout_definition = $layout_definitions[ $layout_type ];
+			$layout_prop_rules = _wp_array_get( $layout_definition, array( $layout_prop ), array() );
+
+			foreach ( $layout_prop_rules as $layout_prop_rule ) {
+				// Iterate over each of the rules and substitute non-string values such as `null` with the real style value.
+				foreach ( $layout_prop_rule['rules'] as $css_property => $css_value ) {
+					$current_css_value = is_string( $css_value ) ? $css_value : $style_value;
+					$rules[]           = new WP_Style_Engine_CSS_Rule(
+						sprintf(
+							'%s%s',
+							$selector,
+							$layout_prop_rule['selector']
+						),
+						array(
+							$css_property => $current_css_value,
+						)
+					);
+				}
+			}
+		}
 	}
 
 	/**
