@@ -26,6 +26,33 @@ function gutenberg_safe_style_attrs_6_1( $attrs ) {
 add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_1' );
 
 /**
+ * Update allowed CSS values to match WordPress 6.1.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 6.1.
+ *
+ * The logic in this function follows that provided in: https://core.trac.wordpress.org/ticket/55966.
+ *
+ * @param boolean $allow_css       Whether or not the current test string is allowed.
+ * @param string  $css_test_string The CSS string to be tested.
+ * @return boolean
+ */
+function gutenberg_safecss_filter_attr_allow_css_6_1( $allow_css, $css_test_string ) {
+	if ( false === $allow_css ) {
+		// Allow some CSS functions.
+		$css_test_string = preg_replace( '/\b(?:calc|min|max|minmax|clamp)\(((?:\([^()]*\)?|[^()])*)\)/', '', $css_test_string );
+
+		// Allow CSS var.
+		$css_test_string = preg_replace( '/\(?var\(--[\w\-\()[\]\,\s]*\)/', '', $css_test_string );
+
+		// Check for any CSS containing \ ( & } = or comments,
+		// except for url(), calc(), or var() usage checked above.
+		$allow_css = ! preg_match( '%[\\\(&=}]|/\*%', $css_test_string );
+	}
+	return $allow_css;
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_safecss_filter_attr_allow_css_6_1', 10, 2 );
+
+/**
  * Registers view scripts for core blocks if handling is missing in WordPress core.
  *
  * @since 6.1.0

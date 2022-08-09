@@ -45,9 +45,6 @@ $navigation-icon-size: 24px;
 	// but still allow them to be overridden by user-set colors.
 	.wp-block-navigation-item__content {
 		display: block;
-
-		// Set the default menu item padding to zero, to allow text-only buttons.
-		padding: 0;
 	}
 
 	// The following rules provide class based application of user selected text
@@ -154,10 +151,7 @@ $navigation-icon-size: 24px;
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .wp-block-navigation .has-child {
-	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
-	// That way if padding is set in theme.json, it still wins.
-	// https://css-tricks.com/almanac/selectors/w/where/
-	:where(.wp-block-navigation__submenu-container) {
+	.wp-block-navigation__submenu-container {
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -233,7 +227,7 @@ $navigation-icon-size: 24px;
 
 	// Custom menu items.
 	// Show submenus on hover unless they open on click.
-	&:where(:not(.open-on-click)):hover > .wp-block-navigation__submenu-container {
+	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		overflow: visible;
 		opacity: 1;
@@ -243,7 +237,7 @@ $navigation-icon-size: 24px;
 	}
 
 	// Keep submenus open when focus is within.
-	&:where(:not(.open-on-click):not(.open-on-hover-click)):focus-within > .wp-block-navigation__submenu-container {
+	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container {
 		visibility: visible;
 		overflow: visible;
 		opacity: 1;
@@ -339,17 +333,6 @@ button.wp-block-navigation-item__content {
 	gap: inherit;
 }
 
-// Menu items with background.
-// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
-// That way if padding is set in theme.json, it still wins.
-// https://css-tricks.com/almanac/selectors/w/where/
-.wp-block-navigation:where(.has-background) {
-	&,
-	.wp-block-navigation .wp-block-page-list,
-	.wp-block-navigation__container {
-		gap: inherit;
-	}
-}
 
 /**
  * Paddings
@@ -361,14 +344,17 @@ button.wp-block-navigation-item__content {
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-.wp-block-navigation:where(.has-background) .wp-block-navigation-item__content {
+:where(.wp-block-navigation.has-background .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation.has-background .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
-.wp-block-navigation :where(.wp-block-navigation__submenu-container) .wp-block-navigation-item__content {
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-link a:not(.wp-element-button)),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)) {
 	padding: 0.5em 1em;
 }
+
 
 /**
  * Justifications.
