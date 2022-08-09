@@ -33,7 +33,7 @@ export const handleDirectEntry = ( val ) => {
 		type = TEL_TYPE;
 	}
 
-	if ( val.startsWith( '#' ) ) {
+	if ( val?.startsWith( '#' ) ) {
 		type = INTERNAL_TYPE;
 	}
 
