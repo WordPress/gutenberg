@@ -41,6 +41,20 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
  * Styles are stored via the style engine API. See: packages/style-engine/README.md
  */
 function gutenberg_enqueue_stored_styles() {
+	$is_block_theme   = wp_is_block_theme();
+	$is_classic_theme = ! $is_block_theme;
+
+	/*
+	 * For block themes, print stored styles in the header.
+	 * For classic themes, in the footer.
+	 */
+	if (
+		( $is_block_theme && doing_action( 'wp_footer' ) ) ||
+		( $is_classic_theme && doing_action( 'wp_enqueue_scripts' ) )
+	) {
+		return;
+	}
+
 	$core_styles_keys         = array( 'block-supports' );
 	$compiled_core_stylesheet = '';
 	$style_tag_id             = 'core';
