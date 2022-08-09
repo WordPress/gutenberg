@@ -7,6 +7,10 @@ const messages = {
 		plugin: 'Done: WordPress plugin title bootstrapped in the slug directory.',
 		block: 'Done: Block "title" bootstrapped in the slug directory.',
 	},
+	customize: {
+		plugin: "Let's customize your WordPress plugin with blocks:",
+		block: "Let's add a new block to your existing WordPress plugin:",
+	},
 };
 
 /**
@@ -24,6 +28,10 @@ const getMessage = ( type, plugin, placeholders = {} ) => {
 
 	if ( typeof message === 'undefined' ) {
 		return '';
+	}
+
+	if ( Object.keys( placeholders ).length === 0 ) {
+		return message;
 	}
 
 	for ( const property in placeholders ) {

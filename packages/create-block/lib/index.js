@@ -18,6 +18,7 @@ const {
 	getDefaultValues,
 	getPrompts,
 } = require( './templates' );
+const { getMessage } = require( './messaging' );
 
 const commandName = `wp-create-block`;
 program
@@ -100,9 +101,7 @@ program
 					await scaffold( pluginTemplate, answers );
 				} else {
 					log.info( '' );
-					log.info(
-						"Let's customize your WordPress plugin with blocks:"
-					);
+					log.info( getMessage( 'customize', plugin ) );
 
 					const filterOptionsProvided = ( { name } ) =>
 						! Object.keys( optionsValues ).includes( name );
@@ -116,33 +115,39 @@ program
 					] ).filter( filterOptionsProvided );
 					const blockAnswers = await inquirer.prompt( blockPrompts );
 
-					const pluginAnswers = await inquirer
-						.prompt( {
-							type: 'confirm',
-							name: 'configurePlugin',
-							message:
-								'Do you want to customize the WordPress plugin?',
-							default: false,
-						} )
-						.then( async ( { configurePlugin } ) => {
-							if ( ! configurePlugin ) {
-								return {};
-							}
+					const pluginAnswers = plugin
+						? await inquirer
+								.prompt( {
+									type: 'confirm',
+									name: 'configurePlugin',
+									message:
+										'Do you want to customize the WordPress plugin?',
+									default: false,
+								} )
+								.then( async ( { configurePlugin } ) => {
+									if ( ! configurePlugin ) {
+										return {};
+									}
 
-							const pluginPrompts = getPrompts( pluginTemplate, [
-								'pluginURI',
-								'version',
-								'author',
-								'license',
-								'licenseURI',
-								'domainPath',
-								'updateURI',
-							] ).filter( filterOptionsProvided );
-							const result = await inquirer.prompt(
-								pluginPrompts
-							);
-							return result;
-						} );
+									const pluginPrompts = getPrompts(
+										pluginTemplate,
+										[
+											'pluginURI',
+											'version',
+											'author',
+											'license',
+											'licenseURI',
+											'domainPath',
+											'updateURI',
+										]
+									).filter( filterOptionsProvided );
+									const result = await inquirer.prompt(
+										pluginPrompts
+									);
+									return result;
+								} )
+						: {};
+
 					await scaffold( pluginTemplate, {
 						...defaultValues,
 						...optionsValues,
