@@ -31,8 +31,8 @@ const toolsPanelGrid = {
 };
 
 export const ToolsPanel = ( columns: number ) => css`
-	${ toolsPanelGrid.columns( columns ) };
-	${ toolsPanelGrid.spacing };
+	${ toolsPanelGrid.columns( columns ) }
+	${ toolsPanelGrid.spacing }
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
@@ -49,8 +49,8 @@ export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
 	return css`
 		> div:not( :first-of-type ) {
 			display: grid;
-			${ toolsPanelGrid.columns( columns ) };
-			${ toolsPanelGrid.spacing };
+			${ toolsPanelGrid.columns( columns ) }
+			${ toolsPanelGrid.spacing }
 			${ toolsPanelGrid.item.fullWidth }
 		}
 	`;
