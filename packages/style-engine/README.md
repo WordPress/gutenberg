@@ -35,7 +35,7 @@ array(
 );
 ```
 
-It will return compiled CSS declartions for inline styles, or, where a selector is provided, a complete CSS rule.
+It will return compiled CSS declarations for inline styles, or, where a selector is provided, a complete CSS rule.
 
 To enqueue a style for rendering in the site's frontend, the `$options` array requires the following:
 
