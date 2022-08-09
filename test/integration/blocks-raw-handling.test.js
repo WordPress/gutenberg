@@ -345,6 +345,7 @@ describe( 'Blocks raw handling', () => {
 			'wordpress',
 			'gutenberg',
 			'shortcode-matching',
+			'slack-quote',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
