@@ -12,7 +12,7 @@ import {
 	RangeControl,
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
-	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -123,7 +123,7 @@ export default function SpacingInputControl( {
 	return (
 		<>
 			{ side !== 'all' && (
-				<VStack className="components-spacing-sizes-control__side-labels">
+				<HStack className="components-spacing-sizes-control__side-labels">
 					<Text className="components-spacing-sizes-control__side-label">
 						{ LABELS[ side ] }
 					</Text>
@@ -135,7 +135,7 @@ export default function SpacingInputControl( {
 								: __( 'Default' ) }
 						</Text>
 					) }
-				</VStack>
+				</HStack>
 			) }
 			{ side === 'all' &&
 				spacingSizes.length <= 9 &&
@@ -165,6 +165,7 @@ export default function SpacingInputControl( {
 					'components-spacing-sizes-control__custom-toggle-single':
 						side !== 'all',
 				} ) }
+				iconSize={ 24 }
 			/>
 			{ showCustomValueControl && (
 				<>
