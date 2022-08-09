@@ -160,8 +160,9 @@ function usePaddingProps( name ) {
 		setRawPadding( padding );
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
-	const hasPaddingValue = () =>
-		!! paddingValues && Object.keys( paddingValues ).length;
+	const [ userSetPaddingValue ] = useStyle( 'spacing.padding', name, 'user' );
+	// The `hasPaddingValue` check does not need a parsed value, as `userSetPaddingValue` will be `undefined` if not set.
+	const hasPaddingValue = () => !! userSetPaddingValue;
 
 	return {
 		paddingValues,
@@ -204,7 +205,8 @@ function useMarginProps( name ) {
 function useBlockGapProps( name ) {
 	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
 	const resetGapValue = () => setGapValue( undefined );
-	const hasGapValue = () => !! gapValue;
+	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
+	const hasGapValue = () => !! userSetGapValue;
 	return {
 		gapValue,
 		setGapValue,

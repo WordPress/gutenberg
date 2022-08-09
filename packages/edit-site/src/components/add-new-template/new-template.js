@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -91,7 +93,19 @@ export default function NewTemplate( { postType } ) {
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		try {
-			const { title, description, slug } = template;
+			const { title, description, slug, templatePrefix } = template;
+			let templateContent = template.content;
+			// Try to find fallback content from existing templates.
+			if ( ! templateContent ) {
+				const fallbackTemplate = await apiFetch( {
+					path: addQueryArgs( '/wp/v2/templates/lookup', {
+						slug,
+						is_custom: ! isWPSuggestion,
+						template_prefix: templatePrefix,
+					} ),
+				} );
+				templateContent = fallbackTemplate.content;
+			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
 				'wp_template',
@@ -101,6 +115,7 @@ export default function NewTemplate( { postType } ) {
 					slug: slug.toString(),
 					status: 'publish',
 					title,
+					content: templateContent,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
 					is_wp_suggestion: isWPSuggestion,
 				},

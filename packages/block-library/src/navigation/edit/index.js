@@ -17,7 +17,8 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	PanelColorSettings,
@@ -104,9 +105,8 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ ref }`
-	);
+	const recursionId = `navigationMenu/${ ref }`;
+	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -206,6 +206,9 @@ function Navigation( {
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
+
+	const navMenuResolvedButMissing =
+		hasResolvedNavigationMenus && isNavigationMenuMissing;
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless
 	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
@@ -386,6 +389,7 @@ function Navigation( {
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
 				ref &&
+				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
@@ -421,24 +425,6 @@ function Navigation( {
 	const navigationSelectorRef = useRef();
 	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
 		useState( false );
-	const handleSelectNavigation = useCallback(
-		( navPostOrClassicMenu ) => {
-			if ( ! navPostOrClassicMenu ) {
-				return;
-			}
-
-			const isClassicMenu =
-				navPostOrClassicMenu.hasOwnProperty( 'auto_add' );
-
-			if ( isClassicMenu ) {
-				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
-			} else {
-				handleUpdateMenu( navPostOrClassicMenu.id );
-			}
-			setShouldFocusNavigationSelector( true );
-		},
-		[ convert, handleUpdateMenu ]
-	);
 
 	// Focus support after menu selection.
 	useEffect( () => {
@@ -693,7 +679,14 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ handleSelectNavigation }
+					onSelectNavigationMenu={ ( menuId ) => {
+						handleUpdateMenu( menuId );
+						setShouldFocusNavigationSelector( true );
+					} }
+					onSelectClassicMenu={ ( classicMenu ) => {
+						convert( classicMenu.id, classicMenu.name );
+						setShouldFocusNavigationSelector( true );
+					} }
 					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
@@ -702,7 +695,7 @@ function Navigation( {
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
-			<RecursionProvider>
+			<RecursionProvider uniqueId={ recursionId }>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
@@ -710,7 +703,14 @@ function Navigation( {
 								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ handleSelectNavigation }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ ( classicMenu ) => {
+									convert( classicMenu.id, classicMenu.name );
+									setShouldFocusNavigationSelector( true );
+								} }
 								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }

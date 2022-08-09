@@ -11,8 +11,11 @@ import {
 	PanelBody,
 	FontSizePicker,
 	__experimentalSpacer as Spacer,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-
+import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -59,9 +62,14 @@ function useHasLetterSpacingControl( name ) {
 }
 
 export default function TypographyPanel( { name, element } ) {
+	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
 	const supports = getSupportedGlobalStylesPanels( name );
-	const prefix =
-		element === 'text' || ! element ? '' : `elements.${ element }.`;
+	let prefix = '';
+	if ( element === 'heading' ) {
+		prefix = `elements.${ selectedLevel }.`;
+	} else if ( element && element !== 'text' ) {
+		prefix = `elements.${ element }.`;
+	}
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
@@ -77,6 +85,12 @@ export default function TypographyPanel( { name, element } ) {
 	const hasLineHeightEnabled = useHasLineHeightControl( name );
 	const hasAppearanceControl = useHasAppearanceControl( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name );
+
+	/* Disable font size controls when the option to style all headings is selected. */
+	let hasFontSizeEnabled = supports.includes( 'fontSize' );
+	if ( element === 'heading' && selectedLevel === 'heading' ) {
+		hasFontSizeEnabled = false;
+	}
 
 	const [ fontFamily, setFontFamily ] = useStyle(
 		prefix + 'typography.fontFamily',
@@ -130,30 +144,79 @@ export default function TypographyPanel( { name, element } ) {
 			>
 				Aa
 			</div>
-
+			{ element === 'heading' && (
+				<div>
+					<h4>{ __( 'Select heading level' ) }</h4>
+					<ToggleGroupControl
+						label={ __( 'Select heading level' ) }
+						hideLabelFromVision={ true }
+						value={ selectedLevel }
+						onChange={ setCurrentTab }
+						isBlock
+						size="__unstable-large"
+					>
+						<ToggleGroupControlOption
+							value="heading"
+							/* translators: 'All' refers to selecting all heading levels 
+							and applying the same style to h1-h6. */
+							label={ __( 'All' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h1"
+							label={ __( 'H1' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h2"
+							label={ __( 'H2' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h3"
+							label={ __( 'H3' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h4"
+							label={ __( 'H4' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h5"
+							label={ __( 'H5' ) }
+						/>
+						<ToggleGroupControlOption
+							value="h6"
+							label={ __( 'H6' ) }
+						/>
+					</ToggleGroupControl>
+				</div>
+			) }
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
 					value={ fontFamily }
 					onChange={ setFontFamily }
+					size="__unstable-large"
 				/>
 			) }
-			{ supports.includes( 'fontSize' ) && (
+			{ hasFontSizeEnabled && (
 				<FontSizePicker
 					value={ fontSize }
 					onChange={ setFontSize }
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
+					size="__unstable-large"
 				/>
 			) }
 			{ hasLineHeightEnabled && (
-				<Spacer marginBottom={ 6 }>
-					<LineHeightControl
-						__nextHasNoMarginBottom={ true }
-						value={ lineHeight }
-						onChange={ setLineHeight }
-					/>
-				</Spacer>
+				<div className="edit-site-typography-panel__half-width-control">
+					<Spacer marginBottom={ 6 }>
+						<LineHeightControl
+							__nextHasNoMarginBottom={ true }
+							__unstableInputWidth="auto"
+							value={ lineHeight }
+							onChange={ setLineHeight }
+							size="__unstable-large"
+						/>
+					</Spacer>
+				</div>
 			) }
 			{ hasAppearanceControl && (
 				<FontAppearanceControl
@@ -170,13 +233,19 @@ export default function TypographyPanel( { name, element } ) {
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
+					size="__unstable-large"
+					__nextUnconstrainedWidth
 				/>
 			) }
 			{ hasLetterSpacingControl && (
-				<LetterSpacingControl
-					value={ letterSpacing }
-					onChange={ setLetterSpacing }
-				/>
+				<div className="edit-site-typography-panel__half-width-control">
+					<LetterSpacingControl
+						value={ letterSpacing }
+						onChange={ setLetterSpacing }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				</div>
 			) }
 		</PanelBody>
 	);

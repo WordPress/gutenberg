@@ -99,15 +99,19 @@ function selectExistingMenu( select, ref ) {
 		args
 	);
 
+	// Only published Navigation posts are considered valid.
+	// If this is changed then a corresponding change must also be made
+	// in the index.php file.
+	const isNavigationMenuPublished = editedNavigationMenu.status === 'publish';
+
 	return {
 		isNavigationMenuResolved: hasResolvedNavigationMenu,
-		isNavigationMenuMissing: hasResolvedNavigationMenu && ! navigationMenu,
+		isNavigationMenuMissing:
+			hasResolvedNavigationMenu &&
+			( ! navigationMenu || ! isNavigationMenuPublished ),
 
 		// getEditedEntityRecord will return the post regardless of status.
 		// Therefore if the found post is not published then we should ignore it.
-		navigationMenu:
-			editedNavigationMenu.status === 'publish'
-				? editedNavigationMenu
-				: null,
+		navigationMenu: isNavigationMenuPublished ? editedNavigationMenu : null,
 	};
 }
