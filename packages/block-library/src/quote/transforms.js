@@ -4,7 +4,6 @@
 import {
 	createBlock,
 	parseWithAttributeSchema,
-	pasteHandler,
 } from '@wordpress/blocks';
 
 const transforms = {
