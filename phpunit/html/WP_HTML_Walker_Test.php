@@ -10,12 +10,6 @@ if ( ! class_exists( 'WP_UnitTestCase' ) ) {
 	class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
 }
 
-if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $s ) {
-		return str_replace( '"', '&quot;', $s );
-	}
-}
-
 require_once '../../lib/experimental/html/index.php';
 
 /**
@@ -590,159 +584,159 @@ HTML;
 	public function data_malformed_tag() {
 		$null_byte = chr( 0 );
 		return array(
-			array(
+			'Invalid entity inside attribute value' => array(
 				'<img src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span>test</span>',
 				'<img foo="bar" class="firstTag" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
 			),
-			array(
+			'HTML tag opening inside attribute value' => array(
 				'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-				'<pre foo="bar" id="<code" class="wp-block-code &lt;code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+				'<pre foo="bar" id="<code" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
 			),
-			array(
+			'HTML tag brackets in attribute values and data markup' => array(
 				'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
-				'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code &lt;code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+				'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
 			),
-			array(
+			'Single and double quotes in attribute value' => array(
 				'<p title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span>test</span>',
 				'<p foo="bar" class="firstTag" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
 			),
-			array(
+			'Unquoted attribute values' => array(
 				'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
 				'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
 			),
-			array(
+			'Double-quotes escaped in double-quote attribute value' => array(
 				'<hr title="This is a &quot;double-quote&quot;"><span>test</span>',
 				'<hr foo="bar" class="firstTag" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
 			),
-			array(
+			'Unquoted attribute value' => array(
 				'<hr id=code><span>test</span>',
 				'<hr foo="bar" class="firstTag" id=code><span class="secondTag">test</span>',
 			),
-			array(
+			'Unquoted attribute value with tag-like value' => array(
 				'<hr id= 	<code> ><span>test</span>',
 				'<hr foo="bar" class="firstTag" id= 	<code> ><span class="secondTag">test</span>',
 			),
-			array(
+			'Unquoted attribute value with tag-like value followed by tag-like data' => array(
 				'<hr id=code>><span>test</span>',
 				'<hr foo="bar" class="firstTag" id=code>><span class="secondTag">test</span>',
 			),
-			array(
+			'1' => array(
 				'<hr id=&quo;code><span>test</span>',
 				'<hr foo="bar" class="firstTag" id=&quo;code><span class="secondTag">test</span>',
 			),
-			array(
+			'2' => array(
 				'<hr id/test=5><span>test</span>',
 				'<hr foo="bar" class="firstTag" id/test=5><span class="secondTag">test</span>',
 			),
-			array(
+			'4' => array(
 				'<hr title="<hr>"><span>test</span>',
 				'<hr foo="bar" class="firstTag" title="<hr>"><span class="secondTag">test</span>',
 			),
-			array(
+			'5' => array(
 				'<hr id=>code><span>test</span>',
 				'<hr foo="bar" class="firstTag" id=>code><span class="secondTag">test</span>',
 			),
-			array(
+			'6' => array(
 				'<hr id"quo="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'7' => array(
 				'<hr id' . $null_byte . 'zero="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'8' => array(
 				'<hr >id="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" >id="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'9' => array(
 				'<hr =id="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'10' => array(
 				'</><span>test</span>',
 				'</><span foo="bar" class="firstTag">test</span>',
 			),
-			array(
+			'11' => array(
 				'The applicative operator <* works well in Haskell; <data-tag> is what?<span>test</span>',
 				'The applicative operator <* works well in Haskell; <data-tag foo="bar" class="firstTag"> is what?<span class="secondTag">test</span>',
 			),
-			array(
+			'12' => array(
 				'<3 is a heart but <t3> is a tag.<span>test</span>',
 				'<3 is a heart but <t3 foo="bar" class="firstTag"> is a tag.<span class="secondTag">test</span>',
 			),
-			array(
+			'13' => array(
 				'<?comment --><span>test</span>',
 				'<?comment --><span foo="bar" class="firstTag">test</span>',
 			),
-			array(
+			'14' => array(
 				'<!-- this is a comment. no <strong>tags</strong> allowed --><span>test</span>',
 				'<!-- this is a comment. no <strong>tags</strong> allowed --><span foo="bar" class="firstTag">test</span>',
 			),
-			array(
+			'15' => array(
 				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span>test</span>',
 				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span foo="bar" class="firstTag">test</span>',
 			),
-			array(
+			'16' => array(
 				'<hr ===name="value"><span>test</span>',
 				'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
 			),
-			array(
+			'17' => array(
 				'<hr asdf="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" asdf="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'18' => array(
 				'<hr =asdf="tes"><span>test</span>',
 				'<hr foo="bar" class="firstTag" =asdf="tes"><span class="secondTag">test</span>',
 			),
-			array(
+			'19' => array(
 				'<hr ==="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" ==="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'20' => array(
 				'<hr =><span>test</span>',
 				'<hr foo="bar" class="firstTag" =><span class="secondTag">test</span>',
 			),
-			array(
+			'21' => array(
 				'<hr =5><span>test</span>',
 				'<hr foo="bar" class="firstTag" =5><span class="secondTag">test</span>',
 			),
-			array(
+			'22' => array(
 				'<hr ==><span>test</span>',
 				'<hr foo="bar" class="firstTag" ==><span class="secondTag">test</span>',
 			),
-			array(
+			'23' => array(
 				'<hr ===><span>test</span>',
 				'<hr foo="bar" class="firstTag" ===><span class="secondTag">test</span>',
 			),
-			array(
+			'24' => array(
 				'<hr disabled><span>test</span>',
 				'<hr foo="bar" class="firstTag" disabled><span class="secondTag">test</span>',
 			),
-			array(
+			'25' => array(
 				'<hr a"sdf="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
 			),
-			array(
+			'26' => array(
 				'<hr id=">"code<span>test</span>',
 				'<hr foo="bar" class="firstTag" id=">"code<span>test</span>',
 			),
-			array(
+			'27' => array(
 				'<hr id="value>"code<span>test</span>',
 				'<hr foo="bar" class="firstTag" id="value>"code<span>test</span>',
 			),
-			array(
+			'28' => array(
 				'<hr id="/>"code<span>test</span>',
 				'<hr foo="bar" class="firstTag" id="/>"code<span>test</span>',
 			),
-			array(
+			'29' => array(
 				'<hr id="value/>"code<span>test</span>',
 				'<hr foo="bar" class="firstTag" id="value/>"code<span>test</span>',
 			),
-			array(
+			'30' => array(
 				'<hr id   =5><span>test</span>',
 				'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
 			),
-			array(
+			'31' => array(
 				'<hr id a  =5><span>test</span>',
 				'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
 			),

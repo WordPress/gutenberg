@@ -661,7 +661,8 @@ class WP_HTML_Walker {
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
-			$escaped_new_value = esc_attr( $value );
+			// @TODO: What escaping and sanitization do we need here?
+			$escaped_new_value = str_replace( '"', '&quot;', $value );
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
