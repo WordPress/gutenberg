@@ -108,15 +108,17 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				array_push(
 					$layout_styles,
 					array(
-						'selector'     => "$selector > *,$selector > * + *",
+						'selector'     => "$selector > *",
 						'declarations' => array(
-							'margin-block-end' => '0',
+							'margin-block-start' => '0',
+							'margin-block-end'   => '0',
 						),
 					),
 					array(
-						'selector'     => "$selector > * + *",
+						'selector'     => "$selector$selector > * + *",
 						'declarations' => array(
 							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
 						),
 					)
 				);
