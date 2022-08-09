@@ -2,7 +2,7 @@
 
 ## Unreleased
 
--   Add `--block-only` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
+-   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
 
 ## 3.6.0 (2022-07-13)
 

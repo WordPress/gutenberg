@@ -22,7 +22,7 @@ module.exports = async (
 	{
 		$schema,
 		apiVersion,
-		blockOnly,
+		plugin,
 		namespace,
 		slug,
 		title,
@@ -51,9 +51,9 @@ module.exports = async (
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
-	const creationMessage = blockOnly
-		? `Creating a new block in the "${ folderName }/${ slug }" directory.`
-		: `Creating a new WordPress plugin in the "${ slug }" directory.`;
+	const creationMessage = plugin
+		? `Creating a new WordPress plugin in the "${ slug }" directory.`
+		: `Creating a new block in the "${ slug }" directory.`;
 
 	info( '' );
 	info( creationMessage );
@@ -61,7 +61,7 @@ module.exports = async (
 	const view = {
 		$schema,
 		apiVersion,
-		blockOnly,
+		plugin,
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
@@ -92,8 +92,7 @@ module.exports = async (
 		style,
 	};
 
-	if ( ! blockOnly ) {
-		// If blockOnly exists, we don't need to scaffold the plugin files.
+	if ( plugin ) {
 		await Promise.all(
 			Object.keys( pluginOutputTemplates ).map(
 				async ( outputFile ) =>
@@ -119,7 +118,7 @@ module.exports = async (
 
 	await initBlock( blockOutputTemplates, view );
 
-	if ( ! blockOnly ) {
+	if ( plugin ) {
 		await initPackageJSON( view );
 		if ( wpScripts ) {
 			await initWPScripts( view );
@@ -131,12 +130,12 @@ module.exports = async (
 	}
 
 	info( '' );
-	const successMessage = blockOnly
-		? `Done: Block "${ title }" bootstrapped in the "${ folderName }/${ slug }" directory.`
-		: `Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`;
+	const successMessage = plugin
+		? `Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
+		: `Done: Block "${ title }" bootstrapped in the "${ slug }" directory.`;
 	success( successMessage );
 
-	if ( ! blockOnly && wpScripts ) {
+	if ( plugin && wpScripts ) {
 		info( '' );
 		info( 'You can run several commands inside:' );
 		info( '' );
@@ -165,13 +164,13 @@ module.exports = async (
 		info( '' );
 		code( `  $ cd ${ slug }` );
 	}
-	if ( ! blockOnly && wpScripts ) {
+	if ( plugin && wpScripts ) {
 		info( '' );
 		info( 'You can start development with:' );
 		info( '' );
 		code( '  $ npm start' );
 	}
-	if ( ! blockOnly && wpEnv ) {
+	if ( plugin && wpEnv ) {
 		info( '' );
 		info( 'You can start WordPress with:' );
 		info( '' );

@@ -57,12 +57,12 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
-	.option( '--block-only', 'scaffold only block files' )
+	.option( '--no-plugin', 'scaffold only block files' )
 	.action(
 		async (
 			slug,
 			{
-				blockOnly,
+				plugin,
 				category,
 				namespace,
 				shortDescription: description,
@@ -78,7 +78,7 @@ program
 				const defaultValues = getDefaultValues( pluginTemplate );
 				const optionsValues = pickBy(
 					{
-						blockOnly,
+						plugin,
 						category,
 						description,
 						namespace,
