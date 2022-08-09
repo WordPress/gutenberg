@@ -199,19 +199,4 @@ class WP_Style_Engine_CSS_Declarations {
 	protected function sanitize_property( $property ) {
 		return trim( sanitize_key( $property ) );
 	}
-
-	/**
-	 * Sanitize values.
-	 *
-	 * @param string $value The CSS value.
-	 *
-	 * @return string The sanitized value.
-	 */
-	protected function sanitize_value( $value ) {
-		// Escape HTML.
-		$value = esc_html( $value );
-		// Fix quotes to account for URLs.
-		$value = str_replace( array( '&#039;', '&#39;', '&#034;', '&#34;', '&quot;', '&apos;' ), array( "'", "'", '"', '"', '"', "'" ), $value );
-		return trim( $value );
-	}
 }
