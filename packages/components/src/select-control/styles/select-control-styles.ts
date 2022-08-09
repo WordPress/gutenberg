@@ -135,6 +135,7 @@ export const Select = styled.select< SelectProps >`
 		font-family: inherit;
 		margin: 0;
 		width: 100%;
+		max-width: none;
 
 		${ disabledStyles };
 		${ fontSizeStyles };
