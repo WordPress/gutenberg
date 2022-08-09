@@ -827,12 +827,7 @@ export function useGlobalStylesOutput() {
 			},
 		];
 
-		return [
-			stylesheets,
-			mergedConfig.settings,
-			filters,
-			hasBlockGapSupport,
-		];
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
