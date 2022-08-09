@@ -47,15 +47,13 @@ describe( 'Tooltip', () => {
 
 			const button = screen.getByRole( 'button' );
 			button.focus();
-
-			const popover =
-				container.getElementsByClassName( 'components-popover' );
 			expect( button.nodeName ).toBe( 'BUTTON' );
 			expect( button.childNodes ).toHaveLength( 2 );
 			expect( button.childNodes[ 0 ] ).toHaveTextContent( 'Hover Me!' );
-			expect( button.childNodes[ 1 ] ).toHaveClass(
-				'components-popover'
-			);
+
+			const popover =
+				container.getElementsByClassName( 'components-popover' );
+			expect( popover ).toHaveLength( 1 );
 			expect( popover[ 0 ].firstChild ).toHaveTextContent( 'Help text' );
 		} );
 
@@ -225,7 +223,7 @@ describe( 'Tooltip', () => {
 			const eventCatcher =
 				container.getElementsByClassName( 'event-catcher' )[ 0 ];
 			fireEvent.click( eventCatcher );
-			expect( handleClick ).toHaveBeenCalledTimes( 0 );
+			expect( handleClick ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', () => {
