@@ -75,6 +75,10 @@
 		height: 30px;
 	}
 
+	.components-spacing-sizes-control__custom-value-input {
+		width: 124px;
+	}
+
 	.components-spacing-sizes-control__range-control {
 		grid-column: span 3;
 		padding-right: $grid-unit-10;
@@ -102,12 +106,6 @@
 
 	[class*="ThumbWrapper-thumbColor"] {
 		z-index: 3;
-	}
-
-	.component-spacing-sizes-control__not-set {
-		[class*="Thumb-thumbColor"] {
-			background-color: $gray-600;
-		}
 	}
 
 	.component-spacing-sizes-control__header {

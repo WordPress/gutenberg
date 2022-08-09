@@ -72,7 +72,7 @@ export default function SpacingInputControl( {
 	};
 
 	const customTooltipContent = ( newValue ) =>
-		value === undefined ? __( 'Inherit' ) : spacingSizes[ newValue ]?.name;
+		value === undefined ? undefined : spacingSizes[ newValue ]?.name;
 
 	const customRangeValue = parseInt( currentValue );
 
@@ -128,22 +128,21 @@ export default function SpacingInputControl( {
 						{ LABELS[ side ] }
 					</Text>
 
-					{ spacingSizes.length <= 9 && ! showCustomValueControl && (
-						<Text className="components-spacing-sizes-control__hint-single">
-							{ currentValueHint !== undefined
-								? currentValueHint
-								: __( 'Default' ) }
-						</Text>
-					) }
+					{ spacingSizes.length <= 9 &&
+						! showCustomValueControl &&
+						currentValueHint !== undefined && (
+							<Text className="components-spacing-sizes-control__hint-single">
+								{ currentValueHint }
+							</Text>
+						) }
 				</HStack>
 			) }
 			{ side === 'all' &&
 				spacingSizes.length <= 9 &&
-				! showCustomValueControl && (
+				! showCustomValueControl &&
+				currentValueHint !== undefined && (
 					<Text className="components-spacing-sizes-control__hint-all">
-						{ currentValueHint !== undefined
-							? currentValueHint
-							: __( 'Default' ) }
+						{ currentValueHint }
 					</Text>
 				) }
 
@@ -179,6 +178,7 @@ export default function SpacingInputControl( {
 						disableUnits={ isMixed }
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
+						className="components-spacing-sizes-control__custom-value-input"
 					/>
 
 					<RangeControl
