@@ -119,7 +119,7 @@ export function CustomColorPickerDropdown( {
 } ) {
 	const popoverProps = {
 		__unstableShift: true,
-		// Open below the control point (centered aligned) when in the sidebar
+		// Open below the control point (centered aligned) when in the sidebar.
 		...( isRenderedInSidebar
 			? {
 					placement: 'bottom',
