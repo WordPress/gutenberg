@@ -18,7 +18,7 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  * CSS styles generation.
  *
  * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
- * This is a low-level API that may need to do breaking changes. Please, use gutenberg_style_engine_get_styles instead.
+ * This is a low-level API that may need to do breaking changes. Please, use wp_style_engine_get_styles instead.
  *
  * @access private
  */
@@ -272,30 +272,30 @@ class WP_Style_Engine {
 	}
 
 	/**
-	 * Stores a CSS rule using the provide CSS selector and CSS declarations.
+	 * Stores a CSS rule using the provided CSS selector and CSS declarations.
 	 *
-	 * @param string $store_key        A valid store key.
+	 * @param string $store_name       A valid store key.
 	 * @param string $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 	 * @param array  $css_declarations An array of parsed CSS property => CSS value pairs.
 	 *
 	 * @return void.
 	 */
-	public static function store_css_rule( $store_key, $css_selector, $css_declarations ) {
-		if ( empty( $store_key ) || empty( $css_selector ) || empty( $css_declarations ) ) {
+	public static function store_css_rule( $store_name, $css_selector, $css_declarations ) {
+		if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 			return;
 		}
-		static::get_store( $store_key )->add_rule( $css_selector )->add_declarations( $css_declarations );
+		static::get_store( $store_name )->add_rule( $css_selector )->add_declarations( $css_declarations );
 	}
 
 	/**
 	 * Returns a store by store key.
 	 *
-	 * @param string $store_key A store key.
+	 * @param string $store_name A store key.
 	 *
 	 * @return WP_Style_Engine_CSS_Rules_Store
 	 */
-	public static function get_store( $store_key ) {
-		return WP_Style_Engine_CSS_Rules_Store::get_store( $store_key );
+	public static function get_store( $store_name ) {
+		return WP_Style_Engine_CSS_Rules_Store::get_store( $store_name );
 	}
 
 	/**
@@ -531,8 +531,8 @@ class WP_Style_Engine {
  *
  * @param array                 $block_styles The style object.
  * @param array<string|boolean> $options      array(
- *     'context'                    => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *     'enqueue'                    => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
+ *     'context' => (string|null) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *                  When set, the style engine will attempt to store the CSS rules, where a selector is also passed.
  *     'convert_vars_to_classnames' => (boolean) Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
  *     'selector'                   => (string) When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
  * );.
@@ -549,18 +549,12 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	}
 	$defaults = array(
 		'selector'                   => null,
-		'context'                    => 'block-supports',
+		'context'                    => null,
 		'convert_vars_to_classnames' => false,
-		'enqueue'                    => false,
 	);
 
 	$options       = wp_parse_args( $options, $defaults );
-	$parsed_styles = null;
-
-	// Block supports styles.
-	if ( 'block-supports' === $options['context'] ) {
-		$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
-	}
+	$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
 
 	// Output.
 	$styles_output = array();
@@ -572,7 +566,7 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
 		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
 		$styles_output['declarations'] = $parsed_styles['declarations'];
-		if ( true === $options['enqueue'] ) {
+		if ( ! empty( $options['context'] ) ) {
 			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
 		}
 	}
@@ -597,8 +591,8 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  *      )
  *  );.
  * @param array<string> $options array(
- *     'context' => (string) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
- *     'enqueue' => (boolean) When `true` will attempt to store and enqueue for rendering on the frontend.
+ *     'context' => (string|null) An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'.
+ *                  When set, the style engine will attempt to store the CSS rules.
  * );.
  *
  * @return string A compiled CSS string.
@@ -609,8 +603,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 	}
 
 	$defaults         = array(
-		'context' => 'block-supports',
-		'enqueue' => false,
+		'context' => null,
 	);
 	$options          = wp_parse_args( $options, $defaults );
 	$css_rule_objects = array();
@@ -620,7 +613,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 			continue;
 		}
 
-		if ( true === $options['enqueue'] ) {
+		if ( ! empty( $options['context'] ) ) {
 			WP_Style_Engine::store_css_rule( $options['context'], $css_rule['selector'], $css_rule['declarations'] );
 		}
 
@@ -639,16 +632,16 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  *
  * @access public
  *
- * @param string $store_key A valid store key.
+ * @param string $store_name A valid store name.
  *
  * @return string A compiled CSS string.
  */
-function wp_style_engine_get_stylesheet_from_store( $store_key ) {
-	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $store_key ) ) {
+function wp_style_engine_get_stylesheet_from_store( $store_name ) {
+	if ( ! class_exists( 'WP_Style_Engine' ) || empty( $store_name ) ) {
 		return '';
 	}
 
-	$store = WP_Style_Engine::get_store( $store_key );
+	$store = WP_Style_Engine::get_store( $store_name );
 
 	return WP_Style_Engine::compile_stylesheet_from_css_rules( $store->get_all_rules() );
 }
