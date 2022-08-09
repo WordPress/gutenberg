@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
 import { COLORS, rtl } from '../../utils';
 import { space } from '../../ui/utils/space';
 import type { SelectControlProps } from '../types';
+import InputControlSuffixWrapper from '../..//input-control/input-suffix-wrapper';
 
 interface SelectProps
 	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
@@ -86,29 +87,33 @@ const sizeStyles = ( {
 	return css( style );
 };
 
+export const chevronIconSize = 18;
+
 const sizePaddings = ( {
 	__next36pxDefaultSize,
 	selectSize = 'default',
 }: SelectProps ) => {
+	const iconWidth = chevronIconSize;
+
 	const sizes = {
 		default: {
 			paddingLeft: 16,
-			paddingRight: 16,
+			paddingRight: 16 + iconWidth,
 		},
 		small: {
 			paddingLeft: 8,
-			paddingRight: 8,
+			paddingRight: 8 + iconWidth,
 		},
 		'__unstable-large': {
 			paddingLeft: 16,
-			paddingRight: 16,
+			paddingRight: 16 + iconWidth,
 		},
 	};
 
 	if ( ! __next36pxDefaultSize ) {
 		sizes.default = {
 			paddingLeft: 8,
-			paddingRight: 8,
+			paddingRight: 8 + iconWidth,
 		};
 	}
 
@@ -139,6 +144,14 @@ export const Select = styled.select< SelectProps >`
 `;
 
 export const DownArrowWrapper = styled.div`
-	margin-inline-end: ${ space( -1 ) };
+	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
+`;
+
+export const InputControlSuffixWrapperWithClickThrough = styled(
+	InputControlSuffixWrapper
+)`
+	position: absolute;
+	right: 0;
+	pointer-events: none;
 `;

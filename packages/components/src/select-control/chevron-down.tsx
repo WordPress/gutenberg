@@ -6,16 +6,19 @@ import { chevronDown, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
-import { DownArrowWrapper } from './styles/select-control-styles';
+import {
+	chevronIconSize,
+	DownArrowWrapper,
+	InputControlSuffixWrapperWithClickThrough,
+} from './styles/select-control-styles';
 
 const SelectControlChevronDown = () => {
 	return (
-		<InputControlSuffixWrapper>
+		<InputControlSuffixWrapperWithClickThrough>
 			<DownArrowWrapper>
-				<Icon icon={ chevronDown } size={ 18 } />
+				<Icon icon={ chevronDown } size={ chevronIconSize } />
 			</DownArrowWrapper>
-		</InputControlSuffixWrapper>
+		</InputControlSuffixWrapperWithClickThrough>
 	);
 };
 
