@@ -207,6 +207,9 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	const navMenuResolvedButMissing =
+		hasResolvedNavigationMenus && isNavigationMenuMissing;
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless
 	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
 	// for the block to "just work" from a user perspective using existing data.
@@ -386,6 +389,7 @@ function Navigation( {
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
 				ref &&
+				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
@@ -421,24 +425,6 @@ function Navigation( {
 	const navigationSelectorRef = useRef();
 	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
 		useState( false );
-	const handleSelectNavigation = useCallback(
-		( navPostOrClassicMenu ) => {
-			if ( ! navPostOrClassicMenu ) {
-				return;
-			}
-
-			const isClassicMenu =
-				navPostOrClassicMenu.hasOwnProperty( 'auto_add' );
-
-			if ( isClassicMenu ) {
-				convert( navPostOrClassicMenu.id, navPostOrClassicMenu.name );
-			} else {
-				handleUpdateMenu( navPostOrClassicMenu.id );
-			}
-			setShouldFocusNavigationSelector( true );
-		},
-		[ convert, handleUpdateMenu ]
-	);
 
 	// Focus support after menu selection.
 	useEffect( () => {
@@ -693,7 +679,14 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onFinish={ handleSelectNavigation }
+					onSelectNavigationMenu={ ( menuId ) => {
+						handleUpdateMenu( menuId );
+						setShouldFocusNavigationSelector( true );
+					} }
+					onSelectClassicMenu={ ( classicMenu ) => {
+						convert( classicMenu.id, classicMenu.name );
+						setShouldFocusNavigationSelector( true );
+					} }
 					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
 				/>
 			</TagName>
@@ -710,7 +703,14 @@ function Navigation( {
 								ref={ navigationSelectorRef }
 								currentMenuId={ ref }
 								clientId={ clientId }
-								onSelect={ handleSelectNavigation }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+									setShouldFocusNavigationSelector( true );
+								} }
+								onSelectClassicMenu={ ( classicMenu ) => {
+									convert( classicMenu.id, classicMenu.name );
+									setShouldFocusNavigationSelector( true );
+								} }
 								onCreateNew={ resetToEmptyBlock }
 								/* translators: %s: The name of a menu. */
 								actionLabel={ __( "Switch to '%s'" ) }
