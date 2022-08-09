@@ -37,7 +37,6 @@ const meta: ComponentMeta< typeof Modal > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
@@ -88,4 +87,11 @@ const Template: ComponentStory< typeof Modal > = ( {
 export const Default: ComponentStory< typeof Modal > = Template.bind( {} );
 Default.args = {
 	title: 'Title',
+};
+Default.parameters = {
+	docs: {
+		source: {
+			code: '',
+		},
+	},
 };
