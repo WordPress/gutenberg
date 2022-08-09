@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -35,15 +34,22 @@ function SinglePalette( {
 	actions,
 } ) {
 	const colorOptions = useMemo( () => {
-		return map( colors, ( { color, name } ) => {
+		// In case the palette contains multiple entries with the same color value,
+		// only consider the first instance as the "selected" one.
+		const firstMatchedColorIndex = colors.findIndex(
+			( { color } ) => color === value
+		);
+
+		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
+			const isSelected = firstMatchedColorIndex === index;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ color }
-					isSelected={ value === color }
+					key={ `${ color }-${ index }` }
+					isSelected={ isSelected }
 					selectedIconProps={
-						value === color
+						isSelected
 							? {
 									fill:
 										colordColor.contrast() >

@@ -82,7 +82,7 @@ MultipleOrigins.args = {
 			],
 		},
 		{
-			name: 'Primary colors',
+			name: 'Secondary colors',
 			colors: [
 				{ name: 'Orange', color: '#f60' },
 				{ name: 'Green', color: '#0f0' },
@@ -110,5 +110,16 @@ CSSVariables.args = {
 		{ name: 'Red', color: 'var(--red)' },
 		{ name: 'Yellow', color: 'var(--yellow)' },
 		{ name: 'Blue', color: 'var(--blue)' },
+	],
+};
+
+export const DuplicatedColors = Template.bind( {} );
+DuplicatedColors.args = {
+	colors: [
+		{ name: 'Primary', color: '#f00' },
+		{ name: 'Secondary', color: '#ff0' },
+		{ name: 'Accent', color: '#00f' },
+		{ name: 'Primary', color: '#f00' },
+		{ name: 'Accent2', color: '#00f' },
 	],
 };
