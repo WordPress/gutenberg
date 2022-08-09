@@ -197,6 +197,6 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return string The sanitized property name.
 	 */
 	protected function sanitize_property( $property ) {
-		return trim( sanitize_key( $property ) );
+		return sanitize_key( $property );
 	}
 }
