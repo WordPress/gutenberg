@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	parseWithAttributeSchema,
-} from '@wordpress/blocks';
+import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
