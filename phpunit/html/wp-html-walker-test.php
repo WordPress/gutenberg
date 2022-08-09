@@ -234,6 +234,52 @@ class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 */
+	public function test_add_class_when_there_is_a_class_attribute_with_excessive_whitespaces() {
+		$w = new WP_HTML_Walker(
+			'<div class="   main   with-border   " id="first"><span class="not-main bold with-border" id="second">Text</span></div>'
+		);
+		$w->next_tag();
+		$w->add_class( 'foo-class' );
+		$this->assertSame(
+			'<div class="   main   with-border foo-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_remove_class_when_there_is_a_class_attribute_with_excessive_whitespaces() {
+		$w = new WP_HTML_Walker(
+			'<div class="   main   with-border   " id="first"><span class="not-main bold with-border" id="second">Text</span></div>'
+		);
+		$w->next_tag();
+		$w->remove_class( 'with-border' );
+		$this->assertSame(
+			'<div class="   main" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
+	public function test_remove_all_classes_when_there_is_a_class_attribute_with_excessive_whitespaces() {
+		$w = new WP_HTML_Walker(
+			'<div class="   main   with-border   " id="first"><span class="not-main bold with-border" id="second">Text</span></div>'
+		);
+		$w->next_tag();
+		$w->remove_class( 'main' );
+		$w->remove_class( 'with-border' );
+		$this->assertSame(
+			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			(string) $w
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 */
 	public function test_set_attribute_takes_priority_over_add_class() {
 		$w = new WP_HTML_Walker( self::HTML_WITH_CLASSES );
 		$w->next_tag();
@@ -530,6 +576,7 @@ HTML;
 	}
 
 	public function data_malformed_tag() {
+		$null_byte = chr( 0 );
 		return array(
 			array(
 				'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
@@ -572,8 +619,8 @@ HTML;
 				'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
 			),
 			array(
-				'<hr idzero="test"><span>test</span>',
-				'<hr foo="bar" class="firstTag" idzero="test"><span class="secondTag">test</span>',
+				'<hr id' . $null_byte . 'zero="test"><span>test</span>',
+				'<hr foo="bar" class="firstTag" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
 			),
 			array(
 				'<hr >id="test"><span>test</span>',

@@ -527,7 +527,7 @@ class WP_HTML_Walker {
 			// Capture the class name – it's everything until the next whitespace.
 			$name_length = strcspn( $existing_class, " \t\f\r\n", $at );
 			if ( 0 === $name_length ) {
-				// We're done, no more class names
+				// We're done, no more class names.
 				break;
 			}
 
@@ -565,7 +565,7 @@ class WP_HTML_Walker {
 		// Add new classes by appending the ones we haven't already seen.
 		foreach ( $this->classname_updates as $name => $operation ) {
 			if ( self::ADD_CLASS === $operation ) {
-				$modified  = true;
+				$modified = true;
 
 				$class .= strlen( $class ) > 0 ? ' ' : '';
 				$class .= $name;
@@ -677,7 +677,7 @@ class WP_HTML_Walker {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute = $this->attributes[ $name ];
+			$existing_attribute               = $this->attributes[ $name ];
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
