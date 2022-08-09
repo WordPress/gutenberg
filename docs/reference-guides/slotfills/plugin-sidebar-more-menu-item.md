@@ -3,6 +3,8 @@
 This slot allows the creation of a `<PluginSidebar>` with a menu item that when clicked will expand the sidebar to the appropriate Plugin section.
 This is done by setting the `target` on `<PluginSidebarMoreMenuItem>` to match the `name` on the `<PluginSidebar>`
 
+Note: In the site editor, import `PluginSidebar` and `PluginSidebarMoreMenuItem` from `@wordpress/edit-site` instead.
+
 ## Example
 
 ```js
