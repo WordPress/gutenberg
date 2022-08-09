@@ -14,6 +14,14 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Returns the year and month of a specified date.
+ *
+ * @see `WP_REST_Posts_Controller::prepare_date_response()`.
+ *
+ * @param {string} date Date in `ISO8601/RFC3339` format.
+ * @return {Object} Year and date of the specified date.
+ */
 const getYearMonth = memoize( ( date ) => {
 	if ( ! date ) {
 		return {};
