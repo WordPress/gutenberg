@@ -28,13 +28,13 @@ What follows is a set of questions that have come up from the last few years of 
 
 ### The Development Experience
 - [How do I make my own block?](#how-do-i-make-my-own-block)
-- [Does Gutenberg involve editing posts/pages in the front-end?](#does-gutenberg-involve-editing-postspages-in-the-front-end)
+- [Does Gutenberg involve editing posts or pages in the front-end?](#does-gutenberg-involve-editing-posts-or-pages-in-the-front-end)
 - [Given Gutenberg is built in JavaScript, how do old meta boxes (PHP) work?](#given-gutenberg-is-built-in-javascript-how-do-old-meta-boxes-php-work)
 - [How can plugins extend the Gutenberg UI?](#how-can-plugins-extend-the-gutenberg-ui)
 - [Are Custom Post Types still supported?](#are-custom-post-types-still-supported)
 
 ### Styles
-- [Can themes _style_ blocks?](#can-themes-_style_-blocks)
+- [Can themes _style_ blocks?](#can-themes-style-blocks)
 - [How do block styles work in both the front-end and back-end?](#how-do-block-styles-work-in-both-the-front-end-and-back-end)
 - [What are block variations? Are they the same as block styles?](#what-are-block-variations-are-they-the-same-as-block-styles)
 - [How do editor styles work?](#how-do-editor-styles-work)
@@ -346,7 +346,7 @@ Yes, you can drag and drop blocks to rearrange their order.
 
 The best place to start is the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
 
-## Does Gutenberg involve editing posts/pages in the front-end?
+## Does Gutenberg involve editing posts or pages in the front-end?
 
 No, we are designing Gutenberg primarily as a replacement for the post and page editing screens. That said, front-end editing is often confused with an editor that looks exactly like the front end. And that is something that Gutenberg will allow as themes customize individual blocks and provide those styles to the editor. Since content is designed to be distributed across so many different experiences—from desktop and mobile to full-text feeds and syndicated article platforms—we believe it's not ideal to create or design posts from just one front-end experience.
 
@@ -361,19 +361,6 @@ The main extension point we want to emphasize is creating new blocks. Blocks are
 ## Are Custom Post Types still supported?
 
 Indeed. There are multiple ways in which custom post types can leverage Gutenberg. The plan is to allow them to specify the blocks they support, as well as defining a default block for the post type. It's not currently the case, but if a post type disables the content field, the “advanced” section at the bottom would fill the page.
-
-## Does Gutenberg support columns?
-
-Yes, a columns block is available in Gutenberg.
-
-## Does Gutenberg support nested blocks?
-
-Yes, it is supported. You can have multiple levels of nesting – blocks within blocks within blocks. See the [Nested Block Tutorial](/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md) for more information.
-
-## Does drag and drop work for rearranging blocks?
-
-Yes, you can drag and drop blocks to rearrange their order.
-
 
 ## Can themes _style_ blocks?
 
