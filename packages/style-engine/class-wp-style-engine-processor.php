@@ -128,7 +128,8 @@ class WP_Style_Engine_Processor {
 				unset( $this->css_rules[ $key ] );
 			}
 			// Create a new rule with the combined selectors.
-			$this->css_rules[ implode( ',', $duplicates ) ] = new WP_Style_Engine_CSS_Rule( implode( ',', $duplicates ), $declarations );
+			$duplicate_selectors                     = implode( ',', $duplicates );
+			$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 		}
 	}
 }
