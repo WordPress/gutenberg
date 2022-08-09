@@ -85,7 +85,7 @@ function FontSizePicker(
 			);
 		}
 		// The `hint` for toggle group control.
-		return selectedOption.name;
+		return selectedOption.label;
 	}, [
 		showCustomValueControl,
 		selectedOption?.name,
