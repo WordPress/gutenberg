@@ -121,7 +121,11 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const { inherit = false, type = 'default' } = usedLayout;
+	const {
+		inherit = false,
+		type = 'default',
+		contentSize = null,
+	} = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `column` layouts and it should not be taken into account when other
@@ -134,6 +138,8 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 	const layoutType = getLayoutType( type );
+
+	const columnType = getLayoutType( 'column' );
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -151,7 +157,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 									'Inner blocks respect content width'
 								) }
 								checked={
-									layoutType?.name === 'column' || !! inherit
+									layoutType?.name === 'column' ||
+									!! inherit ||
+									!! contentSize
 								}
 								onChange={ () =>
 									setAttributes( {
@@ -185,6 +193,13 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 					{ layoutType && layoutType.name !== 'default' && (
 						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					{ columnType && !! contentSize && (
+						<columnType.inspectorControls
 							layout={ usedLayout }
 							onChange={ onChangeLayout }
 							layoutBlockSupport={ layoutBlockSupport }
