@@ -164,6 +164,9 @@ export interface FormTokenFieldProps
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 }
 
+/**
+ * `T` can be either a `string` or an object which must have a `value` prop as a string.
+ */
 export interface SuggestionsListProps<
 	T = string | ( Record< string, unknown > & { value: string } )
 > {
