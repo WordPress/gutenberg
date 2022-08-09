@@ -564,7 +564,7 @@ HTML;
 	 */
 	public function test_updates_when_malformed_tag( $html_input, $html_expected ) {
 		$w = new WP_HTML_Walker( $html_input );
-		$w->next_tag( 'hr' );
+		$w->next_tag();
 		$w->set_attribute( 'foo', 'bar' );
 		$w->add_class( 'firstTag' );
 		$w->next_tag( 'span' );
@@ -578,6 +578,22 @@ HTML;
 	public function data_malformed_tag() {
 		$null_byte = chr( 0 );
 		return array(
+			array(
+				'<img src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span>test</span>',
+				'<img foo="bar" class="firstTag" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="seoncd title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
+			),
+			array(
+				'<pre id="<code" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+				'<pre foo="bar" id="<code" class="wp-block-code &lt;code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+			),
+			array(
+				'<pre id="<code-&gt;-block-&gt;" class="wp-block-code <code is poetry&gt;"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span>test</span>',
+				'<pre foo="bar" id="<code-&gt;-block-&gt;" class="wp-block-code &lt;code is poetry&gt; firstTag"><code>This &lt;is> a &lt;strong is="true">thing.</code></pre><span class="secondTag">test</span>',
+			),
+			array(
+				'<p title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span>test</span>',
+				'<p foo="bar" class="firstTag" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
+			),
 			array(
 				'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
 				'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
@@ -631,6 +647,30 @@ HTML;
 				'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
 			),
 			array(
+				'</><span>test</span>',
+				'</><span foo="bar" class="firstTag">test</span>',
+			),
+			array(
+				'The applicative operator <* works well in Haskell; <data-tag> is what?<span>test</span>',
+				'The applicative operator <* works well in Haskell; <data-tag foo="bar" class="firstTag"> is what?<span class="secondTag">test</span>',
+			),
+			array(
+				'<3 is a heart but <t3> is a tag.<span>test</span>',
+				'<3 is a heart but <t3 foo="bar" class="firstTag"> is a tag.<span class="secondTag">test</span>',
+			),
+			array(
+				'<?comment --><span>test</span>',
+				'<?comment --><span foo="bar" class="firstTag">test</span>',
+			),
+			array(
+				'<!-- this is a comment. no <strong>tags</strong> allowed --><span>test</span>',
+				'<!-- this is a comment. no <strong>tags</strong> allowed --><span foo="bar" class="firstTag">test</span>',
+			),
+			array(
+				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span>test</span>',
+				'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span foo="bar" class="firstTag">test</span>',
+			),
+			array(
 				'<hr ===name="value"><span>test</span>',
 				'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
 			),
@@ -669,6 +709,22 @@ HTML;
 			array(
 				'<hr a"sdf="test"><span>test</span>',
 				'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
+			),
+			array(
+				'<hr id=">"code<span>test</span>',
+				'<hr foo="bar" class="firstTag" id=">"code<span>test</span>',
+			),
+			array(
+				'<hr id="value>"code<span>test</span>',
+				'<hr foo="bar" class="firstTag" id="value>"code<span>test</span>',
+			),
+			array(
+				'<hr id="/>"code<span>test</span>',
+				'<hr foo="bar" class="firstTag" id="/>"code<span>test</span>',
+			),
+			array(
+				'<hr id="value/>"code<span>test</span>',
+				'<hr foo="bar" class="firstTag" id="value/>"code<span>test</span>',
 			),
 			array(
 				'<hr id   =5><span>test</span>',
