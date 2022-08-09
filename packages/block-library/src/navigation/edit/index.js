@@ -336,14 +336,12 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
-			speak( __( 'Classic menu imported successfully.' ) );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu import failed.' )
 			);
-			speak( __( 'Classic menu import failed.' ) );
 		}
 	}, [
 		classicMenuConversionStatus,
