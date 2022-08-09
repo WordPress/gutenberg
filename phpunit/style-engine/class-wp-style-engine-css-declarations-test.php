@@ -216,6 +216,26 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests allows --wp--* CSS custom properties.
+	 */
+	public function test_should_allow_wp_custom_properties() {
+		$input_declarations = array(
+			'--wp--love-your-work'                => 'url("https://wordpress.org")',
+			'--wp--style--unstable-gallery-gap'   => '12em',
+			'--wp-yeah-nah'                       => '100%',
+			'--wp--preset--here-is-a-potato'      => '88px',
+			'--wp--style--/::target-[<nonsense>]' => '2000.75em',
+			'--wp--style--block-gap'              => '2em',
+		);
+		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
+
+		$this->assertSame(
+			'--wp--style--unstable-gallery-gap:12em;',
+			$css_declarations->get_declarations_string()
+		);
+	}
+
+	/**
 	 * Tests removing a single declaration.
 	 *
 	 * @covers ::remove_declaration
