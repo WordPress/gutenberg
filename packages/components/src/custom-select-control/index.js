@@ -167,13 +167,7 @@ export default function CustomSelectControl( {
 						// This is needed because some speech recognition software don't support `aria-labelledby`.
 						'aria-label': label,
 						'aria-labelledby': undefined,
-						className: classnames(
-							'components-custom-select-control__button',
-							{
-								'is-next-unconstrained-width':
-									__nextUnconstrainedWidth,
-							}
-						),
+						className: 'components-custom-select-control__button',
 						describedBy: getDescribedBy(),
 					} ) }
 				>
