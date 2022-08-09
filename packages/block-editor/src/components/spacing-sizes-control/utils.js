@@ -160,7 +160,11 @@ export function getAllRawValue( values = {} ) {
  * @return {boolean} Whether values are mixed.
  */
 export function isValuesMixed( values = {} ) {
-	return new Set( Object.values( values ) ).size > 1;
+	return (
+		( Object.values( values ).length >= 1 &&
+			Object.values( values ).length < 4 ) ||
+		new Set( Object.values( values ) ).size > 1
+	);
 }
 
 /**
