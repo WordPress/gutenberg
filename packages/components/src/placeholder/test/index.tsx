@@ -13,6 +13,8 @@ import { useResizeObserver } from '@wordpress/compose';
  * Internal dependencies
  */
 import BasePlaceholder from '../';
+import type { WordPressComponentProps } from '../../ui/context';
+import type { PlaceholderProps } from '../types';
 
 jest.mock( '@wordpress/compose', () => {
 	return {
@@ -21,9 +23,12 @@ jest.mock( '@wordpress/compose', () => {
 	};
 } );
 
-const Placeholder = ( props ) => (
-	<BasePlaceholder data-testid="placeholder" { ...props } />
-);
+const Placeholder = (
+	props: Omit<
+		WordPressComponentProps< PlaceholderProps< unknown >, 'div', false >,
+		'ref'
+	>
+) => <BasePlaceholder data-testid="placeholder" { ...props } />;
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );
 
@@ -34,6 +39,7 @@ const getLabel = () => {
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
+		// @ts-ignore
 		useResizeObserver.mockReturnValue( [
 			<div key="1" />,
 			{ width: 320 },
@@ -80,15 +86,6 @@ describe( 'Placeholder', () => {
 			expect( placeholderLabel ).toHaveTextContent( label );
 		} );
 
-		it( 'should display an instructions element', () => {
-			const element = <div data-testid="instructions">Instructions</div>;
-			render( <Placeholder instructions={ element } /> );
-			const placeholderInstructions =
-				screen.getByTestId( 'instructions' );
-
-			expect( placeholderInstructions ).toBeInTheDocument();
-		} );
-
 		it( 'should display a fieldset from the children property', () => {
 			const content = 'Fieldset';
 			render( <Placeholder>{ content }</Placeholder> );
@@ -119,15 +116,16 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should add additional props to the top level container', () => {
-			render( <Placeholder test="test" /> );
+			render( <Placeholder data-test="test" /> );
 			const placeholder = getPlaceholder();
 
-			expect( placeholder ).toHaveAttribute( 'test', 'test' );
+			expect( placeholder ).toHaveAttribute( 'data-test', 'test' );
 		} );
 	} );
 
 	describe( 'resize aware', () => {
 		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
+			// @ts-ignore
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 480 },
@@ -142,6 +140,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
+			// @ts-ignore
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },
