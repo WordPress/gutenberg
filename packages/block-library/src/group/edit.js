@@ -76,7 +76,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	useEffect( () => {
 		if ( layoutType ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: { type: layoutType } } );
+			setAttributes( { layout: { ...layout, type: layoutType } } );
 		}
 	}, [ layoutType ] );
 
