@@ -74,16 +74,13 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 }
 
 function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
-	const popoverProps = useMemo( () => {
-		const result = {
+	const popoverProps = useMemo(
+		() => ( {
 			className:
 				'components-custom-gradient-picker__color-picker-popover',
-		};
-		if ( ! isRenderedInSidebar ) {
-			result.placement = 'top';
-		}
-		return result;
-	}, [ isRenderedInSidebar ] );
+		} ),
+		[]
+	);
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }

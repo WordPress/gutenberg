@@ -360,6 +360,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   popoverProps={
     Object {
       "__unstableShift": true,
+      "offset": 8,
+      "placement": "bottom",
     }
   }
   renderContent={[Function]}
@@ -736,6 +738,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             popoverProps={
               Object {
                 "__unstableShift": true,
+                "offset": 8,
+                "placement": "bottom",
               }
             }
             renderContent={[Function]}
