@@ -8,6 +8,14 @@
  * Instead this scans linearly through a document and only parses
  * the HTML tag openers.
  *
+ * @TODO: Unify language around "currently-opened tag."
+ * @TODO: Support <script> data state.
+ * @TODO: Support RCDATA state.
+ * @TODO: Organize unit test cases into normative tests, edge-case tests, regression tests.
+ * @TODO: Clean up attribute token class after is_true addition
+ * @TODO: Review (start,end) vs. (start,length) pairs for consistency and ease.
+ * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
+ *
  * @package WordPress
  * @subpackage HTML
  * @since 6.1.0
@@ -420,12 +428,11 @@ class WP_HTML_Walker {
 		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
 			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
 				$attribute_name,
-				// Avoid storing large, base64-encoded images. This class only ever uses the "class"
-				// attribute value, so let's store just that. If we need to do attribute-based matching
-				// in the future, this function could start accepting a list of relevant attributes.
-				'class' === $attribute_name ? substr( $this->html, $value_start, $value_length ) : null,
+				$value_start,
+				$value_length,
 				$attribute_start,
-				$attribute_end
+				$attribute_end,
+				! $has_value
 			);
 		}
 
@@ -498,7 +505,7 @@ class WP_HTML_Walker {
 		}
 
 		$existing_class = isset( $this->attributes['class'] )
-			? $this->attributes['class']->value
+			? substr( $this->html, $this->attributes['class']->value_starts_at, $this->attributes['class']->value_length )
 			: '';
 
 		/**
@@ -648,6 +655,69 @@ class WP_HTML_Walker {
 	 */
 	private static function sort_start_ascending( $a, $b ) {
 		return $a->start - $b->start;
+	}
+
+	/**
+	 * Returns the value of the parsed attribute in the currently-opened tag.
+	 *
+	 * Example:
+	 * <code>
+	 *     $w = new WP_HTML_Walker( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 *     $w->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $w->get_attribute( 'data-test-id' ) === '14';
+	 *     $w->get_attribute( 'enabled' ) === true;
+	 *     $w->get_attribute( 'aria-label' ) === null;
+	 *
+	 *     $w->next_tag( [] ) === false;
+	 *     $w->get_attribute( 'class' ) === null;
+	 * </code>
+	 *
+	 * @param string $name Name of attribute whose value is requested.
+	 * @return string|true|null Value of attribute or `null` if not available.
+	 *                          Boolean attributes return `true`.
+	 */
+	public function get_attribute( $name ) {
+		if ( null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $name );
+		if ( ! isset( $this->attributes[ $comparable ] ) ) {
+			return null;
+		}
+
+		$attribute = $this->attributes[ $comparable ];
+
+		if ( true === $attribute->is_true ) {
+			return true;
+		}
+
+		return substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
+	}
+
+	/**
+	 * Returns the raw name of the currently-opened tag.
+	 *
+	 * This will return the name as found in the input HTML,
+	 * which might not be equivalent to the case-folded and
+	 * semantically equivalent name sought after.
+	 *
+	 * Example:
+	 * <code>
+	 *     $w = new WP_HTML_Walker( '<DIV CLASS="test">Test</DIV>' );
+	 *     $w->next_tag( [] ) === true;
+	 *     $w->get_tag() === 'DIV';
+	 *
+	 *     $w->next_tag( [] ) === false;
+	 *     $w->get_tag() === null;
+	 * </code>
+	 *
+	 * @return string|null Raw name of current tag in input HTML, or `null` if none currently open.
+	 */
+	public function get_tag() {
+		return null !== $this->tag_name_starts_at
+			? substr( $this->html, $this->tag_name_starts_at, $this->tag_name_ends_at - $this->tag_name_starts_at )
+			: null;
 	}
 
 	/**
@@ -912,8 +982,9 @@ class WP_HTML_Walker {
 				return false;
 			}
 
-			$classes  = $this->attributes['class']->value;
-			$class_at = 0;
+			$class_start = $this->attributes['class']->value_starts_at;
+			$class_end   = $class_start + $this->attributes['class']->value_length;
+			$class_at    = $class_start;
 
 			/*
 			 * We're going to have to jump through potential matches here because
@@ -926,14 +997,17 @@ class WP_HTML_Walker {
 			 * See https://html.spec.whatwg.org/#attributes-3
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
-			while ( false !== ( $class_at = strpos( $classes, $this->sought_class_name, $class_at ) ) ) {
+			while (
+				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
+				$class_at < $class_end
+			) {
 				/*
 				 * Verify this class starts at a boundary. If it were at 0 we'd be at
 				 * the start of the string and that would be fine, otherwise we have
 				 * to start at a place where the preceding character is whitespace.
 				 */
-				if ( $class_at > 0 ) {
-					$c = $classes[ $class_at - 1 ];
+				if ( $class_at > $class_start ) {
+					$c = $this->html[ $class_at - 1 ];
 
 					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
 						$class_at += strlen( $this->sought_class_name );
@@ -946,8 +1020,8 @@ class WP_HTML_Walker {
 				 * can end at the very end of the string value, otherwise we have
 				 * to end at a place where the next character is whitespace.
 				 */
-				if ( $class_at + strlen( $this->sought_class_name ) < strlen( $classes ) ) {
-					$c = $classes[ $class_at + strlen( $this->sought_class_name ) ];
+				if ( $class_at + strlen( $this->sought_class_name ) < $class_end ) {
+					$c = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
 
 					if ( ' ' !== $c && "\t" !== $c && "\f" !== $c && "\r" !== $c && "\n" !== $c ) {
 						$class_at += strlen( $this->sought_class_name );
