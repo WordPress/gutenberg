@@ -14,7 +14,7 @@ import { getRawTransforms } from './get-raw-transforms';
  *
  * @return {Array} An array of blocks.
  */
-export function htmlToBlocks( html ) {
+export function htmlToBlocks( html, handler ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
@@ -36,7 +36,7 @@ export function htmlToBlocks( html ) {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
-			return transform( node );
+			return transform( node, handler );
 		}
 
 		return createBlock(
