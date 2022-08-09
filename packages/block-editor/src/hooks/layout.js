@@ -150,7 +150,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								label={ __(
 									'Inner blocks respect content width'
 								) }
-								checked={ layoutType?.name === 'column' }
+								checked={
+									layoutType?.name === 'column' || !! inherit
+								}
 								onChange={ () =>
 									setAttributes( {
 										layout: {
@@ -163,7 +165,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 								}
 							/>
 							<p className="block-editor-hooks__layout-controls-helptext">
-								{ !! inherit
+								{ !! inherit || layoutType?.name === 'column'
 									? __(
 											'Nested blocks use theme content width with options for full and wide widths.'
 									  )
@@ -292,7 +294,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { default: defaultBlockLayout } =
 			getBlockSupport( name, layoutBlockSupportKey ) || {};
 		const usedLayout = layout?.inherit
-			? defaultThemeLayout
+			? { ...layout, type: 'column' }
 			: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
