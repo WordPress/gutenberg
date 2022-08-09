@@ -6,10 +6,22 @@
  * @subpackage HTML
  */
 
+if ( ! class_exists( 'WP_UnitTestCase' ) ) {
+	class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
+}
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $s ) {
+		return str_replace( '"', '&quot;', $s );
+	}
+}
+
+require_once '../../lib/experimental/html/index.php';
+
 /**
  * @group html
  */
-class Tests_HTML_WP_HTML_Walker extends WP_UnitTestCase {
+class WP_HTML_Walker_Test extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
