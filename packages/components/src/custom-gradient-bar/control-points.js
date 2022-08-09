@@ -17,6 +17,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Button from '../button';
+import { HStack } from '../h-stack';
 import { ColorPicker } from '../color-picker';
 import { VisuallyHidden } from '../visually-hidden';
 import { CustomColorPickerDropdown } from '../color-palette';
@@ -74,17 +75,9 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
 }
 
 function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
-	const popoverProps = useMemo(
-		() => ( {
-			className:
-				'components-custom-gradient-picker__color-picker-popover',
-		} ),
-		[]
-	);
 	return (
 		<CustomColorPickerDropdown
 			isRenderedInSidebar={ isRenderedInSidebar }
-			popoverProps={ popoverProps }
 			{ ...props }
 		/>
 	);
@@ -246,21 +239,25 @@ function ControlPoints( {
 								} }
 							/>
 							{ ! disableRemove && controlPoints.length > 2 && (
-								<Button
-									className="components-custom-gradient-picker__remove-control-point"
-									onClick={ () => {
-										onChange(
-											removeControlPoint(
-												controlPoints,
-												index
-											)
-										);
-										onClose();
-									} }
-									variant="link"
+								<HStack
+									className="components-custom-gradient-picker__remove-control-point-wrapper"
+									alignment="center"
 								>
-									{ __( 'Remove Control Point' ) }
-								</Button>
+									<Button
+										onClick={ () => {
+											onChange(
+												removeControlPoint(
+													controlPoints,
+													index
+												)
+											);
+											onClose();
+										} }
+										variant="link"
+									>
+										{ __( 'Remove Control Point' ) }
+									</Button>
+								</HStack>
 							) }
 						</>
 					) }
