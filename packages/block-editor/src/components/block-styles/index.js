@@ -12,7 +12,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
 	Slot,
 	Fill,
 } from '@wordpress/components';
@@ -126,15 +126,12 @@ function BlockStyles( {
 							role="button"
 							tabIndex="0"
 						>
-							<Text
-								as="span"
-								limit={ 12 }
-								ellipsizeMode="tail"
+							<Truncate
+								numberOfLines={ 1 }
 								className="block-editor-block-styles__item-text"
-								truncate
 							>
 								{ buttonText }
-							</Text>
+							</Truncate>
 						</Button>
 					);
 				} ) }
