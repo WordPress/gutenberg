@@ -29,8 +29,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/deprecated": "^3.8.0",
-		"lodash": "^4.17.21"
+		"@wordpress/deprecated": "^3.8.0"
 	},
 	"publishConfig": {
 		"access": "public"
