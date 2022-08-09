@@ -5,6 +5,11 @@
  * @package Gutenberg
  */
 
+// Test with WordPress debug mode (default).
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', true );
+}
+
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
