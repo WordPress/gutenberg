@@ -12,6 +12,7 @@ const initWPScripts = require( './init-wp-scripts' );
 const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
+const { getMessage } = require( './messaging' );
 
 function upperFirst( str ) {
 	return str.charAt( 0 ).toUpperCase() + str.substr( 1 );
@@ -51,12 +52,9 @@ module.exports = async (
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
-	const creationMessage = plugin
-		? `Creating a new WordPress plugin in the "${ slug }" directory.`
-		: `Creating a new block in the "${ slug }" directory.`;
 
 	info( '' );
-	info( creationMessage );
+	info( getMessage( 'create', plugin, { slug } ) );
 
 	const view = {
 		$schema,
@@ -130,10 +128,8 @@ module.exports = async (
 	}
 
 	info( '' );
-	const successMessage = plugin
-		? `Done: WordPress plugin "${ title }" bootstrapped in the "${ slug }" directory.`
-		: `Done: Block "${ title }" bootstrapped in the "${ slug }" directory.`;
-	success( successMessage );
+
+	success( getMessage( 'complete', plugin, { title, slug } ) );
 
 	if ( plugin && wpScripts ) {
 		info( '' );
