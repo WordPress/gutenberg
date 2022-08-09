@@ -22,6 +22,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link' => array( ':hover', ':focus', ':active', ':visited' ),
+		'button' => array( ':hover', ':focus', ':active', ':visited' )
 	);
 
 	/**
@@ -481,9 +482,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 
 						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
+
+							$element_selector = [];
+							// This converts selectors like '.wp-element-button, .wp-block-button__link'
+							// to an array, so that the pseudo selector is added to both parts of the selector.
+							$el_selectors = explode( ',', static::ELEMENTS[ $element ] );
+							foreach ( $el_selectors as $el_selector_item ) {
+								$element_selector[] = $el_selector_item . $pseudo_selector;
+							}
+							$element_selector = implode( ',', $element_selector );
+
 							$nodes[] = array(
 								'path'     => array( 'styles', 'elements', $element ),
-								'selector' => static::ELEMENTS[ $element ] . $pseudo_selector,
+								'selector' => $element_selector,
 							);
 						}
 					}
@@ -566,9 +577,19 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					if ( array_key_exists( $element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+
+								$block_selector = [];
+								// This converts selectors like '.wp-element-button, .wp-block-button__link'
+								// to an array, so that the pseudo selector is added to both parts of the selector.
+								$bl_selectors = explode( ',', $selectors[ $name ]['elements'][ $element ] );
+								foreach ( $bl_selectors as $bl_selector_item ) {
+									$block_selector[] = $bl_selector_item . $pseudo_selector;
+								}
+								$block_selector = implode( ',', $block_selector );
+
 								$nodes[] = array(
 									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
-									'selector' => $selectors[ $name ]['elements'][ $element ] . $pseudo_selector,
+									'selector' => $block_selector,
 								);
 							}
 						}
