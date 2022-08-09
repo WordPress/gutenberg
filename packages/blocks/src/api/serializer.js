@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -320,7 +320,7 @@ export function getCommentDelimitedContent(
 		: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' )
+	const blockName = rawBlockName?.startsWith( 'core/' )
 		? rawBlockName.slice( 5 )
 		: rawBlockName;
 
