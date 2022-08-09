@@ -22,8 +22,13 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 }
 
 .emotion-4 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
   display: inline-block;
   margin-bottom: calc(4px * 2);
+  padding: 0;
 }
 
 .emotion-6 {
@@ -282,8 +287,13 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
 }
 
 .emotion-4 {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
   display: inline-block;
   margin-bottom: calc(4px * 2);
+  padding: 0;
 }
 
 .emotion-6 {

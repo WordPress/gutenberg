@@ -198,7 +198,7 @@
 		"parent": "data-basics"
 	},
 	{
-		"title": "Part 4: Building a _Create page_ form",
+		"title": "Part 4: Building a Create page form",
 		"slug": "4-building-a-create-page-form",
 		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
 		"parent": "data-basics"
@@ -2116,6 +2116,12 @@
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release.md",
 		"parent": "code"
+	},
+	{
+		"title": "Cherry-picking automation",
+		"slug": "auto-cherry-picking",
+		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
+		"parent": "release"
 	},
 	{
 		"title": "React Native mobile editor",

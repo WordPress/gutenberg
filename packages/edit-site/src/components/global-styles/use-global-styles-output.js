@@ -10,7 +10,6 @@ import {
 	pickBy,
 	reduce,
 	set,
-	startsWith,
 } from 'lodash';
 
 /**
@@ -22,7 +21,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
@@ -50,7 +49,7 @@ function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+	if ( uncompiledValue?.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -192,7 +191,7 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @return {Array} An array of style declarations.
  */
-function getStylesDeclarations(
+export function getStylesDeclarations(
 	blockStyles = {},
 	selector = '',
 	useRootPaddingAlign
@@ -210,6 +209,15 @@ function getStylesDeclarations(
 			}
 
 			const styleValue = get( blockStyles, pathToValue );
+
+			// Root-level padding styles don't currently support strings with CSS shorthand values.
+			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
+			if (
+				key === '--wp--style--root--padding' &&
+				( typeof styleValue === 'string' || ! useRootPaddingAlign )
+			) {
+				return declarations;
+			}
 
 			if ( !! properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
@@ -230,13 +238,6 @@ function getStylesDeclarations(
 						) }`
 					);
 				} );
-			} else if (
-				key === '--wp--style--root--padding' &&
-				typeof styleValue === 'string'
-			) {
-				// Root-level padding styles don't currently support strings with CSS shorthand values.
-				// This may change: https://github.com/WordPress/gutenberg/issues/40132.
-				return declarations;
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key
@@ -253,14 +254,18 @@ function getStylesDeclarations(
 		[]
 	);
 
-	if ( isRoot && useRootPaddingAlign ) {
-		return output;
-	}
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
+		// Don't output padding properties if padding variables are set.
+		if (
+			isRoot &&
+			useRootPaddingAlign &&
+			rule.key.startsWith( 'padding' )
+		) {
+			return;
+		}
 		const cssProperty = rule.key.startsWith( '--' )
 			? rule.key
 			: kebabCase( rule.key );
@@ -435,11 +440,12 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			selector: ROOT_BLOCK_SELECTOR,
 		} );
 	}
-	forEach( tree.styles?.elements, ( value, key ) => {
-		if ( !! value && !! ELEMENTS[ key ] ) {
+
+	forEach( ELEMENTS, ( selector, name ) => {
+		if ( !! tree.styles?.elements[ name ] ) {
 			nodes.push( {
-				styles: value,
-				selector: ELEMENTS[ key ],
+				styles: tree.styles?.elements[ name ],
+				selector,
 			} );
 		}
 	} );
@@ -782,9 +788,6 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 export function useGlobalStylesOutput() {
-	const [ stylesheets, setStylesheets ] = useState( [] );
-	const [ settings, setSettings ] = useState( {} );
-	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -794,9 +797,9 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
-	useEffect( () => {
+	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return;
+			return [];
 		}
 
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
@@ -812,7 +815,7 @@ export function useGlobalStylesOutput() {
 			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		setStylesheets( [
+		const stylesheets = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -821,15 +824,13 @@ export function useGlobalStylesOutput() {
 				css: globalStyles,
 				isGlobalStyles: true,
 			},
-		] );
-		setSettings( mergedConfig.settings );
-		setSvgFilters( filters );
+		];
+
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
 	] );
-
-	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

@@ -663,7 +663,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/query-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, textAlign, type
+-	**Attributes:** level, showSearchTerm, textAlign, type
 
 ## Quote
 

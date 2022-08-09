@@ -170,6 +170,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'padding',
 	'contentSize',
 	'wideSize',
+	'blockGap',
 ];
 
 export function getSupportedGlobalStylesPanels( name ) {

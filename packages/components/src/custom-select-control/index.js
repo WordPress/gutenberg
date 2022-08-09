@@ -18,6 +18,7 @@ import { VisuallyHidden } from '../';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
 import SelectControlChevronDown from '../select-control/chevron-down';
 import { InputBaseWithBackCompatMinWidth } from './styles';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -139,13 +140,13 @@ export default function CustomSelectControl( {
 				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
-				<label
+				<StyledLabel
 					{ ...getLabelProps( {
 						className: 'components-custom-select-control__label',
 					} ) }
 				>
 					{ label }
-				</label>
+				</StyledLabel>
 			) }
 			<InputBaseWithBackCompatMinWidth
 				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }

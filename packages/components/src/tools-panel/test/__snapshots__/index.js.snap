@@ -5,6 +5,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   display: grid;
   gap: calc( 4px * 3 );
   grid-template-columns: repeat( 2, 1fr );
+  grid-template-columns: repeat( 2, minmax(0, 1fr) );
   -webkit-column-gap: calc(4px * 4);
   column-gap: calc(4px * 4);
   row-gap: calc(4px * 6);
@@ -15,7 +16,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
 
 .emotion-0>div:not( :first-of-type ) {
   display: grid;
-  grid-template-columns: repeat( 2, 1fr );
+  grid-template-columns: repeat( 2, minmax(0, 1fr) );
   -webkit-column-gap: calc(4px * 4);
   column-gap: calc(4px * 4);
   row-gap: calc(4px * 6);
@@ -105,11 +106,6 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
   line-height: 1.4em;
 }
 
-.emotion-6 .components-custom-select-control__label,
-.emotion-6 .ej5x27r2 {
-  line-height: 1.4em;
-}
-
 .emotion-8 {
   grid-column: 1/-1;
 }
@@ -134,11 +130,6 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
 }
 
 .emotion-8.emotion-8 .em5sgkm3 label {
-  line-height: 1.4em;
-}
-
-.emotion-8 .components-custom-select-control__label,
-.emotion-8 .ej5x27r2 {
   line-height: 1.4em;
 }
 
