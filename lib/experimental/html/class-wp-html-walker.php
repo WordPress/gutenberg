@@ -10,7 +10,6 @@
  *
  * @TODO: Unify language around "currently-opened tag."
  * @TODO: Support <script> data state.
- * @TODO: Support RCDATA state.
  * @TODO: Organize unit test cases into normative tests, edge-case tests, regression tests.
  * @TODO: Clean up attribute token class after is_true addition
  * @TODO: Review (start,end) vs. (start,length) pairs for consistency and ease.
@@ -110,6 +109,13 @@ class WP_HTML_Walker {
 	 * @var number
 	 */
 	private $tag_name_ends_at;
+
+	/**
+	 * The name of the tag that started the rcdata state.
+	 *
+	 * @var string
+	 */
+	private $rcdata_tag_name;
 
 	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
@@ -231,6 +237,7 @@ class WP_HTML_Walker {
 	 */
 	public function next_tag( $query = null ) {
 		$this->assert_not_closed();
+		$this->skip_rcdata();
 		$this->parse_query( $query );
 		$already_found = 0;
 
@@ -251,12 +258,46 @@ class WP_HTML_Walker {
 				// Twiddle our thumbs...
 			}
 
+			$tag_name = $this->get_tag();
+			if ( 'title' === $tag_name || 'textarea' === $tag_name ) {
+				$this->rcdata_tag_name = $tag_name;
+			} elseif ( 'script' === $tag_name ) {
+				$this->parsed_bytes = strlen( $this->html );
+				return false;
+			}
+
 			if ( $this->matches() ) {
 				$already_found++;
 			}
 		} while ( $already_found < $this->sought_match_offset );
 
 		return true;
+	}
+
+	/**
+	 * Skips the contents of the title and textarea tags until an appropriate
+	 * tag closer is found:
+	 * https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
+	 *
+	 * @since 6.1.0
+	 */
+	private function skip_rcdata() {
+		while ( null !== $this->rcdata_tag_name ) {
+			$closer = "</$this->rcdata_tag_name";
+			$at = strpos( $this->html, $closer, $this->parsed_bytes );
+			if ( false === $at ) {
+				return false;
+			}
+			$this->parsed_bytes = $at + strlen( $closer );
+			if ( 0 === strspn( $this->html, " \t\f\r\n/>", $this->parsed_bytes ) ) {
+				continue;
+			}
+			// Parse all the attributes of the current tag.
+			while ( $this->parse_next_attribute() ) {
+				// Twiddle our thumbs...
+			}
+			$this->rcdata_tag_name = null;
+		}
 	}
 
 	/**

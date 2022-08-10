@@ -630,6 +630,54 @@ HTML;
 		);
 	}
 
+	public function test_bales_out_when_script_tag_found() {
+		$w = new WP_HTML_Walker( '<div><script></script><span>' );
+		$w->next_tag();
+		$this->assertSame( 'div', $w->get_tag() );
+		$this->assertFalse( $w->next_tag() );
+	}
+
+	/**
+	 * @ticket 56299
+	 * @dataProvider data_rcdata_state
+	 */
+	public function test_ignores_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
+		$w = new WP_HTML_Walker( $rcdata_then_div );
+		$w->next_tag();
+		$this->assertSame( $rcdata_tag, $w->get_tag() );
+		$w->next_tag();
+		$this->assertSame( 'div', $w->get_tag() );
+	}
+
+	public function data_rcdata_state() {
+		return array(
+			'Simple textarea'                          => array(
+				'<textarea><span class="d-none d-md-inline">Back to notifications</span></textarea><div></div>',
+				'textarea',
+			),
+			'Simple title'                             => array(
+				'<title><span class="d-none d-md-inline">Back to notifications</title</span></title><div></div>',
+				'title',
+			),
+			'Comment opener inside a textarea tag should be ignored' => array(
+				'<textarea class="d-md-none"><!--</textarea><div></div>-->',
+				'textarea',
+			),
+			'Textarea closer with another textarea tag in closer attributes' => array(
+				'<textarea><span class="d-none d-md-inline">Back to notifications</title</span></textarea <textarea><div></div>',
+				'textarea',
+			),
+			'Textarea closer with attributes'          => array(
+				'<textarea class="d-md-none"><span class="d-none d-md-inline">Back to notifications</span></textarea id="test"><div></div>',
+				'textarea',
+			),
+			'Textarea opener with title closer inside' => array(
+				'<textarea class="d-md-none"></title></textarea><div></div>',
+				'textarea',
+			),
+		);
+	}
+
 	/**
 	 * @ticket 56299
 	 * @dataProvider data_malformed_tag
