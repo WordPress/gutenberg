@@ -255,7 +255,7 @@ function block_core_navigation_render_submenu_icon() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
-	// We default to the most recently created
+	// We default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
 		'no_found_rows'  => true,
@@ -266,7 +266,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
-	if( count( $navigation_post->posts )  > 0 ) {
+	if ( count( $navigation_post->posts ) > 0 ) {
 		return $navigation_post->posts[0];
 	}
 
