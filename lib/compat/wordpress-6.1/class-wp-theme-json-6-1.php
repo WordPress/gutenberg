@@ -1148,6 +1148,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	public function set_spacing_sizes() {
 		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
 
+		// If theme authors want to prevent the generation of the core spacing scale they can set their theme.json spacingScale.steps to 0.
+		if ( 0 === $spacing_scale['steps'] ) {
+			return null;
+		}
+
 		if ( ! is_numeric( $spacing_scale['steps'] )
 			|| ! $spacing_scale['steps'] > 0
 			|| ! isset( $spacing_scale['mediumStep'] )
