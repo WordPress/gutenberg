@@ -23,6 +23,10 @@ import { usePreferredColorScheme } from '@wordpress/compose';
 import sandboxStyles from './style.scss';
 
 const observeAndResizeJS = function () {
+	// Hermes requires a special directive to preserve the original source code
+	// when using `Function.prototype.toString()` below.
+	// https://github.com/facebook/hermes/issues/114#issuecomment-887106990
+	'show source';
 	const { MutationObserver } = window;
 
 	if ( ! MutationObserver || ! document.body || ! window.parent ) {
