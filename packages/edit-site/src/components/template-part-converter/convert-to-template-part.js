@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { symbolFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -65,11 +66,12 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 			<BlockSettingsMenuControls>
 				{ () => (
 					<MenuItem
+						icon={ symbolFilled }
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }
 					>
-						{ __( 'Make template part' ) }
+						{ __( 'Create Template part' ) }
 					</MenuItem>
 				) }
 			</BlockSettingsMenuControls>

@@ -59,6 +59,7 @@ function ComboboxControl( {
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
+	__experimentalRenderItem,
 } ) {
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
@@ -285,6 +286,9 @@ function ComboboxControl( {
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
+							__experimentalRenderItem={
+								__experimentalRenderItem
+							}
 						/>
 					) }
 				</div>
