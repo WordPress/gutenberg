@@ -250,29 +250,24 @@ function block_core_navigation_render_submenu_icon() {
 
 
 /**
- * Finds the first non-empty `wp_navigation` Post.
+ * Finds the most recent published `wp_navigation` Post.
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
-function block_core_navigation_get_first_non_empty_navigation() {
-	// Order and orderby args set to mirror those in `wp_get_nav_menus`
-	// see:
-	// - https://github.com/WordPress/wordpress-develop/blob/ba943e113d3b31b121f77a2d30aebe14b047c69d/src/wp-includes/nav-menu.php#L613-L619.
-	// - https://developer.wordpress.org/reference/classes/wp_query/#order-orderby-parameters.
+function block_core_navigation_get_most_recently_published_navigation() {
+	// We default to the most recently created
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
 		'no_found_rows'  => true,
-		'order'          => 'ASC',
-		'orderby'        => 'name',
+		'order'          => 'DESC',
+		'orderby'        => 'date',
 		'post_status'    => 'publish',
-		'posts_per_page' => 20, // Try the first 20 posts.
+		'posts_per_page' => 1, // Try the first 20 posts.
 	);
 
-	$navigation_posts = new WP_Query( $parsed_args );
-	foreach ( $navigation_posts->posts as $navigation_post ) {
-		if ( has_blocks( $navigation_post ) ) {
-			return $navigation_post;
-		}
+	$navigation_post = new WP_Query( $parsed_args );
+	if( count( $navigation_post->posts )  > 0 ) {
+		return $navigation_post->posts[0];
 	}
 
 	return null;
@@ -325,7 +320,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Default to a list of Pages.
 
-	$navigation_post = block_core_navigation_get_first_non_empty_navigation();
+	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// Prefer using the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
