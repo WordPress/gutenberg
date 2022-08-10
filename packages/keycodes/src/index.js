@@ -12,7 +12,8 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize, xor } from 'lodash';
+import { capitalCase } from 'change-case';
+import { get, mapValues, includes, xor } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -232,7 +233,7 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			/** @type {string[]} */ ( [] )
 		);
 
-		const capitalizedCharacter = capitalize( character );
+		const capitalizedCharacter = capitalCase( character );
 		return [ ...modifierKeys, capitalizedCharacter ];
 	};
 } );
@@ -294,7 +295,7 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 		};
 
 		return [ ...modifier( _isApple ), character ]
-			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
+			.map( ( key ) => capitalCase( get( replacementKeyMap, key, key ) ) )
 			.join( isApple ? ' ' : ' + ' );
 	};
 } );
