@@ -47,6 +47,45 @@
 
 
 /**
+ * Flex container appender appearance.
+ * This renders dashed boxes in flex containers (row/stack style) to indicate their direction.
+ */
+
+.is-layout-flex.block-editor-block-list__block .block-list-appender:only-child {
+	gap: inherit;
+
+	&,
+	.block-editor-default-block-appender__content,
+	.block-editor-button-block-appender,
+	.block-editor-inserter {
+		display: inherit;
+		width: 100%;
+		flex-direction: inherit;
+		flex: 1;
+		box-sizing: border-box;
+	}
+
+	&::after {
+		content: "";
+		display: flex;
+		border: $border-width dashed currentColor;
+		opacity: 0.4;
+		border-radius: $radius-block-ui;
+		flex: 1;
+		pointer-events: none;
+		min-height: $grid-unit-60 - $border-width - $border-width;
+	}
+
+	// Let the parent be selectable in the placeholder area.
+	pointer-events: none;
+	.block-editor-inserter,
+	.block-editor-button-block-appender {
+		pointer-events: all;
+	}
+}
+
+
+/**
  * Fixed position appender.
  * These styles apply to all in-canvas inserters that exist inside nesting containers.
  */
