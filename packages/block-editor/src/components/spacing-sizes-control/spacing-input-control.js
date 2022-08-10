@@ -204,7 +204,7 @@ export default function SpacingInputControl( {
 					onChange={ ( newSize ) =>
 						onChange( getNewPresetValue( newSize ) )
 					}
-					onClick={ setInitialValue }
+					onMouseDown={ setInitialValue }
 					withInputField={ false }
 					aria-valuenow={ valueNow }
 					aria-valuetext={ spacingSizes[ valueNow ]?.name }
