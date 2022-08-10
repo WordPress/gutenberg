@@ -49,7 +49,11 @@ function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-	if ( uncompiledValue?.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
+
+	if (
+		typeof uncompiledValue === 'string' &&
+		uncompiledValue.startsWith( VARIABLE_REFERENCE_PREFIX )
+	) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
