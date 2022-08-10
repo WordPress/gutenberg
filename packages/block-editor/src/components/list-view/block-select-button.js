@@ -94,6 +94,11 @@ function ListViewBlockSelectButton(
 							{ blockInformation.anchor }
 						</span>
 					) }
+					{ blockInformation?.tagName && (
+						<span className="block-editor-list-view-block-select-button__tag-name">
+							{ '<' + blockInformation.tagName + '>' }
+						</span>
+					) }
 					{ isLocked && (
 						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
