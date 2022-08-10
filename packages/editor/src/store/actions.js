@@ -43,7 +43,7 @@ export const setupEditor =
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( edits?.hasOwnProperty( 'content' ) ) {
+			if ( 'content' in edits ) {
 				content = edits.content;
 			} else {
 				content = post.content.raw;
