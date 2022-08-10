@@ -111,13 +111,6 @@ class WP_HTML_Walker {
 	private $tag_name_ends_at;
 
 	/**
-	 * The name of the tag that started the rcdata state.
-	 *
-	 * @var string
-	 */
-	private $rcdata_tag_name;
-
-	/**
 	 * Lazily-built index of attributes found within an HTML tag, keyed by the attribute name.
 	 *
 	 * Example:
@@ -237,7 +230,6 @@ class WP_HTML_Walker {
 	 */
 	public function next_tag( $query = null ) {
 		$this->assert_not_closed();
-		$this->skip_rcdata();
 		$this->parse_query( $query );
 		$already_found = 0;
 
@@ -260,7 +252,7 @@ class WP_HTML_Walker {
 
 			$tag_name = $this->get_tag();
 			if ( 'title' === $tag_name || 'textarea' === $tag_name ) {
-				$this->rcdata_tag_name = $tag_name;
+				$this->skip_rcdata( $tag_name );
 			} elseif ( 'script' === $tag_name ) {
 				$this->parsed_bytes = strlen( $this->html );
 				return false;
@@ -279,24 +271,26 @@ class WP_HTML_Walker {
 	 * tag closer is found:
 	 * https://html.spec.whatwg.org/multipage/parsing.html#rcdata-state
 	 *
+	 * @param string $tag_name – the rcdata tag closer to look for.
 	 * @since 6.1.0
 	 */
-	private function skip_rcdata() {
-		while ( null !== $this->rcdata_tag_name ) {
-			$closer = "</$this->rcdata_tag_name";
+	private function skip_rcdata( $tag_name ) {
+		while ( true ) {
+			// Find a potential tag closer.
+			$closer = "</{$tag_name}";
 			$at = strpos( $this->html, $closer, $this->parsed_bytes );
 			if ( false === $at ) {
-				return false;
+				return;
 			}
+			// Confirm the initial </tag sequence is followed by a terminating character.
 			$this->parsed_bytes = $at + strlen( $closer );
 			if ( 0 === strspn( $this->html, " \t\f\r\n/>", $this->parsed_bytes ) ) {
 				continue;
 			}
-			// Parse all the attributes of the current tag.
+			// Parse all the attributes of the tag closer.
 			while ( $this->parse_next_attribute() ) {
 				// Twiddle our thumbs...
 			}
-			$this->rcdata_tag_name = null;
 		}
 	}
 
