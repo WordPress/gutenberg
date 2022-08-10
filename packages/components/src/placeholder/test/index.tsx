@@ -102,10 +102,11 @@ describe( 'Placeholder', () => {
 					<div>Fieldset</div>
 				</Placeholder>
 			);
-			const placeholderLegend = screen.getByText( instructions );
+			const captionedFieldset = screen.getByRole( 'group', {
+				name: instructions,
+			} );
 
-			expect( placeholderLegend ).toBeInTheDocument();
-			expect( placeholderLegend.tagName ).toBe( 'LEGEND' );
+			expect( captionedFieldset ).toBeInTheDocument();
 		} );
 
 		it( 'should add an additional className to the top container', () => {
