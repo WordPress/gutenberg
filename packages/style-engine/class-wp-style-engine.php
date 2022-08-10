@@ -491,6 +491,11 @@ class WP_Style_Engine {
 		// If the input contains an array, assume box model-like properties
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
+			// Bail out early if the `'individual'` property is not defined.
+			if ( ! isset( $style_property_keys['individual'] ) ) {
+				return $css_declarations;
+			}
+
 			foreach ( $style_value as $key => $value ) {
 				if ( is_string( $value ) && strpos( $value, 'var:' ) !== false && ! $should_skip_css_vars && ! empty( $style_definition['css_vars'] ) ) {
 					$value = static::get_css_var_value( $value, $style_definition['css_vars'] );
