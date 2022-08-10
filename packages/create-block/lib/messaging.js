@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+const { get } = require( 'lodash' );
+
 const messages = {
 	create: {
 		plugin: 'Creating a new WordPress plugin in the slug directory.',
@@ -24,7 +29,7 @@ const messages = {
  */
 const getMessage = ( type, plugin, placeholders = {} ) => {
 	const mode = plugin ? 'plugin' : 'block';
-	let message = messages?.[ type ]?.[ mode ];
+	let message = get( messages, `${ type }.${ mode }` );
 
 	if ( typeof message === 'undefined' ) {
 		return '';
