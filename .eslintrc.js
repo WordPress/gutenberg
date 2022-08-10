@@ -142,6 +142,7 @@ module.exports = {
 							'uniqueId',
 							'uniqWith',
 							'values',
+							'words',
 							'zip',
 						],
 						message:
