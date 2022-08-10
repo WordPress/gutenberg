@@ -74,7 +74,7 @@ export default function SpacingInputControl( {
 	const customTooltipContent = ( newValue ) =>
 		value === undefined ? undefined : spacingSizes[ newValue ]?.name;
 
-	const customRangeValue = parseInt( currentValue );
+	const customRangeValue = parseInt( currentValue, 10 );
 
 	const getNewCustomValue = ( newSize ) => {
 		const isNumeric = ! isNaN( parseFloat( newSize ) );
@@ -82,19 +82,26 @@ export default function SpacingInputControl( {
 		return nextValue;
 	};
 
-	const getNewPresetValue = ( newSize ) => {
+	const getNewPresetValue = ( newSize, controlType ) => {
 		setValueNow( newSize );
+
 		const size = parseInt( newSize, 10 );
-		if ( size === 0 ) {
+
+		if ( controlType === 'selectList' ) {
+			if ( size === 0 ) {
+				return undefined;
+			}
+			if ( size === 1 ) {
+				return '0';
+			}
+		} else if ( size === 0 ) {
 			return '0';
 		}
 		return `var:preset|spacing|${ spacingSizes[ newSize ]?.slug }`;
 	};
 
 	const handleCustomValueSliderChange = ( next ) => {
-		onChange(
-			next !== undefined ? `${ next }${ selectedUnit }` : undefined
-		);
+		onChange( [ next, selectedUnit ].join( '' ) );
 	};
 
 	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
@@ -226,7 +233,10 @@ export default function SpacingInputControl( {
 					}
 					onChange={ ( selection ) => {
 						onChange(
-							getNewPresetValue( selection.selectedItem.key )
+							getNewPresetValue(
+								selection.selectedItem.key,
+								'selectList'
+							)
 						);
 					} }
 					options={ options }
