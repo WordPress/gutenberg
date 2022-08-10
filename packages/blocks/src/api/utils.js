@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, reduce, maxBy } from 'lodash';
+import { every, has, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -101,13 +101,17 @@ export function normalizeIconObject( icon ) {
 
 	if ( has( icon, [ 'background' ] ) ) {
 		const colordBgColor = colord( icon.background );
+		const getColorContrast = ( iconColor ) =>
+			colordBgColor.contrast( iconColor );
+		const maxContrast = Math.max( ...ICON_COLORS.map( getColorContrast ) );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: maxBy( ICON_COLORS, ( iconColor ) =>
-						colordBgColor.contrast( iconColor )
+				: ICON_COLORS.find(
+						( iconColor ) =>
+							getColorContrast( iconColor ) === maxContrast
 				  ),
 			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};

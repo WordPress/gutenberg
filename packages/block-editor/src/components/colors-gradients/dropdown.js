@@ -61,7 +61,12 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem>{ label }</FlexItem>
+		<FlexItem
+			className="block-editor-panel-color-gradient-settings__color-name"
+			title={ label }
+		>
+			{ label }
+		</FlexItem>
 	</HStack>
 );
 
@@ -158,7 +163,7 @@ export default function ColorGradientSettingsDropdown( {
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
-									<DropdownContentWrapper paddingSize="medium">
+									<DropdownContentWrapper paddingSize="none">
 										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 											<ColorGradientControl
 												{ ...controlProps }

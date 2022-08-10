@@ -39,22 +39,32 @@ function mergeInitialState(
 }
 
 /**
- * Creates a reducer that opens the channel for external state subscription
- * and modification.
+ * Creates the base reducer which may be coupled to a specializing reducer.
+ * As its final step, for all actions other than CONTROL, the base reducer
+ * passes the state and action on through the specializing reducer. The
+ * exception for CONTROL actions is because they represent controlled updates
+ * from props and no case has yet presented for their specialization.
  *
- * This technique uses the "stateReducer" design pattern:
- * https://kentcdodds.com/blog/the-state-reducer-pattern/
- *
- * @param  composedStateReducers A custom reducer that can subscribe and modify state.
+ * @param  composedStateReducers A reducer to specialize state changes.
  * @return The reducer.
  */
 function inputControlStateReducer(
 	composedStateReducers: StateReducer
-): StateReducer {
+): StateReducer< actions.ControlAction > {
 	return ( state, action ) => {
 		const nextState = { ...state };
 
 		switch ( action.type ) {
+			/*
+			 * Controlled updates
+			 */
+			case actions.CONTROL:
+				nextState.value = action.payload.value;
+				nextState.isDirty = false;
+				nextState._event = undefined;
+				// Returns immediately to avoid invoking additional reducers.
+				return nextState;
+
 			/**
 			 * Keyboard events
 			 */
@@ -140,7 +150,7 @@ export function useInputControlStateReducer(
 	initialState: Partial< InputState > = initialInputControlState,
 	onChangeHandler: InputChangeCallback
 ) {
-	const [ state, dispatch ] = useReducer< StateReducer >(
+	const [ state, dispatch ] = useReducer(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
@@ -188,10 +198,15 @@ export function useInputControlStateReducer(
 
 	const currentState = useRef( state );
 	const refProps = useRef( { value: initialState.value, onChangeHandler } );
+
+	// Freshens refs to props and state so that subsequent effects have access
+	// to their latest values without their changes causing effect runs.
 	useLayoutEffect( () => {
 		currentState.current = state;
 		refProps.current = { value: initialState.value, onChangeHandler };
 	} );
+
+	// Propagates the latest state through onChange.
 	useLayoutEffect( () => {
 		if (
 			currentState.current._event !== undefined &&
@@ -205,14 +220,16 @@ export function useInputControlStateReducer(
 			} );
 		}
 	}, [ state.value, state.isDirty ] );
+
+	// Updates the state from props.
 	useLayoutEffect( () => {
 		if (
 			initialState.value !== currentState.current.value &&
 			! currentState.current.isDirty
 		) {
 			dispatch( {
-				type: actions.RESET,
-				payload: { value: initialState.value },
+				type: actions.CONTROL,
+				payload: { value: initialState.value ?? '' },
 			} );
 		}
 	}, [ initialState.value ] );

@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	parseWithAttributeSchema,
-	rawHandler,
-} from '@wordpress/blocks';
+import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -59,7 +55,7 @@ const transforms = {
 				},
 			} ),
 			selector: 'blockquote',
-			transform: ( node ) => {
+			transform: ( node, handler ) => {
 				return createBlock(
 					'core/quote',
 					// Don't try to parse any `cite` out of this content.
@@ -68,7 +64,7 @@ const transforms = {
 					// * If the cite is nested in the quoted text, it's wrong to
 					//   remove it.
 					{},
-					rawHandler( {
+					handler( {
 						HTML: node.innerHTML,
 						mode: 'BLOCKS',
 					} )

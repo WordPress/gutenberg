@@ -15,7 +15,7 @@ Display a date archive of your posts. ([Source](https://github.com/WordPress/gut
 -	**Name:** core/archives
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** displayAsDropdown, showPostCounts, type
+-	**Attributes:** displayAsDropdown, showLabel, showPostCounts, type
 
 ## Audio
 
@@ -546,7 +546,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** height, isLink, scale, sizeSlug, width
+-	**Attributes:** height, isLink, linkTarget, rel, scale, sizeSlug, width
 
 ## Post Navigation Link
 
@@ -663,7 +663,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/query-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), spacing (margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, textAlign, type
+-	**Attributes:** level, showSearchTerm, textAlign, type
 
 ## Quote
 

@@ -148,6 +148,23 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should transform when typing backtick over selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A selection test.' );
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowRight' );
+		await page.keyboard.type( '`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should undo the transform.
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should only mutate text data on input', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );

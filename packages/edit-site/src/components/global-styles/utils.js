@@ -3,6 +3,11 @@
  */
 import { get, find } from 'lodash';
 
+/**
+ * Internal dependencies
+ */
+import { getTypographyFontSizeValue } from './typography-utils';
+
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
@@ -58,6 +63,8 @@ export const PRESET_METADATA = [
 	},
 	{
 		path: [ 'typography', 'fontSizes' ],
+		valueFunc: ( preset, { typography: typographySettings } ) =>
+			getTypographyFontSizeValue( preset, typographySettings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -78,6 +85,9 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.link.color.text': 'color',
 	'elements.button.color.text': 'color',
 	'elements.button.backgroundColor': 'background-color',
+	'elements.heading.color': 'color',
+	'elements.heading.backgroundColor': 'background-color',
+	'elements.heading.gradient': 'gradient',
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
