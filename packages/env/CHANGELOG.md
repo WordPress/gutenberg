@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2022-08-10)
+
 ### Enhancement
 - Previously, wp-env used the WordPress version provided by Docker in the WordPress image for installations which don't specify a WordPress version. Now, wp-env will find the latest stable version on WordPress.org and check out the https://github.com/WordPress/WordPress repository at the tag matching that version. In most cases, this will match what Docker provides. The benefit is that wp-env (and WordPress.org) now controls the default WordPress version rather than Docker.
 
