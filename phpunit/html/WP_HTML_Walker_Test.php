@@ -16,7 +16,7 @@ if ( ! class_exists( 'WP_UnitTestCase' ) ) {
 	class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
 }
 
-require_once '../../lib/experimental/html/index.php';
+require_once __DIR__ . '/../../lib/experimental/html/index.php';
 
 /**
  * @group html
