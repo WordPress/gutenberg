@@ -123,3 +123,29 @@ DuplicatedColors.args = {
 		{ name: 'Accent2', color: '#00f' },
 	],
 };
+
+export const DuplicatedColorsAcrossMultiplePalettes = Template.bind( {} );
+DuplicatedColorsAcrossMultiplePalettes.args = {
+	__experimentalHasMultipleOrigins: true,
+	colors: [
+		{
+			name: 'First palette',
+			colors: [
+				{ name: 'Primary', color: '#f00' },
+				{ name: 'Secondary', color: '#ff0' },
+				{ name: 'Accent', color: '#00f' },
+				{ name: 'Primary', color: '#f00' },
+				{ name: 'Accent2', color: '#00f' },
+			],
+		},
+		{
+			name: 'Second palette',
+			colors: [
+				{ name: 'One', color: '#f00' },
+				{ name: 'Two', color: '#ff0' },
+				{ name: 'Three', color: '#00f' },
+				{ name: 'Primary', color: '#f00' },
+			],
+		},
+	],
+};
