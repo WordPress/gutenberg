@@ -250,7 +250,7 @@ function block_core_navigation_render_submenu_icon() {
 
 
 /**
- * Finds the most recent published `wp_navigation` Post.
+ * Finds the most recently published `wp_navigation` Post.
  *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
