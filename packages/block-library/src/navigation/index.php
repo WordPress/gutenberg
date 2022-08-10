@@ -262,7 +262,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
 		'order'          => 'DESC',
 		'orderby'        => 'date',
 		'post_status'    => 'publish',
-		'posts_per_page' => 1, // Try the first 20 posts.
+		'posts_per_page' => 1, // get only the most recent
 	);
 
 	$navigation_post = new WP_Query( $parsed_args );
