@@ -87,7 +87,8 @@
 }
 
 // Center flex items. This has an equivalent in style.scss.
-.wp-block[data-align="center"] > .wp-block-social-links {
+.wp-block[data-align="center"] > .wp-block-social-links,
+.wp-block.wp-block-social-links.aligncenter {
 	justify-content: center;
 }
 
