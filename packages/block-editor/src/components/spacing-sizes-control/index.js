@@ -15,12 +15,8 @@ import LinkedButton from './linked-button';
 import { DEFAULT_VALUES, isValuesMixed, isValuesDefined } from './utils';
 import useSetting from '../use-setting';
 
-const defaultInputProps = {
-	min: 0,
-};
-
 export default function SpacingSizesControl( {
-	inputProps = defaultInputProps,
+	inputProps,
 	onChange,
 	label = __( 'Spacing Control' ),
 	values,
