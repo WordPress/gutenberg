@@ -108,3 +108,7 @@
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
 }
+
+.editor-styles-wrapper .block-editor-block-list__layout.is-root-container .wp-block-social-links.aligncenter{
+	justify-content: center;
+}
