@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 export const GRID = [
 	[ 'top left', 'top center', 'top right' ],
@@ -11,15 +11,15 @@ export const GRID = [
 
 // Stored as map as i18n __() only accepts strings (not variables)
 export const ALIGNMENT_LABEL = {
-	'top left': __( 'Top Left' ),
+	'top left': ! isRTL() ? __( 'Top Left' ) : __( 'Top Right' ),
 	'top center': __( 'Top Center' ),
-	'top right': __( 'Top Right' ),
-	'center left': __( 'Center Left' ),
+	'top right': ! isRTL() ? __( 'Top Right' ) : __( 'Top Left' ),
+	'center left': ! isRTL() ? __( 'Center Left' ) : __( 'Center Right' ),
 	'center center': __( 'Center Center' ),
-	'center right': __( 'Center Right' ),
-	'bottom left': __( 'Bottom Left' ),
+	'center right': ! isRTL() ? __( 'Center Right' ) : __( 'Center Left' ),
+	'bottom left': ! isRTL() ? __( 'Bottom Left' ) : __( 'Bottom Right' ),
 	'bottom center': __( 'Bottom Center' ),
-	'bottom right': __( 'Bottom Right' ),
+	'bottom right': ! isRTL() ? __( 'Bottom Right' ) : __( 'Bottom Left' ),
 };
 
 // Transforms GRID into a flat Array of values.
