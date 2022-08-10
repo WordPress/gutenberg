@@ -209,7 +209,7 @@ function Navigation( {
 	// - the user is creating a new menu.
 	// - there are no menus to choose from.
 	// This attempts to pick the first menu if there is a single Navigation Post. If more
-	// than 1 exists then no attempt to automatically pick a menu is made.
+	// than 1 exists then use the most recent.
 	// The aim is for the block to "just work" from a user perspective using existing data.
 	useEffect( () => {
 		if (
