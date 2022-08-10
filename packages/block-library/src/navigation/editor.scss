@@ -520,6 +520,7 @@ body.editor-styles-wrapper
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
 // "Delete" to remove the block.
+.wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close {
 	@include break-small() {
 		pointer-events: none;
