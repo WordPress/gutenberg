@@ -33,6 +33,14 @@ import {
 } from './utils';
 import { VStack } from '../v-stack';
 
+// This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
+	! __nextHasNoMarginBottom ? (
+		children
+	) : (
+		<VStack spacing={ 6 } children={ children } />
+	);
+
 function FontSizePicker(
 	{
 		/** Start opting into the new margin-free styles that will become the default in a future version. */
@@ -126,13 +134,6 @@ function FontSizePicker(
 		return null;
 	}
 
-	const MaybeVstack = ( { children } ) =>
-		! __nextHasNoMarginBottom ? (
-			children
-		) : (
-			<VStack spacing={ 6 } children={ children } />
-		);
-
 	// This is used for select control only. We need to add support
 	// for ToggleGroupControl.
 	const currentFontSizeSR = sprintf(
@@ -180,7 +181,7 @@ function FontSizePicker(
 					</FlexItem>
 				) }
 			</Flex>
-			<MaybeVstack>
+			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
 				<div
 					className={ classNames( `${ baseClassName }__controls`, {
 						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
@@ -306,7 +307,7 @@ function FontSizePicker(
 						max={ 100 }
 					/>
 				) }
-			</MaybeVstack>
+			</MaybeVStack>
 		</fieldset>
 	);
 }
