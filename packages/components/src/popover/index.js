@@ -351,7 +351,9 @@ const Popover = (
 				},
 			};
 		} else if ( anchorRefFallback.current ) {
-			resultingReferenceRef = anchorRefFallback.current;
+			// If no explicit ref is passed via props, fall back to
+			// anchoring to the popover's parent node.
+			resultingReferenceRef = anchorRefFallback.current.parentNode;
 		}
 
 		if ( ! resultingReferenceRef ) {

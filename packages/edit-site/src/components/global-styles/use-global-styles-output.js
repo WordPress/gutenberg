@@ -10,7 +10,6 @@ import {
 	pickBy,
 	reduce,
 	set,
-	startsWith,
 } from 'lodash';
 
 /**
@@ -22,7 +21,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
@@ -50,7 +49,8 @@ function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+
+	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
 		const variable = uncompiledValue
 			.slice( VARIABLE_REFERENCE_PREFIX.length )
 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
@@ -789,9 +789,6 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 export function useGlobalStylesOutput() {
-	const [ stylesheets, setStylesheets ] = useState( [] );
-	const [ settings, setSettings ] = useState( {} );
-	const [ svgFilters, setSvgFilters ] = useState( {} );
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
@@ -801,9 +798,9 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
-	useEffect( () => {
+	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
-			return;
+			return [];
 		}
 
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
@@ -819,7 +816,7 @@ export function useGlobalStylesOutput() {
 			disableLayoutStyles
 		);
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
-		setStylesheets( [
+		const stylesheets = [
 			{
 				css: customProperties,
 				isGlobalStyles: true,
@@ -828,15 +825,13 @@ export function useGlobalStylesOutput() {
 				css: globalStyles,
 				isGlobalStyles: true,
 			},
-		] );
-		setSettings( mergedConfig.settings );
-		setSvgFilters( filters );
+		];
+
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
 	] );
-
-	return [ stylesheets, settings, svgFilters, hasBlockGapSupport ];
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { camelCase, snakeCase } = require( 'change-case' );
+const { pascalCase, snakeCase } = require( 'change-case' );
 
 /**
  * Internal dependencies
@@ -13,10 +13,6 @@ const initWPEnv = require( './init-wp-env' );
 const { code, info, success } = require( './log' );
 const { writeOutputAsset, writeOutputTemplate } = require( './output' );
 const { getMessage } = require( './messaging' );
-
-function upperFirst( str ) {
-	return str.charAt( 0 ).toUpperCase() + str.substr( 1 );
-}
 
 module.exports = async (
 	{ blockOutputTemplates, pluginOutputTemplates, outputAssets },
@@ -64,7 +60,7 @@ module.exports = async (
 		namespaceSnakeCase: snakeCase( namespace ),
 		slug,
 		slugSnakeCase: snakeCase( slug ),
-		slugPascalCase: upperFirst( camelCase( slug ) ),
+		slugPascalCase: pascalCase( slug ),
 		title,
 		description,
 		dashicon,
