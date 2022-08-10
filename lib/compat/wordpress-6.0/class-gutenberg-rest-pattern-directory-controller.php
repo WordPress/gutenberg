@@ -92,7 +92,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 					sprintf(
 					/* translators: %s: Support forums URL. */
 						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'gutenberg' ),
-						__( 'https://wordpress.org/support/forums/', 'gutenberg' )
+						esc_url( 'https://wordpress.org/support/forums/' )
 					),
 					array(
 						'response' => wp_remote_retrieve_body( $wporg_response ),
