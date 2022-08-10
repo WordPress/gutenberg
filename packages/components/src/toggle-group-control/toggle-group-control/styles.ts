@@ -27,7 +27,7 @@ export const ToggleGroupControl = ( {
 
 	${ toggleGroupControlSize( size ) }
 
-		&:focus-within {
+	&:focus-within {
 		border-color: ${ COLORS.ui.borderFocus };
 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
 		outline: none;
