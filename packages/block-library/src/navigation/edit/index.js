@@ -283,7 +283,7 @@ function Navigation( {
 	// "loading" state:
 	// - there is a menu creation process in progress.
 	// - there is a classic menu conversion process in progress.
-	// OR
+	// OR:
 	// - there is a ref attribute pointing to a Navigation Post
 	// - the Navigation Post isn't available (hasn't resolved) yet.
 	const isLoading =
