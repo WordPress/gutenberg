@@ -427,9 +427,10 @@ test.describe( 'Copy/cut/paste', () => {
 			html: '<span style="border: 1px solid black">x</span>',
 		} );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
-		// Expect the span to be filtered out.
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
-		).toBe( 'axb' );
+		).toBe( 'axyb' );
 	} );
 } );
