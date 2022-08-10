@@ -95,13 +95,16 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
 	if ( presetValue === undefined ) {
 		return 0;
 	}
-
-	const slug = getSpacingPresetSlug( presetValue );
+	const slug =
+		parseInt( presetValue, 10 ) === 0
+			? '0'
+			: getSpacingPresetSlug( presetValue );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
 		return spacingSize.slug === slug;
 	} );
 
-	return sliderValue !== -1 ? sliderValue : 0;
+	// Returning NaN rather than undefined as undefined makes range control thumb sit in center
+	return sliderValue !== -1 ? sliderValue : NaN;
 }
 
 export const LABELS = {

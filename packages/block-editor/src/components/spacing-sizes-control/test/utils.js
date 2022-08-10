@@ -66,8 +66,8 @@ describe( 'getSliderValueFromPreset', () => {
 		{ name: 'Small', slug: 20, size: '8px' },
 		{ name: 'Large', slug: 30, size: '24px' },
 	];
-	it( 'should return 0 if no matching preset found', () => {
-		expect( getSliderValueFromPreset( '10px', spacingSizes ) ).toBe( 0 );
+	it( 'should return NaN if no matching preset found - NaN makes range control go to start', () => {
+		expect( getSliderValueFromPreset( '10px', spacingSizes ) ).toBe( NaN );
 	} );
 	it( 'should return the int value of the slug portion of a valid preset var', () => {
 		expect(
