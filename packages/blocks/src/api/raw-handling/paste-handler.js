@@ -30,6 +30,7 @@ import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
+import slackParagraphCorrector from './slack-paragraph-corrector';
 
 /**
  * Browser dependencies
@@ -189,6 +190,7 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser,
 				divNormaliser,
+				slackParagraphCorrector,
 			];
 
 			const schema = {
