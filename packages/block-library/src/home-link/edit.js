@@ -6,9 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -31,6 +35,8 @@ export default function HomeEdit( {
 		},
 		[ clientId ]
 	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const { textColor, backgroundColor, style } = context;
 	const blockProps = useBlockProps( {
@@ -50,6 +56,7 @@ export default function HomeEdit( {
 
 	useEffect( () => {
 		if ( label === undefined ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { label: __( 'Home' ) } );
 		}
 	}, [ clientId, label ] );
