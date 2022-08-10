@@ -150,6 +150,9 @@ export function pasteHandler( {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
+
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
@@ -190,7 +193,6 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser,
 				divNormaliser,
-				slackParagraphCorrector,
 			];
 
 			const schema = {
