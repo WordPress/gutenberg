@@ -18,23 +18,15 @@ import { useEffect } from '@wordpress/element';
 
 const preventDefault = ( event ) => event.preventDefault();
 
-export default function HomeEdit( {
-	attributes,
-	setAttributes,
-	context,
-	clientId,
-} ) {
-	const { homeUrl } = useSelect(
-		( select ) => {
-			const {
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			return {
-				homeUrl: getUnstableBase()?.home,
-			};
-		},
-		[ clientId ]
-	);
+export default function HomeEdit( { attributes, setAttributes, context } ) {
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -59,7 +51,7 @@ export default function HomeEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { label: __( 'Home' ) } );
 		}
-	}, [ clientId, label ] );
+	}, [ label ] );
 
 	return (
 		<>
