@@ -87,12 +87,22 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	} ) );
 }
 
-function getToggleGroupOptions( optionsArray ) {
+/**
+ * Build options for the toggle group options.
+ *
+ * @param {Array}    optionsArray An array of font size options.
+ * @param {string[]} labelAliases An array of alternative labels.
+ * @return {Array}   Remapped optionsArray.
+ */
+export function getToggleGroupOptions(
+	optionsArray,
+	labelAliases = FONT_SIZES_ALIASES
+) {
 	return optionsArray.map( ( { slug, size, name }, index ) => {
 		return {
 			key: slug,
 			value: size,
-			label: FONT_SIZES_ALIASES[ index ],
+			label: labelAliases[ index ] || size,
 			name,
 		};
 	} );
