@@ -209,7 +209,7 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( piece );
+			return htmlToBlocks( piece, pasteHandler );
 		} )
 		.flat()
 		.filter( Boolean );
