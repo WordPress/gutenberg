@@ -30,9 +30,8 @@ export default function normaliseBlocks( HTML ) {
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
-				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {
+				if ( node.nextSibling ) {
 					accu.appendChild( accuDoc.createElement( 'P' ) );
-					decu.removeChild( node.nextSibling );
 				}
 
 				// Don't append to an empty paragraph.
