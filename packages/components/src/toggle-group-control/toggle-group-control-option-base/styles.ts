@@ -77,8 +77,8 @@ export const isIcon = ( {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => {
 	const iconButtonSizes = {
-		default: '32px',
-		'__unstable-large': '36px',
+		default: '30px',
+		'__unstable-large': '34px',
 	};
 
 	return css`
