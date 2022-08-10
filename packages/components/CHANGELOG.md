@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.17.0 (2022-08-10)
+
 ### Bug Fix
 
 -   `Popover`: make sure that `ownerDocument` is always defined ([#42886](https://github.com/WordPress/gutenberg/pull/42886)).
