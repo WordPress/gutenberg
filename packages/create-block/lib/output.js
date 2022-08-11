@@ -13,9 +13,9 @@ const writeOutputAsset = async ( inputFile, outputFile, view ) => {
 };
 
 const writeOutputTemplate = async ( inputFile, outputFile, view ) => {
-	const outputFilePath = ! view.plugin
-		? outputFile
-		: join( view.slug, outputFile.replace( /\$slug/g, view.slug ) );
+	const outputFilePath = view.plugin
+		? join( view.slug, outputFile.replace( /\$slug/g, view.slug ) )
+		: outputFile;
 	await makeDir( dirname( outputFilePath ) );
 	writeFile( outputFilePath, render( inputFile, view ) );
 };

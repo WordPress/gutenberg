@@ -34,9 +34,9 @@ async function initBlockJSON( {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
 
-	const outputFile = ! plugin
-		? join( process.cwd(), slug, 'block.json' )
-		: join( process.cwd(), slug, folderName, 'block.json' );
+	const outputFile = plugin
+		? join( process.cwd(), slug, folderName, 'block.json' )
+		: join( process.cwd(), slug, 'block.json' );
 	await makeDir( dirname( outputFile ) );
 	await writeFile(
 		outputFile,
@@ -69,9 +69,9 @@ async function initBlockJSON( {
 module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
-			const pathName = ! view.plugin
-				? join( process.cwd(), view.slug, outputFile )
-				: join( view.folderName, outputFile );
+			const pathName = view.plugin
+				? join( view.folderName, outputFile )
+				: join( process.cwd(), view.slug, outputFile );
 
 			await writeOutputTemplate(
 				outputTemplates[ outputFile ],
