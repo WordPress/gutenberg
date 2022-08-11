@@ -27,7 +27,7 @@ export default {
 	argTypes: {
 		__experimentalIsIconGroup: { control: { type: 'boolean' } },
 		size: {
-			control: 'select',
+			control: 'radio',
 			options: [ 'default', '__unstable-large' ],
 		},
 	},
