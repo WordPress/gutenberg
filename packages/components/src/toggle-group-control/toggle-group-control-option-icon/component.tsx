@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
  *
  * function Example() {
  *	return (
- *		<ToggleGroupControl label="my label" value="vertical" isBlock>
+ *		<ToggleGroupControl __experimentalIsIconGroup>
  *			<ToggleGroupControlOptionIcon
  *				value="uppercase"
  *				label="Uppercase"
