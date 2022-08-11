@@ -19,7 +19,18 @@ const CUSTOM_FONT_SIZE_OPTION = {
  * alias as a label of the font size. The label assumes that the font sizes
  * are ordered accordingly - from smallest to largest.
  */
-const FONT_SIZES_ALIASES = [ 'S', 'M', 'L', 'XL', 'XXL' ];
+const FONT_SIZES_ALIASES = [
+	/* translators: S stands for 'small' and is a size label. */
+	__( 'S' ),
+	/* translators: M stands for 'medium' and is a size label. */
+	__( 'M' ),
+	/* translators: L stands for 'large' and is a size label. */
+	__( 'L' ),
+	/* translators: XL stands for 'extra large' and is a size label. */
+	__( 'XL' ),
+	/* translators: XXL stands for 'extra extra large' and is a size label. */
+	__( 'XXL' ),
+];
 
 /**
  * Helper util to split a font size to its numeric value
@@ -54,10 +65,10 @@ export function isSimpleCssValue( value ) {
  * Return font size options in the proper format depending
  * on the currently used control (select, toggle group).
  *
- * @param {boolean}  useSelectControl               Whether to use a select control.
- * @param {Object[]} optionsArray                   Array of available font sizes objects.
- * @param {*}        disableCustomFontSizes         Flag that indicates if custom font sizes are disabled.
- * @return {Object[]|null} Array of font sizes in proper format for the used control.
+ * @param {boolean}  useSelectControl       Whether to use a select control.
+ * @param {Object[]} optionsArray           Array of available font sizes objects.
+ * @param {boolean}  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
+ * @return {Object[]|null}                  Array of font sizes in proper format for the used control.
  */
 export function getFontSizeOptions(
 	useSelectControl,

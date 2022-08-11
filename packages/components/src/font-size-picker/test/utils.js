@@ -105,11 +105,6 @@ describe( 'getToggleGroupOptions', () => {
 				size: '5',
 				name: '5',
 			},
-			{
-				slug: '6',
-				size: '6px',
-				name: '6',
-			},
 		];
 		expect(
 			getToggleGroupOptions( optionsArray, [
@@ -149,12 +144,6 @@ describe( 'getToggleGroupOptions', () => {
 				value: '5',
 				label: 'XXL',
 				name: '5',
-			},
-			{
-				key: '6',
-				value: '6px',
-				label: '6px',
-				name: '6',
 			},
 		] );
 	} );
