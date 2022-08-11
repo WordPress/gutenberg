@@ -26,6 +26,7 @@ export default {
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
 		__experimentalIsIconGroup: { control: { type: 'boolean' } },
+		__nextHasNoMarginBottom: { control: 'boolean' },
 		size: {
 			control: 'radio',
 			options: [ 'default', '__unstable-large' ],
