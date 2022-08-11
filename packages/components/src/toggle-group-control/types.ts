@@ -12,6 +12,12 @@ import type { FormElementProps } from '../utils/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
+	/**
+	 * Style the option as an icon option.
+	 *
+	 * @default false
+	 */
+	isIcon?: boolean;
 	value: ReactText;
 	/**
 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
@@ -22,9 +28,9 @@ export type ToggleGroupControlOptionBaseProps = {
 	showTooltip?: boolean;
 };
 
-export type ToggleGroupControlOptionIconProps = Omit<
+export type ToggleGroupControlOptionIconProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'children' | 'showTooltip'
+	'value'
 > & {
 	/**
 	 * Icon displayed as the content of the option. Usually one of the icons from
@@ -37,9 +43,9 @@ export type ToggleGroupControlOptionIconProps = Omit<
 	label: string;
 };
 
-export type ToggleGroupControlOptionProps = Omit<
+export type ToggleGroupControlOptionProps = Pick<
 	ToggleGroupControlOptionBaseProps,
-	'children'
+	'value' | 'showTooltip'
 > & {
 	/**
 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
@@ -122,14 +128,15 @@ export type ToggleGroupControlProps = Omit<
 	size?: 'default' | '__unstable-large';
 };
 
-export type ToggleGroupControlContextProps = RadioStateReturn & {
-	/**
-	 * Renders `ToggleGroupControl` as a (CSS) block element.
-	 *
-	 * @default false
-	 */
-	isBlock?: boolean;
-};
+export type ToggleGroupControlContextProps = RadioStateReturn &
+	Pick< ToggleGroupControlProps, 'size' > & {
+		/**
+		 * Renders `ToggleGroupControl` as a (CSS) block element.
+		 *
+		 * @default false
+		 */
+		isBlock?: boolean;
+	};
 
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;

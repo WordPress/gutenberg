@@ -1,4 +1,14 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../ui/context';
@@ -6,12 +16,13 @@ import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 import Icon from '../../icon';
 
-export default function ToggleGroupControlOptionIcon(
+function UnforwardedToggleGroupControlOptionIcon(
 	props: WordPressComponentProps<
 		ToggleGroupControlOptionIconProps,
 		'button',
 		false
-	>
+	>,
+	ref: ForwardedRef< any >
 ) {
 	const { icon, label, ...restProps } = props;
 	return (
@@ -20,6 +31,7 @@ export default function ToggleGroupControlOptionIcon(
 			isIcon
 			aria-label={ label }
 			showTooltip
+			ref={ ref }
 		>
 			<Icon icon={ icon } />
 		</ToggleGroupControlOptionBase>
@@ -30,7 +42,6 @@ export default function ToggleGroupControlOptionIcon(
  * `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a
  * child of `ToggleGroupControl` and displays an icon.
  *
- * @example
  * ```jsx
  *
  * import {
@@ -44,14 +55,21 @@ export default function ToggleGroupControlOptionIcon(
  *		<ToggleGroupControl label="my label" value="vertical" isBlock>
  *			<ToggleGroupControlOptionIcon
  *				value="uppercase"
+ *				label="Uppercase"
  *				icon={ formatUppercase }
  *			/>
  *			<ToggleGroupControlOptionIcon
  *				value="lowercase"
+ *				label="Lowercase"
  *				icon={ formatLowercase }
  *			/>
  *		</ToggleGroupControl>
  *	);
  * }
- ** ```
+ * ```
  */
+export const ToggleGroupControlOptionIcon = forwardRef(
+	UnforwardedToggleGroupControlOptionIcon
+);
+
+export default ToggleGroupControlOptionIcon;

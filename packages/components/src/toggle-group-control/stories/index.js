@@ -23,6 +23,7 @@ import Button from '../../button';
 export default {
 	component: ToggleGroupControl,
 	title: 'Components (Experimental)/ToggleGroupControl',
+	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
 	argTypes: {
 		isBorderless: { control: { type: 'boolean' } },
 		size: {
